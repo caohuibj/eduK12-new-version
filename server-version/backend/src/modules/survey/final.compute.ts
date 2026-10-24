@@ -1,3 +1,4 @@
+import { SURVEY_NATIVE_SJT_PROTOCOL,surveySituationalExecutionProtocol,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { matchRawScoreFeedback } from '../scale/raw-score-feedback'
 import type {SurveyFinalInterpretation} from './final-interpretation.service'
@@ -34,6 +35,7 @@ export interface FrozenUnitResult {
   missing:MissingItem[]
   privateScoring:unknown|null
   childReference?:SurveyCognitiveReference
+  nativeReference?:SurveySituationalReceiptReference
   measurement?:MeasurementResultV1
   /** PRESENT only when the entire frozen tool was not reached by Flow V1. */
   notExecuted?:true
@@ -170,8 +172,8 @@ export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,
   return Object.freeze({snapshot:frozen,
     compute:(input:Record<string,unknown>,assignment?:SurveyFlowAssignment|null,
       clientObservedBlocks?:readonly string[],mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,
-      cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>)=>
-      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults),
+      cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>)=>
+      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults,nativeSituationalResults),
   })
 }
 
@@ -184,7 +186,16 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
 function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
   mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,verifiedDigest?:string,
-  cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>):SurveyComputedFinal{
+  cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>,nativeSituationalResults?:ReadonlyMap<string,FrozenUnitResult>):SurveyComputedFinal{
+  for(const unit of snapshot.units)if(unit.kind==='SJT'||unit.executionProtocol!==undefined)surveySituationalExecutionProtocol(unit)
+  const nativeSituationalResult=(unit:ResearchFrozenUnit,raw:AnswerMap):FrozenUnitResult=>{
+    if(Object.keys(raw).length)invalid('answers.'+unit.instrumentKey,'原生情境化答案只能通过共享工具协议提交')
+    const result=nativeSituationalResults?.get(unit.instrumentKey)
+    if(!result||result.kind!=='SJT'||result.nativeReference?.protocol!==SURVEY_NATIVE_SJT_PROTOCOL
+      ||result.sourceDigest!==unit.sourceDigest||result.scoringDigest!==unit.scoringDigest)
+      invalid('answers.'+unit.instrumentKey,'情境化任务缺少已验证的正式子结果')
+    return result
+  }
   const cognitiveResult=(unit:ResearchFrozenUnit,raw:AnswerMap):FrozenUnitResult=>{
     if(Object.keys(raw).length)invalid('answers.'+unit.instrumentKey,'认知原始试次只能由受控子会话提交')
     const result=cognitiveResults?.get(unit.instrumentKey)
@@ -197,6 +208,7 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
      snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||!snapshot.units.length)
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
   if(snapshot.flow){
+    if(snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL))invalid('publication','原生情境化试点不支持研究级条件流程')
     if(!assignment)invalid('flow.assignment','冻结流程缺少已持久化的实验分配')
     let result
     try{
@@ -246,7 +258,8 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
       }
     }
     if(unit.kind==='SCALE')return scaleResult(unit,raw)
-    if(unit.kind==='SJT')return sjtResult(unit,raw)
+    if(unit.kind==='SJT')return unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+      ?nativeSituationalResult(unit,raw):sjtResult(unit,raw)
     if(unit.kind==='COGNITIVE')return cognitiveResult(unit,raw)
     return invalid('publication','未知研究内容类型')
   })

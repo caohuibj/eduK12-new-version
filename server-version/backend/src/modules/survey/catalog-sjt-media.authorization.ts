@@ -1,3 +1,5 @@
+import { assertSurveyStagedSituationalDefinition } from './situational-native.definition'
+import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { assertAssessmentAssetReferencesReady, AssessmentAssetValidationError } from '../assessment-media/assessment-asset'
@@ -5,7 +7,7 @@ import { lockStoredAssetRows } from '../../services/assetStorage'
 import { SjtAuthorMediaError, SJT_AUTHOR_MEDIA_SCOPE, SJT_AUTHOR_MAX_IMAGE_BYTES, SJT_AUTHOR_RELEASE_MEDIA_REFERENCE_TYPE, sjtAuthorImages } from '../situational/authoring/media'
 import { catalogSnapshotsForDrafts } from './catalog.service'
 import type { LibraryBoundMediaUnit } from '../scale-library-governance/media.authorization'
-import { CatalogSourceError, ONLINE_SJT_ADAPTER_VERSION, type CatalogSourceRef } from './catalog.sources'
+import { CatalogSourceError, ONLINE_SJT_ADAPTER_VERSION, NATIVE_SJT_ADAPTER_VERSION, type CatalogSourceRef } from './catalog.sources'
 
 const fail = (): never => { throw new CatalogSourceError('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED', 403) }
 /** Publication-time proof only. Source and grant locks are acquired by the existing
@@ -15,6 +17,11 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   if (unit.kind !== 'SJT' || !unit.sourceProvenance) return null
   const source = unit.sourceProvenance.source as CatalogSourceRef | undefined
   if (!source || source.kind !== 'SJT' || typeof source.sourceId !== 'string' || typeof source.sourceVersion !== 'string') return fail()
+  if(unit.sourceProvenance.adapterVersion===NATIVE_SJT_ADAPTER_VERSION){
+    // This protocol admits text-only staged definitions; it never transfers an asset.
+    assertSurveyStagedSituationalDefinition(unit.compiledDefinition as SituationRuntimeDefinition)
+    return []
+  }
   let images: ReturnType<typeof sjtAuthorImages>
   try { images = sjtAuthorImages({ templateVersion: 'sjt-online-v1', display: unit.definition }) }
   catch (error) { if (error instanceof SjtAuthorMediaError) return fail(); throw error }

@@ -1,3 +1,5 @@
+import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
+import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -20,12 +22,13 @@ import { compileResearchCognitive, initialCognitiveDefinition, SURVEY_GONOGO_CON
 type Database=Prisma.TransactionClient|PrismaClient
 export const CATALOG_ADAPTER_VERSION='survey-catalog-v1' as const
 export const CANONICAL_SCALE_ADAPTER_VERSION='survey-catalog-scale-v2' as const
+export const NATIVE_SJT_ADAPTER_VERSION='survey-catalog-sjt-native-v1' as const
 export const ONLINE_SJT_ADAPTER_VERSION='survey-catalog-sjt-online-v1' as const
 export type CatalogSourceRef={kind:SurveyKind;sourceId:string;sourceVersion:string;organizationId?:string}
 export type SourceAnswerMapping={type:'SCALE_TYPED_V1';items:Record<string,string>;options:Record<string,string|number>}
 export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefinition:unknown;compiledDefinition:unknown;
-  definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;
-  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
+  definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;nativeSituational?:SurveyNativeSituationalHeader;
+  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION|typeof NATIVE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string}
 const CATALOG_MAX_PAGE=40
 export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
@@ -117,6 +120,18 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
     return {...snapshot(ref,title,d,pkg.online.display,d,canonicalHash(d.scoring),
       {source:d.source,license:d.license,definitionHash:validation.definitionHash}),
       adapterVersion:ONLINE_SJT_ADAPTER_VERSION}
+  }
+  if(d.flow.nodes.some(node=>node.nodeType==='SCENE'&&node.responseStages?.length)){
+    // Native staged tools retain their exact scientific protocol; this descriptor
+    // cannot be submitted through the historical static Survey answer parser.
+    let nativeSituational:SurveyNativeSituationalHeader
+    try{nativeSituational=compileSurveyNativeSituationalHeader(pkg)}
+    catch(error){if(error instanceof SurveySituationalProtocolError)fail(error.code);throw error}
+    return copy({ref,title,compiledDefinition:d,
+      displayDefinition:{schemaVersion:1,executionProtocol:SURVEY_NATIVE_SJT_PROTOCOL,title},
+      definitionDigest:canonicalHash(d),scoringDigest:canonicalHash(d.scoring),
+      adapterVersion:NATIVE_SJT_ADAPTER_VERSION,nativeSituational,
+      provenance:{source:d.source,license:d.license,definitionHash:validation.definitionHash}})
   }
   return adaptLegacyCatalogSjt(ref,title,d,validation.definitionHash)
 }

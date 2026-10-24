@@ -1,3 +1,6 @@
+import {clearSurveySituationalSessions,rememberSurveySituationalSession} from './survey-situational-local'
+import { SurveySituationalUnit } from './SurveySituationalUnit'
+import type { SurveySituationalReference } from './survey-situational-api'
 import {SurveyRandomCodeEntry} from './SurveyRandomCodeEntry'
 import {SurveyMemorableCodeSetup,SurveyMemorableCodeSaved,SurveyMemorableCodeRecovery,type MemorableEnrollment} from './SurveyMemorableCode'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
@@ -44,7 +47,7 @@ type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Cho
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
-type Unit={materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
+type Unit={executionProtocol?:'SITUATIONAL_NATIVE_V1';materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
@@ -307,11 +310,17 @@ export default function SurveyPublicApp(){
   const [cognitiveSessions,setCognitiveSessions]=useState<SurveyCognitiveSessionInfo[]>([])
   const knownCognitiveSessions=useRef(new Map<string,{attemptId:string;researchCode:string}>())
   const rememberCognitive=(parentId:string,childId:string)=>{knownCognitiveSessions.current.set(childId,{attemptId:parentId,researchCode});rememberSurveyCognitiveSession(publicId,parentId,childId,researchCode)}
+  const knownSituationalSessions=useRef(new Map<string,{attemptId:string;researchCode:string}>())
   const clearCognitive=async(parentId?:string)=>{
     const known=[...knownCognitiveSessions.current].filter(([,owner])=>parentId?owner.attemptId===parentId:owner.researchCode===researchCode).map(([id])=>id)
-    return clearSurveyCognitiveSessions(publicId,parentId,known,researchCode||undefined)
+    const nativeIds=[...knownSituationalSessions.current].filter(([,owner])=>parentId?owner.attemptId===parentId:owner.researchCode===researchCode).map(([id])=>id)
+    const results=await Promise.all([clearSurveyCognitiveSessions(publicId,parentId,known,researchCode||undefined),
+      clearSurveySituationalSessions(publicId,parentId,nativeIds,researchCode||undefined)])
+    return results.every(Boolean)
   }
   const [cognitiveReferences,setCognitiveReferences]=useState<SurveyCognitiveReference[]>([])
+  const [situationalReferences,setSituationalReferences]=useState<Record<string,SurveySituationalReference>>({})
+  useEffect(()=>setSituationalReferences({}),[attemptId])
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||cognitiveRunning||!task.units.some(unit=>unit.kind==='COGNITIVE'))return
     return scheduleParticipantIdle(()=>{void prepareSurveyCognitive().catch(()=>{/* the task retains its normal loading/error path */})})
@@ -326,7 +335,7 @@ export default function SurveyPublicApp(){
   const serverLockedKeys=useRef(new Set<string>())
   const finalRequest=useRef<{attemptId:string;path:string;
     body:{accessCredential:string;researchCode?:string;submissionId:string;answers:Record<string,Record<string,Answer>>;
-      itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[]}}|null>(null)
+      itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[];situationalReferences?:SurveySituationalReference[]}}|null>(null)
   const finalInFlight=useRef(false)
   const completedAttempts=useRef(new Set<string>())
   const [completion,setCompletion]=useState<{attemptId:string;proof:{accessCredential:string;researchCode?:string}}|null>(null)
@@ -362,6 +371,7 @@ export default function SurveyPublicApp(){
         saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,sealed.body.answers,
           sealed.body.itemTimings,{submissionId:sealed.body.submissionId,screenOut:sealed.path.endsWith('/screen-out'),
             ...(sealed.body.presentation?{presentation:sealed.body.presentation}:{}),
+            ...(sealed.body.situationalReferences?{situationalReferences:sealed.body.situationalReferences}:{}),
             ...(sealed.body.cognitiveReferences?{cognitiveReferences:sealed.body.cognitiveReferences}:{})})
         return
       }
@@ -634,6 +644,7 @@ export default function SurveyPublicApp(){
         submissionId:savedFinal.submissionId,answers:restoredAnswers,
         ...(saved.itemTimings?{itemTimings:restoredTimings}:{}),
         ...(savedFinal.presentation?{presentation:savedFinal.presentation}:{}),
+        ...(savedFinal.situationalReferences?{situationalReferences:savedFinal.situationalReferences}:{}),
         ...(savedFinal.cognitiveReferences?{cognitiveReferences:savedFinal.cognitiveReferences}:{})}}:null
     setFinalSealed(!!savedFinal);setCompletion(null)
     setAttemptId(id);setSubmissionId(savedFinal?.submissionId??crypto.randomUUID())
@@ -705,6 +716,7 @@ export default function SurveyPublicApp(){
     const incomplete=(itemKey?:string)=>{if(focusMissing&&flowUnit)revealAnswer(flowUnit,itemKey);return false}
     if(cognitiveRunning)return false
     if(!flowUnit)return true
+    if(flowUnit.executionProtocol==='SITUATIONAL_NATIVE_V1')return !!situationalReferences[flowUnit.instrumentKey]||incomplete()
     if(flowUnit.kind==='COGNITIVE')return cognitiveReferences.some(ref=>ref.slotKey===flowUnit.instrumentKey)||incomplete()
     const existing=own(answers,flowUnit.instrumentKey)??{}
     if(flowUnit.kind==='FORM'){
@@ -747,7 +759,7 @@ export default function SurveyPublicApp(){
   const advanceFlow=()=>{
     if(!canAdvanceFlow(true)){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
     setError('')
-    if(flowUnit&&flowUnit.kind!=='COGNITIVE')setLockedAnswers(previous=>({...previous,[flowUnit.instrumentKey]:{...(own(answers,flowUnit.instrumentKey)??{})}}))
+    if(flowUnit&&flowUnit.kind!=='COGNITIVE'&&flowUnit.executionProtocol!=='SITUATIONAL_NATIVE_V1')setLockedAnswers(previous=>({...previous,[flowUnit.instrumentKey]:{...(own(answers,flowUnit.instrumentKey)??{})}}))
     if(currentFlow)setFlowStep(i=>Math.min(i+1,currentFlow.blocks.length-1))
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
     focusStep()
@@ -794,6 +806,11 @@ export default function SurveyPublicApp(){
   })
   const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
   const renderSurveyTaskBody=(unit:Unit)=>{
+    if(unit.executionProtocol==='SITUATIONAL_NATIVE_V1')return <SurveySituationalUnit key={attemptId+':'+unit.instrumentKey}
+      publicId={publicId} attemptId={attemptId} slotKey={unit.instrumentKey} title={unit.title}
+      accessCredential={accessCredential.trim()} researchCode={info?.project.collectionMode==='LINKED_WAVES'?researchCode.trim().toUpperCase():undefined}
+      onStarted={id=>{knownSituationalSessions.current.set(id,{attemptId,researchCode});rememberSurveySituationalSession(publicId,attemptId,id,researchCode||undefined)}}
+      onCommitted={receipt=>setSituationalReferences(old=>({...old,[unit.instrumentKey]:receipt}))}/>
     if(unit.kind==='COGNITIVE')return <Suspense key={unit.instrumentKey} fallback={<p role="status">正在加载认知测评…</p>}><SurveyCognitiveUnit publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
       proof={{accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}
@@ -842,6 +859,7 @@ export default function SurveyPublicApp(){
     {renderSurveyTaskBody(unit)}
   </div>
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current||cognitiveRunning)return;
+    if(!finalSealed&&task.units.some(unit=>unit.executionProtocol==='SITUATIONAL_NATIVE_V1'&&!situationalReferences[unit.instrumentKey])){setNotice('请先完成情境化任务并核实保存回执');return}
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
     }
@@ -885,11 +903,13 @@ export default function SurveyPublicApp(){
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
       ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
+      ...(task.units.some(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1')?{situationalReferences:task.units.filter(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1').flatMap(u=>situationalReferences[u.instrumentKey]?[situationalReferences[u.instrumentKey]]:[])}:{}),
       ...(task.units.some(u=>u.kind==='COGNITIVE')?{cognitiveReferences:cognitiveReferences.filter(ref=>eligible===null||eligible.has(ref.slotKey))}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
       }}
       setFinalSealed(true)
       const descriptor:SurveyFinalSubmission={submissionId,screenOut:!!screened,
+        ...(finalRequest.current.body.situationalReferences?{situationalReferences:finalRequest.current.body.situationalReferences}:{}),
         ...(finalRequest.current.body.cognitiveReferences?{cognitiveReferences:finalRequest.current.body.cognitiveReferences}:{}),
         ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{})}
       if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,payload,
@@ -1230,6 +1250,7 @@ export default function SurveyPublicApp(){
         </fieldset>
         {finalSealed&&<p role="status" className={message('')}>本次答案已封存，尚未确认提交结果。请使用下方按钮重试原提交，不会创建另一份答卷；暂不能修改答案，请勿刷新或关闭页面。</p>}
         {finalSubmitVisible&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+          if(unit.executionProtocol==='SITUATIONAL_NATIVE_V1')return !!situationalReferences[unit.instrumentKey]
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})

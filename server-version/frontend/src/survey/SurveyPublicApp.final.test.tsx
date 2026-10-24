@@ -7,6 +7,9 @@ import * as scaleTiming from './survey-scale-timing'
 import * as cognitiveLocal from './survey-cognitive-local'
 import * as localDraft from './local-answer-draft'
 
+vi.mock('./SurveySituationalUnit',()=>({SurveySituationalUnit:({onCommitted}:{onCommitted:(receipt:unknown)=>void})=>
+  <button type="button" onClick={()=>onCommitted({protocol:'SITUATIONAL_NATIVE_V1',attemptId:'44444444-4444-4444-8444-444444444444',submissionId:'55555555-5555-4555-8555-555555555555',payloadHash:'c'.repeat(64)})}>核实原生情境化保存回执</button>}))
+
 const publicId='11111111-1111-4111-8111-111111111111'
 const attemptId='22222222-2222-4222-8222-222222222222'
 const draftKey=`huisurvey:v1:unfinished:${publicId}:${attemptId}`
@@ -690,4 +693,19 @@ it('fetches currently authorized raw feedback on first successful FINAL instead 
   expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
   expect(generalCalls()).toHaveLength(1)
   expect(screen.queryByText(receiptText)).toBeNull()
+})
+
+it('keeps an unfinished native SJT mounted before a timed scale until its server receipt is verified',async()=>{
+  taskOverrides={units:[{kind:'SJT',instrumentKey:'native',title:'分阶段情境化',executionProtocol:'SITUATIONAL_NATIVE_V1'},...task.units]}
+  render(<SurveyPublicApp/>)
+  fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+  const accepted=await screen.findByRole('button',{name:'核实原生情境化保存回执'})
+  const next=screen.getByRole('button',{name:/下一部分/})
+  fireEvent.click(next)
+  expect(screen.getByRole('button',{name:'核实原生情境化保存回执'})).toBeInTheDocument()
+  expect(screen.queryByRole('radio',{name:'同意'})).toBeNull()
+  fireEvent.click(accepted);fireEvent.click(next)
+  fireEvent.click(await screen.findByRole('radio',{name:'同意'}));submit()
+  await waitFor(()=>expect(finalCalls).toHaveLength(1))
+  expect(finalCalls[0].situationalReferences).toEqual([{protocol:'SITUATIONAL_NATIVE_V1',attemptId:'44444444-4444-4444-8444-444444444444',submissionId:'55555555-5555-4555-8555-555555555555',payloadHash:'c'.repeat(64)}])
 })

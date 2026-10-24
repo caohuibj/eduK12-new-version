@@ -123,6 +123,8 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focus
       {q.type==='NUMBER'&&<BasicFormAnswer question={{...q,prompt:q.prompt||'数值回答'}} className="input block" value={typeof answers[q.itemKey]==='number'?answers[q.itemKey] as number:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}
     </fieldset>
   }
+  if(draft.kind==='SJT'&&(draft.definition as {executionProtocol?:unknown}).executionProtocol==='SITUATIONAL_NATIVE_V1')
+    return <section aria-label="原生情境化工具编排预览"><h4>{draft.title}</h4><p>本工具使用与 Training 相同的分阶段情境化运行器和计分协议。此编排预览不模拟正式阶段事件、不计分；正式参与时将展示阶段记录说明，并分别确认工具保存与整轮提交。</p></section>
   return <section ref={previewRoot} className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
     {(draft.definition as {materials?:AssessmentMaterial[]}).materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}
     <div><h3 className="text-lg font-semibold">模拟作答（不保存正式数据）</h3>

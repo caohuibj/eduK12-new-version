@@ -104,6 +104,8 @@ export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:st
   return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind:snapshot.ref.kind,title:draft.title,
     draftRevision:draft.revision,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,
     compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,
+    ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,
+      nativeSituational:snapshot.nativeSituational}:{}),
     sourceProvenance:{...snapshot.provenance,originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
       adapterVersion:snapshot.adapterVersion},...(snapshot.answerMapping?{sourceAnswerMapping:snapshot.answerMapping}:{})}
 }

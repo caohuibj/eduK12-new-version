@@ -187,3 +187,23 @@ describe('Independent stored interpretation export uses the existing ticket life
     expect(()=>decodeSurveyExportCursor(created.nextCursor!,projectId,'SCORE_LONG',waveId)).toThrow()
   })
 })
+
+
+describe('native SJT raw export uses existing explicit sensitive text option',()=>{
+  it.each([false,true])('includes stage originals and free text only when includeFreeText=%s',async includeFreeText=>{
+    database()
+    const types=['SJT_NATIVE_SINGLE_CHOICE','SJT_NATIVE_FREE_TEXT','SJT_NATIVE_RAW_JSON']
+    const values=['ordinary-choice','private-native-text','private-native-original']
+    const raw=types.map((responseType,i)=>({projectId,waveId,waveOrdinal:1,attemptId:'parent',researchCode:null,
+      sourceFinalHash:sourceHash,instrumentKey:'staged',kind:'SJT' as const,responseType,itemKey:'item'+i,
+      columnKey:'native'+i,publicationVersion:1,value:values[i],missingReason:null,completedAt:instant,sourceVerified:true as const}))
+    const codebook=types.map((responseType,i)=>({waveId,waveOrdinal:1,instrumentKey:'staged',kind:'SJT' as const,responseType,
+      itemKey:'item'+i,columnKey:'native'+i,publicationVersion:1,instrumentRevision:1,definitionDigest:'digest',
+      scoringDigest:'score',title:'staged',prompt:'item',options:[]}))
+    vi.mocked(loadSurveySource).mockResolvedValue({...source(0,null,firstFinal,false),raw,codebook})
+    const ticket=await createSurveyExport(req,{projectId,waveId,format:'RAW_WAVE',includeFreeText})
+    const result=await downloadSurveyExport(req,{projectId,exportId:ticket.id})
+    expect(result.csv).toContain('ordinary-choice')
+    for(const value of values.slice(1))expect(result.csv.includes(value)).toBe(includeFreeText)
+  })
+})

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { sjtMeasurementRelease } from '../../measurement-content/sjt'
 import { publishContentRelease } from '../../measurement-content/repository'
 import { Prisma } from '@prisma/client'
@@ -269,8 +270,19 @@ export async function reviewSjtDraft(
           },
         })
         if (existing) throw problem('该版本已存在，请增加内容版本')
+        // Bind both immutable records at INSERT; the published release trigger
+        // deliberately rejects a later measurement pointer UPDATE.
+        const releaseId = randomUUID()
+        const contentRelease = await publishContentRelease(tx, sjtMeasurementRelease({
+          localId: pkg.key, version: pkg.instrumentVersion, instrumentVersion: pkg.instrumentVersion,
+          definition: pkg.definition, onlineProtocol: pkg.online,
+          scope: { kind: 'PLATFORM', ownerId: draft.ownerId },
+          provenance: { authorReleaseId: releaseId, adaptationSource: draft.adaptationSource ?? null },
+        }), actor.userId)
         const release = await tx.sjtAuthorRelease.create({
           data: {
+            id: releaseId,
+            measurementReleaseId: contentRelease.releaseId,
             instrumentKey: pkg.key,
             instrumentVersion: pkg.instrumentVersion,
             sourceDraftId: id,
@@ -283,13 +295,7 @@ export async function reviewSjtDraft(
           },
         })
         await retainSjtAuthorReleaseMedia(tx, draft.ownerId, release.id, c.template, mediaOptions)
-        const contentRelease = await publishContentRelease(tx, sjtMeasurementRelease({
-          localId: pkg.key, version: pkg.instrumentVersion, instrumentVersion: pkg.instrumentVersion,
-          definition: pkg.definition, onlineProtocol: pkg.online,
-          scope: { kind: 'PLATFORM', ownerId: draft.ownerId },
-          provenance: { authorReleaseId: release.id, adaptationSource: draft.adaptationSource ?? null },
-        }), actor.userId)
-        await tx.$executeRaw`UPDATE sjt_author_releases SET measurement_release_id=${contentRelease.releaseId} WHERE id=${release.id}`
+
       }
       await tx.sjtAuthorDraft.update({
         where: { id },

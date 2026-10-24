@@ -1,3 +1,4 @@
+import { isResearchFreeTextType } from './analytics.response-privacy'
 import {rejectPooledVariants} from './analytics.variant'
 import {loadSurveySource} from './analytics.source'
 import {pairedDescriptive,type FrozenScoreObservation} from './analytics.cohorts'
@@ -102,7 +103,7 @@ export async function describeSurveyWaveItemPaged(input:{
       if(dict.length!==1)
         throw new SurveyAnalyticsError(400,'逐题统计目标须来自唯一冻结研究项目/波次/工具/题目')
       const target=dict[0]
-      if(['SHORT_TEXT','LONG_TEXT','OTHER_TEXT'].includes(target.responseType))
+      if(isResearchFreeTextType(target.responseType))
         throw new SurveyAnalyticsError(403,'敏感自由文本不进入自动逐题汇总')
       columnKey=target.columnKey;prompt=target.prompt;responseType=target.responseType
       optionCodes=target.options.map(o=>o.code)

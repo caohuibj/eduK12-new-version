@@ -315,8 +315,8 @@ type DerivedSituationalFinal = ReturnType<typeof deriveSituationalFinalFacts>
 /** Internal authority adapter. Construct only AFTER acquiring parent/flow locks
  * in this transaction. No method may acquire an ancestor lock after child lock.
  * Survey is deliberately not an accepted kind until its real adapter exists. */
-type LockedSituationalFinalHost = {
-  kind: 'TRAINING'
+export type LockedSituationalFinalHost = {
+  kind: 'TRAINING' | 'SURVEY'
   assertLockedAuthority: (row: SituationalAttemptCommitRow) => void | Promise<void>
   assertReplayAdmission: (replayed: boolean) => void
   persistProjection: (tx: Prisma.TransactionClient, row: SituationalAttemptCommitRow, facts: DerivedSituationalFinal) => Promise<void>
@@ -324,14 +324,15 @@ type LockedSituationalFinalHost = {
 
 /** One facts writer, on the caller's existing transaction. There is no optional
  * authorization hook and no nested transaction or alternative scoring engine. */
-async function commitPreparedSituationalFinal(tx: Prisma.TransactionClient, input: SituationalFinalSubmitServiceInput,
+export async function commitPreparedSituationalFinal(tx: Prisma.TransactionClient, input: SituationalFinalSubmitServiceInput,
   prepared: PreparedSituationalFinal, derived: DerivedSituationalFinal, host: LockedSituationalFinalHost) {
   const { row, snapshot, submissionId, payloadHash } = prepared
   const { rawPayload, encryptedRawPayload, encryptedResult, encryptedCanonicalResult, completedAt, totalTime } = derived
   await lockSituationalAttempt(tx, input.attemptId)
   const current = await transactionRow(tx, input.attemptId)
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
-  if (host.kind !== 'TRAINING' || current.surveyAttemptId != null) {
+  if (host.kind === 'TRAINING' ? current.surveyAttemptId != null
+    : host.kind !== 'SURVEY' || current.surveyAttemptId == null || current.userId != null || current.compositeAttemptId != null) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评宿主不匹配', 403)
   }
   await host.assertLockedAuthority(current)

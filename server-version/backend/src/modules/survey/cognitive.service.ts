@@ -11,10 +11,10 @@ import { prepareAuthoritativeScorerContext,runPreparedAuthoritativeScorer } from
 import { createUnifiedCognitiveRawSubmissionPayload } from '../cognitive/unified-raw-submission'
 import { getAssessmentOperationalHold } from '../assessment-governance/operational-hold'
 import { verifiedSurveyAttempt } from './admission.service'
-import { hashResearchCredential } from './identity.service'
+import { lockSurveyTaskAccess } from './task-authority'
+import { ensureSurveyFlowAssignment } from './flow.assignment'
 import { validateSurveyUnitAnswers } from './final.compute'
 import { evaluateFlowCondition,staticFlowValues } from './flow.definition'
-import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
 import { parseFrozenSurveyCognitive,surveyCognitiveTaskDefinition,type FrozenSurveyCognitive } from './cognitive.definition'
 import { cognitiveFail,assertSurveyCognitiveLockedAnswers,surveyCognitiveResultReference,
@@ -32,49 +32,9 @@ const assertDevice=(input:unknown):AdministrationProvenanceV1=>{
     cognitiveFail(400,'本试点只支持桌面或笔记本电脑键盘作答')
   return value
 }
-/** All mutating and participant-read paths share the existing Survey lock order.
- * The Project SHARE serializes revocation/withdrawal; Wave SHARE serializes HARD_STOP.
- * Holding Attempt UPDATE serializes starts, restarts, child FINAL and parent FINAL. */
-async function lockAccess(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowCompleted=false){
-  await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${known.projectId} FOR SHARE`
-  await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
-  await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${known.attemptId}
-    AND project_id=${known.projectId} AND wave_id=${known.waveId} FOR UPDATE`
-  const attempt=await tx.surveyWaveAttempt.findFirst({where:{
-    id:known.attemptId,projectId:known.projectId,waveId:known.waveId,
-  },include:{wave:{include:{publication:true}}}})
-  if(!attempt||attempt.participantId!==known.participantId||attempt.excludedAt!==null
-    ||!(allowCompleted?['STARTED','COMPLETED']:['STARTED']).includes(attempt.status))
-    cognitiveFail(403,'研究作答已经结束、撤回或不属于当前入口')
-  const wave=attempt!.wave,publication=wave.publication
-  if(!publication||publication.id!==known.publicationId||publication.definitionDigest!==known.definitionDigest
-    ||canonicalHash(jsonCopy(publication.compiledSnapshot))!==known.definitionDigest)
-    cognitiveFail(409,'认知任务的冻结研究定义已失效')
-  const end=wave.finishUntil??wave.closesAt
-  if(wave.hardStopAt||!end||end<=new Date())cognitiveFail(403,'研究认知任务完成窗口已经结束')
-  const hash=hashResearchCredential(proof.accessCredential)
-  if(attempt!.participantId){
-    if(!proof.researchCode)cognitiveFail(403,'请提供本人研究编号和私密凭证')
-    await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${attempt!.participantId}
-      AND project_id=${known.projectId} FOR UPDATE`
-    const participant=await tx.surveyParticipant.findFirst({where:{
-      id:attempt!.participantId,projectId:known.projectId,researchCode:proof.researchCode,
-      credentialHash:hash,status:'ACTIVE',credentialRevokedAt:null,
-    },select:{id:true}})
-    if(!participant)cognitiveFail(403,'研究参与凭证已撤回或失效')
-  }else if(attempt!.sessionHash!==hash)cognitiveFail(403,'研究参与凭证无效')
-  const consent=await tx.surveyConsent.findFirst({where:{
-    projectId:known.projectId,waveId:known.waveId,attemptId:known.attemptId,
-    accepted:true,consentVersion:wave.consentVersion,
-  },select:{id:true}})
-  if(!consent)cognitiveFail(403,'当前研究缺少有效的知情同意记录')
-  const snapshot=publication!.compiledSnapshot as unknown as ResearchFrozenPublication
-  const assignment=snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
-    ?await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
-      attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
-      accessCredential:proof.accessCredential,snapshot}):null
-  return {attempt:attempt!,snapshot:assignment?assignedSurveySnapshot(snapshot,assignment):snapshot}
-}
+const lockAccess=(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowCompleted=false)=>
+  lockSurveyTaskAccess(tx,proof,known,{kind:'COGNITIVE',allowCompleted,fail:cognitiveFail})
+
 function frozenUnit(snapshot:ResearchFrozenPublication,slotKey:string):FrozenSurveyCognitive{
   const unit=snapshot.units.find(u=>u.instrumentKey===slotKey&&u.kind==='COGNITIVE')
   if(!unit)cognitiveFail(404,'当前冻结研究中没有这个认知工具')

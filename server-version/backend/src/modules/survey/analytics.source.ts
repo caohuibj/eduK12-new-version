@@ -1,3 +1,6 @@
+import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
+import { frozenSurveyNativeSituationalRuntime } from './situational-native.definition'
+import { loadSurveySituationalResults } from './situational-native.results'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import {decodeSurveyAttemptContentBinding} from './content-binding.service'
 import {checkedStoredSurveyInterpretation,type SurveyStoredInterpretationObservation} from './analytics.interpretation-export'
@@ -152,6 +155,17 @@ const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly
         ...(q.purpose === 'ATTENTION_CHECK' && q.attentionTarget !== undefined
           ? { attentionTarget: q.attentionTarget } : {}) } } : {})})
   }else if(frozen.kind==='SJT'){
+    if(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
+      const {snapshot}=frozenSurveyNativeSituationalRuntime(frozen)
+      for(const scene of snapshot.definition.scenes)for(const channel of scene.channels)
+        add({itemKey:scene.sceneKey+':'+channel.channelKey,prompt:scene.title+'／'+channel.prompt,
+          responseType:'SJT_NATIVE_'+channel.responseType,
+          options:channel.responseType==='SINGLE_CHOICE'?optionsFor(channel.options):emptyOptions,
+          answerKey:scene.sceneKey+':'+channel.channelKey})
+      add({itemKey:'__native_raw',prompt:'正式情境化子提交原件 JSON（含答案及必要阶段事件）',
+        responseType:'SJT_NATIVE_RAW_JSON',options:emptyOptions,answerKey:'__native_raw'})
+      return Object.freeze(output)
+    }
     const draft=frozen.displayDefinition as AnySjtDraft
     if(draft.schemaVersion===1)for(const q of draft.questions)add({itemKey:q.questionKey,prompt:q.prompt,
       responseType:q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',
@@ -244,7 +258,7 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
         :frozen.kind==='SJT'
-          ?(frozen.displayDefinition as AnySjtDraft).respondentType:'research_form',
+          ?(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationDefinitionV2).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType):'research_form',
       unit:provenance?'score':null,
       ...(provenance?{provenance}:{}),
     },
@@ -264,11 +278,11 @@ function storedSjtMetricDetails(record:unknown):FrozenScoreObservation['metricDe
 function sjtProvenance(frozen:ResearchFrozenUnit){
   if(frozen.kind!=='SJT')return undefined
   const draft=frozen.displayDefinition as AnySjtDraft
-  if(draft.schemaVersion!==2)return undefined
+  if(draft.schemaVersion!==2&&frozen.executionProtocol!==SURVEY_NATIVE_SJT_PROTOCOL)return undefined
   const compiled=frozen.compiledDefinition as SituationDefinitionV2
   return {kind:'SJT' as const,measurementDigest:canonicalHash({sourceDigest:frozen.sourceDigest,
     scoringDigest:frozen.scoringDigest}),scoringVersion:compiled.scoring.scoringVersion,
-    scoringMethod:draft.scoring.modelKey}
+    scoringMethod:frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?compiled.scoring.model!.modelKey:(draft as Extract<AnySjtDraft,{schemaVersion:2}>).scoring.modelKey}
 }
 /** The authoritative score variable list is part of the frozen scorer, not
  * inferred from whichever participants happened to finish a Wave.
@@ -290,7 +304,7 @@ function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen
       responseSignature:frozen.sourceDigest,
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
-        :(frozen.displayDefinition as AnySjtDraft).respondentType,
+        :(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationDefinitionV2).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType),
       unit:provenance?'score':null,
       ...(provenance?{provenance}:{}),
     },
@@ -611,15 +625,20 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     if(ids.length||publicationIds.length){
       // Independent scalar subqueries avoid a FINAL × Publication join and
       // retain the original separate limits in one database round trip.
-      const [bytes]=await tx.$queryRaw<Array<{finalCipherBytes:bigint;frozenBytes:bigint;bindingBytes?:bigint}>>(Prisma.sql`
+      const [bytes]=await tx.$queryRaw<Array<{finalCipherBytes:bigint;frozenBytes:bigint;bindingBytes?:bigint;nativeCipherBytes?:bigint}>>(Prisma.sql`
         SELECT ${ids.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint
           FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)}))`:Prisma.sql`0::bigint`} AS "finalCipherBytes",
           ${publicationIds.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint
           FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)}))`:Prisma.sql`0::bigint`} AS "frozenBytes"
+          ${ids.length?Prisma.sql`,(SELECT COALESCE(SUM(COALESCE(octet_length(a.result_encrypted),0)+COALESCE(octet_length(a.canonical_result_encrypted),0)
+            +${input.selectRaw!==false?Prisma.sql`COALESCE(octet_length(r.payload_encrypted),0)`:Prisma.sql`0`}),0)::bigint
+            FROM situational_attempts a JOIN survey_wave_finals f ON f.attempt_id=a.survey_attempt_id AND f.publication_id=a.survey_publication_id
+            LEFT JOIN situational_raw_submissions r ON r.attempt_id=a.id
+            WHERE f.id IN (${Prisma.join(ids)}) AND a.status='COMPLETED') AS "nativeCipherBytes"`:Prisma.empty}
           ${input.includeInterpretation&&ids.length?Prisma.sql`,(SELECT COALESCE(SUM(octet_length(a.content_binding_cipher)),0)::bigint
             FROM survey_wave_attempts a JOIN survey_wave_finals f ON f.attempt_id=a.id WHERE f.id IN (${Prisma.join(ids)})) AS "bindingBytes"`:Prisma.empty}
       `)
-      if((bytes?.finalCipherBytes??0n)>BigInt(8*1024*1024)||(bytes?.frozenBytes??0n)>BigInt(8*1024*1024)||(bytes?.bindingBytes??0n)>BigInt(8*1024*1024))
+      if((bytes?.finalCipherBytes??0n)+(bytes?.nativeCipherBytes??0n)>BigInt(8*1024*1024)||(bytes?.frozenBytes??0n)>BigInt(8*1024*1024)||(bytes?.bindingBytes??0n)>BigInt(8*1024*1024))
         throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
     }
     // Stage 2: fetch bounded bytes, and load each frozen Publication only
@@ -961,6 +980,21 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       }
       for(let parentIndex=0;parentIndex<preparedFinals.length;parentIndex++){
         const {final,wave,publication,snapshot,result,meta}=preparedFinals[parentIndex]
+        const nativeUnits=result.units.filter(unit=>unit.nativeReference)
+        let nativeChildren:Awaited<ReturnType<typeof loadSurveySituationalResults>>=[]
+        if(nativeUnits.length){
+          try{
+            nativeChildren=await prisma.$transaction(async tx=>{
+              await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE`
+              await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${wave.id} AND project_id=${input.projectId} FOR SHARE`
+              await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${final.attempt.id} AND project_id=${input.projectId} AND wave_id=${wave.id} FOR UPDATE`
+              return loadSurveySituationalResults(tx,{surveyAttemptId:final.attempt.id,
+                surveyPublicationId:publication.id,snapshot,references:nativeUnits.map(unit=>unit.nativeReference),
+                includeRaw:input.selectRaw!==false})
+            },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
+          }catch(e){if(e instanceof SurveySituationalProtocolError)invalid('情境化子结果原件不可验证');throw e}
+        }
+        const nativeBySlot=new Map(nativeChildren.map(child=>[child.slotKey,child]))
         const children=childGroups[parentIndex]??[]
         const childrenBySlot=new Map(children.map(child=>[child.reference.slotKey,child]))
         const cognitiveMeta={...meta,publicationId:publication.id,publicationVersion:publication.version,
@@ -977,10 +1011,21 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           flowTermination:flowTrace.termination,
         }:{}
         for(let i=0;i<snapshot.units.length;i++){
-          const frozen=snapshot.units[i],unit=result.units[i]
+          const frozen=snapshot.units[i];let unit=result.units[i]
           if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
             ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
             invalid('研究 FINAL 组件来源与冻结定义不一致')
+          if(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
+            const child=nativeBySlot.get(frozen.instrumentKey)
+            if(!child||Object.keys(unit.rawAnswers).length||unit.notExecuted
+              ||canonicalHash(unit)!==canonicalHash(child.unitResult))invalid('研究情境化 FINAL 与权威子结果不一致')
+            if(input.selectRaw!==false){
+              if(!child.raw)invalid('研究情境化正式原件缺失')
+              const raw=child.raw!
+              unit={...unit,rawAnswers:{...Object.fromEntries(raw.responses.map(response=>[
+                response.sceneKey+':'+response.channelKey,response.responseValue])),__native_raw:JSON.stringify(raw)}}
+            }
+          }
           if(frozen.kind==='COGNITIVE'&&(Object.keys(unit.rawAnswers).length
             ||(unit.notExecuted&&unit.childReference)))invalid('认知整轮 FINAL 不得复制原始试次或引用未呈现的子任务')
           if(frozen.kind==='COGNITIVE'&&unit.notExecuted){

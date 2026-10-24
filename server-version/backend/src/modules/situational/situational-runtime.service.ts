@@ -53,6 +53,8 @@ import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
   surveyAttemptId: true,
+  surveyPublicationId: true,
+  surveySlotKey: true,
   userId: true,
   compositeAttemptId: true,
   compositeItemId: true,

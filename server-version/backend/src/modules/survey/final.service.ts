@@ -1,3 +1,5 @@
+import { loadSurveySituationalResults } from './situational-native.results'
+import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {rawParticipantFeedback} from './participant-feedback'
 import {interpretSurveyFinal} from './final-interpretation.service'
@@ -41,6 +43,7 @@ export interface FinalInput {
   answers:Record<string,unknown>
   itemTimings?:unknown
   cognitiveReferences?:SurveyCognitiveReference[]
+  situationalReferences?:SurveySituationalReceiptReference[]
   presentation?:{shownBlocks:string[]}
 }
 /** No per-item network scoring or database writes; a complete attempt makes
@@ -60,6 +63,7 @@ export async function submitResearchFinal(input:FinalInput){
   const canonical=prepareCanonicalSubmission({
     publicationId:known.publicationId,definitionDigest:known.definitionDigest,
     answers:input.answers,
+    ...(input.situationalReferences!==undefined?{situationalReferences:input.situationalReferences}:{}),
     ...(input.cognitiveReferences!==undefined?{cognitiveReferences:input.cognitiveReferences}:{}),
     ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
@@ -120,7 +124,7 @@ export async function submitResearchFinal(input:FinalInput){
     // must not recover a successful receipt after the Attempt is excluded.
     if(!['STARTED','COMPLETED'].includes(attempt.status)||attempt.excludedAt!==null)
       invalid('这份作答已经关闭或撤回')
-    const hasCognitive=snapshot.units.some(unit=>unit.kind==='COGNITIVE')
+    const hasCognitive=snapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
     // New cognitive parents recheck current consent/window even for receipt
     // replay. Historical noncognitive replay behavior remains unchanged.
     if(hasCognitive){
@@ -165,10 +169,16 @@ export async function submitResearchFinal(input:FinalInput){
         cognitiveResults.set(unit.instrumentKey,cognitiveParentUnit(unit,loaded))
       }
     }
+    const nativeSituationalResults=new Map<string,FrozenUnitResult>()
+    if(snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)||input.situationalReferences?.length){
+      const results=await loadSurveySituationalResults(tx,{surveyAttemptId:attempt.id,
+        surveyPublicationId:publication.id,snapshot:selectedSnapshot,references:input.situationalReferences??[]})
+      for(const loaded of results)nativeSituationalResults.set(loaded.slotKey,loaded.unitResult)
+    }
     let calculated
     try{
       calculated=verified.compute(input.answers,assignment,
-        input.presentation?.shownBlocks,'FINAL',input.itemTimings,cognitiveResults)
+        input.presentation?.shownBlocks,'FINAL',input.itemTimings,cognitiveResults,nativeSituationalResults)
     }catch(e){
       if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)
@@ -178,6 +188,8 @@ export async function submitResearchFinal(input:FinalInput){
     if(reachedCognitive.length!==cognitiveResults.size||
       reachedCognitive.some(unit=>!cognitiveResults.has(unit.instrumentKey)))
       invalid('认知结果引用集合与最终可达路径不一致')
+    const reachedSituational=calculated.units.filter(unit=>unit.nativeReference&&!unit.notExecuted)
+    if(reachedSituational.length!==nativeSituationalResults.size)invalid('情境化结果引用集合与最终路径不一致')
     if(calculated.definitionDigest!==publication.definitionDigest)
       blocked('所提交作答与冻结内容不一致')
     const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
