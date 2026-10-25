@@ -1,4 +1,5 @@
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {standardAxisHashes,standardCombinationHash} from '../measurement-content/standard-combination'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
 import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
@@ -67,10 +68,10 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  }
  const template=parts.REPORT.payload===null?null:reportTemplateSchema.parse({title:source.catalog.identity.canonicalName,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer})
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
- return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:canonicalHash({toolKey:key,CONTENT:parts.CONTENT.hash,PARAMETERS:parts.PARAMETERS.hash,REPORT:parts.REPORT.hash}),blockers:[...new Set(blockers)],reference}
+ return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
 }
 export function tripletSnapshot(triplet:Triplet,releaseId:string,measurement?:{releaseId:string;contentHash:string}):CatalogSourceSnapshot{
  const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE')
  return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
- provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:{CONTENT:triplet.parts.CONTENT.hash,PARAMETERS:triplet.parts.PARAMETERS.hash,REPORT:triplet.parts.REPORT.hash},toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
+ provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:standardAxisHashes(triplet.parts),toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
 }
