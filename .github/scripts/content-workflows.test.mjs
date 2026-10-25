@@ -254,7 +254,18 @@ test('frontend compilation and checks are separate while both remain required',(
   for(const name of ['backend','backend-regression','codeql','frontend-build']) assert.match(job(ci,name),/needs: scope/);
   assert.match(front,/name: lint/);assert.match(front,/name: typecheck/);assert.match(front,/full frontend tests/);
   assert.match(front,/--frontend/);assert.match(front,/3072/);assert.match(front,/mac-ci-cleanup/);
-  assert.doesNotMatch(front,/npm ci --ignore-scripts/);
+  assert.match(front,/defaults:\n      run:\n        working-directory: server-version\/frontend\n/);
+  const steps=front.split('      - ').slice(1).map(step=>step.trimEnd());
+  assert.equal(steps.find(step=>step.startsWith('name: npm ci\n')),
+    'name: npm ci\n        run: npm ci', 'frontend install must retain lifecycle scripts');
+  const backendTypes=steps.find(step=>step.startsWith('name: prepare locked backend dependencies for shared contract types and tests\n'));
+  assert.equal(backendTypes,
+    'name: prepare locked backend dependencies for shared contract types and tests\n'+
+    '        working-directory: server-version/backend\n'+
+    '        run: |\n'+
+    '          npm ci --ignore-scripts\n'+
+    '          npx prisma generate', 'backend type preparation must remain unconditional and contain only locked install plus Prisma generation');
+  assert.doesNotMatch(steps.filter(step=>step!==backendTypes).join('\n'),/npm ci --ignore-scripts/);
   for(const name of ['backend','backend-browser-build']) assert.match(source('ci-'+name),/cognitive-ci-diagnostics\.sh/);
   assert.match(job(ci,'scope'),/head\.repo\.full_name == github\.repository/);
   const diagnostic=fs.readFileSync(new URL('./cognitive-ci-diagnostics.sh',import.meta.url),'utf8');
