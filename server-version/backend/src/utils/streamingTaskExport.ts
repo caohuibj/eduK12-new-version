@@ -166,7 +166,10 @@ export async function writeSnapshotWorkbook(input: string, output: string | Writ
     // through the same cleanup path as workbook generation.
     const { default: ExcelJS } = await guard(import('exceljs'))
     checkConnected()
-    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: destination, useSharedStrings: false, useStyles: true })
+    // Archiver otherwise buffers one MiB independently of the final sink. Bound
+    // that intermediate queue too, so a stalled download stops row production.
+    const zipOptions: Partial<ExcelJS.stream.xlsx.ArchiverZipOptions> & {highWaterMark:number} = {highWaterMark:64*1024}
+    const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: destination, useSharedStrings: false, useStyles: true,zip:zipOptions })
     zip = (workbook as unknown as { zip: NonNullable<typeof zip> }).zip
     zip.on('error', fail)
     const worksheet = workbook.addWorksheet(name.slice(0, 31), { views: [{ state: 'frozen', ySplit: 1 }] })
