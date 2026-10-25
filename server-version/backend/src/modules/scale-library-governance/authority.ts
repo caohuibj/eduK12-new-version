@@ -31,7 +31,7 @@ export async function libraryCapabilities(tx:Prisma.TransactionClient,actorId:st
   const rows=await tx.$queryRaw<Array<{id:string;product:LibraryProduct;resource_keys:string[];capabilities:string[]}>>(Prisma.sql`
     SELECT id,product,resource_keys,capabilities FROM content_capability_grants WHERE subject_id=${actorId}
       AND scope_kind='PLATFORM' AND scope_id=${LIBRARY_SCOPE} AND revoked_at IS NULL
-      AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp() ORDER BY id LIMIT 100`)
+      AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC') ORDER BY id LIMIT 100`)
   const reviewGrants:Array<{grantId:string;releaseIds:string[]}>=[],distributionGrants:Array<{grantId:string;product:LibraryProduct;releaseIds:string[]}>=[]
   for(const row of rows){
     const capability=row.capabilities.includes('catalog.manage')?'catalog.manage':row.capabilities.includes('material.distribute')?'material.distribute':null
