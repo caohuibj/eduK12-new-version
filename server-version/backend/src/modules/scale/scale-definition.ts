@@ -461,7 +461,7 @@ export const validateScaleDefinition = (
     })
   }
 
-  if (definition.license.status === 'self_authored') {
+  if (definition.license.status === 'self_authored' && options.instrumentClass !== 'STANDARD') {
     issues.push({ path: 'license', message: '自有内容将按描述性自定义量表展示', severity: 'warning' })
   }
 

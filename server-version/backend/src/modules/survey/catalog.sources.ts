@@ -1,3 +1,4 @@
+import { registeredSelfAuthoredSourceProof } from '../scale/onboarding/self-authored'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
@@ -429,7 +430,12 @@ export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClien
   const [clock]=await db.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
   if(!clock)fail('SOURCE_SCALE_CLOCK_UNAVAILABLE')
   for(const snapshot of managed){
-    const rights=snapshot.provenance.sourceRights as {validFrom?:string;validTo?:string}|undefined
+    const rights=snapshot.provenance.sourceRights as {basis?:string;sourceHash?:string;validFrom?:string;validTo?:string}|undefined
+    if(rights?.basis==='SELF_AUTHORED_SOURCE'){
+      const code=snapshot.provenance.code
+      if(typeof code!=='string'||!rights.sourceHash||registeredSelfAuthoredSourceProof(code,snapshot.ref.sourceVersion)!==rights.sourceHash)fail('SOURCE_SCALE_AUTHORSHIP_CHANGED')
+      continue
+    }
     const from=Date.parse(rights?.validFrom??''),to=Date.parse(rights?.validTo??'')
     if(!Number.isFinite(from)||!Number.isFinite(to)||clock.now.getTime()<from||clock.now.getTime()>=to)fail('SOURCE_SCALE_LICENSE_EXPIRED')
   }

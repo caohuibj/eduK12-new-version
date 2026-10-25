@@ -26,7 +26,7 @@ export type GovernanceCatalogRecord = {
   catalogId: string; title: string; origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE';
   exactVersion: { origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentKey?: string; instrumentVersion?: string; entryId?: string; releaseId?: string; releaseVersion?: string; contentHash?: string };
   availability: { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] };
-  authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
+  authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
   standard?: ScaleLibraryEntry; authored?: GovernanceEntry;
 }
 export type GovernanceCatalogPage = { schemaVersion: 1; list: GovernanceCatalogRecord[]; generatedAt: string; page: number; pageSize: number; hasMore: boolean }

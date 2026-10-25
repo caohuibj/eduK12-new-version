@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import {
   assertLocaleTerritoryMatch,
@@ -33,14 +34,20 @@ export const scaleDeploymentPolicyV1Schema = z.object({
   locale: z.string().min(1),
   territory: z.string().regex(/^[A-Z]{2}$/),
   deploymentModes: z.array(scaleDeploymentModeSchema).min(1),
-  commercialNature: z.enum(['NON_COMMERCIAL', 'COMMERCIAL']),
+  commercialNature: z.enum(['NON_COMMERCIAL', 'COMMERCIAL', 'UNSPECIFIED']),
   requiredRightsActions: z.array(scaleDeploymentRightActionSchema).min(1),
-  authorizationRefs: z.array(z.string().min(1)).min(1),
+  authorizationRefs: z.array(z.string().min(1)),
+  selfAuthoredSourceHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
   localizationVersion: z.string().min(1).optional(),
   inFlightCompletion: z.literal('FROZEN_DEADLINE'),
   completionWindowMs: z.number().int().positive().max(30 * 24 * 60 * 60 * 1000).optional(),
-}).strict()
+}).strict().superRefine((policy, ctx) => {
+  if (!policy.selfAuthoredSourceHash && (!policy.authorizationRefs.length || policy.commercialNature === 'UNSPECIFIED'))
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['authorizationRefs'], message: 'External tools require authorization references and declared commercial nature' })
+  if (policy.selfAuthoredSourceHash && policy.authorizationRefs.length)
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['authorizationRefs'], message: 'Authored provenance cannot be mixed with external authorization grants' })
+})
 
 export type ScaleDeploymentPolicyV1 = z.infer<typeof scaleDeploymentPolicyV1Schema>
 
@@ -98,8 +105,8 @@ export const evaluateScaleDeployment = (input: {
     reasons.push('DEPLOYMENT_MODE_NOT_BOUND')
   }
   if (
-    input.usageRequirements?.allowedCommercialNatures
-    && !input.usageRequirements.allowedCommercialNatures.includes(policy.commercialNature)
+    !policy.selfAuthoredSourceHash && input.usageRequirements?.allowedCommercialNatures
+    && (policy.commercialNature === 'UNSPECIFIED' || !input.usageRequirements.allowedCommercialNatures.includes(policy.commercialNature))
   ) {
     reasons.push('COMMERCIAL_NATURE_NOT_ALLOWED')
   }
@@ -109,6 +116,15 @@ export const evaluateScaleDeployment = (input: {
     && !input.usageRequirements.allowedDeploymentModes.includes(input.requestedMode)
   ) {
     reasons.push('DEPLOYMENT_MODE_NOT_ALLOWED')
+  }
+
+  // Only exact, compiled repository provenance can select the authored branch.
+  // Client-supplied license labels or a copied hash cannot authorize another identity.
+  if (policy.selfAuthoredSourceHash) {
+    const current = registeredSelfAuthoredSourceProof(input.instrumentKey, input.instrumentVersion)
+    if (!current || current !== policy.selfAuthoredSourceHash) reasons.push('SELF_AUTHORED_SOURCE_MISMATCH')
+    return { evaluatorVersion: SCALE_DEPLOYMENT_EVALUATOR_VERSION, allowNewStarts: reasons.length === 0,
+      deploymentPolicyHash: hashScaleDeploymentPolicy(policy), reasons: [...new Set(reasons)], authorization: null }
   }
 
   // A revocation supersedes older grants in the same lineage; a newer DRAFT does not.

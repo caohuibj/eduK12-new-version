@@ -17,7 +17,7 @@ export interface StandardCatalogRecord {
   exactVersion: Extract<CatalogExactVersion, { origin: 'STANDARD_REGISTRY' }>
   availability: CatalogAvailability
   authorization: {
-    mechanism: 'INSTRUMENT_AUTHORIZATION'
+    mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE'
     rights: UnifiedScaleLibraryEntry['rights']
     requiresRuntimeCheck: true
     useGrantStatus: 'NOT_EVALUATED'
@@ -54,7 +54,7 @@ export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: 
       status: availability.status === 'NOT_AVAILABLE' ? 'NOT_AVAILABLE' : 'RESTRICTED',
       reasons: [...new Set([...availability.reasons, `${product}_EXACT_USER_AUTHORIZATION_NOT_EVALUATED`])],
     },
-    authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
+    authorization: { mechanism: entry.rights.status === 'SELF_AUTHORED' ? 'SELF_AUTHORED_SOURCE' : 'INSTRUMENT_AUTHORIZATION', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
     standard,
   }
 }
