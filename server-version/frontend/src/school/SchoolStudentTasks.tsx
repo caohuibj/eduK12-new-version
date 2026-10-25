@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw } from 'lucide-react'
+import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw, ArrowLeft, Clock3 } from 'lucide-react'
 import { EducationScalePersonalReport, type EducationScalePersonalReportData } from '../components/education-tools/EducationScalePersonalReport'
 import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollectionControls'
 import {schoolSearchText,schoolDeadline} from './school-collection'
@@ -51,8 +51,11 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
   const detailRef=useRef<HTMLDivElement>(null)
+  const inboxTitle=useRef<HTMLHeadingElement>(null),wasDetailOpen=useRef(false)
   useEffect(()=>{
     if(selected&&details){detailRef.current?.focus({preventScroll:true});detailRef.current?.scrollIntoView?.({block:'start'})}
+    else if(wasDetailOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
+    wasDetailOpen.current=Boolean(selected&&details)
   },[selected,details])
   const load=useCallback(async(targetPage:number)=>{
     if(currentScope.current!==scope||scope.pending)return
@@ -122,11 +125,11 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
     <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
     {activityId&&<p className="hs-student-task-filter">当前活动任务 <a href={workspaceHref('tasks')}>查看全部任务</a></p>}
-    <header className="hs-student-task-heading"><div><h2>我的校园活动</h2><p>查看学校安排的任务，继续尚未完成的内容。</p></div>
+    <header className="hs-student-task-heading"><div><h2 ref={inboxTitle} tabIndex={-1}>我的校园活动</h2><p>查看学校安排的任务，继续尚未完成的内容。</p></div>
     {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
     <details className="hs-student-task-help"><summary>任务与隐私说明{studentReference?' · 校园观察编号':''}</summary><p>这里只显示学校已开放、并且当前允许你参加的活动。心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
     {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}</details>
-    {error&&<p className="hs-alert" role="alert">{error}</p>}
+    {!selected&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
     {listError&&<p className="hs-alert" role="alert">{listError}</p>}
     {items&&<>
@@ -169,7 +172,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
       {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
     </div>}
     </details>
-    {(selected||execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
+    {!selected&&(execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
       <h3>{feedback.title} · 我的反馈</h3>
       {feedback.data.kind!==undefined?<EducationScalePersonalReport key={feedback.executionId} data={feedback.data}
@@ -184,18 +187,24 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
       </>}
       <button onClick={()=>{feedbackEpoch.current+=1;setFeedback(null)}}>关闭我的反馈</button>
     </div>}
-    {execution&&<SchoolCompositeRunner api={api} execution={execution}
+    {execution&&<SchoolCompositeRunner api={api} execution={execution} title={items?.list.find(task=>task.id===execution.executionId)?.title}
       onExit={()=>setExecution(null)}
       onFinished={()=>{setExecution(null);void load(page)}}/>}
-    {selected&&details&&<div className="hs-task-detail" ref={detailRef} tabIndex={-1} role="region" aria-label={details.title}>
-      <h3>{details.title}</h3>
-      {details.description&&<p>{details.description}</p>}
-      {details.content&&<p className="hs-multiline">{details.content}</p>}
-      <label className="hs-field"><span>{selected.kind==='READING'?'阅读感受（选填）':'你的回答'}</span>
-        <textarea rows={5} value={answer} onChange={event=>setAnswer(event.target.value)}/></label>
-      <div className="hs-actions"><button disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}>返回活动</button>
-        <button className="hs-primary" disabled={busy||selected.status==='COMPLETED'}
-          onClick={()=>void submit()}>{selected.kind==='READING'?'确认已阅读':'提交活动记录'}</button></div>
+    {selected&&details&&<div className="hs-task-detail hs-student-task-detail" ref={detailRef} tabIndex={-1} role="region" aria-label={details.title}>
+      <button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>
+      <header className="hs-student-detail-header"><p className="hs-student-detail-kicker">{selected.activityTitle} · {kinds[selected.kind]}</p><h1>{details.title}</h1>
+        {details.description&&<p className="hs-student-detail-description">{details.description}</p>}
+        <div className="hs-student-detail-meta"><span className="hs-student-task-state" data-status={selected.status}>{captions[selected.status]}</span>{selected.deadline&&<span><Clock3 size={15} aria-hidden="true"/>截止 {new Date(selected.deadline).toLocaleString('zh-CN',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>}</div>
+      </header>
+      {details.content&&<section className="hs-student-detail-instructions" aria-labelledby="hs-task-instructions"><h2 id="hs-task-instructions">{selected.kind==='READING'?'阅读材料':'任务说明'}</h2><div className="hs-multiline">{details.content}</div></section>}
+      <section className="hs-student-detail-answer" aria-labelledby="hs-task-answer-title">
+        <header><span className="hs-student-detail-answer-icon" aria-hidden="true"><FileText size={20}/></span><div><h2 id="hs-task-answer-title">{selected.status==='COMPLETED'?'我的提交':selected.kind==='READING'?'阅读记录':'我的作答'}</h2><p>{selected.status==='COMPLETED'?'本次记录已提交，以下为已有内容。':selected.kind==='READING'?'读完材料后可以留下感受，也可以直接确认已阅读。':'根据任务说明填写本次记录，提交前可以继续修改。'}</p></div></header>
+        {error&&<p className="hs-alert" role="alert">{error}</p>}
+        <label className="hs-field"><span>{selected.kind==='READING'?'阅读感受（选填）':'你的回答'}</span>
+          <textarea rows={7} readOnly={selected.status==='COMPLETED'} aria-describedby="hs-task-answer-help" placeholder={selected.kind==='READING'?'可以记录一个收获，或一段阅读感受。':'在这里填写你的活动记录…'} value={answer} onChange={event=>setAnswer(event.target.value)}/></label>
+        <footer className="hs-student-detail-footer"><p id="hs-task-answer-help">返回不会提交当前内容。{selected.status==='COMPLETED'?'本次任务已完成。':'填写完成后，请点击下方按钮提交。'}</p>
+          <button type="button" className="hs-primary" disabled={busy||selected.status==='COMPLETED'} onClick={()=>void submit()}>{busy?'正在提交…':selected.kind==='READING'?'确认已阅读':'提交活动记录'}</button></footer>
+      </section>
     </div>}
   </section>
 }

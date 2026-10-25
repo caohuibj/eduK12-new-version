@@ -33,6 +33,7 @@ import './school-theme.css'
 import './school-home-refresh.css'
 import './school-header-actions.css'
 import './school-task-refresh.css'
+import './school-task-detail.css'
 import '../components/education-tools/education-entry-layout.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}

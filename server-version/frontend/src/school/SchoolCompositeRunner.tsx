@@ -1,4 +1,5 @@
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
+import {ArrowLeft} from 'lucide-react'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
@@ -17,8 +18,8 @@ export type CampusExecutionRef={
   resumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
-  api:SchoolApi;execution:CampusExecutionRef
+export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
+  api:SchoolApi;execution:CampusExecutionRef;title?:string
   onExit:()=>void;onFinished:()=>void
 }){
   const panelRef=useRef<HTMLElement>(null)
@@ -124,10 +125,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
-  return <section className="hs-panel hs-runner" ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
-    <div className="hs-actions"><button disabled={busy} onClick={onExit}>返回活动</button></div>
+  return <section className={"hs-panel hs-runner"+(title?" hs-school-task-runner":"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
+    <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
     <p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
-    <h2 hidden={Boolean(state)}>校园正式测评</h2>
+    {title?<h1 hidden={Boolean(state)&&!done}>{title}</h1>:<h2 hidden={Boolean(state)}>校园正式测评</h2>}
     <p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {done?<div role="status" className="hs-message">

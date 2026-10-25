@@ -1,0 +1,49 @@
+/* School-only task detail and answer shell, following Training's reading layout. */
+.hs-app.hs-learner:has(.hs-student-task-detail,.hs-school-task-runner) .hs-workspace-page-heading{display:none}
+.hs-app.hs-workspace.hs-learner:has(.hs-student-task-detail,.hs-school-task-runner) .hs-main.hs-main-workspace{width:min(920px,calc(100% - 64px));padding:28px 0 48px}
+.hs-app.hs-workspace.hs-learner section.hs-panel.hs-task-view:has(>.hs-student-task-detail,>.hs-school-task-runner){padding:0;margin:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+.hs-app.hs-workspace.hs-learner .hs-student-task-detail{scroll-margin-top:24px}
+.hs-app.hs-workspace.hs-learner .hs-student-detail-back,.hs-app.hs-workspace.hs-learner .hs-runner-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 0;border:0;background:transparent;color:var(--hs-muted);font-size:14px;font-weight:500}
+.hs-student-detail-header{padding:16px 0 24px;border-bottom:1px solid var(--hs-border)}
+.hs-app.hs-learner .hs-student-detail-header .hs-student-detail-kicker{font-size:12px;line-height:1.7;color:var(--hs-muted);margin:0 0 10px}
+.hs-app.hs-learner .hs-student-detail-header h1{font-family:var(--hs-serif);font-size:32px;font-weight:600;line-height:1.4;margin:0 0 12px;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-app.hs-learner .hs-student-detail-description{font-size:15px;line-height:1.85;color:var(--hs-muted);margin:0 0 18px}
+.hs-student-detail-meta{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;font-size:13px;line-height:1.7;color:var(--hs-muted)}
+.hs-student-detail-meta>span{display:inline-flex;align-items:center;gap:7px}
+.hs-student-detail-instructions{padding:24px 0 30px}
+.hs-app.hs-learner .hs-student-task-detail h2{font-family:inherit;font-size:18px;line-height:1.5;font-weight:600;margin:0 0 14px;color:var(--hs-ink)}
+.hs-app.hs-learner .hs-student-detail-instructions .hs-multiline{font-size:16px;line-height:1.95;color:var(--hs-ink);padding:0;border:0;background:transparent}
+.hs-student-detail-answer{padding:26px;border:1px solid var(--hs-border);border-radius:16px;background:var(--hs-surface)}
+.hs-student-detail-answer>header{display:flex;align-items:flex-start;gap:12px;margin-bottom:24px}
+.hs-student-detail-answer-icon{display:flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;border-radius:10px;background:color-mix(in srgb,var(--hs-primary) 8%,var(--hs-surface));color:var(--hs-primary)}
+.hs-app.hs-learner .hs-student-detail-answer>header h2{margin:0 0 5px}
+.hs-app.hs-learner .hs-student-detail-answer>header p{font-size:13px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-app.hs-learner .hs-student-detail-answer .hs-field{margin:0}
+.hs-app.hs-learner .hs-student-detail-answer textarea{padding:16px;font-size:16px;font-weight:400;line-height:1.8;min-height:220px;border-color:var(--hs-border);background:var(--hs-surface);color:var(--hs-ink)}
+.hs-student-detail-answer textarea::placeholder{color:var(--hs-muted);opacity:.7}
+.hs-student-detail-answer textarea[readonly]{background:var(--hs-bg)}
+.hs-student-detail-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:20px;padding-top:20px;border-top:1px solid var(--hs-border)}
+.hs-app.hs-learner .hs-student-detail-footer p{flex:1;min-width:190px;font-size:12px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-student-detail-footer .hs-primary{min-width:150px;min-height:44px;flex:none}
+/* Only product/answer shells inherit appearance; scientific stimuli keep their own styles. */
+.hs-app.hs-workspace.hs-learner .hs-school-task-runner{max-width:920px;margin:0 auto}
+.hs-app.hs-learner .hs-school-task-runner>.hs-actions{margin-bottom:8px}
+.hs-app.hs-learner .hs-school-task-runner>:is(h1,h2){font-family:var(--hs-serif);font-size:30px;line-height:1.4;margin:20px 0 12px}
+.hs-app.hs-workspace.hs-learner .hs-school-task-runner>.hui-page--assessment{padding-top:24px}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-learner:has(.hs-student-task-detail,.hs-school-task-runner) .hs-main.hs-main-workspace{width:calc(100% - 32px);padding:16px 0 32px}
+ .hs-app.hs-learner .hs-student-detail-header h1,.hs-app.hs-learner .hs-school-task-runner>:is(h1,h2){font-size:26px}
+ .hs-student-detail-header{padding:12px 0 22px}
+ .hs-student-detail-instructions{padding:22px 0 26px}
+ .hs-student-detail-answer{padding:20px 16px;border-radius:14px}
+ .hs-student-detail-answer>header{gap:10px;margin-bottom:20px}
+ .hs-student-detail-answer-icon{width:36px;height:36px}
+ .hs-app.hs-learner .hs-student-detail-answer textarea{min-height:220px;padding:12px}
+ .hs-student-detail-footer{gap:14px}
+ .hs-student-detail-footer>.hs-primary{width:100%}
+}
+.hs-app.hs-workspace.hs-learner section.hs-panel.hs-task-view:has(>.hs-school-task-runner){padding:26px;border:1px solid var(--hs-border);border-radius:16px;background:var(--hs-surface);--hs-primary:inherit}
+@media(max-width:600px){.hs-app.hs-workspace.hs-learner section.hs-panel.hs-task-view:has(>.hs-school-task-runner){padding:18px 14px;border-radius:14px}}
+
+.hs-app.hs-workspace.hs-learner .hs-school-task-runner{color-scheme:inherit;--hs-primary:inherit;--hs-ink:inherit;--hs-border:inherit;color:var(--hs-ink)}
+.hs-app.hs-workspace.hs-learner .hs-school-task-runner>div>button.hs-primary{background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
