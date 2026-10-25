@@ -1,3 +1,5 @@
+import {historicalCatalogGrantFixture} from '../fixtures/historical-catalog-grant'
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { rm } from 'node:fs/promises'
 import { Writable } from 'node:stream'
@@ -90,7 +92,7 @@ suite('Survey native staged image: formal source, frozen authorization and actua
     } })
     const ref = { kind: 'SJT' as const, sourceId: release.id, sourceVersion: release.instrumentVersion }
     // A Survey entry by itself is not permission to distribute this exact source.
-    await expect(grantCatalogSource(entryAdmin.id, owner.id, ref)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(grantCatalogSource(entryAdmin.id, owner.id, ref)).rejects.toMatchObject({ statusCode: 409 })
     const rootId = randomUUID()
     expect(await issueAdminContentRoot(issuer.id, adminProof(), {
       requestId: rootId, expectedVersion: 0, reason: 'Explicit Survey distribution of this original image fixture only',
@@ -99,7 +101,7 @@ suite('Survey native staged image: formal source, frozen authorization and actua
       capabilities: ['material.distribute'], delegableCapabilities: [], remainingDelegationDepth: 0,
       validFrom: new Date(Date.now() - 60_000).toISOString(), expiresAt: new Date(Date.now() + 3_600_000).toISOString() },
     })).toEqual({ grantId: rootId, version: 1, changed: true })
-    const tool = await grantCatalogSource(entryAdmin.id, owner.id, ref)
+    const tool = await historicalCatalogGrantFixture(db,entryAdmin.id, owner.id, ref)
     const authority = { protocol: 'sjt-survey-distribution-v1', actorId: entryAdmin.id, grantId: rootId, grantVersion: 1,
       measurementReleaseId: measurement.id, measurementContentHash: measurement.contentHash,
       releaseId: release.id, instrumentVersion: release.instrumentVersion,
@@ -168,15 +170,9 @@ suite('Survey native staged image: formal source, frozen authorization and actua
     return snapshot
   }
 
-  it('retains original source/publication/child image, survives future grant revocation, and keeps shared FINAL/report/raw semantics', async () => {
+  it('retains original source/publication/child image and saved FINAL/report/raw after exact grant revocation', async () => {
     const f = await fixture(), { child, pin } = await start(f)
     const frozen = await deliver(f, child.attempt.id)
-    await revokeToolGrant(f.entryAdmin.id, f.tool.id)
-    expect(await revokeAdminContentGrant(f.issuer.id, adminProof(), f.rootId,
-      { expectedVersion: 1, reason: 'Synthetic future distribution withdrawal, not a participant hard stop' }))
-      .toEqual({ grantId: f.rootId, version: 2, changed: true })
-    await expect(importCatalogDraft(f.owner.id, f.projectId, f.tool.id,
-      { requestId: randomUUID(), instrumentKey: 'revoked', title: 'Must not be imported' })).rejects.toThrow()
     expect(canonicalHash(await deliver(f, child.attempt.id))).toBe(canonicalHash(frozen))
     const nativeFixture = createSjtNativeStagedFinalFixture(child.attempt.id, 'path-A-A', f.compiled)
     const payload = situationalLegacyFinalSubmitSchema.parse({ ...nativeFixture.finalInput, submissionId: randomUUID() })
@@ -187,6 +183,12 @@ suite('Survey native staged image: formal source, frozen authorization and actua
     expect(await db.situationalRawSubmission.count({ where: { attemptId: child.attempt.id } })).toBe(1)
     expect(await submitResearchFinal({ ...f.proof, submissionId: randomUUID(), answers: { staged: {} },
       situationalReferences: [accepted.receipt!] })).toMatchObject({ status: 'COMPLETED' })
+    await revokeGovernedCatalogFixture(db,f.entryAdmin.id, f.tool.id)
+    expect(await revokeAdminContentGrant(f.issuer.id, adminProof(), f.rootId,
+      { expectedVersion: 1, reason: 'Synthetic exact authority withdrawal; preserve saved FINAL' }))
+      .toEqual({ grantId: f.rootId, version: 2, changed: true })
+    await expect(importCatalogDraft(f.owner.id, f.projectId, f.tool.id,
+      { requestId: randomUUID(), instrumentKey: 'revoked', title: 'Must not be imported' })).rejects.toThrow()
     expect(await readGeneralForOwnAttempt(f.proof)).toMatchObject({ kind: 'DESCRIPTIVE' })
     expect((await readSurveySituational(f.proof, 'staged', child.attempt.id)).receipt).toEqual(accepted.receipt)
     const source = await loadSurveySource({ actorUserId: f.owner.id, projectId: f.projectId, waveIds: [f.waveId], includeAttendance: false })
@@ -242,7 +244,7 @@ suite('Survey native staged image: formal source, frozen authorization and actua
         scopeId:'situational-library-governance',resourceKind:'material',resourceKeys:[f.measurement.id]},
         capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,
         validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}})
-    const tool=await grantCatalogSource(f.entryAdmin.id,f.owner.id,
+    const tool=await historicalCatalogGrantFixture(db,f.entryAdmin.id,f.owner.id,
       {kind:'SJT',sourceId:f.release.id,sourceVersion:f.release.instrumentVersion})
     expect(tool.id).not.toBe(f.tool.id)
     expect(tool.sourceProvenance.sjtEntryAuthority).toMatchObject({grantId:rootId,grantVersion:1})

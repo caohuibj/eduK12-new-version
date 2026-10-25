@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { PrismaClient, type Prisma } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -87,7 +88,7 @@ suite('Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreS
     await reviewSjtDraft({ userId: admin, admin: true }, authored.id, authored.revision, authored.contentDigest, true,
       'Independent synthetic software fixture; no participant data or new scientific claims')
     const release = await db.sjtAuthorRelease.findFirstOrThrow({ where: { instrumentKey: template.instrumentKey } })
-    const stagedGrant = await grantCatalogSource(admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
+    const stagedGrant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
     stagedId = (await importCatalogDraft(owner, projectId, stagedGrant.id, { requestId: randomUUID(),
       instrumentKey: 'staged', title: 'Synthetic native staged task' })).id
 
@@ -102,7 +103,7 @@ suite('Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreS
     expect(config).toMatchObject({ testType: 'gonogo', configVersion: '1.1.0', engineVersion: '1.0.0',
       scoringVersion: '1.0.0', status: 'PUBLISHED', accessPolicy: 'OPEN' })
     expect(config.config).toEqual(SURVEY_GONOGO_CONFIG)
-    const cognitiveGrant = await grantCatalogSource(admin, owner, { kind: 'COGNITIVE', sourceId: config.id, sourceVersion: '1.1.0' })
+    const cognitiveGrant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'COGNITIVE', sourceId: config.id, sourceVersion: '1.1.0' })
     cognitiveId = (await importCatalogDraft(owner, projectId, cognitiveGrant.id, { requestId: randomUUID(),
       instrumentKey: 'go', title: 'Fixed Go/No-Go' })).id
     for (const [kind, instrumentKey, definition] of [['FORM', 'screen', form], ['SCALE', 'scale', scale]] as const) {

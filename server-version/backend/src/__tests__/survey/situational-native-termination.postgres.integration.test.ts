@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -73,7 +74,7 @@ suite('Survey native host termination and material-only assignment — PostgreSQ
     await requestSjtReview({ userId: author, admin: false }, authored.id, authored.revision, authored.contentDigest)
     await reviewSjtDraft({ userId: admin, admin: true }, authored.id, authored.revision, authored.contentDigest, true, 'Original synthetic host integration fixture')
     const release = await db.sjtAuthorRelease.findFirstOrThrow({ where: { instrumentKey: template.instrumentKey } })
-    const grant = await grantCatalogSource(admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
+    const grant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
     nativeId = (await importCatalogDraft(owner, projectId, grant.id, { requestId: randomUUID(), instrumentKey: 'native', title: 'Synthetic staged task' })).id
     for (const [kind, instrumentKey, definition] of [['FORM', 'screen', form], ['SCALE', 'tail', scale]] as const) {
       const created = await createDraft(owner, projectId, { requestId: randomUUID(), kind, instrumentKey, title: 'Synthetic ' + kind })

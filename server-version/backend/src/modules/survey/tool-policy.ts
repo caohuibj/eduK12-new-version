@@ -6,6 +6,7 @@ import {getScaleInstrumentSource} from '../scale/onboarding/instrument-registry'
 import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
+import {assertSjtEntryDistributionAuthority,sjtEntryDistributionReceiptSchema,SjtEntryAuthorityError} from '../situational/entry-authority'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenPublication} from './publication.service'
 export type PolicyIdentity={resourceKey:string;fingerprint:string}
@@ -52,6 +53,7 @@ export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identit
  * Saved FINAL receipt replay and historical report reads have separate gates. */
 export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
  await assertFrozenPackageAdmissions(tx,snapshot)
+ const checkedSjtAuthorities=new Set<string>()
  for(const unit of snapshot.units){
   const p=unit.sourceProvenance,ref=p?.source as CatalogSourceSnapshot['ref']|undefined
   if(!p||!ref)continue
@@ -63,6 +65,17 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
   }
   const governed=typeof p.surveyToolReleaseId==='string'&&!p.surveyPackage
   if(governed)await assertGovernedEntryAllowed(tx,p.surveyToolReleaseId as string,ref.sourceVersion)
+  if(ref.kind==='SJT'&&p.sjtEntryAuthority!==undefined){
+   const key=canonicalHash(p.sjtEntryAuthority)
+   if(!checkedSjtAuthorities.has(key)){
+    try{
+     const receipt=sjtEntryDistributionReceiptSchema.parse(p.sjtEntryAuthority)
+     await assertSjtEntryDistributionAuthority(tx,{actorId:receipt.actorId,releaseId:receipt.releaseId,instrumentVersion:receipt.instrumentVersion,pinned:receipt})
+    }
+    catch(error){if(error instanceof SjtEntryAuthorityError)throw new AdminPermissionError(403,'此情境工具的精确来源分发授权已失效，停止后续采集；已保存数据保留');throw error}
+    checkedSjtAuthorities.add(key)
+   }
+  }
   if(typeof p.sourceGrantId==='string'){
    const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`
    if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销，停止后续采集；已保存数据保留')

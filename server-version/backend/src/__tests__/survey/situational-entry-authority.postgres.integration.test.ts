@@ -1,3 +1,5 @@
+import {historicalCatalogGrantFixture} from '../fixtures/historical-catalog-grant'
+import {assertSjtEntryDistributionAuthority} from '../../modules/situational/entry-authority'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -120,10 +122,11 @@ suite('Survey SJT explicit entry authority with real published source and frozen
     return { publicId: f.publicId, attemptId, accessCredential }
   }
 
-  it('requires explicit Survey authority, pins it through import/publication, and preserves frozen participation after revocation', async () => {
+  it('requires explicit Survey authority, pins it through import/publication, and immediately stops unfinished collection while preserving saved FINAL', async () => {
     const f = await fixture()
     expect(await db.contentCapabilityGrant.count({ where: { subjectId: f.entryAdmin.id } })).toBe(0)
-    await expect(grantCatalogSource(f.entryAdmin.id, f.owner.id, f.ref)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(grantCatalogSource(f.entryAdmin.id,f.owner.id,f.ref)).rejects.toMatchObject({statusCode:409})
+    await expect(db.$transaction(tx=>assertSjtEntryDistributionAuthority(tx,{actorId:f.entryAdmin.id,releaseId:f.release.id,instrumentVersion:f.ref.sourceVersion}))).rejects.toMatchObject({statusCode:403})
     expect(await db.$queryRaw<Array<{ count: number }>>`SELECT count(*)::int AS count FROM survey_tool_grants WHERE user_id=${f.owner.id}`).toEqual([{ count: 0 }])
     // An existing exact Training course grant and current Survey admin entry do
     // not acquire the other product's material capability implicitly.
@@ -133,7 +136,7 @@ suite('Survey SJT explicit entry authority with real published source and frozen
       product: 'SURVEY', scopeKind: 'PLATFORM', scopeId: 'situational-library-governance', resourceKind: 'material',
       resourceKeys: [f.measurement.id], capabilities: ['material.distribute'], delegableCapabilities: [],
       remainingDelegationDepth: 0, ancestry: [root.id], version: 1, revokedAt: null })
-    const tool = await grantCatalogSource(f.entryAdmin.id, f.owner.id, f.ref)
+    const tool = await historicalCatalogGrantFixture(db,f.entryAdmin.id, f.owner.id, f.ref)
     const authority = { protocol: 'sjt-survey-distribution-v1', actorId: f.entryAdmin.id, grantId: root.id, grantVersion: 1,
       measurementReleaseId: f.measurement.id, measurementContentHash: f.measurement.contentHash,
       releaseId: f.release.id, instrumentVersion: f.release.instrumentVersion,
@@ -148,27 +151,7 @@ suite('Survey SJT explicit entry authority with real published source and frozen
     expect(snapshot.units[0]).toMatchObject({ executionProtocol: 'SITUATIONAL_NATIVE_V1', sourceProvenance: { sjtEntryAuthority: authority } })
     const blockedWave = await wave(f, imported.id, 2)
 
-    // A second explicitly issued capability remains valid. It must never be
-    // silently substituted for the first capability frozen in the old grant.
-    const alternative = await issueRoot(f)
-    await expect(revokeAdminContentGrant(f.issuer.id, proof(), root.id, {
-      expectedVersion: 1, reason: 'Synthetic future-distribution withdrawal',
-    })).resolves.toEqual({ grantId: root.id, version: 2, changed: true })
-    expect(await db.contentCapabilityGrant.findUniqueOrThrow({ where: { id: alternative.id } })).toEqual(alternative)
-    const deniedImport = importInput('blocked-import')
-    await expect(importCatalogDraft(f.owner.id, f.projectId, tool.id, deniedImport)).rejects.toMatchObject({ statusCode: 403 })
-    await expect(copyDraft(f.owner.id, f.projectId, imported.id, importInput('blocked-copy'))).rejects.toMatchObject({ statusCode: 403 })
-    await expect(freeze(f, blockedWave.id, imported.id)).rejects.toMatchObject({ statusCode: 403 })
-    expect(await db.surveyInstrumentDraft.findUnique({ where: { id: deniedImport.requestId } })).toBeNull()
-    expect(await db.surveyInstrumentDraft.count({ where: { projectId: f.projectId } })).toBe(1)
-    expect(await db.surveyPublication.count({ where: { projectId: f.projectId } })).toBe(1)
-    expect(await db.surveyWave.findUniqueOrThrow({ where: { id: blockedWave.id } })).toMatchObject({ publicationId: null, revision: 0, status: 'DRAFT' })
-    const replacement = await grantCatalogSource(f.entryAdmin.id, f.owner.id, f.ref)
-    expect(replacement.id).not.toBe(tool.id)
-    expect(replacement.sourceProvenance.sjtEntryAuthority).toEqual({ ...authority, grantId: alternative.id })
-
-    // Bind a new participant and start the native child only AFTER revocation.
-    // Historical frozen use is not a fresh catalog distribution decision.
+    // Complete a real historical grant before withdrawal; saved facts remain addressable.
     const participant = await bindParticipant(f, frozenWave.id, published.publicationId)
     expect((await getOwnResearchTask(participant)).units[0]).toMatchObject({ executionProtocol: 'SITUATIONAL_NATIVE_V1' })
     const child = await startSurveySituational(participant, 'staged')
@@ -191,6 +174,30 @@ suite('Survey SJT explicit entry authority with real published source and frozen
     expect(raw.researchCapture.events.length).toBeGreaterThan(0)
     expect(canonicalHash((await db.surveyPublication.findUniqueOrThrow({ where: { id: publication.id } })).compiledSnapshot))
       .toBe(canonicalHash(publication.compiledSnapshot))
+    const pendingParticipant=await bindParticipant(f,frozenWave.id,published.publicationId)
+    // A second explicitly issued capability remains valid. It must never be
+    // silently substituted for the first capability frozen in the old grant.
+    const alternative = await issueRoot(f)
+    await expect(revokeAdminContentGrant(f.issuer.id, proof(), root.id, {
+      expectedVersion: 1, reason: 'Synthetic future-distribution withdrawal',
+    })).resolves.toEqual({ grantId: root.id, version: 2, changed: true })
+    expect(await db.contentCapabilityGrant.findUniqueOrThrow({ where: { id: alternative.id } })).toEqual(alternative)
+    const deniedImport = importInput('blocked-import')
+    await expect(importCatalogDraft(f.owner.id, f.projectId, tool.id, deniedImport)).rejects.toMatchObject({ statusCode: 403 })
+    await expect(copyDraft(f.owner.id, f.projectId, imported.id, importInput('blocked-copy'))).rejects.toMatchObject({ statusCode: 403 })
+    await expect(freeze(f, blockedWave.id, imported.id)).rejects.toMatchObject({ statusCode: 403 })
+    expect(await db.surveyInstrumentDraft.findUnique({ where: { id: deniedImport.requestId } })).toBeNull()
+    expect(await db.surveyInstrumentDraft.count({ where: { projectId: f.projectId } })).toBe(1)
+    expect(await db.surveyPublication.count({ where: { projectId: f.projectId } })).toBe(1)
+    expect(await db.surveyWave.findUniqueOrThrow({ where: { id: blockedWave.id } })).toMatchObject({ publicationId: null, revision: 0, status: 'DRAFT' })
+    const replacement = await historicalCatalogGrantFixture(db,f.entryAdmin.id, f.owner.id, f.ref)
+    expect(replacement.id).not.toBe(tool.id)
+    expect(replacement.sourceProvenance.sjtEntryAuthority).toEqual({ ...authority, grantId: alternative.id })
+
+    await expect(getOwnResearchTask(pendingParticipant)).rejects.toMatchObject({statusCode:403})
+    await expect(startSurveySituational(pendingParticipant,'staged')).rejects.toMatchObject({statusCode:403})
+    expect(await db.situationalAttempt.count({where:{surveyAttemptId:pendingParticipant.attemptId}})).toBe(0)
+    expect(await readGeneralForOwnAttempt(participant)).toMatchObject({kind:'DESCRIPTIVE'})
     // All identities and permissions pre-existing to the explicit Survey root
     // remain byte-for-byte unchanged; these are isolated synthetic rows only.
     expect(await db.sjtAuthorRelease.findUniqueOrThrow({ where: { id: f.release.id } })).toEqual(f.release)
@@ -206,7 +213,7 @@ suite('Survey SJT explicit entry authority with real published source and frozen
 
   it('rolls back a real import when its pinned capability expires at the synthetic final database clock', async () => {
     const f = await fixture(), root = await issueRoot(f)
-    const tool = await grantCatalogSource(f.entryAdmin.id, f.owner.id, f.ref)
+    const tool = await historicalCatalogGrantFixture(db,f.entryAdmin.id, f.owner.id, f.ref)
     const input = importInput('expires-at-final-fence')
     let inserted = false, finalClockReads = 0
     const transact = prisma.$transaction.bind(prisma)

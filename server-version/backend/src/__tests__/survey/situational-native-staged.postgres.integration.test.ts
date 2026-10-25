@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import {sjtNativeBranchTemplate,createSjtNativeBranchFinalFixture,createSjtNativeBranchInvalidFinalFixtures} from '../fixtures/sjt-native-branch.fixture'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
@@ -53,7 +54,7 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await reviewSjtDraft({userId:admin,admin:true},draft.id,draft.revision,draft.contentDigest,true,'Synthetic independent release, no real participant data')
     const release=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:template.instrumentKey}})
     expect(release.authorizationPolicy).toBeNull()
-    const grant=await grantCatalogSource(admin,owner,{kind:'SJT',sourceId:release.id,sourceVersion:template.instrumentVersion})
+    const grant=await grantGovernedCatalogFixture(db,admin,owner,{kind:'SJT',sourceId:release.id,sourceVersion:template.instrumentVersion})
     grantId=grant.id;projectId=randomUUID();publicId=randomUUID()
     await db.surveyProject.create({data:{id:projectId,publicId,ownerUserId:owner,title:'Synthetic staged SJT',status:'ACTIVE',collectionMode:'SINGLE_UNLINKED'}})
     const imported=await importCatalogDraft(owner,projectId,grantId,{requestId:randomUUID(),instrumentKey:'staged',title:'Synthetic staged tool'})
@@ -64,7 +65,7 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await requestSjtReview({userId:author,admin:false},branchDraft.id,branchDraft.revision,branchDraft.contentDigest)
     await reviewSjtDraft({userId:admin,admin:true},branchDraft.id,branchDraft.revision,branchDraft.contentDigest,true,'Synthetic authored branching coverage')
     const branchRelease=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:branchTemplate.instrumentKey}})
-    const branchGrant=await grantCatalogSource(admin,owner,{kind:'SJT',sourceId:branchRelease.id,sourceVersion:branchTemplate.instrumentVersion})
+    const branchGrant=await grantGovernedCatalogFixture(db,admin,owner,{kind:'SJT',sourceId:branchRelease.id,sourceVersion:branchTemplate.instrumentVersion})
     branchDraftId=(await importCatalogDraft(owner,projectId,branchGrant.id,{requestId:randomUUID(),instrumentKey:'branch',title:'Synthetic branch tool'})).id
   })
   afterAll(async()=>{
@@ -193,13 +194,15 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await expect(submitResearchFinal({...f.proof,submissionId:randomUUID(),answers:{staged:{}},situationalReferences:[{...accepted.receipt!,payloadHash:'f'.repeat(64)}]})).rejects.toThrow()
     expect((await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:f.proof.attemptId}})).status).toBe('STARTED')
   })
-  it('keeps frozen publication use after future-only grant revoke but honors fresh hard stop even for child replay',async()=>{
-    const f=await fixture()
-    await revokeToolGrant(admin,grantId)
-    const child=await startSurveySituational(f.proof,'staged'),payload=input(child.attempt.id)
+  it('immediately stops a revoked exact grant and preserves saved native facts and hard-stop replay checks',async()=>{
+    const f=await fixture(),child=await startSurveySituational(f.proof,'staged'),payload=input(child.attempt.id)
     await submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)
+    const before=await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})
+    await revokeGovernedCatalogFixture(db,admin,grantId)
+    await expect(startSurveySituational(f.proof,'staged')).rejects.toThrow('撤销')
+    await expect(submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).rejects.toThrow('撤销')
+    expect(await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})).toEqual(before)
     await db.surveyWave.update({where:{id:f.waveId},data:{hardStopAt:new Date()}})
-    await expect(submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).rejects.toThrow('窗口')
+    await expect(submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).rejects.toThrow()
     expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
-  })
-})
+  })})

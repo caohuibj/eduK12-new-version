@@ -132,7 +132,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
  it.each([1,2])('completes v%i approval and receipts, then immediately stops in-flight collection after withdrawal',async version=>{
   const pkg=registry.packages[version-1],source={kind:'SJT' as const,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion}
   await expect(grantCatalogSource(manager,owner,source)).rejects.toThrow()
-  const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'native-'+version,title:'Synthetic native '+version,
+  const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'native-'+version+'-'+randomUUID(),title:'Synthetic native '+version,
    report:{version:'r1',template:{title:'Synthetic report',blocks:[{type:'METRIC',metricKey:'coordination',display:'RAW'}],limitations:[]}},reference:{}},proof)
   const approved=await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic native approval'},proof)
   expect(approved.state,approved.blockers.join(';')).toBe('ONLINE')
