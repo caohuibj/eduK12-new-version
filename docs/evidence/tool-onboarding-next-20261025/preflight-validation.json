@@ -1,0 +1,817 @@
+{
+  "recordedAt": "2026-10-25T04:56:05.833269+00:00",
+  "kind": "recorded-local-execution-not-ci-or-http-qualification",
+  "productCommit": "057f03da99c9015f18a2c9880d61e62155873da2",
+  "productTree": "94a07c615389ca19e502fd31ab6354bf7512ee66",
+  "baselineComparisonCommit": "6fedb640fdd0700b9c1ca9974bf417b5a43cf58c",
+  "environment": {
+    "node": "24.21.0",
+    "npm": "11.9.0",
+    "vitest": "4.1.11",
+    "zod": "4.6.7",
+    "typescript": "5.9.3",
+    "prisma": "5.22.0",
+    "dependencyPreparation": "npm ci --ignore-scripts --no-audit --no-fund --registry=https://registry.npmjs.org --replace-registry-host=always; prisma generate only; no migrations/seeds/services",
+    "runtimeClientSha256": "8fe92cac75d26c6911122bade2dfc3a9ba9fb083055e00f97a3e3f2654085298"
+  },
+  "directInputs": {
+    "server-version/backend/src/modules/survey/publication.service.ts": "2f294e3e739cbe5bbd3dfeceee3e4b26303aad627200d886c60e0411f8aa4f87",
+    "server-version/backend/src/modules/survey/waves.service.ts": "48a5a753b0d9121990c489dbc4e4ff58990d5a6688afd4ee50f4bf9feaeec7fb",
+    "server-version/backend/src/__tests__/survey/wave-measurement-preflight.test.ts": "817ec85c82b256f8286f8dc9f867147e5247f389566f75e21d95f26f79837335",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "newCaseDisjointUnion": {
+    "passed": 25,
+    "firstPassed": 23,
+    "repairedFixtureCasesPassed": 2,
+    "overlappingPassedNames": 0,
+    "basis": "Only two individual test fixture bodies changed; production and shared setup/helpers did not change. No entire-suite rerun. First failure: FORM questionKey/TEXT did not match itemKey/SHORT_TEXT contract; second: catalog fixture omitted required source.sourceVersion."
+  },
+  "existingConsumers": {
+    "passed": 38,
+    "failed": 11,
+    "baselineFailed": 11,
+    "sameFailedNamesAndFirstErrors": true,
+    "status": "pre-existing integrated-candidate failures, not fixed here",
+    "cause": "survey-content-binding.test.ts mock SQL returns the attempt row for recursive release ancestry reads; current collection guard rejects absent exact ancestor identity. No assertion/guard weakening.",
+    "baselineMethod": "git archive 6fedb640 server-version/backend to separate /workspace directory; symlink same restored node_modules; run only 11 failed case names. No worktree or original branch mutation."
+  },
+  "reports": [
+    {
+      "id": "preflight-attempt1",
+      "kind": "new-cases-original-fixtures",
+      "rawReportSha256": "2b40edf98a36a20ab8dd1245fd42a9d906ebb18e370d0b9f7fa2519cd0a5e772",
+      "exitCode": 1,
+      "reportedPassed": 23,
+      "reportedFailed": 2,
+      "reportedPendingOrFiltered": 0,
+      "cases": [
+        {
+          "name": "read-only wave preflight and exact measurement publication reports the missing explicit publication before freeze without creating one",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication accepts the exact current published release and exposes its digest without writes",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another revision",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another owner",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another project",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another content",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports REVOKED without republishing or reactivating it",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports RETIRED without republishing or reactivating it",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports SUPERSEDED without republishing or reactivating it",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication keeps structural draft errors local and does not label them missing publication",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not require a measurement release for an ordinary FORM",
+          "status": "failed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": "AssertionError: expected false to be true // Object.is equality"
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication checks catalog SCALE explicit publication and does not treat source ONLINE as project publication",
+          "status": "failed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": "ContentReleaseError: CONTENT_SOURCE_VERSION_MISSING"
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not add an explicit step for catalog package measurements migrated at freeze",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports every missing current publication in a mixed selection",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not query publication identities for an unauthorized project",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not convert a database outage into a missing-publication instruction",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze FORM with undefined uses NONE",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with undefined uses EXPLICIT",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze COGNITIVE with undefined uses EXPLICIT",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SJT with undefined uses EXPLICIT",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with {\"surveyStandardReleaseId\":\"online\"} uses EXPLICIT",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with {\"surveyPackage\":{}} uses AT_FREEZE",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SJT with {} uses AT_FREEZE",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze COGNITIVE with {} uses AT_FREEZE",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze FORM with {\"surveyPackage\":{}} uses NONE",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        }
+      ]
+    },
+    {
+      "id": "preflight-attempt2",
+      "kind": "only-two-failed-cases-after-fixture-correction",
+      "rawReportSha256": "aad5eafd750c3d62d7be464334143277382206404e6fd0ffa338b585b4df598c",
+      "exitCode": 0,
+      "reportedPassed": 2,
+      "reportedFailed": 0,
+      "reportedPendingOrFiltered": 23,
+      "cases": [
+        {
+          "name": "read-only wave preflight and exact measurement publication reports the missing explicit publication before freeze without creating one",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication accepts the exact current published release and exposes its digest without writes",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another revision",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another owner",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another project",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication rejects a published release with another content",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports REVOKED without republishing or reactivating it",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports RETIRED without republishing or reactivating it",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports SUPERSEDED without republishing or reactivating it",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication keeps structural draft errors local and does not label them missing publication",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not require a measurement release for an ordinary FORM",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication checks catalog SCALE explicit publication and does not treat source ONLINE as project publication",
+          "status": "passed",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not add an explicit step for catalog package measurements migrated at freeze",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication reports every missing current publication in a mixed selection",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not query publication identities for an unauthorized project",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "read-only wave preflight and exact measurement publication does not convert a database outage into a missing-publication instruction",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze FORM with undefined uses NONE",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with undefined uses EXPLICIT",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze COGNITIVE with undefined uses EXPLICIT",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SJT with undefined uses EXPLICIT",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with {\"surveyStandardReleaseId\":\"online\"} uses EXPLICIT",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SCALE with {\"surveyPackage\":{}} uses AT_FREEZE",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze SJT with {} uses AT_FREEZE",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze COGNITIVE with {} uses AT_FREEZE",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "one publication mode for preflight and freeze FORM with {\"surveyPackage\":{}} uses NONE",
+          "status": "skipped",
+          "file": "src/__tests__/survey/wave-measurement-preflight.test.ts",
+          "firstFailure": null
+        }
+      ]
+    },
+    {
+      "id": "existing-consumers",
+      "kind": "current-candidate-existing-consumers",
+      "rawReportSha256": "4707a368c3dd7d94f85680f6c955c59b001fd71a30af14598ffe53817fa7e62b",
+      "exitCode": 1,
+      "reportedPassed": 38,
+      "reportedFailed": 11,
+      "reportedPendingOrFiltered": 0,
+      "cases": [
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository previews one named source without changing publication, pointer, facts or assets",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository writes pointer/audit only, preserves unknown hashes and recovers identical UUID/body",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository recovery does not republish after retirement or overwrite a later explicit pointer",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository refuses source DRAFT",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository refuses source ARCHIVED",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository refuses source DEPRECATED",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository refuses other owner, projected admin, expired account and unproven custom license",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository rejects changed source, mismatched hash, missing scorer and existing mapping",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository publishes STANDARD through real compiler, hashed current rights and existing publication identity",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository denies absent managed deployment or revoked/tampered license",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository rejects package substitution when measurement-only hash ignores a report change",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository rechecks elapsed expiry after release waits and aborts",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository rolls back release/pointer on audit failure, CAS failure or non-published release",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository requires real converted source before Survey can import, then pins source release in explicit project publication",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository Survey rejects withdrawn source release, current revoked managed license and expiry after later waits",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository batch source validation deduplicates repeated grants but rejects stale snapshots and forged release bytes",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "controlled legacy Scale conversion through real validators/compiler/license/release repository does not queue User SHARE behind a writer while holding source/Scale locks",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/legacy-scale-conversion.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Survey START exact encrypted content binding stores only exact selected pointers, empty population and report availability under CAS",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "Error: promise rejected \"ScaleLibraryError: 量表依赖身份不完整 { …(1) }\" instead of resolving"
+        },
+        {
+          "name": "Survey START exact encrypted content binding keeps frozen SUPERSEDED measurement/report identities for START",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding keeps frozen RETIRED measurement/report identities for START",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding denies revoked measurement but records revoked report as unavailable without blocking collection",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding records reference REVOKED as unavailable",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding records reference RETIRED as unavailable",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding preserves superseded reference candidate and refuses to infer missing population",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding uses actual project owner, denying other project/owner/layer/hash instead of trusting anonymous actor",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Survey START exact encrypted content binding binds new native measurement without selections to empty references and leaves legacy/FORM-only rows null",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding recovers original binding without reselecting or rewriting after release retirement/revocation",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding does not backfill old Attempt even if its publication now has exact release metadata",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Survey START exact encrypted content binding fails changed stored hash, wrong Attempt, corrupted publication, and CAS conflict",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding pure recovery validates report and selected reference membership without choosing again",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding uses persisted assigned variant before selecting releases",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication authorizes, locks exact revision, compiles and retains in the same transaction",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication does not read drafts after authorization refusal",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication rejects unavailable or non-native draft {\"revision\":3}",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication rejects unavailable or non-native draft {\"status\":\"ARCHIVED\"}",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication rejects unavailable or non-native draft {\"catalogGrantId\":\"catalog\",\"kind\":\"SJT\"}",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication rejects unavailable or non-native draft {\"kind\":\"FORM\"}",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication does not bypass asset authorization",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication cannot reactivate a retired exact revision",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication publishes catalog SCALE only through its owned active grant and unchanged read-only compiler",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication refuses catalog publication when unconverted source",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication refuses catalog publication when revoked source license",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication refuses catalog publication when source release withdrawn",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "explicit private measurement publication fails a catalog source license that expires while publication waits",
+          "status": "passed",
+          "file": "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Form authoring budget and authoritative preview accepts 12×40 row keys throughout freeze and FINAL but rejects 13×40 before save or freeze",
+          "status": "passed",
+          "file": "src/__tests__/survey/research-form-runtime.contract.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Form authoring budget and authoritative preview rejects authoring a large free-text Form that cannot fit the submission cap",
+          "status": "passed",
+          "file": "src/__tests__/survey/research-form-runtime.contract.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Form authoring budget and authoritative preview aligns decimal, step, integer, bounds and JSON type rejection with FINAL",
+          "status": "passed",
+          "file": "src/__tests__/survey/research-form-runtime.contract.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Form authoring budget and authoritative preview distinguishes hidden, omitted, and refused without trusting injected hidden keys",
+          "status": "passed",
+          "file": "src/__tests__/survey/research-form-runtime.contract.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Form authoring budget and authoritative preview rejects extra fields and payload size without weakening runtime authority",
+          "status": "passed",
+          "file": "src/__tests__/survey/research-form-runtime.contract.test.ts",
+          "firstFailure": null
+        }
+      ]
+    },
+    {
+      "id": "baseline-failures",
+      "kind": "only-eleven-failed-cases-on-unmodified-integrated-baseline",
+      "rawReportSha256": "002b86bf9501764137ae210319a2172b0b6dbfa8c418aa065d79dfa0188c1abb",
+      "exitCode": 1,
+      "reportedPassed": 0,
+      "reportedFailed": 11,
+      "reportedPendingOrFiltered": 3,
+      "cases": [
+        {
+          "name": "Survey START exact encrypted content binding stores only exact selected pointers, empty population and report availability under CAS",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "Error: promise rejected \"ScaleLibraryError: 量表依赖身份不完整 { …(1) }\" instead of resolving"
+        },
+        {
+          "name": "Survey START exact encrypted content binding keeps frozen SUPERSEDED measurement/report identities for START",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding keeps frozen RETIRED measurement/report identities for START",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding denies revoked measurement but records revoked report as unavailable without blocking collection",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding records reference REVOKED as unavailable",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding records reference RETIRED as unavailable",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding preserves superseded reference candidate and refuses to infer missing population",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding uses actual project owner, denying other project/owner/layer/hash instead of trusting anonymous actor",
+          "status": "skipped",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Survey START exact encrypted content binding binds new native measurement without selections to empty references and leaves legacy/FORM-only rows null",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding recovers original binding without reselecting or rewriting after release retirement/revocation",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding does not backfill old Attempt even if its publication now has exact release metadata",
+          "status": "skipped",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        },
+        {
+          "name": "Survey START exact encrypted content binding fails changed stored hash, wrong Attempt, corrupted publication, and CAS conflict",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding pure recovery validates report and selected reference membership without choosing again",
+          "status": "failed",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": "ScaleLibraryError: 量表依赖身份不完整"
+        },
+        {
+          "name": "Survey START exact encrypted content binding uses persisted assigned variant before selecting releases",
+          "status": "skipped",
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "firstFailure": null
+        }
+      ]
+    }
+  ],
+  "typeChecks": [
+    {
+      "id": "types",
+      "exitCode": 0,
+      "kind": "production backend tsc --noEmit --pretty false",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": []
+    },
+    {
+      "id": "test-types",
+      "exitCode": 2,
+      "kind": "first scoped command omitted existing Express Request augmentation; harness error",
+      "sha256": "7f7998ed7ac2ae141a61a6844bbc6861d6af08944d7d2837e75b72ce81ea97ac",
+      "diagnostics": [
+        "src/modules/organization/access.ts(222,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(225,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(236,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(239,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(263,14): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(266,77): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(268,13): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(281,16): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/organization/access.ts(284,79): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/survey/admin-role.ts(21,10): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/survey/admin-role.ts(21,48): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.",
+        "src/modules/survey/admin-role.ts(21,71): error TS7006: Parameter 'g' implicitly has an 'any' type.",
+        "src/services/assetStorage.ts(700,46): error TS2339: Property 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'."
+      ]
+    },
+    {
+      "id": "test-types-attempt2",
+      "exitCode": 0,
+      "kind": "same scoped command plus src/middleware/auth.ts for its existing global augmentation",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": []
+    }
+  ],
+  "commands": {
+    "newCases": "vitest run src/__tests__/survey/wave-measurement-preflight.test.ts --maxWorkers=1 --reporter=json --outputFile=<local report>",
+    "newCasesRetry": "same file/options, -t \"ordinary FORM|catalog SCALE explicit publication\"",
+    "existingConsumers": "vitest run src/__tests__/measurement-content/survey-measurement-publication.test.ts src/__tests__/measurement-content/legacy-scale-conversion.test.ts src/__tests__/measurement-content/survey-content-binding.test.ts src/__tests__/survey/research-form-runtime.contract.test.ts --maxWorkers=1 --reporter=json",
+    "productionTypes": "tsc --noEmit --pretty false",
+    "testTypesFinal": "tsc --noEmit --skipLibCheck --strict --esModuleInterop --target ES2020 --module commonjs --moduleResolution node --resolveJsonModule --experimentalDecorators --emitDecoratorMetadata --strictPropertyInitialization false src/middleware/auth.ts src/__tests__/survey/wave-measurement-preflight.test.ts"
+  },
+  "limitations": [
+    "Tests use synthetic definitions and in-memory SQL/method doubles; no actual HTTP, live database, import/install/publish/trial operations.",
+    "The 38 passing consumer cases do not make the command successful; its 11 failures and the failing baseline command remain failures.",
+    "Two corrected fixture cases pass in a filtered invocation; 23 other cases in that invocation were not executed. Their passed results keep the original invocation identity.",
+    "Direct inputs recorded after execution, not a signed or complete transitive runtime-byte attestation. Original raw reports/logs retained locally and hashes recorded.",
+    "No CI, image/build qualification, merge or deployment success asserted. No changes to #355 repair, permission guards, scan thresholds or third-party license rules."
+  ]
+}
