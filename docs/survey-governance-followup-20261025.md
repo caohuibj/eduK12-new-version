@@ -404,3 +404,13 @@ ProjectTools 将选择回调与共享列表 changed 分开；刷新失败后只�
 实际 SurveyWaveStudio 在 ACK→读取失败后改为 [b,a]、设置 Flow 与 quota=7，重试后保存
 仍是这些值；实际顶层路由正常交接保持通过。后续新批准的原子整包编辑会阻止新拆包，
 本案例保留为旧损坏草稿恢复期间不被只读刷新覆盖的证据。
+
+## A：governed SCALE 使用范围入口接线
+
+GovernedToolLibrary 在原有 family 筛选中补 SCALE；沿用同一个后台准入/策略操作，
+不增加内容、参数、报告编辑能力或新目录。1 项 UI 合同验证管理员选择 SCALE 后
+看到已上线精确版本、仅提交其 policy identity/version；真实 PG 的独立 native Scale
+案例验证系统批准→入口管理员可列出→精确 entry policy→授权和冻结，普通研究者
+目录读取/策略操作均拒绝。证据 `atomic-package-ui-retry.json` 的 SCALE case 与
+`atomic-membership-scale-postgres.json` 的 native Scale case；另一个 membership case
+属于下一片，不能将同一次报告误称为都只测试此入口。
