@@ -335,6 +335,12 @@ export const situationalAttemptForResponse = (
   if (row.status === 'COMPLETED' && !options.suppressResult && !options.feedbackDeferred && !stored) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评终态结果缺失，请联系管理员', 500)
   }
+  // The public assignment and projected runner definition describe the same
+  // frozen attempt. Derive it once within this response, never cache authority.
+  const assignment = snapshot.definition.schemaVersion === 2
+    && (snapshot.definition.researchAssignment || snapshot.definition.flow.nodes.some(n => n.nodeType === 'SCENE' && n.responseStages))
+    ? deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)
+    : undefined
   return {
     attemptId: row.id,
     attempt: {
@@ -363,9 +369,9 @@ export const situationalAttemptForResponse = (
       updatedAt: row.updatedAt,
     },
     instrument: { ...instrumentResponse(snapshot),
-      ...(snapshot.definition.schemaVersion === 2 && (snapshot.definition.researchAssignment || snapshot.definition.flow.nodes.some(n => n.nodeType === 'SCENE' && n.responseStages)) ? {
-        assignment: deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash),
-        definition: assignedSituationalRunnerDefinition(snapshot.definition, deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)),
+      ...(assignment && snapshot.definition.schemaVersion === 2 ? {
+        assignment,
+        definition: assignedSituationalRunnerDefinition(snapshot.definition, assignment),
       } : {}),
     },
     ...(stored ? { result: stored.result.model?.modelKey === 'AUTHOR_KEY_SUM' ? { ...stored.result, metrics: stored.result.metrics.map(({ contributions: _researchOnly, ...metric }) => metric) } : stored.result, canonicalResult: stored.canonicalResult } : {}),

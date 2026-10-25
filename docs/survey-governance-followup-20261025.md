@@ -306,3 +306,17 @@ SHARE 锁，提交后新校验拒绝，已完成回执可重放（`22-grant-scop
 受影响消费者首轮 32 通过，4 个旧 cognitive lifecycle mock 缺 main 已新增 native 锁
 集合而失败；仅添加空 native 夹具，不跳过 authority/锁，四项单独复验，原失败保留。
 证据 `22-stop-consumers{,-retry}.json`；原始类型检查 `backend-types-stop.log` 退出 0。
+
+### B 第三批：响应局部复用与工作台按需统计
+
+精确采用旧 c1f5465071aa29b8652f6885d4cf99608bcfefaf 和
+ e0dd43000e059b0e5732b82274330489cfade58e 的两个完整局部 diff；未合并分支。
+main31d9e4cb→25215 的三个 overview 生产文件及 shared SJT response 未变；
+本分支 native service 的 policy22 改动在不同函数，patch check 成功且锁/准入仍保留。
+SJT assignment 同次 response 只推导一次；prepare 验证 frozen Flow prefix 时不构造
+会被丢弃的 public DTO，commit/replay 仍完成两边原有权威检查，不声称并发只计分一次。
+TrainingTrainerOverview 显式 includeCourseCounts=false；默认 API 仍返回课程统计，
+页面无课程总数时不伪造 0，授权和 pending assignment 查询不变。
+
+实际受影响后端四组 41/41、前端 overview 11/11 通过：
+`B-response-overview.json`、`B-overview-ui.json`。未产生新容量或普遍提速结论。
