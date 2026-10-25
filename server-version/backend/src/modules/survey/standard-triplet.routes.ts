@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticate} from '../../middleware/auth'
@@ -15,7 +16,7 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
 surveyStandardTripletRouter.get('/management-design',handle(async()=>MANAGEMENT_DESIGN))
 const hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().trim().min(1).max(300),reason=z.string().trim().min(1).max(1000)
 const selection=z.object({toolKey:text,CONTENT:hash,PARAMETERS:hash,REPORT:hash}).strict()
-surveyStandardTripletRouter.get('/catalog',handle(req=>service.standardTripletCatalog(req.user!.userId,z.coerce.number().int().min(1).max(10000).default(1).parse(req.query.page))))
+surveyStandardTripletRouter.get('/catalog',handle(req=>{const {page,...filters}=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),...catalogDiscoveryQueryFields}).parse(req.query);return service.standardTripletCatalog(req.user!.userId,page,filters)}))
 surveyStandardTripletRouter.get('/candidate/:key/:version',handle(req=>service.standardTripletDetail(req.user!.userId,text.parse(req.params.key),text.parse(req.params.version))))
 surveyStandardTripletRouter.post('/preview',handle(req=>service.previewStandardTriplet(prisma,req.user!.userId,selection.parse(req.body))))
 surveyStandardTripletRouter.post('/approve',requireRecentAdminKey,handle(req=>service.approveStandardTriplet(req.user!.userId,selection.extend({requestId:z.string().uuid(),expectedCombinationHash:hash,reason}).strict().parse(req.body),req.user!)))

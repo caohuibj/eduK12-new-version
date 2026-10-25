@@ -18,6 +18,7 @@ const DOMAIN_OPTIONS = [
   ['EXECUTIVE_FUNCTION', '执行功能'],
   ['SELF_REGULATION', '自我调节'],
   ['SELF_EFFICACY', '自我效能'],
+  ['MOTIVATION', '学习动机'],
   ['SOCIAL_EMOTIONAL', '社会情绪'],
   ['BEHAVIORAL_DIFFICULTIES', '行为与困难'],
   ['PARENT_OBSERVATION', '家长观察'],

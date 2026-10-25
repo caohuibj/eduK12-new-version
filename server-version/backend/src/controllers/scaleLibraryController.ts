@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../modules/scale/library/catalog-discovery'
 import { Request, Response } from 'express'
 import {
   constructDomainSchema,
@@ -26,6 +27,7 @@ const optionalNumber = z.preprocess((value) => {
 }, z.number().int().min(0).max(100).optional())
 
 const libraryQuerySchema = z.object({
+  tags: catalogDiscoveryQueryFields.tags,
   keyword: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   instrumentFamily: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   primaryDomain: z.preprocess(queryValue, constructDomainSchema.optional()),
@@ -62,6 +64,7 @@ const parseQuery = (req: Request): { query?: z.infer<typeof libraryQuerySchema>;
 
 const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibraryFilterInput => ({
   keyword: query.keyword,
+  tags: query.tags,
   instrumentFamily: query.instrumentFamily,
   primaryDomain: query.primaryDomain,
   secondaryDomain: query.secondaryDomain,

@@ -1,4 +1,5 @@
 import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
+import {catalogClassificationTags,matchesCatalogDiscovery} from './catalog-discovery'
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
@@ -60,6 +61,7 @@ export interface ScaleLibraryReadModelContext {
 
 export interface ScaleLibraryFilterInput {
   keyword?: string
+  tags?: readonly string[]
   instrumentFamily?: string
   primaryDomain?: ConstructDomain
   secondaryDomain?: ConstructDomain
@@ -185,7 +187,6 @@ const bindingKey = (instrumentKey: string, instrumentVersion: string): string =>
 
 const unique = (values: string[]): string[] => [...new Set(values)]
 
-const normalizeText = (value: string): string => value.trim().toLocaleLowerCase()
 
 const deploymentForKey = (
   deployments: readonly ScaleLibraryDeploymentRecord[],
@@ -446,18 +447,18 @@ export const filterScaleLibraryEntries = (
   entries: readonly ScaleLibraryEntry[],
   filters: ScaleLibraryFilterInput = {},
 ): ScaleLibraryEntry[] => {
-  const keyword = filters.keyword ? normalizeText(filters.keyword) : undefined
   return entries.filter((entry) => {
-    if (keyword) {
-      const haystack = normalizeText([
+    if (filters.keyword || filters.tags?.length) {
+      const matches = matchesCatalogDiscovery([
         entry.identity.canonicalName,
         entry.identity.abbreviation ?? '',
         entry.identity.instrumentFamily ?? '',
         entry.construct.primaryDomain,
         entry.construct.constructDefinition,
         entry.source.title ?? '',
-      ].join(' '))
-      if (!haystack.includes(keyword)) return false
+        entry.identity.instrumentKey,
+      ], catalogClassificationTags(entry.construct), filters)
+      if (!matches) return false
     }
     if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false
     if (filters.primaryDomain && entry.construct.primaryDomain !== filters.primaryDomain) return false

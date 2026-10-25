@@ -1,5 +1,6 @@
 import apiClient, { sessionFetch } from './client'
 import type { ScaleLibraryEntry } from './scaleLibrary'
+import type { CatalogClassificationTag } from './catalogDiscovery'
 
 export type GovernanceMediaItem = { assetId: string; contentHash: string; mimeType: string; sizeBytes: number; assetVersion: string; usages: string[]; rights: 'AUTHOR_SHARED_FOR_BOUND_SCALE'; dependencyReleaseIds: string[] }
 export type GovernanceMediaManifest = { schemaVersion: 1; releaseIds: string[]; items: GovernanceMediaItem[]; manifestHash: string }
@@ -24,6 +25,7 @@ export type EducationGrantRequest = { product: EducationDistributionProduct; rel
 
 export type GovernanceCatalogRecord = {
   catalogId: string; title: string; origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE';
+  classificationTags?: CatalogClassificationTag[];
   exactVersion: { origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentKey?: string; instrumentVersion?: string; entryId?: string; releaseId?: string; releaseVersion?: string; contentHash?: string };
   availability: { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] };
   authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
