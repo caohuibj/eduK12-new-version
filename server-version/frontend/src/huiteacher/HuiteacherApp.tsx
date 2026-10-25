@@ -1,4 +1,4 @@
-import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
+import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
@@ -6,14 +6,13 @@ import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { UserRound, X, BookOpen, Compass, FileText, ClipboardList, Sprout, UsersRound, Info, MessageSquare, TrendingUp, BarChart3 } from 'lucide-react'
+import { UserRound, X, BookOpen, Compass, FileText, ClipboardList, Sprout, UsersRound, Info, MessageSquare, TrendingUp } from 'lucide-react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import {HuiteacherMyStudentFeedback} from './HuiteacherMyStudentFeedback'
-import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
 import { HuiteacherConsensusReviews } from './HuiteacherConsensus'
@@ -345,7 +344,8 @@ export default function HuiteacherApp(){
   }
   useEffect(()=>{
     const restoreSection=(event?:Event)=>{
-      const id=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-self')
+      const fragment=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-self')
+      const id=['ht-personal-forms','ht-personal-private-forms','ht-personal-scales'].includes(fragment)?'ht-personal-tasks':fragment
       // A fragment can only select an already-authorized, mounted section.
       const target=document.getElementById(id)
       if(!target?.classList.contains('ht-workspace-section'))return
@@ -479,17 +479,13 @@ export default function HuiteacherApp(){
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
           <span className="ht-workspace-nav-label">我的任务</span>
           <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>自主测评</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-forms" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-private-forms" selected={personalSection} onSelect={setPersonalSection}><FileText size={18} aria-hidden="true"/>私有表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-scales" selected={personalSection} onSelect={setPersonalSection}><BarChart3 size={18} aria-hidden="true"/>量表任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-tasks" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>测评任务</WorkspaceJump>
           {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}><MessageSquare size={18} aria-hidden="true"/>学生反馈</WorkspaceJump>}
           {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}><TrendingUp size={18} aria-hidden="true"/>我的成长</WorkspaceJump>}
         </nav>
         <div className="ht-workspace-sections">
         <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="自主测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-forms" hidden={personalSection!=='ht-personal-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="表单任务"><HuiteacherMyFormTasks api={teacherApi}/></section>
-        <section id="ht-personal-private-forms" hidden={personalSection!=='ht-personal-private-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="私有表单任务"><HuiteacherMyPrivateFormTasks key={`private-form:${me.id}`} actorKey={me.id} api={teacherApi}/></section>
-        <section id="ht-personal-scales" hidden={personalSection!=='ht-personal-scales'} className="ht-workspace-section" tabIndex={-1} aria-label="量表任务"><HuiteacherMyScaleTasks key={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="测评任务"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

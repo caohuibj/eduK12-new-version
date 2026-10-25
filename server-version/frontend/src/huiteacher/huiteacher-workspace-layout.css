@@ -109,3 +109,12 @@
  .ht-app.ht-app-landing.ht-app-signed-in .ht-topbar{flex-wrap:wrap}
  .ht-app.ht-app-landing.ht-app-signed-in .ht-topbar nav{width:100%;margin-left:auto}
 }
+
+/* Assigned assessments share one inbox regardless of the authorized answer format. */
+.ht-assessment-items{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
+.ht-assessment-source,.ht-assessment-source>.ht-event-list{display:contents}
+.ht-assessment-source>.ht-event-list>.ht-event{margin:0;padding:18px;min-width:0}
+.ht-assessment-source>.ht-event-list>.ht-event>strong{display:inline-block;margin-right:10px;font-size:16px}
+.ht-assessment-source>.ht-event-list>.ht-event>p{margin:8px 0 12px;color:var(--ht-quiet);font-size:13px}
+.ht-assessment-source>:not(.ht-event-list){grid-column:1/-1;min-width:0}
+.ht-assessment-source>.ht-task{margin-top:6px;padding-top:18px;border-top:1px solid var(--ht-line)}

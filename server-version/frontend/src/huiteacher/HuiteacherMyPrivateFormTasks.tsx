@@ -1,4 +1,5 @@
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
+import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import type {CompositeAttemptState} from '../modules/composite/types'
 
@@ -16,8 +17,8 @@ function assertAttempt(state:CompositeAttemptState,id:string){
   (state.currentItem&&(state.currentItem.type!=='FORM_SECTION'||!sectionId||state.currentItem.id!==sectionId||!state.units.some(unit=>unit.id===sectionId))))throw Error('表单运行记录与当前获授权任务不一致，请重新读取。')
 }
 
-export function HuiteacherMyPrivateFormTasks(props:{api:Api;actorKey:string}){return <PrivateFormSession key={props.actorKey} {...props}/>}
-function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
+export function HuiteacherMyPrivateFormTasks(props:{api:Api;actorKey:string}&AssessmentListPresentation){return <PrivateFormSession key={props.actorKey} {...props}/>}
+function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:Api;actorKey:string}&AssessmentListPresentation){
  const [listing,setListing]=useState<{api:Api;actorKey:string;rows:Task[];nextCursor:string|null}|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
  const [active,setActive]=useState<{api:Api;task:Task;attempt:CompositeAttemptState|null}|null>(null)
  const [listPending,setListPending]=useState(true),[listError,setListError]=useState(''),[retryCursor,setRetryCursor]=useState<string|undefined>(undefined)
@@ -26,6 +27,7 @@ function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
  currentApi.current=api;currentActor.current=actorKey;activeRef.current=active
  const currentListing=listing?.api===api&&listing.actorKey===actorKey?listing:null
  const tasks=currentListing?.rows??[],visible=active?.api===api?active:null
+ useEffect(()=>{onListStateChange?.({pending:listPending,error:Boolean(listError),count:tasks.length})},[onListStateChange,listPending,listError,tasks.length])
  const mediaTransport=useMemo(()=>{
   const attempt=visible?.attempt,item=attempt?.currentItem
   const rawSectionId=item?.formSectionId||item?.formSection?.id
@@ -116,17 +118,17 @@ function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
   try{await refresh()}catch{if(valid())setMessage('当前表单状态已读取，任务列表刷新失败，请稍后刷新列表。')}
  }
  const leave=()=>{epoch.current++;activeRef.current=null;setActive(null);setBusy(false);locked.current=false}
- return <section className="ht-panel" aria-label="我的自编表单任务"><h2>我的自编表单任务</h2>
+ return <section className={unified?"ht-assessment-source":"ht-panel"} aria-label={unified?undefined:"我的自编表单任务"}>{!unified&&<><h2>我的自编表单任务</h2>
   <p>完成分配给本人的固定版本表单，按分节逐步作答并提交；表单只记录作答，不生成量表分数。</p>
-  <button type="button" disabled={busy||listPending} onClick={()=>void refresh()}>刷新自编表单任务</button>
-  {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
+  <button type="button" disabled={busy||listPending} onClick={()=>void refresh()}>刷新自编表单任务</button></>}
+  {!unified&&listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
   {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p><button type="button" disabled={listPending} onClick={()=>void fetchPage(retryCursor)}>重试读取任务列表</button></div>}
   {message&&<p role="status" className="ht-notice">{message}</p>}
-  {currentListing&&!listPending&&!listError&&!tasks.length&&<p className="ht-empty">暂无分配给本人的自编表单任务。</p>}
-  <div className="ht-event-list">{tasks.map(task=><article className="ht-event" key={task.executionId}><strong>{task.formTitle}</strong><p>{task.eventTitle}</p>
-   {completed.includes(task.executionId)||task.status==='COMPLETED'?<span className="ht-tag">已完成正式提交</span>:canOpen(task)?<button type="button" disabled={busy||Boolean(visible)} onClick={()=>open(task)}>{task.runStatus==='CLOSED'?'继续已有表单':'打开本人表单'}</button>:<p className="ht-muted">当前活动或任务未开放新的作答。</p>}
+  {!unified&&currentListing&&!listPending&&!listError&&!tasks.length&&<p className="ht-empty">暂无分配给本人的自编表单任务。</p>}
+  <div className="ht-event-list">{tasks.map(task=><article className="ht-event" key={task.executionId}><strong>{task.formTitle}</strong>{unified&&<span className="ht-tag">{assessmentStatus(completed.includes(task.executionId)?"COMPLETED":task.status)}</span>}<p>{task.eventTitle}</p>
+   {completed.includes(task.executionId)||task.status==='COMPLETED'?<span className="ht-tag">{unified?"本次测评已提交":"已完成正式提交"}</span>:canOpen(task)?<button type="button" disabled={busy||Boolean(visible)} onClick={()=>open(task)}>{unified?(task.status==='STARTED'?'继续测评':'开始测评'):(task.runStatus==='CLOSED'?'继续已有表单':'打开本人表单')}</button>:<p className="ht-muted">当前活动或任务未开放新的作答。</p>}
   </article>)}</div>
-  {currentListing?.nextCursor&&<button type="button" disabled={busy||listPending} onClick={()=>void fetchPage(currentListing.nextCursor!)}>加载更多表单任务</button>}
+  {currentListing?.nextCursor&&<button type="button" disabled={busy||listPending} onClick={()=>void fetchPage(currentListing.nextCursor!)}>{unified?"加载更多测评任务":"加载更多表单任务"}</button>}
   {visible&&<div className="ht-task"><h3>正在完成：{visible.task.formTitle}</h3>
    {!visible.attempt&&<><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='ABANDONED'&&<><p>本次作答已终止，不能继续提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}

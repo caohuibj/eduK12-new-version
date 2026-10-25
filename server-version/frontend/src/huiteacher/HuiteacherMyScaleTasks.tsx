@@ -1,4 +1,5 @@
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
+import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import { EducationScalePersonalReport, type EducationScalePersonalReportData, type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
@@ -23,7 +24,7 @@ type Summary=EducationScalePersonalReportData&{
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
   runtimeBindingKind?:string;runtimeBindingRef?:string}
 
-export function HuiteacherMyScaleTasks({api}:{api:Api}){
+export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{api:Api}&AssessmentListPresentation){
   const [taskRows,setTasks]=useState<Task[]>([])
   const [session,setSession]=useState<{api:Api;selected:Task;attempt:CompositeAttemptState}|null>(null)
   const currentApi=useRef(api),sessionRef=useRef(session),sessionEpoch=useRef(0)
@@ -73,6 +74,7 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
   const listError=listCurrent?listState.error:''
   const listReady=listCurrent&&listState.loaded
   const tasks=listReady?taskRows:[]
+  useEffect(()=>{onListStateChange?.({pending:listPending,error:Boolean(listError),count:tasks.length})},[onListStateChange,listPending,listError,tasks.length])
   const refresh=useCallback(async()=>{
     if(listSource.current.api!==api||listSource.current.endpoint!=='/my-scale-tasks')return
     const request=++listRequest.current
@@ -173,26 +175,26 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     if(!valid())throw new Error('测评任务已切换，请重新读取提交状态。')
     return {code:0,message:'本次正式提交已确认',data:result}
   }
-  return <section className="ht-panel" aria-label="教师个人发展 Scale 自评">
-    <h2>教师个人发展评价</h2>
+  return <section className={unified?"ht-assessment-source":"ht-panel"} aria-label={unified?undefined:"教师个人发展 Scale 自评"}>
+    {!unified&&<><h2>教师个人发展评价</h2>
     <p>正式计分仅来自经过独立发布、学校授权的教师自评量表。
-      个人结果仅由本人获取，学校管理者不能代查。</p>
-    {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
+      个人结果仅由本人获取，学校管理者不能代查。</p></>}
+    {!unified&&listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
     {visible&&<p className="ht-muted">请先在当前测评中保存并退出，再打开另一项自评。</p>}
     {loading&&!visible&&<button type="button" onClick={leave}>取消打开测评</button>}
     {message&&<p role="status" className="ht-notice">{message}</p>}
-    {listReady&&!listPending&&!listError&&!tasks.length?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
+    {listReady&&!listPending&&!listError&&!tasks.length&&!unified?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
-        <strong>{item.title}</strong> <span className="ht-tag">{item.status}</span>
+        <strong>{item.title}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span>
         <p>{item.eventTitle}</p>
         <div className="ht-inline">
           {item.status!=='COMPLETED'&&(item.runStatus==='PUBLISHED'
             ||(item.runStatus==='CLOSED'&&item.status==='STARTED'&&Boolean(item.runtimeBindingRef)))&&
             <button type="button" disabled={loading||reportBusy||Boolean(visible)}
-              onClick={()=>open(item)}>{item.runStatus==='CLOSED'?'继续已有自评':'进入本人自评'}</button>}
+              onClick={()=>open(item)}>{unified?(item.status==='STARTED'?'继续测评':'开始测评'):(item.runStatus==='CLOSED'?'继续已有自评':'进入本人自评')}</button>}
           {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'
             &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)&&
             <p className="ht-muted">任务已结束或不再接受新的 START，不能重新开始。</p>}
