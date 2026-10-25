@@ -1,0 +1,73 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "parameters": [
+    {
+      "subscale": "victim",
+      "mean": 3.13,
+      "sd": 1.43,
+      "population": "UK adult native English n468 age18–69",
+      "source": "Official manual Table6",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "observer",
+      "mean": 3.9,
+      "sd": 1.24,
+      "population": "UK adult native English n468 age18–69",
+      "source": "Official manual Table6",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "beneficiary",
+      "mean": 2.82,
+      "sd": 1.34,
+      "population": "UK adult native English n468 age18–69",
+      "source": "Official manual Table6",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "perpetrator",
+      "mean": 3.64,
+      "sd": 1.63,
+      "population": "UK adult native English n468 age18–69",
+      "source": "Official manual Table6",
+      "runtimeSelected": false
+    }
+  ],
+  "sampleContext": {
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ],
+    "fielding": "January 2018",
+    "sampling": "Native-language adult quota samples by age/gender/education; not Chinese or child norms"
+  },
+  "thresholds": [],
+  "references": [
+    {
+      "url": "https://access.gesis.org/zis/1396",
+      "doi": "10.6102/zis337_exz",
+      "citation": "Groskurth, K., Beierlein, C., Nießen, D., Baumert, A., Rammstedt, B., & Lechner, C. M. (2024). Justice Sensitivity Short Scales–8 (JSS-8). ZIS.",
+      "role": "CCBY p2; printed pp2–3 original complete instructions/items/scoring; Table2 sample; Table6 descriptive statistics; Table8 age/sex references."
+    },
+    {
+      "url": "https://doi.org/10.1371/journal.pone.0293748",
+      "citation": "Groskurth et al. (2023). An English-language adaptation and validation of the Justice Sensitivity Short Scales–8 (JSS-8). PLOS ONE18(11),e0293748.",
+      "role": "Original author validation publication"
+    },
+    {
+      "url": "https://zis.gesis.org/s//skala/openScale/417",
+      "role": "Official registry"
+    }
+  ],
+  "currentTranslationValidated": false
+}

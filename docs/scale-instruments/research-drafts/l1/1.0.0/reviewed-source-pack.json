@@ -1,0 +1,193 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "defaultAudience": "ADULT_SELF_18_69_REFERENCE_ONLY",
+  "k12Validated": false,
+  "thresholds": [],
+  "thresholdPolicy": "No established diagnostic cutoff; no invented low/medium/high or percentiles. External sample means are not cutoffs and are not runtime-selected.",
+  "sampleContext": {
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ],
+    "fielding": "January 2018",
+    "sampling": "Native-language adult quota samples by age/gender/education; not Chinese or child norms"
+  },
+  "changesNotice": "本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+  "dedup": {
+    "registry": "eduk12-dot-local-scales-20261025/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "exactAliasMatch": false
+  },
+  "reportPolicy": {
+    "trigger": "one neutral report for all valid patterns, no invented strata",
+    "technicalDetails": "文案设计目标：正文不堆砌原始分、标准分、百分位或常模比较，技术数字尽量放补充说明。现有平台底层仍保留数值；本sourcepack不宣称已隐藏数值或改变UI。",
+    "purpose": "成人自主了解与非诊断研究；不用于儿童筛查、录取或人事决策"
+  },
+  "id": "L1",
+  "title": "总体生活满意度简表（1题）",
+  "family": "general-life-satisfaction",
+  "authors": [
+    "Désirée Nießen",
+    "Katharina Groskurth",
+    "Beatrice Rammstedt",
+    "Clemens M. Lechner"
+  ],
+  "rights": {
+    "license": "CC-BY-NC-SA-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "noncommercialOnly": true,
+    "basis": "GESIS standalone English instrument PDF page 2 explicitly licenses this work CC BY-NC-SA 4.0; full item on page 3.",
+    "translationRedistribution": "Attribution + NC + share adapted material under same license; keep content license independent from repository code license."
+  },
+  "references": [
+    {
+      "url": "https://access.gesis.org/zis/624",
+      "role": "Official standalone original instrument, license p2, full form p3",
+      "citation": "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS.",
+      "note": "PDF front cover prints doi 10.6102/zis275 whereas current matching official registry identifies 10.6102/zis284. Preserve discrepancy; use current registry DOI as canonical, not silent correction."
+    },
+    {
+      "url": "https://zis.gesis.org/s//skala/openScale/327?lang=en",
+      "doi": "10.6102/zis284",
+      "role": "Current official scoring and validation, response specifications and Tables 2–4"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "en": "The next question is about your general satisfaction with life. All things considered, how satisfied are you with your life these days?",
+      "zh": "下面的问题关于您对生活的总体满意程度。综合各方面来看，您对近来的生活有多满意？",
+      "reverse": false
+    }
+  ],
+  "responses": [
+    {
+      "value": 1,
+      "en": "not at all satisfied",
+      "zh": "完全不满意"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5"
+    },
+    {
+      "value": 6,
+      "en": "6",
+      "zh": "6"
+    },
+    {
+      "value": 7,
+      "en": "7",
+      "zh": "7"
+    },
+    {
+      "value": 8,
+      "en": "8",
+      "zh": "8"
+    },
+    {
+      "value": 9,
+      "en": "9",
+      "zh": "9"
+    },
+    {
+      "value": 10,
+      "en": "10",
+      "zh": "10"
+    },
+    {
+      "value": 11,
+      "en": "completely satisfied",
+      "zh": "完全满意"
+    }
+  ],
+  "scoring": {
+    "formula": "q1",
+    "range": [
+      1,
+      11
+    ],
+    "higherMeaning": "Higher current general life satisfaction",
+    "reverseItems": [],
+    "warning": "Use 2020 English validation coding 1–11. German original used 0–10; do not mix score conventions or reference values."
+  },
+  "missingPolicy": {
+    "rule": "single item required, otherwise no score; no imputation",
+    "source": "Project implementation; study used FIML for analyses, not an individual scoring instruction"
+  },
+  "externalReferenceValues": [
+    {
+      "population": "UK adults18–69, n468",
+      "mean": 7.18,
+      "sd": 2.5,
+      "source": "Current official registry Table3, 1–11 coding",
+      "runtimeSelected": false
+    }
+  ],
+  "tags": {
+    "domain:": [
+      "幸福感与生活质量"
+    ],
+    "construct:": [
+      "总体生活满意度"
+    ],
+    "orientation:": [],
+    "population:": [
+      "成人"
+    ],
+    "response:": [
+      "自评",
+      "单题"
+    ],
+    "use:": [
+      "自我了解",
+      "研究",
+      "非诊断"
+    ],
+    "license:": [
+      "CC BY-NC-SA 4.0",
+      "非商业"
+    ],
+    "language_validation:": [
+      "中文工作译本",
+      "待专家审校",
+      "未验证中文常模"
+    ]
+  },
+  "report": {
+    "heading": "给近来的生活拍一张“全景照”",
+    "summary": "这道题记录的是您此刻对整段生活的总体感受，不是对人生是否成功的判决。不同生活领域可能一边顺利、一边吃力，一句话并不能说完所有经历。",
+    "reflection": [
+      "最近哪件小事让您觉得生活还不错？",
+      "如果只改善一件事，您希望从休息、关系还是日常安排开始？"
+    ],
+    "action": "挑一个最在意的小方面，定下本周可以完成的一步，例如留出十分钟休息或与信任的人聊聊。过段时间再回看感受，不必追着数字跑。",
+    "limits": "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。"
+  }
+}

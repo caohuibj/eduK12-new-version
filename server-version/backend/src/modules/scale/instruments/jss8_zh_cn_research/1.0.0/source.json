@@ -1,0 +1,855 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "jss8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "公正敏感性简表（8题）（中文研究译稿）",
+      "abbreviation": "JSS8",
+      "instrumentFamily": "justice-sensitivity"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [],
+      "constructDefinition": "从自身吃亏、旁观、被动获益和主动造成不公四个视角自述对不公的反应，不是人品或实际行为。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "jss8",
+        "domain:social_emotional",
+        "construct:justice_sensitivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人研究及非诊断自我了解；原英德研究18–69岁不代表本中文版本已验证。ADULT_SELF/student是技术映射，不表示未成年人适用。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般情境反应；未经历时想象自己如何反应",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留1–6两端文字锚点；四段角色前导语重复嵌入对应每题，原总体说明与未经历时想象作答也嵌入第一题。",
+        "各对两题均分，无反向、不合成总分。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "人工译审、认知访谈及本地心理测量验证待完成。四组前导语嵌入各题，总体说明放第一题；这是保持语境的数字版布局改编，非已验证原版版式。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "jss8-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "jss8-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "jss8-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Groskurth, K., Beierlein, C., Nießen, D., Baumert, A., Rammstedt, B., & Lechner, C. M. (2024). Justice Sensitivity Short Scales–8 (JSS-8). ZIS. https://access.gesis.org/zis/1396 https://creativecommons.org/licenses/by/4.0/；本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+      "CC BY 4.0允许署名条件下公开再分发、翻译及商业使用。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "公正敏感性简表（8题）",
+        "citation": "Groskurth, K., Beierlein, C., Nießen, D., Baumert, A., Rammstedt, B., & Lechner, C. M. (2024). Justice Sensitivity Short Scales–8 (JSS-8). ZIS.",
+        "url": "https://access.gesis.org/zis/1396"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Groskurth, K., Beierlein, C., Nießen, D., Baumert, A., Rammstedt, B., & Lechner, C. M. (2024). Justice Sensitivity Short Scales–8 (JSS-8). ZIS. https://access.gesis.org/zis/1396 https://creativecommons.org/licenses/by/4.0/；本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。 CC BY 4.0允许署名条件下公开再分发、翻译及商业使用。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "jss8_response",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全符合",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "JSS8_01",
+          "content": "人们面对不公平的情境时，反应很不一样。下面想了解您在这类情境中会如何反应。请阅读各项陈述，选择它们与您相符的程度。如果您从未亲身遇到某种情境，请试着想象自己遇到时会如何反应。\n\n首先，请想象对别人有利、对您不利的情境。\n当别人没有正当理由却比我过得更好时，我会生气。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_02",
+          "content": "首先，请想象对别人有利、对您不利的情境。\n当别人轻易就能得到的东西，我却必须付出很大努力时，我会感到困扰。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_03",
+          "content": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。\n当有人没有正当理由却比别人处境更差时，我会感到难受。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_04",
+          "content": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。\n当别人轻易就能得到的东西，有人却必须付出很大努力时，我会感到困扰。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_05",
+          "content": "接下来，请想象结果对您有利、对别人不利的情境。\n当我没有什么理由却比别人过得更好时，我会感到内疚。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_06",
+          "content": "接下来，请想象结果对您有利、对别人不利的情境。\n当别人必须付出很大努力才能得到的东西，我却能轻易得到时，我会感到不安。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_07",
+          "content": "最后，请想象您不公平地对待、歧视或利用他人的情境。\n当我以牺牲他人为代价使自己获利时，我会感到内疚。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "JSS8_08",
+          "content": "最后，请想象您不公平地对待、歧视或利用他人的情境。\n当别人必须努力争取的东西，我却靠耍手段得到时，我会感到不安。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "jss8_response",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "JSS8_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "JSS8_08",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "JSS8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JSS8_02",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "JSS8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JSS8_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "JSS8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JSS8_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "JSS8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "JSS8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "victim",
+          "observer",
+          "beneficiary",
+          "perpetrator"
+        ],
+        "scoreOrder": [
+          "victim",
+          "observer",
+          "beneficiary",
+          "perpetrator"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:19:00Z",
+            "basis": "AI editorial check only: adult descriptive report; no individual diagnostic/ability/moral classification; source sample statistics not Chinese norms. Not human expert review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "jss8",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "victim": 1.0,
+            "observer": 1.0,
+            "beneficiary": 1.0,
+            "perpetrator": 1.0
+          },
+          "totalScoreKeys": [
+            "victim",
+            "observer",
+            "beneficiary",
+            "perpetrator"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "victim": 6.0,
+            "observer": 6.0,
+            "beneficiary": 6.0,
+            "perpetrator": 6.0
+          },
+          "totalScoreKeys": [
+            "victim",
+            "observer",
+            "beneficiary",
+            "perpetrator"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "victim": 3.0,
+            "observer": 3.0,
+            "beneficiary": 3.0,
+            "perpetrator": 3.0
+          },
+          "totalScoreKeys": [
+            "victim",
+            "observer",
+            "beneficiary",
+            "perpetrator"
+          ]
+        }
+      },
+      {
+        "name": "separate-perspectives",
+        "answers": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "victim": 1.0,
+            "observer": 2.0,
+            "beneficiary": 4.0,
+            "perpetrator": 6.0
+          },
+          "totalScoreKeys": [
+            "victim",
+            "observer",
+            "beneficiary",
+            "perpetrator"
+          ]
+        }
+      },
+      {
+        "name": "fractional-means",
+        "answers": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "victim": 1.5,
+            "observer": 2.5,
+            "beneficiary": 4.5,
+            "perpetrator": 5.5
+          },
+          "totalScoreKeys": [
+            "victim",
+            "observer",
+            "beneficiary",
+            "perpetrator"
+          ]
+        }
+      }
+    ]
+  }
+}

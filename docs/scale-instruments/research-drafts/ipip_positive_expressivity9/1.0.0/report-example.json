@@ -1,0 +1,985 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_positive_expressivity9_zh_cn_research",
+          "name": "IPIP积极情绪表达9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 27,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "answeredItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_positive_expressivity9_zh_cn_research",
+          "name": "IPIP积极情绪表达9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 9,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "answeredItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "keyed-maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_positive_expressivity9_zh_cn_research",
+          "name": "IPIP积极情绪表达9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 45,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "answeredItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-one",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_positive_expressivity9_zh_cn_research",
+          "name": "IPIP积极情绪表达9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 21,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "answeredItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    },
+    {
+      "fixture": "all-five",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ipip_positive_expressivity9_zh_cn_research",
+          "name": "IPIP积极情绪表达9题（研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          },
+          {
+            "itemCode": "IPIP_POSITIVE_EXPRESSIVITY9_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "ipip_positive_expressivity9",
+            "type": "total",
+            "label": "积极情绪表达",
+            "description": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 33,
+            "range": {
+              "min": 9,
+              "max": 45
+            },
+            "expectedItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "answeredItems": [
+              "IPIP_POSITIVE_EXPRESSIVITY9_01",
+              "IPIP_POSITIVE_EXPRESSIVITY9_02",
+              "IPIP_POSITIVE_EXPRESSIVITY9_03",
+              "IPIP_POSITIVE_EXPRESSIVITY9_04",
+              "IPIP_POSITIVE_EXPRESSIVITY9_05",
+              "IPIP_POSITIVE_EXPRESSIVITY9_06",
+              "IPIP_POSITIVE_EXPRESSIVITY9_07",
+              "IPIP_POSITIVE_EXPRESSIVITY9_08",
+              "IPIP_POSITIVE_EXPRESSIVITY9_09"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "ipip_positive_expressivity9",
+            "headline": "积极情绪表达：从日常经历看自己的习惯",
+            "label": null,
+            "interpretation": "这份回答帮助你观察：开心和亲近的感受，通常会怎样被别人看见？它关注表达习惯，而不是你过得有多快乐。计分方向越高，表示你越常通过笑声、表情或亲近动作表达积极感受；较少外露也不代表冷漠或不在乎。例如，有人习惯笑出声，也有人更愿意说一句感谢；表达是否合适，还要看双方的意愿和关系边界。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次开心的事：你是笑出声、说出来，还是安静地享受？身边的人是否知道你的心情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个自己舒服、对方也愿意接受的方式，分享一件小开心或说一句感谢；表达亲近不必依赖拥抱或身体接触。"
+              }
+            ],
+            "limitations": [
+              "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+              "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+              "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+              "9题需完整回答；漏答不当作零分，也不代填。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究译稿尚待人工审校与目标人群验证，目前仅供成人研究与自我了解。",
+          "表达方式受文化、关系边界和情境影响。该中文译稿尚待审核与验证，无可用的项目常模或分界值；不能用于诊断、能力排名或考核。",
+          "目前没有依据划分高低或人群排名；原英文研究的数据不是本中文版本的效度证明。",
+          "9题需完整回答；漏答不当作零分，也不代填。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。"
+      }
+    }
+  ]
+}

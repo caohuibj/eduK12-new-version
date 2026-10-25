@@ -1,0 +1,1570 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "JSS8_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_08",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "jss8_zh_cn_research",
+          "name": "公正敏感性简表（8题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "answeredItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "answeredItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "answeredItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "answeredItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "label": null,
+            "interpretation": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "label": null,
+            "interpretation": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "label": null,
+            "interpretation": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "label": null,
+            "interpretation": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "JSS8_01",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_02",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_03",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_04",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_05",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_06",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_07",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_08",
+          "responseValue": "6"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "jss8_zh_cn_research",
+          "name": "公正敏感性简表（8题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          }
+        ],
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "answeredItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "answeredItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "answeredItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "answeredItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "label": null,
+            "interpretation": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "label": null,
+            "interpretation": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "label": null,
+            "interpretation": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "label": null,
+            "interpretation": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "all-three",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "JSS8_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_08",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "jss8_zh_cn_research",
+          "name": "公正敏感性简表（8题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "answeredItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "answeredItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "answeredItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "answeredItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "label": null,
+            "interpretation": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "label": null,
+            "interpretation": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "label": null,
+            "interpretation": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "label": null,
+            "interpretation": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "separate-perspectives",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "JSS8_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_03",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "JSS8_04",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "JSS8_05",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "JSS8_06",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "JSS8_07",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "JSS8_08",
+          "responseValue": "6"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "jss8_zh_cn_research",
+          "name": "公正敏感性简表（8题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          }
+        ],
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "answeredItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 2,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "answeredItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "answeredItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "answeredItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "label": null,
+            "interpretation": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "label": null,
+            "interpretation": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "label": null,
+            "interpretation": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "label": null,
+            "interpretation": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "fractional-means",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "JSS8_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "JSS8_02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "JSS8_03",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "JSS8_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "JSS8_05",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "JSS8_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "JSS8_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "JSS8_08",
+          "responseValue": "6"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "jss8_zh_cn_research",
+          "name": "公正敏感性简表（8题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "JSS8_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "JSS8_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "JSS8_03",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "JSS8_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "JSS8_05",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "JSS8_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "JSS8_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "JSS8_08",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          }
+        ],
+        "scores": [
+          {
+            "key": "victim",
+            "type": "dimension",
+            "label": "自己处于不利位置",
+            "description": "在自己处于不利位置的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1.5,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "answeredItems": [
+              "JSS8_01",
+              "JSS8_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "observer",
+            "type": "dimension",
+            "label": "看到他人受到不公平对待",
+            "description": "在看到他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 2.5,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "answeredItems": [
+              "JSS8_03",
+              "JSS8_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "beneficiary",
+            "type": "dimension",
+            "label": "自己从不公平中获益",
+            "description": "在自己被动从不公平中获益的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4.5,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "answeredItems": [
+              "JSS8_05",
+              "JSS8_06"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "perpetrator",
+            "type": "dimension",
+            "label": "自己造成不公平",
+            "description": "在自己造成他人受到不公平对待的情境中，对不公平的情绪反应与敏感程度；不是事件频率、实际行为或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5.5,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "answeredItems": [
+              "JSS8_07",
+              "JSS8_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "victim",
+            "headline": "自己处于不利位置",
+            "label": null,
+            "interpretation": "留意自己吃亏时，什么最容易触动您。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "observer",
+            "headline": "看到他人受到不公平对待",
+            "label": null,
+            "interpretation": "留意看到别人吃亏时，您最在意什么。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "beneficiary",
+            "headline": "自己从不公平中获益",
+            "label": null,
+            "interpretation": "留意自己无意中占了便宜时，内心会有什么反应。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次觉得不公平时，您站在哪个位置？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "perpetrator",
+            "headline": "自己造成不公平",
+            "label": null,
+            "interpretation": "留意自己的行为影响别人时，您会怎样看待它。在这个视角下，越同意题目，表示这次越认可自己会因这些不公平情境而受到触动。同一件事，站在吃亏的人、旁观的人、获益的人或做出行为的人位置上，感受可能不同。这份问卷帮您留意这些差别，不会把四种感受加成一个“人品分”。感受强烈不证明一定会采取行动，反应较轻也不能直接解释为不关心。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "把自己换到另一个位置，会多看到什么信息？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一件日常小事，先写下事实，再写下自己的感受和希望。需要沟通时，可用“发生了什么—我有什么感受—我希望怎样”开头。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "回答的是想象或自述的感受，不等于实际行为；不能据此评判自私、善良或道德水平。四视角分开看，不排优劣。中文译本尚待验证。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。每个视角的两题都必须完整，不把四个视角合成总分。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    }
+  ]
+}

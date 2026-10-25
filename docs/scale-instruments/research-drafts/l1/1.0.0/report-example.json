@@ -1,0 +1,305 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "L1_01",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "l1_zh_cn_research",
+          "name": "总体生活满意度简表（1题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "821914f2a1122ca0e855a2dfc0bbc6ff4e3e5c8053d23265c4841daa00fa7d8f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "life_satisfaction",
+            "type": "total",
+            "label": "对近来生活的总体满意程度",
+            "description": "对近来生活的总体满意程度的自述程度，不是诊断、排名或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 11
+            },
+            "expectedItems": [
+              "L1_01"
+            ],
+            "answeredItems": [
+              "L1_01"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "life_satisfaction",
+            "headline": "给近来的生活拍一张“全景照”",
+            "label": null,
+            "interpretation": "这道题记录的是您此刻对整段生活的总体感受，不是对人生是否成功的判决。不同生活领域可能一边顺利、一边吃力，一句话并不能说完所有经历。选择越靠近“完全满意”，表示您这次对生活的总体评价越满意；这不是需要追求满分的考试。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪件小事让您觉得生活还不错？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个最在意的小方面，定下本周可以完成的一步，例如留出十分钟休息或与信任的人聊聊。过段时间再回看感受，不必追着数字跑。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "L1_01",
+          "responseValue": "11"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "l1_zh_cn_research",
+          "name": "总体生活满意度简表（1题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "821914f2a1122ca0e855a2dfc0bbc6ff4e3e5c8053d23265c4841daa00fa7d8f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "11",
+            "baseScore": 11,
+            "score": 11
+          }
+        ],
+        "scores": [
+          {
+            "key": "life_satisfaction",
+            "type": "total",
+            "label": "对近来生活的总体满意程度",
+            "description": "对近来生活的总体满意程度的自述程度，不是诊断、排名或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 11,
+            "range": {
+              "min": 1,
+              "max": 11
+            },
+            "expectedItems": [
+              "L1_01"
+            ],
+            "answeredItems": [
+              "L1_01"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "life_satisfaction",
+            "headline": "给近来的生活拍一张“全景照”",
+            "label": null,
+            "interpretation": "这道题记录的是您此刻对整段生活的总体感受，不是对人生是否成功的判决。不同生活领域可能一边顺利、一边吃力，一句话并不能说完所有经历。选择越靠近“完全满意”，表示您这次对生活的总体评价越满意；这不是需要追求满分的考试。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪件小事让您觉得生活还不错？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个最在意的小方面，定下本周可以完成的一步，例如留出十分钟休息或与信任的人聊聊。过段时间再回看感受，不必追着数字跑。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    },
+    {
+      "fixture": "all-three",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "L1_01",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "l1_zh_cn_research",
+          "name": "总体生活满意度简表（1题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "821914f2a1122ca0e855a2dfc0bbc6ff4e3e5c8053d23265c4841daa00fa7d8f",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "L1_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "life_satisfaction",
+            "type": "total",
+            "label": "对近来生活的总体满意程度",
+            "description": "对近来生活的总体满意程度的自述程度，不是诊断、排名或道德评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 11
+            },
+            "expectedItems": [
+              "L1_01"
+            ],
+            "answeredItems": [
+              "L1_01"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "life_satisfaction",
+            "headline": "给近来的生活拍一张“全景照”",
+            "label": null,
+            "interpretation": "这道题记录的是您此刻对整段生活的总体感受，不是对人生是否成功的判决。不同生活领域可能一边顺利、一边吃力，一句话并不能说完所有经历。选择越靠近“完全满意”，表示您这次对生活的总体评价越满意；这不是需要追求满分的考试。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪件小事让您觉得生活还不错？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一个最在意的小方面，定下本周可以完成的一步，例如留出十分钟休息或与信任的人聊聊。过段时间再回看感受，不必追着数字跑。"
+              }
+            ],
+            "limitations": [
+              "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+              "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+              "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+              "完整回答才提供报告；漏答不补零、不插补。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文研究工作译稿尚待人工审校与本地验证，仅供成人研究和自我了解。",
+          "这是一张当下快照，不解释变化原因，也不诊断心理疾病。中文内容为工作译本，暂不与外国样本作个人排名。",
+          "原英德参考样本的均值/标准差只记入外部档案，不作为本中文高低分界或人群排名。",
+          "完整回答才提供报告；漏答不补零、不插补。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "非商业使用；本译文和反馈依CC BY-NC-SA 4.0同许可提供。仅供成人研究与自我了解，不用于心理诊断、录取、人事决策或道德评价。"
+      }
+    }
+  ]
+}

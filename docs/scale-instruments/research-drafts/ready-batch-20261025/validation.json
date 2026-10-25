@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-25T16:24:02Z",
+  "candidateContentHead": "55971fda1d48aaa3dd258027c14e8d72be6110a5",
+  "toolTests": 67,
+  "registryTests": 8,
+  "testsTotal": 75,
+  "testExitCode": 0,
+  "typecheckCommand": "node node_modules/typescript/bin/tsc --noEmit",
+  "typecheckExitCode": 0,
+  "generatorCommand": "node --import tsx scripts/generate-scale-instruments.ts --check",
+  "generatorExitCode": 0,
+  "runtimeSyntheticVectors": 23,
+  "scope": "Only five new tools + affected registry + backend types. No historical tests repeated, DB/CI/deployment not run.",
+  "packages": [
+    {
+      "key": "ipip_positive_expressivity9",
+      "sourceSha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+      "canonicalSourceHash": "93f09659a3008973960bed14bfaddae510523a294d0d8c20cff1f4ac5166b6e1",
+      "measurementHash": "5bb556b39f5fb5e3b12eafd663b6ed009280289e5c71f652e3e392be84461a22",
+      "checkedAt": "2026-10-25T16:22:20.511Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 5,
+      "dbWrites": false
+    },
+    {
+      "key": "ipip_emotion_based_decision9",
+      "sourceSha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+      "canonicalSourceHash": "8f93ad877f0c6704b3fbe2b2df8f910be86f1b9bd374056b2fadaabccd0a6e01",
+      "measurementHash": "5867644d1b4e8f3a62bb31513965dd94a8605c462070a3277e38df02ef4fd54f",
+      "checkedAt": "2026-10-25T16:22:20.520Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 5,
+      "dbWrites": false
+    },
+    {
+      "key": "ipip_empathic_concern10",
+      "sourceSha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef",
+      "canonicalSourceHash": "d28c2439c69edf1772b2d2cf3a3f91325bf9a76f1ea0b2d6f2bbbd2f6f60c474",
+      "measurementHash": "1846f13b8e3c4c9c09b1cc519f782280aa5f634abdaa535a91a0b830375c662c",
+      "checkedAt": "2026-10-25T16:22:20.526Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 5,
+      "dbWrites": false
+    },
+    {
+      "key": "l1",
+      "sourceSha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833",
+      "canonicalSourceHash": "dc8cd329c4c64289cf39ca4f165002d168becc2f54e67d85e4d85fd394d6497e",
+      "measurementHash": "821914f2a1122ca0e855a2dfc0bbc6ff4e3e5c8053d23265c4841daa00fa7d8f",
+      "checkedAt": "2026-10-25T16:22:20.530Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 3,
+      "dbWrites": false
+    },
+    {
+      "key": "jss8",
+      "sourceSha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db",
+      "canonicalSourceHash": "6c5682863f244552f02ee6588efb05695681e3109c7bdd5940320aa48e950162",
+      "measurementHash": "298d6054d5ca69d850e8a04d4ca684e2213f739f34d6bbc745e9c1302ec9e907",
+      "checkedAt": "2026-10-25T16:24:46.847Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 5,
+      "dbWrites": false
+    }
+  ],
+  "jss8ReviewCorrection": "12 affected tests revalidated; unique tests remain 75. Typecheck/generator reused for scalar text correction; see jss8 local-validation.json."
+}

@@ -1,0 +1,21 @@
+import { describe, expect, it } from 'vitest'
+import { SCALE_INSTRUMENT_SOURCE as source } from '../../../modules/scale/instruments/l1_zh_cn_research/1.0.0/instrument'
+import { defineScaleInstrumentSource, projectScalePackage } from '../../../modules/scale/onboarding/define-instrument'
+import { validateScalePackage } from '../../../modules/scale/scale-package.registry'
+import { hashScaleDefinition } from '../../../modules/scale/scale-definition'
+import { scoreScale } from '../../../modules/scale/scale-scoring'
+import { buildScaleResult, parseScaleResultV2 } from '../../../modules/scale/scale-result'
+const pkg = projectScalePackage(source)!
+const d = pkg.definition
+const answers = d.items.map(item => ({ itemCode: item.itemCode, responseValue: '3' }))
+const result = (a = answers) => buildScaleResult({ scaleId: 'synthetic-local-only', instrumentKey: source.identity.instrumentKey, name: source.catalog.identity.canonicalName, instrumentVersion: source.identity.instrumentVersion, definition: d, answers: a })
+describe('l1 content contract', () => {
+ it('passes strict source and package validation without pretending scientific approval', () => { expect(() => defineScaleInstrumentSource(source)).not.toThrow(); expect(validateScalePackage(pkg).valid).toBe(true); expect(pkg.releaseStatus).toBe('DRAFT'); expect(source.localization?.expertReviewStatus).toBe('PENDING'); expect(source.scientificReview).toBeUndefined() })
+ it('preserves canonical count/order, endpoint-only anchors and no reverse keys',()=>{expect(d.items).toHaveLength(1);expect(d.items.map(x=>x.sortOrder)).toEqual(Array.from({length:1},(_,i)=>i));expect(d.scoring.itemRules.every(x=>x.transform.type==='identity')).toBe(true);expect(d.responseSets[0].options.map(x=>x.score)).toEqual(Array.from({length:11},(_,i)=>i+1));expect(d.responseSets[0].options.slice(1,-1).every(x=>x.label===x.value)).toBe(true)})
+ for(const fixture of pkg.goldenCases) it('runtime scoring '+fixture.name,()=>{const a=scoreScale(d,fixture.answers);expect(a.quality.status).toBe('interpretable');expect(Object.fromEntries(a.scores.map(x=>[x.key,x.value]))).toEqual(fixture.expected.scores)})
+ it('does not replace missing responses or invalid codes',()=>{expect(()=>result([{...answers[0],responseValue:'99'},...answers.slice(1)])).toThrow('量表回答不合法');const r=result(answers.slice(1));expect(r.quality.status).toBe('invalid');expect(r.scores[0].value).toBeNull();expect(r.interpretations).toEqual([]);expect(r.references).toEqual([])})
+ it('creates real serializable reports without unsupported labels or runtime external norms',()=>{const r=parseScaleResultV2(JSON.parse(JSON.stringify(result())));expect(r.scores.every(x=>x.value===3&&x.range?.min===1&&x.range?.max===11)).toBe(true);expect(r.interpretations).toHaveLength(1);expect(r.interpretations.every(x=>x.label===null&&x.referenceVersion===null&&x.guidance.length>=2)).toBe(true);expect(d.report.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true);expect(r.references).toEqual([]);expect(d.referencePolicy).toEqual({type:'none'});expect(source.catalog.evidence).toEqual([]);expect(source.catalog.population.minAge).toBe(18);expect(d.report.audienceContract?.respondent).toBe('ADULT_SELF')})
+ it('uses initial C/P/R axes and keeps report wording outside measurement identity',()=>{expect(d.scoring.scoringVersion).toBe('1.0.0');expect(d.report.reportVersion).toBe('1.0.0');const revised=structuredClone(d);revised.report.disclaimer+=' 文案';expect(hashScaleDefinition(revised)).toBe(hashScaleDefinition(d));revised.items[0].content+=' 题项';expect(hashScaleDefinition(revised)).not.toBe(hashScaleDefinition(d))})
+ it('keeps the original separate scoring keys and mean formulas',()=>{expect(d.scoring.scores.map(x=>x.key)).toEqual(["life_satisfaction"]);expect(d.scoring.scores.every(x=>x.source.aggregation==='mean')).toBe(true)})
+ it('enforces noncommercial use and share-alike content notice',()=>{expect(source.usageRequirements?.allowedCommercialNatures).toEqual(['NON_COMMERCIAL']);expect(source.catalog.construct.constructOverlapTags).toContain('非商业');expect(d.license?.note).toContain('CC BY-NC-SA 4.0');expect(d.report.disclaimer).toContain('同许可')})
+})

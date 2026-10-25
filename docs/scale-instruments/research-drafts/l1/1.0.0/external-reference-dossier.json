@@ -1,0 +1,44 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "parameters": [
+    {
+      "population": "UK adults18–69, n468",
+      "mean": 7.18,
+      "sd": 2.5,
+      "source": "Current official registry Table3, 1–11 coding",
+      "runtimeSelected": false
+    }
+  ],
+  "sampleContext": {
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ],
+    "fielding": "January 2018",
+    "sampling": "Native-language adult quota samples by age/gender/education; not Chinese or child norms"
+  },
+  "thresholds": [],
+  "references": [
+    {
+      "url": "https://access.gesis.org/zis/624",
+      "role": "Official standalone original instrument, license p2, full form p3",
+      "citation": "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS.",
+      "note": "PDF front cover prints doi 10.6102/zis275 whereas current matching official registry identifies 10.6102/zis284. Preserve discrepancy; use current registry DOI as canonical, not silent correction."
+    },
+    {
+      "url": "https://zis.gesis.org/s//skala/openScale/327?lang=en",
+      "doi": "10.6102/zis284",
+      "role": "Current official scoring and validation, response specifications and Tables 2–4"
+    }
+  ],
+  "currentTranslationValidated": false
+}

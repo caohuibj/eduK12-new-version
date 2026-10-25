@@ -1,0 +1,89 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": 1,
+      "en": "The next question is about your general satisfaction with life. All things considered, how satisfied are you with your life these days?",
+      "zh": "下面的问题关于您对生活的总体满意程度。综合各方面来看，您对近来的生活有多满意？",
+      "reverse": false
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "not at all satisfied",
+      "zh": "完全不满意"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5"
+    },
+    {
+      "value": 6,
+      "en": "6",
+      "zh": "6"
+    },
+    {
+      "value": 7,
+      "en": "7",
+      "zh": "7"
+    },
+    {
+      "value": 8,
+      "en": "8",
+      "zh": "8"
+    },
+    {
+      "value": 9,
+      "en": "9",
+      "zh": "9"
+    },
+    {
+      "value": 10,
+      "en": "10",
+      "zh": "10"
+    },
+    {
+      "value": 11,
+      "en": "completely satisfied",
+      "zh": "完全满意"
+    }
+  ],
+  "instructions": null,
+  "sections": null,
+  "runtimeItems": [
+    {
+      "itemCode": "L1_01",
+      "content": "下面的问题关于您对生活的总体满意程度。综合各方面来看，您对近来的生活有多满意？",
+      "type": "single",
+      "required": true,
+      "sortOrder": 0,
+      "responseSetKey": "l1_response",
+      "randomizeOptions": false
+    }
+  ],
+  "changes": "人工译审、认知访谈及本地心理测量验证待完成。原题说明已包含在唯一题干。",
+  "license": {
+    "license": "CC-BY-NC-SA-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "noncommercialOnly": true,
+    "basis": "GESIS standalone English instrument PDF page 2 explicitly licenses this work CC BY-NC-SA 4.0; full item on page 3.",
+    "translationRedistribution": "Attribution + NC + share adapted material under same license; keep content license independent from repository code license."
+  }
+}

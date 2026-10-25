@@ -1,0 +1,120 @@
+{
+  "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+  "instructions": "请根据你通常的情况，判断以下说法与你的符合程度。没有标准答案，请按自己的真实感受作答。",
+  "items": [
+    {
+      "id": "q1",
+      "position": 1,
+      "en": "Am concerned about others.",
+      "zh": "我关心别人。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_01"
+    },
+    {
+      "id": "q2",
+      "position": 2,
+      "en": "Feel sympathy for those who are worse off than myself.",
+      "zh": "我同情处境比自己更困难的人。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_02"
+    },
+    {
+      "id": "q3",
+      "position": 3,
+      "en": "Sympathize with the homeless.",
+      "zh": "我同情无家可归的人。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_03"
+    },
+    {
+      "id": "q4",
+      "position": 4,
+      "en": "Believe that criminals should receive help rather than punishment.",
+      "zh": "我认为犯罪者应该得到帮助，而不是惩罚。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_04"
+    },
+    {
+      "id": "q5",
+      "position": 5,
+      "en": "Believe that the poor deserve our sympathy.",
+      "zh": "我认为贫困的人值得我们同情。",
+      "key": "positive",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_05"
+    },
+    {
+      "id": "q6",
+      "position": 6,
+      "en": "Feel little concern for others.",
+      "zh": "我很少关心别人。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_06"
+    },
+    {
+      "id": "q7",
+      "position": 7,
+      "en": "Have no sympathy for criminals.",
+      "zh": "我不同情犯罪者。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_07"
+    },
+    {
+      "id": "q8",
+      "position": 8,
+      "en": "Look down on any weakness.",
+      "zh": "我看不起任何软弱。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_08"
+    },
+    {
+      "id": "q9",
+      "position": 9,
+      "en": "Don't like to get involved in other people's problems.",
+      "zh": "我不喜欢卷入别人的问题。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_09"
+    },
+    {
+      "id": "q10",
+      "position": 10,
+      "en": "Have little sympathy for the unemployed.",
+      "zh": "我很少同情失业者。",
+      "key": "negative",
+      "runtimeItemCode": "IPIP_EMPATHIC_CONCERN10_10"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "非常不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "非常符合"
+    }
+  ],
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": "IPIP items/scales/inventories, commercial and noncommercial use; official homepage explicitly permits copying, editing and translation",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "note": "This applies to these exact IPIP items, not every proprietary measure with a similar name."
+  }
+}

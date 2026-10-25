@@ -1,0 +1,212 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": 1,
+      "en": "It makes me angry when others are undeservingly better off than me.",
+      "zh": "当别人没有正当理由却比我过得更好时，我会生气。",
+      "reverse": false,
+      "subscale": "victim"
+    },
+    {
+      "id": 2,
+      "en": "It worries me when I have to work hard for things that come easily to others.",
+      "zh": "当别人轻易就能得到的东西，我却必须付出很大努力时，我会感到困扰。",
+      "reverse": false,
+      "subscale": "victim"
+    },
+    {
+      "id": 3,
+      "en": "I am upset when someone is undeservingly worse off than others.",
+      "zh": "当有人没有正当理由却比别人处境更差时，我会感到难受。",
+      "reverse": false,
+      "subscale": "observer"
+    },
+    {
+      "id": 4,
+      "en": "It worries me when someone has to work hard for things that come easily to others.",
+      "zh": "当别人轻易就能得到的东西，有人却必须付出很大努力时，我会感到困扰。",
+      "reverse": false,
+      "subscale": "observer"
+    },
+    {
+      "id": 5,
+      "en": "I feel guilty when I am better off than others for no reason.",
+      "zh": "当我没有什么理由却比别人过得更好时，我会感到内疚。",
+      "reverse": false,
+      "subscale": "beneficiary"
+    },
+    {
+      "id": 6,
+      "en": "It bothers me when things come easily to me that others have to work hard for.",
+      "zh": "当别人必须付出很大努力才能得到的东西，我却能轻易得到时，我会感到不安。",
+      "reverse": false,
+      "subscale": "beneficiary"
+    },
+    {
+      "id": 7,
+      "en": "I feel guilty when I enrich myself at the cost of others.",
+      "zh": "当我以牺牲他人为代价使自己获利时，我会感到内疚。",
+      "reverse": false,
+      "subscale": "perpetrator"
+    },
+    {
+      "id": 8,
+      "en": "It bothers me when I use tricks to achieve something while others have to struggle for it.",
+      "zh": "当别人必须努力争取的东西，我却靠耍手段得到时，我会感到不安。",
+      "reverse": false,
+      "subscale": "perpetrator"
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5"
+    },
+    {
+      "value": 6,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "instructions": {
+    "en": "People react to unfair situations in very different ways. In the following, we would like to know how you would react in unfair situations. Please read the statements below and indicate to what extent each of these statements applies to you. If you have never experienced such a situation yourself, try to imagine how you would react if you were in such a situation.",
+    "zh": "人们面对不公平的情境时，反应很不一样。下面想了解您在这类情境中会如何反应。请阅读各项陈述，选择它们与您相符的程度。如果您从未亲身遇到某种情境，请试着想象自己遇到时会如何反应。"
+  },
+  "sections": [
+    {
+      "beforeItem": 1,
+      "en": "First, we will look at situations to the advantage of others and to your own disadvantage.",
+      "zh": "首先，请想象对别人有利、对您不利的情境。"
+    },
+    {
+      "beforeItem": 3,
+      "en": "Now, we will look at situations in which you notice or learn that someone else is being treated unfairly, put at a disadvantage, or used.",
+      "zh": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。"
+    },
+    {
+      "beforeItem": 5,
+      "en": "Now, we will look at situations that turn out to your advantage and to the disadvantage of others.",
+      "zh": "接下来，请想象结果对您有利、对别人不利的情境。"
+    },
+    {
+      "beforeItem": 7,
+      "en": "Finally, we look at situations in which you treat someone else unfairly, discriminate against someone or exploit them.",
+      "zh": "最后，请想象您不公平地对待、歧视或利用他人的情境。"
+    }
+  ],
+  "runtimeItems": [
+    {
+      "itemCode": "JSS8_01",
+      "content": "人们面对不公平的情境时，反应很不一样。下面想了解您在这类情境中会如何反应。请阅读各项陈述，选择它们与您相符的程度。如果您从未亲身遇到某种情境，请试着想象自己遇到时会如何反应。\n\n首先，请想象对别人有利、对您不利的情境。\n当别人没有正当理由却比我过得更好时，我会生气。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 0,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_02",
+      "content": "首先，请想象对别人有利、对您不利的情境。\n当别人轻易就能得到的东西，我却必须付出很大努力时，我会感到困扰。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 1,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_03",
+      "content": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。\n当有人没有正当理由却比别人处境更差时，我会感到难受。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 2,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_04",
+      "content": "接下来，请想象您发现或得知某个人受到不公平对待、被置于不利地位或被利用的情境。\n当别人轻易就能得到的东西，有人却必须付出很大努力时，我会感到困扰。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 3,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_05",
+      "content": "接下来，请想象结果对您有利、对别人不利的情境。\n当我没有什么理由却比别人过得更好时，我会感到内疚。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 4,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_06",
+      "content": "接下来，请想象结果对您有利、对别人不利的情境。\n当别人必须付出很大努力才能得到的东西，我却能轻易得到时，我会感到不安。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 5,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_07",
+      "content": "最后，请想象您不公平地对待、歧视或利用他人的情境。\n当我以牺牲他人为代价使自己获利时，我会感到内疚。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 6,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    },
+    {
+      "itemCode": "JSS8_08",
+      "content": "最后，请想象您不公平地对待、歧视或利用他人的情境。\n当别人必须努力争取的东西，我却靠耍手段得到时，我会感到不安。",
+      "type": "single",
+      "required": true,
+      "sortOrder": 7,
+      "responseSetKey": "jss8_response",
+      "randomizeOptions": false
+    }
+  ],
+  "changes": "人工译审、认知访谈及本地心理测量验证待完成。四组前导语嵌入各题，总体说明放第一题；这是保持语境的数字版布局改编，非已验证原版版式。",
+  "license": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "basis": "GESIS author instrument documentation https://access.gesis.org/zis/1396 p2 explicitly licenses work CC BY4; Table1 includes original authors English8item adaptation, instructions and scoring. Not an unrelated article overlay.",
+    "translationRedistribution": "Attribution, license link, identify translation/report modifications."
+  },
+  "presentationChanges": {
+    "change": "原作者四段角色前导语的工作译文重复放入每对各题；原总说明工作译文仅放第一题",
+    "reason": "现有指导语投影不足，保证每题语境可见；不是修复系统指导语功能",
+    "preserved": [
+      "原题顺序",
+      "原题构念",
+      "无新解释性题干内容",
+      "原锚点与计分"
+    ],
+    "validation": "本数字呈现与中文翻译未经验证，不宣称等同原英文验证版exact-form"
+  }
+}
