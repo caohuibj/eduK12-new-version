@@ -1,8 +1,12 @@
+import {decryptCognitivePayload} from '../../modules/cognitive/cognitive.security'
+import {getContentRelease} from '../../modules/measurement-content/repository'
+import {cognitiveMeasurementRelease} from '../../modules/measurement-content/cognitive'
+import {publishTrainingSourcesFixture} from '../fixtures/published-measurement'
 import * as reportFacts from '../../modules/assessment-bundle/report-facts'
 import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient, UserRole } from '@prisma/client'
-import { integrationDatabaseUrl } from '../integration/integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 import { MIXED_SCALE_DEFINITION } from '../questionnaire/product-fixtures'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE as sjt } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
@@ -73,10 +77,10 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     cogSubmit = await import('../../modules/cognitive/final-submit.service')
     sjtSubmit = await import('../../modules/situational/situational-final-submit.service')
     for (const [id, role] of [[actor.userId, 'TEACHER'], [other.userId, 'TEACHER'], [student, 'STUDENT'], [student2, 'STUDENT']] as const) {
-      await db.user.create({ data: { id, username: id, passwordHash: 'fixture-only', role } })
+      await db.user.create({ data: { id, username: id, passwordHash: 'fixture-only', role, teacherApproved: role==='TEACHER', accountDomain:'TRAINING' } })
     }
     const cs = []
-    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
+    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseType:'TRAINING_COURSE', courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
     course1=cs[0].id; course2=cs[1].id
     await db.courseStudent.createMany({ data: [{ courseId: course1, studentId: student, status: 'ACTIVE' }, { courseId: course2, studentId: student2, status: 'APPROVED' }] })
     const cognitiveEntry = requireCognitiveRegistryEntry('gonogo','1.0.0','1.0.0')
@@ -88,6 +92,7 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     configId=config.id
     assignmentId=(await db.cognitiveAssignment.create({ data: { configId,courseId:course1,createdBy:actor.userId,title:'Go/No-Go fixture',status:'PUBLISHED',listedStandalone:true,maxAttempts:100,...freezeDataForWrite(freeze) } })).id
     scaleId=(await db.scale.create({ data: { code:'Q1-'+suffix,name:'Scale fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:MIXED_SCALE_DEFINITION as any,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),itemCount:1,dimensionCount:1 } })).id
+    await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[scaleId],assignmentIds:[assignmentId],situational:[{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion}]})
 
     const { createCodeBundleDefinitionProvider } = await import('../../modules/bundle-product/code-catalog')
     const { BundleDefinitionProvider } = await import('../../modules/bundle-product/definition-provider')
@@ -145,6 +150,7 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     let combined = await questionnaire.create(actor, { requestId: randomUUID(), name: 'Shared quota course copy', questionnaireType: 'COURSE', courseIds: [course1] })
     combined = await questionnaire.addItem(actor, combined.id, { revision: combined.revision, item: { type: 'COGNITIVE', cognitiveAssignmentId: source.id, required: true } })
     combined = await questionnaire.publish(actor, combined.id, { revision: combined.revision })
+    await publishTrainingSourcesFixture(db,actor.userId,{assignmentIds:[source.id]})
     const legacy = await runtime.createComposite(actor.userId, actor.role, { code: 'bundle-quota-' + mode + '-' + suffix, name: 'Shared quota composition', courseId: course1, maxAttempts: 3 })
     await runtime.addItem(actor.userId, actor.role, legacy.id, { type: 'COGNITIVE', cognitiveAssignmentId: source.id, required: true })
     await runtime.publishComposite(actor.userId, actor.role, legacy.id)
@@ -174,6 +180,45 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     } else expect((await standalone.createSession(student, source.id)).sessionId).toBe(active.id)
     expect(await db.cognitiveSession.count({ where: { userId: student, OR: [{ assignmentId: source.id }, { assignment: { quotaSourceAssignmentId: source.id } }] } })).toBe(1)
   }, 30000)
+  it('publishes the frozen cognitive copy in the same transaction, rejects foreign ownership and rolls back a failed bundle publication',async()=>{
+    requireIsolatedReleaseDatabase(url!)
+    const draft=await fresh(),item=await db.compositeAssessmentItem.findFirstOrThrow({where:{compositeAssessmentId:draft.id,type:'COGNITIVE'},include:{cognitiveAssignment:true}})
+    const copy=item.cognitiveAssignment!,configBefore=await db.cognitiveTestConfig.findUniqueOrThrow({where:{id:copy.configId}})
+    const releases=()=>db.$queryRaw<Array<{id:string}>>`SELECT id FROM measurement_content_releases WHERE provenance->>'assignmentId'=${copy.id}`
+    expect(copy.measurementReleaseId).toBeNull();expect(await releases()).toHaveLength(0)
+    await expect(product.publish(other,draft.id,draft.revision)).rejects.toMatchObject({statusCode:403})
+    expect(await releases()).toHaveLength(0)
+    const trigger='bundle_publication_'+randomUUID().replaceAll('-','')
+    await db.$executeRawUnsafe(`CREATE FUNCTION ${trigger}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.id=TG_ARGV[0] AND NEW.status='PUBLISHED' THEN RAISE EXCEPTION 'synthetic bundle publication rollback'; END IF; RETURN NEW; END $$`)
+    try{
+      await db.$executeRawUnsafe(`CREATE TRIGGER ${trigger} BEFORE UPDATE ON composite_assessments FOR EACH ROW EXECUTE FUNCTION ${trigger}('${draft.id}')`)
+      await expect(product.publish(actor,draft.id,draft.revision)).rejects.toThrow('synthetic bundle publication rollback')
+      expect(await releases()).toHaveLength(0)
+      expect((await db.cognitiveAssignment.findUniqueOrThrow({where:{id:copy.id}})).measurementReleaseId).toBeNull()
+      expect(await db.compositeAssessment.findUniqueOrThrow({where:{id:draft.id}})).toMatchObject({status:'DRAFT',revision:draft.revision})
+    }finally{
+      await db.$executeRawUnsafe(`DROP TRIGGER IF EXISTS ${trigger} ON composite_assessments`)
+      await db.$executeRawUnsafe(`DROP FUNCTION IF EXISTS ${trigger}()`)
+    }
+    const published=await product.publish(actor,draft.id,draft.revision)
+    expect(published.status).toBe('PUBLISHED')
+    const accepted=await db.cognitiveAssignment.findUniqueOrThrow({where:{id:copy.id}})
+    expect(accepted.measurementReleaseId).toBeTruthy()
+    const release=await db.$transaction(tx=>getContentRelease(tx,accepted.measurementReleaseId!))
+    const scope={kind:'PRIVATE' as const,product:'TRAINING' as const,ownerId:actor.userId,resourceId:copy.id}
+    const expected=cognitiveMeasurementRelease({localId:configBefore.testType,version:'assignment-v1',testType:configBefore.testType,
+      configVersion:configBefore.configVersion,engineVersion:configBefore.engineVersion,scoringVersion:configBefore.scoringVersion,
+      config:decryptCognitivePayload(copy.resolvedConfigSnapshotEncrypted!),scope})
+    expect(release!.scope).toEqual(scope)
+    expect(release!.provenance).toMatchObject({assignmentId:copy.id,configId:copy.configId,resolvedConfigHash:copy.resolvedConfigHash})
+    expect(release!.content.measurementHash).toBe(expected.content.measurementHash)
+    expect(accepted.resolvedConfigSnapshotEncrypted).toBe(copy.resolvedConfigSnapshotEncrypted)
+    expect(accepted.resolvedConfigHash).toBe(copy.resolvedConfigHash)
+    expect(await db.cognitiveTestConfig.findUniqueOrThrow({where:{id:copy.configId}})).toEqual(configBefore)
+    expect(await releases()).toHaveLength(1)
+    await expect(product.publish(actor,draft.id,draft.revision)).rejects.toMatchObject({statusCode:409})
+    expect(await releases()).toHaveLength(1)
+  },30_000)
   it('completes four canonical sources, persists once, and appends reanalysis without changing original facts', async () => {
     let row=await fresh()
     row=await product.publish(actor,row.id,row.revision)
