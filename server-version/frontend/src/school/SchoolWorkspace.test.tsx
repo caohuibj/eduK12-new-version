@@ -1,5 +1,5 @@
 import {it,expect,vi} from 'vitest'
-import {render,screen,waitFor,fireEvent,within} from '@testing-library/react'
+import {render,screen,waitFor,fireEvent} from '@testing-library/react'
 import SchoolApp from './SchoolApp'
 
 it('keeps teacher task panels unique when organization context loads',async()=>{
@@ -15,17 +15,17 @@ it('keeps teacher task panels unique when organization context loads',async()=>{
  }))
  try{
   render(<SchoolApp/> )
-  await screen.findByRole('heading',{name:'校园工作台'})
-  expect(screen.queryByRole('heading',{name:'我的学生观察任务'})).not.toBeInTheDocument()
-  const navigation=screen.getByRole('navigation',{name:'校园功能入口'})
-  await within(navigation).findByRole('link',{name:'学生观察任务'})
-  expect(within(navigation).getAllByRole('link')).toHaveLength(1)
-  expect(screen.queryByRole('link',{name:/活动管理/})).not.toBeInTheDocument()
-  expect(screen.queryByText('',{selector:'summary[aria-label="校园功能"]'})).not.toBeInTheDocument()
-  fireEvent.click(within(navigation).getByRole('link',{name:'学生观察任务'}))
   await screen.findByRole('heading',{name:'我的学生观察任务'})
+  expect(screen.queryByRole('navigation',{name:'校园功能入口'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('link',{name:/活动管理/})).not.toBeInTheDocument()
+  expect(screen.queryByRole('link',{name:'返回概览'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('heading',{name:'校园工作台'})).not.toBeInTheDocument()
   expect(window.location.pathname).toBe('/workspace/tasks')
-  expect(within(navigation).getByRole('link',{name:'学生观察任务'})).toHaveAttribute('aria-current','page')
+  expect(screen.getByRole('link',{name:/School @eduk12.top/})).toHaveAttribute('href','/workspace/tasks?organizationId=preview-school')
+  fireEvent.click(screen.getByRole('link',{name:'个人信息编辑'}))
+  await screen.findByRole('heading',{name:'校园账号'})
+  fireEvent.click(screen.getByRole('link',{name:'返回任务'}))
+  await screen.findByRole('heading',{name:'我的学生观察任务'})
   await screen.findByText('目前没有可作答的教师观察任务。请确认任教关系、活动状态和测评发布情况。')
   await waitFor(()=>expect(screen.getAllByRole('heading',{name:'我的学生观察任务'})).toHaveLength(1))
   expect(errors.mock.calls.flat().join(' ')).not.toMatch(/same key/)
@@ -46,7 +46,8 @@ it('does not mount activity configuration or request activity data for an ordina
  vi.stubGlobal('fetch',fetcher)
  try{
   render(<SchoolApp/> )
-  await within(await screen.findByRole('navigation',{name:'校园功能入口'})).findByRole('link',{name:'学生观察任务'})
+  await waitFor(()=>expect(fetcher.mock.calls.some(([url])=>url.endsWith('/context'))).toBe(true))
+  expect(screen.queryByRole('navigation',{name:'校园功能入口'})).not.toBeInTheDocument()
   expect(screen.getByRole('heading',{name:'当前无法进入此功能'})).toBeInTheDocument()
   expect(screen.queryByRole('link',{name:/活动管理/})).not.toBeInTheDocument()
   expect(screen.queryByText('新建活动',{exact:true})).not.toBeInTheDocument()
