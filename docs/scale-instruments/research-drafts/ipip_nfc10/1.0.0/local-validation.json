@@ -1,0 +1,17 @@
+{
+  "validatedAt": "2026-10-25T14:04:51Z",
+  "sourceSha256": "2f04e89cd8a96804cbeceab19f094b67a0543ee5c55fa2c4d21e087caa211e41",
+  "node": "v24.22.1",
+  "contentTests": {
+    "toolTests": 12,
+    "combinedToolAndRegistryTests": 30,
+    "exitCode": 0,
+    "log": "/workspace/scratch/5a77e8bdc1ae/local-scale-validation-20261025/final-content-tests.log"
+  },
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0
+  },
+  "scope": "Local content/source registry/scoring/result construction only. No DB writes, production deployment or psychometric validation claimed.",
+  "independentReview": "Internal AI read-only content cross-check; no human expert approval claimed."
+}
