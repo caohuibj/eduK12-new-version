@@ -19,6 +19,7 @@ function fixture(frozen=false,nativeDefinition?:Record<string,unknown>){
  const requests:Array<{url:string;body:any}>=[]
  const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
  vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+  if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
   const url=String(input),body=init?.body?JSON.parse(String(init.body)):undefined
   requests.push({url,body})
   if(url.endsWith('/auth/csrf'))return response({csrfToken:'csrf'})

@@ -4,7 +4,7 @@ import {prisma as db} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {artifactReference,governedSnapshot,type GovernedArtifact} from '../../modules/survey/governed-tool.model'
 import {governedCatalog,governedComponentOptions,governedSources,approveGovernedTool,governedRow} from '../../modules/survey/governed-tool.service'
-import {packageGrantsForManager,packageGrantsForResearcher,importSurveyPackage,listProjectPackageImports} from '../../modules/survey/governed-package.service'
+import {packageGrantsForManager,packageGrantsForResearcher,importSurveyPackage,listProjectPackageImports,selectedPackageMemberships} from '../../modules/survey/governed-package.service'
 import {changeSurveyToolPolicy} from '../../modules/survey/library-admin.service'
 import {SURVEY_GONOGO_CONFIG} from '../../modules/survey/cognitive.definition'
 const suite=process.env.SURVEY_GOVERNED_LIST_ISOLATED==='1'?describe:describe.skip
@@ -73,5 +73,16 @@ suite('bounded exact-version catalog and grant lists on synthetic PostgreSQL',()
   await changeSurveyToolPolicy(manager,{resourceKey:'governed-release:'+grant.toolId,fingerprint:grant.hash,expectedVersion:1,decision:'APPROVED',paused:true,reason:'Synthetic current pause'})
   expect((await listProjectPackageImports(owner,projectId,1)).list[0].availability).toMatchObject({ready:false,reasons:expect.arrayContaining(['此版本 Survey 使用已暂停'])})
   await expect(listProjectPackageImports(manager,projectId,1)).rejects.toMatchObject({statusCode:404})
+ })
+ it('reads selected membership beyond import 25 and keeps two instances of one version distinct',async()=>{
+  const grant=(await packageGrantsForResearcher(owner,projectId,1,prefix+' Bundle 01')).list[0],imports=[]
+  for(let n=0;n<26;n++)imports.push(await importSurveyPackage(owner,projectId,grant.id,randomUUID()))
+  const first=imports[0],last=imports[25]
+  const result=await selectedPackageMemberships(owner,projectId,[first.bindings[0].draftId,last.bindings[0].draftId])
+  expect(new Set(result.list.map(p=>p.id))).toEqual(new Set([first.importId,last.importId]))
+  expect(new Set(result.list.map(p=>p.toolId)).size).toBe(1)
+  expect(result.list.every(p=>p.bindings.length===1&&p.hash===grant.hash)).toBe(true)
+  expect(JSON.stringify(result)).not.toContain('technicalGrantId');expect(JSON.stringify(result)).not.toContain('DO_NOT_TRANSMIT_EXECUTABLE_BODY')
+  await expect(selectedPackageMemberships(manager,projectId,[last.bindings[0].draftId])).rejects.toMatchObject({statusCode:404})
  })
 })

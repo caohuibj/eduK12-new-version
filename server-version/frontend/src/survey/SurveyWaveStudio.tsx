@@ -13,6 +13,8 @@ import type { FlowDraft } from './flow.client'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, createInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
+import {usePackageMemberships} from './package-memberships'
+import {planPackageSelection,packageFlowChangeAllowed,type PackageMembership} from './package-arrangement'
 import './survey-publish.css'
 
 // Load researcher authoring/preview code only when its existing control is opened.
@@ -113,6 +115,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const [wavePage,setWavePage]=useState(1),[waveError,setWaveError]=useState('')
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
+  const packageFacts=usePackageMemberships(projectId,form.instrumentIds)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   useEffect(()=>{onLeaveRiskChange?.({dirty:toolRisk.dirty||librarySelectionDirty,busy:toolRisk.busy||busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[onLeaveRiskChange,toolRisk,librarySelectionDirty,busy])
@@ -405,6 +408,14 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
     }))
   }
   const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
+  const arrangeSelection=(ids:string[],extra?:PackageMembership,extraTools:InstrumentDetails[]=[])=>{
+    if(packageFacts.loading||packageFacts.error){setError('整包身份尚未读取完成，请先重试读取；草稿未改变。');return false}
+    const memberships=extra?[...packageFacts.list.filter(p=>p.id!==extra.id),extra]:packageFacts.list
+    const plan=planPackageSelection(form.instrumentIds,ids,memberships,[...flowTools,...extraTools],form.flowDefinition)
+    if(plan.error){setError(plan.error);return false}
+    setForm(old=>({...old,instrumentIds:plan.ids,flowDefinition:plan.flow}))
+    setError('');setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null);return true
+  }
   const flowQuestions:FormQuestionInfo[]=Object.values(details)
     .filter(d=>d.kind==='FORM').flatMap(d=>{
       const form=d.definition as FormDraft
@@ -518,16 +529,20 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         </section>}
 
         {showDraft&&<SurveyProjectTools projectId={projectId} projectStatus={project?.status||'DRAFT'} instrumentLibrary={sharedLibrary}
+          selectionIds={form.instrumentIds} memberships={packageFacts.list} membershipLoading={packageFacts.loading} membershipError={packageFacts.error} onRetryMembership={packageFacts.retry}
           selectedTools={form.instrumentIds.map(id=>flowTools.find(tool=>tool.id===id)).filter((tool):tool is typeof flowTools[number]=>!!tool)}
-          onReorder={ids=>{if(form.flowDefinition&&!window.confirm('调整内容会重置当前流程与实验组配额，继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}
+          onReorder={ids=>{arrangeSelection(ids)}}
           onLeaveRiskChange={toolRiskChanged} onNavigateLibrary={onNavigateLibrary||(()=>{window.location.assign('/workspace/tools')})}
-          onBeforeSelect={()=>{if(busy||activePending)return false;if(form.flowDefinition&&!window.confirm('添加工具会重置当前问卷的流程与实验组配额，请随后重新编排。继续？'))return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
+          onBeforeSelect={()=>{if(busy||activePending||packageFacts.loading||packageFacts.error)return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
           onSelected={async(ids,options)=>{
             if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current){setNotice('工具已加入本研究；当前波次已切换，请在当前问卷中重新选择。');return}
-            setForm(old=>({...old,instrumentIds:options?.wholePackage?[...old.instrumentIds.filter(id=>!ids.includes(id)),...ids]:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
-            setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)
+            const next=options?.wholePackage?[...form.instrumentIds.filter(id=>!ids.includes(id)),...ids]:[...form.instrumentIds,...ids.filter(id=>!form.instrumentIds.includes(id))]
+            const missing=form.flowDefinition?ids.filter(id=>!flowTools.some(t=>t.id===id)&&!options?.membership?.bindings.some(b=>b.draftId===id)):[]
+            const exact=await Promise.all(missing.map(id=>surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
+            if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current)return
+            if(!arrangeSelection(next,options?.membership,exact))throw new Error('工具已导入；当前问卷编排未改变，请核对整包身份或材料位置后重试选择。')
           }}/>}
-        {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy} onSelect={ids=>{if(form.flowDefinition&&!window.confirm('整包加入会重置当前流程，请随后重新编排。继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}/>}
+        {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy||packageFacts.loading||Boolean(packageFacts.error)} onSelect={(ids,p)=>{arrangeSelection(ids,p)}}/>}
         {showDraft&&<form className="survey-wave-form survey-task-card space-y-4" onSubmit={save}>
           <div className="survey-wave-draft-heading"><h3>{editing?'修改未发布波次':'创建波次草稿'}</h3>
           <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button></div>
@@ -565,8 +580,13 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           </fieldset></details>
 <details className="survey-workflow-disclosure" open={!!form.flowDefinition}><summary><span>实验与流程</span><span className="survey-workflow-summary">{form.flowDefinition?'已配置':'可选 · 默认按工具顺序作答'}</span></summary>
           <SurveyFlowStudio value={form.flowDefinition}
-            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition,
-              quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}))}
+            packages={packageFacts.list} membershipPending={packageFacts.loading||Boolean(packageFacts.error)}
+            onArrange={ids=>{arrangeSelection(ids)}}
+            onChange={flowDefinition=>{if(packageFacts.loading||packageFacts.error||!packageFlowChangeAllowed(form.flowDefinition,flowDefinition,packageFacts.list)){setError('整包流程约束未满足；原草稿保留，请先核对整包身份与批准顺序。');return}setForm(old=>{
+              const keys=flowDefinition?.blocks.filter(b=>b.kind==='INSTRUMENT').map(b=>b.instrumentKey)??[],ordered=keys.flatMap(key=>{const id=flowTools.find(t=>t.instrumentKey===key)?.id;return id?[id]:[]})
+              const complete=ordered.length===old.instrumentIds.length&&keys.length===ordered.length&&new Set(ordered).size===old.instrumentIds.length&&ordered.every(id=>old.instrumentIds.includes(id))
+              return {...old,flowDefinition,...(complete?{instrumentIds:ordered}:{}),quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}
+            })}}
             tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
             collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/></details>
           <details className="survey-workflow-disclosure" open={!!(form.quotaPolicy||form.checkpointPolicy||form.groupIpPolicy)}><summary><span>采集策略</span><span className="survey-workflow-summary">配额 · 临时保存 · 集体作答</span></summary><div className="survey-wave-policies">

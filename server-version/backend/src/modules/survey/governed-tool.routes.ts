@@ -54,4 +54,5 @@ surveyGovernedResearcherRouter.post('/:pid/instruments/:iid/submit-library',hand
 surveyGovernedResearcherRouter.get('/:pid/waves/:wid/finals/:fid/package-reports',handle(req=>readGovernedPackageReports(req.user!.userId,{projectId:uuid.parse(req.params.pid),waveId:uuid.parse(req.params.wid),finalId:uuid.parse(req.params.fid)})))
 
 surveyGovernedResearcherRouter.get('/:pid/package-imports',handle(req=>packages.listProjectPackageImports(req.user!.userId,uuid.parse(req.params.pid),page.parse(req.query.page))))
+surveyGovernedResearcherRouter.get('/:pid/package-memberships',handle(req=>packages.selectedPackageMemberships(req.user!.userId,uuid.parse(req.params.pid),z.string().max(1200).transform(value=>value?value.split(','):[]).pipe(z.array(uuid).max(30)).parse(req.query.draftIds))))
 surveyGovernedResearcherRouter.get('/:pid/waves/:wid/package-reports',handle(req=>listGovernedPackageReports(req.user!.userId,uuid.parse(req.params.pid),uuid.parse(req.params.wid),page.parse(req.query.page))))

@@ -19,6 +19,7 @@ it('reaches whole-package import through the actual workspace route and hands or
   if(path==='/api/survey/projects?page=1')return reply({list:[project]})
   if(path==='/api/survey/projects/p1')return reply(project)
   if(path.includes('/waves?page='))return reply({list:[]})
+  if(path.includes('/package-memberships?'))return reply({list:[{...grant,id:'instance',bindings}]})
   if(path.includes('/instruments?page='))return reply({list:imported?tools:[]})
   if(path.includes('/governed-projects/p1/package-grants?'))return reply({list:[grant],hasMore:false})
   if(path==='/api/survey/governed-projects/p1/package-grants/grant/import'){

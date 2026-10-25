@@ -145,13 +145,26 @@ export async function assertFrozenPackageAdmissions(tx:Prisma.TransactionClient,
  }
 }
 
-export async function listProjectPackageImports(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{
- await authorizedProject(tx,actor,projectId,false)
+async function packageImportSummaries(tx:Prisma.TransactionClient,projectId:string,input:{page:number}|{draftIds:string[]}){
  const rows=await tx.$queryRaw<Array<ListedPackageGrant&{import_id:string;bindings:Array<{draftId:string;slotKey:string;instrumentKey:string}>}>>(Prisma.sql`
   SELECT g.*,i.id AS import_id,i.bindings,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused
   FROM survey_package_imports i JOIN survey_package_grants g ON g.id=i.grant_id
   JOIN LATERAL(SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE t.id=i.tool_id AND t.snapshot_hash=i.snapshot_hash) tool ON true
   LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
-  WHERE i.project_id=${projectId} ORDER BY i.created_at DESC,i.id LIMIT 26 OFFSET ${(page-1)*25}`)
- return {list:rows.slice(0,25).map(r=>({...view(r,r.tool.title,r.tool.family),id:r.import_id,bindings:r.bindings,versions:r.tool.versions,components:r.tool.components,availability:packageAvailability(r)})),page,hasMore:rows.length>25}
+  WHERE i.project_id=${projectId} ${'draftIds'in input?Prisma.sql`AND EXISTS(SELECT 1 FROM survey_package_members member WHERE member.import_id=i.id AND member.draft_id=ANY(${input.draftIds}::text[]))`:Prisma.empty}
+  ORDER BY i.created_at DESC,i.id ${'page'in input?Prisma.sql`LIMIT 26 OFFSET ${(input.page-1)*25}`:Prisma.sql`LIMIT 31`}`)
+ if('draftIds'in input&&rows.length>30)governedFail(409,'选用整包身份数量超限，不能截断编排身份')
+ return rows.map(r=>({...view(r,r.tool.title,r.tool.family),id:r.import_id,bindings:r.bindings,versions:r.tool.versions,components:r.tool.components,availability:packageAvailability(r)}))
+}
+export async function listProjectPackageImports(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{
+ await authorizedProject(tx,actor,projectId,false)
+ const rows=await packageImportSummaries(tx,projectId,{page})
+ return {list:rows.slice(0,25),page,hasMore:rows.length>25}
+})}
+/** Exact selected draft scope, independent of catalog/import-list pagination. */
+export async function selectedPackageMemberships(actor:string,projectId:string,draftIds:string[]){return prisma.$transaction(async tx=>{
+ await authorizedProject(tx,actor,projectId,false)
+ if(!draftIds.length)return {list:[]}
+ if(draftIds.length>30)governedFail(400,'选用工具身份数量超限')
+ return {list:(await packageImportSummaries(tx,projectId,{draftIds:[...new Set(draftIds)]})).map(p=>({...p,bindings:p.bindings.map(b=>({draftId:b.draftId,slotKey:b.slotKey,instrumentKey:b.instrumentKey}))}))}
 })}

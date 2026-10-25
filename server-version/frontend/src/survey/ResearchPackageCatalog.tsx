@@ -1,9 +1,10 @@
 import {useEffect,useState,useRef} from 'react'
 import {governedResearcherRequest,type PackageGrant} from '../api/surveyGovernance'
 import {ExactToolVersions,PackageComponentVersions} from './ExactToolVersions'
+import type {PackageMembership} from './package-arrangement'
 type Binding={draftId:string;slotKey:string;instrumentKey:string}
-export function ResearchPackageCatalog({projectId,busy,onImported,onRefresh,onBeforeImport,onBusyChange}:{projectId:string;busy:boolean;onImported:(bindings:Binding[])=>Promise<void>;onRefresh?:(input:{retry:boolean})=>Promise<void>;onBeforeImport?:()=>boolean;onBusyChange?:(busy:boolean)=>void}){
- const [list,setList]=useState<PackageGrant[]>([]),[page,setPage]=useState(1),[more,setMore]=useState(false),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[refreshOnly,setRefreshOnly]=useState<string|null>(null),epoch=useRef(0),pending=useRef<{grantId:string;requestId:string;bindings?:Binding[];selectionApplied?:boolean;refreshAttempted?:boolean}|null>(null)
+export function ResearchPackageCatalog({projectId,busy,onImported,onRefresh,onBeforeImport,onBusyChange}:{projectId:string;busy:boolean;onImported:(bindings:Binding[],membership?:PackageMembership)=>Promise<void>;onRefresh?:(input:{retry:boolean})=>Promise<void>;onBeforeImport?:()=>boolean;onBusyChange?:(busy:boolean)=>void}){
+ const [list,setList]=useState<PackageGrant[]>([]),[page,setPage]=useState(1),[more,setMore]=useState(false),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[loading,setLoading]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[refreshOnly,setRefreshOnly]=useState<string|null>(null),epoch=useRef(0),pending=useRef<{grantId:string;requestId:string;bindings?:Binding[];importId?:string;selectionApplied?:boolean;refreshAttempted?:boolean}|null>(null)
  useEffect(()=>{onBusyChange?.(loading);return()=>onBusyChange?.(false)},[loading,onBusyChange])
  useEffect(()=>{epoch.current++;setList([]);setPage(1);setMore(false);setQuery('');setSearch('');setLoading(false);setError('');setNotice('');setRefreshOnly(null);pending.current=null;return()=>{epoch.current++}},[projectId])
  const load=async(nextPage=1,nextSearch=search)=>{const current=++epoch.current;setLoading(true);setError('');try{const r=await governedResearcherRequest<{list:PackageGrant[];hasMore:boolean}>('/'+projectId+'/package-grants?'+new URLSearchParams({page:String(nextPage),q:nextSearch}));if(current===epoch.current){setList(r.list);setPage(nextPage);setSearch(nextSearch);setMore(r.hasMore)}}catch(e){if(current===epoch.current)setError(e instanceof Error?e.message:'读取失败')}finally{if(current===epoch.current)setLoading(false)}}
@@ -14,11 +15,11 @@ export function ResearchPackageCatalog({projectId,busy,onImported,onRefresh,onBe
   try{
    if(pending.current?.grantId!==g.id)pending.current={grantId:g.id,requestId:crypto.randomUUID()}
    const command=pending.current
-   const r=command.bindings?{bindings:command.bindings}:await governedResearcherRequest<{bindings:Binding[]}>('/'+projectId+'/package-grants/'+g.id+'/import',{requestId:command.requestId})
+   const r=command.bindings?{bindings:command.bindings,importId:command.importId}:await governedResearcherRequest<{bindings:Binding[];importId:string}>('/'+projectId+'/package-grants/'+g.id+'/import',{requestId:command.requestId})
    if(current!==epoch.current)return
-   command.bindings=r.bindings
+   command.bindings=r.bindings;command.importId=r.importId
    setNotice('已整包导入 '+r.bindings.length+' 项固定组件；正在更新当前研究。')
-   if(!command.selectionApplied){await onImported(r.bindings);if(current!==epoch.current)return;command.selectionApplied=true}
+   if(!command.selectionApplied){await onImported(r.bindings,r.importId?{...g,id:r.importId,bindings:r.bindings}:undefined);if(current!==epoch.current)return;command.selectionApplied=true}
    const retry=Boolean(command.refreshAttempted);command.refreshAttempted=true
    await onRefresh?.({retry})
    if(current===epoch.current){pending.current=null;setRefreshOnly(null);setNotice('整包已加入本研究，组件顺序与版本固定；请核对当前问卷后冻结发布。')}

@@ -19,7 +19,7 @@ DB 实工量/字节及存储；不以 SQL 数量代替净收益。
 | 阶段 | 任务、依赖与边界 | 当前实际状态/证据 |
 | --- | --- | --- |
 | A 基准及正确性 | 01–07；先复现顺序/native/报告预算/拒答，冻结角色、版本与生命周期合同 | 01–07 已实现并有局部/合成 PG 证据，见各节；用户新政策 21/22 继续实施 |
-| B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 9a1cc142 / 39784cfe 已逐片整合；overview 等余项仍须精确盘点 |
+| B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 9a1cc142 / 39784cfe / b969c94d 已逐片整合约定的兼容局部 diff，保留新的立即停止检查；未整体合并 |
 | C 新基线 | 依赖实际整合 source/config；普通、native mixed、整包报告，进程冷/热分别记录 | 新系列待冻结；历史 d01、31d9 及各候选原件不覆盖 |
 | D 核心减工 | 08–13，以及 14–19 中已证明语义/成本的部分；发布编译复用、参与精确绑定、提交 fresh authority 与同请求事实复用 | 08–13、15 已有定向证据；14、16–19 尚需结构和成本证明 |
 | E 推进与报告 | 依赖 B–D 的合同证据；分离纯 next-plan 与准入/推进写，保逐单元保存、GET 恢复及两入口报告开放差异 | 本 PR 仅纳入已证明兼容片；显式 advance、正文迁移等先列方案 |
@@ -414,3 +414,49 @@ GovernedToolLibrary 在原有 family 筛选中补 SCALE；沿用同一个后台�
 目录读取/策略操作均拒绝。证据 `atomic-package-ui-retry.json` 的 SCALE case 与
 `atomic-membership-scale-postgres.json` 的 native Scale case；另一个 membership case
 属于下一片，不能将同一次报告误称为都只测试此入口。
+
+## A/E：整包按导入实例原子编排
+
+用户另行批准的编辑约束按 importId 实施：同工具/同版本/同标题的两次导入仍是两个
+编排单元。当前问卷内容列表与实际 Flow 共用纯编排计划，整包整体移动、整体移除，
+组件展开只读显示批准顺序与精确版本。普通工具可以位于包外或两包之间，不能插入包内；
+不更改授权、计分、版本、发布或服务端最终校验。
+
+已选 draftIds（最多 30 个）通过 project-scoped package-memberships 获取完整相关
+membership 摘要，不依赖目录第一页。只读查询保留当前研究者/项目权限；摘要不带
+executable、报告正文或 technicalGrantIds，不作为准入凭证。真实合成 PG 新建 26 份
+同版本导入，首份/末份精确选中返回两个独立 importId，普通入口管理员不能读取其他
+研究者项目（保持原隐匿 404）。同批 native Scale 路径属于上节单独一项证据。
+
+不完整、倒序、外部工具插入的旧草稿先显示原序列；只有使用者显式“恢复完整整包及
+批准顺序”才补回成员，或显式从本波次移除整包。保持其他工具、embedded data、配额
+和原 block 身份；失效授权仍显示阻塞，修复顺序不恢复权限。已有无条件 MATERIAL
+仍合法；若移动/修复会跨材料或结束块，计划拒绝并保留原草稿，提示先明确材料位置，
+不静默搬动或删掉材料。条件跳过、END、experiment 的包内限制与后端一致。
+
+已 ACK 导入三阶段继续保留。刷新失败后可以编辑新的合法整包顺序和 Flow；只读重试
+不再应用选择、不再重置 Flow/配额。新增实际 WaveStudio DOM 合同覆盖两个相同版本
+实例、失效损坏草稿、原子移动、只读成员、拒绝实验、保留无条件材料/配额；顶层
+SurveyApp 的真实组件路由交接合同也通过。不是浏览器或真实后台 UI 验收。
+
+执行原件（均 maxWorkers=1，不重跑不受影响全矩阵）：
+
+- `atomic-package-ui.json`：11 项纯计划 + 1 顶层路由通过，1 新 DOM 夹具误写“材料正文”
+  而失败；改为实际“素材正文”，仅该 DOM case 在 `atomic-package-ui-retry.json` 通过。
+  retry 的另一个 SCALE case 单独归入上一节，不混加为原子编排覆盖。
+- `atomic-broken-flow.json`：补 1 项损坏 Flow 可编辑静态数据、不能进一步插题的合同通过。
+- `atomic-membership-scale-postgres.json`：26 份 membership 与 native Scale 各 1 项通过。
+- `atomic-consumers.json`：41 项旧 Wave/Flow 消费者通过，刷新 case 只因未等待异步
+  membership 读取而失败；显式等待后仅该例在 `atomic-refresh-retry.json` 通过。
+- `atomic-last-consumers.json`：实际工作台请求合同与旧 picker 消费者 27 项通过。
+
+命令为 frontend `npx vitest run <以上报告列出的精确测试文件> --maxWorkers=1
+--reporter=json --outputFile=<独立证据文件>`；后端 selected membership case 在全新
+schema-only 合成库单列运行对应 governed-list PG 文件的精确 testNamePattern。
+失败原件不覆盖；通过计数是每次 invocation，不可把 retry 相加当独立全量覆盖。
+
+本片完成后的 backend `npx tsc --noEmit`、frontend
+`npx tsc -p tsconfig.app.json --noEmit` 均真实退出 0（生产类型，不冒充构建或 CI）。
+日志与明确退出码分别保留为 `*-types-atomic-final.log` / `.exit`。
+最终受影响前端文件 eslint 退出 0，0 error / 3 warning（epoch cleanup 两条与原有
+publicationId effect dependency 一条），没有关规则或降低阈值。
