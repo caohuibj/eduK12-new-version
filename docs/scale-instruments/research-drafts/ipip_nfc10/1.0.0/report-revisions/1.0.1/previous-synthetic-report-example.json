@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_nfc10_zh_cn_research",
+    "name": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "12d62646f9e28fb576a8aaa4f677b8c5ab2964c379a6d956fea1cbf13de384a3",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_NFC10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NFC10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "need_for_cognition",
+      "type": "total",
+      "label": "认知需求",
+      "description": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_NFC10_01",
+        "IPIP_NFC10_02",
+        "IPIP_NFC10_03",
+        "IPIP_NFC10_04",
+        "IPIP_NFC10_05",
+        "IPIP_NFC10_06",
+        "IPIP_NFC10_07",
+        "IPIP_NFC10_08",
+        "IPIP_NFC10_09",
+        "IPIP_NFC10_10"
+      ],
+      "answeredItems": [
+        "IPIP_NFC10_01",
+        "IPIP_NFC10_02",
+        "IPIP_NFC10_03",
+        "IPIP_NFC10_04",
+        "IPIP_NFC10_05",
+        "IPIP_NFC10_06",
+        "IPIP_NFC10_07",
+        "IPIP_NFC10_08",
+        "IPIP_NFC10_09",
+        "IPIP_NFC10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "need_for_cognition",
+      "headline": "认知需求：描述性反馈",
+      "label": null,
+      "interpretation": "本量表反映你对复杂思考、挑战性阅读以及理解信息的自我描述。得分较高表示你更倾向认可这些描述；它不是智力测验，也不能用来判断一个人聪不聪明。 回想最近一次愿意认真思考的问题：是兴趣、任务意义，还是足够的时间与支持帮助了你？可以选一项略有挑战但可完成的任务，记录尝试过程，而不只看是否答对。 每个分数的理论范围为10–50；数值不代表人群百分位，没有高／中／低等级。可结合最近一次具体经历理解这些描述，而不把分数当成固定身份。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想最近一周一个与“认知需求”相关的具体情境：你的实际表现是否与这些自我描述一致？当时的时间、任务和支持有什么影响？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个低压力、可调整的小行动，记录自己的感受与情境；目标是理解自己，而不是为了提高量表分数。不要将本结果用于学生评判、绩效或选拔。"
+        }
+      ],
+      "limitations": [
+        "中文为未验证工作译稿，未完成专家译审或认知访谈。",
+        "没有适用于当前中文版本与目标人群的常模、经验阈值或临床 cut-off；30仅为理论中点，不是人群平均值。",
+        "各维度全部10项合法作答才可计分；不插补、不将漏答当零。任一主要分数缺失时现有引擎将整份结果标为 invalid。",
+        "部分条目同时涉及自评理解能力和阅读习惯，不能将总分等同于纯粹学习动机、实际认知能力或学业潜力。",
+        "禁止诊断、高风险选拔、学校排名和未经支持的群体比较。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "中文为未验证工作译稿，未完成专家译审或认知访谈。",
+    "没有适用于当前中文版本与目标人群的常模、经验阈值或临床 cut-off；30仅为理论中点，不是人群平均值。",
+    "各维度全部10项合法作答才可计分；不插补、不将漏答当零。任一主要分数缺失时现有引擎将整份结果标为 invalid。",
+    "部分条目同时涉及自评理解能力和阅读习惯，不能将总分等同于纯粹学习动机、实际认知能力或学业潜力。",
+    "禁止诊断、高风险选拔、学校排名和未经支持的群体比较。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供研究内容审查与描述性自我了解，不用于心理诊断、智力鉴定或高风险决策。公有领域不等于本译稿已经得到原作者认可。"
+}
