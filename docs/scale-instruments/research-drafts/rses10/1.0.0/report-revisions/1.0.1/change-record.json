@@ -1,0 +1,108 @@
+{
+  "instrumentKey": "rses10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "previousSourceSha256": "bbfa4464fa2d0fc385a73a1d934123c21e1b208106aaca5c9d616f81818a3c63",
+  "sourceSha256": "d5aa2eaa477e9f77e03bd9de1667e671427286746e4e42af85a9aba7f08b8a7c",
+  "fromReportVersion": "1.0.0",
+  "toReportVersion": "1.0.1",
+  "changeScope": "report-only reader-friendly wording; measurement, scoring, references, licensing and source identity unchanged",
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/headline",
+      "before": "总体自尊：描述性反馈",
+      "after": "自尊：你怎样看待自己",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "before": "总分描述你对自己的总体感受和自我价值感，理论范围为0–30。分数较高表示本次更认可积极的自我描述，不代表你客观上更有价值，也不是对人格好坏、成就或潜力的判断。自我感受可能受近期处境、关系和支持影响。该工作译稿尚未完成本地验证，官方没有通用高低界线；不启用常见但未经目标人群支持的15分或15–25分分档。",
+      "after": "这一项关注你对自己的总体感受和价值感。分数越高，表示这次更认可积极的自我描述。它像一张此刻自我评价的快照，不是给整个人打分。近期的经历、比较和关系可能影响回答。这里没有通用的高低界线，也不能凭分数判断你的能力、成就或未来。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "before": "回想一次你对自己满意或不满意的情境：当时的评价是否受到比较、压力或他人反馈的影响？",
+      "after": "回想一次你对自己不满意的时候：你是在评价一件具体的事，还是把那件事变成了对整个人的结论？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "before": "试着用具体行为和需要来描述那次经历，而不是给整个人下结论；可以记录一个你认可自己的小事实。",
+      "after": "试着把“我就是不行”换成更具体的说法：“这次的……没有做好，我需要……”。再记下一件你认可自己的小事实，不必很出色，只要真实。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations",
+      "before": [
+        "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+        "没有可运行的目标人群常模或经验分档；15仅为理论中点，不是高低界线。",
+        "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+        "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+        "原始青少年样本与PhenX年龄建议不证明本项目中文译稿适用于未成年人。"
+      ],
+      "after": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "没有可通用于所有人的高低分界；不能拿一个固定分数给自己贴标签，也不能据此评价个人价值。",
+        "原版曾用于青少年，不代表本项目这份中文译稿已经适合未成年人。",
+        "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、能力排名或教师考核。"
+      ],
+      "reason": "保留成人、待验证、非诊断、缺失和许可等必要边界，用白话缩短；具体样本统计、算法和文献仍保留在源资料/参数档案，不修改。"
+    }
+  ],
+  "measurementHash": "d953c5df70384c7e43e12d8e8b9e56f478bdeaeade0860b02100c5274ec672df",
+  "originalMeasurementHash": "d953c5df70384c7e43e12d8e8b9e56f478bdeaeade0860b02100c5274ec672df",
+  "finalReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "rses10"
+    ],
+    "scoreOrder": [
+      "rses10"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "rses10",
+        "headline": "自尊：你怎样看待自己",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项关注你对自己的总体感受和价值感。分数越高，表示这次更认可积极的自我描述。它像一张此刻自我评价的快照，不是给整个人打分。近期的经历、比较和关系可能影响回答。不能凭分数判断你的能力、成就或未来。一次不顺利的表现，不必变成对自己全部价值的结论。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想一次你对自己不满意的时候：你是在评价一件具体的事，还是把那件事变成了对整个人的结论？"
+          },
+          {
+            "category": "strategy",
+            "text": "试着把“我就是不行”换成更具体的说法：“这次的……没有做好，我需要……”。再记下一件你认可自己的小事实，不必很出色，只要真实。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "没有可通用于所有人的高低分界；不能拿一个固定分数给自己贴标签，也不能据此评价个人价值。",
+      "原版曾用于青少年，不代表本项目这份中文译稿已经适合未成年人。",
+      "10题都需完整回答；漏答不当作零分，也不代填。不用于诊断、学生筛选、能力排名或教师考核。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。来源：Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). 本中文为项目工作译稿，非作者认可版本。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:42:00Z",
+        "basis": "AI editorial check: adult self-description, correct source identity, no universal cutoffs or objective ability claims; not human expert review."
+      }
+    }
+  },
+  "additionalEditorialAdjustment": "Repeated no-ranking/no-band warnings consolidated in limitations; retained construct-specific caveats and distinct everyday examples."
+}

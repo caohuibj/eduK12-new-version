@@ -1,0 +1,49 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "rses10"
+  ],
+  "scoreOrder": [
+    "rses10"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "rses10",
+      "headline": "总体自尊：描述性反馈",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "总分描述你对自己的总体感受和自我价值感，理论范围为0–30。分数较高表示本次更认可积极的自我描述，不代表你客观上更有价值，也不是对人格好坏、成就或潜力的判断。自我感受可能受近期处境、关系和支持影响。该工作译稿尚未完成本地验证，官方没有通用高低界线；不启用常见但未经目标人群支持的15分或15–25分分档。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想一次你对自己满意或不满意的情境：当时的评价是否受到比较、压力或他人反馈的影响？"
+        },
+        {
+          "category": "strategy",
+          "text": "试着用具体行为和需要来描述那次经历，而不是给整个人下结论；可以记录一个你认可自己的小事实。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+    "没有可运行的目标人群常模或经验分档；15仅为理论中点，不是高低界线。",
+    "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+    "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+    "原始青少年样本与PhenX年龄建议不证明本项目中文译稿适用于未成年人。"
+  ],
+  "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。来源：Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). 本中文为项目工作译稿，非作者认可版本。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T14:42:00Z",
+      "basis": "AI editorial check: adult self-description, correct source identity, no universal cutoffs or objective ability claims; not human expert review."
+    }
+  }
+}
