@@ -4511,7 +4511,9 @@ model SurveyParticipantCode {
 }
 
 // Survey administration only. Append-only audit enforcement lives in the migration.
+// product-scoped exact admission identity; matches migration 20261025120000.
 model SurveyToolPolicy {
+ product String @default("SURVEY")
  resourceKey String @map("resource_key")
  fingerprint String
  decision String @default("PENDING")
@@ -4521,7 +4523,7 @@ model SurveyToolPolicy {
  reviewedBy String @map("reviewed_by")
  reviewer User @relation("SurveyPolicyReviewer",fields:[reviewedBy],references:[id],onDelete:Restrict,onUpdate:NoAction)
  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
- @@id([resourceKey,fingerprint])
+ @@id([product,resourceKey,fingerprint])
  @@map("survey_tool_policies")
 }
 model SurveySystemExportGrant {

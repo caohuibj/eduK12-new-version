@@ -11,6 +11,11 @@ import {parseCompiledInstrumentRuntime} from '../assessment-runtime/compiler'
 export const PACKAGE_REPORT_MAX_BYTES=4_000_000
 export const PACKAGE_REPORT_MAX_CIPHER_BYTES=2*PACKAGE_REPORT_MAX_BYTES+30*4096
 export const jsonBytes=(value:unknown)=>Buffer.byteLength(JSON.stringify(value),'utf8')
+/** Artifacts finalized before the read-side budget shipped (PR #355, merged
+ * 2026-10-25) stay readable: only artifacts created at/after this instant are
+ * bound by the read budget. Integrity checks (hash, results binding) still
+ * cover every artifact; only the size ceiling is scoped. */
+export const PACKAGE_REPORT_BUDGET_ENFORCED_FROM=new Date('2026-10-25T00:00:00.000Z')
 const textBytes=(value:string)=>jsonBytes(value)-2
 export class PackageReportBudgetError extends Error{readonly statusCode=409}
 export function assertPackageReportBytes(bytes:number,kind='展开正文',limit=PACKAGE_REPORT_MAX_BYTES){
