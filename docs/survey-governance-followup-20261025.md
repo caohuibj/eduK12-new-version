@@ -97,3 +97,36 @@ author release 链；都不宣称真实目录已授权。原生 V1 无阶段 cap
 首轮 PG：V1 通过；V2 夹具让作者审核自己，正确被既有保护拒绝。改用独立夹具
 作者后只运行 V2，该项通过。原失败不改写，两个通过取不相交证据。文件：
 `02-native-unit.json`、`02-native-postgres.json`、`02-native-postgres-v2.json`。
+
+## 03/04 报告展开预算、读取防线与拒答
+
+采用每份 FINAL 所有整包**合计 4,000,000 UTF-8 JSON 字节**，依据现有
+publication 上限（publication.service.ts），低于 compact codec 的 8 MiB 明文
+上限。密文合计上限为 `2 × 4,000,000 + 30 × 4096`，兼容 legacy hex 编码
+约二倍放大及每包 envelope/header 余量；不是每包独立获得 4 MB。发布估计另留
+每包 4096 字节，用于 artifact 元数据/固定生成器开销。字段文本按最多六字节/
+UTF-16 code unit，标签按实际 JSON 转义 UTF-8，重复引用逐次计入，矩阵含每行
+标签和全部可选值；不依赖条件跳过来削减预算。
+
+提交审批列出可解释 blocker，审批再次验证；多个单独合格包在 wave 冻结时
+检查总预算。生成时逐 block 检查，hash/encrypt/INSERT 前检查实际合计；读取
+先锁最多 31 条 id/密文长度，超量或超字节不获取正文，再窄列读并检查解密后
+实际合计及原 FINAL/report hash。没有截断答案或报告、异步化或改变开放时机。
+历史超大/异常 artifact 会明确报预算错误，保留原件，未做数据重写/清理。
+
+拒答只消费 normalizeFormAnswers 已验证的 missing 原因：REFUSED 与 NOT_SHOWN、
+SHOWN_MISSING 区分，矩阵逐行显示；不重新评分。组件、结果、字段、missing、
+metric 索引只在本次渲染复用，未缓存权限。
+
+验证：10 个预算/拒答断言、4 个读取预算断言通过。实际 PG 的两包 FINAL 第二
+report INSERT 强制失败时，parent FINAL/所有 report 均回滚，Attempt 保持 STARTED；
+移除仅合成库 fixture trigger 后同命令重试完成，重放只有两份报告。发布测试
+确认 200×合法长文本被审批拒绝，两个各 60 引用的合格包在冻结时拒绝总预算；
+单包 10,000 个可转义字符可真实完成并完整读取 60 次引用，未截断。
+
+原治理 PG 20 项中 18 通过（含新回滚与权限/历史保护）；两项全表空断言因先前
+native 合成数据留在同一测试库失败。随后新建 schema-only 合成库，只重跑这两项
+及它们必需的原表单创建前置案例，3/3 通过；未重跑其余 18 项。原失败保留。
+追加发布预算案例 1/1 通过。原始证据：`03-budget-unit.json`、
+`03-budget-read.json`、`03-governed-postgres.json`、
+`03-governed-postgres-empty-scope.json`、`03-budget-publication-postgres.json`。

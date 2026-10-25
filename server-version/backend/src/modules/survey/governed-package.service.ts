@@ -9,6 +9,7 @@ import {clone,packageFamily,type GovernedRow} from './governed-tool.model'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenUnit,FrozenGovernedPackage,ResearchFrozenPublication} from './publication.service'
 import {assertSurveyToolPolicy,snapshotPolicyIdentity} from './tool-policy'
+import {packageReportWorstCaseBytes,assertPackageReportBytes} from './governed-package.budget'
 export type PackageGrantRow={id:string;tool_id:string;snapshot_hash:string;user_id:string;status:string;version:number;valid_from:Date;expires_at:Date|null;created_by:string;reason:string;revoked_at:Date|null}
 const view=(g:PackageGrantRow,title:string,family:string)=>({id:g.id,toolId:g.tool_id,hash:g.snapshot_hash,title,family,status:g.status,version:g.version,validFrom:g.valid_from,expiresAt:g.expires_at,reason:g.reason,mode:'PACKAGE_ONLY',revokedAt:g.revoked_at})
 async function audit(tx:Prisma.TransactionClient,actor:string,action:string,metadata:object,projectId?:string){await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,projectId,action,metadata:metadata as Prisma.InputJsonValue}})}
@@ -83,6 +84,7 @@ export async function packageBoundCatalogSnapshots(tx:Prisma.TransactionClient,a
 }
 export async function assertNotTechnicalPackageGrant(tx:Prisma.TransactionClient,id:string){const rows=await tx.$queryRaw<Array<{draft_id:string}>>`SELECT draft_id FROM survey_package_members WHERE technical_grant_id=${id}`;if(rows.length)governedFail(403,'整包绑定不能作为单独工具导入、复制或撤销；请操作整包授权')}
 export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:string,projectId:string,units:ResearchFrozenUnit[],flow:ResearchFrozenPublication['flow']):Promise<FrozenGovernedPackage[]>{
+ let reportBytes=0
  const ids=[...new Set(units.flatMap(u=>{const p=u.sourceProvenance?.surveyPackage as {importId?:string}|undefined;return p?.importId?[p.importId]:[]}))].sort(),frozen:FrozenGovernedPackage[]=[]
  for(const id of ids){
   const [instance]=await tx.$queryRaw<Array<{grant_id:string;tool_id:string;project_id:string;snapshot_hash:string;bindings:Array<{draftId:string;slotKey:string;instrumentKey:string;technicalGrantId:string}>}>>`SELECT * FROM survey_package_imports WHERE id=${id} AND project_id=${projectId} FOR SHARE`
@@ -105,6 +107,7 @@ export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:s
    if(start<0||instance.bindings.some((b,i)=>execution[start+i]?.instrumentKey!==b.instrumentKey))governedFail(409,'实际研究流程必须按已批准顺序连续执行整包工具，禁止重排或插入其他工具')}
   if(flow){const last=Math.max(...instance.bindings.map(b=>flow.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&block.instrumentKey===b.instrumentKey)));if(flow.blocks.slice(0,last+1).some(block=>block.kind==='END'||block.when))governedFail(409,'整包组件完成前不能结束或使用条件分支')}
   if(flow?.experiment)governedFail(409,'整包版本不能拆入实验分支；请将完整组合独立投放')
+  if(tool.snapshot.packageReport){reportBytes+=packageReportWorstCaseBytes(tool.snapshot.packageReport,tool.snapshot.components,tool.title);assertPackageReportBytes(reportBytes,'波次所有整包最坏展开合计')}
   frozen.push({schemaVersion:1,importId:id,toolId:tool.id,hash:tool.snapshot_hash,title:tool.title,family:tool.family as 'COMBINATION'|'BUNDLE',parentGrantId:grant.id,report:clone(tool.snapshot.packageReport),slots:instance.bindings.map(b=>({slotKey:b.slotKey,draftId:b.draftId,instrumentKey:b.instrumentKey,kind:members.find(u=>u.draftId===b.draftId)!.kind}))})
  }
  return frozen
