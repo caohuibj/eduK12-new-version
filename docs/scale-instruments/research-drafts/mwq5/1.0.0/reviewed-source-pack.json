@@ -1,0 +1,224 @@
+{
+  "id": "MWQ5",
+  "title": "走神问卷（5题）",
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "family": "task-unrelated-mind-wandering",
+  "defaultAudience": "MIDDLE_HIGH_SCHOOL_COLLEGE_RESEARCH_REFERENCE",
+  "k12Validated": false,
+  "authors": [
+    "Michael D. Mrazek",
+    "Dawa T. Phillips",
+    "Michael S. Franklin",
+    "James M. Broadway",
+    "Jonathan W. Schooler"
+  ],
+  "rights": {
+    "license": "CC-BY-3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "noncommercialOnly": false,
+    "basis": "Original authors publish complete MWQ wording in Study 1 and Table 1, under article CC BY linked to version 3.0. No separate exclusion for MWQ form. Footnote transparently identifies items 3 and 4 adapted from MAAS; original MAAS is not being republished.",
+    "attribution": "Mrazek et al. (2013), doi:10.3389/fpsyg.2013.00560; retain article/CC-BY3 links and identify Chinese project adaptation."
+  },
+  "references": [
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full",
+      "doi": "10.3389/fpsyg.2013.00560",
+      "citation": "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560.",
+      "role": "Original authors, exact five items, 6-point response anchors, Study 1 validation, adolescent studies, CC-BY3 link"
+    }
+  ],
+  "instructions": {
+    "en": "Project administration instruction: Rate how frequently each statement applies to you.",
+    "zh": "请根据平时的情况，选择以下每句话发生的频繁程度。",
+    "timeframe": "general tendency; no fixed recall window",
+    "provenance": "Administration wording composed by project; exact item and anchor wording from original."
+  },
+  "items": [
+    {
+      "id": 1,
+      "en": "I have difficulty maintaining focus on simple or repetitive work",
+      "zh": "做简单或重复的工作时，我很难保持专注。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "While reading, I find I haven't been thinking about the text and must therefore read it again",
+      "zh": "阅读时，我发现自己并没有在想文字的内容，因此不得不重新读一遍。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I do things without paying full attention",
+      "zh": "我做事时没有把注意力完全放在上面。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I find myself listening with one ear, thinking about something else at the same time",
+      "zh": "我发现自己一边听着，一边在想别的事情。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I mind-wander during lectures or presentations",
+      "zh": "听课或听报告时，我会走神。",
+      "reverse": false
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "almost never",
+      "zh": "几乎从不"
+    },
+    {
+      "value": 2,
+      "en": "very infrequently",
+      "zh": "很少"
+    },
+    {
+      "value": 3,
+      "en": "somewhat infrequently",
+      "zh": "比较少"
+    },
+    {
+      "value": 4,
+      "en": "somewhat frequently",
+      "zh": "比较频繁"
+    },
+    {
+      "value": 5,
+      "en": "very frequently",
+      "zh": "很频繁"
+    },
+    {
+      "value": 6,
+      "en": "almost always",
+      "zh": "几乎总是"
+    }
+  ],
+  "scoring": {
+    "method": "mean",
+    "range": [
+      1,
+      6
+    ],
+    "reverseItems": [],
+    "dimensions": [
+      {
+        "id": "total",
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "range": [
+          1,
+          6
+        ]
+      }
+    ],
+    "higherMeans": "more frequent self-reported task-unrelated thoughts",
+    "basis": "Unidimensional 5-item form and Tables 2–3 report MWQ means on response metric (3.68 and 3.44). Project uses equal-weight mean of all 5 items; original prose does not separately state an explicit MWQ aggregation formula. Do not confuse thought-probe mean with MWQ scoring.",
+    "missingOriginal": "Not specified.",
+    "missingProjectPolicy": "All five responses required; no imputation; no score/report for incomplete response set."
+  },
+  "thresholds": [],
+  "report": {
+    "title": "看看注意力什么时候悄悄拐了弯",
+    "summary": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。",
+    "interpretation": "回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。",
+    "dailyExample": "比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+    "reflection": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？",
+    "smallAction": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。",
+    "caveat": "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。"
+  },
+  "tags": {
+    "domain": [
+      "注意与认知",
+      "学习与自我管理"
+    ],
+    "construct": [
+      "任务无关思维",
+      "走神频率"
+    ],
+    "orientation": [],
+    "population": [
+      "中学生英文证据",
+      "大学生英文证据"
+    ],
+    "response": [
+      "自评",
+      "5题",
+      "六点频率"
+    ],
+    "use": [
+      "非诊断研究",
+      "自我观察"
+    ],
+    "license": [
+      "CC-BY-3.0"
+    ],
+    "language_validation": [
+      "英文原版",
+      "中文工作译稿",
+      "中文待验证"
+    ]
+  },
+  "changesNotice": "本项目据原作者2013年MWQ发布文字独立翻译并编写通俗反馈。保留五题顺序与六级频率锚点；尚非经验证的中文版本，原作者未背书。",
+  "sourceFiles": [
+    {
+      "file": "scale-source-packs-learning-attention-20261025/sources/mwq-original.html",
+      "sha256": "df659d41d0b357e81544afcde0f320cfdc759558058f6f237dc7a5cfdfb7760e"
+    }
+  ],
+  "sourceDiscrepancies": [
+    "Item 5 Study 1 prose says lectures or presentations; Table 1 has lectures of presentations. Preserve prose wording as questionnaire form; record table typo rather than silently rewriting source.",
+    "Study 3 prose says 106 female high-school students; Table 2 caption says N=156. Neither treated as population norm."
+  ],
+  "thresholdPolicy": "No validated diagnostic thresholds or low/medium/high bands in original. Do not use sample mean/SD as cutoffs or ADHD indicators.",
+  "sampleContext": {
+    "study1": {
+      "n": 663,
+      "population": "UCSB undergraduates",
+      "ageRange": [
+        18,
+        58
+      ],
+      "meanAge": 19.48,
+      "alpha": 0.85
+    },
+    "study2": {
+      "n": 77,
+      "population": "UCSB undergraduates",
+      "ageRange": [
+        18,
+        22
+      ]
+    },
+    "study3": "California female high-school sample; paper inconsistent n=106 prose vs156 table; no normative inference",
+    "study4": {
+      "n": 78,
+      "population": "Santa Barbara middle schools",
+      "grades": {
+        "6": 10,
+        "7": 68
+      },
+      "ageDiscussion": [
+        11,
+        13
+      ]
+    },
+    "scope": "English original has adolescent evidence; project Chinese translation has no local validation. English validation does not validate Chinese/K12 deployment."
+  },
+  "dedup": {
+    "registry": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "exactAliasMatch": false,
+    "checkedAt": "2026-10-25T16:30:00Z"
+  }
+}

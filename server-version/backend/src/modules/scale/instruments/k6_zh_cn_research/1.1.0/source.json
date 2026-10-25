@@ -1,0 +1,590 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "k6_zh_cn_research",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "凯斯勒心理困扰量表（K6，作者官网普通话版）（研究呈现）",
+      "abbreviation": "K6",
+      "instrumentFamily": "Kessler Psychological Distress Scales"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "过去30天非特异性心理困扰自述频率，非SMI诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "k6",
+        "domain:distress_behavior",
+        "construct:psychological_distress",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:author_unrestricted_use",
+        "language_validation:content_zh-CN",
+        "language_validation:official_author_hosted_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:presentation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "仅成人研究；原英文临床校准不能当作本中文/未成年人常模。ADULT_SELF/student为技术报告受众，不表示儿童。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "每一道症状题重复原过去30天总题干，防止离开总说明后丢失回忆窗口。",
+        "六道K6核心题，非完整K6+；原打印码1–5映射分数4–0，无构念反向。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前数字呈现版本与目标人群适配尚待核验；原作者托管普通话译文不等于本项目目标人群验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.；直接转录作者托管普通话题文；不自创中译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原中文翻译作者已署名；本项目数字呈现审核和精确版本效度匹配待完成，不声称中文缺乏所有研究或原译者未审核。 本次instrumentVersion1.1.0接续历史PR328 1.0.0候选，未覆盖已公开旧身份。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "k6-zh-cn-research-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "k6-zh-cn-research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "k6-zh-cn-research-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview © 2001 Ronald C. Kessler, PhD. All rights reserved. Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189. https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+      "作者当前免费/不需许可及unrestricted译本使用声明；保留原版权，不是公共领域/CC。",
+      "研究DRAFT，不启用诊断/人群分档或自动危机处置。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "凯斯勒心理困扰量表（K6，作者官网普通话版）",
+        "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+        "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview © 2001 Ronald C. Kessler, PhD. All rights reserved. Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189. https://rckessler.scholars.harvard.edu/k10-and-k6-scales 作者当前免费/不需许可及unrestricted译本使用声明；保留原版权，不是公共领域/CC。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "k6_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "全部时间",
+              "score": 4
+            },
+            {
+              "value": "2",
+              "label": "大部分时间",
+              "score": 3
+            },
+            {
+              "value": "3",
+              "label": "一部分时间",
+              "score": 2
+            },
+            {
+              "value": "4",
+              "label": "偶尔",
+              "score": 1
+            },
+            {
+              "value": "5",
+              "label": "无",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "K6_01",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…紧张?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "K6_02",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…绝望?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "K6_03",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…不安或烦躁?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "K6_04",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…太沮丧以至于什么都不能让您愉快起来?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "K6_05",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…做每一件事情都很费劲?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "K6_06",
+          "content": "问 1. 在过去３０天中，您经常会感到 …\n…无价值?",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "k6_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "K6_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "K6_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "K6_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "K6_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "K6_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "K6_06",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "k6_total",
+            "type": "total",
+            "label": "过去30天困扰体验",
+            "description": "数值越高，表示这些困扰在这次回答里出现得越频繁。它无法单独说明原因，也不能据此判断是否患病。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "K6_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "K6_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "K6_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "K6_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "K6_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "K6_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "k6_total"
+        ],
+        "scoreOrder": [
+          "k6_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "k6_total",
+            "headline": "过去30天困扰体验：了解近来的自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份小记录关注过去一个月里，紧张、沮丧和做事费劲等感受出现得有多频繁。它像一张近况快照，不是给你下结论，也不评价你是否坚强。数值越高，表示这些困扰在这次回答里出现得越频繁。它无法单独说明原因，也不能据此判断是否患病。可以回想最近一件平常的小事：它是否比以前更费力？是偶尔如此，还是常常如此？具体例子往往比分数更有助于理解自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "记下一件最近最费劲的事，以及当时让你稍微轻松一点的条件。"
+              },
+              {
+                "category": "support",
+                "text": "如果困扰持续或妨碍日常生活，可以与可信赖的人或合格专业人员谈谈。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "目前没有为这个版本启用人群分档，因此不把你的结果标成轻、中、重。回答较少困扰也不证明完全安全或不需要帮助。",
+          "若有症状问题未完成，暂不计算总分；这不表示没有困扰，也不把缺失答案当作零。",
+          "原英文成人校准参数仅文档保存，不作为本中文的诊断、分档或人群排名。",
+          "原作者普通话题文保留；精确版本与本目标人群效度匹配待核。"
+        ],
+        "disclaimer": "本工具不评估自杀风险。若你此刻可能伤害自己或无法保证安全，请联系当地紧急服务并找可信赖的人陪伴。本页不提供实时监测或自动救援。 仅供成人研究，不用于心理诊断。 © Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview © 2001 Ronald C. Kessler, PhD. All rights reserved. Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189. https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:34:00Z",
+            "basis": "AI editorial review: adult descriptive symptoms, no norm/diagnosis or low-score safety claim; static safety notice, not human expert translation or clinical review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "k6",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "K6_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_06",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "k6_total": 0
+          },
+          "totalScoreKeys": [
+            "k6_total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "K6_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_06",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "k6_total": 24
+          },
+          "totalScoreKeys": [
+            "k6_total"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "K6_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_06",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "k6_total": 6
+          },
+          "totalScoreKeys": [
+            "k6_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "K6_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "K6_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "K6_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "K6_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "K6_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "K6_06",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "k6_total": 10
+          },
+          "totalScoreKeys": [
+            "k6_total"
+          ]
+        }
+      }
+    ]
+  }
+}

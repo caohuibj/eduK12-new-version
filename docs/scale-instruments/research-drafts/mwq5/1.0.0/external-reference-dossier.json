@@ -1,0 +1,52 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "sampleContext": {
+    "study1": {
+      "n": 663,
+      "population": "UCSB undergraduates",
+      "ageRange": [
+        18,
+        58
+      ],
+      "meanAge": 19.48,
+      "alpha": 0.85
+    },
+    "study2": {
+      "n": 77,
+      "population": "UCSB undergraduates",
+      "ageRange": [
+        18,
+        22
+      ]
+    },
+    "study3": "California female high-school sample; paper inconsistent n=106 prose vs156 table; no normative inference",
+    "study4": {
+      "n": 78,
+      "population": "Santa Barbara middle schools",
+      "grades": {
+        "6": 10,
+        "7": 68
+      },
+      "ageDiscussion": [
+        11,
+        13
+      ]
+    },
+    "scope": "English original has adolescent evidence; project Chinese translation has no local validation. English validation does not validate Chinese/K12 deployment."
+  },
+  "sourceDiscrepancies": [
+    "Item 5 Study 1 prose says lectures or presentations; Table 1 has lectures of presentations. Preserve prose wording as questionnaire form; record table typo rather than silently rewriting source.",
+    "Study 3 prose says 106 female high-school students; Table 2 caption says N=156. Neither treated as population norm."
+  ],
+  "thresholds": [],
+  "currentTranslationValidated": false,
+  "references": [
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full",
+      "doi": "10.3389/fpsyg.2013.00560",
+      "citation": "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560.",
+      "role": "Original authors, exact five items, 6-point response anchors, Study 1 validation, adolescent studies, CC-BY3 link"
+    }
+  ]
+}

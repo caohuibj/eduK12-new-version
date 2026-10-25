@@ -1,0 +1,29 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "sampleContext": {
+    "n": 380,
+    "population": "Midwestern US college students; 356 four-year public university, 24 community college",
+    "fielding": "toward end of Winter 1990 semester January–May",
+    "courses": "37 classrooms, 14 subject domains, 5 disciplines",
+    "criticalThinkingAlpha": 0.8,
+    "descriptiveMean": 4.16,
+    "descriptiveSD": 1.28,
+    "externalOnly": true,
+    "scope": "Not Chinese or K12 norms; descriptive numbers cannot activate report bands."
+  },
+  "thresholds": [],
+  "currentTranslationValidated": false,
+  "references": [
+    {
+      "url": "https://files.eric.ed.gov/fulltext/ED338122.pdf",
+      "role": "Original 1991 manual archived by ERIC; printed p22 full five items; pp3–6 modular use/scoring/no norms. PDF p23 screenshot visually checked to correct OCR try.",
+      "citation": "Pintrich, P. R., Smith, D. A. F., Garcia, T., & McKeachie, W. J. (1991). A manual for the use of the Motivated Strategies for Learning Questionnaire (MSLQ). Ann Arbor, MI: University of Michigan, National Center for Research to Improve Postsecondary Teaching and Learning. ERIC ED338122."
+    },
+    {
+      "url": "https://www.researchgate.net/publication/280741846_Motivated_Strategies_for_Learning_Questionnaire_MSLQ_Manual",
+      "role": "Original developer author-uploaded manual page, explicit public-domain statement; uploaded by Teresa Duncan 2015-08-07",
+      "doi": "10.13140/RG.2.1.2547.6968"
+    }
+  ]
+}

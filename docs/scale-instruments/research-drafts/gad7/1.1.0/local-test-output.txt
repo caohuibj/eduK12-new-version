@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12-dot-local-scales-20261025/server-version/backend
+
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  01:37:35
+   Duration  1.08s (transform 670ms, setup 0ms, import 891ms, tests 60ms, environment 0ms)
+

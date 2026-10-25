@@ -1,0 +1,78 @@
+{
+  "items": [
+    {
+      "id": "GAD7-01",
+      "en": "Feeling nervous, anxious or on edge",
+      "zh_draft": "感到紧张、焦虑或绷紧了神经",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-02",
+      "en": "Not being able to stop or control worrying",
+      "zh_draft": "无法停止或控制担忧",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-03",
+      "en": "Worrying too much about different things",
+      "zh_draft": "对各种事情担忧过多",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-04",
+      "en": "Trouble relaxing",
+      "zh_draft": "难以放松",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-05",
+      "en": "Being so restless that it is hard to sit still",
+      "zh_draft": "坐立不安，以至于难以安静地坐着",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-06",
+      "en": "Becoming easily annoyed or irritable",
+      "zh_draft": "变得容易恼火或烦躁",
+      "reverse": false
+    },
+    {
+      "id": "GAD7-07",
+      "en": "Feeling afraid as if something awful might happen",
+      "zh_draft": "感到害怕，好像可能会有很糟糕的事情发生",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "instructions": "过去两周里，以下问题困扰您的频率是多少？",
+  "status": "Existing PR328 AI-assisted working Simplified Chinese; NOT validated, NOT developer endorsed. Official site Chinese download not recovered through current page/search; do not substitute an unverified mirror.",
+  "supplementary": null,
+  "presentationChanges": "原回忆时段总题干重复入每道症状题；题文不改。",
+  "historicalSource": {
+    "pr": 328,
+    "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "reused": "existing reviewed working Chinese text and source identity; no second translation invented",
+    "fresh_primary_check": "2026-10-25 developer form items/anchors/permission footer reread; author handbook p8 permission and Pfizer release rechecked; original validation evidence rechecked via GAD7 paper / PHQ9 PubMed abstract; PMC direct PHQ9 page challenge."
+  }
+}

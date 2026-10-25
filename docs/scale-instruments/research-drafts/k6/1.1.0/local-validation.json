@@ -1,0 +1,18 @@
+{
+  "sourceSha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640",
+  "canonicalSourceHash": "04727803bcd7b501d5b495aa9095ab7b9ca0a1b6b2612964b3b2d62493e3572c",
+  "measurementHash": "ad8d86057b99b45f12e4cc470d87fe888632110522934c113faa0dbb0055880b",
+  "checkedAt": "2026-10-25T16:37:33.586Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 4,
+  "dbWrites": false,
+  "toolTests": 10,
+  "testExitCode": 0,
+  "generatorExitCode": 0,
+  "typecheckStatus": "PASSED_BATCH",
+  "testEvidence": "local-test-output.txt",
+  "metadataCorrection": "Official Mandarin attribution wording only; measurement/report unchanged, prior scoring tests reused.",
+  "typecheckExitCode": 0,
+  "combinedTests": 74,
+  "batchEvidence": "../../learning-screening-batch-20261025/validation.json"
+}

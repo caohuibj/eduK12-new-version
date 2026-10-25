@@ -1,0 +1,298 @@
+{
+  "code": "PHQ9",
+  "name_zh": "患者健康问卷（PHQ-9，简体中文研究工作译稿）",
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "existing_key": "phq9_zh_cn_research",
+  "historical_source": {
+    "pr": 328,
+    "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "reused": "existing reviewed working Chinese text and source identity; no second translation invented",
+    "fresh_primary_check": "2026-10-25 developer form items/anchors/permission footer reread; author handbook p8 permission and Pfizer release rechecked; original validation evidence rechecked via GAD7 paper / PHQ9 PubMed abstract; PMC direct PHQ9 page challenge."
+  },
+  "rights": {
+    "instrument_grant": "Public-domain measure; developer manual explicitly permits reproduction, translation, display and distribution. Retain developer attribution; do not claim publisher articles, third-party branding or all translations are covered.",
+    "source_url": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+    "source_locator": "p.8, QUESTIONS REGARDING DEVELOPMENT, ACKNOWLEDGMENTS AND USE; Table1 p.3 includes both measures.",
+    "quotation": "No permission is required to reproduce, translate, display or distribute.",
+    "form_source_url": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+    "form_footer": "Developer attribution and no-permission reproduction/translation/display/distribution statement present on standalone form.",
+    "attribution": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.",
+    "archive_policy": "Only original instrument wording transcribed under instrument grant. No journal article or manual PDF downloaded/uploaded; links retained. No logos copied.",
+    "historical_notice": "Early journal appendix copyright notice predates the later public-domain/free-use grant; retain current instrument-specific evidence rather than treating the journal article as public domain.",
+    "corroboration_url": "https://www.pfizer.com/news/press-release/press-release-detail/pfizer_to_offer_free_public_access_to_mental_health_assessment_tools_to_improve_diagnosis_and_patient_care",
+    "corroboration_date": "2010-07-21",
+    "corroboration_summary": "Pfizer announced download access without copyright restrictions; this corroborates the instrument grant, not journal article reuse."
+  },
+  "primary_measure_source": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+  "translation_status": "Existing PR328 AI-assisted working Simplified Chinese; NOT validated, NOT developer endorsed. Official site Chinese download not recovered through current page/search; do not substitute an unverified mirror.",
+  "timeframe": "过去两周",
+  "instructions_zh": "过去两周里，以下问题困扰您的频率是多少？",
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "items": [
+    {
+      "id": "PHQ9-01",
+      "en": "Little interest or pleasure in doing things",
+      "zh_draft": "做事情时没什么兴趣或乐趣",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-02",
+      "en": "Feeling down, depressed, or hopeless",
+      "zh_draft": "感到情绪低落、抑郁或没有希望",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-03",
+      "en": "Trouble falling or staying asleep, or sleeping too much",
+      "zh_draft": "难以入睡、难以维持睡眠，或睡得太多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-04",
+      "en": "Feeling tired or having little energy",
+      "zh_draft": "感到疲倦或没什么精力",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-05",
+      "en": "Poor appetite or overeating",
+      "zh_draft": "食欲不振或吃得过多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-06",
+      "en": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+      "zh_draft": "对自己感觉很糟，或觉得自己是个失败者，或让自己或家人失望了",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-07",
+      "en": "Trouble concentrating on things, such as reading the newspaper or watching television",
+      "zh_draft": "难以集中注意力做事，例如读报纸或看电视",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-08",
+      "en": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+      "zh_draft": "动作或说话慢到别人可能会注意到的程度？或者相反，坐立不安或躁动不宁，以至于活动比平时多得多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-09",
+      "en": "Thoughts that you would be better off dead or of hurting yourself in some way",
+      "zh_draft": "想到自己死了会更好，或想到以某种方式伤害自己",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "total": "sum(all 9 scored symptoms)",
+    "total_range": [
+      0,
+      27
+    ],
+    "reverse": [],
+    "missing": "Platform conservative policy: all 9 scored responses valid 0..3 integers required. Any missing/invalid => no total or band; no imputation. This is not claimed as the authors sole missingness rule.",
+    "direction": "更高表示过去两周报告的相应困扰更频繁"
+  },
+  "reference_profiles": [
+    {
+      "severity": {
+        "kind": "Descriptive symptom-severity bands, not diagnosis or percentile norms",
+        "bands": [
+          {
+            "min": 0,
+            "max": 4,
+            "label": "none/minimal"
+          },
+          {
+            "min": 5,
+            "max": 9,
+            "label": "mild"
+          },
+          {
+            "min": 10,
+            "max": 14,
+            "label": "moderate"
+          },
+          {
+            "min": 15,
+            "max": 19,
+            "label": "moderately severe"
+          },
+          {
+            "min": 20,
+            "max": 27,
+            "label": "severe"
+          }
+        ],
+        "source_doi": "10.1046/j.1525-1497.2001.016009606.x",
+        "source_locator": "Original article discussion: lower limits 5,10,15,20; 0–4 residual none/minimal band.",
+        "population": "Original US clinical adult study, not Chinese norms."
+      },
+      "screening": {
+        "operator": ">=",
+        "cutoff": 10,
+        "target": "Possible major depression for further clinical assessment",
+        "sensitivity": 0.88,
+        "specificity": 0.88,
+        "source_doi": "10.1046/j.1525-1497.2001.016009606.x",
+        "criterion_sample_n": 580,
+        "scope": "Original clinical criterion-validation sample only; no claim of accuracy for all users, Chinese translations or adolescents.",
+        "diagnostic_use": false
+      },
+      "norms": "No population norms or percentiles approved.",
+      "longitudinal": "May describe within-person score changes with consistent form/language/recall period; do not claim a validated treatment response or minimal important difference from these packages."
+    }
+  ],
+  "reference_study": {
+    "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+    "doi": "10.1046/j.1525-1497.2001.016009606.x",
+    "fulltext_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1495268/",
+    "publisher_fulltext_url": "https://onlinelibrary.wiley.com/doi/full/10.1046/j.1525-1497.2001.016009606.x",
+    "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+    "access_note": "Publicly indexed full text verified through primary-source search; direct PMC fetch currently presents browser challenge and Wiley direct fetch returned 403. Do not describe direct retrieval as successful. No article file copied.",
+    "article_reuse_status": "LINK_ONLY: article copyright/repository redistribution grant not established; later instrument permission is not an article license.",
+    "evidence_summary": "Development validation: 6,000 patients across eight primary-care and seven obstetrics/gynecology clinics; criterion interview subgroup 580 primary-care patients. Threshold >=10: sensitivity 88%, specificity 88% for major depression against independent mental-health-professional interview. Severity lower bounds 5,10,15,20. These are not population norms or a self-administered diagnosis."
+  },
+  "runtime_policy": {
+    "score_only": true,
+    "references": [],
+    "bind_adult_reference": false,
+    "invent_school_grade": false,
+    "population": "ADULT_SELF",
+    "stage": "PILOT",
+    "release": "DRAFT",
+    "activation": "Adult evidence external dossier only, not selected. No claim of Chinese validated cutoffs."
+  },
+  "tags": {
+    "领域": [
+      "情绪健康"
+    ],
+    "构念": [
+      "抑郁相关症状"
+    ],
+    "理论": [
+      "无特定疗法归属"
+    ],
+    "人群": [
+      "成人",
+      "不外推未成年人"
+    ],
+    "作答": [
+      "自评",
+      "9个计分条目",
+      "过去两周"
+    ],
+    "用途": [
+      "描述性筛查",
+      "非诊断",
+      "研究候选"
+    ],
+    "许可": [
+      "公共领域",
+      "允许翻译与分发"
+    ],
+    "语言": [
+      "中文工作译稿",
+      "未验证"
+    ]
+  },
+  "report": {
+    "summary": "这份记录关注过去两周的情绪、兴趣、睡眠和精力等变化。它描述这段时间的经历，不给你贴上人格或疾病标签。",
+    "meaning": "数值较高，表示这些问题在你的回答里出现得更频繁。它不能单独说明原因，也不等于诊断。",
+    "everyday_example": "可以回想一件平时愿意做的事：最近是否变得提不起兴趣、难集中注意，或做起来特别费力？生活中的例子比分数更有助于交流。",
+    "next_steps": [
+      "记下一件最近最影响生活的具体情形，以及当时需要什么帮助。",
+      "如果这些感受持续或影响工作、休息和关系，可以与合格专业人员讨论。"
+    ],
+    "limits": "这个中文工作译稿尚未经过心理测量验证，当前不启用人群分档。较少报告困扰也不能证明完全安全或不需要支持。",
+    "incomplete": "还有问题未完成，暂不计算总分；不把缺失答案当作没有困扰。",
+    "safety_unconditional": "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "attribution": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.",
+    "item9_safety_policy": {
+      "positive": "If item9 valid and >0, surface a supportive professional-followup notice independent of total, including incomplete attempts. No suicide-risk level or intent inference.",
+      "zero": "Does not establish absence of risk.",
+      "missing": "Do not treat as zero or reassuring.",
+      "fallback_if_item_specific_runtime_unavailable": "Unconditional explicit item9 notice before/during/report/incomplete, no low-score reassurance; document absent conditional signal as blocker. Do not claim automated detection/safety workflow implemented."
+    }
+  },
+  "references": [
+    {
+      "url": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+      "role": "developer_form_permission_footer"
+    },
+    {
+      "url": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+      "role": "developer_handbook pp2/3/8: item9 followup, itemcount, public-domain grant"
+    },
+    {
+      "url": "https://www.pfizer.com/news/press-release/press-release-detail/pfizer_to_offer_free_public_access_to_mental_health_assessment_tools_to_improve_diagnosis_and_patient_care",
+      "role": "Pfizer public-release primary rights source"
+    },
+    {
+      "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+      "doi": "10.1046/j.1525-1497.2001.016009606.x",
+      "fulltext_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1495268/",
+      "publisher_fulltext_url": "https://onlinelibrary.wiley.com/doi/full/10.1046/j.1525-1497.2001.016009606.x",
+      "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+      "access_note": "Publicly indexed full text verified through primary-source search; direct PMC fetch currently presents browser challenge and Wiley direct fetch returned 403. Do not describe direct retrieval as successful. No article file copied.",
+      "article_reuse_status": "LINK_ONLY: article copyright/repository redistribution grant not established; later instrument permission is not an article license.",
+      "evidence_summary": "Development validation: 6,000 patients across eight primary-care and seven obstetrics/gynecology clinics; criterion interview subgroup 580 primary-care patients. Threshold >=10: sensitivity 88%, specificity 88% for major depression against independent mental-health-professional interview. Severity lower bounds 5,10,15,20. These are not population norms or a self-administered diagnosis."
+    }
+  ],
+  "critical_caveats": [
+    "No questionnaire article PDF copied; public-domain instrument grant does not license the journal article.",
+    "Keep existing historical key and source wording; writer must assess release/version semantics.",
+    "No fresh translation, no new adolescent form, no ACT/CBT/DBT label.",
+    "Original impairment question is not a scored symptom."
+  ],
+  "unscored_impairment_question": {
+    "en": {
+      "included_in_selected_pdf": true,
+      "original_article_includes": true,
+      "text": "If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
+      "options": [
+        "Not difficult at all",
+        "Somewhat difficult",
+        "Very difficult",
+        "Extremely difficult"
+      ],
+      "scored": false,
+      "placement": "Original extra unscored question retained after the nine scored symptoms."
+    },
+    "zh_draft": {
+      "text": "如果您勾选了任何问题，这些问题使您在工作、料理家中事务或与他人相处时感到多大困难？",
+      "options": [
+        "完全没有困难",
+        "有些困难",
+        "很困难",
+        "极其困难"
+      ],
+      "optional": true,
+      "scored": false,
+      "optionalPolicy": "optional=true 是本平台研究草稿的施测选择，并非声称原作者规定该题可选；保留原题条件提示。该题在原量表中不计分。"
+    },
+    "required_implementation": "retain separately as unscored optional supplementary item, not ninth/tenth symptom or total. If existing engine cannot exclude it from scoring, HOLD runtime rather than mis-score or silently drop full-form item."
+  }
+}

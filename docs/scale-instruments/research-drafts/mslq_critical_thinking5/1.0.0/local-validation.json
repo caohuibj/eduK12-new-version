@@ -1,0 +1,17 @@
+{
+  "sourceSha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c",
+  "canonicalSourceHash": "e64412d783531160e44baf976578f5985022a8972d9ee25c381a2fd8a30f5ba4",
+  "measurementHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+  "checkedAt": "2026-10-25T16:32:50.963Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 4,
+  "dbWrites": false,
+  "toolTests": 15,
+  "testExitCode": 0,
+  "generatorExitCode": 0,
+  "typecheckStatus": "PASSED_BATCH",
+  "testEvidence": "local-test-output.txt",
+  "typecheckExitCode": 0,
+  "combinedTests": 74,
+  "batchEvidence": "../../learning-screening-batch-20261025/validation.json"
+}

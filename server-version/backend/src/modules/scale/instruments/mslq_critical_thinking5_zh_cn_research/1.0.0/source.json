@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+      "abbreviation": "MSLQ_CT5",
+      "instrumentFamily": "Motivated Strategies for Learning Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "选定一门大学课程中的批判性思考策略使用自述；不是推理能力实测、完整MSLQ或通用学习能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mslq_critical_thinking5",
+        "domain:learning_self_management",
+        "construct:course_critical_thinking_strategy",
+        "population:adult_college_research",
+        "response:self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:course_research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人大学课程研究；原380名美国大学生证据不是本中文或K12验证。ADULT_SELF/student技术角色。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "固定同一门具体课程，无固定日/周回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "只采用完整Critical Thinking五题模块，原题38/47/51/66/71，保持顺序。",
+        "实施者在施测记录中写明选定课程；全部五题指同一课程。首题包含课程选择指导语，不声称已有系统课程字段强制绑定。",
+        "1–7仅两端原文字标签，中间数字；无反向。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "成人课程特定研究，实施者需记录同一具体课程。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只讨论所选课程的策略，不外推通用能力。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "只采用MSLQ原有完整批判性思考5题模块，不称完整81题MSLQ。保留原题号映射、课程语境及原端点；独立中文工作译稿与通俗反馈尚未验证，原作者未背书。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "工作译稿待人工审校与本地验证；项目课程说明嵌首题，不声称原验证版exact-form。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "mslq_critical_thinking5-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "mslq_critical_thinking5-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "mslq_critical_thinking5-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Pintrich, P. R., Smith, D. A. F., Garcia, T., & McKeachie, W. J. (1991). A manual for the use of the Motivated Strategies for Learning Questionnaire (MSLQ). Ann Arbor, MI: University of Michigan, National Center for Research to Improve Postsecondary Teaching and Learning. ERIC ED338122. https://files.eric.ed.gov/fulltext/ED338122.pdf；作者公共领域声明 https://www.researchgate.net/publication/280741846_Motivated_Strategies_for_Learning_Questionnaire_MSLQ_Manual；只采用MSLQ原有完整批判性思考5题模块，不称完整81题MSLQ。保留原题号映射、课程语境及原端点；独立中文工作译稿与通俗反馈尚未验证，原作者未背书。",
+      "仅题本公共领域；不将ERIC手册其他评论、图片或全文重新授权。课程须由实施者选定记录，当前source没有新增课程上下文强制绑定能力。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "MSLQ Critical Thinking subscale (five items)",
+        "citation": "Pintrich, P. R., Smith, D. A. F., Garcia, T., & McKeachie, W. J. (1991). A manual for the use of the Motivated Strategies for Learning Questionnaire (MSLQ). Ann Arbor, MI: University of Michigan, National Center for Research to Improve Postsecondary Teaching and Learning. ERIC ED338122.",
+        "url": "https://files.eric.ed.gov/fulltext/ED338122.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Pintrich, P. R., Smith, D. A. F., Garcia, T., & McKeachie, W. J. (1991). A manual for the use of the Motivated Strategies for Learning Questionnaire (MSLQ). Ann Arbor, MI: University of Michigan, National Center for Research to Improve Postsecondary Teaching and Learning. ERIC ED338122. https://files.eric.ed.gov/fulltext/ED338122.pdf；作者公共领域声明 https://www.researchgate.net/publication/280741846_Motivated_Strategies_for_Learning_Questionnaire_MSLQ_Manual；只采用MSLQ原有完整批判性思考5题模块，不称完整81题MSLQ。保留原题号映射、课程语境及原端点；独立中文工作译稿与通俗反馈尚未验证，原作者未背书。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "mslq_critical_thinking5_accuracy",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常符合我",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MSLQ_CT_38",
+          "content": "请先选定一门具体课程，所有问题都围绕同一门课程回答。按每句话与您的实际情况相符的程度作答，1表示“完全不符合我”，7表示“非常符合我”。\n\n我常常会质疑在这门课上听到或读到的内容，以判断它们是否让我信服。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "mslq_critical_thinking5_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSLQ_CT_47",
+          "content": "当课堂或阅读材料中提出一种理论、解释或结论时，我会尝试判断它是否有充分的证据支持。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "mslq_critical_thinking5_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSLQ_CT_51",
+          "content": "我把课程材料当作起点，并尝试在此基础上形成自己的想法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "mslq_critical_thinking5_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSLQ_CT_66",
+          "content": "我会尝试对这门课所学内容产生自己的想法，并灵活地琢磨这些想法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "mslq_critical_thinking5_accuracy",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MSLQ_CT_71",
+          "content": "每当在这门课上读到或听到一个论断或结论时，我会思考其他可能的解释。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "mslq_critical_thinking5_accuracy",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "course_critical_thinking_strategy",
+            "type": "total",
+            "label": "所选课程中的思考策略",
+            "description": "所选同一课程中评价依据、比较解释和形成想法的自述策略程度，不是思考能力或智力实测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MSLQ_CT_38",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSLQ_CT_47",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSLQ_CT_51",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSLQ_CT_66",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MSLQ_CT_71",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "course_critical_thinking_strategy"
+        ],
+        "scoreOrder": [
+          "course_critical_thinking_strategy"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:32:00Z",
+            "basis": "AI editorial review: course-specific strategy self-report, complete original module not full MSLQ, no ability/norm inference; not human expert review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mslq_critical_thinking5",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "course_critical_thinking_strategy": 1.0
+          },
+          "totalScoreKeys": [
+            "course_critical_thinking_strategy"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "course_critical_thinking_strategy": 7.0
+          },
+          "totalScoreKeys": [
+            "course_critical_thinking_strategy"
+          ]
+        }
+      },
+      {
+        "name": "all-four",
+        "answers": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "course_critical_thinking_strategy": 4.0
+          },
+          "totalScoreKeys": [
+            "course_critical_thinking_strategy"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "course_critical_thinking_strategy": 4.0
+          },
+          "totalScoreKeys": [
+            "course_critical_thinking_strategy"
+          ]
+        }
+      }
+    ]
+  }
+}

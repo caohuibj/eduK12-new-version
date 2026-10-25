@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-25T16:39:33Z",
+  "contentHead": "47661a2dcb3ad71fad2da803e34e748254d2d08b",
+  "newToolTests": 66,
+  "registryTests": 8,
+  "uniqueTests": 74,
+  "reviewAffectedRerun": "K6 10 after conditional limitation wording; same unique tests",
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "actualEngineVectors": 21,
+  "packages": [
+    {
+      "key": "srq63_brown_miller",
+      "version": "1.0.0",
+      "sourceSha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d",
+      "canonicalSourceHash": "532610cc2d995dd5f7fcefb4b0c5fd3e2475ed8d3916dc8b9b261013a802f335",
+      "measurementHash": "d4fe1d8e552a726411eb38ca6e71247402a723a358a076617487b123d4453c5e",
+      "checkedAt": "2026-10-25T16:30:14.827Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 5,
+      "dbWrites": false
+    },
+    {
+      "key": "mwq5",
+      "version": "1.0.0",
+      "sourceSha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749",
+      "canonicalSourceHash": "4a6e1ab61d87d700bc91356f40c817adeef134e3a7cb11964ff696ecada169f7",
+      "measurementHash": "76381eda1cf5cfd610c6b87d0ba0ee9f8ed191a30c91d1400d1f2a4e20b48a5b",
+      "checkedAt": "2026-10-25T16:31:48.005Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 4,
+      "dbWrites": false
+    },
+    {
+      "key": "mslq_critical_thinking5",
+      "version": "1.0.0",
+      "sourceSha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c",
+      "canonicalSourceHash": "e64412d783531160e44baf976578f5985022a8972d9ee25c381a2fd8a30f5ba4",
+      "measurementHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+      "checkedAt": "2026-10-25T16:32:50.963Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 4,
+      "dbWrites": false
+    },
+    {
+      "key": "k6",
+      "version": "1.1.0",
+      "sourceSha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640",
+      "canonicalSourceHash": "04727803bcd7b501d5b495aa9095ab7b9ca0a1b6b2612964b3b2d62493e3572c",
+      "measurementHash": "ad8d86057b99b45f12e4cc470d87fe888632110522934c113faa0dbb0055880b",
+      "checkedAt": "2026-10-25T16:37:33.586Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 4,
+      "dbWrites": false,
+      "metadataCorrection": "Official Mandarin attribution wording only; measurement/report unchanged, prior scoring tests reused."
+    },
+    {
+      "key": "gad7",
+      "version": "1.1.0",
+      "sourceSha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e",
+      "canonicalSourceHash": "6c60958386b6adaa8ebfcd6b9faeefb015fad4191bd869330778b63cb9a009a1",
+      "measurementHash": "718ce6c721aea9384185149d8d63c6561e963ff0fcf6cd74b48f36fc11688c8f",
+      "checkedAt": "2026-10-25T16:37:33.594Z",
+      "validation": "strict source/package + actual synthetic reports",
+      "goldenCases": 4,
+      "dbWrites": false
+    }
+  ],
+  "documentationOnly": [
+    "phq9_zh_cn_research planned1.1.0"
+  ],
+  "noArchitectureChanges": true,
+  "dbWrites": false,
+  "ciTriggered": false
+}

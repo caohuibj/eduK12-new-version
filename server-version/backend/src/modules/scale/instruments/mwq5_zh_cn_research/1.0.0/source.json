@@ -1,0 +1,560 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "mwq5_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "走神问卷（5题）（中文研究译稿）",
+      "abbreviation": "MWQ5",
+      "instrumentFamily": "Mind-Wandering Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "EXECUTIVE_FUNCTION",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "任务无关思维打断当前专注的自述频率，不是ADHD诊断、客观注意监测或学习能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mwq5",
+        "domain:attention_cognition",
+        "construct:mind_wandering",
+        "population:adult_research",
+        "population:adolescent_source_evidence_only",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "当前中文仅限成人研究与自我了解；原英文大学与中学生研究仅存来源档案，不授权本中文自动K12施测。ADULT_SELF/student是技术角色，不表示儿童。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 5,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "通常情况，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "原五题顺序，1–6完整频率锚点；无反向。",
+        "项目作答说明嵌入第一题，不伪称原作者验证指导语。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "本项目据原作者2013年MWQ发布文字独立翻译并编写通俗反馈。保留五题顺序与六级频率锚点；尚非经验证的中文版本，原作者未背书。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "工作译稿人工审校/认知访谈/本地验证待完成。题5按正文lectures or presentations，保留表格of差异档案。项目说明置于第一题，非exact-form验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "mwq5-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "mwq5-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "mwq5-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560. https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full https://creativecommons.org/licenses/by/3.0/；本项目据原作者2013年MWQ发布文字独立翻译并编写通俗反馈。保留五题顺序与六级频率锚点；尚非经验证的中文版本，原作者未背书。",
+      "CC BY 3.0；保留署名/许可/改动说明；作者未背书。3/4题原作者脚注明来自MAAS改编，此处仅复现作者发布MWQ五题，不复制MAAS整表。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Mind-Wandering Questionnaire (MWQ)",
+        "citation": "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560. https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full https://creativecommons.org/licenses/by/3.0/；本项目据原作者2013年MWQ发布文字独立翻译并编写通俗反馈。保留五题顺序与六级频率锚点；尚非经验证的中文版本，原作者未背书。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "mwq5_frequency",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "比较少",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较频繁",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "很频繁",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "MWQ5_01",
+          "content": "请根据平时的情况，选择以下每句话发生的频繁程度。\n\n做简单或重复的工作时，我很难保持专注。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "mwq5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MWQ5_02",
+          "content": "阅读时，我发现自己并没有在想文字的内容，因此不得不重新读一遍。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "mwq5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MWQ5_03",
+          "content": "我做事时没有把注意力完全放在上面。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "mwq5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MWQ5_04",
+          "content": "我发现自己一边听着，一边在想别的事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "mwq5_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "MWQ5_05",
+          "content": "听课或听报告时，我会走神。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "mwq5_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "MWQ5_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "mind_wandering",
+            "type": "total",
+            "label": "任务中走神的自述频率",
+            "description": "五项任务中走神描述的平均认可频率；不是注意力障碍、能力或意志力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "MWQ5_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MWQ5_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MWQ5_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MWQ5_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "MWQ5_05",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "mind_wandering"
+        ],
+        "scoreOrder": [
+          "mind_wandering"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:31:00Z",
+            "basis": "AI editorial review: adult descriptive self-report, source adolescent evidence not Chinese validation, no ADHD inference; not human expert review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "mwq5",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "mind_wandering": 1.0
+          },
+          "totalScoreKeys": [
+            "mind_wandering"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "mind_wandering": 6.0
+          },
+          "totalScoreKeys": [
+            "mind_wandering"
+          ]
+        }
+      },
+      {
+        "name": "all-three",
+        "answers": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "mind_wandering": 3.0
+          },
+          "totalScoreKeys": [
+            "mind_wandering"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "mind_wandering": 3.2
+          },
+          "totalScoreKeys": [
+            "mind_wandering"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "originalThresholdEvidence": {
+    "sourceLocation": "official PDF page 2 Recommended Use",
+    "population": "authors’ clinical and college samples, tentative recommendations, not Chinese children/adolescents",
+    "rawRanges": [
+      "> 239: high (top quartile)",
+      "214–238: intermediate (middle quartiles)",
+      "< 213: low (bottom quartile)"
+    ],
+    "unresolvedBoundaries": [
+      213,
+      239
+    ],
+    "runtimeEnabled": false,
+    "reason": "Printed source leaves exactly 213 and 239 uncovered. Preserve discrepancy, do not silently repair. No clinical decision-making. Unvalidated project translation and no K12 norm."
+  },
+  "currentTranslationValidated": false,
+  "sourceReliability": {
+    "communityN": 83,
+    "retestHours": 48,
+    "retestR": 0.94,
+    "alpha": 0.91,
+    "note": "Official PDF p1, source English sample only, not Chinese reliability"
+  },
+  "references": [
+    {
+      "url": "https://casaa.unm.edu/assets/inst/selfregulation-questionnaire-srq.pdf",
+      "role": "Official 63-item form, Table 1 key, scoring, recommendations and instrument-specific permission",
+      "citation": "Brown, J. M., Miller, W. R., & Lawendowski, L. A. (1999). The Self-Regulation Questionnaire. In L. VandeCreek & T. L. Jackson (Eds.), Innovations in clinical practice: A source book (Vol. 17, pp. 281–289). Sarasota, FL: Professional Resource Press."
+    },
+    {
+      "url": "https://casaa.unm.edu/tools/assessment-instruments.html",
+      "role": "Official library permission and professional-use restrictions"
+    }
+  ]
+}

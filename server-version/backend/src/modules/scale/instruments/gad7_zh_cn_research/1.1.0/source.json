@@ -1,0 +1,620 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "gad7_zh_cn_research",
+    "instrumentVersion": "1.1.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "广泛性焦虑量表（GAD-7，简体中文研究工作译稿）（中文研究译稿）",
+      "abbreviation": "GAD7",
+      "instrumentFamily": "Patient Health Questionnaire / GAD"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "过去两周焦虑相关症状自述频率，非诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "gad7",
+        "domain:distress_behavior",
+        "construct:anxiety_experience",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "仅成人研究；原英文临床校准不能当作本中文/未成年人常模。ADULT_SELF/student为技术报告受众，不表示儿童。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 7,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去两周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "每一道症状题重复原过去两周总题干，防止离开总说明后丢失回忆窗口。",
+        "原0–3天数频率，不作构念反向。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "接续PR328工作译稿，本次逐项对照原开发者题本；不是既有验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "人工译审、认知访谈与精确中文版本验证待完成。 本次instrumentVersion1.1.0接续历史PR328 1.0.0候选，未覆盖已公开旧身份。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "gad7-zh-cn-research-1.1.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "gad7-zh-cn-research-1.1.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "gad7-zh-cn-research-1.1.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc. https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+      "开发者手册/原题脚注明确可复制、翻译、展示与分发；仅题本，不给论文/商标/第三方中译重新授权。",
+      "研究DRAFT，不启用诊断/人群分档或自动危机处置。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "广泛性焦虑量表（GAD-7，简体中文研究工作译稿）",
+        "citation": "Spitzer RL, Kroenke K, Williams JBW, Löwe B. A Brief Measure for Assessing Generalized Anxiety Disorder: The GAD-7. Archives of Internal Medicine. 2006;166(10):1092–1097.",
+        "url": "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetPdf.cgi?id=phd007940.1"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc. https://archive.thepcc.org/sites/default/files/resources/instructions.pdf 开发者手册/原题脚注明确可复制、翻译、展示与分发；仅题本，不给论文/商标/第三方中译重新授权。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "gad7_frequency",
+          "options": [
+            {
+              "value": "0",
+              "label": "完全没有",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有几天",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "超过一半的天数",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "几乎每天",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "GAD7_01",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n感到紧张、焦虑或绷紧了神经",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_02",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n无法停止或控制担忧",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_03",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n对各种事情担忧过多",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_04",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n难以放松",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_05",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n坐立不安，以至于难以安静地坐着",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_06",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n变得容易恼火或烦躁",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "GAD7_07",
+          "content": "过去两周里，以下问题困扰您的频率是多少？\n感到害怕，好像可能会有很糟糕的事情发生",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "gad7_frequency",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "GAD7_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "GAD7_07",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "gad7_total",
+            "type": "total",
+            "label": "过去两周紧张与担忧体验",
+            "description": "数值较高，表示这些问题在你的回答里出现得更频繁。它不能单独说明原因，也不等于诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "GAD7_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "GAD7_07",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "gad7_total"
+        ],
+        "scoreOrder": [
+          "gad7_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "gad7_total",
+            "headline": "过去两周紧张与担忧体验：了解近来的自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份记录关注过去两周的紧张、担忧和难以放松等感受。它描述这段时间的经历，不给你贴上人格或疾病标签。数值较高，表示这些问题在你的回答里出现得更频繁。它不能单独说明原因，也不等于诊断。可以想想：最近有没有一件已经处理完的小事，仍在脑海中反复盘旋，让你难以放松？具体场景比一个分数更有助于把困扰说清楚。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "记下一件最近最影响生活的具体情形，以及当时需要什么帮助。"
+              },
+              {
+                "category": "support",
+                "text": "如果这些感受持续或影响工作、休息和关系，可以与合格专业人员讨论。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这个中文工作译稿尚未经过心理测量验证，当前不启用人群分档。较少报告困扰也不能证明完全安全或不需要支持。",
+          "若有症状问题未完成，暂不计算总分；这不表示没有困扰，也不把缺失答案当作零。",
+          "原英文成人校准参数仅文档保存，不作为本中文的诊断、分档或人群排名。",
+          "中文工作译稿仍待人工译审与目标人群验证。"
+        ],
+        "disclaimer": "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若持续感到困扰，可寻求合格专业人员的评估。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。 仅供成人研究，不用于心理诊断。 Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc. https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:34:00Z",
+            "basis": "AI editorial review: adult descriptive symptoms, no norm/diagnosis or low-score safety claim; static safety notice, not human expert translation or clinical review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "gad7",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "GAD7_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_07",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "gad7_total": 0
+          },
+          "totalScoreKeys": [
+            "gad7_total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "GAD7_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_07",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "gad7_total": 21
+          },
+          "totalScoreKeys": [
+            "gad7_total"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "GAD7_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_07",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "gad7_total": 7
+          },
+          "totalScoreKeys": [
+            "gad7_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "GAD7_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "GAD7_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "GAD7_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "GAD7_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "GAD7_07",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "gad7_total": 9
+          },
+          "totalScoreKeys": [
+            "gad7_total"
+          ]
+        }
+      }
+    ]
+  }
+}

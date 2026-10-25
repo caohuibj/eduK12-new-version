@@ -1,0 +1,23 @@
+{
+  "status": "DESIGN_ONLY_NOT_RUNTIME_REPORT",
+  "report": {
+    "summary": "这份记录关注过去两周的情绪、兴趣、睡眠和精力等变化。它描述这段时间的经历，不给你贴上人格或疾病标签。",
+    "meaning": "数值较高，表示这些问题在你的回答里出现得更频繁。它不能单独说明原因，也不等于诊断。",
+    "everyday_example": "可以回想一件平时愿意做的事：最近是否变得提不起兴趣、难集中注意，或做起来特别费力？生活中的例子比分数更有助于交流。",
+    "next_steps": [
+      "记下一件最近最影响生活的具体情形，以及当时需要什么帮助。",
+      "如果这些感受持续或影响工作、休息和关系，可以与合格专业人员讨论。"
+    ],
+    "limits": "这个中文工作译稿尚未经过心理测量验证，当前不启用人群分档。较少报告困扰也不能证明完全安全或不需要支持。",
+    "incomplete": "还有问题未完成，暂不计算总分；不把缺失答案当作没有困扰。",
+    "safety_unconditional": "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "attribution": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.",
+    "item9_safety_policy": {
+      "positive": "If item9 valid and >0, surface a supportive professional-followup notice independent of total, including incomplete attempts. No suicide-risk level or intent inference.",
+      "zero": "Does not establish absence of risk.",
+      "missing": "Do not treat as zero or reassuring.",
+      "fallback_if_item_specific_runtime_unavailable": "Unconditional explicit item9 notice before/during/report/incomplete, no low-score reassurance; document absent conditional signal as blocker. Do not claim automated detection/safety workflow implemented."
+    }
+  },
+  "note": "不是实际用户结果、非运行中的report example；未实现全程安全提示时保持不可执行。"
+}

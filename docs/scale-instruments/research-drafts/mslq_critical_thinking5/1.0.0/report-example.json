@@ -1,0 +1,597 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MSLQ_CT_38",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MSLQ_CT_47",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MSLQ_CT_51",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MSLQ_CT_66",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MSLQ_CT_71",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mslq_critical_thinking5_zh_cn_research",
+          "name": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "course_critical_thinking_strategy",
+            "type": "total",
+            "label": "所选课程中的思考策略",
+            "description": "所选同一课程中评价依据、比较解释和形成想法的自述策略程度，不是思考能力或智力实测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 7
+            },
+            "expectedItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "answeredItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "label": null,
+            "interpretation": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+              "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+              "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+              "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MSLQ_CT_38",
+          "responseValue": "7"
+        },
+        {
+          "itemCode": "MSLQ_CT_47",
+          "responseValue": "7"
+        },
+        {
+          "itemCode": "MSLQ_CT_51",
+          "responseValue": "7"
+        },
+        {
+          "itemCode": "MSLQ_CT_66",
+          "responseValue": "7"
+        },
+        {
+          "itemCode": "MSLQ_CT_71",
+          "responseValue": "7"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mslq_critical_thinking5_zh_cn_research",
+          "name": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          }
+        ],
+        "scores": [
+          {
+            "key": "course_critical_thinking_strategy",
+            "type": "total",
+            "label": "所选课程中的思考策略",
+            "description": "所选同一课程中评价依据、比较解释和形成想法的自述策略程度，不是思考能力或智力实测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 7,
+            "range": {
+              "min": 1,
+              "max": 7
+            },
+            "expectedItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "answeredItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "label": null,
+            "interpretation": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+              "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+              "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+              "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。"
+      }
+    },
+    {
+      "fixture": "all-four",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MSLQ_CT_38",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MSLQ_CT_47",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MSLQ_CT_51",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MSLQ_CT_66",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MSLQ_CT_71",
+          "responseValue": "4"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mslq_critical_thinking5_zh_cn_research",
+          "name": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          }
+        ],
+        "scores": [
+          {
+            "key": "course_critical_thinking_strategy",
+            "type": "total",
+            "label": "所选课程中的思考策略",
+            "description": "所选同一课程中评价依据、比较解释和形成想法的自述策略程度，不是思考能力或智力实测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4,
+            "range": {
+              "min": 1,
+              "max": 7
+            },
+            "expectedItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "answeredItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "label": null,
+            "interpretation": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+              "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+              "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+              "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。"
+      }
+    },
+    {
+      "fixture": "mixed",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MSLQ_CT_38",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MSLQ_CT_47",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "MSLQ_CT_51",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MSLQ_CT_66",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "MSLQ_CT_71",
+          "responseValue": "7"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mslq_critical_thinking5_zh_cn_research",
+          "name": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "6723f05fe3ae826763ad0f93d3a4d7eba16cac88dc45cf58620f3bf17e1e5b78",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MSLQ_CT_38",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MSLQ_CT_47",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "MSLQ_CT_51",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MSLQ_CT_66",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "MSLQ_CT_71",
+            "responseValue": "7",
+            "baseScore": 7,
+            "score": 7
+          }
+        ],
+        "scores": [
+          {
+            "key": "course_critical_thinking_strategy",
+            "type": "total",
+            "label": "所选课程中的思考策略",
+            "description": "所选同一课程中评价依据、比较解释和形成想法的自述策略程度，不是思考能力或智力实测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4,
+            "range": {
+              "min": 1,
+              "max": 7
+            },
+            "expectedItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "answeredItems": [
+              "MSLQ_CT_38",
+              "MSLQ_CT_47",
+              "MSLQ_CT_51",
+              "MSLQ_CT_66",
+              "MSLQ_CT_71"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "course_critical_thinking_strategy",
+            "headline": "在“知道答案”之外，再问一步",
+            "label": null,
+            "interpretation": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+              "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+              "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+              "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。",
+          "所有题必须围绕同一门已选定课程；若回答混合了多门课程，不宜解释本结果。",
+          "只含原MSLQ完整Critical Thinking模块，不是完整81题问卷，不合成MSLQ总分。",
+          "五题完整才计分，不插补；原作者不提供跨课程通用常模，原样本均值仅外部档案。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人大学课程研究与学习反思；中文译稿未经验证，不用于心理诊断、学生筛选、能力排名或将单门课程结果概括为固定能力。"
+      }
+    }
+  ]
+}

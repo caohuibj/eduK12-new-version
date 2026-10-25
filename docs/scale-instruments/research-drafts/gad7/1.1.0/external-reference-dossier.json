@@ -1,0 +1,80 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "referenceProfiles": [
+    {
+      "severity": {
+        "kind": "Descriptive symptom-severity bands, not diagnosis or percentile norms",
+        "bands": [
+          {
+            "min": 0,
+            "max": 4,
+            "label": "minimal"
+          },
+          {
+            "min": 5,
+            "max": 9,
+            "label": "mild"
+          },
+          {
+            "min": 10,
+            "max": 14,
+            "label": "moderate"
+          },
+          {
+            "min": 15,
+            "max": 21,
+            "label": "severe"
+          }
+        ],
+        "source_doi": "10.1001/archinte.166.10.1092",
+        "source_locator": "Original article Tables 2–3 and discussion, pp.1095–1096; PDF text extraction drops the leading 1 in one severe row, corroborated by Table3 and discussion.",
+        "population": "Original US clinical adult study, not Chinese norms."
+      },
+      "screening": {
+        "operator": ">=",
+        "cutoff": 10,
+        "target": "Possible generalized anxiety disorder for further clinical assessment",
+        "sensitivity": 0.89,
+        "specificity": 0.82,
+        "source_doi": "10.1001/archinte.166.10.1092",
+        "criterion_sample_n": 965,
+        "scope": "Original clinical criterion-validation sample only; no claim of accuracy for all users, Chinese translations or adolescents.",
+        "diagnostic_use": false
+      },
+      "norms": "No population norms or percentiles approved.",
+      "longitudinal": "May describe within-person score changes with consistent form/language/recall period; do not claim a validated treatment response or minimal important difference from these packages."
+    }
+  ],
+  "referenceStudy": {
+    "citation": "Spitzer RL, Kroenke K, Williams JBW, Löwe B. A Brief Measure for Assessing Generalized Anxiety Disorder: The GAD-7. Archives of Internal Medicine. 2006;166(10):1092–1097.",
+    "doi": "10.1001/archinte.166.10.1092",
+    "fulltext_url": "https://depts.washington.edu/psychres/wordpress/wp-content/uploads/2017/09/gad7_ref.pdf",
+    "access_note": "Six-page publisher article openly readable from University of Washington; Figure 1 p.1094 confirms original seven symptoms and extra unscored difficulty question. Freely readable is not an open redistribution license.",
+    "article_reuse_status": "LINK_ONLY: PDF explicitly says ©2006 American Medical Association, all rights reserved; no article PDF copied.",
+    "evidence_summary": "US study across 15 primary-care clinics; adult participants 18–95 years. Abstract reports 2,740, body 2,739 with no/minimal missing data; preserve this source discrepancy. Criterion interviews: 965. Threshold >=10 had sensitivity 89%, specificity 82% for GAD. Original severity tables: 0–4 minimal,5–9 mild,10–14 moderate,15–21 severe. Two-week symptom window does not establish diagnostic duration; original reference interview used six months."
+  },
+  "references": [
+    {
+      "url": "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetPdf.cgi?id=phd007940.1",
+      "role": "developer_form_permission_footer"
+    },
+    {
+      "url": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+      "role": "developer_handbook pp2/3/8: item9 followup, itemcount, public-domain grant"
+    },
+    {
+      "url": "https://www.pfizer.com/news/press-release/press-release-detail/pfizer_to_offer_free_public_access_to_mental_health_assessment_tools_to_improve_diagnosis_and_patient_care",
+      "role": "Pfizer public-release primary rights source"
+    },
+    {
+      "citation": "Spitzer RL, Kroenke K, Williams JBW, Löwe B. A Brief Measure for Assessing Generalized Anxiety Disorder: The GAD-7. Archives of Internal Medicine. 2006;166(10):1092–1097.",
+      "doi": "10.1001/archinte.166.10.1092",
+      "fulltext_url": "https://depts.washington.edu/psychres/wordpress/wp-content/uploads/2017/09/gad7_ref.pdf",
+      "access_note": "Six-page publisher article openly readable from University of Washington; Figure 1 p.1094 confirms original seven symptoms and extra unscored difficulty question. Freely readable is not an open redistribution license.",
+      "article_reuse_status": "LINK_ONLY: PDF explicitly says ©2006 American Medical Association, all rights reserved; no article PDF copied.",
+      "evidence_summary": "US study across 15 primary-care clinics; adult participants 18–95 years. Abstract reports 2,740, body 2,739 with no/minimal missing data; preserve this source discrepancy. Criterion interviews: 965. Threshold >=10 had sensitivity 89%, specificity 82% for GAD. Original severity tables: 0–4 minimal,5–9 mild,10–14 moderate,15–21 severe. Two-week symptom window does not establish diagnostic duration; original reference interview used six months."
+    }
+  ],
+  "noChineseThresholdClaim": true
+}

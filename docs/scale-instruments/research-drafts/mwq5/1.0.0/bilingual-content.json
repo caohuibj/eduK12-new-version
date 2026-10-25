@@ -1,0 +1,78 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "en": "I have difficulty maintaining focus on simple or repetitive work",
+      "zh": "做简单或重复的工作时，我很难保持专注。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "While reading, I find I haven't been thinking about the text and must therefore read it again",
+      "zh": "阅读时，我发现自己并没有在想文字的内容，因此不得不重新读一遍。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I do things without paying full attention",
+      "zh": "我做事时没有把注意力完全放在上面。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I find myself listening with one ear, thinking about something else at the same time",
+      "zh": "我发现自己一边听着，一边在想别的事情。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I mind-wander during lectures or presentations",
+      "zh": "听课或听报告时，我会走神。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "almost never",
+      "zh": "几乎从不"
+    },
+    {
+      "value": 2,
+      "en": "very infrequently",
+      "zh": "很少"
+    },
+    {
+      "value": 3,
+      "en": "somewhat infrequently",
+      "zh": "比较少"
+    },
+    {
+      "value": 4,
+      "en": "somewhat frequently",
+      "zh": "比较频繁"
+    },
+    {
+      "value": 5,
+      "en": "very frequently",
+      "zh": "很频繁"
+    },
+    {
+      "value": 6,
+      "en": "almost always",
+      "zh": "几乎总是"
+    }
+  ],
+  "instructions": {
+    "en": "Project administration instruction: Rate how frequently each statement applies to you.",
+    "zh": "请根据平时的情况，选择以下每句话发生的频繁程度。",
+    "timeframe": "general tendency; no fixed recall window",
+    "provenance": "Administration wording composed by project; exact item and anchor wording from original."
+  },
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "sourceDiscrepancies": [
+    "Item 5 Study 1 prose says lectures or presentations; Table 1 has lectures of presentations. Preserve prose wording as questionnaire form; record table typo rather than silently rewriting source.",
+    "Study 3 prose says 106 female high-school students; Table 2 caption says N=156. Neither treated as population norm."
+  ],
+  "presentationChanges": "项目指导语只在首题前添加，原题正文顺序不改；未称原验证版版式"
+}

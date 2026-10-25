@@ -1,0 +1,246 @@
+{
+  "code": "K6",
+  "name_zh": "凯斯勒心理困扰量表（K6，作者官网普通话版）",
+  "status": "READY_FOR_INDEPENDENT_REVIEW",
+  "existing_key": "k6_zh_cn_research",
+  "version_recommendation": "1.0.0 historical catalog only; preserve key and record extraction lineage; writer assess version semantics",
+  "historical_source": {
+    "pr": 328,
+    "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "reused": "official Mandarin and English transcription; scoring and rights dossier",
+    "fresh_primary_check": "2026-10-25: current author permission page, Mandarin PDF pp1/3, English pp1/3 and scoring FAQ pp1/2 freshly reread"
+  },
+  "rights": {
+    "type": "AUTHOR_FREE_USE_GRANT_COPYRIGHT_RETAINED",
+    "source_url": "https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+    "quotation": "Use of the K6 and K10 is free and does not require any formal permission or approval.",
+    "translation_grant_summary": "The same author page expressly posts translations for unrestricted use, subject to copyright acknowledgement and citation of Kessler et al.(2003).",
+    "copyright_english": "© Ronald C. Kessler, PhD. 2003. All rights reserved.",
+    "copyright_mandarin": "© Ronald C. Kessler, PhD. 2006. All rights reserved.",
+    "underlying_notice": "Based on the Composite International Diagnostic Interview ©2001 Ronald C. Kessler, PhD. All rights reserved.",
+    "required_citation_doi": "10.1001/archpsyc.60.2.184",
+    "historical_permission_notice": "PDFs retain an older request-permission footer. Current rights-holder webpage provides free/unrestricted-use permission; preserve both provenance and copyright, do not label CC0/public domain.",
+    "archive_policy": "Official English and Mandarin instrument text reproduced under current author grant; source PDFs linked only in this package. Journal articles link only. Copyright retained; not public domain."
+  },
+  "primary_measure_source": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf",
+  "translation_status": "OFFICIAL_AUTHOR_HOSTED_TRANSLATION_RIGHTS_CLEAR_VALIDATION_MATCH_OPEN",
+  "translator": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.",
+  "timeframe": "过去30天",
+  "instructions_zh": "下面的问题是询问您过去 30 天中的情绪。回答每一个问题时，请圈出最能描述这种情绪的出现频率的号码。",
+  "prompt_zh": "问 1. 在过去３０天中，您经常会感到 …",
+  "selected_form": "Six scored K6 symptom questions Q1a–f, extracted verbatim from official K6+ self-report form; past30days. Not an entire reproduction of all K6+ supplementary questions.",
+  "excluded_fields": "K6+ Q2 persistence/comparison; Q3–Q4 activity impairment; Q5 health-service contacts; Q6 physical-health attribution. Official author page says these are not required for K6 scoring. Administrative identifiers/demographics are not scale items and are not added to this research form.",
+  "anchors": [
+    {
+      "value": 4,
+      "printed_code": 1,
+      "en": "All of the time",
+      "zh": "全部时间",
+      "zh_draft": "全部时间"
+    },
+    {
+      "value": 3,
+      "printed_code": 2,
+      "en": "Most of the time",
+      "zh": "大部分时间",
+      "zh_draft": "大部分时间"
+    },
+    {
+      "value": 2,
+      "printed_code": 3,
+      "en": "Some of the time",
+      "zh": "一部分时间",
+      "zh_draft": "一部分时间"
+    },
+    {
+      "value": 1,
+      "printed_code": 4,
+      "en": "A little of the time",
+      "zh": "偶尔",
+      "zh_draft": "偶尔"
+    },
+    {
+      "value": 0,
+      "printed_code": 5,
+      "en": "None of the time",
+      "zh": "无",
+      "zh_draft": "无"
+    }
+  ],
+  "items": [
+    {
+      "id": "K6_1",
+      "source_id": "Q1a",
+      "en": "…nervous?",
+      "zh": "…紧张?",
+      "zh_draft": "…紧张?",
+      "reverse": false
+    },
+    {
+      "id": "K6_2",
+      "source_id": "Q1b",
+      "en": "…hopeless?",
+      "zh": "…绝望?",
+      "zh_draft": "…绝望?",
+      "reverse": false
+    },
+    {
+      "id": "K6_3",
+      "source_id": "Q1c",
+      "en": "…restless or fidgety?",
+      "zh": "…不安或烦躁?",
+      "zh_draft": "…不安或烦躁?",
+      "reverse": false
+    },
+    {
+      "id": "K6_4",
+      "source_id": "Q1d",
+      "en": "…so depressed that nothing could cheer you up?",
+      "zh": "…太沮丧以至于什么都不能让您愉快起来?",
+      "zh_draft": "…太沮丧以至于什么都不能让您愉快起来?",
+      "reverse": false
+    },
+    {
+      "id": "K6_5",
+      "source_id": "Q1e",
+      "en": "…that everything was an effort?",
+      "zh": "…做每一件事情都很费劲?",
+      "zh_draft": "…做每一件事情都很费劲?",
+      "reverse": false
+    },
+    {
+      "id": "K6_6",
+      "source_id": "Q1f",
+      "en": "…worthless?",
+      "zh": "…无价值?",
+      "zh_draft": "…无价值?",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "total": "sum(six scored values)",
+    "total_range": [
+      0,
+      24
+    ],
+    "mapping": "printed_code 1,2,3,4,5 => score 4,3,2,1,0; do not confuse raw displayed codes with scored values; no construct-reversed items",
+    "missing": "Platform conservative policy: all six valid scored answers required; any missing/invalid => no total, no band. Author FAQ does not impose one missingness rule.",
+    "direction": "较高表示这六类困扰报告得更频繁；不等于诊断"
+  },
+  "reference_profiles": [
+    {
+      "screening_reference": {
+        "operator": ">=",
+        "value": 13,
+        "scale": "0–24",
+        "source_doi": "10.1001/archpsyc.60.2.184",
+        "source_url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Scoring_K6_K10.pdf",
+        "target": "Research screening reference for serious mental illness in source study, not a diagnosis.",
+        "population_and_period": "2003 enriched US calibration, weighted for population estimation; worst-month-in-previous12months implementation differs from selected past30days.",
+        "auto_apply_to_selected_chinese_form": false
+      },
+      "severity_bands": [],
+      "norms": null,
+      "interpretation_policy": "No mild/moderate/severe bands or percentile norms approved. Display continuous0–24 descriptive distress score only pending independent review; any future threshold display must name applicable population, period, language and source.",
+      "prevalence_warning": "Do not estimate SMI prevalence as raw percentage scoring13+ in arbitrary sample; official scoring FAQ warns calibration depends on population characteristics."
+    }
+  ],
+  "runtime_policy": {
+    "score_only": true,
+    "references": [],
+    "bind_adult_reference": false,
+    "invent_school_grade": false,
+    "population": "ADULT_SELF",
+    "stage": "PILOT",
+    "release": "DRAFT",
+    "activation": "External dossier only. Chinese exact validation match unestablished; no severity or Chinese norm bands."
+  },
+  "tags": {
+    "领域": [
+      "心理困扰",
+      "情绪健康"
+    ],
+    "构念": [
+      "非特异性心理困扰"
+    ],
+    "理论": [
+      "无特定疗法归属"
+    ],
+    "人群": [
+      "成人",
+      "不外推未成年人"
+    ],
+    "作答": [
+      "自评",
+      "六题",
+      "过去30天"
+    ],
+    "用途": [
+      "描述性筛查",
+      "研究候选",
+      "非诊断"
+    ],
+    "许可": [
+      "作者免费使用许可",
+      "保留版权",
+      "必须引用"
+    ],
+    "语言": [
+      "作者官网普通话译本",
+      "精确验证版本待核对"
+    ]
+  },
+  "report": {
+    "summary": "这份小记录关注过去一个月里，紧张、沮丧和做事费劲等感受出现得有多频繁。它像一张近况快照，不是给你下结论，也不评价你是否坚强。",
+    "meaning": "数值越高，表示这些困扰在这次回答里出现得越频繁。它无法单独说明原因，也不能据此判断是否患病。",
+    "everyday_example": "可以回想最近一件平常的小事：它是否比以前更费力？是偶尔如此，还是常常如此？具体例子往往比分数更有助于理解自己。",
+    "next_steps": [
+      "记下一件最近最费劲的事，以及当时让你稍微轻松一点的条件。",
+      "如果困扰持续或妨碍日常生活，可以与可信赖的人或合格专业人员谈谈。"
+    ],
+    "limits": "目前没有为这个版本启用人群分档，因此不把你的结果标成轻、中、重。回答较少困扰也不证明完全安全或不需要帮助。",
+    "incomplete": "这次还有问题没有完成，暂不计算总分；这不表示没有困扰。",
+    "safety_unconditional": "本工具不评估自杀风险。若你此刻可能伤害自己或无法保证安全，请联系当地紧急服务并找可信赖的人陪伴。本页不提供实时监测或自动救援。",
+    "copyright_display": "© Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview © 2001 Ronald C. Kessler, PhD. All rights reserved.",
+    "citation_display": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189."
+  },
+  "references": [
+    {
+      "url": "https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+      "role": "rights_holder_current_permission"
+    },
+    {
+      "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf",
+      "role": "official_mandarin_items_and_translator"
+    },
+    {
+      "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Self%20admin_K6.pdf",
+      "role": "english_original"
+    },
+    {
+      "role": "Original development paper",
+      "citation": "Kessler RC, Andrews G, Colpe LJ, Hiripi E, Mroczek DK, Normand SLT, Walters EE, Zaslavsky AM. Short screening scales to monitor population prevalences and trends in non-specific psychological distress. Psychological Medicine.2002;32(6):959–976.",
+      "doi": "10.1017/S0033291702006074",
+      "fulltext_url": "https://www.researchgate.net/profile/Daniel-Mroczek/publication/11174017_Short_Screening_Scales_to_Monitor_Population_Prevlances_and_Trends_in_Non-Specific_Psychological_Distress/links/09e415086e6f1ba56f000000/Short-Screening-Scales-to-Monitor-Population-Prevlances-and-Trends-in-Non-Specific-Psychological-Distress.pdf",
+      "access_status": "18-page original paper readable from coauthor Daniel Mroczek profile; copyright Cambridge University Press2002. Publicly readable copy, not an established open redistribution license.",
+      "summary": "K6 and K10 were developed for general health surveys using item-response methods. Table2 identifies final six symptoms and30-day frame.",
+      "backup": "LINK_ONLY"
+    },
+    {
+      "role": "Required author citation and SMI calibration",
+      "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+      "doi": "10.1001/archpsyc.60.2.184",
+      "fulltext_url": "https://jamanetwork.com/journals/jamapsychiatry/fullarticle/207204",
+      "author_copy_url": "https://www.hcp.med.harvard.edu/ncs/ftpdir/PA284.pdf",
+      "access_status": "Publisher full article readable through web; author copy indexed but direct fetch timed out. No article PDF copied.",
+      "summary": "Enriched convenience sample155; reference12-month DSM-IV disorder (excluding substance-use disorder) with GAF<60. Cutoff13+ on0–24 equalized weighted false positives/negatives; sensitivity.36, specificity.96. Critically, NHSDA implementation changed recall to the emotionally worst month within the previous12months. These performance estimates must not be presented as validation of the selected30-day Mandarin form.",
+      "backup": "LINK_ONLY"
+    }
+  ],
+  "critical_caveats": [
+    "This is K6 scored Q1a-f, not full K6+; other forms not duplicated as separate tools.",
+    "Keep question prompt visible on every page: bare stems depend on it.",
+    "2003 >=13 threshold empirical calibration used enriched US sample155 and worst-month-in-past-year framing; cannot transfer performance to this past30day Mandarin form.",
+    "Do not call unrestricted author use public domain or CC0. Retain both current grant and historical PDF footer."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "instrumentKey": "phq9_zh_cn_research",
+  "plannedInstrumentVersion": "1.1.0",
+  "historicalVersion": "1.0.0 PR328 candidate",
+  "status": "PUBLIC_DOCS_ONLY_HOLD_RUNTIME",
+  "registered": false,
+  "dbImported": false,
+  "tags": [
+    "domain:distress_behavior",
+    "construct:depressive_experience",
+    "population:adult_research",
+    "response:self",
+    "use:research",
+    "use:not_diagnostic",
+    "license:public_domain",
+    "language_validation:content_zh-CN",
+    "language_validation:working_translation",
+    "language_validation:translation_review_pending",
+    "language_validation:local_validation_pending"
+  ],
+  "orientation": []
+}

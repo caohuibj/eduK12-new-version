@@ -1,0 +1,230 @@
+{
+  "id": "MSLQ_CRITICAL_THINKING5",
+  "title": "MSLQ课程批判性思考策略分量表（5题）",
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "family": "course-critical-thinking-strategies",
+  "defaultAudience": "COLLEGE_COURSE_SPECIFIC_RESEARCH",
+  "k12Validated": false,
+  "authors": [
+    "Paul R. Pintrich",
+    "David A. F. Smith",
+    "Teresa Garcia",
+    "Wilbert J. McKeachie"
+  ],
+  "rights": {
+    "license": "PUBLIC-DOMAIN",
+    "noncommercialOnly": false,
+    "licenseUrl": "https://www.researchgate.net/publication/280741846_Motivated_Strategies_for_Learning_Questionnaire_MSLQ_Manual",
+    "basis": "Original developer Teresa Duncan (Teresa Garcia) author-uploaded manual page explicitly states MSLQ is in the public domain, no permission required, appropriate citation requested. Instrument text independently verified against US ERIC original 1991 manual scan. Not inferring public domain merely from government hosting/funding.",
+    "scope": "MSLQ instrument, not blanket relicensing of ERIC manual commentary/artwork. Original manual explicitly permits 15 modules singly or together; this is the complete Critical Thinking module only."
+  },
+  "references": [
+    {
+      "url": "https://files.eric.ed.gov/fulltext/ED338122.pdf",
+      "role": "Original 1991 manual archived by ERIC; printed p22 full five items; pp3–6 modular use/scoring/no norms. PDF p23 screenshot visually checked to correct OCR try.",
+      "citation": "Pintrich, P. R., Smith, D. A. F., Garcia, T., & McKeachie, W. J. (1991). A manual for the use of the Motivated Strategies for Learning Questionnaire (MSLQ). Ann Arbor, MI: University of Michigan, National Center for Research to Improve Postsecondary Teaching and Learning. ERIC ED338122."
+    },
+    {
+      "url": "https://www.researchgate.net/publication/280741846_Motivated_Strategies_for_Learning_Questionnaire_MSLQ_Manual",
+      "role": "Original developer author-uploaded manual page, explicit public-domain statement; uploaded by Teresa Duncan 2015-08-07",
+      "doi": "10.13140/RG.2.1.2547.6968"
+    }
+  ],
+  "instructions": {
+    "en": "Project administration instruction: Select one particular course. Answer all five items about that same course, from 1 (not at all true of me) to 7 (very true of me).",
+    "zh": "请先选定一门具体课程，所有问题都围绕同一门课程回答。按每句话与您的实际情况相符的程度作答，1表示“完全不符合我”，7表示“非常符合我”。",
+    "timeframe": "course-specific; no fixed day/week recall",
+    "provenance": "Project administration wording; course-level context and endpoint anchors from original manual. Course must be selected/recorded; do not generalize to all learning."
+  },
+  "items": [
+    {
+      "id": 1,
+      "originalItemNumber": 38,
+      "en": "I often find myself questioning things I hear or read in this course to decide if I find them convincing.",
+      "zh": "我常常会质疑在这门课上听到或读到的内容，以判断它们是否让我信服。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "originalItemNumber": 47,
+      "en": "When a theory, interpretation, or conclusion is presented in class or in the readings, I try to decide if there is good supporting evidence.",
+      "zh": "当课堂或阅读材料中提出一种理论、解释或结论时，我会尝试判断它是否有充分的证据支持。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "originalItemNumber": 51,
+      "en": "I treat the course material as a starting point and try to develop my own ideas about it.",
+      "zh": "我把课程材料当作起点，并尝试在此基础上形成自己的想法。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "originalItemNumber": 66,
+      "en": "I try to play around with ideas of my own related to what I am learning in this course.",
+      "zh": "我会尝试对这门课所学内容产生自己的想法，并灵活地琢磨这些想法。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "originalItemNumber": 71,
+      "en": "Whenever I read or hear an assertion or conclusion in this class, I think about possible alternatives.",
+      "zh": "每当在这门课上读到或听到一个论断或结论时，我会思考其他可能的解释。",
+      "reverse": false
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "not at all true of me",
+      "zh": "完全不符合我",
+      "anchorProvenance": "original endpoint"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 6,
+      "en": "6",
+      "zh": "6",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 7,
+      "en": "very true of me",
+      "zh": "非常符合我",
+      "anchorProvenance": "original endpoint"
+    }
+  ],
+  "scoring": {
+    "method": "mean",
+    "range": [
+      1,
+      7
+    ],
+    "reverseItems": [],
+    "dimensions": [
+      {
+        "id": "critical_thinking",
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "originalItemNumbers": [
+          38,
+          47,
+          51,
+          66,
+          71
+        ],
+        "range": [
+          1,
+          7
+        ]
+      }
+    ],
+    "higherMeans": "greater reported use of critical thinking strategies for the selected course; NOT demonstrated reasoning ability",
+    "basis": "Manual Scoring: scales constructed by mean of constituent items; original p22 gives this exact five-item module with no reversed items.",
+    "missingOriginal": "Not specified.",
+    "missingProjectPolicy": "Require all five; no imputation; no score/report for incomplete answers.",
+    "doNotCompute": "No whole-MSLQ total; no five-item general learning ability score."
+  },
+  "thresholds": [],
+  "report": {
+    "title": "在“知道答案”之外，再问一步",
+    "summary": "这份简表关注在选定课程里，您是否会查看依据、比较解释，并发展自己的想法。它记录您报告的学习做法，不是智力或辩论能力测试。",
+    "interpretation": "平均分越高，表示您在这门课中报告了更多这类做法。不同课程的教学方式、任务和熟悉程度都可能让回答不同，不宜把一次结果当成固定能力。",
+    "dailyExample": "比如读到一个结论时，顺手追问“依据是什么？”或者“有没有另一种解释？”，就是把知识拿来进一步思考。",
+    "reflection": "回想这门课最近的一段材料：哪个观点让您信服？您依靠的是证据、例子，还是对说话者的信任？",
+    "smallAction": "选一个刚学到的结论，写下一条支持它的理由，再试着找一个可能的不同解释。暂时没有答案也没关系，可以把问题带到下一次讨论。",
+    "caveat": "本中文为独立工作译稿，尚未验证。不要用它给学生贴“会不会思考”的标签，也不用于选拔或排名。没有适用于所有课程的高低界线。"
+  },
+  "tags": {
+    "domain": [
+      "学习与自我管理"
+    ],
+    "construct": [
+      "课程批判性思考策略",
+      "证据评价策略"
+    ],
+    "orientation": [],
+    "population": [
+      "大学生英文证据",
+      "非K12验证"
+    ],
+    "response": [
+      "自评",
+      "5题",
+      "七点符合度"
+    ],
+    "use": [
+      "课程研究",
+      "学习反思",
+      "完整原分量表"
+    ],
+    "license": [
+      "公共领域"
+    ],
+    "language_validation": [
+      "英文原版",
+      "中文工作译稿",
+      "中文待验证"
+    ]
+  },
+  "changesNotice": "只采用MSLQ原有完整批判性思考5题模块，不称完整81题MSLQ。保留原题号映射、课程语境及原端点；独立中文工作译稿与通俗反馈尚未验证，原作者未背书。",
+  "sourceFiles": [
+    {
+      "file": "scale-source-packs-learning-attention-20261025/sources/mslq-manual.pdf",
+      "sha256": "75ee1ff190ab5b1784d0bbefbf0437a918e72cb2e3ba749ce51b967e7f9480c5"
+    },
+    {
+      "file": "scale-source-packs-learning-attention-20261025/sources/mslq-author-permission.html",
+      "sha256": "57edecc2536766814815f3fe8485ce255f7e1c416aad5e068797cd9974e8478b"
+    }
+  ],
+  "sourceDiscrepancies": [],
+  "thresholdPolicy": "Original manual expressly supplies no general norms: course-specific variability, local norms if needed. No invented quartiles, low/high bands or diagnostic thresholds.",
+  "sampleContext": {
+    "n": 380,
+    "population": "Midwestern US college students; 356 four-year public university, 24 community college",
+    "fielding": "toward end of Winter 1990 semester January–May",
+    "courses": "37 classrooms, 14 subject domains, 5 disciplines",
+    "criticalThinkingAlpha": 0.8,
+    "descriptiveMean": 4.16,
+    "descriptiveSD": 1.28,
+    "externalOnly": true,
+    "scope": "Not Chinese or K12 norms; descriptive numbers cannot activate report bands."
+  },
+  "dedup": {
+    "registry": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "exactAliasMatch": false,
+    "checkedAt": "2026-10-25T16:30:00Z"
+  }
+}

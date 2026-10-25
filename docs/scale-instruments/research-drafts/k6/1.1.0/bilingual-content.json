@@ -1,0 +1,99 @@
+{
+  "items": [
+    {
+      "id": "K6_1",
+      "source_id": "Q1a",
+      "en": "…nervous?",
+      "zh": "…紧张?",
+      "zh_draft": "…紧张?",
+      "reverse": false
+    },
+    {
+      "id": "K6_2",
+      "source_id": "Q1b",
+      "en": "…hopeless?",
+      "zh": "…绝望?",
+      "zh_draft": "…绝望?",
+      "reverse": false
+    },
+    {
+      "id": "K6_3",
+      "source_id": "Q1c",
+      "en": "…restless or fidgety?",
+      "zh": "…不安或烦躁?",
+      "zh_draft": "…不安或烦躁?",
+      "reverse": false
+    },
+    {
+      "id": "K6_4",
+      "source_id": "Q1d",
+      "en": "…so depressed that nothing could cheer you up?",
+      "zh": "…太沮丧以至于什么都不能让您愉快起来?",
+      "zh_draft": "…太沮丧以至于什么都不能让您愉快起来?",
+      "reverse": false
+    },
+    {
+      "id": "K6_5",
+      "source_id": "Q1e",
+      "en": "…that everything was an effort?",
+      "zh": "…做每一件事情都很费劲?",
+      "zh_draft": "…做每一件事情都很费劲?",
+      "reverse": false
+    },
+    {
+      "id": "K6_6",
+      "source_id": "Q1f",
+      "en": "…worthless?",
+      "zh": "…无价值?",
+      "zh_draft": "…无价值?",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 4,
+      "printed_code": 1,
+      "en": "All of the time",
+      "zh": "全部时间",
+      "zh_draft": "全部时间"
+    },
+    {
+      "value": 3,
+      "printed_code": 2,
+      "en": "Most of the time",
+      "zh": "大部分时间",
+      "zh_draft": "大部分时间"
+    },
+    {
+      "value": 2,
+      "printed_code": 3,
+      "en": "Some of the time",
+      "zh": "一部分时间",
+      "zh_draft": "一部分时间"
+    },
+    {
+      "value": 1,
+      "printed_code": 4,
+      "en": "A little of the time",
+      "zh": "偶尔",
+      "zh_draft": "偶尔"
+    },
+    {
+      "value": 0,
+      "printed_code": 5,
+      "en": "None of the time",
+      "zh": "无",
+      "zh_draft": "无"
+    }
+  ],
+  "instructions": "下面的问题是询问您过去 30 天中的情绪。回答每一个问题时，请圈出最能描述这种情绪的出现频率的号码。",
+  "status": "OFFICIAL_AUTHOR_HOSTED_TRANSLATION_RIGHTS_CLEAR_VALIDATION_MATCH_OPEN",
+  "supplementary": null,
+  "presentationChanges": "原回忆时段总题干重复入每道症状题；题文不改。",
+  "historicalSource": {
+    "pr": 328,
+    "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "reused": "official Mandarin and English transcription; scoring and rights dossier",
+    "fresh_primary_check": "2026-10-25: current author permission page, Mandarin PDF pp1/3, English pp1/3 and scoring FAQ pp1/2 freshly reread"
+  }
+}

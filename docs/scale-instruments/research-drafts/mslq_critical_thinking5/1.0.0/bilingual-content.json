@@ -1,0 +1,91 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "originalItemNumber": 38,
+      "en": "I often find myself questioning things I hear or read in this course to decide if I find them convincing.",
+      "zh": "我常常会质疑在这门课上听到或读到的内容，以判断它们是否让我信服。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "originalItemNumber": 47,
+      "en": "When a theory, interpretation, or conclusion is presented in class or in the readings, I try to decide if there is good supporting evidence.",
+      "zh": "当课堂或阅读材料中提出一种理论、解释或结论时，我会尝试判断它是否有充分的证据支持。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "originalItemNumber": 51,
+      "en": "I treat the course material as a starting point and try to develop my own ideas about it.",
+      "zh": "我把课程材料当作起点，并尝试在此基础上形成自己的想法。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "originalItemNumber": 66,
+      "en": "I try to play around with ideas of my own related to what I am learning in this course.",
+      "zh": "我会尝试对这门课所学内容产生自己的想法，并灵活地琢磨这些想法。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "originalItemNumber": 71,
+      "en": "Whenever I read or hear an assertion or conclusion in this class, I think about possible alternatives.",
+      "zh": "每当在这门课上读到或听到一个论断或结论时，我会思考其他可能的解释。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "not at all true of me",
+      "zh": "完全不符合我",
+      "anchorProvenance": "original endpoint"
+    },
+    {
+      "value": 2,
+      "en": "2",
+      "zh": "2",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 3,
+      "en": "3",
+      "zh": "3",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 4,
+      "en": "4",
+      "zh": "4",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 5,
+      "en": "5",
+      "zh": "5",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 6,
+      "en": "6",
+      "zh": "6",
+      "anchorProvenance": "unlabeled numeric position in original; do not invent verbal intermediate anchors"
+    },
+    {
+      "value": 7,
+      "en": "very true of me",
+      "zh": "非常符合我",
+      "anchorProvenance": "original endpoint"
+    }
+  ],
+  "instructions": {
+    "en": "Project administration instruction: Select one particular course. Answer all five items about that same course, from 1 (not at all true of me) to 7 (very true of me).",
+    "zh": "请先选定一门具体课程，所有问题都围绕同一门课程回答。按每句话与您的实际情况相符的程度作答，1表示“完全不符合我”，7表示“非常符合我”。",
+    "timeframe": "course-specific; no fixed day/week recall",
+    "provenance": "Project administration wording; course-level context and endpoint anchors from original manual. Course must be selected/recorded; do not generalize to all learning."
+  },
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "presentationChanges": "项目课程指导语只在首题前添加；原模块题序/课程语境保持，未称exact-form验证"
+}

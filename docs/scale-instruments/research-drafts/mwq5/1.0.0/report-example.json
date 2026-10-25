@@ -1,0 +1,597 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MWQ5_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MWQ5_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MWQ5_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MWQ5_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MWQ5_05",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mwq5_zh_cn_research",
+          "name": "走神问卷（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "76381eda1cf5cfd610c6b87d0ba0ee9f8ed191a30c91d1400d1f2a4e20b48a5b",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "mind_wandering",
+            "type": "total",
+            "label": "任务中走神的自述频率",
+            "description": "五项任务中走神描述的平均认可频率；不是注意力障碍、能力或意志力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "answeredItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "label": null,
+            "interpretation": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+              "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+              "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+              "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MWQ5_01",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "MWQ5_02",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "MWQ5_03",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "MWQ5_04",
+          "responseValue": "6"
+        },
+        {
+          "itemCode": "MWQ5_05",
+          "responseValue": "6"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mwq5_zh_cn_research",
+          "name": "走神问卷（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "76381eda1cf5cfd610c6b87d0ba0ee9f8ed191a30c91d1400d1f2a4e20b48a5b",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          }
+        ],
+        "scores": [
+          {
+            "key": "mind_wandering",
+            "type": "total",
+            "label": "任务中走神的自述频率",
+            "description": "五项任务中走神描述的平均认可频率；不是注意力障碍、能力或意志力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 6,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "answeredItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "label": null,
+            "interpretation": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+              "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+              "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+              "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。"
+      }
+    },
+    {
+      "fixture": "all-three",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MWQ5_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "MWQ5_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "MWQ5_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "MWQ5_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "MWQ5_05",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mwq5_zh_cn_research",
+          "name": "走神问卷（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "76381eda1cf5cfd610c6b87d0ba0ee9f8ed191a30c91d1400d1f2a4e20b48a5b",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "mind_wandering",
+            "type": "total",
+            "label": "任务中走神的自述频率",
+            "description": "五项任务中走神描述的平均认可频率；不是注意力障碍、能力或意志力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "answeredItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "label": null,
+            "interpretation": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+              "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+              "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+              "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。"
+      }
+    },
+    {
+      "fixture": "mixed",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "MWQ5_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "MWQ5_02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "MWQ5_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "MWQ5_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "MWQ5_05",
+          "responseValue": "6"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "mwq5_zh_cn_research",
+          "name": "走神问卷（5题）（中文研究译稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "76381eda1cf5cfd610c6b87d0ba0ee9f8ed191a30c91d1400d1f2a4e20b48a5b",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "MWQ5_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "MWQ5_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "MWQ5_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "MWQ5_04",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "MWQ5_05",
+            "responseValue": "6",
+            "baseScore": 6,
+            "score": 6
+          }
+        ],
+        "scores": [
+          {
+            "key": "mind_wandering",
+            "type": "total",
+            "label": "任务中走神的自述频率",
+            "description": "五项任务中走神描述的平均认可频率；不是注意力障碍、能力或意志力评价。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3.2,
+            "range": {
+              "min": 1,
+              "max": 6
+            },
+            "expectedItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "answeredItems": [
+              "MWQ5_01",
+              "MWQ5_02",
+              "MWQ5_03",
+              "MWQ5_04",
+              "MWQ5_05"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "mind_wandering",
+            "headline": "看看注意力什么时候悄悄拐了弯",
+            "label": null,
+            "interpretation": "这份问卷关注做事时，思绪转向其他内容的频繁程度。走神不等于懒惰，也不能据此判断有没有注意力障碍。回答反映的是您对平时走神的感受；平均分越高，表示您报告这些情况更常发生。它不是某一节课的专注监测，也不直接代表学习能力。比如眼睛还在读下一行，脑子却已经想到另一件事；发现后回头重读，就是一种常见情境。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次走神：当时任务是否单调、是否疲劳，或者是否有事情一直挂在心上？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次开始任务前，先写下眼前这一小步要做什么。发现走神时，记下待会再想的事，再把注意力轻轻带回当前一步。"
+              }
+            ],
+            "limitations": [
+              "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+              "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+              "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+              "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "本中文为独立工作译稿，尚未验证，不用于诊断、学生筛选或能力排名。原研究没有提供可直接用于个人分级的界线。",
+          "原英文中学生证据不能证明本中文版本可用于中小学生；当前限定成人研究。",
+          "没有诊断阈值、常模排名或低中高等级；自报频率不等于实时监测。",
+          "五题须完整作答，不插补；等权平均与完整作答是明确记录的项目实现。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "仅供成人研究与非诊断自我了解；中文研究译稿尚待验证，不用于心理诊断、学生筛选或能力排名。"
+      }
+    }
+  ]
+}

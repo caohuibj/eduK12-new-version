@@ -1,0 +1,118 @@
+{
+  "status": "PUBLIC_RESEARCH_DOCUMENT_ONLY_NOT_REGISTERED",
+  "items": [
+    {
+      "id": "PHQ9-01",
+      "en": "Little interest or pleasure in doing things",
+      "zh_draft": "做事情时没什么兴趣或乐趣",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-02",
+      "en": "Feeling down, depressed, or hopeless",
+      "zh_draft": "感到情绪低落、抑郁或没有希望",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-03",
+      "en": "Trouble falling or staying asleep, or sleeping too much",
+      "zh_draft": "难以入睡、难以维持睡眠，或睡得太多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-04",
+      "en": "Feeling tired or having little energy",
+      "zh_draft": "感到疲倦或没什么精力",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-05",
+      "en": "Poor appetite or overeating",
+      "zh_draft": "食欲不振或吃得过多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-06",
+      "en": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+      "zh_draft": "对自己感觉很糟，或觉得自己是个失败者，或让自己或家人失望了",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-07",
+      "en": "Trouble concentrating on things, such as reading the newspaper or watching television",
+      "zh_draft": "难以集中注意力做事，例如读报纸或看电视",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-08",
+      "en": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+      "zh_draft": "动作或说话慢到别人可能会注意到的程度？或者相反，坐立不安或躁动不宁，以至于活动比平时多得多",
+      "reverse": false
+    },
+    {
+      "id": "PHQ9-09",
+      "en": "Thoughts that you would be better off dead or of hurting yourself in some way",
+      "zh_draft": "想到自己死了会更好，或想到以某种方式伤害自己",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "instructions": "过去两周里，以下问题困扰您的频率是多少？",
+  "supplementary": {
+    "en": {
+      "included_in_selected_pdf": true,
+      "original_article_includes": true,
+      "text": "If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
+      "options": [
+        "Not difficult at all",
+        "Somewhat difficult",
+        "Very difficult",
+        "Extremely difficult"
+      ],
+      "scored": false,
+      "placement": "Original extra unscored question retained after the nine scored symptoms."
+    },
+    "zh_draft": {
+      "text": "如果您勾选了任何问题，这些问题使您在工作、料理家中事务或与他人相处时感到多大困难？",
+      "options": [
+        "完全没有困难",
+        "有些困难",
+        "很困难",
+        "极其困难"
+      ],
+      "optional": true,
+      "scored": false,
+      "optionalPolicy": "optional=true 是本平台研究草稿的施测选择，并非声称原作者规定该题可选；保留原题条件提示。该题在原量表中不计分。"
+    },
+    "required_implementation": "retain separately as unscored optional supplementary item, not ninth/tenth symptom or total. If existing engine cannot exclude it from scoring, HOLD runtime rather than mis-score or silently drop full-form item."
+  },
+  "translationStatus": "Existing PR328 AI-assisted working Simplified Chinese; NOT validated, NOT developer endorsed. Official site Chinese download not recovered through current page/search; do not substitute an unverified mirror.",
+  "presentationChanges": "无。本文档保留原9症状题及不计分功能困难附题；不向题文插入自编安全说明。",
+  "historicalSource": {
+    "pr": 328,
+    "head": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "reused": "existing reviewed working Chinese text and source identity; no second translation invented",
+    "fresh_primary_check": "2026-10-25 developer form items/anchors/permission footer reread; author handbook p8 permission and Pfizer release rechecked; original validation evidence rechecked via GAD7 paper / PHQ9 PubMed abstract; PMC direct PHQ9 page challenge."
+  }
+}

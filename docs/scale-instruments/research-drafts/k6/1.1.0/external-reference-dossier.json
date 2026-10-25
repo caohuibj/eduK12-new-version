@@ -1,0 +1,57 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "referenceProfiles": [
+    {
+      "screening_reference": {
+        "operator": ">=",
+        "value": 13,
+        "scale": "0–24",
+        "source_doi": "10.1001/archpsyc.60.2.184",
+        "source_url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Scoring_K6_K10.pdf",
+        "target": "Research screening reference for serious mental illness in source study, not a diagnosis.",
+        "population_and_period": "2003 enriched US calibration, weighted for population estimation; worst-month-in-previous12months implementation differs from selected past30days.",
+        "auto_apply_to_selected_chinese_form": false
+      },
+      "severity_bands": [],
+      "norms": null,
+      "interpretation_policy": "No mild/moderate/severe bands or percentile norms approved. Display continuous0–24 descriptive distress score only pending independent review; any future threshold display must name applicable population, period, language and source.",
+      "prevalence_warning": "Do not estimate SMI prevalence as raw percentage scoring13+ in arbitrary sample; official scoring FAQ warns calibration depends on population characteristics."
+    }
+  ],
+  "referenceStudy": null,
+  "references": [
+    {
+      "url": "https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+      "role": "rights_holder_current_permission"
+    },
+    {
+      "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf",
+      "role": "official_mandarin_items_and_translator"
+    },
+    {
+      "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Self%20admin_K6.pdf",
+      "role": "english_original"
+    },
+    {
+      "role": "Original development paper",
+      "citation": "Kessler RC, Andrews G, Colpe LJ, Hiripi E, Mroczek DK, Normand SLT, Walters EE, Zaslavsky AM. Short screening scales to monitor population prevalences and trends in non-specific psychological distress. Psychological Medicine.2002;32(6):959–976.",
+      "doi": "10.1017/S0033291702006074",
+      "fulltext_url": "https://www.researchgate.net/profile/Daniel-Mroczek/publication/11174017_Short_Screening_Scales_to_Monitor_Population_Prevlances_and_Trends_in_Non-Specific_Psychological_Distress/links/09e415086e6f1ba56f000000/Short-Screening-Scales-to-Monitor-Population-Prevlances-and-Trends-in-Non-Specific-Psychological-Distress.pdf",
+      "access_status": "18-page original paper readable from coauthor Daniel Mroczek profile; copyright Cambridge University Press2002. Publicly readable copy, not an established open redistribution license.",
+      "summary": "K6 and K10 were developed for general health surveys using item-response methods. Table2 identifies final six symptoms and30-day frame.",
+      "backup": "LINK_ONLY"
+    },
+    {
+      "role": "Required author citation and SMI calibration",
+      "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+      "doi": "10.1001/archpsyc.60.2.184",
+      "fulltext_url": "https://jamanetwork.com/journals/jamapsychiatry/fullarticle/207204",
+      "author_copy_url": "https://www.hcp.med.harvard.edu/ncs/ftpdir/PA284.pdf",
+      "access_status": "Publisher full article readable through web; author copy indexed but direct fetch timed out. No article PDF copied.",
+      "summary": "Enriched convenience sample155; reference12-month DSM-IV disorder (excluding substance-use disorder) with GAF<60. Cutoff13+ on0–24 equalized weighted false positives/negatives; sensitivity.36, specificity.96. Critically, NHSDA implementation changed recall to the emotionally worst month within the previous12months. These performance estimates must not be presented as validation of the selected30-day Mandarin form.",
+      "backup": "LINK_ONLY"
+    }
+  ],
+  "noChineseThresholdClaim": true
+}

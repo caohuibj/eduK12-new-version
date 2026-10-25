@@ -1,0 +1,693 @@
+{
+  "id": "SRQ63",
+  "title": "自我调节问卷（Brown–Miller 63题）",
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "family": "behavioral-self-regulation",
+  "defaultAudience": "ADULT_PROFESSIONAL_RESEARCH_ONLY",
+  "k12Validated": false,
+  "authors": [
+    "Judith M. Brown",
+    "William R. Miller",
+    "Lawendowski, L. A."
+  ],
+  "rights": {
+    "license": "PUBLIC-DOMAIN",
+    "noncommercialOnly": false,
+    "basis": "Official instrument PDF page 5 expressly states SRQ is public domain and may be freely used, adapted and reproduced without special permission. Official CASAA library additionally says not copyrighted.",
+    "scope": "Instrument public-domain permission is explicit; CASAA intended use is professional research/clinical use, not self-diagnosis. Do not treat this as an SDT Self-Regulation Questionnaire.",
+    "licenseUrl": "https://casaa.unm.edu/assets/inst/selfregulation-questionnaire-srq.pdf",
+    "useBoundaryNote": "CASAA professional-use guidance addresses context and prohibition of using self-assessment to determine substance problem/diagnosis; SRQ itself is a self-report questionnaire. This is not interpreted as forbidding participant self-completion. Professional research and professional-mediated non-diagnostic feedback only."
+  },
+  "references": [
+    {
+      "url": "https://casaa.unm.edu/assets/inst/selfregulation-questionnaire-srq.pdf",
+      "role": "Official 63-item form, Table 1 key, scoring, recommendations and instrument-specific permission",
+      "citation": "Brown, J. M., Miller, W. R., & Lawendowski, L. A. (1999). The Self-Regulation Questionnaire. In L. VandeCreek & T. L. Jackson (Eds.), Innovations in clinical practice: A source book (Vol. 17, pp. 281–289). Sarasota, FL: Professional Resource Press."
+    },
+    {
+      "url": "https://casaa.unm.edu/tools/assessment-instruments.html",
+      "role": "Official library permission and professional-use restrictions"
+    }
+  ],
+  "instructions": {
+    "en": "Please answer the following questions by circling the response that best describes how you are. There are no right or wrong answers. Work quickly and don’t think too long about your answers.",
+    "zh": "请选择最符合您情况的回答。答案没有对错，请按第一反应作答，不必思考太久。",
+    "timeframe": "general tendency; no fixed recall window"
+  },
+  "items": [
+    {
+      "id": 1,
+      "en": "I usually keep track of my progress toward my goals.",
+      "subscale": "Receiving",
+      "reverse": false,
+      "zh": "我通常会留意自己朝目标前进的进展。"
+    },
+    {
+      "id": 2,
+      "en": "My behavior is not that different from other people's.",
+      "subscale": "Evaluating",
+      "reverse": true,
+      "zh": "我的行为和别人并没有那么不同。"
+    },
+    {
+      "id": 3,
+      "en": "Others tell me that I keep on with things too long.",
+      "subscale": "Triggering",
+      "reverse": true,
+      "zh": "别人说我做某些事坚持得太久。"
+    },
+    {
+      "id": 4,
+      "en": "I doubt I could change even if I wanted to.",
+      "subscale": "Searching",
+      "reverse": true,
+      "zh": "即使我想改变，我也怀疑自己能否做到。"
+    },
+    {
+      "id": 5,
+      "en": "I have trouble making up my mind about things.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "我很难对事情拿定主意。"
+    },
+    {
+      "id": 6,
+      "en": "I get easily distracted from my plans.",
+      "subscale": "Implementing",
+      "reverse": true,
+      "zh": "我很容易分心，偏离自己的计划。"
+    },
+    {
+      "id": 7,
+      "en": "I reward myself for progress toward my goals.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "当我朝目标取得进展时，我会奖励自己。"
+    },
+    {
+      "id": 8,
+      "en": "I don't notice the effects of my actions until it's too late.",
+      "subscale": "Receiving",
+      "reverse": true,
+      "zh": "我往往等到为时已晚，才察觉自己行为的影响。"
+    },
+    {
+      "id": 9,
+      "en": "My behavior is similar to that of my friends.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我的行为和朋友们相似。"
+    },
+    {
+      "id": 10,
+      "en": "It's hard for me to see anything helpful about changing my ways.",
+      "subscale": "Triggering",
+      "reverse": true,
+      "zh": "我很难看出改变自己的做法有什么帮助。"
+    },
+    {
+      "id": 11,
+      "en": "I am able to accomplish goals I set for myself.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "我能够实现自己设定的目标。"
+    },
+    {
+      "id": 12,
+      "en": "I put off making decisions.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "我会拖延做决定。"
+    },
+    {
+      "id": 13,
+      "en": "I have so many plans that it's hard for me to focus on any one of them.",
+      "subscale": "Implementing",
+      "reverse": true,
+      "zh": "我的计划太多，很难专注于其中任何一个。"
+    },
+    {
+      "id": 14,
+      "en": "I change the way I do things when I see a problem with how things are going.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "当我发现事情的进展有问题时，我会改变自己的做法。"
+    },
+    {
+      "id": 15,
+      "en": "It's hard for me to notice when I've “had enough” (alcohol, food, sweets).",
+      "subscale": "Receiving",
+      "reverse": true,
+      "zh": "我很难察觉自己什么时候已经“够了”（比如饮酒、吃东西、吃甜食）。"
+    },
+    {
+      "id": 16,
+      "en": "I think a lot about what other people think of me.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我常常想别人怎么看我。"
+    },
+    {
+      "id": 17,
+      "en": "I am willing to consider other ways of doing things.",
+      "subscale": "Triggering",
+      "reverse": false,
+      "zh": "我愿意考虑用其他方式做事。"
+    },
+    {
+      "id": 18,
+      "en": "If I wanted to change, I am confident that I could do it.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "如果我想改变，我有信心自己做得到。"
+    },
+    {
+      "id": 19,
+      "en": "When it comes to deciding about a change, I feel overwhelmed by the choices.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "要决定作出改变时，众多选择让我感到不知所措。"
+    },
+    {
+      "id": 20,
+      "en": "I have trouble following through with things once I've made up my mind to do something.",
+      "subscale": "Implementing",
+      "reverse": true,
+      "zh": "一旦下定决心做一件事，我仍很难坚持做下去。"
+    },
+    {
+      "id": 21,
+      "en": "I don't seem to learn from my mistakes.",
+      "subscale": "Assessing",
+      "reverse": true,
+      "zh": "我似乎无法从自己的错误中吸取教训。"
+    },
+    {
+      "id": 22,
+      "en": "I'm usually careful not to overdo it when working, eating, drinking.",
+      "subscale": "Receiving",
+      "reverse": false,
+      "zh": "在工作、吃东西或饮酒时，我通常会注意不过量。"
+    },
+    {
+      "id": 23,
+      "en": "I tend to compare myself with other people.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我倾向于拿自己和别人比较。"
+    },
+    {
+      "id": 24,
+      "en": "I enjoy a routine, and like things to stay the same.",
+      "subscale": "Triggering",
+      "reverse": true,
+      "zh": "我喜欢按惯例行事，也喜欢事情保持原样。"
+    },
+    {
+      "id": 25,
+      "en": "I have sought out advice or information about changing.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "我曾主动寻求有关改变的建议或信息。"
+    },
+    {
+      "id": 26,
+      "en": "I can come up with lots of ways to change, but it's hard for me to decide which one to use.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "我能想出很多改变的方法，但很难决定采用哪一种。"
+    },
+    {
+      "id": 27,
+      "en": "I can stick to a plan that's working well.",
+      "subscale": "Implementing",
+      "reverse": false,
+      "zh": "如果一个计划效果不错，我能坚持执行。"
+    },
+    {
+      "id": 28,
+      "en": "I usually only have to make a mistake one time in order to learn from it.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "通常犯过一次错，我就能吸取教训。"
+    },
+    {
+      "id": 29,
+      "en": "I don't learn well from punishment.",
+      "subscale": "Receiving",
+      "reverse": true,
+      "zh": "我不太能从惩罚中吸取教训。"
+    },
+    {
+      "id": 30,
+      "en": "I have personal standards, and try to live up to them.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我有自己的标准，并努力做到。"
+    },
+    {
+      "id": 31,
+      "en": "I am set in my ways.",
+      "subscale": "Triggering",
+      "reverse": true,
+      "zh": "我的做事方式已经固定下来。"
+    },
+    {
+      "id": 32,
+      "en": "As soon as I see a problem or challenge, I start looking for possible solutions.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "一发现问题或挑战，我就开始寻找可能的解决办法。"
+    },
+    {
+      "id": 33,
+      "en": "I have a hard time setting goals for myself.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "我很难为自己设定目标。"
+    },
+    {
+      "id": 34,
+      "en": "I have a lot of willpower.",
+      "subscale": "Implementing",
+      "reverse": false,
+      "zh": "我有很强的意志力。"
+    },
+    {
+      "id": 35,
+      "en": "When I'm trying to change something, I pay a lot of attention to how I'm doing.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "当我尝试改变某件事时，我会密切留意自己的进展。"
+    },
+    {
+      "id": 36,
+      "en": "I usually judge what I'm doing by the consequences of my actions.",
+      "subscale": "Receiving",
+      "reverse": false,
+      "zh": "我通常会根据行为带来的后果，判断自己正在做的事。"
+    },
+    {
+      "id": 37,
+      "en": "I don't care if I'm different from most people.",
+      "subscale": "Evaluating",
+      "reverse": true,
+      "zh": "我不在意自己是否与大多数人不同。"
+    },
+    {
+      "id": 38,
+      "en": "As soon as I see things aren't going right I want to do something about it.",
+      "subscale": "Triggering",
+      "reverse": false,
+      "zh": "一发现事情进展不顺，我就想采取行动。"
+    },
+    {
+      "id": 39,
+      "en": "There is usually more than one way to accomplish something.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "完成一件事通常不止一种办法。"
+    },
+    {
+      "id": 40,
+      "en": "I have trouble making plans to help me reach my goals.",
+      "subscale": "Planning",
+      "reverse": true,
+      "zh": "我很难制定帮助自己达成目标的计划。"
+    },
+    {
+      "id": 41,
+      "en": "I am able to resist temptation.",
+      "subscale": "Implementing",
+      "reverse": false,
+      "zh": "我能够抵挡诱惑。"
+    },
+    {
+      "id": 42,
+      "en": "I set goals for myself and keep track of my progress.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "我会为自己设定目标，并持续关注进展。"
+    },
+    {
+      "id": 43,
+      "en": "Most of the time I don't pay attention to what I'm doing.",
+      "subscale": "Receiving",
+      "reverse": true,
+      "zh": "大多数时候，我不太留意自己正在做什么。"
+    },
+    {
+      "id": 44,
+      "en": "I try to be like people around me.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我努力让自己像身边的人一样。"
+    },
+    {
+      "id": 45,
+      "en": "I tend to keep doing the same thing, even when it doesn't work.",
+      "subscale": "Triggering",
+      "reverse": true,
+      "zh": "即使某种做法没有效果，我也倾向于继续照做。"
+    },
+    {
+      "id": 46,
+      "en": "I can usually find several different possibilities when I want to change something.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "当我想改变某件事时，通常能找到几种不同的办法。"
+    },
+    {
+      "id": 47,
+      "en": "Once I have a goal, I can usually plan how to reach it.",
+      "subscale": "Planning",
+      "reverse": false,
+      "zh": "一旦有了目标，我通常能够规划如何实现它。"
+    },
+    {
+      "id": 48,
+      "en": "I have rules that I stick by no matter what.",
+      "subscale": "Implementing",
+      "reverse": false,
+      "zh": "我有无论如何都会坚持的规则。"
+    },
+    {
+      "id": 49,
+      "en": "If I make a resolution to change something, I pay a lot of attention to how I'm doing.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "如果我下决心改变某件事，我会密切留意自己的进展。"
+    },
+    {
+      "id": 50,
+      "en": "Often I don't notice what I'm doing until someone calls it to my attention.",
+      "subscale": "Receiving",
+      "reverse": true,
+      "zh": "常常要等别人提醒，我才注意到自己正在做什么。"
+    },
+    {
+      "id": 51,
+      "en": "I think a lot about how I'm doing.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我常常思考自己做得怎么样。"
+    },
+    {
+      "id": 52,
+      "en": "Usually I see the need to change before others do.",
+      "subscale": "Triggering",
+      "reverse": false,
+      "zh": "通常我比别人更早意识到需要改变。"
+    },
+    {
+      "id": 53,
+      "en": "I'm good at finding different ways to get what I want.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "我善于寻找不同的方法来得到自己想要的东西。"
+    },
+    {
+      "id": 54,
+      "en": "I usually think before I act.",
+      "subscale": "Planning",
+      "reverse": false,
+      "zh": "我通常会先思考再行动。"
+    },
+    {
+      "id": 55,
+      "en": "Little problems or distractions throw me off course.",
+      "subscale": "Implementing",
+      "reverse": true,
+      "zh": "小问题或分心的事就会让我偏离原来的方向。"
+    },
+    {
+      "id": 56,
+      "en": "I feel bad when I don't meet my goals.",
+      "subscale": "Assessing",
+      "reverse": false,
+      "zh": "没有达成目标时，我会感到难受。"
+    },
+    {
+      "id": 57,
+      "en": "I learn from my mistakes.",
+      "subscale": "Receiving",
+      "reverse": false,
+      "zh": "我会从自己的错误中吸取教训。"
+    },
+    {
+      "id": 58,
+      "en": "I know how I want to be.",
+      "subscale": "Evaluating",
+      "reverse": false,
+      "zh": "我知道自己想成为什么样的人。"
+    },
+    {
+      "id": 59,
+      "en": "It bothers me when things aren't the way I want them.",
+      "subscale": "Triggering",
+      "reverse": false,
+      "zh": "事情不如我所愿时，我会感到烦恼。"
+    },
+    {
+      "id": 60,
+      "en": "I call in others for help when I need it.",
+      "subscale": "Searching",
+      "reverse": false,
+      "zh": "需要时，我会请别人帮忙。"
+    },
+    {
+      "id": 61,
+      "en": "Before making a decision, I consider what is likely to happen if I do one thing or another.",
+      "subscale": "Planning",
+      "reverse": false,
+      "zh": "做决定前，我会考虑选择不同做法可能带来的结果。"
+    },
+    {
+      "id": 62,
+      "en": "I give up quickly.",
+      "subscale": "Implementing",
+      "reverse": true,
+      "zh": "我很快就会放弃。"
+    },
+    {
+      "id": 63,
+      "en": "I usually decide to change and hope for the best.",
+      "subscale": "Assessing",
+      "reverse": true,
+      "zh": "我通常会决定作出改变，然后期待出现好结果。"
+    }
+  ],
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "Strongly disagree",
+      "zh": "非常不同意"
+    },
+    {
+      "value": 2,
+      "en": "Disagree",
+      "zh": "不同意"
+    },
+    {
+      "value": 3,
+      "en": "Uncertain or Unsure",
+      "zh": "不确定或拿不准"
+    },
+    {
+      "value": 4,
+      "en": "Agree",
+      "zh": "同意"
+    },
+    {
+      "value": 5,
+      "en": "Strongly Agree",
+      "zh": "非常同意"
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "range": [
+      63,
+      315
+    ],
+    "reverseFormula": "6 - response",
+    "reverseItems": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12,
+      13,
+      15,
+      19,
+      20,
+      21,
+      24,
+      26,
+      29,
+      31,
+      33,
+      37,
+      40,
+      43,
+      45,
+      50,
+      55,
+      62,
+      63
+    ],
+    "higherMeans": "greater reported behavioral self-regulatory functioning",
+    "dimensions": [
+      {
+        "id": "total",
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63
+        ],
+        "range": [
+          63,
+          315
+        ]
+      }
+    ],
+    "researchSubscales": "Seven rationally-derived group labels retained in item metadata only. Original explicitly recommends against separate subscale interpretation; do not expose seven scored profiles.",
+    "missingOriginal": "Not specified in source.",
+    "missingProjectPolicy": "Require all 63 responses; no imputation; incomplete answer set produces no score/report."
+  },
+  "thresholds": [],
+  "externalThresholdEvidence": {
+    "sourceLocation": "official PDF page 2 Recommended Use",
+    "population": "authors’ clinical and college samples, tentative recommendations, not Chinese children/adolescents",
+    "rawRanges": [
+      "> 239: high (top quartile)",
+      "214–238: intermediate (middle quartiles)",
+      "< 213: low (bottom quartile)"
+    ],
+    "unresolvedBoundaries": [
+      213,
+      239
+    ],
+    "runtimeEnabled": false,
+    "reason": "Printed source leaves exactly 213 and 239 uncovered. Preserve discrepancy, do not silently repair. No clinical decision-making. Unvalidated project translation and no K12 norm."
+  },
+  "report": {
+    "title": "把想法一步步变成行动",
+    "summary": "这份问卷关注您如何发现问题、制定计划、执行并回看效果。它像一张行动路线的草图，不是给意志力贴标签。",
+    "interpretation": "总分越高，通常表示您在回答中报告了更多有助于推进和调整行动的做法。阅读结果时，更值得留意的是最近哪个环节顺手、哪个环节容易卡住；本工作译本不据此判断您处于什么等级。",
+    "dailyExample": "例如，想完成一个学习或工作任务时，有人卡在开始，有人容易被打断，也有人做完后忘了回看方法是否有效。相似的结果，可能对应完全不同的日常情境。",
+    "reflection": "选一件最近想推进的小事：最难的是定目标、开始行动，还是中途调整？哪些环境和帮助让它容易一点？",
+    "smallAction": "把下一步缩小到今天能完成的一件具体小事，约定一个回看的时间。若没有完成，先看看哪里需要调整，不必急着责怪自己。",
+    "caveat": "由专业人员在研究或交流中使用。本中文为独立工作译稿，尚未验证；结果不用于诊断、临床决策、学生筛选或评价个人品德。"
+  },
+  "tags": {
+    "domain": [
+      "学习与自我管理"
+    ],
+    "construct": [
+      "行为自我调节",
+      "目标与计划执行"
+    ],
+    "orientation": [],
+    "population": [
+      "成人",
+      "大学生证据",
+      "非K12验证"
+    ],
+    "response": [
+      "自评",
+      "63题",
+      "五点同意度"
+    ],
+    "use": [
+      "专业研究",
+      "非诊断",
+      "工作译稿"
+    ],
+    "license": [
+      "公共领域"
+    ],
+    "language_validation": [
+      "英文原版",
+      "中文工作译稿",
+      "中文待验证"
+    ]
+  },
+  "changesNotice": "本项目据CASAA官方英文题本独立翻译，另编写通俗反馈；尚非经验证的中文版本，原作者未背书。题目顺序、原反向键及5级锚点保留。",
+  "sourceFiles": [
+    {
+      "file": "scale-source-packs-learning-attention-20261025/sources/srq63.pdf",
+      "sha256": "a339a7be02978735402e2baf6919beb15c767104c22f6616f7446acc71c6e705"
+    },
+    {
+      "file": "scale-source-packs-learning-attention-20261025/sources/casaa-permissions.html",
+      "sha256": "6da900cab2524047200fafec4baa6f2a74e43ae502402351735e86aa08732381"
+    }
+  ]
+}
