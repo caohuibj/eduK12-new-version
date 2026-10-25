@@ -32,7 +32,7 @@ function SessionReady(){const {isLoading,isAuthenticated}=useAuth();return isLoa
 const open=(survey:boolean)=>render(<MemoryRouter initialEntries={[survey?'/admin/scale-library-governance?workspace=survey':'/admin/scale-library-governance']}><AuthProvider><SessionReady/></AuthProvider></MemoryRouter>)
 describe('governance visible workspace construction',()=>{
   it('serializes only the visible Survey detail and preserves inspected data, reason and grants across views',async()=>{
-    open(true)
+    open(false)
     fireEvent.click(await screen.findByRole('button',{name:'查看自编精确版本详情'}))
     await screen.findByRole('region',{name:'公共量表精确版本详情'})
     expect(catalogSerialized).toHaveBeenCalledTimes(1)
