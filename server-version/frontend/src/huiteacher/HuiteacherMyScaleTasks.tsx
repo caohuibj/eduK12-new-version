@@ -31,6 +31,9 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
   currentApi.current=api;sessionRef.current=session
   const visible=session?.api===api?session:null
   const selected=visible?.selected??null,attempt=visible?.attempt??null
+  const answering=useRef<HTMLDivElement>(null)
+  const activeAnswerKey=visible?visible.selected.executionId+':'+visible.attempt.id:''
+  useEffect(()=>{if(activeAnswerKey){answering.current?.focus({preventScroll:true});answering.current?.scrollIntoView?.({block:'start'})}},[activeAnswerKey])
   const mediaTransport=useMemo(()=>{
     if(!attempt?.currentItem||attempt.currentItem.type!=='SCALE')return undefined
     const attemptId=encodeURIComponent(attempt.id)
@@ -203,9 +206,11 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         </div>
         {reports[item.executionId]&&<div className="ht-personal-report">
           <h4>本人描述性反馈</h4>
-          {reports[item.executionId].kind!==undefined?<EducationScalePersonalReport
+          {reports[item.executionId].kind==='EDUCATION_SCALE_PERSONAL_REPORT'?<EducationScalePersonalReport
             data={reports[item.executionId]} api={api} executionId={item.executionId} entry="TEACHER"/>:
-          reports[item.executionId].state!=='READY'
+          reports[item.executionId].kind!==undefined&&reports[item.executionId].kind!=='HUITEACHER_PERSONAL_DESCRIPTION'
+            ?<p>当前反馈格式暂不支持，请联系管理员核查。</p>
+            :reports[item.executionId].state!=='READY'
             ?<p>当前报告尚未获准显示。</p>
             :<>
               <p className="ht-muted">{reports[item.executionId].explanation}</p>
@@ -228,7 +233,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
           <button type="button" onClick={()=>closeReport(item.executionId)}>关闭本人反馈</button>
         </div>}
       </article>)}</div>}
-    {selected&&attempt&&attempt.status!=='COMPLETED'&&<div className="ht-task">
+    {selected&&attempt&&attempt.status!=='COMPLETED'&&<div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
       <h3>正在完成：{selected.title}</h3>
       <FinalCompositeAssessment
         key={`${attempt.id}:${attempt.currentItem?.id??''}:${attempt.currentItem?.definitionHash??''}`}

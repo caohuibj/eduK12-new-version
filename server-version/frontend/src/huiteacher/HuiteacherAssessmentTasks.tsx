@@ -17,7 +17,7 @@ export function HuiteacherAssessmentTasks({api,actorKey}:Props){
   const error=states.some(state=>state.error)
   const count=states.reduce((sum,state)=>sum+state.count,0)
   return <div className="ht-panel ht-assessment-inbox">
-    <h2 id="ht-assessment-inbox-title">测评任务</h2>
+    <h2 id="ht-assessment-inbox-title" className="ht-assessment-section-title">参与测评{!pending&&count>0&&<span className="ht-tag">{count} 项</span>}</h2>
     <p className="ht-muted">学校或项目分配给你的测评，统一在这里查看与完成。</p>
     {pending&&<p role="status">正在读取测评任务，请稍候…</p>}
     {!pending&&!error&&!count&&<p className="ht-empty">暂无分配给你的测评任务。</p>}

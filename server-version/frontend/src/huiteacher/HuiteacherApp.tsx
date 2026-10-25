@@ -137,7 +137,7 @@ function PersonalSpaceInfo(){
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
-  const [personalSection,setPersonalSection]=useState('ht-personal-self')
+  const [personalSection,setPersonalSection]=useState('ht-personal-tasks')
   const [schoolSection,setSchoolSection]=useState('ht-school-settings')
   const historySectionFocus=useRef<string|null>(null)
   useLayoutEffect(()=>{
@@ -344,7 +344,7 @@ export default function HuiteacherApp(){
   }
   useEffect(()=>{
     const restoreSection=(event?:Event)=>{
-      const fragment=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-self')
+      const fragment=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-tasks')
       const id=['ht-personal-forms','ht-personal-private-forms','ht-personal-scales'].includes(fragment)?'ht-personal-tasks':fragment
       // A fragment can only select an already-authorized, mounted section.
       const target=document.getElementById(id)
@@ -478,14 +478,14 @@ export default function HuiteacherApp(){
         <div className="ht-workspace-body">
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
           <span className="ht-workspace-nav-label">我的任务</span>
-          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>自主测评</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-tasks" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>测评任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-tasks" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>参与测评</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>组织测评</WorkspaceJump>
           {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}><MessageSquare size={18} aria-hidden="true"/>学生反馈</WorkspaceJump>}
           {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}><TrendingUp size={18} aria-hidden="true"/>我的成长</WorkspaceJump>}
         </nav>
         <div className="ht-workspace-sections">
-        <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="自主测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="测评任务"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="组织测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
+        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

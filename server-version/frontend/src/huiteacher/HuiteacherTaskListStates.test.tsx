@@ -108,7 +108,7 @@ describe('List-only retry preserves current answering',()=>{
    return {id:'attempt',status:'IN_PROGRESS',items:[{id:'item',type:'FORM'}],units:[{id:'section',type:'FORM_SECTION',formSectionId:'section'}],currentItem:{id:'section',type:'FORM_SECTION',formSectionId:'section',definitionHash:'hash'}}
   })
   render(view.render(api as Api))
-  const open={form:'继续评价',scale:'进入本人自评',personal:'开始／继续自主测评',private:'打开本人表单'}[key]
+  const open={form:'继续评价',scale:'进入本人自评',personal:'发起个人测评',private:'打开本人表单'}[key]
   fireEvent.click(await screen.findByRole('button',{name:open}))
   await screen.findByRole('alert')
   expect(screen.getByText('已分配任务',{selector:'strong'})).toBeInTheDocument()

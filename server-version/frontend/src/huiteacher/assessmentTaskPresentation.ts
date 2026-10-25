@@ -4,5 +4,5 @@ export type AssessmentListPresentation={
   onListStateChange?:(state:AssessmentListState)=>void
 }
 export function assessmentStatus(status:string){
-  return ({ASSIGNED:'待完成',STARTED:'进行中',COMPLETED:'已完成',CANCELLED:'已取消',WITHHELD:'暂未开放'} as Record<string,string>)[status]??'状态待确认'
+  return ({ASSIGNED:'待完成',STARTED:'进行中',IN_PROGRESS:'进行中',COMPLETED:'已完成',CANCELLED:'已取消',WITHHELD:'暂未开放'} as Record<string,string>)[status]??'状态待确认'
 }
