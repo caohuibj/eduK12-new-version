@@ -2,147 +2,146 @@ import {afterEach,describe,expect,it,vi} from 'vitest'
 vi.mock('../../config/database',()=>({prisma:{}}))
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {ASSESSMENT_OPERATIONAL_HOLDS,operationalIdentityKey} from '../../modules/assessment-governance/operational-hold'
-import {freezeTrainingStandardReference,verifyTrainingStandardReference,freezeTrainingStandardBinding,verifyTrainingStandardBinding} from '../../modules/composite/training-standard-combination'
-import {ids,tid,trainingSourceHarness} from './training-standard-source.fixture'
+import {freezeTrainingStandardReference,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource} from '../../modules/composite/training-standard-combination'
 import {hashScaleDeploymentPolicy} from '../../modules/scale/policy/deployment'
-
-afterEach(()=>ASSESSMENT_OPERATIONAL_HOLDS.clear())
+import {ids,tid,trainingSourceHarness} from './training-standard-source.fixture'
 const run=(f:ReturnType<typeof trainingSourceHarness>)=>freezeTrainingStandardReference(f.db,ids.owner,ids.composite,f.input)
-describe('Training consumes one exact shared C/P/R reference under real current authority guards',()=>{
-  it('pins the same shared combination, axes and formal C while keeping HIDDEN and writing no business data',async()=>{
-    const f=trainingSourceHarness(),before=structuredClone(f.h),result=await run(f)
-    expect(result.reference.combination).toMatchObject({releaseId:f.h.row.id,combinationHash:f.h.row.combination_hash,toolKey:'who5',instrumentVersion:'1.0.0'})
-    for(const axis of ['CONTENT','PARAMETERS','REPORT'] as const)expect(result.reference.combination.axes[axis]).toEqual({version:f.h.row.snapshot.parts[axis].version,axisHash:f.h.row.snapshot.parts[axis].hash,sourceVersion:'1.0.0'})
-    expect(result.reference.measurement).toEqual({releaseId:ids.measurement,contentHash:f.h.release.content_hash,measurementHash:f.h.release.content.measurementHash})
-    expect(result.reference.authority).toEqual({useGrantId:ids.leaf,useGrantVersion:1,issuerId:ids.issuer})
-    expect(result.reference.reportDisclosure).toBe('EXISTING_TRAINING_POLICY')
-    expect(result.referenceHash).toBe(canonicalHash(result.reference));expect(Object.isFrozen(result.reference.combination.axes)).toBe(true)
-    expect(f.h.scale.visibility).toBe('HIDDEN');expect(f.h.grants).toEqual(before.grants);expect(f.h.writes).toEqual([])
-    expect(JSON.stringify(result.reference)).not.toMatch(/"template"|"payload"|"answers"|"summary"|"definition"/)
-    expect(f.h.calls[0]).toContain('c.created_by=')
-    expect(f.h.calls.findIndex(s=>s.includes('pg_advisory_xact_lock_shared'))).toBeLessThan(f.h.calls.findIndex(s=>s.includes('FROM content_capability_grants leaf')))
+const frozen=(f:ReturnType<typeof trainingSourceHarness>,source:unknown)=>{f.h.composite.items[0].standardCombinationSource=source;return f.h.composite.items[0]}
+afterEach(()=>ASSESSMENT_OPERATIONAL_HOLDS.clear())
+
+describe('Training consumes one exact shared combination through one user MaterialGrant',()=>{
+ it('pins C/P/R and the original 21B root without requiring a legacy Scale grant',async()=>{
+  const f=trainingSourceHarness();f.h.materialActive=false
+  const source=await run(f)
+  expect(source.reference.combination).toMatchObject({releaseId:ids.combo,combinationHash:f.h.row.combination_hash,toolKey:'who5',instrumentVersion:'1.0.0'})
+  for(const axis of ['CONTENT','PARAMETERS','REPORT'] as const)expect(source.reference.combination.axes[axis]).toEqual({version:f.h.row.snapshot.parts[axis].version,axisHash:f.h.row.snapshot.parts[axis].hash,sourceVersion:'1.0.0'})
+  expect(source.reference.authority).toEqual({useGrantId:ids.leaf,useGrantVersion:1,authorityGrantId:ids.root,issuerId:ids.issuer})
+  expect(source.reference.measurement.contentHash).toBe(f.h.release.content_hash)
+  expect(source.referenceHash).toBe(canonicalHash(source.reference));expect(Object.isFrozen(source.reference.combination.axes)).toBe(true)
+  expect(f.db.materialGrant.findUnique).not.toHaveBeenCalled();expect(f.h.writes).toEqual([]);expect(f.h.scale.visibility).toBe('HIDDEN')
+  expect(JSON.stringify(source)).not.toMatch(/"template"|"payload"|"answers"|"definition"/)
+ })
+ it('uses the same exact user use across two owned courses without another grant',async()=>{
+  const f=trainingSourceHarness(),first=await run(f)
+  f.h.composite.questionnaireCourses=[{courseId:tid(80)}]
+  const second=await run(f)
+  expect(second.reference.authority).toEqual(first.reference.authority)
+  expect(second.referenceHash).toBe(first.referenceHash);expect(f.h.writes).toEqual([])
+ })
+ it.each(['missing-use','wrong-recipient','wrong-combo','wrong-hash','replaced-root','missing-root','wrong-product','course-root','wrong-content','wrong-subject','no-distribute','revoked-root','expired-root','future-root','wrong-entry','revoked-entry','system-issuer'])(
+  'ONLINE cannot replace current %s authority',async field=>{
+   const f=trainingSourceHarness()
+   if(field==='missing-use')f.h.use=null
+   if(field==='wrong-recipient')f.h.use.teacher_id=tid(99)
+   if(field==='wrong-combo')f.h.use.resource_id=tid(99)
+   if(field==='wrong-hash')f.h.use.standard_combination_hash='f'.repeat(64)
+   if(field==='replaced-root')f.h.use.authority_grant_id=tid(99)
+   if(field==='missing-root')f.h.grants=[]
+   if(field==='wrong-product')f.root().product='SURVEY'
+   if(field==='course-root'){f.root().scope_kind='COURSE';f.root().scope_id=ids.course}
+   if(field==='wrong-content')f.root().resource_keys=[tid(99)]
+   if(field==='wrong-subject')f.root().subject_id=tid(99)
+   if(field==='no-distribute')f.root().capabilities=['material.use']
+   if(field==='revoked-root')f.root().revoked_at=new Date('2026-01-01')
+   if(field==='expired-root')f.root().expires_at=new Date('2025-01-01')
+   if(field==='future-root')f.root().valid_from=new Date('2027-01-01')
+   if(field==='wrong-entry')f.h.entryProduct='SURVEY'
+   if(field==='revoked-entry')f.h.entryActive=false
+   if(field==='system-issuer')f.h.entryRole='SYSTEM_ADMIN'
+   const reason=['missing-use','wrong-recipient','wrong-combo','wrong-hash'].includes(field)?'精确组合的 Training 使用授权不可用'
+    :['wrong-entry','revoked-entry'].includes(field)?'缺少当前入口管理授权':field==='system-issuer'?'系统管理员不能代替入口管理员':'CONTENT_AUTHORITY_DENIED'
+   await expect(run(f)).rejects.toThrow(reason);expect(f.h.writes).toEqual([])
   })
-  it.each(['missing-material','missing-use-grant','wrong-entry','revoked-entry','system-issuer','wrong-product','wrong-course','wrong-combo','wrong-subject','no-use-capability','revoked-use','expired-use','future-use','missing-parent'])(
-    'ONLINE cannot substitute for %s authorization',async field=>{
-      const f=trainingSourceHarness()
-      if(field==='missing-material')f.h.materialActive=false
-      if(field==='missing-use-grant')f.h.grants=[]
-      if(field==='wrong-entry')f.h.entryProduct='SURVEY'
-      if(field==='revoked-entry')f.h.entryActive=false
-      if(field==='system-issuer')f.h.entryRole='SYSTEM_ADMIN'
-      if(field==='wrong-product')for(const g of f.h.grants)g.product='SURVEY'
-      if(field==='wrong-course')for(const g of f.h.grants)g.scope_id=tid(99)
-      if(field==='wrong-combo')for(const g of f.h.grants)g.resource_keys=['other-combination']
-      if(field==='wrong-subject')f.leaf().subject_id='other'
-      if(field==='no-use-capability')f.leaf().capabilities=['material.adapt']
-      if(field==='revoked-use')f.leaf().revoked_at=new Date('2026-01-01')
-      if(field==='expired-use')f.leaf().expires_at=new Date('2025-01-01')
-      if(field==='future-use')f.leaf().valid_from=new Date('2027-01-01')
-      if(field==='missing-parent')f.h.grants=f.h.grants.filter(g=>g.id!==ids.root)
-      const reason=field==='missing-material'?'SCALE_USE_DENIED'
-        :['wrong-entry','revoked-entry','system-issuer'].includes(field)?'缺少当前入口管理授权':'CONTENT_AUTHORITY_DENIED'
-      await expect(run(f)).rejects.toThrow(reason);expect(f.h.writes).toEqual([])
-    })
-  it.each(['foreign-owner','foreign-course-owner','wrong-course-type','library-course','frozen-owner','survey-realm','wrong-item','wrong-scale-version','changed-source'])(
-    'retains actual project and source scope: %s',async field=>{
-      const f=trainingSourceHarness()
-      if(field==='foreign-owner')f.h.owned=false
-      if(field==='foreign-course-owner')f.h.courseOwner='foreign'
-      if(field==='wrong-course-type')f.h.courseType='OTHER'
-      if(field==='library-course')f.h.courseLibrary=true
-      if(field==='frozen-owner')f.h.principal.is_frozen=true
-      if(field==='survey-realm')f.h.principal.account_domain='SURVEY'
-      if(field==='wrong-item')f.input.itemId=tid(99)
-      if(field==='wrong-scale-version')f.h.scale.instrumentVersion='other'
-      if(field==='changed-source')f.h.sourceChanged=true
-      const reason=field==='foreign-owner'?'测量实例或工具来源不存在'
-        :['foreign-course-owner','wrong-course-type','library-course'].includes(field)?'测量实例须属于本人 Training 课程'
-        :['frozen-owner','survey-realm'].includes(field)?'测量实例发布需要当前真实作者资格'
-        :field==='wrong-item'?'SCALE_SOURCE_REQUIRED':'SCALE_SOURCE_CHANGED'
-      await expect(run(f)).rejects.toThrow(reason);expect(f.h.writes).toEqual([])
-    })
-  it.each(['WITHDRAWN','TRIAL_FAILED','APPROVED','TRIAL_RUNNING'])('refuses a shared combination in %s',async state=>{
-    const f=trainingSourceHarness();f.h.row.state=state
-    await expect(run(f)).rejects.toThrow('STANDARD_COMBINATION_NOT_CURRENT');expect(f.h.writes).toEqual([])
+ it.each(['foreign-owner','foreign-course-owner','library-course','wrong-course-type','frozen-owner','survey-realm','wrong-item','changed-scale-version','changed-scale-key'])(
+  'keeps the actual container/source boundary: %s',async field=>{
+   const f=trainingSourceHarness()
+   if(field==='foreign-owner')f.h.owned=false
+   if(field==='foreign-course-owner')f.h.courseOwner=tid(99)
+   if(field==='library-course')f.h.courseLibrary=true
+   if(field==='wrong-course-type')f.h.courseType='OTHER'
+   if(field==='frozen-owner')f.h.principal.is_frozen=true
+   if(field==='survey-realm')f.h.principal.account_domain='SURVEY'
+   if(field==='wrong-item')f.input.itemId=tid(99)
+   if(field==='changed-scale-version')f.h.scale.instrumentVersion='other'
+   if(field==='changed-scale-key')f.h.sourceChanged=true
+   const reason=field==='foreign-owner'?'测量实例或工具来源不存在':field==='wrong-item'?'SCALE_SOURCE_REQUIRED'
+    :field.startsWith('changed-')?'SCALE_SOURCE_CHANGED':['frozen-owner','survey-realm'].includes(field)?'测量实例发布需要当前真实作者资格':'测量实例须属于本人 Training 课程'
+   await expect(run(f)).rejects.toThrow(reason)
   })
-  it.each(['missing-license','revoked-license','expired-license','wrong-rights-mode','changed-policy-hash'])(
-    'keeps the actual deployment/third-party license boundary: %s',async field=>{
-      const f=trainingSourceHarness()
-      if(field==='missing-license')f.h.auth=null
-      if(field==='revoked-license')f.h.auth.status='REVOKED'
-      if(field==='expired-license')f.h.auth.validTo=new Date('2025-01-01')
-      if(field==='wrong-rights-mode'){f.h.policy.deploymentModes=['STANDALONE'];f.h.deployment.policyHash=hashScaleDeploymentPolicy(f.h.policy)}
-      if(field==='changed-policy-hash')f.h.deployment.policyHash='f'.repeat(64)
-      await expect(run(f)).rejects.toThrow(field==='changed-policy-hash'?'Scale deployment policy hash mismatch':'DEPLOYMENT_OR_RIGHTS_UNAVAILABLE')
-      expect(f.h.writes).toEqual([])
-    })
-  it.each(['missing-measurement','revoked-measurement','axis-tamper','compiled-report-tamper','parameters-tamper','emergency-stop'])(
-    'does not accept a broken or stopped frozen source: %s',async field=>{
-      const f=trainingSourceHarness()
-      if(field==='missing-measurement')f.h.missingMeasurement=true
-      if(field==='revoked-measurement')f.h.release.status='REVOKED'
-      if(field==='axis-tamper')f.h.row.snapshot.parts.REPORT.payload={unexpected:'changed'}
-      if(field==='compiled-report-tamper')f.h.row.snapshot.definition.report.disclaimer+=' changed'
-      if(field==='parameters-tamper')f.h.row.snapshot.references.push({unexpected:'changed'})
-      if(field==='emergency-stop')f.h.emergency=true
-      const reason=field==='compiled-report-tamper'?'REPORT_SNAPSHOT_MISMATCH'
-        :field==='parameters-tamper'?'PARAMETERS_SNAPSHOT_MISMATCH':field==='emergency-stop'?'该量表版本已紧急停用':'IDENTITY_MISMATCH'
-      await expect(run(f)).rejects.toThrow(reason);expect(f.h.writes).toEqual([])
-    })
-  it('rechecks UTC use-grant expiry after a source/stop lock wait',async()=>{
-    const f=trainingSourceHarness();f.h.expireDuringStop=true
-    await expect(run(f)).rejects.toThrow('CONTENT_AUTHORITY_DENIED');expect(f.h.writes).toEqual([])
+ it.each(['WITHDRAWN','TRIAL_FAILED','APPROVED','TRIAL_RUNNING'])('refuses new use in %s',async state=>{
+  const f=trainingSourceHarness();f.h.row.state=state
+  await expect(run(f)).rejects.toThrow('STANDARD_COMBINATION_NOT_CURRENT')
+ })
+ it.each(['missing-license','revoked-license','expired-license','wrong-mode','changed-policy-hash'])('preserves third-party rights: %s',async field=>{
+  const f=trainingSourceHarness()
+  if(field==='missing-license')f.h.auth=null
+  if(field==='revoked-license')f.h.auth.status='REVOKED'
+  if(field==='expired-license')f.h.auth.validTo=new Date('2025-01-01')
+  if(field==='wrong-mode'){f.h.policy.deploymentModes=['STANDALONE'];f.h.deployment.policyHash=hashScaleDeploymentPolicy(f.h.policy)}
+  if(field==='changed-policy-hash')f.h.deployment.policyHash='f'.repeat(64)
+  await expect(run(f)).rejects.toThrow(field==='changed-policy-hash'?'Scale deployment policy hash mismatch':'DEPLOYMENT_OR_RIGHTS_UNAVAILABLE')
+ })
+ it.each(['missing-measurement','revoked-measurement','axis-tamper','report-tamper','template-tamper','parameters-tamper','emergency-stop'])(
+  'rejects a broken/stopped source: %s',async field=>{
+   const f=trainingSourceHarness()
+   if(field==='missing-measurement')f.h.missingMeasurement=true
+   if(field==='revoked-measurement')f.h.release.status='REVOKED'
+   if(field==='axis-tamper')f.h.row.snapshot.parts.REPORT.payload={unexpected:'changed'}
+   if(field==='report-tamper')f.h.row.snapshot.definition.report.disclaimer+=' changed'
+   if(field==='template-tamper')f.h.row.snapshot.template.disclaimer+=' changed'
+   if(field==='parameters-tamper')f.h.row.snapshot.references.push({unexpected:'changed'})
+   if(field==='emergency-stop')f.h.emergency=true
+   const reason=field==='report-tamper'?'REPORT_SNAPSHOT_MISMATCH':field==='template-tamper'?'REPORT_TEMPLATE_MISMATCH'
+    :field==='parameters-tamper'?'PARAMETERS_SNAPSHOT_MISMATCH':field==='emergency-stop'?'该量表版本已紧急停用':'IDENTITY_MISMATCH'
+   await expect(run(f)).rejects.toThrow(reason)
   })
-  it('rechecks real source license expiry after the same lock wait',async()=>{
-    const f=trainingSourceHarness();f.h.auth.validTo=new Date('2027-01-01');f.h.expireLicenseDuringStop=true
-    await expect(run(f)).rejects.toThrow('DEPLOYMENT_OR_RIGHTS_UNAVAILABLE');expect(f.h.writes).toEqual([])
-  })
-  it('rejects client-supplied axes, self-authored labels and public visibility fields',async()=>{
-    const f=trainingSourceHarness()
-    for(const extra of [{self_authored:true},{visibility:'PUBLIC'},{axes:f.h.row.snapshot.parts}])await expect(freezeTrainingStandardReference(f.db,ids.owner,ids.composite,{...f.input,...extra})).rejects.toThrow()
-    expect(f.h.calls).toEqual([])
-  })
+ it('rejects owner and original root expiry after source-lock waits',async()=>{
+  const f=trainingSourceHarness();f.h.expireDuringStop=true
+  await expect(run(f)).rejects.toThrow('账号不可用')
+ })
+ it('rejects license expiry after the same source-lock wait',async()=>{
+  const f=trainingSourceHarness();f.h.auth.validTo=new Date('2027-01-01');f.h.expireLicenseDuringStop=true
+  await expect(run(f)).rejects.toThrow('DEPLOYMENT_OR_RIGHTS_UNAVAILABLE')
+ })
+ it('rejects client axes, self-authored and PUBLIC fields before any SQL',async()=>{
+  const f=trainingSourceHarness()
+  for(const extra of [{self_authored:true},{visibility:'PUBLIC'},{axes:f.h.row.snapshot.parts},{ownerId:ids.owner}])
+   await expect(freezeTrainingStandardReference(f.db,ids.owner,ids.composite,{...f.input,...extra})).rejects.toMatchObject({name:'ZodError'})
+  expect(f.h.calls).toEqual([])
+ })
 })
 
-describe('frozen Training combination reference is exact and independently reauthorized',()=>{
-  it('serializes an immutable reference and verifies the same ids without latest or implicit grants',async()=>{
-    const f=trainingSourceHarness(),frozen=await freezeTrainingStandardBinding(f.db,f.context,f.input)
-    const restored=JSON.parse(JSON.stringify(frozen.binding))
-    expect(await verifyTrainingStandardBinding(f.db,f.context,restored,frozen.bindingHash)).toEqual(frozen.binding)
-    expect(f.h.calls.filter(s=>s.includes('FROM survey_standard_releases')).every(s=>s.includes('WHERE id=')&&s.includes('FOR SHARE'))).toBe(true)
-    expect(f.h.writes).toEqual([])
-  })
-  it.each(['attemptId','epoch','publicationHash','compositeId','actorId','courseId'] as const)('rejects changed %s container scope before reading source/grants',async field=>{
-    const f=trainingSourceHarness(),frozen=await freezeTrainingStandardBinding(f.db,f.context,f.input),changed={...f.context}
-    ;(changed as any)[field]=field==='epoch'?2:field==='publicationHash'?'f'.repeat(64):tid(99)
-    f.h.calls=[]
-    await expect(verifyTrainingStandardBinding(f.db,changed,frozen.binding,frozen.bindingHash)).rejects.toThrow('BINDING_IDENTITY_MISMATCH')
-    expect(f.h.calls).toEqual([])
-  })
-  it('does not let a matching recomputed hash replace current authority',async()=>{
-    const f=trainingSourceHarness(),source=await run(f)
-    f.leaf().revoked_at=new Date('2026-01-01')
-    await expect(verifyTrainingStandardReference(f.db,source.reference,canonicalHash(source.reference))).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
-  })
-  it('rejects a later grant version and never silently renews the frozen reference',async()=>{
-    const f=trainingSourceHarness(),source=await run(f);f.leaf().version++
-    await expect(verifyTrainingStandardReference(f.db,source.reference,source.referenceHash)).rejects.toThrow('FROZEN_IDENTITY_CHANGED')
-  })
-  it('preserves start-only hold semantics while DB emergency stops and combo withdrawal still block collection',async()=>{
-    const f=trainingSourceHarness(),source=await run(f),identity={family:'SCALE' as const,key:'who5',version:'1.0.0'}
-    ASSESSMENT_OPERATIONAL_HOLDS.set(operationalIdentityKey(identity),{...identity,reasonCode:'SYNTHETIC_NEW_START_ONLY',effectiveAt:'2026-10-25T00:00:00Z'})
-    await expect(run(f)).rejects.toThrow('OPERATIONALLY_PAUSED')
-    await expect(verifyTrainingStandardReference(f.db,source.reference,source.referenceHash)).resolves.toMatchObject({referenceHash:source.referenceHash})
-    f.h.scaleStop=true
-    await expect(verifyTrainingStandardReference(f.db,source.reference,source.referenceHash)).rejects.toThrow('SCALE_EMERGENCY_STOPPED')
-    f.h.scaleStop=false;f.h.row.state='WITHDRAWN'
-    await expect(verifyTrainingStandardReference(f.db,source.reference,source.referenceHash)).rejects.toThrow('NOT_CURRENT')
-  })
-  it('does not reinterpret in-flight source identity as a new deployment approval',async()=>{
-    const f=trainingSourceHarness(),source=await run(f)
-    f.h.auth.validTo=new Date('2025-01-01');f.h.release.status='SUPERSEDED';f.h.scale.status='DRAFT'
-    await expect(run(f)).rejects.toThrow()
-    await expect(verifyTrainingStandardReference(f.db,source.reference,source.referenceHash)).resolves.toMatchObject({referenceHash:source.referenceHash})
-    expect(f.h.writes).toEqual([])
-  })
+describe('the persisted Training source is exact, while live use remains current',()=>{
+ it.each(['compositeId','itemId','scaleId','ownerId'] as const)('refuses a changed %s context before SQL',async field=>{
+  const f=trainingSourceHarness(),source=await run(f),context={compositeId:ids.composite,itemId:ids.item,scaleId:ids.scale,ownerId:ids.owner,[field]:tid(99)}
+  f.h.calls=[]
+  expect(()=>decodeTrainingStandardItemSource(source,context)).toThrow('BINDING_IDENTITY_MISMATCH');expect(f.h.calls).toEqual([])
+ })
+ it('does not silently adopt a newly issued use id',async()=>{
+  const f=trainingSourceHarness(),source=await run(f),item=frozen(f,source);f.h.use.id=tid(99)
+  await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('使用授权不可用')
+ })
+ it('does not revive an old frozen reference when the same use UUID is explicitly reissued',async()=>{
+  const f=trainingSourceHarness(),source=await run(f),item=frozen(f,source)
+  f.h.use.revoked_at=new Date('2026-10-25T06:01:00Z');f.h.use.version=2
+  await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('使用授权不可用')
+  f.h.use.revoked_at=null;f.h.use.version=3
+  await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('使用授权不可用')
+  const fresh=await run(f);expect(fresh.reference.authority.useGrantVersion).toBe(3)
+  expect(fresh.referenceHash).not.toBe(source.referenceHash)
+ })
+ it('preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation',async()=>{
+  const f=trainingSourceHarness(),source=await run(f),item=frozen(f,source)
+  f.h.scale.status='DRAFT';f.h.scale.instrumentVersion='newer';f.h.auth.validTo=new Date('2025-01-01');f.h.release.status='SUPERSEDED'
+  await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).resolves.toMatchObject({referenceHash:source.referenceHash})
+  f.h.scaleStop=true;await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('SCALE_EMERGENCY_STOPPED')
+  f.h.scaleStop=false;f.h.use=null;await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('使用授权不可用')
+ })
+ it('keeps start-only hold semantics and current combination withdrawal separate',async()=>{
+  const f=trainingSourceHarness(),source=await run(f),item=frozen(f,source),identity={family:'SCALE' as const,key:'who5',version:'1.0.0'}
+  ASSESSMENT_OPERATIONAL_HOLDS.set(operationalIdentityKey(identity),{...identity,reasonCode:'SYNTHETIC_NEW_START_ONLY',effectiveAt:'2026-10-25T00:00:00Z'})
+  await expect(run(f)).rejects.toThrow('OPERATIONALLY_PAUSED')
+  await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).resolves.toMatchObject({referenceHash:source.referenceHash})
+  f.h.row.state='WITHDRAWN';await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('NOT_CURRENT')
+ })
 })

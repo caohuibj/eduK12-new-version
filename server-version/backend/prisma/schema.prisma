@@ -761,6 +761,7 @@ enum MaterialResourceType {
   SCALE
   COGNITIVE_CONFIG
   REPORT_PACKAGE
+  STANDARD_COMBINATION
 }
 
 enum CognitiveConfigAccessPolicy {
@@ -769,6 +770,11 @@ enum CognitiveConfigAccessPolicy {
 }
 
 model MaterialGrant {
+  version Int @default(1)
+  revokedAt DateTime? @map("revoked_at")
+  standardCombinationHash String? @map("standard_combination_hash")
+  authorityGrantId String? @map("authority_grant_id")
+  standardCombinationAuthority ContentCapabilityGrant? @relation("StandardCombinationMaterialAuthority",fields:[authorityGrantId],references:[id],onDelete:Restrict)
   legacyScaleGrant Boolean @default(false) @map("legacy_scale_grant")
   id           String               @id @default(uuid())
   teacherId    String               @map("teacher_id")
@@ -1366,6 +1372,7 @@ model AssessmentManagementEvent {
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
 model CompositeAssessmentItem {
+  standardCombinationSource Json? @map("standard_combination_source")
   id                    String                      @id @default(uuid())
   compositeAssessmentId String                      @map("composite_assessment_id")
   type                  CompositeAssessmentItemType
@@ -4191,6 +4198,7 @@ model SurveyReportDraft {
 }
 
 model ContentCapabilityGrant {
+  standardCombinationUses MaterialGrant[] @relation("StandardCombinationMaterialAuthority")
   publicScaleDistributions Scale[]
   scaleLibraryUseGrants ScaleLibraryUseGrant[]
   id                       String   @id

@@ -2,7 +2,9 @@ import { updateCatalogTags } from '../training-catalog/tags'
 import {trainingReinterpretationsRouter} from './reinterpretation.routes'
 import {trainingReferencesRouter} from '../training-analysis/reference.routes'
 import {trainingContentReportsRouter} from './content-report.routes'
-import {previewTrainingStandardSource} from './standard-source.service'
+import {grantTrainingStandardCombinationUse,revokeTrainingStandardCombinationUse} from '../measurement-content/standard-combination-use'
+import {platformSurveyOriginGuard} from '../survey/originGuard'
+import {ContentReleaseError} from '../measurement-content/release'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
 import { UserRole } from '../../types'
@@ -14,12 +16,18 @@ const router = Router()
 const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
   try { return success(res, await fn(req)) } catch (e: any) {
     if (e instanceof z.ZodError) return error(res, e.issues.map(v => v.message).join('; '), -1, 400)
+    if (e instanceof ContentReleaseError) return error(res,e.code,-1,409)
     if (e.statusCode >= 400 && e.statusCode < 500) return error(res, e.message, -1, e.statusCode)
     return next(e)
   }
 }
 const pagination = z.object({ page: z.coerce.number().int().min(1).max(500).default(1), pageSize: z.coerce.number().int().min(1).max(50).default(25) })
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
+// The same current 21B entry distribution authority; no course approval route.
+router.post('/standard-combinations/:combinationId/use-grants',authenticate,platformSurveyOriginGuard,
+  handle(req=>grantTrainingStandardCombinationUse(req.user!.userId,req.params.combinationId,req.body)))
+router.post('/standard-combination-use-grants/:grantId/revoke',authenticate,platformSurveyOriginGuard,
+  handle(req=>revokeTrainingStandardCombinationUse(req.user!.userId,req.params.grantId,req.body)))
 router.use(authenticate, requireTeacher)
 router.use('/:id/courses/:courseId/attempts/:attemptId/interpretations',trainingReinterpretationsRouter)
 router.use('/:id/content-reports/courses/:courseId',trainingContentReportsRouter)
@@ -51,7 +59,6 @@ router.post('/:id/timing-export-policy', handle(req => service.updateTimingExpor
 router.get('/:id/content-reference-choices', handle(req => service.contentReferenceChoices(req.user!, req.params.id)))
 router.post('/:id/content-reference-selection', handle(req => service.updateContentReferenceSelection(req.user!, req.params.id, req.body)))
 router.post('/:id/content-report-selection', handle(req => service.updateContentReportSelection(req.user!, req.params.id, req.body)))
-router.post('/:id/standard-combination-source', handle(req => previewTrainingStandardSource(req.user!, req.params.id, req.body)))
 router.post('/:id/measurement-instances/publish', handle(req => service.publishMeasurementInstances(req.user!, req.params.id, req.body)))
 router.post('/:id/publish', handle(req => service.publish(req.user!, req.params.id, req.body)))
 router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.params.id, req.body)))
