@@ -24,6 +24,7 @@ import TeacherBrand from './TeacherBrand'
 import { useProductTheme } from '../components/product-theme/useProductTheme'
 import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import './huiteacher-theme.css'
+import './teacher-home-refresh.css'
 import './huiteacher-workspace-layout.css'
 import '../components/education-tools/education-entry-layout.css'
 
@@ -317,12 +318,12 @@ export default function HuiteacherApp(){
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
     <header className="ht-topbar">
       {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
-        onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
+        onClick={()=>changeScreen('home')}><TeacherBrand home={publicHome}/></button>}
       <nav aria-label="产品导航">
         <ProductThemeControl appearance={appearance} product="Teacher"/>
         {!me&&<>
           {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
-          <button type="button" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
+          <button type="button" className="ht-login-entry" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
           <button type="button" className="ht-register-entry" aria-current={['join','register','student','expert'].includes(screen)?'page':undefined}
             onClick={()=>changeScreen('join')}>注册</button>
         </>}

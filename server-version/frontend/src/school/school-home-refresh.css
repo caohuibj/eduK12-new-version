@@ -1,0 +1,49 @@
+/* Public home only: Training's spacing and hierarchy, with School's own identity. */
+.hs-app:has(.hs-public-header--landing){position:relative;--hs-home-gutter:max(32px,calc((100vw - 1200px)/2))}
+.hs-app .hs-public-header--landing{position:absolute;inset:0 0 auto;min-height:118px;padding:24px var(--hs-home-gutter);border:0;background:transparent;gap:24px}
+.hs-public-header--landing .hs-brand{gap:14px}
+.hs-public-header--landing .hs-brand-icon{width:82px;height:60px;object-fit:contain}
+.hs-public-header--landing .hs-brand-wordmark{width:142px}
+.hs-public-header--landing .hs-public-nav{gap:24px}
+.hs-public-header--landing .hs-header-actions{gap:10px}
+.hs-app .hs-public-header--landing .hs-header-actions>button{min-width:70px;min-height:44px;padding:10px 18px;border-radius:9px;font-size:14px}
+.hs-app .hs-public-header--landing .hs-register-entry{background:#fffdf5c7;border:1px solid #c9d5c3;color:var(--hs-ink)}
+.hs-public-header--landing .product-theme-control .product-theme-trigger{border-color:#718b6b66}
+.hs-app:has(.hs-public-header--landing) .hs-landing-hero{height:auto;min-height:max(820px,min(940px,100svh));max-height:none;padding:190px var(--hs-home-gutter) 36px;gap:48px;--hs-glass:rgba(255,255,245,.46)}
+.hs-app:has(.hs-public-header--landing) .hs-campus-art{object-position:center 78%}
+.hs-app:has(.hs-public-header--landing) .hs-landing-copy{width:640px;max-width:100%;padding:40px 44px;border:1px solid #fffefb7a;border-radius:22px 22px 64px 22px;backdrop-filter:blur(1.5px);box-shadow:0 16px 60px #1a342608}
+.hs-app:has(.hs-public-header--landing) .hs-landing-copy h1{font-size:clamp(42px,4vw,58px);font-weight:600;line-height:1.4;margin:0 0 24px}
+.hs-app:has(.hs-public-header--landing) .hs-landing-copy>p{font-family:'Songti SC','STSong',serif;font-size:19px;font-weight:400;line-height:1.9;letter-spacing:.035em;margin-bottom:26px}
+.hs-app:has(.hs-public-header--landing) .hs-hero-actions button,.hs-app:has(.hs-public-header--landing) .hs-hero-actions>a{min-height:48px;min-width:0;padding:10px 22px;border-radius:9px;font-size:15px}
+.hs-app:has(.hs-public-header--landing) .hs-hero-actions>a{background:transparent;border-color:transparent;font-weight:500}
+.hs-app:has(.hs-public-header--landing) .hs-feature-strip{margin-top:auto;border-radius:16px}
+.hs-app[data-theme=dark] .hs-public-header--landing{background:transparent}
+.hs-app[data-theme=dark] .hs-public-header--landing .hs-register-entry{background:#1d322bc7;color:var(--hs-ink);border-color:var(--hs-border)}
+.hs-app[data-theme=dark]:has(.hs-public-header--landing) .hs-landing-hero{--hs-glass:rgba(18,34,26,.68)}
+.hs-app[data-theme=dark]:has(.hs-public-header--landing) .hs-landing-copy{border-color:#c6e7cf38}
+@media(max-width:1000px){
+ .hs-app:has(.hs-public-header--landing){--hs-home-gutter:32px}
+ .hs-app .hs-public-header--landing{min-height:102px;padding-block:18px;gap:12px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-hero{min-height:960px;padding-top:166px;gap:40px}
+ .hs-public-header--landing .hs-brand-icon{width:70px;height:52px}
+ .hs-public-header--landing .hs-brand-wordmark{width:130px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-copy{width:640px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-copy h1{font-size:clamp(32px,5.5vw,46px)}
+}
+@media(max-width:600px){
+ .hs-app:has(.hs-public-header--landing){--hs-home-gutter:18px}
+ .hs-app .hs-public-header--landing{min-height:86px;padding-block:16px;gap:6px}
+ .hs-public-header--landing .hs-brand{gap:6px}
+ .hs-public-header--landing .hs-brand-icon{width:44px;height:38px}
+ .hs-public-header--landing .hs-brand-wordmark{width:92px}
+ .hs-public-header--landing .hs-header-actions{margin-left:auto;gap:4px}
+ .hs-app .hs-public-header--landing .hs-header-actions>button{min-width:44px;padding:8px 9px;font-size:12px}
+ .hs-app .hs-public-header--landing .hs-navigation-toggle>.hs-menu-toggle{width:36px;padding-inline:4px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-hero{min-height:940px;padding-top:142px;gap:40px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-copy{padding:28px 23px;border-radius:16px 16px 40px 16px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-copy h1{font-size:clamp(23px,6.8vw,34px);line-height:1.5;margin-bottom:20px}
+ .hs-app:has(.hs-public-header--landing) .hs-landing-copy>p{font-size:14px;letter-spacing:0;margin-bottom:24px}
+ .hs-app:has(.hs-public-header--landing) .hs-hero-actions{gap:10px}
+ .hs-app:has(.hs-public-header--landing) .hs-hero-actions button,.hs-app:has(.hs-public-header--landing) .hs-hero-actions>a{padding-inline:12px;font-size:14px}
+}
+@media(max-width:360px){.hs-public-header--landing .hs-brand-icon{width:30px}.hs-public-header--landing .hs-brand-wordmark{width:68px}.hs-app:has(.hs-public-header--landing){--hs-home-gutter:12px}}

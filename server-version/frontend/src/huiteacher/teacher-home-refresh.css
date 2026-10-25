@@ -1,0 +1,49 @@
+/* Match Training's public-home proportions without changing Teacher's journal palette. */
+.ht-app.ht-app-landing{position:relative;--ht-home-gutter:max(32px,calc((100vw - 1200px)/2))}
+.ht-app.ht-app-landing .ht-topbar{position:absolute;inset:0 0 auto;min-height:118px;padding:24px var(--ht-home-gutter);background:transparent;flex-wrap:nowrap;gap:24px;z-index:3}
+.ht-app.ht-app-landing .ht-brand{gap:14px}
+.ht-app.ht-app-landing .ht-brand-b3{width:58px;height:66px}
+.ht-app.ht-app-landing .ht-brand-wordmark{width:158px}
+.ht-app.ht-app-landing .ht-topbar nav{gap:10px;flex-wrap:nowrap}
+.ht-app.ht-app-landing .ht-topbar nav button{min-width:70px;min-height:44px;padding:10px 18px;border-radius:9px;font-size:14px;font-weight:600}
+.ht-app.ht-app-landing .ht-topbar nav .ht-login-entry{background:var(--ht-copper);border:1px solid var(--ht-copper);color:#fffaf6}
+.ht-app.ht-app-landing .ht-topbar nav .ht-register-entry{background:#fffaf3c7;border-color:#cfbba6}
+.ht-app.ht-app-landing .product-theme-control .product-theme-trigger{border-color:#a77d5a66}
+.ht-app.ht-app-landing .ht-topbar nav .product-theme-trigger{min-width:44px;width:44px;padding:0;border-radius:50%;background:transparent}
+.ht-app.ht-app-landing .product-theme-control{order:1}
+.ht-app.ht-app-landing .ht-journal{min-height:max(820px,min(940px,100svh));padding:190px var(--ht-home-gutter) 36px;gap:48px;justify-content:flex-start}
+.ht-app.ht-app-landing .ht-journal-copy{width:630px;max-width:100%;padding:40px 44px;border-radius:22px 22px 64px 22px;background:#fffdf675;border-color:#fffefb7a;backdrop-filter:blur(1.5px)}
+.ht-app.ht-app-landing .ht-journal h1{font-size:clamp(42px,4vw,58px);font-weight:600;line-height:1.4;letter-spacing:.025em}
+.ht-app.ht-app-landing .ht-journal-copy>p{font-family:'Songti SC','STSong',serif;font-size:19px;line-height:1.9;letter-spacing:.035em;margin:24px 0 26px}
+.ht-app.ht-app-landing .ht-journal-rule{margin-bottom:24px}
+.ht-app.ht-app-landing .ht-journal-actions button,.ht-app.ht-app-landing .ht-journal-actions>a{min-height:48px;font-size:15px}
+.ht-app.ht-app-landing .ht-journal-actions .ht-primary{min-width:174px}
+.ht-app.ht-app-landing .ht-feature-strip{margin-top:auto;border-radius:16px;flex:none}
+.ht-app.ht-app-landing[data-theme=dark] .ht-topbar{background:transparent}
+.ht-app.ht-app-landing[data-theme=dark] .ht-topbar nav .ht-login-entry{color:var(--ht-on-primary)}
+.ht-app.ht-app-landing[data-theme=dark] .ht-topbar nav .ht-register-entry{background:#231d1ac7;border-color:var(--ht-line)}
+.ht-app.ht-app-landing[data-theme=dark] .ht-journal-copy{background:#231d1aaf;border-color:#f1d0b738}
+@media(max-width:1100px){
+ .ht-app.ht-app-landing{--ht-home-gutter:32px}
+ .ht-app.ht-app-landing .ht-topbar{min-height:102px;padding-block:18px;gap:16px}
+ .ht-app.ht-app-landing .ht-journal{min-height:960px;padding-top:166px;gap:40px}
+ .ht-app.ht-app-landing .ht-journal h1{font-size:clamp(32px,5.5vw,46px)}
+}
+@media(max-width:600px){
+ .ht-app.ht-app-landing{--ht-home-gutter:18px}
+ .ht-app.ht-app-landing .ht-topbar{min-height:86px;padding-block:16px;gap:8px}
+ .ht-app.ht-app-landing .ht-brand{gap:8px}
+ .ht-app.ht-app-landing .ht-brand-b3{width:36px;height:44px}
+ .ht-app.ht-app-landing .ht-brand-wordmark{width:100px}
+ .ht-app.ht-app-landing .ht-topbar nav{gap:4px;margin-left:auto}
+ .ht-app.ht-app-landing .ht-topbar nav button{min-width:44px;padding:8px 9px;font-size:12px}
+ .ht-app.ht-app-landing .ht-journal{min-height:940px;padding-top:142px;gap:40px}
+ .ht-app.ht-app-landing .ht-journal-copy{padding:28px 23px;border-radius:16px 16px 40px 16px}
+ .ht-app.ht-app-landing .ht-journal h1{font-size:clamp(26px,7.1vw,34px);line-height:1.5}
+ .ht-app.ht-app-landing .ht-journal-copy>p{font-size:15px;letter-spacing:0;margin:20px 0 24px}
+ .ht-app.ht-app-landing .ht-journal-rule{margin-bottom:20px}
+ .ht-app.ht-app-landing .ht-journal-actions{gap:12px}
+ .ht-app.ht-app-landing .ht-journal-actions button,.ht-app.ht-app-landing .ht-journal-actions>a{padding-inline:10px;font-size:14px}
+ .ht-app.ht-app-landing .ht-journal-actions .ht-primary{min-width:150px}
+}
+@media(max-width:360px){.ht-app.ht-app-landing{--ht-home-gutter:12px}.ht-app.ht-app-landing .ht-brand-wordmark{width:88px}}
