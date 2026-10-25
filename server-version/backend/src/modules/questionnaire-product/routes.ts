@@ -2,6 +2,7 @@ import { updateCatalogTags } from '../training-catalog/tags'
 import {trainingReinterpretationsRouter} from './reinterpretation.routes'
 import {trainingReferencesRouter} from '../training-analysis/reference.routes'
 import {trainingContentReportsRouter} from './content-report.routes'
+import {previewTrainingStandardSource} from './standard-source.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
 import { UserRole } from '../../types'
@@ -50,6 +51,7 @@ router.post('/:id/timing-export-policy', handle(req => service.updateTimingExpor
 router.get('/:id/content-reference-choices', handle(req => service.contentReferenceChoices(req.user!, req.params.id)))
 router.post('/:id/content-reference-selection', handle(req => service.updateContentReferenceSelection(req.user!, req.params.id, req.body)))
 router.post('/:id/content-report-selection', handle(req => service.updateContentReportSelection(req.user!, req.params.id, req.body)))
+router.post('/:id/standard-combination-source', handle(req => previewTrainingStandardSource(req.user!, req.params.id, req.body)))
 router.post('/:id/measurement-instances/publish', handle(req => service.publishMeasurementInstances(req.user!, req.params.id, req.body)))
 router.post('/:id/publish', handle(req => service.publish(req.user!, req.params.id, req.body)))
 router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.params.id, req.body)))
