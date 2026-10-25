@@ -230,8 +230,17 @@ export const loadProjectionPolicyForAssessment = async (assessment: any, result:
   }
   return resolveProjectionPolicyForAssessment(assessment, result, verifiedRuntime)
 }
+/** Request-local immutable runtime only, never an authorization or result cache. */
+export interface PreparedScaleResponseRuntime {
+  assessmentId: string
+  attemptEpoch: number
+  compiledRuntimeHash: string
+  encrypted: string | null
+  runtime: VersionedFrozenScaleRuntimeSnapshot
+}
 export const loadScaleAssessmentForResponse = async (assessment: any, options: ScaleResponseProjectionOptions = {},
-  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb) => {
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
+  preparedRuntime?: PreparedScaleResponseRuntime) => {
   // A read failure after the save transaction must not undo or misreport durable acceptance.
   // The existing allowlisted serializer emits RESULT_UNAVAILABLE for unreadable results.
   const source = assessment
@@ -240,8 +249,16 @@ export const loadScaleAssessmentForResponse = async (assessment: any, options: S
   if (assessment.status !== 'COMPLETED') {
     try { assessment.answers = await resolveStoredScaleAnswers(source?.answers, source, db) } catch { assessment.answers = 'UNREADABLE_RAW_FACTS' }
   }
-  let runtime: VersionedFrozenScaleRuntimeSnapshot | undefined
-  if (typeof assessment?.runtimeSnapshotEncrypted === 'string') {
+  // A concurrent winner may have a different epoch or frozen policy despite
+  // sharing scientific compiled bytes. Reuse only the exact prepared row binding.
+  const matchesPrepared = preparedRuntime && preparedRuntime.assessmentId === assessment?.id
+    && preparedRuntime.attemptEpoch === assessment?.attemptEpoch
+    && preparedRuntime.compiledRuntimeHash === assessment?.compiledRuntimeHash
+    && preparedRuntime.runtime.compiledRuntime.compiledRuntimeHash === assessment?.compiledRuntimeHash
+    && typeof preparedRuntime.encrypted === 'string'
+    && preparedRuntime.encrypted === assessment?.runtimeSnapshotEncrypted
+  let runtime: VersionedFrozenScaleRuntimeSnapshot | undefined = matchesPrepared ? preparedRuntime.runtime : undefined
+  if (!runtime && typeof assessment?.runtimeSnapshotEncrypted === 'string') {
     try { runtime = await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted, db) }
     catch { return scaleAssessmentForResponse(assessment, options) }
   }

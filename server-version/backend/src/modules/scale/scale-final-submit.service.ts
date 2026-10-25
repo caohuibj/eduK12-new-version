@@ -236,7 +236,8 @@ const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   }
 }
 
-const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow) => {
+const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow,
+  receiptOnly = false) => {
   const submissionId = validateSubmissionId(input.submissionId)
   // Only the private Composite parent/item lookup supplies this request-local row.
   // Unified submission still performs its normal admission checks and locked reread.
@@ -249,7 +250,9 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
   }))
   if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
   if (child.runtimeGeneration === 'UNIFIED_V1') {
-    const data = await submitUnifiedScaleAssessmentFinal(input, child)
+    const data = receiptOnly
+      ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, true)
+      : await submitUnifiedScaleAssessmentFinal(input, child)
     return {
       ...data,
       internalContext: {
@@ -589,6 +592,7 @@ export const submitCompositeScaleFinal = async (
   itemId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'compositeAttemptId' | 'questionnaireSessionId'>,
   context: { userId?: string | null; recoveryTokenHash?: string },
+  responseOptions?: { receiptOnly: true },
 ) => {
   const result = await withUnitSubmitAdmission(async () => {
     const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
@@ -605,9 +609,11 @@ export const submitCompositeScaleFinal = async (
       userId: context.userId,
       compositeAttemptId: attemptId,
       recoveryTokenHash: context.recoveryTokenHash,
-    }, child)
+    }, child, responseOptions?.receiptOnly)
   })
-  return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
+  const data = stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
+  if (!responseOptions?.receiptOnly) return data
+  return { submissionId: data.submissionId, payloadHash: data.payloadHash, replayed: Boolean(data.replayed), completed: true }
 }
 
 /**

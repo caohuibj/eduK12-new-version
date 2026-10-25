@@ -229,6 +229,28 @@ lint 0 error/4 warning（含数值 epoch ref 和既有 effect 依赖提示）。
 receipt-only、窄 composite 状态、Scale runtime 复用、Training report single-view、
 overview opt-in 仍待逐消费者整合；不把旧候选已测误写为 main 已有。
 
+### B 第二批：显式 receipt-only 与报告 single-view
+
+采用 e0dd4300 中这些相互依赖的精确文件净差异：composite 的状态子 header/
+controller/query schema/report read/service，Scale 的 final/workflow/unified final 与
+`services/scale-final-submit.schema.ts`，前端 composite 两个既有 host/API/types/
+receipt recovery 及对应七组后端、六组前端合同。main31d9→25215 上这些生产文件
+字节未变；完整局部 patch 通过 `git apply --check`。没有采用第五片 callback，
+没有整个父图 raw SQL、ordinary schema、每 unit job 或提前成功 ACK。
+
+当前单元仍加载权威 runtime；所有 child header 保留以检查非法分卷注入。
+prepared runtime 仅同一请求、assessment ID/epoch/hash/原密文精确一致时复用。
+只有两个已知前端 host 显式请求 receipt；旧默认详情和 GET 恢复保留，receipt
+事务不取无用 cipher。report combined view 仍按当前身份/epoch/开放状态取正文，
+READY hint 不授权正文，不把报告工作塞入提交 ACK。
+
+首轮后端 106 通过、6 个 query schema 断言失败，类型指出遗漏了原候选的一个
+schema 导出。补齐该精确依赖文件后只运行六个失败断言，6/6 通过；原 106 保留。
+前端 71 项通过。前后端类型均实际退出 0。证据：
+`B-receipt-report-backend.json`、`B-receipt-schema-retry.json`、
+`B-receipt-report-frontend.json`，以及 `*-types-receipt*.log`。尚无本批新 HTTP /
+浏览器/CPU 均值或生产资格；原候选的受控 probe 也不冒称本批已执行。
+
 ## D：15 去标识投影提前
 
 系统独立导出在已授权 source load 时显式选择正向 choice 白名单，在访问值/转成

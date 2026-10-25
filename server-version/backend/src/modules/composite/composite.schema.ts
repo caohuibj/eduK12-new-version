@@ -141,6 +141,11 @@ export const compositeExportQuerySchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
 })
 
+export const compositeReportViewQuerySchema = z.object({
+  view: z.literal('combined'),
+  waitMs: z.string().regex(/^\d{1,5}$/).transform(Number).optional(),
+}).strict()
+
 export const compositeReportQuerySchema = z.object({
   partial: z.literal('1').optional(),
   snapshotId: z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/).optional(),

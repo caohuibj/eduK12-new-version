@@ -1,6 +1,7 @@
 import type { ApiResponse } from '../../types'
 import type { WholeQuestionnaireReceipt } from './types'
 import { normalizeApiError } from '../../utils/normalizeApiError'
+import { completionRetryDelayMs, isCompletionBusyError } from '../../services/completionRetry'
 export type WholeReceiptLookup = WholeQuestionnaireReceipt | { status: 'NOT_RECEIVED'; attemptId: string; submissionId: string }
 export const readMatchingWholeReceipt = async (read: (() => Promise<ApiResponse<WholeReceiptLookup>>) | undefined,
   attemptId: string, submissionId: string): Promise<WholeQuestionnaireReceipt | null> => {
@@ -27,11 +28,18 @@ export const isRecoverableReceiptError = (cause: unknown) => {
 }
 /** Read-only retries only; callers keep their bounded polling budget and recovery link. */
 export const withReportReadRecovery = async <T>(read: () => Promise<T>, signal: AbortSignal,
-  sleep: (ms: number) => Promise<void> = ms => new Promise(resolve => setTimeout(resolve, ms))): Promise<T> => {
+  sleep: (ms: number) => Promise<void> = ms => new Promise(resolve => setTimeout(resolve, ms)),
+  options: { completionBusyMaxAttempts?: number } = {}): Promise<T> => {
   for (let attempt = 0; ; attempt++) {
     if (signal.aborted) throw new DOMException('Aborted', 'AbortError')
     try { return await read() } catch (cause) {
-      if (signal.aborted || attempt >= 2 || !isRecoverableReceiptError(cause)) throw cause
+      const completionBusy = options.completionBusyMaxAttempts !== undefined && isCompletionBusyError(cause)
+      const maxAttempts = completionBusy ? options.completionBusyMaxAttempts! : 3
+      if (signal.aborted || attempt + 1 >= maxAttempts || !isRecoverableReceiptError(cause)) throw cause
+      if (completionBusy) {
+        await sleep(completionRetryDelayMs(cause))
+        continue
+      }
       const minimum = normalizeApiError(cause).retryAfterMs ?? 0
       await sleep(Math.max(minimum, Math.min(4000, 750 * 2 ** attempt)) + Math.floor(Math.random() * 250))
     }
