@@ -320,3 +320,20 @@ TrainingTrainerOverview 显式 includeCourseCounts=false；默认 API 仍返回�
 
 实际受影响后端四组 41/41、前端 overview 11/11 通过：
 `B-response-overview.json`、`B-overview-ui.json`。未产生新容量或普遍提速结论。
+
+## A：运行时表分类遗漏（父对话确认的部署阻断）
+
+补匿名参与编号迁移的两份 raw-SQL 表：anonymous_study_codes 和
+anonymous_study_participation_events。按现有政策最窄的可写类别 RUNTIME_RW 显式列名；
+codes 需 SELECT/INSERT/UPDATE（绑定、重置、禁用未认领编号），events 需追加审计。
+与现有审计表一致，原 triggers 保持禁止删除 codes、修改已认领身份以及 UPDATE/DELETE
+审计事件；没有新增通配 GRANT、TRUNCATE、owner/超级用户能力或取消未知表 fail-closed。
+没有改生产角色或执行生产 ACL。
+
+本任务新合成库有当前全部 229 迁移和 260 张真实 public 表，实际 catalog 与完整政策
+精确相等。新建 NOSUPERUSER/NOBYPASSRLS 临时登录角色，旧政策在原 defaults.sql
+实际重现 P0001 / UNCLASSIFIED_RUNTIME_TABLE；新政策初始化和完整 privileges/schema
+核验通过。用真正受限角色读写 codes、追加 events，原不可变操作均被 trigger 拒绝。
+新增一份临时未知表后 defaults.sql 仍拒绝，且该角色没有该表 SELECT/INSERT 权限。
+三项定向断言通过（`runtime-policy-full-schema.json`），只清理本测试的临时 DDL/角色，
+合成业务审计保留；本轮不是用 owner 冒充运行时业务权限证明。
