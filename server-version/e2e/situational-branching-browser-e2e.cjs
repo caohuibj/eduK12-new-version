@@ -85,13 +85,13 @@ const setConfidence = async (page, value) => {
   }, value, { timeout: 30000 })
 }
 
-const waitProgress = async (page, completedSteps, _legacyTotal) => {
+const waitProgress = async (page, viewedSteps) => {
   const openPath = page.locator('section[aria-label="当前开放路径"]').first()
   await openPath.waitFor({ state: 'visible', timeout: 30000 })
-  await openPath.getByText(`已完成 ${completedSteps} 个步骤`, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await openPath.getByText(`已查看 ${viewedSteps} 个步骤`, { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   await openPath.getByText(/^当前：/u).waitFor({ state: 'visible', timeout: 30000 })
   const progressText = await openPath.textContent()
-  assert.doesNotMatch(progressText || '', /已完成\s+\d+\s*\/\s*\d+/u, 'branching progress exposed a mutable denominator')
+  assert.doesNotMatch(progressText || '', /(?:已查看|已完成)\s+\d+\s*\/\s*\d+/u, 'branching progress exposed a mutable denominator')
 }
 
 const nextScene = async (page, title) => {
@@ -99,8 +99,8 @@ const nextScene = async (page, title) => {
   await waitScene(page, title)
 }
 
-const navigateScene = async (page, index, completed = true) => {
-  await page.getByRole('button', { name: `情境 ${index}，${completed ? '已完成' : '未完成'}`, exact: true }).click()
+const navigateScene = async (page, index, answered = true) => {
+  await page.getByRole('button', { name: `情境 ${index}，${answered ? '已作答' : '未作答'}`, exact: true }).click()
 }
 
 const assertImageScene = async (page) => {
@@ -202,7 +202,7 @@ const runStandaloneLongPath = async (browser) => {
     await assertImageScene(page)
     await assertNoOverflow(page, 'standalone-image-layout')
     await chooseOption(page, fixture.branching.options.longPath)
-    await waitProgress(page, 1, 2)
+    await waitProgress(page, 1)
 
     await page.reload({ waitUntil: 'domcontentloaded' })
     await waitScene(page, fixture.branching.scenes.diagnostic)
@@ -221,20 +221,20 @@ const runStandaloneLongPath = async (browser) => {
 
     await chooseOption(page, 'A')
     await setConfidence(page, 80)
-    await waitProgress(page, 2, 3)
+    await waitProgress(page, 2)
     await nextScene(page, fixture.branching.scenes.nested)
     await assertComicScene(page)
     await chooseOption(page, fixture.branching.options.nestedContinue)
-    await waitProgress(page, 3, 4)
+    await waitProgress(page, 3)
     await nextScene(page, fixture.branching.scenes.roundTwo)
     await assertTextOnly(page, 'round-two-text-visible')
 
     await page.reload({ waitUntil: 'domcontentloaded' })
     await waitScene(page, fixture.branching.scenes.roundTwo)
-    await waitProgress(page, 3, 4)
+    await waitProgress(page, 4)
     record('multi-round-refresh-resume')
     await chooseOption(page, 'A')
-    await waitProgress(page, 4, 4)
+    await waitProgress(page, 4)
 
     let forcedAmbiguousFailure = false
     await page.route('**/api/situational/attempts/*/submit', async (route) => {
@@ -298,17 +298,17 @@ const runStandalonePruneAndEarlyTerminal = async (browser) => {
     await chooseOption(page, fixture.branching.options.nestedContinue)
     await nextScene(page, fixture.branching.scenes.roundTwo)
     await chooseOption(page, 'A')
-    await waitProgress(page, 4, 4)
+    await waitProgress(page, 4)
 
     await navigateScene(page, 1, true)
     await waitScene(page, fixture.branching.scenes.entry)
     await chooseOption(page, fixture.branching.options.earlyTerminal)
-    await waitProgress(page, 1, 1)
+    await waitProgress(page, 1)
     assert.equal(await page.getByRole('navigation', { name: '情境导航' }).getByRole('button').count(), 1, 'early branch retained stale downstream navigation')
     record('cross-round-prune-to-early-terminal')
 
     await chooseOption(page, fixture.branching.options.longPath)
-    await waitProgress(page, 1, 2)
+    await waitProgress(page, 1)
     await nextScene(page, fixture.branching.scenes.diagnostic)
     assert.equal(await page.locator('input[type="radio"]').first().isChecked(), false, 'required diagnostic survived prune')
     await page.getByText('未选择', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
@@ -316,7 +316,7 @@ const runStandalonePruneAndEarlyTerminal = async (browser) => {
 
     await navigateScene(page, 1, true)
     await chooseOption(page, fixture.branching.options.earlyTerminal)
-    await waitProgress(page, 1, 1)
+    await waitProgress(page, 1)
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.waitForURL(/\/student\/situational\/attempts\/[^/]+\/result(?:\?|$)/, { timeout: 30000 })
     await page.getByText('测评已完成', { exact: true }).waitFor({ state: 'visible', timeout: 30000 })
@@ -488,7 +488,7 @@ const runPublicBundle = async (browser) => {
     await chooseOption(page, 'B')
     await nextScene(page, fixture.branching.scenes.nested)
     await chooseOption(page, fixture.branching.options.nestedTerminal)
-    await waitProgress(page, 3, 3)
+    await waitProgress(page, 3)
     await page.getByRole('button', { name: '提交测评', exact: true }).click()
     await page.waitForURL(new RegExp(`/public/composite/attempts/${parentId}(?:/report)?(?:\\?|$)`), { timeout: 30000 })
 
