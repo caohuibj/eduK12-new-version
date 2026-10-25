@@ -98,6 +98,11 @@ export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:s
    if(!u||!c||u.kind!==c.unit.ref.kind||canonicalHash(u.compiledDefinition)!==canonicalHash(c.unit.compiledDefinition)||canonicalHash(u.displayDefinition)!==canonicalHash(c.unit.displayDefinition))governedFail(409,'组合组件定义或绑定被更改')
   }
   if(flow){for(const b of instance.bindings){const blocks=flow.blocks.filter(block=>block.kind==='INSTRUMENT'&&block.instrumentKey===b.instrumentKey);if(blocks.length!==1||blocks[0].when)governedFail(409,'组合组件不能被条件跳过或分到不同问卷子版本')}}
+  // Flow, rather than the units/result array, determines administration order.
+  // Preserve the existing allowance for unconditional MATERIAL blocks; they do
+  // not administer another instrument. External instruments may not interleave.
+  if(flow){const execution=flow.blocks.filter(block=>block.kind==='INSTRUMENT'),start=execution.findIndex(block=>block.instrumentKey===instance.bindings[0].instrumentKey)
+   if(start<0||instance.bindings.some((b,i)=>execution[start+i]?.instrumentKey!==b.instrumentKey))governedFail(409,'实际研究流程必须按已批准顺序连续执行整包工具，禁止重排或插入其他工具')}
   if(flow){const last=Math.max(...instance.bindings.map(b=>flow.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&block.instrumentKey===b.instrumentKey)));if(flow.blocks.slice(0,last+1).some(block=>block.kind==='END'||block.when))governedFail(409,'整包组件完成前不能结束或使用条件分支')}
   if(flow?.experiment)governedFail(409,'整包版本不能拆入实验分支；请将完整组合独立投放')
   frozen.push({schemaVersion:1,importId:id,toolId:tool.id,hash:tool.snapshot_hash,title:tool.title,family:tool.family as 'COMBINATION'|'BUNDLE',parentGrantId:grant.id,report:clone(tool.snapshot.packageReport),slots:instance.bindings.map(b=>({slotKey:b.slotKey,draftId:b.draftId,instrumentKey:b.instrumentKey,kind:members.find(u=>u.draftId===b.draftId)!.kind}))})
