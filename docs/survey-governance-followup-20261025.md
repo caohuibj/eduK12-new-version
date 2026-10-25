@@ -790,3 +790,30 @@ browser/media/三引擎/维护/性能等选中项未执行，仍须正式成功�
 本次不修改工作流或权限、不启动新CI，最终候选仍需父 dot 再次复查。
 精确job、失败项及验证映射见`ci-b376-repair-candidate.json`；原始日志与报告仅存
 任务私有证据目录，公开记录不含会话、连接字符串或真实数据。
+
+### School 刷新反馈最小修复（用户已批准，等待最终差异复查）
+
+用户随后明确批准此项，解除上一检查点在`abe7d6b6`记录的等待。基准为
+`abe7d6b6029babe30449ec09c069a390ada80a30` / tree
+`a533ce0625e16137defbd66a9fbcdd39485fdb4a`；不引入其他产品功能。
+
+`SchoolStudentTasks.load`只增加一行：现有API scope及pending守卫通过后，先递增
+已有`feedbackEpoch`并清空组件反馈，再发出原待办列表请求。显示中的旧结果立即
+移除；更早反馈请求的成功或失败回调均因既有epoch校验失效。报告API、权限、
+开放时机、READY/WITHHELD投影门、答卷及报告持久数据均不变。
+
+原“School clears authorized feedback even when refreshing tasks fails”用例与
+基准逐字相同（SHA256 `0fe9e0cfc9192fa9252f0eca76e7b8a9499b4eb0a1022680eba3c56f1391086f`）。
+新增4例交叉验证旧反馈成功/失败响应在列表刷新期间晚到、列表随后成功/失败；
+不得重新显示旧结果或旧错误，之后显式读取仍走原精确报告接口并可显示新反馈。
+
+仅补新测试、未改产品时实际3通过/5失败；应用最小修复后4个直接消费者文件
+32项全部通过、0失败、0跳过，包括分页/刷新状态、FORM仅回执、已有绑定继续和
+原School/Teacher报告读取边界。`npm run typecheck`（原清单/session预检、app及
+cognitive两份tsc）、两文件eslint与diff检查均退出0。
+
+详细命令、原始报告摘要和hash见`school-feedback-refresh.json`；原红/绿JSON与
+日志均保留，不覆盖历史失败。先前25个测试文件与工作流合同/工作流源码未修改；
+本次按直接影响范围验证32项，未重复跑全量矩阵。此补丁尚未启动CI，需父dot
+对最终HEAD/tree独立复查后决定；
+之前正式run的失败、未执行门禁仍不能算通过，不合并、不部署。
