@@ -85,3 +85,14 @@ describe('campus overview shortcuts',()=>{
   expect(navigate).toHaveBeenCalledWith('overview')
  })
 })
+
+it('keeps compact teacher navigation authorized and retains the page heading',()=>{
+ const items=schoolNavigation('TEACHER','',teacher,true)
+ const {rerender}=render(<SchoolWorkspaceShell compactNavigation items={items} page="activities" onNavigate={vi.fn()}><p>教师活动内容</p></SchoolWorkspaceShell>)
+ expect(screen.queryByRole('navigation',{name:'工作台功能导航'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'功能导航'})).not.toBeInTheDocument()
+ expect(screen.getByRole('heading',{level:1,name:'活动管理'})).toBeInTheDocument()
+ rerender(<SchoolWorkspaceShell compactNavigation items={items} page="staff" onNavigate={vi.fn()}><p>不应挂载的人员数据</p></SchoolWorkspaceShell>)
+ expect(screen.queryByText('不应挂载的人员数据')).not.toBeInTheDocument()
+ expect(screen.getByText('当前无法进入此功能')).toBeInTheDocument()
+})

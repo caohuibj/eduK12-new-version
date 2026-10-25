@@ -261,20 +261,20 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
 
-  return <section className="hs-panel">
+  return <section className="hs-panel hs-activity-manager">
     <h2>校园心理健康活动</h2>
     <p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <div className="hs-grid">
-      <div><label className="hs-field"><span>新建活动名称</span>
+    <div className="hs-grid hs-activity-entry-grid">
+      <div className="hs-activity-create"><h3>准备新活动</h3><label className="hs-field"><span>新建活动名称</span>
         <input value={title} onChange={event=>setTitle(event.target.value)} maxLength={200}/></label>
         <label className="hs-field"><span>活动主题</span>
           <select value={purpose} onChange={event=>setPurpose(event.target.value as typeof purpose)}>
             {purposeOptions.map(([value,text])=><option key={value} value={value}>{text}</option>)}
           </select></label>
         <button disabled={busy||!title.trim()} onClick={create}>创建活动草稿</button></div>
-      <div><label className="hs-field"><span>选择已有活动</span>
+      <div className="hs-activity-select"><h3>继续已有活动</h3><label className="hs-field"><span>选择已有活动</span>
         <select value={selected?.courseId??''} onChange={event=>void execute(async()=>{
           const id=event.target.value
           if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}

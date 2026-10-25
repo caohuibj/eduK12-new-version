@@ -32,3 +32,23 @@ describe('Huischool teacher observation inbox',()=>{
     expect(await screen.findByText(/目前没有可作答的教师观察任务/)).toBeInTheDocument()
   })
 })
+
+it('filters and sorts only returned tasks, retaining execution identity after changing view',async()=>{
+  const entry={runId:'run-1',activityId:'activity-1',organizationId:'school-a',activityTitle:'班级支持',studentReference:'林-123456789ABC',status:'ASSIGNED',deadline:null,consentRequired:false,consentPurpose:null,consentVisibility:null}
+  const api=vi.fn(async()=>({list:[{...entry,executionId:'exec-z',runTitle:'Z 观察'},{...entry,executionId:'exec-a',runTitle:'A 观察'}],truncated:true}))
+  render(<SchoolTeacherTasks api={api as unknown as SchoolApi} organizationId="school-a"/>)
+  await screen.findByRole('heading',{name:'Z 观察'})
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  fireEvent.change(screen.getByRole('combobox',{name:'排序'}),{target:{value:'title'}})
+  expect(screen.getAllByRole('article').map(node=>node.getAttribute('data-execution-id'))).toEqual(['exec-a','exec-z'])
+  fireEvent.click(screen.getByRole('button',{name:'卡片视图'}))
+  expect(screen.getByRole('button',{name:'卡片视图'})).toHaveAttribute('aria-pressed','true')
+  fireEvent.click(screen.getByRole('button',{name:'检索观察任务'}))
+  fireEvent.change(screen.getByRole('searchbox',{name:'检索观察任务'}),{target:{value:'Z 观察'}})
+  fireEvent.submit(screen.getByRole('search'))
+  expect(screen.getAllByRole('article')).toHaveLength(1)
+  expect(screen.getByText(/检索和排序仅作用于当前已加载任务/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'开始／继续教师观察测评'}))
+  expect(screen.getByRole('region',{name:'official campus runner'})).toHaveTextContent('exec-z')
+  expect(api).toHaveBeenCalledTimes(1)
+})

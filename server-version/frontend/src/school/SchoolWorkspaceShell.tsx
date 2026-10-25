@@ -3,14 +3,14 @@ import { ArrowLeft, ArrowRight, Clock3, Menu, X } from 'lucide-react'
 import './school-overview-refresh.css'
 import { workspaceHref, type SchoolNavigationItem } from './school-navigation'
 
-export function SchoolWorkspaceShell({items,page,onNavigate,context,children,learner=false}:{learner?:boolean;items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void;context?:ReactNode;children:ReactNode}){
+export function SchoolWorkspaceShell({items,page,onNavigate,context,children,learner=false,compactNavigation=false}:{compactNavigation?:boolean;learner?:boolean;items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void;context?:ReactNode;children:ReactNode}){
  const [open,setOpen]=useState(false)
  const toggle=useRef<HTMLButtonElement>(null)
  const content=useRef<HTMLDivElement>(null)
  const previous=useRef(page)
  const active=items.find(i=>i.id===page)
  const groups=[...new Set(items.map(i=>i.group))]
- const hasWorkspaceNavigation=!learner&&items.some(item=>item.id!=='overview'&&item.id!=='account')
+ const hasWorkspaceNavigation=!learner&&!compactNavigation&&items.some(item=>item.id!=='overview'&&item.id!=='account')
  useEffect(()=>{
   if(previous.current!==page){setOpen(false);content.current?.focus();previous.current=page}
   document.title=`${active?.label??'校园功能'} · Huischool`
@@ -36,16 +36,16 @@ export function SchoolWorkspaceShell({items,page,onNavigate,context,children,lea
  </div>
 }
 
-export function SchoolWorkspaceOverview({username,items,onNavigate,pending}:{username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void;pending?:ReactNode}){
+export function SchoolWorkspaceOverview({username,items,onNavigate,pending,compact=false}:{compact?:boolean;username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void;pending?:ReactNode}){
  // Use actual authorized entries; a group label must never disguise a different destination.
  const priority=['tasks','activities','feedback','family','classes','group-reports','private-tools']
  const primary=priority.flatMap(id=>items.filter(item=>item.id===id)).slice(0,4)
  const shortcuts=primary
  return <div className="hs-overview">
-  <div className="hs-workspace-welcome"><div><p className="hs-eyebrow">School · 校园空间</p><h1>欢迎回来，<span>{username}</span></h1><p>从今天的校园活动开始，<br className="hs-overview-copy-break"/>让每一次参与与陪伴都有温度。</p></div></div>
+  {compact?<header className="hs-educator-home-heading"><h1>校园工作台</h1><p>你好，{username}。选择校园任务与活动，开始今天的工作。</p></header>:<div className="hs-workspace-welcome"><div><p className="hs-eyebrow">School · 校园空间</p><h1>欢迎回来，<span>{username}</span></h1><p>从今天的校园活动开始，<br className="hs-overview-copy-break"/>让每一次参与与陪伴都有温度。</p></div></div>}
   {pending&&<div className="hs-overview-status"><span className="hs-overview-status-icon" aria-hidden="true"><Clock3 size={24}/></span>{pending}</div>}
   {shortcuts.length>0&&<section className="hs-overview-section" aria-label="可用功能"><h2>从这里开始</h2><div className="hs-workspace-shortcuts">{shortcuts.map(item=>{
-   return <a href={workspaceHref(item.id)} key={item.id} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onNavigate(item.id)}}><item.icon size={24} aria-hidden="true"/><h3>{item.label}</h3><p>{item.description}</p><span>{`进入${item.label}`} <ArrowRight size={16}/></span></a>
+   return <a href={workspaceHref(item.id)} key={item.id} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onNavigate(item.id)}}><item.icon size={24} aria-hidden="true"/><h3>{item.label}</h3><p>{item.description}</p><span>{compact?'打开':`进入${item.label}`} <ArrowRight size={16}/></span></a>
   })}</div></section>}
  </div>
 }
