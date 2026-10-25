@@ -38,11 +38,18 @@ async function createPublication(teacher, experimentKey, title) {
     questionnaireType: 'COURSE', courseIds: [f.courseId], publicEnabled: true, expiresAt: new Date(Date.now() + 3600000).toISOString() }))
   product = ok(await api(teacher, '/questionnaire-products/' + product.id + '/items', 'POST', { revision: product.revision,
     item: { type: 'FORM', formType: 'text_input', formLabel: 'C20 reflection', required: true } }))
+  stage = 'C20 authoring: open delivery step'
   await teacher.goto(base + '/questionnaire-products/' + product.id)
+  const steps = teacher.getByRole('navigation', { name: '编制步骤', exact: true })
+  await steps.getByRole('link', { name: /投放设置/ }).click()
+  await teacher.locator('summary').filter({ hasText: '分组与条件路径' }).click()
+  stage = 'C20 authoring: enable material flow'
   const region = teacher.getByRole('region', { name: '跨工具条件流程' })
   await region.getByLabel('启用跨工具条件流程', { exact: true }).check()
   await region.getByRole('button', { name: '启用两组材料实验', exact: true }).click()
   await region.getByRole('button', { name: '添加配额示例', exact: true }).click()
+  stage = 'C20 authoring: edit advanced flow JSON'
+  await region.locator('summary').filter({ hasText: '编辑流程规则（高级 JSON）' }).click()
   const editor = region.getByLabel('流程 JSON（高级编辑）', { exact: true })
   const config = JSON.parse(await editor.inputValue())
   assert.equal(config.schemaVersion, 2)
@@ -53,11 +60,15 @@ async function createPublication(teacher, experimentKey, title) {
   config.quotaPolicy = { schemaVersion: 1, groupLimits: { a: 1, b: 1 } }
   await editor.fill(JSON.stringify(config, null, 2))
   await region.getByLabel('最多作答次数（材料实验）', { exact: true }).fill('2')
+  stage = 'C20 authoring: save material flow'
   const saved = teacher.waitForResponse(r => new URL(r.url()).pathname === `/api/questionnaire-products/${product.id}/training-flow` && r.request().method() === 'POST')
   await region.getByRole('button', { name: '保存流程设置', exact: true }).click()
   assert.equal((await saved).status(), 200)
+  stage = 'C20 authoring: preflight'
+  await steps.getByRole('link', { name: /检查与发布/ }).click()
   await teacher.getByRole('button', { name: '发布前自检', exact: true }).click()
   await teacher.getByText('当前草稿自检通过', { exact: true }).waitFor()
+  stage = 'C20 authoring: confirm publication'
   const published = teacher.waitForResponse(r => new URL(r.url()).pathname === `/api/questionnaire-products/${product.id}/publish` && r.request().method() === 'POST')
   await teacher.getByRole('button', { name: '发布组合测评', exact: true }).click()
   await teacher.getByRole('dialog', { name: '确认发布组合测评', exact: true })
@@ -68,6 +79,11 @@ async function createPublication(teacher, experimentKey, title) {
   assert.deepEqual(product.trainingFlowFrozen.experiment, config.experiment)
   assert.deepEqual(product.trainingFlowFrozen.quotaPolicy, config.quotaPolicy)
   assert.match(product.trainingFlowDigest, /^[a-f0-9]{64}$/)
+  stage = 'C20 authoring: verify frozen flow UI'
+  await steps.getByRole('link', { name: /投放设置/ }).click()
+  // The advanced disclosure remains open across save/publication hydration.
+  // Require the actual visible editor, not only a hidden DOM readOnly flag.
+  await editor.waitFor({ state: 'visible' })
   await teacher.waitForFunction(() => document.getElementById('questionnaire-training-flow-json')?.readOnly === true)
   return product
 }
