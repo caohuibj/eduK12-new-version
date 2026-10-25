@@ -140,3 +140,19 @@ it.each(['FORM_SECTION','SCALE','COGNITIVE'])('scopes observer %s answer present
  expect(Boolean(m.presentation.mock.lastCall?.[0].instructionsAppendix)).toBe(ordinary)
  expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
 })
+
+
+it('shows a single plain-language observer completion with one return action',async()=>{
+ const finished=vi.fn()
+ const api=vi.fn(async(path:string)=>path.endsWith('/start')?{state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:{id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'COMPLETED'})
+ render(<SchoolCompositeRunner observer api={api as unknown as SchoolApi} execution={execution} onExit={vi.fn()} onFinished={finished}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await screen.findByRole('heading',{level:1,name:'本次测评已完成'})
+ expect(screen.queryByRole('button',{name:'返回活动'})).not.toBeInTheDocument()
+ expect(screen.queryByText(/返回不会提交当前作答/)).not.toBeInTheDocument()
+ expect(screen.getByText('作答已提交。报告会按学校的授权与隐私规则开放。')).toBeInTheDocument()
+ expect(screen.getAllByRole('button')).toHaveLength(1)
+ fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}))
+ expect(finished).toHaveBeenCalledOnce()
+ expect(api).toHaveBeenCalledTimes(2)
+})

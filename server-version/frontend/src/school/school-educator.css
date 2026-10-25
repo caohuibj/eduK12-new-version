@@ -287,3 +287,21 @@
  .hs-app.hs-workspace.hs-educator .hs-observer-runner--answer [data-assessment-shell-header]{gap:10px}
  .hs-app.hs-workspace.hs-educator .hs-observer-runner--answer .assessment-instructions>div{left:0;right:auto;width:100%}
 }
+
+/* The completion view has one message and one return action. */
+.hs-app.hs-workspace.hs-educator .hs-workspace-content:has(.hs-observer-runner--done)>.hs-workspace-page-heading{display:none}
+.hs-app.hs-workspace.hs-educator[data-theme] .hs-teacher-tasks--compact:has(>.hs-observer-runner--done){padding:0;border:0;background:transparent;--hs-primary:inherit}
+.hs-app.hs-workspace.hs-educator[data-theme] .hs-teacher-tasks--compact>.hs-observer-runner--done{padding:0;margin:0;border:0;background:transparent;box-shadow:none;color-scheme:inherit;color:var(--hs-ink);--hs-primary:inherit;--hs-ink:inherit;--hs-border:inherit}
+.hs-app.hs-workspace.hs-educator[data-theme] .hs-observer-runner--done>.hs-message{display:flex;flex-direction:column;align-items:center;gap:16px;max-width:680px;margin:24px auto 0;padding:42px 32px;border:1px solid var(--hs-border);border-radius:18px;background:var(--hs-surface);color:var(--hs-ink);text-align:center}
+.hs-observer-complete-icon{box-sizing:content-box;padding:14px;border-radius:50%;background:var(--hs-surface-soft);color:var(--hs-primary)}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--done>.hs-message>h1{font-family:inherit;font-size:26px;font-weight:600;line-height:1.5;margin:0}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--done>.hs-message>p{font-size:14px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--done>.hs-message>button{min-height:46px;min-width:180px;margin-top:8px;padding:10px 22px;border:1px solid var(--hs-primary);border-radius:9px;background:var(--hs-primary);color:var(--hs-on-primary,#fff);font-size:15px;font-weight:500}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--answer [data-assessment-shell-navigation] section{box-shadow:none}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--answer [data-assessment-shell-navigation] section>p{font-size:13px;line-height:1.6;color:var(--hs-muted)}
+.hs-app.hs-workspace.hs-educator .hs-observer-runner--answer .form-player>div:last-child>button:last-child:not(:first-child){border-radius:9px}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-educator[data-theme] .hs-observer-runner--done>.hs-message{margin-top:8px;padding:30px 20px;gap:14px;border-radius:14px}
+ .hs-app.hs-workspace.hs-educator .hs-observer-runner--done>.hs-message>h1{font-size:23px}
+ .hs-app.hs-workspace.hs-educator .hs-observer-runner--done>.hs-message>button{width:100%}
+}

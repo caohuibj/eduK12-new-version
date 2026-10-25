@@ -505,7 +505,7 @@ it('advances a campus form only after durable save and never submits the page au
  await screen.findByText('第二题')
  expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(row=>row.itemKey==='auto-0'&&row.value==='a')).toBe(true)
  await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
- await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled())
+ await waitFor(()=>expect(screen.getByRole('button',{name:'提交本页'})).toBeEnabled())
  expect(submit).not.toHaveBeenCalled()
 })
 
@@ -529,5 +529,19 @@ it('advances to a newly revealed campus form question after the source choice is
  render(<FinalCompositeAssessment campusMode state={makeState({...formItem,formAnswers:[source,detail]})} submitFormSection={submit} submitScale={vi.fn()} {...sharedProps}/>)
  await userEvent.click(await screen.findByRole('radio',{name:'显示'}))
  await screen.findByRole('textbox',{name:'后续问题'})
+ expect(submit).not.toHaveBeenCalled()
+})
+
+
+it('uses plain School page wording for submission, progress and required answers',async()=>{
+ const submit=vi.fn()
+ const fields=[{...formItem.formAnswers![0],required:true},{...formItem.formAnswers![0],formItemId:'optional',label:'补充意见',required:false}]
+ const view=render(<FinalCompositeAssessment campusMode state={makeState({...formItem,formAnswers:fields})} submitFormSection={submit} submitScale={vi.fn()} {...sharedProps}/>)
+ await userEvent.click(await screen.findByRole('button',{name:'下一题'}))
+ await userEvent.click(screen.getByRole('button',{name:'提交本页'}))
+ expect(await screen.findByRole('alert')).toHaveTextContent('还有 1 道必答题未完成')
+ expect(screen.getByRole('progressbar',{name:'完成进度'})).toBeInTheDocument()
+ expect(screen.getByRole('region',{name:'测评内容'})).toBeInTheDocument()
+ expect(view.container.textContent).not.toMatch(/区段|字段/)
  expect(submit).not.toHaveBeenCalled()
 })

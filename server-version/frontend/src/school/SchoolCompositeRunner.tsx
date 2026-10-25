@@ -1,5 +1,5 @@
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
-import {ArrowLeft} from 'lucide-react'
+import {ArrowLeft,CircleCheck} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
@@ -131,12 +131,13 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
   const compactNotes=ordinaryAnswer||Boolean(title&&child)
   const observerReady=observer&&!state&&!done
   const observerAnswer=observer&&ordinaryAnswer
-  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(title&&child?' hs-school-task-runner--child':'')+(ordinaryAnswer?' hs-school-task-runner--answer':'')+(observerAnswer?' hs-observer-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答"
+  const observerComplete=observer&&done
+  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(observerComplete?' hs-observer-runner--done':'')+(title&&child?' hs-school-task-runner--child':'')+(ordinaryAnswer?' hs-school-task-runner--answer':'')+(observerAnswer?' hs-observer-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答"
     onMouseOut={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
     onPointerDownCapture={observerAnswer?event=>{const details=panelRef.current?.querySelector<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.target as Node))details.open=false}:undefined}
     onBlurCapture={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
     onKeyDown={observerAnswer?event=>{const details=panelRef.current?.querySelector<HTMLDetailsElement>('details.assessment-instructions');if(event.key==='Escape'&&details?.open){details.open=false;details.querySelector<HTMLElement>('summary')?.focus()}}:undefined}>
-    {observerReady||observerAnswer?<>
+    {observerComplete?null:observerReady||observerAnswer?<>
       <div className={'hs-observer-ready-toolbar'+(observerAnswer?' hs-observer-answer-toolbar':'')}><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回任务</button>
         {!observerAnswer&&<SchoolTaskHelp label="作答与隐私说明" buttonText="作答说明"><p><strong>离开与提交</strong><br/>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p><strong>结果可见性</strong><br/>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></SchoolTaskHelp>}
       </div>
@@ -149,9 +150,9 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
     </>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {done?<div role="status" className="hs-message">
-      <h3>本次测评已完成</h3>
-      <p>已收到正式完成确认。报告是否可查看由独立披露政策决定。</p>
-      <button onClick={onFinished}>返回我的校园活动</button>
+      {observer?<><CircleCheck className="hs-observer-complete-icon" size={36} aria-hidden="true"/><h1>本次测评已完成</h1></>:<h3>本次测评已完成</h3>}
+      <p>{observer?'作答已提交。报告会按学校的授权与隐私规则开放。':'已收到正式完成确认。报告是否可查看由独立披露政策决定。'}</p>
+      <button onClick={onFinished}>{observer?'返回任务列表':'返回我的校园活动'}</button>
     </div>:
     child?.type==='COGNITIVE'&&child.cognitiveSession?.sessionId&&state&&cognitiveClient?
       <MemoryRouter key={child.cognitiveSession.sessionId}

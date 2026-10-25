@@ -350,7 +350,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     if (missing.length > 0) {
       setSectionIndex(Math.max(0, visibleAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
       focusAnonymousRequired(missing[0].formItemId)
-      setError(`还有 ${missing.length} 个必填字段未完成`)
+      setError(`还有 ${missing.length} ${campusMode?'道必答题':'个必填字段'}未完成`)
       return
     }
     let accepted = false
@@ -364,7 +364,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         const cleanMap = sanitizeTrainingFormValues(formAnswers,Object.fromEntries(answerMap))
         const visibleStored = trainingVisibleFields(formAnswers,cleanMap)
         const missingStored = visibleStored.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
-        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
+        if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} ${campusMode?'道必答题':'个必填字段'}尚未保存，请确认后再提交`)
         return {
           submissionId: snapshot.meta.submissionId,
           attemptEpoch: snapshot.meta.attemptEpoch,
@@ -530,13 +530,13 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       instructions={(
         <div className="space-y-2">
           {state.instruction ? <p>{state.instruction}</p> : null}
-          {!(isTrainingHost() && !campusMode) ? <p>当前单元：{currentUnit ? compositeItemLabel(currentUnit) : item ? compositeItemLabel(item) : '—'}</p> : null}
+          {!(isTrainingHost() && !campusMode) ? <p>{campusMode?'当前部分：':'当前单元：'}{currentUnit ? compositeItemLabel(currentUnit) : item ? compositeItemLabel(item) : '—'}</p> : null}
           {expiredCognitive ? <p>请先处理本机认知试次过期状态，已接受的单元记录不受影响。</p>
             : <p>{contextText} {publicMode?'仅可恢复此浏览器中仍有效的本机草稿；换设备需要已启用并成功保存的临时进度。参与链接本身不包含未提交答案。':'浏览器重开后可以继续恢复。'}</p>}
           {instructionsAppendix}
         </div>
       )}
-      progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}
+      progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: campusMode?'完成进度':'综合测评单元进度' }}
       submissionStatus={submissionStatus}
       recoveryState={recoveryState}
       actions={(
@@ -545,8 +545,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         </button>
       )}
       navigation={(
-        <section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="mb-2 text-sm font-medium text-slate-600">提交单元</p>
+        <section aria-label={campusMode?'测评内容':'提交单元'} className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="mb-2 text-sm font-medium text-slate-600">{campusMode?'测评内容':'提交单元'}</p>
           <div className="flex flex-wrap gap-2">
             {units.map((unit) => (
               <span
@@ -629,15 +629,15 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       {item?.type === 'FORM_SECTION' ? (
         <div>
           <div className="mb-5 rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-            <p className="text-sm text-slate-500"><FileText className="mr-1 inline h-4 w-4" />表单区段</p>
+            <p className="text-sm text-slate-500"><FileText className="mr-1 inline h-4 w-4" />{campusMode?'本页内容':'表单区段'}</p>
             <h2 className="mt-1 text-xl font-semibold text-slate-900">{item.title || '表单'}</h2>
             {item.description ? <p className="mt-3 whitespace-pre-wrap text-sm text-slate-600">{item.description}</p> : null}
           </div>
           {(() => {
             const field = formFields[sectionIndex]
             if (!field) return item.contextSection || item.formSection?.contextSection
-              ? <p role="alert" className="text-amber-800">历史背景信息区段缺少字段。请联系教师发布修复版本后重新开始，已提交记录会保留。</p>
-              : <div className="space-y-3"><p className="text-gray-600">此历史区段没有字段。确认后会提交空区段记录并继续。</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart || exiting} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
+              ? <p role="alert" className="text-amber-800">{campusMode?'这份背景信息页缺少题目，请联系老师处理后重新开始。已提交的内容会保留。':'历史背景信息区段缺少字段。请联系教师发布修复版本后重新开始，已提交记录会保留。'}</p>
+              : <div className="space-y-3"><p className="text-gray-600">{campusMode?'这一页没有题目，确认后将记录本页已完成，并继续后续内容。':'此历史区段没有字段。确认后会提交空区段记录并继续。'}</p><button type="button" className="btn-primary" disabled={submitting || requiresRestart || exiting} onClick={() => void submitSection()}>{submitting ? '正在提交…' : '确认并继续'}</button></div>
             const value = formValues[field.formItemId]
             const options = parseOptions(field.options)
             const imageItems = assessmentOptionImageItems(options)
@@ -649,6 +649,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                   loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}
                 >
                   <FormPlayer
+                    submitLabel={campusMode?'提交本页':undefined}
                     autoAdvance={campusMode}
                     scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={{

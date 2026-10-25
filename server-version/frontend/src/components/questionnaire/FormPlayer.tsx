@@ -43,6 +43,7 @@ export interface FormPlayerProps {
   onPrevious: () => void
   onNext?: () => void
   onSubmit?: () => void | Promise<void>
+  submitLabel?: string
   submitting?: boolean
   allowSkip?: boolean
 }
@@ -99,7 +100,7 @@ export function FormPlayer({
   onChange,
   onPrevious,
   onNext,
-  onSubmit,
+  onSubmit, submitLabel='提交整个区段',
   submitting = false,
   allowSkip = false,
   autoAdvance = false, scopeKey = '',
@@ -304,7 +305,7 @@ export function FormPlayer({
             disabled={submitControlsDisabled}
             className="min-h-11 rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? '提交区段中…' : '提交整个区段'}
+            {submitting ? '正在提交…' : submitLabel}
           </button>
         ) : null}
       </div>
