@@ -8,6 +8,19 @@ const row=(i:number)=>({ref:{kind:'SCALE' as const,sourceId:'survey-standard:exa
 const page=(i:number)=>({page:i,hasMore:i===1,terminalReason:i===1?null:'END_OF_CATALOG',list:[row(i===1?1:26)],tagFacets:{...EMPTY_CATALOG_FACETS,population:[{id:'student_self_report',label:'学生'}],language:[{id:'language:zh-CN',label:'简体中文'}]}})
 
 describe('classification discovery and explicitly selected version grants',()=>{
+ it('limits explicit selection to ten versions and provides no implicit select-all grant',async()=>{
+  const api=vi.fn(async()=>({...page(1),hasMore:false,list:Array.from({length:11},(_,index)=>row(index+1))}))
+  render(<SurveyCatalogGrants api={api as CatalogApi} password="synthetic" researchers={[]}/>)
+  fireEvent.click(screen.getByRole('button',{name:'查询可授权版本'}));await screen.findByRole('heading',{name:'工具11'})
+  expect(screen.queryByRole('checkbox',{name:/全选/})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:/授权全部|全选全部结果/})).not.toBeInTheDocument()
+  for(let i=1;i<=10;i++)fireEvent.click(screen.getByRole('checkbox',{name:'选择精确版本：工具'+i+' · hash-'+i}))
+  expect(screen.getByRole('checkbox',{name:'选择精确版本：工具11 · hash-11'})).toBeDisabled()
+  expect(screen.getByRole('heading',{name:'已选 10 个精确版本（最多10个）'})).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('checkbox',{name:'选择精确版本：工具1 · hash-1'}))
+  expect(screen.getByRole('checkbox',{name:'选择精确版本：工具11 · hash-11'})).toBeEnabled()
+  expect(api).toHaveBeenCalledTimes(1)
+ })
  it('keeps exact choices across pages, changes no grants on filter/selection, and grants only the chosen version',async()=>{
   const api=vi.fn(async(path:string,method?:string)=>method==='POST'?{}:path.startsWith('/source-catalog')?page(path.includes('page=2')?2:1):{list:[]})
   render(<SurveyCatalogGrants api={api as CatalogApi} password="synthetic" researchers={[person]}/>)
