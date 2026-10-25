@@ -1,12 +1,12 @@
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {standardAxisHashes,standardCombinationHash} from '../measurement-content/standard-combination'
+import {standardAxisHashes,standardCombinationHash,compileStandardCombinationReport} from '../measurement-content/standard-combination'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
 import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {getScaleCustomScorerKeys} from '../scale/scale-scoring'
 import {validateReferenceSetDefinition,type AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
-import {reportTemplateSchema,type ReportTemplate} from '../measurement-content/report-template'
+import type {ReportTemplate} from '../measurement-content/report-template'
 import {toolReference,type ToolReference} from './tool-reference'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 export type Axis='CONTENT'|'PARAMETERS'|'REPORT'
@@ -57,16 +57,8 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
   const report=definition.report.interpretations.find(r=>r.scoreKey===choice.scoreKey)
   if(entry?.statistics.thresholds?.some(t=>!report?.bands.some(b=>b.key===t.key)))blockers.push('报告区间与参数阈值编码不匹配：'+choice.scoreKey)
  }
- const blocks:ReportTemplate['blocks']=[]
- if(parts.REPORT.payload!==null)for(const key of definition.report.scoreOrder){
-  const score=definition.scoring.scores.find(s=>s.key===key),text=definition.report.interpretations.find(r=>r.scoreKey===key)
-  if(!score||!text){blockers.push('报告缺少指标或解释：'+key);continue}
-  blocks.push({type:'METRIC',metricKey:key,label:score.label,display:'RAW'},{type:'TEXT',text:text.headline+'\n'+text.summary})
-  for(const guidance of text.guidance)blocks.push({type:'TEXT',text:guidance.text})
-  const selected=parameters.referencePolicy.type==='declared'?parameters.referencePolicy.selections.filter(s=>s.scoreKey===key):[]
-  for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
- }
- const template=parts.REPORT.payload===null?null:reportTemplateSchema.parse({title:source.catalog.identity.canonicalName,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer})
+ const {template,blockers:reportBlockers}=compileStandardCombinationReport(source.catalog.identity.canonicalName,definition,parts.REPORT.payload!==null)
+ blockers.push(...reportBlockers)
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
  return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
 }

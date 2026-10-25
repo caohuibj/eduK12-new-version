@@ -3,6 +3,9 @@ import {prepareRelease} from './release'
 import type {StoredRelease} from './repository'
 import {scaleMeasurementRelease} from './scale'
 import type {ScaleDefinitionV2} from '../scale/scale-definition'
+import {reportTemplateSchema,type ReportTemplate} from './report-template'
+import {z} from 'zod'
+export const standardCombinationPointerSchema=z.object({releaseId:z.string().guid(),combinationHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict()
 
 export const STANDARD_AXES=['CONTENT','PARAMETERS','REPORT'] as const
 export type StandardAxis=typeof STANDARD_AXES[number]
@@ -14,6 +17,21 @@ export type StandardCombinationSnapshot={
 export type StandardCombinationRecord={
   id:string;tool_key:string;combination_hash:string;state:string;approved_by:string;snapshot:StandardCombinationSnapshot
   measurement_release:{releaseId:string;contentHash:string}|null
+}
+
+/** One mechanical R adapter for both entries. Titles/text come from the stored
+ * approved source; this does not consult a newer registry or rewrite prose. */
+export function compileStandardCombinationReport(title:string,definition:ScaleDefinitionV2,configured:boolean){
+ const blocks:ReportTemplate['blocks']=[],blockers:string[]=[]
+ if(configured)for(const key of definition.report.scoreOrder){
+  const score=definition.scoring.scores.find(s=>s.key===key),text=definition.report.interpretations.find(r=>r.scoreKey===key)
+  if(!score||!text){blockers.push('报告缺少指标或解释：'+key);continue}
+  blocks.push({type:'METRIC',metricKey:key,label:score.label,display:'RAW'},{type:'TEXT',text:text.headline+'\n'+text.summary})
+  for(const guidance of text.guidance)blocks.push({type:'TEXT',text:guidance.text})
+  const selected=definition.referencePolicy.type==='declared'?definition.referencePolicy.selections.filter(s=>s.scoreKey===key):[]
+  for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
+ }
+ return {template:configured?reportTemplateSchema.parse({title,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer}):null,blockers}
 }
 
 /** Preserve the existing approved-combination hash scheme byte for byte.
