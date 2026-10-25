@@ -1,9 +1,13 @@
 /* Workspace structure only. Product appearance remains owned by the theme. */
-.ht-app .ht-workspace-header{padding:16px 20px}
-.ht-workspace-heading{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
-.ht-workspace-heading h1{font-size:clamp(1.35rem,3vw,1.7rem);margin:0 0 4px}
+.ht-app .ht-workspace .ht-workspace-header{padding:12px 16px}
+.ht-workspace-heading{display:grid;gap:4px}
+.ht-workspace-heading h1{font-size:clamp(1.15rem,2vw,1.35rem);line-height:1.4;margin:0}
 .ht-workspace-heading p{margin:0;color:var(--ht-quiet);font-size:.9rem}
-.ht-workspace-heading>.ht-field{margin:0;flex:0 1 320px;max-width:100%}
+.ht-workspace-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;min-width:0}
+.ht-workspace-meta>p{min-width:0;font-size:.85rem}
+.ht-workspace-meta>.ht-field{display:flex;flex-direction:row;align-items:center;gap:8px;margin:0 0 0 auto;flex:1 1 260px;min-width:0;max-width:430px}
+.ht-workspace-meta>.ht-field>span{flex:none;font-size:12px;white-space:nowrap}
+.ht-workspace-meta>.ht-field>select{flex:1;min-width:0}
 .ht-workspace-account{margin-top:12px;border-top:1px solid var(--ht-line)}
 .ht-workspace-account>summary{min-height:44px;padding:12px 0;cursor:pointer;color:var(--ht-quiet);font-size:.9rem}
 .ht-workspace-account>.ht-panel{padding:12px 16px;box-shadow:none}
@@ -14,8 +18,7 @@
 .ht-workspace-section{min-width:0;scroll-margin-top:24px}
 .ht-workspace>.ht-notice{margin:0;max-width:none;font-size:.9rem;padding:10px 14px}
 @media(max-width:640px){
- .ht-app .ht-workspace-header{padding:14px}
- .ht-workspace-heading>.ht-field{flex-basis:100%}
+ .ht-app .ht-workspace .ht-workspace-header{padding:10px 12px}
  .ht-workspace-jumps{gap:4px}
  .ht-workspace-jumps a{padding:8px 10px}
 }

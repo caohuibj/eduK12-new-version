@@ -424,12 +424,15 @@ export default function HuiteacherApp(){
     </section>:
     me&&screen==='workspace'?<div className="ht-workspace">
       <section className="ht-panel ht-workspace-header">
-        <div className="ht-workspace-heading"><div><h1>我的教育发展空间</h1><p>欢迎，{me.username}</p></div>
-          {me.organizations.length>0&&<label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
-            {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
-          </select></label>}
+        <div className="ht-workspace-heading">
+          <h1>我的教育发展空间</h1>
+          <div className="ht-workspace-meta">
+            <p>欢迎，{me.username}</p>
+            {me.organizations.length>0&&<label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
+              {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
+            </select></label>}
+          </div>
         </div>
-
       </section>
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
