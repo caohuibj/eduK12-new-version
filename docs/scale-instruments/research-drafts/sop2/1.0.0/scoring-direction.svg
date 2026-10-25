@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="340" viewBox="0 0 920 340" role="img" aria-labelledby="title desc">
+<title id="title">SOP2 两项计分方向示意</title><desc id="desc">示例：乐观原答6保持6；悲观原答3经8减3变成5；两值均值为5.5。仅展示公式，不表示人群排名或心理健康等级。</desc>
+<rect width="920" height="340" fill="#f5f7fa"/>
+<g font-family="sans-serif" fill="#20344a"><text x="32" y="42" font-size="24">SOP2：先统一方向，再计算均值</text>
+<rect x="32" y="72" width="400" height="90" rx="12" fill="#e1ebf4"/><text x="52" y="105" font-size="19">乐观题原答：6</text><text x="52" y="139" font-size="19">保持原值 → 6</text>
+<rect x="480" y="72" width="408" height="90" rx="12" fill="#e8e5f4"/><text x="500" y="105" font-size="19">悲观题原答：3（越高越悲观）</text><text x="500" y="139" font-size="19">反向计分：8 − 3 → 5</text>
+<text x="32" y="214" font-size="23">合成分 = (6 + 5) ÷ 2 = 5.5</text>
+<text x="32" y="255" font-size="17">理论范围 1–7；两题均有效作答才能合成。原始悲观值 ≠ 反向值。</text>
+<text x="32" y="287" font-size="17">仅为虚构作答的公式示例，不是常模、排名、诊断或人格优劣分级。</text>
+<text x="32" y="318" font-size="14">项目原创说明图；不是原量表题图，也未作为系统媒体资产上线。</text></g></svg>

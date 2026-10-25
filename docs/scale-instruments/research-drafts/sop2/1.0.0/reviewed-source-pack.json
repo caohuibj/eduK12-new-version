@@ -1,0 +1,197 @@
+{
+  "schema": "research-candidate-source-pack/v1",
+  "reviewed_at": "2026-10-25",
+  "inventory_status": "pending_existing_library_deduplication",
+  "translation": {
+    "language": "zh-CN",
+    "status": "AI-assisted working translation, NOT validated Chinese adaptation",
+    "requires": [
+      "bilingual review",
+      "independent back-translation/adjudication",
+      "cognitive interviews",
+      "target-population validation before assessment deployment"
+    ]
+  },
+  "empirical_thresholds": {
+    "clinical_cutoffs": [],
+    "severity_bands": [],
+    "percentile_norms": null,
+    "policy": "No clinical thresholds established in sources reviewed; do not invent low/medium/high bands from reference means or response midpoint."
+  },
+  "deployment": {
+    "enabled": false,
+    "k12_validated": false,
+    "individual_diagnosis_supported": false,
+    "report_policy": "Descriptive response explanation only; no clinical, ability, placement or counseling decisions from score."
+  },
+  "illustration": {
+    "status": "not_created",
+    "brief": "Optional original neutral abstract horizon/steps icon; avoid borrowed scale diagrams and diagnostic traffic-light zones."
+  },
+  "id": "gesis-sop2-2022-zh-working",
+  "name": {
+    "en": "Optimism–Pessimism Short Scale–2 (SOP2)",
+    "zh": "乐观—悲观短量表（2题，中文工作译稿）"
+  },
+  "aliases": [
+    "SOP2",
+    "Skala Optimismus-Pessimismus-2"
+  ],
+  "tags": [
+    "nonclinical",
+    "optimism",
+    "pessimism",
+    "future-expectations",
+    "adult-research",
+    "ultrashort"
+  ],
+  "deduplication": {
+    "family": "SOP2",
+    "not_same_as": [
+      "LOT-R",
+      "IPIP optimism"
+    ],
+    "note": "Separate construct instrument, not a new language counted as independent scale. Existing inventory still pending."
+  },
+  "status": "CANDIDATE_RESEARCH_ONLY_PENDING_TRANSLATION_AND_PRODUCT_FIT",
+  "license": {
+    "identifier": "CC-BY-4.0",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "evidence": "2022 author article PDF p1 full CC BY4 statement; p4 Table1 contains complete English items, without separate copyright credit line. Use article version, NOT infer license from ZIS landing (Standard License).",
+    "commercial_cleared_for_article_material": true,
+    "electronic_reproduction_allowed": true,
+    "translation_allowed": true,
+    "limitations": "Attribution/link/change notice required. This copyright grant does not establish clinical validity or suitability for individual K12 assessment.",
+    "attribution": "Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied."
+  },
+  "instructions": {
+    "en": null,
+    "zh": null,
+    "note": "No general instruction in source. Retain the construct definition and question as one complete item."
+  },
+  "items": [
+    {
+      "id": "sop2_1",
+      "en": "The next question deals with optimism. Optimists are people who look to the future with confidence and who mostly expect good things to happen. How would you describe yourself? How optimistic are you in general?",
+      "zh": "接下来的问题涉及乐观。乐观的人对未来抱有信心，并且通常期待好事发生。你会如何描述自己？总的来说，你有多乐观？",
+      "reverse": false,
+      "anchors": {
+        "1": {
+          "en": "not at all optimistic",
+          "zh": "一点也不乐观"
+        },
+        "7": {
+          "en": "very optimistic",
+          "zh": "非常乐观"
+        }
+      }
+    },
+    {
+      "id": "sop2_2",
+      "en": "The next question is about pessimism. Pessimists are people who are full of doubt when they look to the future and who mostly expect bad things to happen. How would you describe yourself? How pessimistic are you in general?",
+      "zh": "接下来的问题涉及悲观。悲观的人想到未来时充满疑虑，并且通常预期坏事发生。你会如何描述自己？总的来说，你有多悲观？",
+      "reverse": true,
+      "anchors": {
+        "1": {
+          "en": "not at all pessimistic",
+          "zh": "一点也不悲观"
+        },
+        "7": {
+          "en": "very pessimistic",
+          "zh": "非常悲观"
+        }
+      }
+    }
+  ],
+  "response_options": {
+    "valid_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "middle_values": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "middle_labels": null,
+    "note": "Only endpoints labeled. Do not invent verbal intermediate labels."
+  },
+  "scoring": {
+    "formula": "(q1 + (8-q2))/2",
+    "range": [
+      1,
+      7
+    ],
+    "step": 0.5,
+    "reverse_items": [
+      "sop2_2"
+    ],
+    "minimum_answered": 2,
+    "missing_result": null,
+    "imputation": false,
+    "direction": "Higher aggregate reflects more optimistic/less pessimistic responses. Preserve raw pessimism answer separately; do not label raw and reversed values identically."
+  },
+  "references": [
+    {
+      "url": "https://link.springer.com/content/pdf/10.1186/s42409-021-00027-6.pdf",
+      "role": "license p1; scoring and missingness p3; exact full English items p4 Table1; reference means p7 Table4"
+    },
+    {
+      "url": "https://link.springer.com/article/10.1186/s42409-021-00027-6",
+      "role": "canonical primary article"
+    },
+    {
+      "url": "https://zis.gesis.org/s/skala/openScale/399?lang=en",
+      "role": "cross-check only; landing license is Standard License, not CC BY4"
+    },
+    {
+      "url": "https://zis.gesis.org/s/skala/openScale/241?lang=en",
+      "role": "German original provenance and adult research scope; not chosen reuse license"
+    }
+  ],
+  "empirical_reference": {
+    "purpose": "metadata only, NOT Chinese or youth norms",
+    "design": "January2018 native-speaker online quota samples, CASI, ages18–69; not probability samples",
+    "samples": [
+      {
+        "country": "UK",
+        "n": 468,
+        "mean": 4.41,
+        "sd": 1.41,
+        "omega": 0.68,
+        "retest_r": 0.74,
+        "retest_n": 111,
+        "retest_days_median": 28
+      },
+      {
+        "country": "DE",
+        "n": 474,
+        "mean": 4.64,
+        "sd": 1.36,
+        "omega": 0.77,
+        "retest_r": 0.77,
+        "retest_n": 117,
+        "retest_days_median": 20
+      }
+    ],
+    "activate_norm_comparison": false,
+    "cutoffs": []
+  },
+  "feedback": {
+    "complete": "你的两项作答合成分为 {score}（取值范围1–7，悲观题已反向计分）。数值越高，表示本次作答呈现出更多积极的未来期待。本结果不是心理健康诊断，也不代表固定的人格标签。中文工作译稿尚未经验证，不进行高低分级、百分位比较或学生筛查。",
+    "incomplete": "需要两题均作答后才能计算合成分；不会用另一题代填。",
+    "reflection": "仅作为自我思考时，可以分别写下你期待发生的一件事和你担心的一件事，再思考哪些因素是自己能够影响的。这是另行撰写的提示，并非量表作者的诊断或干预建议。"
+  },
+  "original_german": {
+    "included": false,
+    "reason": "English official adaptation selected as canonical source for Chinese working translation. Do not merge German-source license with English adaptation grant. German wording can be consulted at original ZIS source, but is not an additional deployable language pack here.",
+    "source": "https://doi.org/10.6102/zis185"
+  }
+}

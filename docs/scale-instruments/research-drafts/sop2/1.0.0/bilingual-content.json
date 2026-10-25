@@ -1,0 +1,64 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "sop2_1",
+      "en": "The next question deals with optimism. Optimists are people who look to the future with confidence and who mostly expect good things to happen. How would you describe yourself? How optimistic are you in general?",
+      "zh": "接下来的问题涉及乐观。乐观的人对未来抱有信心，并且通常期待好事发生。你会如何描述自己？总的来说，你有多乐观？",
+      "reverse": false,
+      "anchors": {
+        "1": {
+          "en": "not at all optimistic",
+          "zh": "一点也不乐观"
+        },
+        "7": {
+          "en": "very optimistic",
+          "zh": "非常乐观"
+        }
+      }
+    },
+    {
+      "id": "sop2_2",
+      "en": "The next question is about pessimism. Pessimists are people who are full of doubt when they look to the future and who mostly expect bad things to happen. How would you describe yourself? How pessimistic are you in general?",
+      "zh": "接下来的问题涉及悲观。悲观的人想到未来时充满疑虑，并且通常预期坏事发生。你会如何描述自己？总的来说，你有多悲观？",
+      "reverse": true,
+      "anchors": {
+        "1": {
+          "en": "not at all pessimistic",
+          "zh": "一点也不悲观"
+        },
+        "7": {
+          "en": "very pessimistic",
+          "zh": "非常悲观"
+        }
+      }
+    }
+  ],
+  "response_options": {
+    "valid_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "middle_values": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "middle_labels": null,
+    "note": "Only endpoints labeled. Do not invent verbal intermediate labels."
+  },
+  "instructions": {
+    "en": null,
+    "zh": null,
+    "note": "No general instruction in source. Retain the construct definition and question as one complete item."
+  },
+  "attribution": "Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied.",
+  "license": "https://creativecommons.org/licenses/by/4.0/"
+}

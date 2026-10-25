@@ -1,0 +1,11 @@
+{
+  "validatedAt": "2026-10-25T14:40:46Z",
+  "sourceSha256": "88adc05820bf856aae50c9f5c6d2ed7db6055c1e0a2c73da51ae662543a1e297",
+  "node": "v24.22.1",
+  "toolTests": 15,
+  "combinedToolAndRegistryTests": 21,
+  "testsExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorCheckExitCode": 0,
+  "scope": "Source/schema/scoring/report only; no DB writes or production activation. AI content review not human expert approval."
+}

@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sop2_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "乐观—悲观短量表（2题，中文工作译稿）",
+      "abbreviation": "SOP2",
+      "instrumentFamily": "Optimism–Pessimism Short Scale–2"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "以乐观与悲观两项自我描述合成未来期待倾向；不等同IPIP乐观或LOT-R。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "optimism",
+        "pessimism",
+        "future_expectations",
+        "ultra_short",
+        "adult_self_report",
+        "research",
+        "individual_reflection",
+        "working_translation",
+        "cc_by_4_0",
+        "non_diagnostic",
+        "descriptive_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 2,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般倾向，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "完整保留每题的构念定义与问题，不另造原作者一般指导语。",
+        "两题分别使用乐观/悲观端点的1–7刻度；中间仅数字标签。",
+        "悲观项8−原答后与乐观项求均值；不混淆原始悲观作答与反向值。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于Nießen等2022论文Table1英文版的项目AI辅助中文工作译稿；CC BY4.0允许翻译改编。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "不是经验证中文版；专家译审、认知访谈与目标人群效度待完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "sop2-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "sop2-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "sop2-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied.",
+      "许可链接：https://creativecommons.org/licenses/by/4.0/；需保留署名与改动说明，不暗示原作者认可。",
+      "采用2022论文材料的CC BY4.0，不把ZIS落地页Standard License误称CC BY。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Optimism–Pessimism Short Scale–2 (SOP2)",
+        "citation": "Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied.",
+        "url": "https://doi.org/10.1186/s42409-021-00027-6",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "sop2_1_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "一点也不乐观",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常乐观",
+              "score": 7
+            }
+          ]
+        },
+        {
+          "key": "sop2_2_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "一点也不悲观",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常悲观",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "sop2_1",
+          "content": "接下来的问题涉及乐观。乐观的人对未来抱有信心，并且通常期待好事发生。你会如何描述自己？总的来说，你有多乐观？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "sop2_1_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "sop2_2",
+          "content": "接下来的问题涉及悲观。悲观的人想到未来时充满疑虑，并且通常预期坏事发生。你会如何描述自己？总的来说，你有多悲观？",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "sop2_2_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "sop2_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "sop2_2",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "optimism_composite",
+            "type": "total",
+            "label": "乐观—悲观合成分",
+            "description": "乐观原答与反向悲观项（8−原答）的等权平均值；范围1–7。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 1,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "sop2_1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "sop2_2",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "optimism_composite"
+        ],
+        "scoreOrder": [
+          "optimism_composite"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "optimism_composite",
+            "headline": "未来期待的自我描述",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "合成分把你对乐观的自我描述与反向计分后的悲观描述结合起来，取值范围为1–7。数值较高表示本次作答更偏向积极的未来期待，不代表你必须一直乐观，也不是固定人格、实际能力或心理健康的判定。悲观题的原始回答越高表示越悲观；它在合成前使用8减去原始回答，不能把原始值与反向值混用。中文工作译稿尚未经验证，不提供高低分级、百分位或学生筛查结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "仅作为自我思考时，可以分别写下你期待发生的一件事和你担心的一件事，再思考哪些因素是自己能够影响的。这是另行撰写的提示，并非量表作者的诊断或干预建议。"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件自己能够影响的小事记录下一步行动，并允许期待与担忧同时存在；不为追求更高分而改变回答。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "两题均完整合法作答才给合成分，个人报告不插补；论文对研究级缺失分析另讨论MI/FIML，不在本包执行。",
+          "中文工作译稿未完成专家译审、认知访谈或本地效度验证。",
+          "英德18–69岁成人在线配额样本统计仅作外部证据，不是中国或青少年常模。",
+          "不存在本包可用的临床阈值或高低分档；4仅为理论中点，不是人群均值。",
+          "超短自陈不能代替全面评估；不用于诊断、能力鉴定、选拔或学校排名。"
+        ],
+        "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:38:00Z",
+            "basis": "AI editorial check: adult self-report, full construct definitions, endpoints, reverse/raw distinction and attribution. Not human expert approval or psychometric validation."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "sop2",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "sop2_1",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "sop2_2",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism_composite": 4
+          },
+          "totalScoreKeys": [
+            "optimism_composite"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "sop2_1",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "sop2_2",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism_composite": 7
+          },
+          "totalScoreKeys": [
+            "optimism_composite"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "sop2_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "sop2_2",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism_composite": 1
+          },
+          "totalScoreKeys": [
+            "optimism_composite"
+          ]
+        }
+      },
+      {
+        "name": "half-step",
+        "answers": [
+          {
+            "itemCode": "sop2_1",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "sop2_2",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism_composite": 5.5
+          },
+          "totalScoreKeys": [
+            "optimism_composite"
+          ]
+        }
+      }
+    ]
+  }
+}

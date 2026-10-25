@@ -1,0 +1,21 @@
+# 本地合成报告示例
+
+以下由实际 buildScaleResult 生成；全题选择4，仅演示格式，不是真实参与者数据。
+
+- 乐观—悲观合成分：4（理论范围 1–7；不是常模等级）
+
+## 未来期待的自我描述
+
+合成分把你对乐观的自我描述与反向计分后的悲观描述结合起来，取值范围为1–7。数值较高表示本次作答更偏向积极的未来期待，不代表你必须一直乐观，也不是固定人格、实际能力或心理健康的判定。悲观题的原始回答越高表示越悲观；它在合成前使用8减去原始回答，不能把原始值与反向值混用。中文工作译稿尚未经验证，不提供高低分级、百分位或学生筛查结论。
+
+- 仅作为自我思考时，可以分别写下你期待发生的一件事和你担心的一件事，再思考哪些因素是自己能够影响的。这是另行撰写的提示，并非量表作者的诊断或干预建议。
+- 选一件自己能够影响的小事记录下一步行动，并允许期待与担忧同时存在；不为追求更高分而改变回答。
+
+- 两题均完整合法作答才给合成分，个人报告不插补；论文对研究级缺失分析另讨论MI/FIML，不在本包执行。
+- 中文工作译稿未完成专家译审、认知访谈或本地效度验证。
+- 英德18–69岁成人在线配额样本统计仅作外部证据，不是中国或青少年常模。
+- 不存在本包可用的临床阈值或高低分档；4仅为理论中点，不是人群均值。
+- 超短自陈不能代替全面评估；不用于诊断、能力鉴定、选拔或学校排名。
+- 未提供群体参考。
+
+仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/
