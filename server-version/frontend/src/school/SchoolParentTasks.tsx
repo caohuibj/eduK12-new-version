@@ -35,7 +35,9 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
     void refresh()
     return()=>{currentScope.current=null}
   },[refresh,scope])
-  return <section className="hs-panel">
+  return <section className="hs-panel hs-task-view">
+    <details className="hs-task-inbox" open={!(active)}>
+    <summary hidden={!(active)}>查看任务列表</summary>
     <h2>我的家校观察任务</h2>
     <p>只显示你作为答题者被正式分配、且关系当前仍有效的测评。答题不代表获得孩子的个人心理报告。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
@@ -45,7 +47,7 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
       <div className="hs-task-list">{tasks.map(task=><article className="hs-task-card"
         key={task.executionId}>
         <h3>{task.runTitle}</h3><p>{task.activityTitle}</p>
-        <p>当前状态：{task.status}</p>
+        <p>当前状态：{({ASSIGNED:'待完成',STARTED:'进行中',COMPLETED:'已完成',EXPIRED:'已截止',CANCELLED:'已取消'} as Record<string,string>)[task.status]??task.status}</p>
         {['ASSIGNED','STARTED'].includes(task.status)&&
           <button onClick={()=>setActive({
             organizationId:task.organizationId,courseId:task.activityId,
@@ -55,6 +57,7 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
             consentVisibility:task.consentVisibility,
           })}>开始／继续校园正式测评</button>}
       </article>)}</div>}
+    </details>
     {active&&<SchoolCompositeRunner api={api} execution={active}
       onExit={()=>setActive(null)}
       onFinished={()=>{setActive(null);void refresh()}}/>}

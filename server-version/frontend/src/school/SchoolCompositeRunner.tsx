@@ -1,4 +1,4 @@
-import { useCallback,useMemo,useState } from 'react'
+import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
@@ -21,6 +21,11 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
   api:SchoolApi;execution:CampusExecutionRef
   onExit:()=>void;onFinished:()=>void
 }){
+  const panelRef=useRef<HTMLElement>(null)
+  useEffect(()=>{
+    panelRef.current?.focus({preventScroll:true})
+    panelRef.current?.scrollIntoView?.({block:'start'})
+  },[execution.executionId])
   const [state,setState]=useState<CompositeAttemptState|null>(null)
   const [child,setChild]=useState<CompositeCurrentItem|null>(null)
   const [busy,setBusy]=useState(false)
@@ -119,11 +124,11 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
-  return <section className="hs-panel hs-runner">
+  return <section className="hs-panel hs-runner" ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
     <div className="hs-actions"><button disabled={busy} onClick={onExit}>返回活动</button></div>
-    <p>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
-    <h2>校园正式测评</h2>
-    <p>答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>
+    <p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
+    <h2 hidden={Boolean(state)}>校园正式测评</h2>
+    <p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {done?<div role="status" className="hs-message">
       <h3>本次测评已完成</h3>
@@ -178,7 +183,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
         setChild(item)
       }}
     />:<div>
-      {needsAdmissionConsent&&<div className="hs-panel">
+      {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">
         <h3>本次受控观察测评的知情同意</h3>
         <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>
         <p>可见性政策：{execution.consentVisibility||'仅限经授权人员'}</p>

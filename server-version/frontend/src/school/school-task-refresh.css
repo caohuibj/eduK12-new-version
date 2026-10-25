@@ -1,0 +1,32 @@
+/* School task inbox and task content; shared assessment internals stay unchanged. */
+.hs-task-view{min-width:0}
+.hs-workspace .hs-task-view .hs-task-card:not(.hs-runner *){display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:22px}
+.hs-workspace .hs-task-view .hs-task-card small:not(.hs-runner *){line-height:1.65;overflow-wrap:anywhere}
+.hs-workspace .hs-task-view .hs-task-card h3:not(.hs-runner *){font-size:18px;line-height:1.5;margin:8px 0 0}
+.hs-workspace .hs-task-view .hs-task-card p:not(.hs-runner *){margin:8px 0 16px}
+.hs-workspace .hs-task-view .hs-task-card>button:not(.hs-runner *){margin-top:auto;min-height:44px}
+.hs-workspace .hs-task-view .hs-task-detail:not(.hs-runner *){margin:0;padding:0;border:0;scroll-margin-top:96px;outline:none}
+.hs-workspace .hs-task-detail>h3:not(.hs-runner *){margin:0 0 16px;font-size:24px;line-height:1.4}
+.hs-workspace .hs-task-detail>.hs-multiline:not(.hs-runner *){padding:20px;border:1px solid var(--hs-border);border-radius:14px;background:var(--hs-surface);line-height:1.9;margin:20px 0 24px}
+.hs-task-view>.hs-runner{margin:0;min-width:0;scroll-margin-top:96px;outline:none;color-scheme:light;color:#1d3a31;background:#fff;--hs-border:#cbded1;--hs-primary:#356957;--hs-ink:#1d3a31}
+@media(max-width:700px){
+ .hs-workspace .hs-task-view .hs-task-card:not(.hs-runner *){padding:18px}
+ .hs-workspace .hs-task-view .hs-task-detail:not(.hs-runner *),.hs-task-view>.hs-runner{scroll-margin-top:88px}
+ .hs-workspace .hs-task-detail>.hs-multiline:not(.hs-runner *){padding:16px}
+}
+
+.hs-app.hs-workspace details.hs-task-inbox{border:0;background:transparent;padding:0;margin:0}
+.hs-task-inbox>summary{padding:10px 0;margin-bottom:18px;color:var(--hs-primary);font-weight:650;cursor:pointer}
+.hs-task-inbox>summary[hidden]{display:none}
+
+.hs-app.hs-workspace .hs-task-view>.hs-runner{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.hs-app.hs-workspace .hs-task-view>.hs-runner>.hui-page--assessment{padding:20px 0 0;min-height:0;background:transparent}
+.hs-runner>.hs-actions{margin-bottom:12px}
+.hs-runner>.hs-runner-note{font-size:13px;line-height:1.65;margin:8px 0;color:#527063}
+.hs-workspace .hs-task-view:has(>.hs-runner){background:#fff;border-color:#cbded1;color:#1d3a31;--hs-primary:#356957}
+
+.hs-runner .hs-runner-consent{padding:18px;margin:20px 0;overflow-wrap:anywhere}
+.hs-runner .hs-runner-consent h3{margin:0 0 12px;font-size:18px;line-height:1.5}
+.hs-runner .hs-runner-consent p{font-size:14px;line-height:1.75}
+.hs-runner .hs-consent{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.7;cursor:pointer}
+.hs-runner .hs-consent input{flex:none;width:18px;height:18px;margin-top:3px}

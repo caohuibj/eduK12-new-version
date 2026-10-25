@@ -44,6 +44,10 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const scope=useMemo(()=>({pending:false}),[api])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
+  const detailRef=useRef<HTMLDivElement>(null)
+  useEffect(()=>{
+    if(selected&&details){detailRef.current?.focus({preventScroll:true});detailRef.current?.scrollIntoView?.({block:'start'})}
+  },[selected,details])
   const load=useCallback(async(targetPage:number)=>{
     if(currentScope.current!==scope||scope.pending)return
     scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
@@ -106,7 +110,9 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     }catch(err){setError(err instanceof Error?err.message:'提交失败，请核实活动是否仍开放')}
     finally{setBusy(false)}
   }
-  return <section className="hs-panel">
+  return <section className="hs-panel hs-task-view">
+    <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
+    <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
     <h2>我的校园活动</h2>
     <p>这里只显示学校已开放、并且当前允许你参加的活动。
       心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
@@ -149,6 +155,8 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       <button disabled={!items.hasMore||busy||loading} onClick={()=>void load(page+1)}>下一页</button>
       {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
     </div>}
+    </details>
+    {(selected||execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
       <h3>{feedback.title} · 我的反馈</h3>
       {feedback.data.kind!==undefined?<EducationScalePersonalReport key={feedback.executionId} data={feedback.data}
@@ -166,7 +174,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     {execution&&<SchoolCompositeRunner api={api} execution={execution}
       onExit={()=>setExecution(null)}
       onFinished={()=>{setExecution(null);void load(page)}}/>}
-    {selected&&details&&<div className="hs-task-detail">
+    {selected&&details&&<div className="hs-task-detail" ref={detailRef} tabIndex={-1} role="region" aria-label={details.title}>
       <h3>{details.title}</h3>
       {details.description&&<p>{details.description}</p>}
       {details.content&&<p className="hs-multiline">{details.content}</p>}
