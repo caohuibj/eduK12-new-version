@@ -35,7 +35,7 @@ type Me={id:string;username:string;role:string;organizations:Scope[];product:'HU
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
 type Screen='home'|'join'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
-type WorkspaceTab='teacher'|'school'|'expert'|'platform'|'private-tools'
+type WorkspaceTab='teacher'|'school'|'expert'|'private-tools'
 
 function cookie(name:string){
   const part=document.cookie.split('; ').find(x=>x.startsWith(name+'='))
@@ -445,8 +445,6 @@ export default function HuiteacherApp(){
           onClick={()=>changeWorkspaceTab('school')}>学校改进</button>}
         <button type="button" aria-pressed={workspaceTab==='expert'}
           onClick={()=>changeWorkspaceTab('expert')}>专家实践</button>
-        <button type="button" aria-pressed={workspaceTab==='platform'}
-          onClick={()=>changeWorkspaceTab('platform')}>平台治理入口</button>
       </nav>
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
@@ -531,15 +529,6 @@ export default function HuiteacherApp(){
         <HuiteacherFieldWorkspace api={teacherApi}/>
         <HuiteacherConsensusReviews api={teacherApi}/>
       </>}
-      {workspaceTab==='platform'&&<section className="ht-panel">
-        <h2>平台级教育产品治理</h2>
-        <p>学校 Teacher 产品管理与平台治理相互独立。
-          当前 Teacher 教育会话不能开通产品或授权其他学校，
-          平台管理员请从主域管理员入口独立登录，School／Teacher 产品会话不可代用。</p>
-        <a href="https://eduk12.top/admin/education-products" rel="noopener noreferrer">
-          前往平台教育产品治理</a>
-        <p className="ht-muted">当前不复制已有平台授权、审计或量表许可逻辑到 Teacher 工作台。</p>
-      </section>}
       </>}
     </div>:null}
     </div>
