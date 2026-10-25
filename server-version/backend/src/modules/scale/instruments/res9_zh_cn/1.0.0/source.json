@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -43,6 +43,7 @@
         "use:no_validated_cutoff",
         "license:cc_by_nc_4_0",
         "license:noncommercial_only",
+        "非商业",
         "license:attribution_required",
         "language_validation:content_zh-CN",
         "language_validation:published_chinese_items",
