@@ -73,3 +73,26 @@ Library 文件 `libfile_89850517a9b081919bfcc37ae8aafb22`（v0）经当前 Libra
 最后核对#355远端已到`9065bb0ee73916d5e35f913b389f2ea55a9f0818`，main仍25215dcc、#356仍0d2e417d。本分支严格保留指定f7b6c766起点，未擅自重基线；新远端差异与本轮新增代码没有同路径重叠，但 `tool-policy.ts` 等被调用依赖已改变，仍需父对话协调最终集成和相应验证。见 [remote-drift.json](evidence/library-management-next-20261025/remote-drift.json)。
 
 核心文件只改目录读函数与只读过滤；正文、参数、报告、授权/撤权写函数、三轴批准与trial函数、依赖/schema和CI配置相对八提交集成基线均保留，20项精确对照见 [protected-inputs.json](evidence/library-management-next-20261025/protected-inputs.json)。本轮唯一提前执行的安装门禁是保留科学地域保护、在计划阶段更早报错。没有实际工具写入或生产操作。
+
+## 二次 review 前补充：旧渲染合同与有限真实 HTTP
+
+按父对话续派范围，提交 `e1e3a88248d6061c24397afa9dd03fc372e62b4d` 修复旧渲染测试包装。原两例断言全部保留：真实 `AuthProvider` 读取合成会话，明确的release级审核/分发能力取代原无范围系统管理员夹具；通过无会话拒绝例证明没有无条件授权mock。两例针对保留的共享视图，外层Survey路由已经迁入新组件，因此导出并直接测试该共享组件，未改权限判定或产品路由。三例通过，先前两个失败原件保留。
+
+提交 `4233c5ad4be0e381bfe307c71b3b00000aa7d675` 增加有限HTTP及明确选择边界检查。只选中最多10个精确版本，没有全选全部结果或自动写授权，新增一例通过；原两条不受影响用例未重复。
+
+真实loopback HTTP最终5例、27个请求通过，0个500，覆盖：
+
+- 标准量表跨页25+11、多个facet AND、中文与原ID关键词一致；注册原创工具仍能找到。
+- 真实Survey目录未筛选第二页含SDQ，安装/审批未完成、可分配受阻和目标grant未评估状态一致。
+- 认知目录第31项可在第一页通过能力标签找到；未批准提交和不支持运行的配置不因标签变为可用。
+- 当前数据库身份拒绝JWT假冒ADMIN，无资格目标404，未批准/错误精确版本409；隐式批量/标签全选请求400，缺CSRF403；无工具授权的研究者不能导入。
+
+测试挂载真实router、认证/当前DB权限、CSRF和来源保护，没有mock后端授权服务。使用合成签名会话与已验证MFA标记，未测试真实登录或MFA仪式；不称完整身份E2E。为避免通常test模式自动略过限流，测试在隔离router harness中启用原动态production分支，实际Redis限流返回90/120额度头，没有改额度或关闭限流；这不授生产启动资格。
+
+数据只在本任务新的空隔离库中：4个合成账号、31个SUBMITTED且明确不可运行的治理目录行，以及31个故意不满足运行协议的认知配置目录夹具。没有安装父dot工具或批准这些目录夹具。最终独立读回scales、正式measurement、standard release、trial、tool grant、use grant及草稿全为0；数据库/Redis在检查结束后正常停止。
+
+首次HTTP夹具缺项目id，0请求、5项未运行；补正后27请求全过。严格测试类型检查随后暴露JSON/ES2020/JWT用户名等夹具合同问题，修正并完成同范围最终27请求；同一5例不相加为10例。最终运行后只补了两处非空类型断言，TypeScript及esbuild输出字节均与运行时输入一致，旧/新源码与输出SHA保留；不重跑未受影响通过项。前端app及新HTTP导入闭包类型检查均实际退出0，受影响lint退出0、3条既有warning。
+
+本轮9个不同用例通过。原始结果、HTTP脱敏journal、首次失败、输入绑定、类型检查及零写读回见 [followup/summary.json](evidence/library-management-next-20261025/followup/summary.json)。原39个文件及两个代码提交的精确交集为空，完整清单见 [original-39-paths.json](evidence/library-management-next-20261025/followup/original-39-paths.json)，也已直接列给父对话。
+
+与版本流程节点的字段边界仍是：本任务不改 `standard-triplet.model.ts`；`standard-triplet.service.ts` 仅 `standardTripletCatalog` 的 `classificationTags`/`tagFacets` 与分页前匹配，`standardTripletDetail`/`versionMappings`、批准、trial均未改。本轮没有新增该service修改，不引入共享来源读取或Training绑定模块。管理页不把ONLINE当Training直接发布资格。没有吸收新的#355维护提交，继续等待父对话协调稳定基线与二次review，未push/CI/merge。

@@ -1,0 +1,2 @@
+src/__tests__/survey/library-management.http.integration.test.ts(116,10): error TS2532: Object is possibly 'undefined'.
+src/__tests__/survey/library-management.http.integration.test.ts(117,10): error TS2532: Object is possibly 'undefined'.

@@ -1,0 +1,392 @@
+{
+  "scope": "isolated synthetic HTTP; no real tool or grant writes",
+  "requests": [
+    {
+      "actor": "anonymous",
+      "path": "/api/platform/survey-standard/catalog",
+      "method": "GET",
+      "status": 401,
+      "limit": null,
+      "message": "缺少认证令牌"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey-standard/catalog",
+      "method": "GET",
+      "status": 403,
+      "limit": "90",
+      "message": "只有独立系统管理员可以批准工具上线"
+    },
+    {
+      "actor": "outsider",
+      "path": "/api/platform/survey/source-catalog?kind=COGNITIVE",
+      "method": "GET",
+      "status": 403,
+      "limit": null,
+      "message": "研究者管理与工具分配仅限独立 Survey 管理员"
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-standard/catalog?tags=student_self_report&page=1",
+      "method": "GET",
+      "status": 200,
+      "limit": "90",
+      "message": "操作成功",
+      "ids": [
+        "academic_self_concept_biology_zh_cn",
+        "academic_self_concept_chemistry_zh_cn",
+        "academic_self_concept_chinese_zh_cn",
+        "academic_self_concept_english_zh_cn",
+        "academic_self_concept_mathematics_zh_cn",
+        "academic_self_concept_physics_zh_cn",
+        "academic_self_efficacy_biology_zh_cn",
+        "academic_self_efficacy_chemistry_zh_cn",
+        "academic_self_efficacy_chinese_zh_cn",
+        "academic_self_efficacy_english_zh_cn",
+        "academic_self_efficacy_mathematics_zh_cn",
+        "academic_self_efficacy_physics_zh_cn",
+        "domain_fixed_mindset_biology_zh_cn",
+        "domain_fixed_mindset_chemistry_zh_cn",
+        "domain_fixed_mindset_chinese_zh_cn",
+        "domain_fixed_mindset_english_zh_cn",
+        "domain_fixed_mindset_mathematics_zh_cn",
+        "domain_fixed_mindset_physics_zh_cn",
+        "teacher_subject_liking_biology_zh_cn",
+        "teacher_subject_liking_chemistry_zh_cn",
+        "teacher_subject_liking_chinese_zh_cn",
+        "teacher_subject_liking_english_zh_cn",
+        "teacher_subject_liking_mathematics_zh_cn",
+        "teacher_subject_liking_physics_zh_cn",
+        "tutoring_necessity_biology_zh_cn"
+      ],
+      "hasMore": true
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-standard/catalog?tags=student_self_report&page=2",
+      "method": "GET",
+      "status": 200,
+      "limit": "90",
+      "message": "操作成功",
+      "ids": [
+        "tutoring_necessity_chemistry_zh_cn",
+        "tutoring_necessity_chinese_zh_cn",
+        "tutoring_necessity_english_zh_cn",
+        "tutoring_necessity_mathematics_zh_cn",
+        "tutoring_necessity_physics_zh_cn",
+        "value_cost_biology_zh_cn",
+        "value_cost_chemistry_zh_cn",
+        "value_cost_chinese_zh_cn",
+        "value_cost_english_zh_cn",
+        "value_cost_mathematics_zh_cn",
+        "value_cost_physics_zh_cn"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-standard/catalog?keyword=%E5%AD%A6%E7%94%9F+%E6%95%B0%E5%AD%A6&tags=value_cost%2Cmathematics%2Cstudent_self_report%2Clanguage%3Azh-CN",
+      "method": "GET",
+      "status": 200,
+      "limit": "90",
+      "message": "操作成功",
+      "ids": [
+        "value_cost_mathematics_zh_cn"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-standard/catalog?keyword=student_self_report+mathematics&tags=value_cost%2Cmathematics%2Cstudent_self_report%2Clanguage%3Azh-CN",
+      "method": "GET",
+      "status": 200,
+      "limit": "90",
+      "message": "操作成功",
+      "ids": [
+        "value_cost_mathematics_zh_cn"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-library/catalog?page=2",
+      "method": "GET",
+      "status": 200,
+      "limit": "60",
+      "message": "操作成功",
+      "ids": [
+        "standard:general_fixed_mindset_zh_cn:1.0.0",
+        "standard:grit_s_zh_cn:1.0.0",
+        "standard:gse_zh_cn:1.0.0",
+        "standard:hse_msit_en:1.0.0",
+        "standard:jcq_en:1.0.0",
+        "standard:mpfi24_zh_cn:1.0.0",
+        "standard:pss10_zh_cn:1.0.0",
+        "standard:sdq_parent_zh_cn:1.0.0",
+        "standard:sdq_teacher_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_biology_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_chemistry_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_chinese_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_english_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_mathematics_zh_cn:1.0.0",
+        "standard:teacher_subject_liking_physics_zh_cn:1.0.0",
+        "standard:texi_parent_zh_cn:1.0.0",
+        "standard:texi_teacher_zh_cn:1.0.0",
+        "standard:tipi_zh_cn:1.0.0",
+        "standard:tswq_en:1.0.0",
+        "standard:tutoring_necessity_biology_zh_cn:1.0.0",
+        "standard:tutoring_necessity_chemistry_zh_cn:1.0.0",
+        "standard:tutoring_necessity_chinese_zh_cn:1.0.0",
+        "standard:tutoring_necessity_english_zh_cn:1.0.0",
+        "standard:tutoring_necessity_mathematics_zh_cn:1.0.0",
+        "standard:tutoring_necessity_physics_zh_cn:1.0.0"
+      ],
+      "hasMore": true
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-library/catalog?keyword=%E5%AD%A6%E7%94%9F+%E6%95%B0%E5%AD%A6&tags=value_cost%2Clanguage%3Azh-CN",
+      "method": "GET",
+      "status": 200,
+      "limit": "60",
+      "message": "操作成功",
+      "ids": [
+        "standard:value_cost_mathematics_zh_cn:1.0.0"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-standard/preflight/value_cost_mathematics_zh_cn/1.0.0",
+      "method": "GET",
+      "status": 200,
+      "limit": "90",
+      "message": "操作成功"
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-tools/catalog?family=COGNITIVE&page=1",
+      "method": "GET",
+      "status": 200,
+      "limit": "120",
+      "message": "操作成功",
+      "ids": [
+        "164979fa-31c1-4552-88c2-13a79387ed03",
+        "b4082c21-0363-4165-80dc-300d9bb76d52",
+        "52585cb0-0437-4760-af2d-59083ed39e54",
+        "91acbac5-f2d2-49ca-b27b-119b04f02b63",
+        "e40f79cb-8835-4565-aec3-39b30ee0f16b",
+        "e711b88c-4490-4275-809c-f8e0e41edf1f",
+        "a25aab87-b47e-46cb-9887-d61495a3cdee",
+        "362bf618-5183-4183-a5d5-60c479a0ee1a",
+        "51edbf4a-ddaf-4054-8704-bdf63e2b3e98",
+        "1c83871f-3493-4447-876a-e7231430769d",
+        "207a003e-5493-42b8-9319-694e0ad610de",
+        "ebfcac7c-ac9d-4800-ab5b-674a860da42f",
+        "4c09aa09-c0e5-4b18-9b90-af4cb7d91222",
+        "6c9191ae-45bb-4853-aba9-dac129a660de",
+        "8c4fef69-577d-4f51-8851-a4144e1afec9",
+        "f4932720-dc94-4e6d-a625-a8e68ec7cb5b",
+        "f764b42a-b76e-40fb-a850-f7620790d720",
+        "673a8bc9-754f-449c-ac32-e6e4b799df4f",
+        "b55f7bc5-3bf7-4d3d-a572-a45c604b3946",
+        "7b71f0f7-92bb-47e7-952a-6728a805d7e3",
+        "ee7d01f7-853d-4d68-b5e2-c66904af20b5",
+        "562199da-acc6-477f-a6ab-2b5512fd3bc3",
+        "c9133c62-7da7-45ba-9469-b7f4a393a75d",
+        "7f0ecb3e-3aca-49f0-88d5-dd929231f3c1",
+        "d0a45f13-c234-453a-b491-3c1dd0dfc93d"
+      ],
+      "hasMore": true
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-tools/catalog?family=COGNITIVE&page=2",
+      "method": "GET",
+      "status": 200,
+      "limit": "120",
+      "message": "操作成功",
+      "ids": [
+        "fc9b8ec6-e368-42bd-a822-fb94a8b9f74b",
+        "22e92df1-c8e4-4798-8aa5-8b108c00b088",
+        "2aad8ebe-b996-402f-9449-44a7765538b5",
+        "c234133a-9033-4507-a830-9b02a92c9516",
+        "3e88122f-257e-4296-8a3c-6ac4f30a76b7",
+        "7565ba4c-a406-4560-a48e-236c220cc4ce"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-tools/catalog?family=COGNITIVE&keyword=%E5%8F%8D%E5%BA%94%E6%8A%91%E5%88%B6&tags=cognitive-facet%3Aresponse_inhibition%2Faction_withholding",
+      "method": "GET",
+      "status": 200,
+      "limit": "120",
+      "message": "操作成功",
+      "ids": [
+        "7565ba4c-a406-4560-a48e-236c220cc4ce"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-tools/catalog?family=COGNITIVE&tags=cognitive-domain:working_memory,cognitive-domain:response_inhibition",
+      "method": "GET",
+      "status": 200,
+      "limit": "120",
+      "message": "操作成功",
+      "ids": [],
+      "hasMore": false
+    },
+    {
+      "actor": "system",
+      "path": "/api/platform/survey-tools/catalog?family=COGNITIVE&tags=PUBLIC",
+      "method": "GET",
+      "status": 200,
+      "limit": "120",
+      "message": "操作成功",
+      "ids": [],
+      "hasMore": false
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey-tool-use/catalog?family=COGNITIVE",
+      "method": "GET",
+      "status": 200,
+      "limit": null,
+      "message": "操作成功",
+      "ids": [],
+      "hasMore": false
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/source-catalog?kind=COGNITIVE&page=1",
+      "method": "GET",
+      "status": 200,
+      "limit": null,
+      "message": "操作成功",
+      "ids": [
+        "00000000-0000-4000-8000-000000000000",
+        "00000000-0000-4000-8000-000000000001",
+        "00000000-0000-4000-8000-000000000002",
+        "00000000-0000-4000-8000-000000000003",
+        "00000000-0000-4000-8000-000000000004",
+        "00000000-0000-4000-8000-000000000005",
+        "00000000-0000-4000-8000-000000000006",
+        "00000000-0000-4000-8000-000000000007",
+        "00000000-0000-4000-8000-000000000008",
+        "00000000-0000-4000-8000-000000000009",
+        "00000000-0000-4000-8000-000000000010",
+        "00000000-0000-4000-8000-000000000011",
+        "00000000-0000-4000-8000-000000000012",
+        "00000000-0000-4000-8000-000000000013",
+        "00000000-0000-4000-8000-000000000014",
+        "00000000-0000-4000-8000-000000000015",
+        "00000000-0000-4000-8000-000000000016",
+        "00000000-0000-4000-8000-000000000017",
+        "00000000-0000-4000-8000-000000000018",
+        "00000000-0000-4000-8000-000000000019",
+        "00000000-0000-4000-8000-000000000020",
+        "00000000-0000-4000-8000-000000000021",
+        "00000000-0000-4000-8000-000000000022",
+        "00000000-0000-4000-8000-000000000023",
+        "00000000-0000-4000-8000-000000000024"
+      ],
+      "hasMore": true
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/source-catalog?kind=COGNITIVE&page=2",
+      "method": "GET",
+      "status": 200,
+      "limit": null,
+      "message": "操作成功",
+      "ids": [
+        "00000000-0000-4000-8000-000000000025",
+        "00000000-0000-4000-8000-000000000026",
+        "00000000-0000-4000-8000-000000000027",
+        "00000000-0000-4000-8000-000000000028",
+        "00000000-0000-4000-8000-000000000029",
+        "00000000-0000-4000-8000-000000000030"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/source-catalog?kind=COGNITIVE&keyword=cognitive-domain%3Aresponse_inhibition&tags=cognitive-facet%3Aresponse_inhibition%2Faction_withholding",
+      "method": "GET",
+      "status": 200,
+      "limit": null,
+      "message": "操作成功",
+      "ids": [
+        "00000000-0000-4000-8000-000000000030"
+      ],
+      "hasMore": false
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/ca0f193b-0c0b-438d-8c22-41b12252a88a/tool-grants",
+      "method": "POST",
+      "status": 404,
+      "limit": null,
+      "message": "研究者不存在或资格不可用"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/3e08800f-edda-40f7-bd23-bda118e19d8c/tool-grants",
+      "method": "POST",
+      "status": 409,
+      "limit": null,
+      "message": "该精确工具版本未上线或已停止新增使用"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/3e08800f-edda-40f7-bd23-bda118e19d8c/tool-grants",
+      "method": "POST",
+      "status": 409,
+      "limit": null,
+      "message": "该精确工具版本未上线或已停止新增使用"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/3e08800f-edda-40f7-bd23-bda118e19d8c/tool-grants",
+      "method": "POST",
+      "status": 400,
+      "limit": null,
+      "message": "输入格式不合法"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/3e08800f-edda-40f7-bd23-bda118e19d8c/tool-grants",
+      "method": "POST",
+      "status": 400,
+      "limit": null,
+      "message": "输入格式不合法"
+    },
+    {
+      "actor": "manager",
+      "path": "/api/platform/survey/researchers/3e08800f-edda-40f7-bd23-bda118e19d8c/tool-grants",
+      "method": "POST",
+      "status": 403,
+      "limit": null,
+      "message": "CSRF 校验失败"
+    },
+    {
+      "actor": "researcher",
+      "path": "/api/survey/projects/99bac529-8d3a-4c29-af69-e395aaced893/catalog",
+      "method": "GET",
+      "status": 200,
+      "limit": null,
+      "message": "操作成功",
+      "ids": []
+    },
+    {
+      "actor": "researcher",
+      "path": "/api/survey/projects/99bac529-8d3a-4c29-af69-e395aaced893/catalog/c562061e-e199-45f7-8a3c-88a7a86ad47b/import",
+      "method": "POST",
+      "status": 403,
+      "limit": null,
+      "message": "工具来源不属于当前研究者授权"
+    }
+  ]
+}
