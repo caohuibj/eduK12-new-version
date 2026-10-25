@@ -1,0 +1,45 @@
+[
+  {
+    "file": "survey.html",
+    "url": "https://ipip.ori.org/newORVISSurvey.htm",
+    "sha256": "a88334ad9cd60e7dff9b4ec1839adf4214964c28234efad71945e7f406fd834d",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "RAW_SOURCE_FETCHED"
+  },
+  {
+    "file": "key.html",
+    "url": "https://ipip.ori.org/newORVISKey.htm",
+    "sha256": "d3bef2111f80c7e14f64c5245951400a18793337b1d791e30d279f84b4059690",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "RAW_SOURCE_FETCHED"
+  },
+  {
+    "file": "permission.html",
+    "url": "https://ipip.ori.org/newPermission.htm",
+    "sha256": "15e3d162504ce920c1da2476941b2a538f2d06075b514324de8cbeab874cc198",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "RAW_SOURCE_FETCHED"
+  },
+  {
+    "file": "translate.html",
+    "url": "https://ipip.ori.org/newItemTranslations.htm",
+    "sha256": "09d1ea9c5a9a79c2eae5b92ce529417c83ac56e20865e56a589570d47fc54dda",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "RAW_SOURCE_FETCHED"
+  },
+  {
+    "file": "homepage.html",
+    "url": "https://ipip.ori.org/",
+    "sha256": "45d41652bdf7a434973b8501051272e2e8b764f588629fed96f22116d184cd0e",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "RAW_SOURCE_FETCHED"
+  },
+  {
+    "file": "validation-browser-challenge.html",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2822996/",
+    "sha256": "022fb690eb2a2de3bfefe79363bc633b02cf71570b21a72e0b866dc5c4d99a6f",
+    "accessDate": "2026-10-25",
+    "retrievalStatus": "BROWSER_CHALLENGE_NOT_PAPER",
+    "note": "Paper independently read through web tool open https://pmc.ncbi.nlm.nih.gov/articles/PMC2822996/ ; do not cite this hash as article contents."
+  }
+]

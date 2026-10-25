@@ -1,0 +1,56 @@
+{
+  "activationStatus": "EXTERNAL_DOCUMENTATION_ONLY_NOT_RUNTIME",
+  "sourceEvidence": {
+    "citation": "Pozzebon, J. A., Visser, B. A., Ashton, M. C., Lee, K., & Goldberg, L. R. (2010). Psychometric characteristics of a public-domain self-report measure of vocational interests: The Oregon Vocational Interest Scales. Journal of Personality Assessment, 92(2), 168–174.",
+    "doi": "10.1080/00223890903510431",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2822996/",
+    "samples": [
+      {
+        "name": "Eugene-Springfield community",
+        "n": 665,
+        "meanAge": 62,
+        "sdAge": 11.7,
+        "note": "Over 98% Caucasian; 85% some college education; not Chinese norms"
+      },
+      {
+        "name": "Canadian first-year college",
+        "n": 346,
+        "meanAge": 18.5,
+        "sdAge": 1.7,
+        "note": "Not a secondary-school validation sample"
+      }
+    ],
+    "reliabilityAlpha": {
+      "community": {
+        "Leadership": 0.87,
+        "Organization": 0.9,
+        "Altruism": 0.86,
+        "Creativity": 0.88,
+        "Analysis": 0.88,
+        "Production": 0.81,
+        "Adventure": 0.82,
+        "Erudition": 0.79
+      },
+      "college": {
+        "Leadership": 0.85,
+        "Organization": 0.91,
+        "Altruism": 0.84,
+        "Creativity": 0.89,
+        "Analysis": 0.84,
+        "Production": 0.82,
+        "Adventure": 0.83,
+        "Erudition": 0.75
+      }
+    }
+  },
+  "norms": {
+    "status": "NO_CHINESE_NORMS_NO_CUTOFFS",
+    "active": false,
+    "note": "原文描述统计不可作为诊断线、能力线、职业匹配线或中国常模。不按性别计算推荐，不使用性别差异作个人推断。",
+    "sourceTableAnomaly": "原文Table 1社区Erudition总均值3.58与女性3.40、男性3.12明显不一致；本包不导入该总均值，不自动更正，不计算z分或百分位。"
+  },
+  "thresholds": [],
+  "meanAggregationBasis": "Official key supplies + keys; original validation Table 1 explicitly describes theoretical midpoint 3.00 on 1-to-5 scale, supporting mean-scale presentation. The reviewed source does not state a special weighted or missing-data formula; do not claim a published missingness rule.",
+  "projectMissingRule": "Project rule: require all 92 answers, each integer 1–5, before producing profile; do not impute or substitute neutral. Author missingness policy not located.",
+  "chineseValidated": false
+}

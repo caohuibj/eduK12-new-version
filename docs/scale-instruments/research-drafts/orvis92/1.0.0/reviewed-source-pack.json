@@ -1,0 +1,1191 @@
+{
+  "sourceAccessDate": "2026-10-25",
+  "status": "SOURCE_PACK_READY_NOT_IMPORTED",
+  "code": "ORVIS92",
+  "nameEn": "Oregon Vocational Interest Scales",
+  "nameZh": "俄勒冈职业兴趣量表（ORVIS，92题中文工作译稿）",
+  "itemCount": 92,
+  "license": {
+    "status": "PUBLIC_DOMAIN",
+    "permissionUrl": "https://ipip.ori.org/newPermission.htm",
+    "translationPermissionUrl": "https://ipip.ori.org/",
+    "scope": "Exact official IPIP ORVIS items and scales: copying, editing, translating, commercial/noncommercial use; public GitHub redistribution permitted. Not a license for proprietary CISS or article typesetting.",
+    "nonCommercialOnly": false
+  },
+  "translation": {
+    "language": "zh-CN",
+    "status": "AI_WORKING_TRANSLATION_REVIEW_PENDING",
+    "validatedChineseVersion": false,
+    "note": "独立工作译稿，尚未回译、专家审校或开展中文版效度研究。保留原题美国语境（州长、参议员、赏金猎人等），未用本地职业替换；文化适配未完成。"
+  },
+  "administration": {
+    "responseMode": "ADULT_SELF",
+    "instructionEn": "Please rate the degree to which you like to do the following activities, using the following scale. I would like to…",
+    "instructionZh": "请使用以下选项，评价你对从事下列活动的喜欢程度。我想要……",
+    "contextNoteZh": "本问卷问的是喜欢程度，不是你现在会不会做、能不能被录用或应不应该选择某个职业。没有尝试过的活动可能较难想象；你可以不完成问卷，不必为了得到结果而猜答。",
+    "responseOptions": [
+      {
+        "value": 1,
+        "en": "Strongly dislike",
+        "zh": "非常不喜欢"
+      },
+      {
+        "value": 2,
+        "en": "Dislike",
+        "zh": "不喜欢"
+      },
+      {
+        "value": 3,
+        "en": "Neutral",
+        "zh": "中立"
+      },
+      {
+        "value": 4,
+        "en": "Like",
+        "zh": "喜欢"
+      },
+      {
+        "value": 5,
+        "en": "Strongly like",
+        "zh": "非常喜欢"
+      }
+    ],
+    "timeframe": "General current activity preferences; no retrospective day/week window in official form.",
+    "projectMinimumAge": 18,
+    "ageBoundaryStatus": "Conservative implementation boundary, not original validated cutoff",
+    "populationCaution": "研究样本为美国社区成人及加拿大大学新生；不外推为中国常模或中小学生适用性证据。"
+  },
+  "items": [
+    {
+      "position": 1,
+      "originalItemNumber": 1,
+      "en": "Make important things happen",
+      "zh": "推动重要的事情实现",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 2,
+      "originalItemNumber": 2,
+      "en": "Be the financial officer for a company",
+      "zh": "担任一家公司的财务主管",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 3,
+      "originalItemNumber": 3,
+      "en": "Help others learn new ideas",
+      "zh": "帮助他人学习新观念",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 4,
+      "originalItemNumber": 4,
+      "en": "Create works of art",
+      "zh": "创作艺术作品",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 5,
+      "originalItemNumber": 5,
+      "en": "Be a chemist",
+      "zh": "成为化学家",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 6,
+      "originalItemNumber": 6,
+      "en": "Care for cattle or horses",
+      "zh": "照料牛或马",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 7,
+      "originalItemNumber": 7,
+      "en": "Be a professional athlete",
+      "zh": "成为职业运动员",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 8,
+      "originalItemNumber": 8,
+      "en": "Be a translator or interpreter",
+      "zh": "从事笔译或口译工作",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 9,
+      "originalItemNumber": 9,
+      "en": "Lead other people",
+      "zh": "带领其他人",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 10,
+      "originalItemNumber": 10,
+      "en": "Be an office manager",
+      "zh": "担任办公室经理",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 11,
+      "originalItemNumber": 11,
+      "en": "Care for sick people",
+      "zh": "照顾病人",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 12,
+      "originalItemNumber": 12,
+      "en": "Create new fashion designs",
+      "zh": "设计新的时装款式",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 13,
+      "originalItemNumber": 13,
+      "en": "Design a laboratory experiment",
+      "zh": "设计实验室实验",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 14,
+      "originalItemNumber": 14,
+      "en": "Be a farmer",
+      "zh": "从事农业生产",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 15,
+      "originalItemNumber": 15,
+      "en": "Engage in exciting adventure",
+      "zh": "参与令人兴奋的探险",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 16,
+      "originalItemNumber": 16,
+      "en": "Be a librarian",
+      "zh": "担任图书馆员",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 17,
+      "originalItemNumber": 17,
+      "en": "Be a sales or marketing director",
+      "zh": "担任销售或市场营销总监",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 18,
+      "originalItemNumber": 18,
+      "en": "Plan budgets",
+      "zh": "编制预算",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 19,
+      "originalItemNumber": 19,
+      "en": "Be an elementary-school teacher",
+      "zh": "成为小学教师",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 20,
+      "originalItemNumber": 20,
+      "en": "Be a professional dancer",
+      "zh": "成为职业舞蹈演员",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 21,
+      "originalItemNumber": 21,
+      "en": "Be a mathematician",
+      "zh": "成为数学家",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 22,
+      "originalItemNumber": 22,
+      "en": "Construct new buildings",
+      "zh": "建造新的建筑物",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 23,
+      "originalItemNumber": 23,
+      "en": "Survive in the wilderness",
+      "zh": "在荒野中求生",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 24,
+      "originalItemNumber": 24,
+      "en": "Be a professor of English",
+      "zh": "成为英语教授",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 25,
+      "originalItemNumber": 25,
+      "en": "Be the chief executive of a large company",
+      "zh": "担任一家大型公司的首席执行官",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 26,
+      "originalItemNumber": 26,
+      "en": "Prepare financial contracts",
+      "zh": "拟订财务合同",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 27,
+      "originalItemNumber": 27,
+      "en": "Be a social worker",
+      "zh": "成为社会工作者",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 28,
+      "originalItemNumber": 28,
+      "en": "Write short stories or novels",
+      "zh": "创作短篇故事或长篇小说",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 29,
+      "originalItemNumber": 29,
+      "en": "Explain scientific concepts to others",
+      "zh": "向他人解释科学概念",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 30,
+      "originalItemNumber": 30,
+      "en": "Be a forest ranger",
+      "zh": "成为护林员",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 31,
+      "originalItemNumber": 31,
+      "en": "Be a racing car driver",
+      "zh": "成为赛车手",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 32,
+      "originalItemNumber": 32,
+      "en": "Make up word puzzles",
+      "zh": "编制文字谜题",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 33,
+      "originalItemNumber": 33,
+      "en": "Organize a political campaign",
+      "zh": "组织政治竞选活动",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 34,
+      "originalItemNumber": 34,
+      "en": "Develop an office filing system",
+      "zh": "建立办公室档案管理系统",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 35,
+      "originalItemNumber": 35,
+      "en": "Be a minister, priest, rabbi, or other religious teacher",
+      "zh": "成为牧师、神父、拉比或其他宗教教师",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 36,
+      "originalItemNumber": 36,
+      "en": "Play an instrument in a symphony",
+      "zh": "在交响乐团中演奏乐器",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 37,
+      "originalItemNumber": 37,
+      "en": "Be a physicist",
+      "zh": "成为物理学家",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 38,
+      "originalItemNumber": 38,
+      "en": "Cultivate plants",
+      "zh": "栽培植物",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 39,
+      "originalItemNumber": 39,
+      "en": "Face physical danger",
+      "zh": "面对人身危险",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 40,
+      "originalItemNumber": 40,
+      "en": "Edit a newspaper",
+      "zh": "编辑报纸",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 41,
+      "originalItemNumber": 41,
+      "en": "Be the master of ceremonies at a meeting",
+      "zh": "担任会议主持人",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 42,
+      "originalItemNumber": 42,
+      "en": "Supervise the work of others",
+      "zh": "监督他人的工作",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 43,
+      "originalItemNumber": 43,
+      "en": "Counsel persons who need help",
+      "zh": "为需要帮助的人提供咨询",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 44,
+      "originalItemNumber": 44,
+      "en": "Redecorate one’s house",
+      "zh": "重新装饰自己的房子",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 45,
+      "originalItemNumber": 45,
+      "en": "Carry out medical research",
+      "zh": "开展医学研究",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 46,
+      "originalItemNumber": 46,
+      "en": "Go on nature walks",
+      "zh": "在大自然中散步",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 47,
+      "originalItemNumber": 47,
+      "en": "Be a military officer",
+      "zh": "成为军官",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 48,
+      "originalItemNumber": 48,
+      "en": "Know many languages",
+      "zh": "掌握多种语言",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 49,
+      "originalItemNumber": 49,
+      "en": "Plan an advertising campaign",
+      "zh": "策划广告宣传活动",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 50,
+      "originalItemNumber": 50,
+      "en": "Plan investment strategies",
+      "zh": "规划投资策略",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 51,
+      "originalItemNumber": 51,
+      "en": "Instruct parents on child care",
+      "zh": "指导父母照顾孩子",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 52,
+      "originalItemNumber": 52,
+      "en": "Select art works for a museum",
+      "zh": "为博物馆挑选艺术作品",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 53,
+      "originalItemNumber": 53,
+      "en": "Be a scientific reporter",
+      "zh": "成为科学记者",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 54,
+      "originalItemNumber": 54,
+      "en": "Do woodworking",
+      "zh": "做木工",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 55,
+      "originalItemNumber": 55,
+      "en": "Compete in athletic events",
+      "zh": "参加体育竞赛",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 56,
+      "originalItemNumber": 56,
+      "en": "Be a foreign correspondent",
+      "zh": "成为驻外记者",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 57,
+      "originalItemNumber": 57,
+      "en": "Debate topics in a public meeting",
+      "zh": "在公开会议上就议题进行辩论",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 58,
+      "originalItemNumber": 58,
+      "en": "Establish time schedules",
+      "zh": "制订时间安排",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 59,
+      "originalItemNumber": 59,
+      "en": "Be a doctor or nurse",
+      "zh": "成为医生或护士",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 60,
+      "originalItemNumber": 60,
+      "en": "Sing professionally",
+      "zh": "以歌唱为职业",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 61,
+      "originalItemNumber": 61,
+      "en": "Solve complex puzzles",
+      "zh": "解答复杂的谜题",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 62,
+      "originalItemNumber": 62,
+      "en": "Raise flowers",
+      "zh": "种花",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 63,
+      "originalItemNumber": 63,
+      "en": "Be a bounty hunter",
+      "zh": "成为赏金猎人",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 64,
+      "originalItemNumber": 64,
+      "en": "Speak fluently on any subject",
+      "zh": "就任何话题流畅地表达",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 65,
+      "originalItemNumber": 65,
+      "en": "Persuade others to change their views",
+      "zh": "说服他人改变观点",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 66,
+      "originalItemNumber": 66,
+      "en": "Monitor business expenses",
+      "zh": "监控企业开支",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 67,
+      "originalItemNumber": 67,
+      "en": "Be a physical therapist",
+      "zh": "成为物理治疗师",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 68,
+      "originalItemNumber": 68,
+      "en": "Be an actor or actress",
+      "zh": "成为演员",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 69,
+      "originalItemNumber": 69,
+      "en": "Develop a computer program",
+      "zh": "开发计算机程序",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 70,
+      "originalItemNumber": 70,
+      "en": "Repair cars or trucks",
+      "zh": "修理汽车或卡车",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 71,
+      "originalItemNumber": 71,
+      "en": "Be a long-distance bicycle rider",
+      "zh": "进行长途骑行",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 72,
+      "originalItemNumber": 72,
+      "en": "Read many books",
+      "zh": "阅读许多书籍",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 73,
+      "originalItemNumber": 73,
+      "en": "Be a state governor or senator",
+      "zh": "成为州长或参议员",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 74,
+      "originalItemNumber": 74,
+      "en": "Be a purchasing agent",
+      "zh": "担任采购员",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 75,
+      "originalItemNumber": 75,
+      "en": "Provide comfort and support to others",
+      "zh": "给他人安慰和支持",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 76,
+      "originalItemNumber": 76,
+      "en": "Be an artist or architect",
+      "zh": "成为艺术家或建筑师",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 77,
+      "originalItemNumber": 77,
+      "en": "Be a statistician",
+      "zh": "成为统计学家",
+      "key": "+",
+      "dimension": "Analysis"
+    },
+    {
+      "position": 78,
+      "originalItemNumber": 78,
+      "en": "Work with tools and machinery",
+      "zh": "使用工具和机器工作",
+      "key": "+",
+      "dimension": "Production"
+    },
+    {
+      "position": 79,
+      "originalItemNumber": 79,
+      "en": "Be a police officer",
+      "zh": "成为警察",
+      "key": "+",
+      "dimension": "Adventure"
+    },
+    {
+      "position": 80,
+      "originalItemNumber": 80,
+      "en": "Keep a diary or journal",
+      "zh": "写日记或日志",
+      "key": "+",
+      "dimension": "Erudition"
+    },
+    {
+      "position": 81,
+      "originalItemNumber": 81,
+      "en": "Run for political office",
+      "zh": "竞选公职",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 82,
+      "originalItemNumber": 82,
+      "en": "Keep track of a company's inventory",
+      "zh": "跟踪一家公司的库存情况",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 83,
+      "originalItemNumber": 83,
+      "en": "Participate in charity events",
+      "zh": "参加慈善活动",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 84,
+      "originalItemNumber": 84,
+      "en": "Act in a play",
+      "zh": "出演戏剧",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 85,
+      "originalItemNumber": 85,
+      "en": "Design Internet web pages",
+      "zh": "设计互联网网页",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 86,
+      "originalItemNumber": 86,
+      "en": "Make decisions that affect a lot of people",
+      "zh": "作出影响许多人的决定",
+      "key": "+",
+      "dimension": "Leadership"
+    },
+    {
+      "position": 87,
+      "originalItemNumber": 87,
+      "en": "Manage a computer data base",
+      "zh": "管理计算机数据库",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 88,
+      "originalItemNumber": 88,
+      "en": "Help people make career decisions",
+      "zh": "帮助他人作出职业决定",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 89,
+      "originalItemNumber": 89,
+      "en": "Write songs",
+      "zh": "创作歌曲",
+      "key": "+",
+      "dimension": "Creativity"
+    },
+    {
+      "position": 90,
+      "originalItemNumber": 90,
+      "en": "Keep detailed records",
+      "zh": "保存详细记录",
+      "key": "+",
+      "dimension": "Organization"
+    },
+    {
+      "position": 91,
+      "originalItemNumber": 91,
+      "en": "Be a counselor or therapist",
+      "zh": "成为咨询师或治疗师",
+      "key": "+",
+      "dimension": "Altruism"
+    },
+    {
+      "position": 92,
+      "originalItemNumber": 92,
+      "en": "Paint or draw",
+      "zh": "绘画或素描",
+      "key": "+",
+      "dimension": "Creativity"
+    }
+  ],
+  "scoring": {
+    "method": "Eight separate unweighted arithmetic item means on 1–5 scale",
+    "methodEvidence": "Official key supplies + keys; original validation Table 1 explicitly describes theoretical midpoint 3.00 on 1-to-5 scale, supporting mean-scale presentation. The reviewed source does not state a special weighted or missing-data formula; do not claim a published missingness rule.",
+    "reverseItemPositions": [],
+    "dimensions": [
+      {
+        "id": "Leadership",
+        "nameZh": "带领与影响",
+        "items": [
+          1,
+          9,
+          17,
+          25,
+          33,
+          41,
+          49,
+          57,
+          65,
+          73,
+          81,
+          86
+        ],
+        "itemCount": 12,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 12,
+        "rawSumMax": 60
+      },
+      {
+        "id": "Organization",
+        "nameZh": "组织与安排",
+        "items": [
+          2,
+          10,
+          18,
+          26,
+          34,
+          42,
+          50,
+          58,
+          66,
+          74,
+          82,
+          87,
+          90
+        ],
+        "itemCount": 13,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 13,
+        "rawSumMax": 65
+      },
+      {
+        "id": "Altruism",
+        "nameZh": "助人与照顾",
+        "items": [
+          3,
+          11,
+          19,
+          27,
+          35,
+          43,
+          51,
+          59,
+          67,
+          75,
+          83,
+          88,
+          91
+        ],
+        "itemCount": 13,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 13,
+        "rawSumMax": 65
+      },
+      {
+        "id": "Creativity",
+        "nameZh": "艺术与创作",
+        "items": [
+          4,
+          12,
+          20,
+          28,
+          36,
+          44,
+          52,
+          60,
+          68,
+          76,
+          84,
+          85,
+          89,
+          92
+        ],
+        "itemCount": 14,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 14,
+        "rawSumMax": 70
+      },
+      {
+        "id": "Analysis",
+        "nameZh": "分析与探究",
+        "items": [
+          5,
+          13,
+          21,
+          29,
+          37,
+          45,
+          53,
+          61,
+          69,
+          77
+        ],
+        "itemCount": 10,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 10,
+        "rawSumMax": 50
+      },
+      {
+        "id": "Production",
+        "nameZh": "动手与自然",
+        "items": [
+          6,
+          14,
+          22,
+          30,
+          38,
+          46,
+          54,
+          62,
+          70,
+          78
+        ],
+        "itemCount": 10,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 10,
+        "rawSumMax": 50
+      },
+      {
+        "id": "Adventure",
+        "nameZh": "运动与冒险",
+        "items": [
+          7,
+          15,
+          23,
+          31,
+          39,
+          47,
+          55,
+          63,
+          71,
+          79
+        ],
+        "itemCount": 10,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 10,
+        "rawSumMax": 50
+      },
+      {
+        "id": "Erudition",
+        "nameZh": "语言与阅读",
+        "items": [
+          8,
+          16,
+          24,
+          32,
+          40,
+          48,
+          56,
+          64,
+          72,
+          80
+        ],
+        "itemCount": 10,
+        "meanMin": 1,
+        "meanMax": 5,
+        "rawSumMin": 10,
+        "rawSumMax": 50
+      }
+    ],
+    "totalScore": null,
+    "totalScoreNote": "No overall score: summing eight interests creates an unsupported general-interest/fitness score. Raw sums across unequal-length scales must not be directly compared.",
+    "missing": "Project rule: require all 92 answers, each integer 1–5, before producing profile; do not impute or substitute neutral. Author missingness policy not located.",
+    "direction": "Higher within a scale = stronger reported liking of the listed activities, not ability, fitness, merit or symptom severity."
+  },
+  "empiricalThresholds": [],
+  "norms": {
+    "status": "NO_CHINESE_NORMS_NO_CUTOFFS",
+    "active": false,
+    "note": "原文描述统计不可作为诊断线、能力线、职业匹配线或中国常模。不按性别计算推荐，不使用性别差异作个人推断。",
+    "sourceTableAnomaly": "原文Table 1社区Erudition总均值3.58与女性3.40、男性3.12明显不一致；本包不导入该总均值，不自动更正，不计算z分或百分位。"
+  },
+  "validation": {
+    "citation": "Pozzebon, J. A., Visser, B. A., Ashton, M. C., Lee, K., & Goldberg, L. R. (2010). Psychometric characteristics of a public-domain self-report measure of vocational interests: The Oregon Vocational Interest Scales. Journal of Personality Assessment, 92(2), 168–174.",
+    "doi": "10.1080/00223890903510431",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2822996/",
+    "samples": [
+      {
+        "name": "Eugene-Springfield community",
+        "n": 665,
+        "meanAge": 62,
+        "sdAge": 11.7,
+        "note": "Over 98% Caucasian; 85% some college education; not Chinese norms"
+      },
+      {
+        "name": "Canadian first-year college",
+        "n": 346,
+        "meanAge": 18.5,
+        "sdAge": 1.7,
+        "note": "Not a secondary-school validation sample"
+      }
+    ],
+    "reliabilityAlpha": {
+      "community": {
+        "Leadership": 0.87,
+        "Organization": 0.9,
+        "Altruism": 0.86,
+        "Creativity": 0.88,
+        "Analysis": 0.88,
+        "Production": 0.81,
+        "Adventure": 0.82,
+        "Erudition": 0.79
+      },
+      "college": {
+        "Leadership": 0.85,
+        "Organization": 0.91,
+        "Altruism": 0.84,
+        "Creativity": 0.89,
+        "Analysis": 0.84,
+        "Production": 0.82,
+        "Adventure": 0.83,
+        "Erudition": 0.75
+      }
+    }
+  },
+  "tags": {
+    "domain": [
+      "兴趣与生涯探索"
+    ],
+    "construct": [
+      "活动偏好",
+      "带领与影响",
+      "组织与安排",
+      "助人与照顾",
+      "艺术与创作",
+      "分析与探究",
+      "动手与自然",
+      "运动与冒险",
+      "语言与阅读"
+    ],
+    "orientation": [
+      "职业兴趣构念研究",
+      "非治疗取向"
+    ],
+    "population": [
+      "成人自评",
+      "大学生研究样本",
+      "社区成人研究样本"
+    ],
+    "response": [
+      "自评",
+      "喜欢程度",
+      "五点量尺",
+      "92题完整版本"
+    ],
+    "use": [
+      "自我探索",
+      "研究",
+      "非诊断",
+      "不用于教育或招聘选拔"
+    ],
+    "license": [
+      "公共领域",
+      "可商用",
+      "可翻译",
+      "可公开再分发"
+    ],
+    "language": [
+      "中文工作译稿",
+      "未完成中文验证"
+    ]
+  },
+  "report": {
+    "title": "看看哪些活动更能吸引你",
+    "introduction": "把这份结果当作一张“想试试什么”的活动地图，而不是给人生定方向的判决书。你可以同时喜欢好几类活动，也可以暂时没有特别喜欢的一类。",
+    "dimensions": {
+      "Leadership": {
+        "title": "带领与影响",
+        "meaning": "这组活动围绕带领团队、表达主张和推动事情。喜欢这些活动不等于已经具备管理能力。",
+        "everydayExample": "一起筹备活动时，你可能更关注提出方向、协调大家，或更愿意承担其他角色。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "试着为一次小型自愿活动提出一个方案，再观察你更享受发起、协调还是执行。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Organization": {
+        "title": "组织与安排",
+        "meaning": "这组活动围绕预算、记录、流程和时间安排。关注的是你喜不喜欢做，而不是你是否足够细心。",
+        "everydayExample": "面对一次出游，你可能喜欢排日程、算预算，也可能更喜欢随行体验。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "为一件小事做一张简单清单，做完后留意：安排过程让你觉得有趣还是消耗？",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Altruism": {
+        "title": "助人与照顾",
+        "meaning": "这组活动围绕教学、照顾和支持他人。不喜欢某些助人职业，并不等于缺少善意。",
+        "everydayExample": "在朋友学习新东西时，你可能享受讲解与陪伴，也可能更喜欢独立探索。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "在对方愿意的前提下，花十分钟分享一项你熟悉的小技能；不需要承担专业照护责任。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Creativity": {
+        "title": "艺术与创作",
+        "meaning": "这组活动围绕写作、设计、表演和视觉创作。兴趣不需要先有拿得出手的作品。",
+        "everydayExample": "同一个周末，你可能想画画、写故事或看表演，也可能有别的充电方式。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "用十分钟做一张小画或写一段故事，只记录过程是否让你愿意继续，不评比作品。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Analysis": {
+        "title": "分析与探究",
+        "meaning": "这组活动围绕科学问题、实验、计算和复杂谜题。它不是智力或学业能力测验。",
+        "everydayExample": "遇到一个“为什么”，你可能愿意查资料、试着验证，也可能更想先把眼前事情做好。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "选一个生活中的小问题，找两条可信资料并写下自己的解释，不必做危险实验。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Production": {
+        "title": "动手与自然",
+        "meaning": "这组活动围绕植物、自然、制作和机械操作。不同具体活动的吸引力可能相差很大。",
+        "everydayExample": "照顾一盆植物、整理工具或做个小物件，都可以让你看看自己喜欢哪种动手体验。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "挑一个安全、低成本的小任务，如给植物换盆或拼装简单模型；操作工具前了解安全要求。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Adventure": {
+        "title": "运动与冒险",
+        "meaning": "这组活动围绕运动、挑战和部分带有危险的职业想象。偏好不等于你应该冒险，也不代表现实中的风险承受能力。",
+        "everydayExample": "有的人喜欢运动中的变化和挑战，有的人更享受可预测、安稳的活动；两种偏好都可以。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "如果你想探索挑战感，可以选择规则清楚、风险低、量力而行的运动体验；不要用冒险证明分数。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      },
+      "Erudition": {
+        "title": "语言与阅读",
+        "meaning": "这组活动围绕语言、阅读、写作和知识交流。它不是知识量或文化水平评定。",
+        "everydayExample": "读一本书、学一句外语、写一段观察，都是体验这类兴趣的日常入口。",
+        "reflection": "回看这一组题：哪些活动是真心喜欢，哪些只是听起来体面、熟悉或陌生？如果没有做过，也可以暂时保留判断。",
+        "smallAction": "从感兴趣的主题读一篇短文，或学几个外语表达，再看看哪一部分让你想继续。",
+        "interpretation": "回答越靠近“喜欢”，表示你目前对这一组活动的整体吸引感越强；靠近“不喜欢”表示吸引感较弱。这不是优劣排名，也没有需要达标的分数。"
+      }
+    },
+    "nextStep": "回看两三个你最有兴趣的具体活动，选一件安全、低成本的小尝试。体验之后，再问自己：我喜欢的是活动本身，还是它带来的认可、收入想象或熟悉感？",
+    "limitations": "这份中文题本是尚未验证的工作译稿。结果只整理这一次的兴趣自述，不测能力、人格好坏或职业适配，也不能决定选科、升学、录用、晋升或职业资格。兴趣会随体验与环境改变。",
+    "displayRule": "优先显示8维日常语言说明及对应喜欢程度，不显示诊断、百分位、雷达面积总分或强制前三职业推荐；并列如实保留，不强行排序。",
+    "illustrationIdea": "可使用原创8张活动小卡片作为非评判性的视觉辅助；不要以红绿交通灯表示优劣。尚未生成或部署图片。"
+  },
+  "references": [
+    {
+      "title": "ORVIS Survey",
+      "url": "https://ipip.ori.org/newORVISSurvey.htm",
+      "role": "Exact 92-item order, wording, instruction, anchors"
+    },
+    {
+      "title": "ORVIS Scoring Keys",
+      "url": "https://ipip.ori.org/newORVISKey.htm",
+      "role": "8 dimension memberships; all + keyed"
+    },
+    {
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain commercial/noncommercial use"
+    },
+    {
+      "title": "IPIP Home",
+      "url": "https://ipip.ori.org/",
+      "role": "Copy/edit/translate/use for any purpose without permission or fee"
+    },
+    {
+      "title": "Psychometric Characteristics of a Public-Domain Self-Report Measure of Vocational Interests",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2822996/",
+      "doi": "10.1080/00223890903510431",
+      "role": "Original psychometric study; not item redistribution license"
+    }
+  ],
+  "sourceDifferences": [
+    "Official survey item15 singular adventure; key plural adventures. English preserved from administration survey, meaning unchanged.",
+    "Official survey/key punctuation and apostrophes differ on items35/82; survey text is canonical here.",
+    "Article calls Production/Adventure also Producing/Adventuring. Official key labels retained."
+  ]
+}
