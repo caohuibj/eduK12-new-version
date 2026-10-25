@@ -1,0 +1,49 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "ipip_neo_c1_self_efficacy10"
+  ],
+  "scoreOrder": [
+    "ipip_neo_c1_self_efficacy10"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_neo_c1_self_efficacy10",
+      "headline": "一般任务自我效能感：描述性反馈",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "总分描述你对完成一般任务、判断情况和寻找解决办法的信心，理论范围为10–50。分数较高表示本次作答呈现更强的任务自我效能感，不等于客观能力、实际绩效或个人价值更高。本工具是IPIP对NEO C1的公共领域表征，不是专有NEO-PI-R题目，也不等同GSE或具体学科的自我效能。中文工作译稿未验证，不提供人群排名和高低等级。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想最近一次完成任务的经历：你的信心来自经验、信息、准备还是他人的支持？"
+        },
+        {
+          "category": "strategy",
+          "text": "选择一个可完成的小步骤，记录用了什么方法和资源；把需要帮助看作任务信息，而不是能力不足的标签。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+    "没有可运行的目标人群常模或经验分档；30仅为理论中点，不是人群均值。",
+    "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+    "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+    "官方英文alpha=.78仅为来源统计，样本细节未重新建立，不冒称中文信度或个人准确性。"
+  ],
+  "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T14:42:00Z",
+      "basis": "AI editorial check: adult self-description, correct source identity, no universal cutoffs or objective ability claims; not human expert review."
+    }
+  }
+}
