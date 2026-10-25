@@ -1,0 +1,220 @@
+{
+  "schemaVersion": 1,
+  "snapshotHead": "14a08e5cd3fc48225f1ec13951c5221d62d2024e",
+  "entries": [
+    {
+      "batch": 1,
+      "localHead": "b200f21c69830495af1d71a809aec5679cb895be",
+      "localTree": "94aad709c5211ef0a95297b4305f81d29048efee",
+      "remoteHead": "0a4e13b1bd0ccc5dc4edf9f961d317d2d3b80634",
+      "remoteParent": "b37520c29e535d54156ec671ad6bdf43a22724e2",
+      "remoteTree": "94aad709c5211ef0a95297b4305f81d29048efee",
+      "date": null,
+      "dateEvidence": null,
+      "scope": {
+        "changedFileCount": 210,
+        "sourcePackagesTouched": [
+          "cesd10_zh_cn_research/1.0.0",
+          "gse3_asku_zh_cn_research/1.0.0",
+          "ipip50_zh_cn_research/1.1.0",
+          "ipip_attending_emotions10_zh_cn_research/1.0.0",
+          "ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0",
+          "ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0",
+          "ipip_nfc10_zh_cn_research/1.0.0",
+          "ipip_opt10_zh_cn_research/1.0.0",
+          "ipip_responsive_joy10_zh_cn_research/1.0.0",
+          "kseg6_zh_cn_research/1.0.0",
+          "kusiv3_zh_cn_research/1.0.0",
+          "phq4_zh_cn_research/1.0.0",
+          "rses10_zh_cn_research/1.0.0",
+          "sop2_zh_cn_research/1.0.0",
+          "sswq16_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 2,
+      "localHead": "a99e4898b6a9fb049e2b143554a61e23bb931a77",
+      "localTree": "7060ef11baf7606b45c6e50cba9853bc00334383",
+      "remoteHead": "d92ce0ffa80179edb03f5d0e2fc50e7c9358f5ec",
+      "remoteParent": "0a4e13b1bd0ccc5dc4edf9f961d317d2d3b80634",
+      "remoteTree": "7060ef11baf7606b45c6e50cba9853bc00334383",
+      "date": "2026-10-25T16:19:54Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 58,
+        "sourcePackagesTouched": [
+          "cesd10_zh_cn_research/1.0.0",
+          "djgls6_zh_cn_research/1.0.0",
+          "gse3_asku_zh_cn_research/1.0.0",
+          "ipip50_zh_cn_research/1.1.0",
+          "ipip_attending_emotions10_zh_cn_research/1.0.0",
+          "ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0",
+          "ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0",
+          "ipip_nfc10_zh_cn_research/1.0.0",
+          "ipip_opt10_zh_cn_research/1.0.0",
+          "ipip_responsive_joy10_zh_cn_research/1.0.0",
+          "kseg6_zh_cn_research/1.0.0",
+          "kusiv3_zh_cn_research/1.0.0",
+          "phq4_zh_cn_research/1.0.0",
+          "rses10_zh_cn_research/1.0.0",
+          "sas_sv10_zh_cn_research/1.0.0",
+          "sci8_zh_cn_research/1.0.0",
+          "sop2_zh_cn_research/1.0.0",
+          "sswq16_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 3,
+      "localHead": "98d1b8f77f6249833819a1d1282cb68dcf98fce1",
+      "localTree": "578259b7bd154585f7d42b6b1d21bfe4572b4cb6",
+      "remoteHead": "f47f75bd4b8e1c7804e53677b23816274edfbf1c",
+      "remoteParent": "d92ce0ffa80179edb03f5d0e2fc50e7c9358f5ec",
+      "remoteTree": "578259b7bd154585f7d42b6b1d21bfe4572b4cb6",
+      "date": "2026-10-25T16:30:30Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 75,
+        "sourcePackagesTouched": [
+          "ipip_emotion_based_decision9_zh_cn_research/1.0.0",
+          "ipip_empathic_concern10_zh_cn_research/1.0.0",
+          "ipip_positive_expressivity9_zh_cn_research/1.0.0",
+          "jss8_zh_cn_research/1.0.0",
+          "l1_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 4,
+      "localHead": "02db018a3d1a7a17894123f140f06d95546f7616",
+      "localTree": "a715bcdd473cba25513958802657fe6265356220",
+      "remoteHead": "a6208ceaa9efaa4b26470456ba8ecf594216362d",
+      "remoteParent": "f47f75bd4b8e1c7804e53677b23816274edfbf1c",
+      "remoteTree": "a715bcdd473cba25513958802657fe6265356220",
+      "date": "2026-10-25T16:48:54.018Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 84,
+        "sourcePackagesTouched": [
+          "gad7_zh_cn_research/1.1.0",
+          "k6_zh_cn_research/1.1.0",
+          "mslq_critical_thinking5_zh_cn_research/1.0.0",
+          "mwq5_zh_cn_research/1.0.0",
+          "srq63_brown_miller_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 5,
+      "localHead": "08341d4324357802b160b8deac8905ee6f1d21df",
+      "localTree": "316aa9746952efcadfb48b211d2b3ab474171469",
+      "remoteHead": "6d50023ebb8cc6e984251ed6a9e24ff24b44a9b9",
+      "remoteParent": "a6208ceaa9efaa4b26470456ba8ecf594216362d",
+      "remoteTree": "316aa9746952efcadfb48b211d2b3ab474171469",
+      "date": "2026-10-25T17:03:07.395408+00:00",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 64,
+        "sourcePackagesTouched": [
+          "cbi_zh_cn/1.0.0",
+          "hse_msit_zh_cn/1.0.0",
+          "tswq_zh_cn/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 6,
+      "localHead": "0cd7d69547000bb548718d5fd679b56b5683835f",
+      "localTree": "86a9bd01315dc945baf949d8e5c57bfcd664b975",
+      "remoteHead": "46681d72200ae769efdc2d38080b3f569a1f94f2",
+      "remoteParent": "6d50023ebb8cc6e984251ed6a9e24ff24b44a9b9",
+      "remoteTree": "86a9bd01315dc945baf949d8e5c57bfcd664b975",
+      "date": "2026-10-25T17:13:54.769814+00:00",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 49,
+        "sourcePackagesTouched": [
+          "csacs9_zh_cn/1.0.0",
+          "ipip_negative_expressivity10_zh_cn_research/1.0.0",
+          "ipip_responsive_distress10_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 7,
+      "localHead": "09450a350326ab520795dc6c2953341f0946187e",
+      "localTree": "b3b3fb01a95685a2f44d8d00cc2fa7c072fec51b",
+      "remoteHead": "29a5ea15217d829611b73d96615d3394328cdba2",
+      "remoteParent": "46681d72200ae769efdc2d38080b3f569a1f94f2",
+      "remoteTree": "b3b3fb01a95685a2f44d8d00cc2fa7c072fec51b",
+      "date": "2026-10-25T17:23:49.270Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 17,
+        "sourcePackagesTouched": [
+          "orvis92_zh_cn_research/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 8,
+      "localHead": "68061f416e3f40a00d0c642b21bd770da1dbf524",
+      "localTree": "eb700745bec29205ecdc270bf6ffb13cbd3e02c0",
+      "remoteHead": "1c31befcc8e5d5308d8a41c76d1651f1aa45e992",
+      "remoteParent": "29a5ea15217d829611b73d96615d3394328cdba2",
+      "remoteTree": "eb700745bec29205ecdc270bf6ffb13cbd3e02c0",
+      "date": "2026-10-25T17:45:37Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 20,
+        "sourcePackagesTouched": [
+          "pba23_2018_zh_cn/1.0.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    },
+    {
+      "batch": 9,
+      "localHead": "14a08e5cd3fc48225f1ec13951c5221d62d2024e",
+      "localTree": "5069e4faea8d04ff67c5e9b27b886d27afb77809",
+      "remoteHead": "0e9087a340a692bc5b93df783a692a217413cf44",
+      "remoteParent": "1c31befcc8e5d5308d8a41c76d1651f1aa45e992",
+      "remoteTree": "5069e4faea8d04ff67c5e9b27b886d27afb77809",
+      "date": "2026-10-25T18:03:42Z",
+      "dateEvidence": "verifiedAt",
+      "scope": {
+        "changedFileCount": 16,
+        "sourcePackagesTouched": [
+          "ie4_zh_cn_research/1.1.0"
+        ],
+        "publicDocumentationChanged": true
+      },
+      "treeMatch": true,
+      "ciRun": false
+    }
+  ]
+}
