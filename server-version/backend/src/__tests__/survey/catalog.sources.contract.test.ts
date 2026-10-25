@@ -101,7 +101,7 @@ describe('immutable system catalog source adapters',()=>{
     const db={$queryRaw:vi.fn().mockResolvedValue([{platformRole:'SYSTEM_ADMIN'}]),
       scale:{findMany:vi.fn().mockResolvedValue([])},sjtAuthorRelease:{findMany:vi.fn().mockResolvedValue([])},
       cognitiveTestConfig:{findMany:vi.fn().mockResolvedValue([])},huiteacherFormInstrument:{findMany:vi.fn()}}
-    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',limit:500,page:1},db as never)
+    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',limit:500,page:1,includeGoverned:false},db as never)
     expect(result.list.length).toBeLessThanOrEqual(25)
     expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({take:26}))
     expect(db.huiteacherFormInstrument.findMany).not.toHaveBeenCalled()
@@ -144,7 +144,7 @@ describe('immutable system catalog source adapters',()=>{
   it('keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup',async()=>{
     const definition=scale(),rows=Array.from({length:26},(_,i)=>({id:'source-'+i,instrumentVersion:'1',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom-'+i,name:'Source '+i,definition,definitionHash:hashScaleDefinition(definition)}))
     const db={scale:{findMany:vi.fn().mockResolvedValue(rows),findFirst:vi.fn()},$queryRaw:vi.fn()}
-    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25},db as never)
+    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25,includeGoverned:false},db as never)
     expect(result.list).toHaveLength(25);expect(result.hasMore).toBe(true)
     expect(result.list.every(r=>!r.available&&r.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(db.scale.findMany).toHaveBeenCalledTimes(1)
@@ -170,7 +170,7 @@ describe('immutable system catalog source adapters',()=>{
     expect(()=>adaptCatalogQuestionnaireForm({...ref,sourceVersion:'old'},row,'admin')).toThrow('VERSION_CHANGED')
     expect(()=>adaptCatalogQuestionnaireForm({...ref,sourceVersion:questionnaireFormSourceVersion({...row,contextSection:true})},{...row,contextSection:true},'admin')).toThrow('CONTEXT_UNSUPPORTED')
     const db={$queryRaw:vi.fn().mockResolvedValue([]),questionnaireFormSection:{findMany:vi.fn().mockResolvedValue([row]),findFirst:vi.fn().mockResolvedValue(row)}}
-    const listed=await listCatalogSources({actorUserId:'admin',kind:'FORM'},db as never)
+    const listed=await listCatalogSources({actorUserId:'admin',kind:'FORM',includeGoverned:false},db as never)
     expect(listed.list).toEqual([{ref,title:row.title,available:true,unsupportedReason:null,definitionDigest:ref.sourceVersion}])
     expect(db.$queryRaw).not.toHaveBeenCalled();expect(db.questionnaireFormSection.findFirst).not.toHaveBeenCalled()
     expect(db.questionnaireFormSection.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:'admin',status:'PUBLISHED'}}}))

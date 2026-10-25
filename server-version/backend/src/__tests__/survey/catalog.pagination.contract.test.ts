@@ -19,7 +19,7 @@ function catalog(total:number){
 }
 beforeEach(()=>{
   vi.resetAllMocks()
-  db.$queryRaw.mockResolvedValue([{platformRole:'SYSTEM_ADMIN'}])
+  db.$queryRaw.mockImplementation(async(query:unknown)=>{const sql=Array.isArray(query)?query.join(''):(query as {sql?:string}).sql??'';return sql.includes('admin_entry_grants')?[{id:'admin'}]:[]})
 })
 
 describe('bounded source catalog pagination',()=>{
@@ -39,7 +39,7 @@ describe('bounded source catalog pagination',()=>{
     expect(result.list).toHaveLength(count)
     expect(result.list.every(row=>!row.available&&row.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(result.list.map(row=>row.ref.sourceId)).toEqual(Array.from({length:count},(_,i)=>'source-'+String((page-1)*25+i+1).padStart(4,'0')))
-    expect(db.$queryRaw).toHaveBeenCalledTimes(1) // Current administrator authority remains mandatory.
+    expect(db.$queryRaw).toHaveBeenCalledTimes(2) // Current entry authority plus the bounded standard-version index.
     expect(db.scale.findMany).toHaveBeenCalledExactlyOnceWith({where:{status:'PUBLISHED',instrumentClass:'STANDARD'},orderBy:{id:'asc'},skip:(page-1)*25,take:26})
     expect(db.scale.findFirst).not.toHaveBeenCalled()
   })

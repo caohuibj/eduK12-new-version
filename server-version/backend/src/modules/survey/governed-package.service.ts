@@ -10,6 +10,7 @@ import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenUnit,FrozenGovernedPackage,ResearchFrozenPublication} from './publication.service'
 import {assertSurveyToolPolicy,snapshotPolicyIdentity} from './tool-policy'
 import {packageReportWorstCaseBytes,assertPackageReportBytes} from './governed-package.budget'
+import {governedSummaryColumns,type GovernedSummaryRow} from './governed-tool.summary'
 export type PackageGrantRow={id:string;tool_id:string;snapshot_hash:string;user_id:string;status:string;version:number;valid_from:Date;expires_at:Date|null;created_by:string;reason:string;revoked_at:Date|null}
 const view=(g:PackageGrantRow,title:string,family:string)=>({id:g.id,toolId:g.tool_id,hash:g.snapshot_hash,title,family,status:g.status,version:g.version,validFrom:g.valid_from,expiresAt:g.expires_at,reason:g.reason,mode:'PACKAGE_ONLY',revokedAt:g.revoked_at})
 async function audit(tx:Prisma.TransactionClient,actor:string,action:string,metadata:object,projectId?:string){await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,projectId,action,metadata:metadata as Prisma.InputJsonValue}})}
@@ -36,8 +37,19 @@ export async function revokeSurveyPackage(actor:string,id:string,version:number,
  if(!row)governedFail(409,'整包授权已撤销或状态已变化')
  await audit(tx,actor,'PACKAGE_USE_REVOKED',{grantId:id,reason,historyRetained:true});return {revoked:true}
 })}
-export async function packageGrantsForManager(actor:string,userId:string,page:number){await prisma.$transaction(tx=>assertSurveyManager(tx,actor));const rows=await prisma.$queryRaw<Array<PackageGrantRow&{title:string;family:string}>>`SELECT g.*,t.title,t.family FROM survey_package_grants g JOIN survey_governed_tools t ON t.id=g.tool_id WHERE g.user_id=${userId} ORDER BY g.created_at DESC,g.id LIMIT 25 OFFSET ${(page-1)*25}`;return {list:rows.map(r=>view(r,r.title,r.family)),page}}
-export async function packageGrantsForResearcher(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{await authorizedProject(tx,actor,projectId,false);const rows=await tx.$queryRaw<Array<PackageGrantRow&{title:string;family:string}>>`SELECT g.*,t.title,t.family FROM survey_package_grants g JOIN survey_governed_tools t ON t.id=g.tool_id WHERE g.user_id=${actor} AND g.status='ACTIVE' AND g.valid_from<=clock_timestamp() AND (g.expires_at IS NULL OR g.expires_at>clock_timestamp()) ORDER BY g.created_at DESC,g.id LIMIT 25 OFFSET ${(page-1)*25}`;return {list:rows.map(r=>view(r,r.title,r.family)),page}})}
+type ListedPackageGrant=PackageGrantRow&{tool:GovernedSummaryRow;now:Date;decision:string|null;paused:boolean|null}
+async function listedPackageGrants(tx:Prisma.TransactionClient,userId:string,page:number,query:string,activeOnly:boolean){
+ const pattern='%'+query.trim().replace(/[\\%_]/g,'\\$&')+'%'
+ const rows=await tx.$queryRaw<ListedPackageGrant[]>(Prisma.sql`SELECT g.*,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused FROM survey_package_grants g
+  JOIN LATERAL(SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE t.id=g.tool_id) tool ON true
+  LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
+  WHERE g.user_id=${userId} ${activeOnly?Prisma.sql`AND g.status='ACTIVE'`:Prisma.empty} AND (${query}='' OR tool.title ILIKE ${pattern} OR g.snapshot_hash ILIKE ${pattern})
+  ORDER BY g.created_at DESC,g.id LIMIT 26 OFFSET ${(page-1)*25}`)
+ return {list:rows.slice(0,25).map(r=>{const reasons=[...(r.status==='ACTIVE'?[]:['整包授权已撤销']),...(r.valid_from>r.now?['整包授权尚未生效']:[]),...(r.expires_at&&r.expires_at<=r.now?['整包授权已到期']:[]),...(r.tool.state==='ONLINE'?[]:['此精确工具版本未上线或已停止新增使用']),...(r.decision==='APPROVED'?[]:['此版本尚未批准 Survey 使用范围']),...(r.paused?['此版本 Survey 使用已暂停']:[])]
+  return {...view(r,r.tool.title,r.tool.family),toolVersion:r.tool.tool_version,versions:r.tool.versions,components:r.tool.components,availability:{ready:!reasons.length,reasons,requiresFreshCheck:true}}}),page,hasMore:rows.length>25}
+}
+export async function packageGrantsForManager(actor:string,userId:string,page:number,query=''){return prisma.$transaction(async tx=>{await assertSurveyManager(tx,actor);return listedPackageGrants(tx,userId,page,query,false)})}
+export async function packageGrantsForResearcher(actor:string,projectId:string,page:number,query=''){return prisma.$transaction(async tx=>{await authorizedProject(tx,actor,projectId,false);return listedPackageGrants(tx,actor,page,query,true)})}
 const exactToolKey=(id:string,hash:string)=>id+':'+hash
 async function currentPackageGrant(tx:Prisma.TransactionClient,id:string,actor:string,active=true,verifiedTools?:Map<string,GovernedRow>){
  const [g]=await tx.$queryRaw<PackageGrantRow[]>`SELECT * FROM survey_package_grants WHERE id=${id} AND user_id=${actor} FOR SHARE`

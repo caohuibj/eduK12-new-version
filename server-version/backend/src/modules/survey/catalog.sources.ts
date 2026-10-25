@@ -324,50 +324,51 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
   return snapshot(ref,row!.title,definition,definition,definition,null,{organizationId:ref.organizationId,revision:row!.revision,definitionDigest:row!.definitionDigest,createdByUserId:row!.createdByUserId})
 }
 /** Administrative caller owns authorization; omitted kind selects Scale, never a cross-product scan. */
-export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number},db:Database=prisma):Promise<CatalogSourcePage>{
+export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number;query?:string;includeGoverned?:boolean},db:Database=prisma):Promise<CatalogSourcePage>{
   const kind=input.kind??'SCALE'
   if(kind==='SJT'&&db===prisma)return prisma.$transaction(tx=>listCatalogSources(input,tx))
   const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.max(1,Math.floor(input.page||1))
   if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
   let offset=(page-1)*limit
+  const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
-  if(kind!=='SCALE'){
-    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string}>>`SELECT id,title,snapshot_hash FROM survey_governed_tools WHERE family=${kind} AND state='ONLINE' ORDER BY submitted_at,id`
+  if(kind!=='SCALE'&&input.includeGoverned!==false){
+    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string}>>`SELECT id,title,snapshot_hash FROM survey_governed_tools WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) ORDER BY submitted_at,id`
     for(const row of governed.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},title:row.title})
     offset=Math.max(0,offset-governed.length)
   }
   if(kind==='SCALE'){
-    const online=await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string}}>>`SELECT id,combination_hash,snapshot FROM survey_standard_releases WHERE state='ONLINE' ORDER BY tool_key,created_at,id`
+    const online=input.includeGoverned===false?[]:await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string}}>>`SELECT id,combination_hash,snapshot FROM survey_standard_releases WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) ORDER BY tool_key,created_at,id`
     for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
-    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
+    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
-    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED').sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
+    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
     for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
-    const rows=refs.length<take?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
+    const rows=refs.length<take?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED',...(query?{instrumentKey:contains}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.instrumentKey})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
-    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED',...(query?{OR:[{name:contains},{testType:contains}]}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.configVersion},title:row.name})
     cached={cognitiveTestConfig:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.configVersion===where.configVersion)??null}} as unknown as Database
   }else if(kind==='FORM'&&!input.organizationId){
-    const rows=await db.questionnaireFormSection.findMany({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=await db.questionnaireFormSection.findMany({where:{contextSection:false,...(query?{title:contains}:{}),items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:'questionnaire:'+row.id,sourceVersion:questionnaireFormSourceVersion(row)},title:row.title})
     cached={questionnaireFormSection:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.questionnaire.creatorId===where.questionnaire.creatorId)??null}} as unknown as Database
   }else if(kind==='FORM'){
     await formScope(input.actorUserId,input.organizationId,db)
-    const rows=await db.huiteacherFormInstrument.findMany({where:{organizationId:input.organizationId,status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=await db.huiteacherFormInstrument.findMany({where:{organizationId:input.organizationId,status:'PUBLISHED',...(query?{title:contains}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:String(row.revision),organizationId:input.organizationId},title:row.title})
     cached={huiteacherFormInstrument:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.organizationId===where.organizationId&&r.revision===where.revision)??null}} as unknown as Database
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
-    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},cached,true,db,scaleReleases)
+    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},isGovernedSource(item.ref.sourceId)?db:cached,true,db,scaleReleases)
     list.push({...item,available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){
     if(!(e instanceof CatalogSourceError)&&!(e instanceof Error&&e.name==='SurveyDraftError'))throw e
