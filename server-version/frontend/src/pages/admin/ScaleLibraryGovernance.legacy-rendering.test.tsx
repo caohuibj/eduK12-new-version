@@ -8,7 +8,7 @@ vi.mock('../../api/auth',()=>({authApi:{me:session.me}}))
 const api=vi.hoisted(()=>({catalog:vi.fn(),catalogDetail:vi.fn(),capabilities:vi.fn(),submissionDetail:vi.fn(),submissions:vi.fn(),grants:vi.fn(),review:vi.fn(),setStatus:vi.fn(),grant:vi.fn(),revoke:vi.fn()}))
 vi.mock('../../api/scaleLibraryGovernance',()=>({governanceApi:()=>api,submissionStatusLabel:{SUBMITTED:'待审核'}}))
 const metadata={title:'Synthetic scale',author:'Synthetic author',copyright:'Owned',applicability:'Research',scoringDescription:'Sum',reportDescription:'Descriptive'}
-const submission={id:'submission',releaseId:'release',metadata,version:3,status:'SUBMITTED',product:'TRAINING',supportedEntrypoints:['TRAINING','SURVEY']}
+const submission={id:'submission',releaseId:'release',metadata,version:3,status:'SUBMITTED',product:'TRAINING',supportedEntrypoints:['TRAINING','SURVEY'],admittedEntrypoints:['TRAINING','SURVEY']}
 const entry={...submission,id:'entry',status:'ACTIVE'}
 const record={catalogId:'catalog',origin:'AUTHORED',title:metadata.title,exactVersion:{origin:'AUTHORED',releaseId:'release'},authored:entry}
 let catalogSerialized:ReturnType<typeof vi.fn>,submissionSerialized:ReturnType<typeof vi.fn>
@@ -32,7 +32,10 @@ function SessionReady(){const {isLoading,isAuthenticated}=useAuth();return isLoa
 const open=(survey:boolean)=>render(<MemoryRouter initialEntries={[survey?'/admin/scale-library-governance?workspace=survey':'/admin/scale-library-governance']}><AuthProvider><SessionReady/></AuthProvider></MemoryRouter>)
 describe('governance visible workspace construction',()=>{
   it('serializes only the visible Survey detail and preserves inspected data, reason and grants across views',async()=>{
-    open(false)
+    // The Survey workspace branch of this shared component: the modern tabbed
+    // view with the sidebar reason field, where only the visible detail region
+    // serializes and the grant panel follows the catalog view.
+    open(true)
     fireEvent.click(await screen.findByRole('button',{name:'查看自编精确版本详情'}))
     await screen.findByRole('region',{name:'公共量表精确版本详情'})
     expect(catalogSerialized).toHaveBeenCalledTimes(1)

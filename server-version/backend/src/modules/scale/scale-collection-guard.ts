@@ -25,6 +25,19 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   if(scope.compositeAttemptId){
     const {assertTrainingStandardCollectionAllowed}=await import('../composite/training-standard-collection')
     exact=await assertTrainingStandardCollectionAllowed(tx,scope.compositeAttemptId,ids,scope.compositeItemIds,scope.acceptedReceipt)
+    // Children already committed into the attempt's current epoch were admitted
+    // at START under the then-current locks; the frozen-rules contract lets an
+    // entered attempt finish, so only scales not yet bound to the attempt
+    // re-check the shared stop locks and entry admission. New children are
+    // created after this guard runs, and a restarted epoch leaves prior rows
+    // on a previous epoch, so neither new-START path can borrow this exemption.
+    const bound=await tx.$queryRaw<Array<{scale_id:string}>>(Prisma.sql`SELECT a.scale_id FROM assessments a
+      JOIN composite_assessment_attempts p ON p.id=a.composite_attempt_id
+      WHERE a.composite_attempt_id=${scope.compositeAttemptId} AND a.attempt_epoch=p.attempt_epoch
+      AND a.scale_id=ANY(${ids}::text[])
+      ${scope.compositeItemIds?.length?Prisma.sql`AND a.composite_item_id=ANY(${[...scope.compositeItemIds]}::text[])`:Prisma.empty}
+      FOR SHARE OF a`)
+    for(const row of bound)exact.add(row.scale_id)
   }
   // The shared guard locks Scale rows and resolves release IDs from those locked
   // rows, so an explicit legacy conversion cannot race a stale pre-lock read.
