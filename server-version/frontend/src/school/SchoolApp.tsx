@@ -1,13 +1,14 @@
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { UserRoundPen } from 'lucide-react'
 import './school.css'
 import './school-workspace.css'
 import { useProductTheme } from '../components/product-theme/useProductTheme'
 import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
-import { canReadSchoolClasses, schoolNavigation, workspacePage, workspacePath } from './school-navigation'
+import { canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
@@ -29,6 +30,7 @@ import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports,
 
 import './school-theme.css'
 import './school-home-refresh.css'
+import './school-header-actions.css'
 import '../components/education-tools/education-entry-layout.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
@@ -351,9 +353,15 @@ export default function SchoolApp(){
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
       onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome} appearance={appearance}/>:<header className="hs-header">
       <a href="/workspace" className="hs-workspace-brand" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('overview')}}><SchoolMark/></a>
-      <nav aria-label="校园导航">
+      <nav className="hs-account-actions" aria-label="校园导航">
+        <span className="hs-account">{user.username}</span>
+        <a className="hs-profile-entry" href={workspaceHref('account')} aria-label="个人信息编辑" title="个人信息编辑"
+          aria-current={page==='account'?'page':undefined}
+          onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>
+          <UserRoundPen size={19} aria-hidden="true"/>
+        </a>
+        <button type="button" onClick={()=>void logOut()}>退出</button>
         <ProductThemeControl appearance={appearance} product="School"/>
-        <span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button>
       </nav>
     </header>}
     <main id="hs-main" tabIndex={-1} className={`hs-main${publicHome?' hs-main-landing':publicAuth?' hs-main-auth':user?' hs-main-workspace':''}`}>

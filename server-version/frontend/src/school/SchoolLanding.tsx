@@ -38,18 +38,17 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
     <nav className={`hs-public-nav${open ? ' hs-public-nav-open' : ''}`} id="hs-public-navigation" aria-label="校园导航">
       <button type="button" onClick={() => act(onHome)} aria-current={home ? 'page' : undefined}>首页</button>
       <a href="#hs-features" onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>
-      {!home && appearance && <ProductThemeControl appearance={appearance} product="School"/>}
     </nav>
-    <div className="hs-header-actions" aria-label="校园账号入口">
-      <button type="button" className={`hs-login-entry${home ? ' hs-primary' : ''}`} onClick={() => act(onLogin)}>登录</button>
-      <button type="button" className={`hs-register-entry${home ? '' : ' hs-primary'}`} onClick={() => act(onRegister)}>注册</button>
-      {home && appearance && <ProductThemeControl appearance={appearance} product="School"/>}
-    </div>
     <div className="hs-navigation-toggle">
       <button type="button" className="hs-menu-toggle" ref={menuButton} aria-expanded={open} aria-controls="hs-public-navigation"
         aria-label={open ? '关闭菜单' : '打开菜单'} onClick={() => setOpen(value => !value)}>
         {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
       </button>
+    </div>
+    <div className="hs-header-actions" aria-label="校园账号入口">
+      <button type="button" className={`hs-login-entry${home ? ' hs-primary' : ''}`} onClick={() => act(onLogin)}>登录</button>
+      <button type="button" className={`hs-register-entry${home ? '' : ' hs-primary'}`} onClick={() => act(onRegister)}>注册</button>
+      {appearance && <ProductThemeControl appearance={appearance} product="School"/>}
     </div>
   </header>
 }
