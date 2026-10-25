@@ -31,9 +31,9 @@ export function SchoolProfessionalHome({items,username,schoolName,onNavigate}:{i
  </div>
 }
 
-export function SchoolProfessionalClassScope({children}:{children:ReactNode}){
- return <section className="hs-panel hs-professional-class-scope" aria-label="学校与班级选择">
-  <header><h2>选择学校和班级</h2><SchoolTaskHelp label="学校与班级使用说明" buttonText="使用说明"><p>选择学校和班级后，可进入你已获授权的校园功能。</p><p>查看学校和班级；管理员可维护年级与班级。</p></SchoolTaskHelp></header>
+export function SchoolProfessionalClassScope({children,admission=false}:{children:ReactNode;admission?:boolean}){
+ return <section className="hs-panel hs-professional-class-scope" aria-label={admission?'审批班级选择':'学校与班级选择'}>
+  <header><h2>{admission?'选择班级':'选择学校和班级'}</h2><SchoolTaskHelp label={admission?'班级注册与审批说明':'学校与班级使用说明'} buttonText="使用说明">{admission?<><p>选择学校和班级，刷新后查看注册进度与审批条件。</p><p>学校管理员负责名册和注册窗口；心理教师在注册关闭、人数一致且无待处理异常后确认整班身份审批。</p><p>班级审批不代表校园活动已开放。</p></>:<><p>选择学校和班级后，可进入你已获授权的校园功能。</p><p>查看学校和班级；管理员可维护年级与班级。</p></>}</SchoolTaskHelp></header>
   {children}
  </section>
 }
