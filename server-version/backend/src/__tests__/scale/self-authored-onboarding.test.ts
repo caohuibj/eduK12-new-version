@@ -32,6 +32,18 @@ function database(installed = false) {
 const input = { instrumentKey: key, instrumentVersion: version, actorUserId: 'system', deploymentPolicy: policy }
 
 describe('self-authored formal install, publication and consumption', () => {
+  it('rejects the known scientific territory mismatch in the install plan before creating a deployment', async () => {
+    const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
+    const reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
+    const db = database()
+    const reviewedInput = { ...input, instrumentKey: reviewedKey, deploymentPolicy: { ...policy,
+      selfAuthoredSourceHash: registeredSelfAuthoredSourceProof(reviewedKey, version)!, runtimePolicyHash: reviewedRuntime.runtimePolicyHash } }
+    const wrong = await planScaleInstrumentInstall(db as any, reviewedInput)
+    expect(wrong.allowActivation).toBe(false)
+    expect(wrong.blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    const correct = await planScaleInstrumentInstall(db as any, { ...reviewedInput, deploymentPolicy: { ...reviewedInput.deploymentPolicy, territory: 'CN' } })
+    expect(correct).toMatchObject({ createScale: true, allowActivation: true, blockers: [] })
+  })
   it('plans fresh installation without a fabricated authorization row, and checks the real system actor', async () => {
     const db = database()
     expect(await planScaleInstrumentInstall(db as any, input)).toMatchObject({ createScale: true, allowActivation: true, blockers: [] })
