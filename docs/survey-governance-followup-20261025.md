@@ -392,3 +392,15 @@ scoring/report 版本、题目、权利、reference 改变会改变闭包，严�
 首轮新夹具存在括号语法和缺 project.id，无业务断言通过；修夹具后 10 项通过，
 另补既有 axis bytes 不变 1 项单列验证。原件 `standard-fingerprint{,-fixed-fixtures,-axis}.json`。
 策略审计同时明确“停止后续采集、保留已保存数据”，不再用可能误解为允许在途继续的字段。
+
+## A：已 ACK 导入与草稿选择、只读刷新分阶段
+
+ResearchPackageCatalog 分别记忆“导入已保存”“选择已应用”“等待刷新”。外层实际
+ProjectTools 将选择回调与共享列表 changed 分开；刷新失败后只调用 list.load，不再
+调用 onSelected/onBeforeSelect，也不再次增加 mutation revision。故重试不会把包重新
+移动到末尾或清空后来编辑的 Flow/配额。重试文案明确“重新读取工具列表”。
+
+三项 UI 通过（`05-07-refresh-phases.json`）：目录只有一份 import、选择只应用一次，
+实际 SurveyWaveStudio 在 ACK→读取失败后改为 [b,a]、设置 Flow 与 quota=7，重试后保存
+仍是这些值；实际顶层路由正常交接保持通过。后续新批准的原子整包编辑会阻止新拆包，
+本案例保留为旧损坏草稿恢复期间不被只读刷新覆盖的证据。

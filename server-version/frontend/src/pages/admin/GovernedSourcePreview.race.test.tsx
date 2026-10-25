@@ -61,10 +61,10 @@ it('shows frozen package versions and prevents selection of an expired ACTIVE im
 })
 it('does not create a second package import when only the acknowledged handoff refresh failed',async()=>{
  const grant={id:'grant',hash:'a'.repeat(64),title:'Synthetic',family:'BUNDLE',status:'ACTIVE',versions:{content:'1',parameters:null,report:'1'},availability:{ready:true,reasons:[]}}
- const bindings=[{draftId:'a',slotKey:'a',instrumentKey:'a'}],handoff=vi.fn().mockRejectedValueOnce(new Error('list refresh failed')).mockResolvedValue(undefined)
+ const bindings=[{draftId:'a',slotKey:'a',instrumentKey:'a'}],handoff=vi.fn().mockResolvedValue(undefined),refresh=vi.fn().mockRejectedValueOnce(new Error('list refresh failed')).mockResolvedValue(undefined)
  research.mockImplementation(async(path:string)=>path.endsWith('/import')?{bindings}:{list:[grant],hasMore:false})
- render(<ResearchPackageCatalog projectId="p" busy={false} onImported={handoff}/>);fireEvent.click(screen.getByRole('button',{name:'查看我的整包授权'}));await screen.findByText('Synthetic')
- fireEvent.click(screen.getByRole('button',{name:'整包导入：Synthetic'}));await screen.findByText(/整包已保存，重试只刷新导入交接/)
- fireEvent.click(screen.getByRole('button',{name:'整包导入：Synthetic'}));await screen.findByText(/整包已加入本研究/)
- expect(research.mock.calls.filter(c=>c[0].endsWith('/import'))).toHaveLength(1);expect(handoff).toHaveBeenCalledTimes(2)
+ render(<ResearchPackageCatalog projectId="p" busy={false} onImported={handoff} onRefresh={refresh}/>);fireEvent.click(screen.getByRole('button',{name:'查看我的整包授权'}));await screen.findByText('Synthetic')
+ fireEvent.click(screen.getByRole('button',{name:'整包导入：Synthetic'}));await screen.findByText(/导入与选择已完成，只需重新读取工具列表/)
+ fireEvent.click(screen.getByRole('button',{name:'重新读取工具列表：Synthetic'}));await screen.findByText(/整包已加入本研究/)
+ expect(research.mock.calls.filter(c=>c[0].endsWith('/import'))).toHaveLength(1);expect(handoff).toHaveBeenCalledTimes(1);expect(refresh.mock.calls).toEqual([[{retry:false}],[{retry:true}]])
 })
