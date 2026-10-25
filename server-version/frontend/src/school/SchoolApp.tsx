@@ -8,7 +8,7 @@ import { useProductTheme } from '../components/product-theme/useProductTheme'
 import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
-import {SchoolProfessionalHome,SchoolProfessionalNavigation} from './SchoolProfessionalWorkspace'
+import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
@@ -369,6 +369,15 @@ export default function SchoolApp(){
   const publicHome=!user&&screen==='home'
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
+  const professionalClassPage=professionalWorkspace&&!schoolAdmin&&page==='classes'
+  const contextSecurity=(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>
+  const workspaceContext=page!=='overview'&&page!=='account'&&(user?.role==='TEACHER'||user?.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">
+    {!professionalClassPage&&contextSecurity}
+    <label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>
+    {['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}
+    {professionalClassPage&&contextSecurity}
+  </section>:undefined
+
   return <div className={`hs-app${user?' hs-workspace':''}${user?.role==='STUDENT'?' hs-learner':''}${ordinaryTeacher?' hs-educator':''}${parentWorkspace?' hs-parent':''}${professionalWorkspace?' hs-professional':''}`} data-theme={appearance.theme}>
     <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
@@ -458,7 +467,7 @@ export default function SchoolApp(){
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(professionalWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||professionalWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
+      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(professionalWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||professionalWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalClassPage?undefined:workspaceContext}>
         {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&professionalWorkspace&&<SchoolProfessionalHome items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&!professionalWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
@@ -489,7 +498,8 @@ export default function SchoolApp(){
           </>:
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
-          {page==='classes'&&<section className="hs-panel"><h2>学校与班级</h2>
+          {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
+          {page==='classes'&&!professionalClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
             <div>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}>
               <option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>

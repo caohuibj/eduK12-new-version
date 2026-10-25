@@ -1,5 +1,6 @@
-import type {MouseEvent} from 'react'
+import type {MouseEvent,ReactNode} from 'react'
 import {ArrowRight} from 'lucide-react'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import {workspaceHref,type SchoolNavigationItem} from './school-navigation'
 
 const sections=(items:SchoolNavigationItem[])=>{
@@ -28,4 +29,11 @@ export function SchoolProfessionalHome({items,username,schoolName,onNavigate}:{i
   <header className="hs-professional-home-heading"><div><h1>心理教师工作台</h1><p>你好，{username}。从校园活动、学校事务与专业支持开始今天的工作。</p></div>{schoolName&&<p className="hs-professional-school"><span>当前学校</span>{schoolName}</p>}</header>
   {sections(items).map(section=><section key={section.group} className="hs-professional-section" aria-label={section.group}><h2>{section.group}</h2><div className="hs-workspace-shortcuts">{section.items.map(item=><a key={item.id} href={workspaceHref(item.id)} onClick={event=>follow(event,item.id,onNavigate)}><span className="hs-professional-card-icon"><item.icon size={22} aria-hidden="true"/></span><div><h3>{item.label}</h3><p>{item.description}</p></div><ArrowRight size={17} aria-hidden="true"/></a>)}</div></section>)}
  </div>
+}
+
+export function SchoolProfessionalClassScope({children}:{children:ReactNode}){
+ return <section className="hs-panel hs-professional-class-scope" aria-label="学校与班级选择">
+  <header><h2>选择学校和班级</h2><SchoolTaskHelp label="学校与班级使用说明" buttonText="使用说明"><p>选择学校和班级后，可进入你已获授权的校园功能。</p><p>查看学校和班级；管理员可维护年级与班级。</p></SchoolTaskHelp></header>
+  {children}
+ </section>
 }
