@@ -4,6 +4,7 @@ import {artifactBlockers,artifactReference,snapshotUnit,type GovernedArtifact} f
 import {computeGovernedTrial} from '../../modules/survey/governed-tool.trial'
 import {compileSjtNativeV1Fixture} from '../fixtures/sjt-native-v1.fixture'
 import {createSjtNativeStagedPackage} from '../fixtures/sjt-native-staged.fixture'
+import {packageReportWorstCaseBytes,jsonBytes} from '../../modules/survey/governed-package.budget'
 vi.mock('../../modules/situational/onboarding/scientific-registry',async original=>{
  const actual=await original<typeof import('../../modules/situational/onboarding/scientific-registry')>()
  const fixture=await import('../fixtures/sjt-native-v1.fixture')
@@ -12,6 +13,13 @@ vi.mock('../../modules/situational/onboarding/scientific-registry',async origina
 afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await (await import('../../config/database')).prisma.$disconnect()})
 describe('governed native SJT retains shared execution and scoring',()=>{
  for(const pkg of [compileSjtNativeV1Fixture().package,createSjtNativeStagedPackage()]){
+  it('bounds native v'+pkg.definition.schemaVersion+' report metrics using its exact frozen units',()=>{
+   const source=adaptCatalogSjt({kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},'Synthetic',{...pkg,releaseStatus:'PUBLISHED'})
+   const a:GovernedArtifact={schemaVersion:1,family:'BUNDLE',toolKey:'synthetic',version:'1',title:'Synthetic',unit:null,parameters:null,report:null,components:[{slotKey:'tool',title:'Synthetic',source:{type:'GOVERNED',id:'synthetic',hash:'a'.repeat(64)},unit:source}],packageReport:{version:'1',title:'Synthetic',introduction:'',disclaimer:'',blocks:[{type:'METRIC',slotKey:'tool',metricKey:'coordination',label:'Synthetic'}]},reference:artifactReference('BUNDLE','synthetic',{})}
+   const rendered=computeGovernedTrial(a,'synthetic',0).result.report!
+   expect(rendered.blocks[0]).toMatchObject({unit:source.nativeSituational!.compiledRuntime.metricDefinitions.coordination.unit})
+   expect(jsonBytes({schemaVersion:1,packageTitle:a.title,packageVersionHash:'a'.repeat(64),reportVersion:'1',sourceFinalHash:'b'.repeat(64),report:rendered})).toBeLessThan(packageReportWorstCaseBytes(a.packageReport!,a.components,a.title))
+  })
   it('runs the exact native v'+pkg.definition.schemaVersion+' synthetic protocol, report and receipt decoder',()=>{
    const source=adaptCatalogSjt({kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},'Synthetic',{...pkg,releaseStatus:'PUBLISHED'})
    const unit=snapshotUnit(source)

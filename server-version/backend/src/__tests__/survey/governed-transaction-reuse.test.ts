@@ -13,6 +13,12 @@ const tx=(active=true)=>({$queryRaw:vi.fn().mockResolvedValueOnce(rows).mockReso
 beforeEach(()=>{mocked.strict.mockReset().mockResolvedValue(tool);mocked.read.mockReset().mockResolvedValue(tool)})
 afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await (await import('../../config/database')).prisma.$disconnect()})
 describe('exact package proofs live only inside one transaction call',()=>{
+ it.each(['REVOKED','EXPIRED'])('checks a later %s grant even when its exact tool is already verified',async status=>{
+  const second={...grant,id:'grant2',...(status==='REVOKED'?{status:'REVOKED'}:{expires_at:new Date(0)})}
+  const fake={$queryRaw:vi.fn().mockResolvedValueOnce([{owner_user_id:'owner'}]).mockResolvedValueOnce([grant]).mockResolvedValueOnce([{now:new Date()}]).mockResolvedValueOnce([second]).mockResolvedValueOnce([{now:new Date()}])}
+  await expect(assertFrozenPackageAdmissions(fake as never,{projectId:'project',governedPackages:['grant','grant2'].map(parentGrantId=>({parentGrantId,toolId:'tool',hash:'hash'}))} as ResearchFrozenPublication)).rejects.toMatchObject({statusCode:403})
+  expect(mocked.strict).toHaveBeenCalledTimes(1)
+ })
  it('reuses the locked exact parent for all members and rechecks authority next request',async()=>{
   await packageBoundCatalogSnapshots(tx() as never,'owner',map(),true)
   expect(mocked.strict).toHaveBeenCalledTimes(1);expect(mocked.read).not.toHaveBeenCalled()

@@ -18,10 +18,10 @@ DB 实工量/字节及存储；不以 SQL 数量代替净收益。
 
 | 阶段 | 任务、依赖与边界 | 当前实际状态/证据 |
 | --- | --- | --- |
-| A 基准及正确性 | 01–07；先复现顺序/native/报告预算/拒答，冻结角色、版本与生命周期合同 | 基准已核实；01 已提交 4c54fafe，9 断言通过；02–07 进行中 |
-| B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 已核远端与历史证据；尚未整合，不以无冲突代替兼容证明 |
+| A 基准及正确性 | 01–07；先复现顺序/native/报告预算/拒答，冻结角色、版本与生命周期合同 | 01–07 已实现并有局部/合成 PG 证据，见各节；用户新政策 21/22 继续实施 |
+| B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 9a1cc142 / 39784cfe 已逐片整合；overview 等余项仍须精确盘点 |
 | C 新基线 | 依赖实际整合 source/config；普通、native mixed、整包报告，进程冷/热分别记录 | 新系列待冻结；历史 d01、31d9 及各候选原件不覆盖 |
-| D 核心减工 | 08–13，以及 14–19 中已证明语义/成本的部分；发布编译复用、参与精确绑定、提交 fresh authority 与同请求事实复用 | 在 A 后按实际合同推进；不建平行 ordinary 协议/每 unit job/authority 缓存 |
+| D 核心减工 | 08–13，以及 14–19 中已证明语义/成本的部分；发布编译复用、参与精确绑定、提交 fresh authority 与同请求事实复用 | 08–13、15 已有定向证据；14、16–19 尚需结构和成本证明 |
 | E 推进与报告 | 依赖 B–D 的合同证据；分离纯 next-plan 与准入/推进写，保逐单元保存、GET 恢复及两入口报告开放差异 | 本 PR 仅纳入已证明兼容片；显式 advance、正文迁移等先列方案 |
 
 完成 A/局部 D 不等于路线图整体完成。旧 M1 ordinary schema 不是当前强前置；
@@ -226,8 +226,8 @@ lint 0 error/4 warning（含数值 epoch ref 和既有 effect 依赖提示）。
 
 实际命令为 backend `vitest run` 上述三个 test 文件，36 项通过
 （`B-perf-selected.json`）。没有新的全流程 CPU/时延或容量结论。
-receipt-only、窄 composite 状态、Scale runtime 复用、Training report single-view、
-overview opt-in 仍待逐消费者整合；不把旧候选已测误写为 main 已有。
+receipt-only、窄 composite 状态、Scale runtime 复用、Training report single-view
+后续已在第二批逐消费者整合；overview opt-in 尚待整合。所有修复仍仅在候选分支。
 
 ### B 第二批：显式 receipt-only 与报告 single-view
 
@@ -258,3 +258,25 @@ raw observation 前跳过自由文本、日期等。最终去标识白名单仍�
 核对不变。普通授权 raw 查看仍可读取原值，未从原件删除任何内容或重计分。
 14 项定向合同通过，包括用访问即抛错的排除字段证明它未被投影（默认普通路径
 仍访问），以及原隐私/链接/analytics 消费者（`15-deidentified.json`）。
+
+## 父对话定向反馈补证
+
+`39784cfe3cf64333e799a968ecd524a8a1c6dc2a` 已推送；远端 main 仍为
+`25215dcc71dd7b4b205ebdef4c92ce9c5785836b`，这些是本任务候选修订，不是 main 已修复。
+
+原 01 的 9 例为 freeze mock 合同。另加真实编译的合法 units=[A,B,C]、Flow=[A,C,B]
+拒绝，units=[A,B]、Flow=[B,A] 拒绝，以及含合法 MATERIAL title/body 的原序通过，
+三项均经过实际 compiler→freeze。仅运行这三个新例，未重复原九例。
+同工具第二 grant 已撤销或过期仍逐项拒绝，两个新例通过。
+`review-compiler-grants.json` 合计 5/5。
+
+METRIC 预算移除固定 240 字符单位假设，使用每个冻结 native/cognitive compiled runtime
+的实际单位；static Scale/SJT 与实际结果一致为 score。新增 native V1/V2 真实 trial 和
+认知 ms/400 次长转义单位，200 次 METRIC 引用均比较实际渲染字节与预算，4/4 通过。
+暂停严格策略、撤销 sourceGrant 和严格检查后不再弱重读的 3 个定向合同通过；
+原件 `review-metric-policy.json` 7/7。4 MB 是**解密后累计报告 JSON 字节**预算，
+不是峰值内存上限；原 codec 每字段解压限仍保留。
+
+native 并发案例证明一份 raw/结果可靠持久化、重复回执和父 FINAL 重放，
+不证明并发 prepare 总共只执行一次 CPU 计分，也不是全协议或浏览器覆盖。
+旧测试撤权后 in-flight 继续仅记录旧行为，不能冒称政策 22 已完成。
