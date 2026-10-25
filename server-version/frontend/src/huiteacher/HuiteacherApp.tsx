@@ -106,6 +106,35 @@ function WorkspaceJump({id,children,selected,onSelect}:{id:string;children:React
 }
 
 
+function PersonalSpaceInfo(){
+  const [open,setOpen]=useState(false)
+  const pinned=useRef(false)
+  const root=useRef<HTMLDivElement>(null)
+  useEffect(()=>{
+    const dismiss=(event:PointerEvent)=>{
+      if(root.current&&!root.current.contains(event.target as Node)){pinned.current=false;setOpen(false)}
+    }
+    document.addEventListener('pointerdown',dismiss)
+    return()=>document.removeEventListener('pointerdown',dismiss)
+  },[])
+  return <div className="ht-workspace-info" ref={root}
+    onMouseEnter={()=>setOpen(true)}
+    onMouseLeave={()=>{if(!pinned.current&&!root.current?.contains(document.activeElement))setOpen(false)}}
+    onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node)){pinned.current=false;setOpen(false)}}}
+    onKeyDown={event=>{if(event.key==='Escape'){pinned.current=false;setOpen(false);event.stopPropagation()}}}>
+    <button type="button" className="ht-workspace-info-trigger" aria-label="个人空间说明"
+      aria-controls="ht-personal-space-info" aria-expanded={open}
+      aria-describedby={open?'ht-personal-space-info':undefined}
+      onFocus={()=>setOpen(true)} onClick={()=>{pinned.current=!pinned.current;setOpen(pinned.current)}}>
+      <Info size={16} aria-hidden="true"/>
+    </button>
+    <p id="ht-personal-space-info" className="ht-workspace-info-copy" role="tooltip" hidden={!open}>
+      个人空间 · 显示本人各学校的任务与个人测评，不随学校选择筛选。
+    </p>
+  </div>
+}
+
+
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
@@ -426,16 +455,12 @@ export default function HuiteacherApp(){
       <section className="ht-panel ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
-          <div className="ht-workspace-meta">
-            <p>欢迎，{me.username}</p>
-            {me.organizations.length>0&&<label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
-              {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
-            </select></label>}
-          </div>
+          <p className="ht-workspace-welcome">欢迎，{me.username}</p>
         </div>
       </section>
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
+      <div className="ht-workspace-switcher">
       <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
           onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
@@ -446,9 +471,10 @@ export default function HuiteacherApp(){
         <button type="button" aria-pressed={workspaceTab==='expert'}
           onClick={()=>changeWorkspaceTab('expert')}><Compass size={18} aria-hidden="true"/>专业实践</button>
       </nav>
+      {workspaceTab==='teacher'&&<PersonalSpaceInfo/>}
+      </div>
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
-        <p className="ht-workspace-context"><Info size={16} aria-hidden="true"/><span>个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</span></p>
         <div className="ht-workspace-body">
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
           <span className="ht-workspace-nav-label">我的任务</span>
@@ -534,6 +560,11 @@ export default function HuiteacherApp(){
         </div>
       </>}
       </>}
+      {me.organizations.length>0&&<div className="ht-workspace-school">
+        <label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
+          {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
+        </select></label>
+      </div>}
     </div>:null}
     </div>
     {me&&!me.mustChangePassword&&<>

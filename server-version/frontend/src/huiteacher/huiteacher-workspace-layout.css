@@ -1,15 +1,19 @@
 /* Teacher workspaces retain their warm journal palette and compact account banner. */
-.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1240px,100%);padding:24px clamp(16px,3vw,32px) 48px;gap:18px}
+.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1120px,100%);padding:24px clamp(16px,3vw,32px) 48px;gap:18px}
 .ht-app[data-theme=dark] .ht-workspace{--ht-workspace-soft:#382d26}
-.ht-app .ht-workspace .ht-workspace-header{padding:12px 16px}
-.ht-workspace-heading{display:grid;gap:4px}
-.ht-workspace-heading h1{font-size:clamp(1.15rem,2vw,1.35rem);line-height:1.4;margin:0}
-.ht-workspace-heading p{margin:0;color:var(--ht-quiet);font-size:.9rem}
-.ht-workspace-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;min-width:0}
-.ht-workspace-meta>p{min-width:0;font-size:.85rem}
-.ht-workspace-meta>.ht-field{display:flex;flex-direction:row;align-items:center;gap:8px;margin:0 0 0 auto;flex:1 1 260px;min-width:0;max-width:430px}
-.ht-workspace-meta>.ht-field>span{flex:none;font-size:12px;white-space:nowrap}
-.ht-workspace-meta>.ht-field>select{flex:1;min-width:0}
+.ht-app .ht-workspace .ht-workspace-header{padding:10px 16px}
+.ht-workspace-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 16px;min-width:0}
+.ht-workspace-heading h1{font-size:clamp(1.05rem,1.7vw,1.2rem);line-height:1.4;margin:0}
+.ht-workspace-heading .ht-workspace-welcome{min-width:0;max-width:100%;margin:0;color:var(--ht-quiet);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-workspace-school{display:flex;justify-content:flex-end;margin-top:8px;padding-top:16px;border-top:1px solid var(--ht-line)}
+.ht-workspace-school>.ht-field{display:flex;flex-direction:row;align-items:center;gap:10px;width:min(430px,100%);min-width:0;margin:0}
+.ht-workspace-school>.ht-field>span{flex:none;font-size:12px;white-space:nowrap}
+.ht-workspace-school>.ht-field>select{flex:1;min-width:0}
+.ht-workspace-switcher{display:flex;align-items:center;gap:8px;min-width:0}
+.ht-workspace-info{position:relative;flex:none}
+.ht-app .ht-workspace-info-trigger{display:inline-flex;align-items:center;justify-content:center;width:36px;min-height:36px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ht-quiet)}
+.ht-app .ht-workspace-info-trigger:hover{background:var(--ht-workspace-soft);color:var(--ht-copper)}
+.ht-workspace .ht-workspace-info-copy{position:absolute;z-index:10;top:100%;right:0;width:300px;max-width:calc(100vw - 48px);margin:0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper);color:var(--ht-ink);box-shadow:0 8px 24px #211c1a26;font-size:13px;line-height:1.8}
 
 /* Main workspaces are distinct from the quieter task navigation. */
 .ht-app .ht-workspace-tabs{display:flex;align-self:start;width:fit-content;max-width:100%;margin:0;padding:5px;gap:4px;border:1px solid var(--ht-line);border-radius:13px;background:var(--ht-paper)}
@@ -21,7 +25,7 @@
 .ht-workspace-context svg{margin-top:3px;color:var(--ht-copper)}
 
 /* Sections remain mounted so navigation never discards in-progress answers. */
-.ht-workspace-body{display:grid;grid-template-columns:200px minmax(0,1fr);gap:22px;align-items:start;min-width:0}
+.ht-workspace-body{display:grid;grid-template-columns:180px minmax(0,1fr);gap:22px;align-items:start;min-width:0}
 .ht-workspace-body>.ht-workspace-jumps{position:sticky;top:20px;display:grid;align-content:start;gap:4px;max-height:calc(100dvh - 40px);overflow:auto;margin:0;padding:10px;border:1px solid var(--ht-line);border-radius:14px;background:var(--ht-paper)}
 .ht-workspace-nav-label{display:block;padding:6px 12px 10px;color:var(--ht-quiet);font-size:12px;letter-spacing:.05em}
 .ht-workspace-jumps a{position:relative;display:flex;align-items:center;gap:10px;min-width:0;min-height:46px;padding:10px 12px;border-radius:9px;color:var(--ht-quiet);text-decoration:none;font-size:14px;font-weight:500;line-height:1.6;overflow-wrap:anywhere}
@@ -70,8 +74,9 @@
 @media(max-width:640px){
  .ht-app .ht-workspace{padding:20px 16px 32px;gap:16px}
  .ht-app .ht-workspace .ht-workspace-header{padding:10px 12px}
- .ht-app .ht-workspace-tabs{width:100%}
- .ht-app .ht-workspace-tabs button{flex:1 1 auto;padding:10px 12px;gap:7px}
+ .ht-app .ht-workspace-switcher .ht-workspace-tabs{width:auto;flex:1}
+ .ht-app .ht-workspace-tabs button{flex:1 1 auto;padding:10px 8px;gap:7px}
+ .ht-app .ht-workspace-info-trigger{width:44px;min-height:44px}
  .ht-workspace .ht-panel{padding:20px 18px;border-radius:14px}
  .ht-workspace .ht-empty{padding:18px;margin-top:18px}
  .ht-workspace-sections{gap:16px}
@@ -80,6 +85,12 @@
  .ht-workspace .ht-inline button{margin-bottom:0}
  .ht-workspace-jumps a{flex:1 1 calc(50% - 4px);justify-content:flex-start;gap:7px;padding:9px 10px;font-size:13px}
  .ht-workspace h2{font-size:19px}
+}
+
+@media(min-width:901px){
+ .ht-app-signed-in:not(.ht-app-landing) .ht-topbar{padding-inline:max(24px,calc((100vw - 1056px)/2));padding-block:12px}
+ .ht-workspace-tabs svg,.ht-workspace-jumps svg{width:16px;height:16px}
+ .ht-app-signed-in .ht-topbar svg:not(.ht-brand-wordmark){width:18px;height:18px}
 }
 
 /* Account settings live in the native modal top layer, separate from workspace content. */
