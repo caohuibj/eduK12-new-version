@@ -1,0 +1,108 @@
+{
+  "instrumentKey": "sop2_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "previousSourceSha256": "88adc05820bf856aae50c9f5c6d2ed7db6055c1e0a2c73da51ae662543a1e297",
+  "sourceSha256": "7ea5c91b2afedce657934b6d0561c7c03693accc95a264754e49486bf7b0c440",
+  "fromReportVersion": "1.0.0",
+  "toReportVersion": "1.0.1",
+  "changeScope": "report-only reader-friendly wording; measurement, scoring, references, licensing and source identity unchanged",
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/headline",
+      "before": "未来期待的自我描述",
+      "after": "乐观与悲观：你对未来的两种声音",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "before": "合成分把你对乐观的自我描述与反向计分后的悲观描述结合起来，取值范围为1–7。数值较高表示本次作答更偏向积极的未来期待，不代表你必须一直乐观，也不是固定人格、实际能力或心理健康的判定。悲观题的原始回答越高表示越悲观；它在合成前使用8减去原始回答，不能把原始值与反向值混用。中文工作译稿尚未经验证，不提供高低分级、百分位或学生筛查结论。",
+      "after": "这两道题分别问你怎样看待自己的乐观与悲观。分数越高，表示这次回答整体更偏向积极的未来期待。期待好事发生，同时担心事情不顺，并不奇怪。这个分数只能提供一个简短观察角度，不能给性格或心理健康下结论，也不提供与他人的排名。悲观题已反向换算，所以原始回答和合成分的方向不同。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "before": "仅作为自我思考时，可以分别写下你期待发生的一件事和你担心的一件事，再思考哪些因素是自己能够影响的。这是另行撰写的提示，并非量表作者的诊断或干预建议。",
+      "after": "想到同一件未来的事时，你期待什么，又担心什么？这两种声音各自在提醒你关注什么？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "before": "选一件自己能够影响的小事记录下一步行动，并允许期待与担忧同时存在；不为追求更高分而改变回答。",
+      "after": "各写下一件期待和担忧，再圈出自己能影响的一小部分。为它定一个下一步，不必先让所有担忧消失。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations",
+      "before": [
+        "两题均完整合法作答才给合成分，个人报告不插补；论文对研究级缺失分析另讨论MI/FIML，不在本包执行。",
+        "中文工作译稿未完成专家译审、认知访谈或本地效度验证。",
+        "英德18–69岁成人在线配额样本统计仅作外部证据，不是中国或青少年常模。",
+        "不存在本包可用的临床阈值或高低分档；4仅为理论中点，不是人群均值。",
+        "超短自陈不能代替全面评估；不用于诊断、能力鉴定、选拔或学校排名。"
+      ],
+      "after": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "只有两道题，能提供的信息很有限；不划分高低，不作排名，也不能用来诊断或鉴定能力。",
+        "国外成人的研究结果只能作资料参考，不能直接用来比较中国个人或未成年人。",
+        "两题都需完整回答才计算结果；漏答不代填。精确计分方法和来源另见计分与参考资料。"
+      ],
+      "reason": "保留成人、待验证、非诊断、缺失和许可等必要边界，用白话缩短；具体样本统计、算法和文献仍保留在源资料/参数档案，不修改。"
+    }
+  ],
+  "measurementHash": "a8fb697db6b0844e0ef686f0417a9fc849953aab1031b606cfc2d300231f594f",
+  "originalMeasurementHash": "a8fb697db6b0844e0ef686f0417a9fc849953aab1031b606cfc2d300231f594f",
+  "finalReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "optimism_composite"
+    ],
+    "scoreOrder": [
+      "optimism_composite"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "optimism_composite",
+        "headline": "乐观与悲观：你对未来的两种声音",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这两道题分别问你怎样看待自己的乐观与悲观。分数越高，表示这次回答整体更偏向积极的未来期待。期待好事发生，同时担心事情不顺，并不奇怪。这个分数只能提供一个简短观察角度，不能给性格或心理健康下结论。悲观题已反向换算，所以原始回答和合成分的方向不同。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "想到同一件未来的事时，你期待什么，又担心什么？这两种声音各自在提醒你关注什么？"
+          },
+          {
+            "category": "strategy",
+            "text": "各写下一件期待和担忧，再圈出自己能影响的一小部分。为它定一个下一步，不必先让所有担忧消失。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "只有两道题，能提供的信息很有限；不划分高低，不作排名，也不能用来诊断或鉴定能力。",
+      "国外成人的研究结果只能作资料参考，不能直接用来比较中国个人或未成年人。",
+      "两题都需完整回答才计算结果；漏答不代填。精确计分方法和来源另见计分与参考资料。"
+    ],
+    "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断。Adapted from Nießen, D., Groskurth, K., Kemper, C. J., Rammstedt, B., & Lechner, C. M. (2022). The Optimism–Pessimism Short Scale–2 (SOP2): a comprehensive validation of the English-language adaptation. Measurement Instruments for the Social Sciences,4,1. https://doi.org/10.1186/s42409-021-00027-6. CC BY4.0. Changes: Chinese working translation and original explanatory feedback; no author endorsement implied. License: https://creativecommons.org/licenses/by/4.0/",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:38:00Z",
+        "basis": "AI editorial check: adult self-report, full construct definitions, endpoints, reverse/raw distinction and attribution. Not human expert approval or psychometric validation."
+      }
+    }
+  },
+  "additionalEditorialAdjustment": "Repeated no-ranking/no-band warnings consolidated in limitations; retained construct-specific caveats and distinct everyday examples."
+}
