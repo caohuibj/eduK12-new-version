@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
-/** IDs come only from the authorized stored attempt/source, never request payload. */
+/** New Training parent/standalone admission, not an existing Attempt's writes.
+ * IDs come from the server's selected exact source, never request payload. */
 export async function assertTrainingScaleCollectionAllowed(tx:Prisma.TransactionClient,scaleIds:string[]){
   const ids=[...new Set(scaleIds)].sort()
   if(!ids.length)return

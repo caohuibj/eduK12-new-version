@@ -443,7 +443,6 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
       }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
-    await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
     const completedAt = new Date()
     const totalTime = Math.max(0, completedAt.getTime() - new Date(assessment.startedAt).getTime())
     const updated = await tx.assessment.updateMany({

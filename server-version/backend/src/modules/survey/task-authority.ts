@@ -4,15 +4,12 @@ import type { verifiedSurveyAttempt } from './admission.service'
 import { hashResearchCredential } from './identity.service'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
-import {assertSurveyScaleCollectionAllowed} from './scale-collection-guard'
-import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
-import type {SurveyFlowAssignment} from './flow.assignment'
 export type SurveyTaskProof={publicId:string;attemptId:string;accessCredential:string;researchCode?:string}
 export type VerifiedSurveyTask=Awaited<ReturnType<typeof verifiedSurveyAttempt>>
 /** Host authority only. Tool-specific eligibility, disclosure and frozen scientific
  * protocol must be checked by the caller before child admission. */
 /** All mutating and participant-read paths share the existing Survey lock order.
- * The Project SHARE serializes revocation/withdrawal; Wave SHARE serializes HARD_STOP.
+ * The Project SHARE serializes revocation/withdrawal; Wave SHARE stabilizes the completion window.
  * Holding Attempt UPDATE serializes starts, restarts, child FINAL and parent FINAL. */
 export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:SurveyTaskProof,known:VerifiedSurveyTask,
   policy:{kind:'COGNITIVE'|'SITUATIONAL';allowCompleted:boolean;fail:(status:number,message:string)=>never}){
@@ -33,7 +30,7 @@ export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:Sur
     ||canonicalHash(JSON.parse(JSON.stringify(publication.compiledSnapshot)))!==known.definitionDigest)
     fail(409,`${tool}的冻结研究定义已失效`)
   const end=wave.finishUntil??wave.closesAt
-  if(wave.hardStopAt||!end||end<=new Date())fail(403,`研究${tool}完成窗口已经结束`)
+  if(!end||end<=new Date())fail(403,`研究${tool}完成窗口已经结束`)
   const hash=hashResearchCredential(proof.accessCredential)
   if(attempt!.participantId){
     if(!proof.researchCode)fail(403,'请提供本人研究编号和私密凭证')
@@ -56,9 +53,5 @@ export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:Sur
       attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot}):null
   const selected=assignment?assignedSurveySnapshot(snapshot,assignment):snapshot
-  if(attempt!.status==='STARTED'){
-    const stored=attempt!.flowAssignmentCipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt!.flowAssignmentCipher):null
-    await assertSurveyScaleCollectionAllowed(tx,assignedSurveySnapshot(selected,stored))
-  }
   return {attempt:attempt!,snapshot:selected}
 }

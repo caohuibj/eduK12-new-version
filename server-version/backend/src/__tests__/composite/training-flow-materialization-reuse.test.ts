@@ -94,10 +94,11 @@ describe('locked Training child candidate reuse',()=>{
     expect(mocks.allowed).not.toHaveBeenCalled()
     expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
   })
-  it('emergency stop rejects a frozen pending child before runtime materialization',async()=>{
+  it('materializes an admitted pending child after a stop without repeating new-start checks',async()=>{
     const {parent}=fixture()
     mocks.tx.$queryRaw.mockImplementation(async(sql:any)=>String(sql?.sql??sql).includes('scale_library_emergency_stops')?[{target_id:'scale'}]:[{id:'scale',measurement_release_id:null}])
-    await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toMatchObject({statusCode:409})
-    expect(mocks.runtime).not.toHaveBeenCalled()
+    await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toBe(mocks.boundary)
+    expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
+    expect(mocks.tx.$queryRaw.mock.calls.some(([sql]:any)=>String(sql?.sql??sql).includes('scale_library_emergency_stops'))).toBe(false)
   })
 })

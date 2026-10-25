@@ -1,0 +1,74 @@
+{
+  "baseHead": "149441f908b57e67d53b55532206cc36b4b55580",
+  "preservedBrowserWip": "bdf424d2724d3df87b4edb0788cd3ab1ba445947",
+  "scope": "First slice only: stop new admission, preserve already-admitted execution. No copyright/C-P-R model or report/export authority changes.",
+  "verification": [
+    {
+      "command": "vitest six direct backend contract files --no-file-parallelism",
+      "result": "75 passed / 2 old checkpoint contract failures",
+      "repair": "Updated explicit semantics; affected checkpoint file rerun 28 passed, 0 failed."
+    },
+    {
+      "command": "vitest five direct consumer files --no-file-parallelism",
+      "result": "31 passed / 1 old mid-flow stop contract failure",
+      "repair": "Updated admitted-child semantics; affected materialization file rerun 8 passed, 0 failed. Education source/authority contracts passed unchanged."
+    },
+    {
+      "command": "vitest SurveyWaveStudio.links and group-ip",
+      "result": "19 passed, 0 failed"
+    },
+    {
+      "command": "vitest research-wave-final and scale-library-governance PG, named cases only --no-file-parallelism",
+      "result": "8 passed;35 name-filtered;not a complete integration-suite run"
+    },
+    {
+      "command": "backend and frontend tsc --noEmit",
+      "result": "passed"
+    },
+    {
+      "command": "vitest public-rate.contract and group-ip-rate.contract, separate bounded invocations",
+      "result": "3 passed and 8 passed; publisher qualification joins removed from the IP-budget lookup, current participant proof retained"
+    }
+  ],
+  "evidence": {
+    "daily-lifecycle-contracts1.log": {
+      "sha256": "e9a131e89bcb6abb90db7f962ccdff7c09051f34d969f68ea851ce66920ef817"
+    },
+    "daily-lifecycle-checkpoint2.log": {
+      "sha256": "dafc9c39e5970292d3d206f5d81b2e6e217472eb7728176d9e73d08114e9ae52"
+    },
+    "daily-lifecycle-direct-consumers1.log": {
+      "sha256": "589e19fa0d6d8f7577084a02208251a451e4c254d63143febde1422cf689c695"
+    },
+    "daily-lifecycle-materialization2.log": {
+      "sha256": "5f764778b5eea3b0bac9fd6201094384aaa1c300a9b2ca13b7b94126448b4ca1"
+    },
+    "daily-lifecycle-frontend1.log": {
+      "sha256": "a6e831f8a2d1c8900106e8b84814f75b95335fd0a3d7aad47c55c7ccf1525414"
+    },
+    "daily-lifecycle-pg2.log": {
+      "sha256": "4f0997bf3a2da327ff4ac76e257c74cca6c8228f8bd40458731aad1b3cc6eb57"
+    },
+    "daily-lifecycle-backend-types3.log": {
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    "daily-lifecycle-frontend-types1.log": {
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    "daily-lifecycle-group-rate1.log": {
+      "sha256": "adeaee412d731567b9532b54645e7cc6b927317e0e3992b30b9e385b42260544"
+    },
+    "daily-lifecycle-rate1.log": {
+      "sha256": "a97894d15da929fa638f24a84d1ec5bc67abdef9c8dc2159f80074072eb6618c"
+    },
+    "daily-lifecycle-backend-types4.log": {
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    }
+  },
+  "boundaries": [
+    "Current authenticated participant, ownership, consent/withdrawal, input validation and frozen identity checks retained.",
+    "Restart with a new epoch retains existing new-admission rules.",
+    "No new CI run, push, merge, deployment or real-data action.",
+    "SQL/resource paired measurements still pending; no performance result claimed."
+  ]
+}

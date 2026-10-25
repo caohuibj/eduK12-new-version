@@ -45,12 +45,12 @@ export async function readToolPolicies(tx:Prisma.TransactionClient,identities:re
 }
 export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,requireApproval:boolean){
  const policy=await readToolPolicy(tx,identity,true)
- if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 分配、准入和后续采集：'+policy.reason)
+ if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 分配和新作答准入：'+policy.reason)
  if(policy.decision==='RETURNED')throw new AdminPermissionError(409,'该精确版本的 Survey 准入已撤回：'+policy.reason)
  if(requireApproval&&policy.decision!=='APPROVED')throw new AdminPermissionError(409,'该精确版本尚未通过 Survey 范围审批：'+policy.reason)
 }
-/** Fresh exact authority at new admission AND each subsequent collection write.
- * Saved FINAL receipt replay and historical report reads have separate gates. */
+/** Fresh new-parent admission only. Frozen execution and report/data authority
+ * have separate boundaries; never call this on an existing Attempt's writes. */
 export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
  await assertFrozenPackageAdmissions(tx,snapshot)
  const checkedSjtAuthorities=new Set<string>()

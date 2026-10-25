@@ -2517,7 +2517,6 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!])
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2647,13 +2646,10 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
-    if(item.scale.status!=='PUBLISHED')throw compositeForbidden('当前量表已不可准入')
-    await assertTrainingScaleCollectionAllowed(tx,[item.scaleId])
     const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
     prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
   }else if(item.type==='COGNITIVE'){
     assertCognitiveModuleEnabled()
-    if(item.cognitiveAssignment.status!=='PUBLISHED'||item.cognitiveAssignment.config.status!=='PUBLISHED')throw compositeForbidden('当前认知配置已不可准入')
     const loaded=await cognitiveSessionService.loadCognitiveSessionConfig(candidate.references[item.id],tx as any)
     if(!loaded.snapshot?.compiledRuntime)throw compositeForbidden('冻结认知运行时缺失')
     prepared.cognitive.set(item.id,{snapshot:loaded.snapshot,compiledRuntime:loaded.snapshot.compiledRuntime})
@@ -2695,6 +2691,9 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
+  // Parent START and publication stop/archive serialize on the same row. Child
+  // progression later consumes the already-admitted immutable runtime plan.
+  await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
       select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
@@ -2714,7 +2713,6 @@ const createAttempt = async (
     // A shared publication lock still fences archive, while independent
     // authenticated admissions keep their own participant lock. Other entry
     // paths retain their outer exclusive publication/token locks.
-    await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
@@ -2934,6 +2932,10 @@ const createAttempt = async (
   }) : null
   const trainingFeedbackSnapshot = feedbackBinding ? freezeTrainingFeedbackSnapshot({ ...feedbackBinding, attemptId: newAttemptId, attemptEpoch }) : null
   const selectedContentItems=new Set<string>(composite.items.map((item:any)=>item.id))
+  // Include conditional/unselected slots before admitting the parent; otherwise
+  // a stop could first be discovered halfway through an accepted attempt.
+  await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,
+    composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({

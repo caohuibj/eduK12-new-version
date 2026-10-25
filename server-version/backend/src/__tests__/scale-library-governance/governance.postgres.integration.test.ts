@@ -202,7 +202,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   expect(response.statusCode).toBe(403)
   expect(await db.assessment.count({where:{scaleId:wrapper.id,userId:student}})).toBe(1)
  })
- it('real FINAL waiting on an uncommitted emergency fence cannot collect after the stop commits',async()=>{
+ it('finishes an admitted frozen FINAL while a new-start stop transaction is held',async()=>{
   const {submitScaleAssessmentFinal}=await import('../../modules/scale/scale-final-submit.service')
   const {entryId,release}=await approved()
   const teacher=(await db.user.create({data:{username:'raceteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
@@ -215,18 +215,14 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const stopping=db.$transaction(async tx=>{await stopCollection(tx,admin,'RELEASE',release.releaseId,'Synthetic FINAL race');locked();await commitStop},{timeout:15000})
   await lockReady
   const final=submitScaleAssessmentFinal(input).then(value=>({ok:true,value}),error=>({ok:false,error}))
-  let waiting=false
+  let timer:ReturnType<typeof setTimeout>|undefined,result:Awaited<typeof final>|undefined
   try{
-    for(let n=0;n<100&&!waiting;n++){
-      const [row]=await db.$queryRaw<Array<{waiting:boolean}>>(Prisma.sql`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND cardinality(pg_blocking_pids(pid))>0 AND query ILIKE '%measurement_content_releases%') AS waiting`)
-      waiting=row.waiting;if(!waiting)await new Promise(resolve=>setTimeout(resolve,25))
-    }
-  }finally{commit()}
+    result=await Promise.race([final,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error('Admitted FINAL waited for a new-start stop')),3000)})])
+  }finally{if(timer)clearTimeout(timer);commit()}
   await stopping
-  expect(waiting).toBe(true)
-  expect((await final).ok).toBe(false)
+  expect(result?.ok).toBe(true)
   const retained=await db.assessment.findUniqueOrThrow({where:{id:assessment.id}})
-  expect(retained.status).toBe('IN_PROGRESS');expect(retained.submissionId).toBeNull();expect(retained.result).toBeNull()
+  expect(retained.status).toBe('COMPLETED');expect(retained.submissionId).toBe(input.submissionId);expect(retained.result).not.toBeNull()
  })
  it('old Serializable snapshots cannot miss a committed stop after the existing-identity fence',async()=>{
   const release=await source();let ready!:()=>void,resume!:()=>void

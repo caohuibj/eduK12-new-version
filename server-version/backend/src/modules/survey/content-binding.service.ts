@@ -74,7 +74,9 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
   if(Boolean(row.content_binding_cipher)!==Boolean(row.content_binding_hash))fail()
   const assignment=row.flow_assignment_cipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(row.flow_assignment_cipher):null
   const selected=assignedSurveySnapshot(snapshot,assignment)
-  if(input.newAttempt||row.status==='STARTED')await assertSurveyScaleCollectionAllowed(tx,selected)
+  // The parent START transaction admits this frozen publication once. Recovery
+  // validates its immutable binding; later tool policy changes cannot reopen it.
+  if(input.newAttempt)await assertSurveyScaleCollectionAllowed(tx,selected)
   if(!input.newAttempt&&!row.content_binding_cipher)return // Legacy recovery never invents an assignment/content binding.
   const cache=new Map<string,StoredRelease>()
   const read=async(id:string)=>{

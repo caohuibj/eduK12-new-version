@@ -1,5 +1,4 @@
 import {SURVEY_NATIVE_SJT_PROTOCOL} from './situational-native.contract'
-import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import { surveySjtQuestions } from './sjt-structure'
 import { assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import { randomUUID } from 'node:crypto'
@@ -92,7 +91,7 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
   },select:{participantId:true,status:true,excludedAt:true,sessionHash:true,
     wave:{select:{publicationId:true,hardStopAt:true,finishUntil:true,closesAt:true}}}})
   if(!attempt||attempt.participantId!==known.participantId||attempt.status!=='STARTED'||
-    attempt.excludedAt!==null||attempt.wave.hardStopAt)
+    attempt.excludedAt!==null)
     fail(403,'此研究作答已经结束或撤回，不允许访问临时草稿')
   const finishUntil=attempt.wave.finishUntil??attempt.wave.closesAt
   if(!finishUntil||finishUntil<=new Date())
@@ -125,7 +124,6 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
     ?await ensureSurveyFlowAssignment(tx,{...known,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot:frozen!}):null
   const snapshot=assignment?assignedSurveySnapshot(frozen!,assignment):frozen!
-  await assertSurveyScaleCollectionAllowed(tx,snapshot)
   return {policy,wave:attempt.wave,snapshot,hasCognitive:frozen!.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)}
 }
 const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyFinalLocator(proof)

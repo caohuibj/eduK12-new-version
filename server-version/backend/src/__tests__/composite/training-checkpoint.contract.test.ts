@@ -183,7 +183,7 @@ describe('checkpoint bounded allocation and lookup regressions',()=>{
   expect(f.keyReads()).toBe(100)
   for(const model of ['compositeFormSectionAttempt','assessment','situationalAttempt','assessmentUnitSnapshot'])expect(mocks.tx[model].findMany).toHaveBeenCalledOnce()
   expect(mocks.scale).toHaveBeenCalledTimes(25);expect(mocks.sjt).toHaveBeenCalledTimes(25)
-  expect(mocks.guard).toHaveBeenCalledExactlyOnceWith(mocks.tx,Array.from({length:25},(_,i)=>`scale${24-i}`))
+  expect(mocks.guard).not.toHaveBeenCalled()
   expect(JSON.parse(row.payloadEncrypted.slice(10)).drafts).toEqual(f.data.envelope.drafts)
  })
  it.each(['FORM_SECTION','SCALE','SITUATIONAL','COGNITIVE'])('rejects %s frozen mismatch in mixed batches',async kind=>{
@@ -208,10 +208,11 @@ describe('checkpoint bounded allocation and lookup regressions',()=>{
   await saveTrainingCheckpoint('attempt',{userId:'user'},f.data)
   expect(mocks.scale).toHaveBeenCalledExactlyOnceWith('scale:0',mocks.tx)
  })
- it('keeps current scale emergency guard before decrypting mixed drafts',async()=>{
+ it('saves admitted frozen drafts after a later scale stop without rerunning admission',async()=>{
   const f=mixed();mocks.guard.mockRejectedValue(new Error('emergency stop'))
-  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},f.data)).rejects.toThrow('emergency stop')
-  expect(mocks.scale).not.toHaveBeenCalled();expect(mocks.sjt).not.toHaveBeenCalled()
-  expect(mocks.tx.trainingAttemptCheckpoint.create).not.toHaveBeenCalled()
+  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},f.data)).resolves.toMatchObject({revision:1})
+  expect(mocks.guard).not.toHaveBeenCalled()
+  expect(mocks.scale).toHaveBeenCalled();expect(mocks.sjt).toHaveBeenCalled()
+  expect(mocks.tx.trainingAttemptCheckpoint.create).toHaveBeenCalledOnce()
  })
 })
