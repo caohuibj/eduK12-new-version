@@ -1,0 +1,23 @@
+import { describe, expect, it } from 'vitest'
+import { SCALE_INSTRUMENT_SOURCE as source } from '../../../modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/instrument'
+import { defineScaleInstrumentSource, projectScalePackage } from '../../../modules/scale/onboarding/define-instrument'
+import { validateScalePackage } from '../../../modules/scale/scale-package.registry'
+import { hashScaleDefinition } from '../../../modules/scale/scale-definition'
+import { scoreScale } from '../../../modules/scale/scale-scoring'
+import { buildScaleResult, parseScaleResultV2 } from '../../../modules/scale/scale-result'
+const pkg = projectScalePackage(source)!
+const d = pkg.definition
+const midpoint = d.items.map(item => ({ itemCode: item.itemCode, responseValue: '3' }))
+const result = (answers = midpoint) => buildScaleResult({ scaleId: 'synthetic-local-only', instrumentKey: source.identity.instrumentKey, name: source.catalog.identity.canonicalName, instrumentVersion: source.identity.instrumentVersion, definition: d, answers })
+describe('ipip_neo_c5_self_discipline10 local content contract', () => {
+ it('imports through strict source and package validation', () => { expect(() => defineScaleInstrumentSource(source)).not.toThrow(); expect(validateScalePackage(pkg).valid).toBe(true) })
+ it('retains honest draft and localization status', () => { expect(pkg.releaseStatus).toBe('DRAFT'); expect(source.catalog.catalogStatus).toBe('CANDIDATE'); expect(source.localization?.expertReviewStatus).toBe('PENDING'); expect(source.localization?.reviewStatus).toBe('PENDING'); expect(source.scientificReview).toBeUndefined() })
+ it('has canonical item count, order and independent reverse key', () => { expect(d.items).toHaveLength(10); expect(d.items.map(x=>x.sortOrder)).toEqual(Array.from({length:10},(_,i)=>i)); expect(d.scoring.itemRules.flatMap((x,i)=>x.transform.type==='reverse'?[i+1]:[])).toEqual([6, 7, 8, 9, 10]); expect(d.responseSets[0].options.map(x=>x.score)).toEqual([1,2,3,4,5]); expect(d.responseSets[0].options[2].label).toBe('介于不符合与符合之间') })
+ for (const fixture of pkg.goldenCases) it('scores '+fixture.name+' through runtime',()=>{const actual=scoreScale(d,fixture.answers);expect(actual.quality.status).toBe(fixture.expected.quality);expect(Object.fromEntries(actual.scores.map(x=>[x.key,x.value]))).toEqual(fixture.expected.scores)})
+ it('scores an independently calculated all-one vector',()=>{expect(scoreScale(d,midpoint.map(x=>({...x,responseValue:'1'}))).scores.map(x=>x.value)).toEqual([30])})
+ it('is independent of answer transport order',()=>{expect(scoreScale(d,[...midpoint].reverse()).scores).toEqual(scoreScale(d,midpoint).scores)})
+ it('rejects missing and out-of-range responses without optimistic report',()=>{expect(()=>result([{...midpoint[0],responseValue:'6'},...midpoint.slice(1)])).toThrow('量表回答不合法');{const r=result(midpoint.slice(1));expect(r.quality.status).toBe('invalid');expect(r.scores[0].value).toBeNull();expect(r.interpretations).toEqual([]);expect(r.references).toEqual([])}})
+ it('builds a serializable descriptive report with chart ranges, no norms or bands',()=>{const r=parseScaleResultV2(JSON.parse(JSON.stringify(result())));expect(r.quality.status).toBe('interpretable');expect(r.interpretations).toHaveLength(d.scoring.scores.length);expect(r.interpretations.every(x=>x.interpretation.length>=100&&x.guidance.length>=2)).toBe(true);expect(r.scores.every(x=>x.value===30&&x.range?.min===10&&x.range?.max===50)).toBe(true);expect(r.method.referenceVersions).toEqual([]);expect(d.referencePolicy).toEqual({type:'none'});expect(d.report.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true);expect(r.disclaimer).toContain('不用于心理诊断')})
+ it('keeps report text outside the measurement hash using existing version axes',()=>{expect(d.versionAxes?.localizationVersion).toBe(source.localization?.localizationVersion);const revised=structuredClone(d);revised.report.reportVersion='1.0.1';revised.report.disclaimer+=' 文案修订';expect(hashScaleDefinition(revised)).toBe(hashScaleDefinition(d));revised.items[0].content+=' 题项变更';expect(hashScaleDefinition(revised)).not.toBe(hashScaleDefinition(d))})
+ it('does not invent personality total or target-population evidence',()=>{expect(d.scoring.scores).toHaveLength(1);expect(source.catalog.evidence).toEqual([]);expect(source.catalog.referenceApplicability).toEqual([]);expect(d.report.limitations.length).toBeGreaterThan(0)})
+})

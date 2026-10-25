@@ -1,0 +1,143 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "number": 1,
+      "en": "Get chores done right away.",
+      "zh": "我会马上把日常杂事做完。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_01"
+    },
+    {
+      "number": 2,
+      "en": "Am always prepared.",
+      "zh": "我总是做好准备。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_02"
+    },
+    {
+      "number": 3,
+      "en": "Start tasks right away.",
+      "zh": "我会马上开始任务。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_03"
+    },
+    {
+      "number": 4,
+      "en": "Get to work at once.",
+      "zh": "我会立刻着手做事。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_04"
+    },
+    {
+      "number": 5,
+      "en": "Carry out my plans.",
+      "zh": "我会执行自己的计划。",
+      "reverse": false,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_05"
+    },
+    {
+      "number": 6,
+      "en": "Find it difficult to get down to work.",
+      "zh": "我觉得很难着手做事。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_06"
+    },
+    {
+      "number": 7,
+      "en": "Waste my time.",
+      "zh": "我会浪费时间。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_07"
+    },
+    {
+      "number": 8,
+      "en": "Need a push to get started.",
+      "zh": "我需要一些推动才会开始。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_08"
+    },
+    {
+      "number": 9,
+      "en": "Have difficulty starting tasks.",
+      "zh": "我很难开始一项任务。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_09"
+    },
+    {
+      "number": 10,
+      "en": "Postpone decisions.",
+      "zh": "我会推迟作决定。",
+      "reverse": true,
+      "runtimeItemCode": "IPIP_NEO_C5_SELF_DISCIPLINE10_10"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+  "translationChanges": [
+    {
+      "item": 6,
+      "old": "我觉得很难静下心来开始做事。",
+      "new": "我觉得很难着手做事。",
+      "reason": "Avoid adding need for calmness to get down to work."
+    },
+    {
+      "item": 8,
+      "old": "我需要有人推动才会开始。",
+      "new": "我需要一些推动才会开始。",
+      "reason": "Do not restrict push to another person."
+    }
+  ],
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": [
+      "full-item-reproduction",
+      "translation",
+      "online-administration",
+      "commercial-and-noncommercial",
+      "project-authored-feedback"
+    ],
+    "sources": [
+      "https://ipip.ori.org/newPermission.htm",
+      "https://www.ipip.ori.org/"
+    ]
+  },
+  "deduplication": {
+    "sameFullInstrumentFound": false,
+    "sharedIPIP50EnglishItems": [
+      "Am always prepared.",
+      "Get chores done right away."
+    ],
+    "notEquivalentTo": [
+      "Grit",
+      "BSCS",
+      "IPIP-NEO C1"
+    ]
+  }
+}
