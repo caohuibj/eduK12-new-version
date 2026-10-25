@@ -1,0 +1,585 @@
+{
+  "schemaVersion": 1,
+  "kind": "sanitized-premerge-local-validation",
+  "baselineCommit": "984eadcf22fc1b30a50a9d44a2668f35e51d0dec",
+  "qualification": "Six actual invocations, including retained failures and explicit fixture corrections. Not signed execution provenance, formal CI admission, a full suite or browser validation. Invocation counts overlap and pending/filtered cases were not executed. Final inspected file hashes apply to green invocations and final checks; earlier failures ran previous local variants.",
+  "finalInspectedFiles": {
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": "6222672d5865314145e03a73e0ed4dcee2f7c6e635e82b78583c24ce295669fb",
+    "server-version/frontend/src/survey/package-arrangement.ts": "c3f812f5cd35ecfe2e879bd8be6bb108d8f0cc162491c58a1392efc68c0ff2e6",
+    "server-version/frontend/src/survey/package-arrangement.test.ts": "de12edfb61e34839d8cad8c13c3bf206d2a52530ca9d660d429eee6d3adf4c93",
+    "server-version/frontend/src/survey/SurveyPackageAtomic.test.tsx": "cb7314b096f5d1621efe9a2de748f37d6439f633d4863a5fdb33cab335ba3350",
+    "server-version/frontend/src/survey/SurveyPackageCheckbox.test.tsx": "f450fca4ca78166d9eea50a7d92f18b66e112c10745f4162ed2247f7a554e101",
+    "server-version/backend/src/__tests__/survey/governed-tools.postgres.integration.test.ts": "1f3d088389714ebecfc99bbcdd775a1c3bfd571241b00a90bd1c1c5502639142"
+  },
+  "failureNotes": {
+    "premerge355-ui-red": "11 expected baseline failures: checkbox member removal and ten damaged-package restore/remove/final-valid paths.",
+    "premerge355-pg-red": "Image FORM failed its wrong SCALE-membership assertion; native SCALE passed that catalog/approval section but stopped at the disabled publication feature because the test command omitted SURVEY_PUBLICATION_ENABLED=true. Not a passed path. No timezone/permission change.",
+    "premerge355-ui-first-fix": "22 pure assertions passed. The DOM fixture tried to find removed members after persisting the wave; the existing independent-workspace filter intentionally stops offering them. Fixture now reselects before saving, then cancels the other member and verifies persisted whole removal. Product filter retained."
+  },
+  "greenConfiguration": {
+    "nodeEnv": "test",
+    "postgres": "Task-owned loopback 55433, new schema-only synthetic database; runtime timezone unchanged",
+    "backendFlags": {
+      "SURVEY_ALL_TOOLS_ISOLATED": "1",
+      "SURVEY_WORKSPACE_ENABLED": "true",
+      "SURVEY_PUBLICATION_ENABLED": "true"
+    },
+    "redis": "Task-owned loopback 56380/0",
+    "pgSelection": "retains explicitly shared image bindings|can approve and authorize an explicitly submitted native scale"
+  },
+  "invocations": [
+    {
+      "invocation": "premerge355-ui-red.json",
+      "originalSha256": "241def2807f5d6d2af7a97331f54a1f39428baa9eec0757bd90cba40ed238e39",
+      "reportedStartUtc": "2026-10-25T03:23:00.151000+00:00",
+      "success": false,
+      "passed": 0,
+      "failed": 11,
+      "pendingOrFiltered": 12,
+      "files": [
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageCheckbox.test.tsx",
+          "executedCases": [
+            {
+              "test": "premerge: the actual workspace legacy checkbox removes and reselects the complete imported instance",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/package-arrangement.test.ts",
+          "executedCases": [
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore A while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove A while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore B while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove B while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore A while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove A while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore B while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove B while leaving the other damaged instance unchanged",
+              "status": "failed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invocation": "premerge355-pg-red.json",
+      "originalSha256": "10c324729aebcb3835d8ebffe2085699edb8377b6dac7a09267107615f4acbf0",
+      "reportedStartUtc": "2026-10-25T03:23:05.784000+00:00",
+      "success": false,
+      "passed": 0,
+      "failed": 2,
+      "pendingOrFiltered": 19,
+      "files": [
+        {
+          "file": "server-version/backend/src/__tests__/survey/governed-tools.postgres.integration.test.ts",
+          "executedCases": [
+            {
+              "test": "Survey all-tool governance on schema-only isolated PostgreSQL retains explicitly shared image bindings for an approved form without granting standalone asset access",
+              "status": "failed"
+            },
+            {
+              "test": "Survey all-tool governance on schema-only isolated PostgreSQL can approve and authorize an explicitly submitted native scale without changing its frozen presentation",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invocation": "premerge355-ui-first-fix.json",
+      "originalSha256": "9d2f0e0a1bbfdd38bdc0bb44650dffdfce4ad2b842c5b9f7d07db52dedab15bc",
+      "reportedStartUtc": "2026-10-25T03:24:26.594000+00:00",
+      "success": false,
+      "passed": 22,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "files": [
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageCheckbox.test.tsx",
+          "executedCases": [
+            {
+              "test": "premerge: the actual workspace legacy checkbox removes and reselects the complete imported instance",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/package-arrangement.test.ts",
+          "executedCases": [
+            {
+              "test": "whole package editor plans use import identity without authority side effects keeps two packages and two instances of the same version separate",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects moves whole instances and allows ordinary tools between packages",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"b\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"b\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"a\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects preserves invalid authority hints when explicitly restoring approved membership",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects removes only the selected package instance and retains all unrelated blocks/settings",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects permits the existing unconditional material inside a valid package",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects moves ordinary units within one material region without moving its barrier",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects rejects direct Flow member edits, external insertion, missing members, conditions and experiments",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects preserves an ambiguous damaged material draft instead of deleting other blocks",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects allows data-only edits on a damaged Flow but cannot insert more tools into its broken package",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invocation": "premerge355-ui-green.json",
+      "originalSha256": "04ac2c97ff17040d0b5ab3c6325a6cb750a4e854d647987b09120b2fae9afa46",
+      "reportedStartUtc": "2026-10-25T03:26:12.811000+00:00",
+      "success": true,
+      "passed": 25,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "files": [
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageAtomic.test.tsx",
+          "executedCases": [
+            {
+              "test": "repairs two damaged instances explicitly, keeps expired authority blocked and preserves atomic moves and ambiguous material",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageCheckbox.test.tsx",
+          "executedCases": [
+            {
+              "test": "premerge: the actual workspace legacy checkbox removes and reselects the complete imported instance",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/package-arrangement.test.ts",
+          "executedCases": [
+            {
+              "test": "whole package editor plans use import identity without authority side effects keeps two packages and two instances of the same version separate",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects moves whole instances and allows ordinary tools between packages",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"b\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"b\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects does not silently change damaged draft \"a\"",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects preserves invalid authority hints when explicitly restoring approved membership",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects removes only the selected package instance and retains all unrelated blocks/settings",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects permits the existing unconditional material inside a valid package",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects moves ordinary units within one material region without moving its barrier",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects rejects direct Flow member edits, external insertion, missing members, conditions and experiments",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects preserves an ambiguous damaged material draft instead of deleting other blocks",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects allows data-only edits on a damaged Flow but cannot insert more tools into its broken package",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can restore B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false can remove B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=false explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove A while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can restore B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true can remove B while leaving the other damaged instance unchanged",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery with Flow=true explicitly restores both instances to a final valid draft without deleting the ordinary tool or material",
+              "status": "passed"
+            },
+            {
+              "test": "whole package editor plans use import identity without authority side effects premerge recovery cannot split a valid instance, add a new partial instance or worsen an unresolved interleaving",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invocation": "premerge355-pg-green.json",
+      "originalSha256": "c02286327e0af36d3ced2b3b21612d95f983edbdb15a11da4e325e59e7bc53f2",
+      "reportedStartUtc": "2026-10-25T03:25:14.634000+00:00",
+      "success": true,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 19,
+      "files": [
+        {
+          "file": "server-version/backend/src/__tests__/survey/governed-tools.postgres.integration.test.ts",
+          "executedCases": [
+            {
+              "test": "Survey all-tool governance on schema-only isolated PostgreSQL retains explicitly shared image bindings for an approved form without granting standalone asset access",
+              "status": "passed"
+            },
+            {
+              "test": "Survey all-tool governance on schema-only isolated PostgreSQL can approve and authorize an explicitly submitted native scale without changing its frozen presentation",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "invocation": "premerge355-consumers.json",
+      "originalSha256": "03c020e78ebb5c60be4dd54ce172c50f3a6990d18009149db9654f4303f52040",
+      "reportedStartUtc": "2026-10-25T03:27:25.288000+00:00",
+      "success": true,
+      "passed": 37,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "files": [
+        {
+          "file": "server-version/frontend/src/survey/SurveyFlowStudio.test.tsx",
+          "executedCases": [
+            {
+              "test": "A/B questionnaire variant editor keeps legacy material design until explicitly selected, then normalizes weights and forces per-wave randomization",
+              "status": "passed"
+            },
+            {
+              "test": "A/B questionnaire variant editor edits arm membership independently and warns about uncovered tools and empty arms",
+              "status": "passed"
+            },
+            {
+              "test": "uses includes when inserting an END rule from a multiple-choice question",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageJourney.test.tsx",
+          "executedCases": [
+            {
+              "test": "reaches whole-package import through the actual workspace route and hands ordered exact bindings to wave saving",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/SurveyPackageRefresh.test.tsx",
+          "executedCases": [
+            {
+              "test": "retries only the failed read after import/selection and preserves subsequent order, Flow and quota edits",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/SurveyWaveStudio.content.test.tsx",
+          "executedCases": [
+            {
+              "test": "Survey Wave report selection freeze boundary does not offer unselected draft tools in the independent-library workspace",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary keeps published self-authored scales selectable for explicit wave freezing",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary does not offer archived scales for new wave selection",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary sends exact selections separately from participant feedback and displays frozen server identities",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary retains selection after a known 409 and does not retry or replace with newest",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary checks an uncertain freeze and only retries the original payload on explicit action",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary unlocks preserved choices after an uncertain request is definitively rejected on retry and verified unfrozen",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary recovers an accepted but lost response by reading the actual frozen binding without another POST",
+              "status": "passed"
+            },
+            {
+              "test": "Survey Wave report selection freeze boundary invalidates unsubmitted choices when instrument-library revisions change",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx",
+          "executedCases": [
+            {
+              "test": "shared Survey workspace instruments requests loads one instruments page for real Builder and WaveStudio, including StrictMode replay and empty results",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests refreshes both lists once after create and catalog import, preserving unsaved wave fields",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests saves once, shares the refreshed summary, and reloads selected question details",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests fetches only the requested list on paging and refreshes each active instruments page once after a write",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests retries a shared initial failure and updates both consumers with one retry",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests ignores an older list response that finishes after a successful mutation refresh",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not apply an old project list after selecting another project",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not restore an old wave selection or its details after New wave",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests rejects old project wave/project responses even when the component is reused without a key",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests retries selected-details refresh failure without repeating a successful instruments list request",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not overwrite refreshed question details with an older checkbox request",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests refreshes only waves after saving a draft and ignores a save selection interrupted by New wave",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests keeps a successful Builder create successful when another active page refresh fails",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests loads the newly selected wave details when a Builder save invalidates a pending wave selection",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests keeps both selected tool details when a new checkbox is added during mutation revalidation",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests retains the created instrument ACK when its own list refresh fails and retries only the read",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests retains a saved wave identity when its list refresh fails and retries only the list",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not attach an old preflight response to a New wave",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not attach an old open response to a New wave",
+              "status": "passed"
+            },
+            {
+              "test": "shared Survey workspace instruments requests does not attach an old rotate response to a New wave",
+              "status": "passed"
+            },
+            {
+              "test": "S04 workspace section navigation retains unsaved settings, tool and wave edits across sections without any new request",
+              "status": "passed"
+            },
+            {
+              "test": "Private report cross-project leave protection keeps unsaved edits on cancellation and leaves only after confirmation",
+              "status": "passed"
+            },
+            {
+              "test": "Private report cross-project leave protection blocks leaving with uncertain create outcome and retries the original request",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "staticChecks": [
+    {
+      "command": "npx tsc -p tsconfig.app.json --noEmit",
+      "cwd": "server-version/frontend",
+      "exitCode": 0,
+      "retainedPrivateLogSha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+    },
+    {
+      "command": "npx eslint src/survey/SurveyWaveStudio.tsx src/survey/package-arrangement.ts src/survey/package-arrangement.test.ts src/survey/SurveyPackageAtomic.test.tsx src/survey/SurveyPackageCheckbox.test.tsx",
+      "cwd": "server-version/frontend",
+      "exitCode": 0,
+      "retainedPrivateLogSha256": "320a28cb28c7d16861da11d662e06ac8890826ce5646b383452cc47d92a9e2bb"
+    }
+  ],
+  "lintWarnings": 1,
+  "backendProductionUnchanged": true,
+  "ci": "Not triggered or qualified; all follow-up commits must retain [skip ci]."
+}

@@ -14,7 +14,7 @@ import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, createInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 import {usePackageMemberships} from './package-memberships'
-import {planPackageSelection,packageFlowChangeAllowed,type PackageMembership} from './package-arrangement'
+import {planPackageSelection,packageFlowChangeAllowed,restorePackage,type PackageMembership} from './package-arrangement'
 import './survey-publish.css'
 
 // Load researcher authoring/preview code only when its existing control is opened.
@@ -116,6 +116,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const packageFacts=usePackageMemberships(projectId,form.instrumentIds)
+  const [existingToolsOpen,setExistingToolsOpen]=useState(false)
+  const existingSelectableTools=tools.filter(t=>t.status==='DRAFT'&&(!onNavigateLibrary||editing?.instrumentIds.includes(t.id)||form.instrumentIds.includes(t.id))||t.kind==='SCALE'&&t.status==='PUBLISHED')
+  // Only unresolved candidates on the visible checkbox page need another read.
+  // Removed/unselected members must not become ordinary tools on re-selection.
+  const candidatePackages=usePackageMemberships(projectId,existingToolsOpen?existingSelectableTools.filter(t=>!form.instrumentIds.includes(t.id)).map(t=>t.id):[])
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   useEffect(()=>{onLeaveRiskChange?.({dirty:toolRisk.dirty||librarySelectionDirty,busy:toolRisk.busy||busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[onLeaveRiskChange,toolRisk,librarySelectionDirty,busy])
@@ -402,11 +407,6 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
       setNotice('已读取受控 Flow 样本统计。若包含实验分组，小样本详情仍不可公开转发。')
     })
   }
-  const toggle=(id:string,checked:boolean)=>{
-    setForm(old=>({...old,
-      instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
-    }))
-  }
   const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
   const arrangeSelection=(ids:string[],extra?:PackageMembership,extraTools:InstrumentDetails[]=[])=>{
     if(packageFacts.loading||packageFacts.error){setError('整包身份尚未读取完成，请先重试读取；草稿未改变。');return false}
@@ -415,6 +415,16 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
     if(plan.error){setError(plan.error);return false}
     setForm(old=>({...old,instrumentIds:plan.ids,flowDefinition:plan.flow}))
     setError('');setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null);return true
+  }
+  const checkboxPackages=[...new Map([...packageFacts.list,...candidatePackages.list].map(p=>[p.id,p])).values()]
+  const checkboxPending=packageFacts.loading||candidatePackages.loading||Boolean(packageFacts.error||candidatePackages.error)
+  const toggle=(id:string,checked:boolean)=>{
+    if(checkboxPending)return
+    const pack=checkboxPackages.find(p=>p.bindings.some(b=>b.draftId===id)),own=pack?.bindings.map(b=>b.draftId)??[id]
+    const next=checked?pack&&own.some(member=>form.instrumentIds.includes(member))?restorePackage(form.instrumentIds,pack)
+      :[...form.instrumentIds,...own.filter(member=>!form.instrumentIds.includes(member))]
+      :form.instrumentIds.filter(member=>!own.includes(member))
+    arrangeSelection(next,pack)
   }
   const flowQuestions:FormQuestionInfo[]=Object.values(details)
     .filter(d=>d.kind==='FORM').flatMap(d=>{
@@ -451,7 +461,6 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   // The legacy embedded builder can still manage its existing draft selection.
   // The independent-library workspace offers only saved wave members or published
   // scales here; new authored content enters through completed library revisions.
-  const existingSelectableTools=tools.filter(t=>t.status==='DRAFT'&&(!onNavigateLibrary||editing?.instrumentIds.includes(t.id)||form.instrumentIds.includes(t.id))||t.kind==='SCALE'&&t.status==='PUBLISHED')
   const showOverview=wavesLoaded&&waves.length>0&&!editing&&!creatingWave
   const showDraft=wavesLoaded&&!showOverview&&(!editing||editing.status==='DRAFT'&&!editing.publicationId)
   const waveStatus=(wave:Wave)=>wave.hardStopAt?'已终止':wave.status==='OPEN'?'采集中':wave.status==='PAUSED'?'已暂停':wave.status==='CLOSED'?'已结束':wave.publicationId?'待开放':'编制中'
@@ -565,10 +574,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
           </fieldset>
-          <details className="survey-library-help survey-existing-tools"><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
-            {existingSelectableTools.map(t=><label key={t.id} className="block text-sm my-2">
-              <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
-                onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
+          <details className="survey-library-help survey-existing-tools" onToggle={e=>setExistingToolsOpen(e.currentTarget.open)}><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
+            {checkboxPending&&<p role="status">正在核对复选工具的整包身份…</p>}
+            {candidatePackages.error&&<p role="alert">{candidatePackages.error}<button type="button" onClick={candidatePackages.retry}>重试复选工具整包身份</button></p>}
+            {existingSelectableTools.map(t=>{const pack=checkboxPackages.find(p=>p.bindings.some(b=>b.draftId===t.id));return <label key={t.id} className="block text-sm my-2">
+              <input type="checkbox" disabled={checkboxPending} checked={form.instrumentIds.includes(t.id)}
+                onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}{pack&&<small>（整包 {pack.title} #{pack.id.slice(0,8)}：整体选择或取消）</small>}</label>})}
             {!existingSelectableTools.length&&<p className="text-xs">从上方工具集添加问卷内容，或勾选已加入本研究的工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}

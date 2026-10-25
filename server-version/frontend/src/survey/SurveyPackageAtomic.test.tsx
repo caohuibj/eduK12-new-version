@@ -4,11 +4,11 @@ import {SurveyWaveStudio} from './SurveyWaveStudio'
 import type {PackageMembership} from './package-arrangement'
 const reply=(data:unknown)=>({ok:true,status:200,json:async()=>({code:0,data})} as Response)
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks()})
-it('repairs a damaged expired instance explicitly, moves two same-version packages atomically and preserves ambiguous material',async()=>{
+it('repairs two damaged instances explicitly, keeps expired authority blocked and preserves atomic moves and ambiguous material',async()=>{
  const p=(id:string,ids:string[],ready=true):PackageMembership=>({id,title:'Same version package',family:'BUNDLE',hash:'a'.repeat(64),status:'ACTIVE',version:1,expiresAt:null,bindings:ids.map(draftId=>({draftId,slotKey:draftId,instrumentKey:draftId})),availability:{ready,reasons:ready?[]:['此授权已失效'],requiresFreshCheck:true}})
  const packages=[p('instance-26',['a','b'],false),p('instance-27',['x','y'])]
  const tools=['a','b','c','x','y'].map(id=>({id,projectId:'p',instrumentKey:id,title:'Tool '+id,kind:'FORM',status:'DRAFT',revision:1,definition:{schemaVersion:2,pages:[{pageKey:'p',title:'Synthetic',questions:[]}]}}))
- const wave={id:'w',projectId:'p',title:'损坏草稿',ordinal:1,status:'DRAFT',revision:1,instrumentIds:['b','c','x','y'],publicationId:null,consentText:'这是合成测试使用的完整知情同意说明，没有任何真实研究资料。',generalText:'Synthetic',consentVersion:1,linkageNoticeConfirmed:false,opensAt:null,closesAt:null,finishUntil:null,quotaStarts:9,startsCount:0,allowNewParticipants:true,hardStopAt:null}
+ const wave={id:'w',projectId:'p',title:'损坏草稿',ordinal:1,status:'DRAFT',revision:1,instrumentIds:['b','c','x'],publicationId:null,consentText:'这是合成测试使用的完整知情同意说明，没有任何真实研究资料。',generalText:'Synthetic',consentVersion:1,linkageNoticeConfirmed:false,opensAt:null,closesAt:null,finishUntil:null,quotaStarts:9,startsCount:0,allowNewParticipants:true,hardStopAt:null}
  let saved:any
  const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
   const path=String(input)
@@ -23,8 +23,10 @@ it('repairs a damaged expired instance explicitly, moves two same-version packag
  })
  vi.stubGlobal('fetch',fetcher);render(<SurveyWaveStudio projectId="p" onNavigateLibrary={()=>{}}/>)
  fireEvent.click(await screen.findByRole('button',{name:/T1 · 损坏草稿/}))
- await screen.findByText('整包不完整');expect(screen.getByText(/原序列：Tool b → Tool c → Tool x → Tool y/)).toBeInTheDocument()
+ expect(await screen.findAllByText('整包不完整')).toHaveLength(2);expect(screen.getByText(/原序列：Tool b → Tool c → Tool x/)).toBeInTheDocument()
  expect(screen.queryByRole('button',{name:'上移 Tool b'})).toBeNull()
+ fireEvent.click(screen.getAllByRole('button',{name:'恢复完整整包及批准顺序'})[0])
+ await waitFor(()=>expect(screen.getAllByText('整包不完整')).toHaveLength(1))
  fireEvent.click(screen.getByRole('button',{name:'恢复完整整包及批准顺序'}))
  await waitFor(()=>expect(screen.queryByText('整包不完整')).toBeNull())
  expect(screen.getByText(/此授权已失效；修复顺序不恢复使用授权/)).toBeInTheDocument()

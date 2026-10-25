@@ -567,3 +567,46 @@ N 项通过”；未做密码学执行认证，不等于完整输入闭包、正
 唯一仍需用户决定的相关政策为历史报告停止范围；它不阻止当前采集立即停止修复。
 25 单人系统管理员签发仍保留，School/Teacher 不自动扩展。完整目标模型属于可独立
 审查的后续迁移片，不夹进当前已有证据的正确性/低风险提交。
+
+## PR355 合并前定向收尾（审查基准 984eadcf）
+
+按父审查此次明确的三项范围修复；开始时 HEAD/远端同为
+`984eadcf22fc1b30a50a9d44a2668f35e51d0dec`，工作树干净，保留全部已有提交。
+不混入 Training、共享三层正文、按需报告迁移或 main 原有的非 UTC 授权时窗问题。
+
+1. 旧“选用本研究已加入的工具”复选区也经同一编排计划：点击一个包成员会整体选用/
+   取消该 importId，并明确标示整包操作。对已移除/未选中的可见候选，打开复选区后
+   只按本页未解析 draftIds 读取 membership；已选成员复用现有摘要，不再因移除后
+   摘要为空而把包成员当普通工具。读取未完成/失败时保留原草稿并阻止该复选操作，
+   不将摘要当准入凭证。真实 SurveyApp 路由验证取消 A→B 同时取消、再次选用 A→全包
+   恢复、取消 B→整包移除，最终 PATCH 只含普通工具，原 MATERIAL/embedded data/
+   quotaStarts=9 均保留；没有 mock 掉 WaveStudio、ProjectTools 或 Flow。
+2. 多个残缺包允许逐包显式恢复/移除。仍未修复的其他包必须保持精确已选成员，不能
+   新增问题、插入/重排更多外部工具，不能新建残缺包或拆坏原合法包。Flow 同样只
+   容许原有未解问题保留，不能新增条件/END/分支问题；材料跨区歧义仍拒绝并保留原稿。
+   10 项带/不带 Flow 的双残缺包恢复/移除/最终合法路径，另 1 项拒绝加重的断言，
+   加实际 WaveStudio 两包逐一恢复，证明有可推进路径而非强制同时修好全部。
+3. 图片 FORM 用例改查 FORM 目录，并明确断言 SCALE 目录不含该 FORM；保普通角色
+   读取/精确 policy 的 403 以及共享图片冻结引用。原生 SCALE 原断言与完整冻结路径
+   保留，两条路径均实际执行通过，没有用单个 SCALE 通过替代图片用例。
+
+本轮证据在[独立索引](evidence/survey-governance-followup-20261025/premerge-validation.json)，
+没有覆盖此前 60 份历史 invocation 或资源探针：
+
+- 前端初始红例：11 失败（复选入口 1、双残缺包 10）；第一次修复 22 纯断言通过，
+  1 DOM 夹具错误地要求保存后仍显示已移除工具而失败。保原页面筛选规则，改为保存
+  前验证重新选用，再取消另一成员并核对保存，最终 25 项（23 纯计划 + 2 实际页面）通过。
+- PG 首轮图片 FORM 在错误 family 断言失败；native SCALE 因命令漏设本地发布功能
+  标志，止步既有发布前置。原件保留；在另一新 schema-only 合成库明确 test 配置后，
+  图片 FORM 和 native SCALE 两条完整路径 2/2 通过。没有修改数据库时区、权限或
+  业务开关默认值。该次只选两项，其他 19 项过滤，不能称全 suite 通过。
+- 直接消费者 37/37：SurveyWorkspace.requests、SurveyWaveStudio.content、
+  SurveyPackageJourney、SurveyPackageRefresh、SurveyFlowStudio。前端测试命令均
+  `npx vitest run <上述精确文件> --maxWorkers=1 --reporter=json --outputFile=<独立原件>`。
+- `npx tsc -p tsconfig.app.json --noEmit` 退出 0；本轮两个生产文件与三个前端测试的
+  eslint 退出 0、0 error / 1 既有 publicationId effect dependency warning。
+  后端只修改测试断言，生产模块/schema/依赖不变，不重复旧 backend 类型和资源探针。
+
+原始失败、夹具修订与绿色输入文件 hash 分开记录；不是正式 CI、整应用构建、真实
+浏览器或非 UTC 风险修复。此次提交保 `[skip ci]`，只更新既有 draft PR355，并在
+push 后检查没有新 Actions/check；不改 workflow/required checks、不合并、不部署。

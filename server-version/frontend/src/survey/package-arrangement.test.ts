@@ -52,4 +52,32 @@ describe('whole package editor plans use import identity without authority side 
   expect(packageFlowChangeAllowed(broken,{...broken,embeddedData:[]},[a])).toBe(true)
   expect(packageFlowChangeAllowed(broken,flow(['a','x','c']),[a])).toBe(false)
  })
+ describe.each([false,true])('premerge recovery with Flow=%s',withFlow=>{
+  const selected=['a','c','x'],damaged=[a,b]
+  const original=()=>{if(!withFlow)return null;const f=flow(selected);f.blocks.splice(2,0,{blockKey:'material',kind:'MATERIAL',title:'Synthetic',body:'Keep this barrier'});return f}
+  it.each([
+   ['restore A',()=>restorePackage(selected,a),['a','b','c','x']],
+   ['remove A',()=>['c','x'],['c','x']],
+   ['restore B',()=>restorePackage(selected,b),['a','c','x','y']],
+   ['remove B',()=>['a','c'],['a','c']],
+  ] as const)('can %s while leaving the other damaged instance unchanged',(_action,next,expected)=>{
+   const f=original(),plan=planPackageSelection(selected,next(),damaged,tools,f)
+   expect(plan.error).toBeUndefined();expect(plan.ids).toEqual(expected);expect(selected).toEqual(['a','c','x'])
+   if(f){expect(plan.flow?.embeddedData).toEqual(f.embeddedData);expect(plan.flow?.blocks.find(block=>block.kind==='MATERIAL')).toBe(f.blocks[2])}
+  })
+  it('explicitly restores both instances to a final valid draft without deleting the ordinary tool or material',()=>{
+   const f=original(),first=planPackageSelection(selected,restorePackage(selected,a),damaged,tools,f)
+   expect(first.error).toBeUndefined()
+   const second=planPackageSelection(first.ids,restorePackage(first.ids,b),damaged,tools,first.flow)
+   expect(second.error).toBeUndefined();expect(second.ids).toEqual(['a','b','c','x','y'])
+   expect(packageArrangement(second.ids,damaged).every(unit=>unit.issues.length===0)).toBe(true)
+   expect(packageFlowProblems(second.flow,damaged)).toEqual([])
+   if(f){expect(second.flow?.blocks.map(block=>block.instrumentKey??block.kind)).toEqual(['a','b','c','MATERIAL','x','y']);expect(f.blocks.map(block=>block.instrumentKey??block.kind)).toEqual(['a','c','MATERIAL','x'])}
+  })
+ })
+ it('premerge recovery cannot split a valid instance, add a new partial instance or worsen an unresolved interleaving',()=>{
+  expect(planPackageSelection(['a','b','x'],['a','x'],[a,b],tools,null).error).toContain('不能新增或加重')
+  expect(planPackageSelection(['a'],['a','b','x'],[a,b],tools,null).error).toContain('不能新增或加重')
+  expect(planPackageSelection(['a','x','c','y'],['a','b','x','c','d','y'],[a,b],[...tools,{id:'d',instrumentKey:'d'}],null).error).toContain('不能新增或加重')
+ })
 })

@@ -29,6 +29,18 @@ export function moveArrangementUnit(ids:readonly string[],packages:readonly Pack
  ;[units[at],units[to]]=[units[to],units[at]]
  return units.flatMap(u=>u.ids)
 }
+function interleavedKeys(keys:readonly string[],own:Set<string>){
+ const positions=keys.flatMap((key,i)=>own.has(key)?[i]:[])
+ return positions.length?keys.slice(positions[0],positions[positions.length-1]+1).filter(key=>!own.has(key)):[]
+}
+function isSubsequence(next:readonly string[],previous:readonly string[]){
+ let at=0
+ return next.every(key=>{const found=previous.indexOf(key,at);at=found+1;return found>=0})
+}
+function constrainedPrefix(flow:FlowDraft,p:PackageMembership){
+ const last=Math.max(...flow.blocks.map((b,i)=>b.kind==='INSTRUMENT'&&p.bindings.some(member=>member.instrumentKey===b.instrumentKey)?i:-1))
+ return flow.blocks.slice(0,last+1).filter(b=>b.when||b.kind==='END')
+}
 export function packageFlowProblems(flow:FlowDraft|null,packages:readonly PackageMembership[]){
  if(!flow)return []
  const execution=flow.blocks.filter(b=>b.kind==='INSTRUMENT'),issues:string[]=[]
@@ -63,8 +75,16 @@ export function packageFlowChangeAllowed(previous:FlowDraft|null,next:FlowDraft|
 export function planPackageSelection(ids:string[],next:string[],packages:readonly PackageMembership[],tools:readonly {id:string;instrumentKey:string}[],flow:FlowDraft|null):{ids:string[];flow:FlowDraft|null;error?:string}{
  const reject=(error:string)=>({ids,flow,error})
  if(next.length>30)return reject('本波次超过 30 个工具上限；原草稿保留，请先明确移除其他编排单元。')
- const units=packageArrangement(next,packages)
- if(units.some(u=>u.issues.length))return reject('整包只能整体编排；请显式恢复批准顺序或从本波次移除整包。')
+ const units=packageArrangement(next,packages),before=new Map(packageArrangement(ids,packages).map(unit=>[unit.id,unit]))
+ // One explicit repair/removal must remain possible when another instance is
+ // already damaged. Unresolved instances keep the exact selected members and
+ // cannot gain a problem or an additional/reordered intervening tool.
+ if(units.some(unit=>{
+  if(!unit.issues.length)return false
+  const old=before.get(unit.id),own=new Set(unit.package!.bindings.map(b=>b.draftId))
+  return !old||unit.issues.some(issue=>!old.issues.includes(issue))||JSON.stringify(unit.ids)!==JSON.stringify(old.ids)
+   ||!isSubsequence(interleavedKeys(next,own),interleavedKeys(ids,own))
+ }))return reject('整包只能整体编排，不能新增或加重其他整包问题；请逐包显式恢复批准顺序或从本波次移除。')
  if(!flow)return {ids:next,flow:null}
  const byId=new Map(tools.map(t=>[t.id,t.instrumentKey]))
  for(const p of packages)for(const b of p.bindings)byId.set(b.draftId,b.instrumentKey)
@@ -97,6 +117,12 @@ export function planPackageSelection(ids:string[],next:string[],packages:readonl
   if(barriers[n])blocks.push(barriers[n])
  }
  const planned={...flow,blocks},active=packages.filter(p=>p.bindings.some(b=>next.includes(b.draftId)))
- if(packageFlowProblems(planned,active).length)return reject('流程仍有整包缺失、条件、结束或实验分支问题；原草稿保留，请显式修复。')
+ const oldProblems=packageFlowProblems(flow,packages.filter(p=>p.bindings.some(b=>ids.includes(b.draftId)))),remaining=packageFlowProblems(planned,active)
+ if(remaining.some(problem=>!oldProblems.includes(problem))||active.some(p=>{
+  const own=new Set(p.bindings.map(b=>b.instrumentKey)),oldBlocks=flow.blocks.filter(b=>b.kind==='INSTRUMENT'&&own.has(b.instrumentKey!)),newBlocks=blocks.filter(b=>b.kind==='INSTRUMENT'&&own.has(b.instrumentKey!))
+  return remaining.includes(p.id+':ORDER')&&(JSON.stringify(oldBlocks)!==JSON.stringify(newBlocks)
+   ||!isSubsequence(interleavedKeys(keys,own),interleavedKeys(flow.blocks.filter(b=>b.kind==='INSTRUMENT').map(b=>b.instrumentKey!),own)))
+   ||constrainedPrefix(planned,p).some(block=>!constrainedPrefix(flow,p).some(old=>JSON.stringify(old)===JSON.stringify(block)))
+ }))return reject('这次编排会新增或加重整包流程问题；原草稿保留，请逐包显式修复。')
  return {ids:next,flow:planned}
 }
