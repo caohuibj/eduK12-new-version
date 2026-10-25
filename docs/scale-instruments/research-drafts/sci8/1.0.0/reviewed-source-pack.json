@@ -1,0 +1,374 @@
+{
+  "researched_at": "2026-10-25",
+  "artifact_kind": "research-sourcepack-not-runtime-ingestion",
+  "translation_status": "独立中译工作稿，未做认知访谈或中文版心理测量验证；不冒充已有验证中文版",
+  "publication_gate": [
+    "仅非商业用途；须保留作者、原来源、许可证链接和翻译修改说明",
+    "公共库可索引不等于获准任何商用入口；上线须正确限制用途",
+    "中文工作稿须明确研究用途，不能宣称诊断或验证完成"
+  ],
+  "report_disclaimer": "这是一份自我了解的线索，不是诊断，也不评价你这个人。结果需要结合你的生活处境来看。",
+  "id": "SCI8",
+  "name_zh": "睡眠状况指标（8题）",
+  "name_en": "Sleep Condition Indicator",
+  "version": "2014 original Appendix, eight-item version",
+  "domains": [
+    "睡眠与恢复",
+    "睡眠困扰",
+    "白天生活影响"
+  ],
+  "tags": [
+    "睡眠",
+    "失眠筛查",
+    "成人",
+    "自评",
+    "过去一个月",
+    "非商业",
+    "CC-BY-NC-4.0",
+    "独立中译待验证",
+    "非诊断"
+  ],
+  "license": {
+    "id": "CC-BY-NC-4.0",
+    "url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "copyright_holder": "Sleepio Limited",
+    "authority_url": "https://doi.org/10.1136/bmjopen-2013-004183",
+    "evidence_location": "Original paper page 4 Acknowledgements explicitly licenses SCI under CC Attribution Non Commercial 4.0; article itself separately CC BY-NC 3.0",
+    "permissions": [
+      "noncommercial reproduction",
+      "noncommercial digital distribution",
+      "noncommercial translation/adaptation with attribution and change notice"
+    ],
+    "noncommercial_only": true
+  },
+  "references": [
+    {
+      "citation": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183.",
+      "doi": "10.1136/bmjopen-2013-004183",
+      "url": "https://bmjopen.bmj.com/content/4/3/e004183",
+      "author_paper_pdf_mirror": "https://www.antoniocasella.eu/salute/Espie_2014.pdf",
+      "local_pdf": "Espie_2014.pdf",
+      "use": "original eight-item appendix; scoring; rights; adult validation; initial screening reference"
+    }
+  ],
+  "chinese_existing_validation": {
+    "url": "https://doi.org/10.1186/s12888-024-05844-7",
+    "note": "Existing Chinese healthcare-student study identified; its translation text and cutoffs are not copied or claimed for this independent translation."
+  },
+  "instructions_zh": "第1—4题，请想一想过去一个月里通常一晚的睡眠情况。第5—7题，请回想过去一个月睡眠不好对你的影响。最后一题询问睡眠问题持续了多久。",
+  "items": [
+    {
+      "id": 1,
+      "en": "… how long does it take you to fall asleep?",
+      "zh": "你需要多长时间才能入睡？",
+      "stem_en": "Thinking about a typical night in the last month …",
+      "options": [
+        {
+          "en": "0–15 min",
+          "zh": "0—15分钟",
+          "score": 4
+        },
+        {
+          "en": "16–30 min",
+          "zh": "16—30分钟",
+          "score": 3
+        },
+        {
+          "en": "31–45 min",
+          "zh": "31—45分钟",
+          "score": 2
+        },
+        {
+          "en": "46–60 min",
+          "zh": "46—60分钟",
+          "score": 1
+        },
+        {
+          "en": "≥61 min",
+          "zh": "61分钟或更久",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "en": "… if you then wake up during the night … how long are you awake for in total? (add all the wakenings up)",
+      "zh": "如果你在夜里醒来，醒着的时间加起来一共有多长？（把各次醒着的时间相加）",
+      "stem_en": "Thinking about a typical night in the last month …",
+      "options": [
+        {
+          "en": "0–15 min",
+          "zh": "0—15分钟",
+          "score": 4
+        },
+        {
+          "en": "16–30 min",
+          "zh": "16—30分钟",
+          "score": 3
+        },
+        {
+          "en": "31–45 min",
+          "zh": "31—45分钟",
+          "score": 2
+        },
+        {
+          "en": "46–60 min",
+          "zh": "46—60分钟",
+          "score": 1
+        },
+        {
+          "en": "≥61 min",
+          "zh": "61分钟或更久",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "en": "… how many nights a week do you have a problem with your sleep?",
+      "zh": "你每周有几个晚上遇到睡眠问题？",
+      "stem_en": "Thinking about a typical night in the last month …",
+      "options": [
+        {
+          "en": "0–1",
+          "zh": "0—1晚",
+          "score": 4
+        },
+        {
+          "en": "2",
+          "zh": "2晚",
+          "score": 3
+        },
+        {
+          "en": "3",
+          "zh": "3晚",
+          "score": 2
+        },
+        {
+          "en": "4",
+          "zh": "4晚",
+          "score": 1
+        },
+        {
+          "en": "5–7",
+          "zh": "5—7晚",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "en": "… how would you rate your sleep quality?",
+      "zh": "你觉得自己的睡眠质量怎么样？",
+      "stem_en": "Thinking about a typical night in the last month …",
+      "options": [
+        {
+          "en": "Very good",
+          "zh": "很好",
+          "score": 4
+        },
+        {
+          "en": "Good",
+          "zh": "好",
+          "score": 3
+        },
+        {
+          "en": "Average",
+          "zh": "一般",
+          "score": 2
+        },
+        {
+          "en": "Poor",
+          "zh": "差",
+          "score": 1
+        },
+        {
+          "en": "Very poor",
+          "zh": "很差",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "en": "… affected your mood, energy, or relationships?",
+      "zh": "睡眠不好在多大程度上影响了你的心情、精力或人际关系？",
+      "stem_en": "Thinking about the past month, to what extent has poor sleep …",
+      "options": [
+        {
+          "en": "Not at all",
+          "zh": "完全没有",
+          "score": 4
+        },
+        {
+          "en": "A little",
+          "zh": "一点点",
+          "score": 3
+        },
+        {
+          "en": "Somewhat",
+          "zh": "有一些",
+          "score": 2
+        },
+        {
+          "en": "Much",
+          "zh": "很大",
+          "score": 1
+        },
+        {
+          "en": "Very much",
+          "zh": "非常大",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "en": "… affected your concentration, productivity, or ability to stay awake",
+      "zh": "睡眠不好在多大程度上影响了你集中注意、做事的效率或保持清醒的能力？",
+      "stem_en": "Thinking about the past month, to what extent has poor sleep …",
+      "options": [
+        {
+          "en": "Not at all",
+          "zh": "完全没有",
+          "score": 4
+        },
+        {
+          "en": "A little",
+          "zh": "一点点",
+          "score": 3
+        },
+        {
+          "en": "Somewhat",
+          "zh": "有一些",
+          "score": 2
+        },
+        {
+          "en": "Much",
+          "zh": "很大",
+          "score": 1
+        },
+        {
+          "en": "Very much",
+          "zh": "非常大",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "en": "… troubled you in general",
+      "zh": "总的来说，睡眠不好给你带来了多大困扰？",
+      "stem_en": "Thinking about the past month, to what extent has poor sleep …",
+      "options": [
+        {
+          "en": "Not at all",
+          "zh": "完全没有",
+          "score": 4
+        },
+        {
+          "en": "A little",
+          "zh": "一点点",
+          "score": 3
+        },
+        {
+          "en": "Somewhat",
+          "zh": "有一些",
+          "score": 2
+        },
+        {
+          "en": "Much",
+          "zh": "很大",
+          "score": 1
+        },
+        {
+          "en": "Very much",
+          "zh": "非常大",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "en": "… how long have you had a problem with your sleep?",
+      "zh": "你的睡眠问题持续多久了？",
+      "stem_en": "Finally …",
+      "options": [
+        {
+          "en": "I don’t have a problem/<1 mo",
+          "zh": "没有睡眠问题，或不足1个月",
+          "score": 4
+        },
+        {
+          "en": "1–2 mo",
+          "zh": "1—2个月",
+          "score": 3
+        },
+        {
+          "en": "3–6 mo",
+          "zh": "3—6个月",
+          "score": 2
+        },
+        {
+          "en": "7–12 mo",
+          "zh": "7—12个月",
+          "score": 1
+        },
+        {
+          "en": ">1 yr",
+          "zh": "超过1年",
+          "score": 0
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "method": "sum all 8 scored responses",
+    "range": [
+      0,
+      32
+    ],
+    "higher_means": "better sleep",
+    "reverse_items": [],
+    "optional_rescale": "total / 3.2 gives 0–10; keep out of main lay report to avoid redundant score jargon",
+    "missing": "Original appendix does not specify imputation. Project conservative rule: any missing item => no total/band; invite completion; never zero-fill.",
+    "parameters": [
+      {
+        "id": "original_screening_reference",
+        "bands": [
+          {
+            "min": 0,
+            "max": 16,
+            "code": "follow_up"
+          },
+          {
+            "min": 17,
+            "max": 32,
+            "code": "not_flagged"
+          }
+        ],
+        "population": "2014 adult development study total n=30941 (71% female), mainly self-selected online adults; threshold evaluated in Science Centre sample against ISI classification (n=255 usable, 27 ISI>=15,228 ISI<15)",
+        "comparison": "SCI<=16 identified 89% of ISI>=15 group; >16 identified82% of ISI<15 group. Not evaluated against independent clinical diagnosis in this paper.",
+        "not_applicable_as": "Chinese validated cutoff, child/adolescent cutoff, diagnosis, prevalence estimate",
+        "source": "2014 paper page3 concurrent validity; page4 limitations"
+      }
+    ]
+  },
+  "reports": {
+    "follow_up": {
+      "title": "睡眠可能正在拖累你的日常",
+      "body": "你的回答提示，睡眠困扰值得进一步留意。与其责怪自己“怎么还睡不好”，不如先看看：难的是入睡、夜里醒来，还是白天受影响？这些线索可以帮助你更具体地描述自己的处境。",
+      "next_step": "可以先记录几天的睡眠和白天感受；如果困扰持续，或明显影响学习、工作和安全，建议与专业人员讨论。这个结果本身不能确定你是否有失眠障碍。"
+    },
+    "not_flagged": {
+      "title": "这次回答没有触及原研究的睡眠提醒线",
+      "body": "这次回答没有达到原研究用于提醒进一步了解的界线，但这并不意味着每一晚都该睡得完美。你仍可以留意让你感觉最不舒服的那一项。",
+      "next_step": "保留对自己有帮助的规律；如果你依然感觉很困扰，不必等到得分“够高或够低”才寻求帮助。"
+    },
+    "incomplete": {
+      "title": "还差一点信息",
+      "body": "有题目没有填写，因此暂不计算总结果。你可以补充，也可以选择不继续。"
+    },
+    "visual": "可选简洁睡眠/白天影响两栏图；不显示未经验证分项阈值，不用红色诊断标签。"
+  }
+}

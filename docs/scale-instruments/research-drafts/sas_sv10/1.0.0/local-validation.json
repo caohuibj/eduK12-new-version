@@ -1,0 +1,12 @@
+{
+  "sourceSha256": "db270c80d2a1086f0adce5ef0005c6acad294aeb396ad05f9d70987e251fe0a1",
+  "validatedAt": "2026-10-25T16:07:30Z",
+  "node": "v24.22.1",
+  "toolTests": 15,
+  "combinedTestsWithRegistry": 23,
+  "finalBatchTests": 98,
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "scope": "Local content/scoring/report and taxonomy axis checks; no database/push/production action."
+}

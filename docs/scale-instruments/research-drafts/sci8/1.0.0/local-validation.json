@@ -1,0 +1,12 @@
+{
+  "sourceSha256": "9a8e7c669cd1df9b9a6279de208029555bafa8a1c5e939187e0a64780cb7a540",
+  "validatedAt": "2026-10-25T16:02:00Z",
+  "node": "v24.22.1",
+  "toolTests": 14,
+  "combinedTestsIncluding5Catalogs": 29,
+  "finalAffectedTests": 14,
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "scope": "Local source/scoring/report; original per-item anchors and NC版权独立核，不是DB入库证明。"
+}

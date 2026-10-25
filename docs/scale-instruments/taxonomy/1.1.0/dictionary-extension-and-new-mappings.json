@@ -1,0 +1,159 @@
+{
+  "taxonomyVersion": "1.1.0",
+  "extends": "../1.0.0/eight-axis-tag-mapping.json",
+  "status": "SOURCE_CONTENT_APPLIED_DATABASE_STATE_SEPARATE",
+  "newDictionaryTerms": [
+    {
+      "id": "construct:sleep_condition",
+      "axis": "construct",
+      "label": "睡眠状况",
+      "definition": "睡眠状况；须结合本工具来源与状态，不代表施测已开放。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "license:cc_by_nc_4_0",
+      "axis": "license",
+      "label": "CC BY-NC 4.0署名非商业",
+      "definition": "CC BY-NC 4.0署名非商业；须结合本工具来源与状态，不代表施测已开放。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "construct:loneliness",
+      "axis": "construct",
+      "label": "孤独与联结不足",
+      "definition": "孤独与联结不足；须结合本工具来源与状态，不代表施测已开放。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "license:cc_by_nc_2_0",
+      "axis": "license",
+      "label": "CC BY-NC 2.0署名非商业",
+      "definition": "CC BY-NC 2.0署名非商业；须结合本工具来源与状态，不代表施测已开放。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "domain:digital_behavior",
+      "axis": "domain",
+      "label": "数字使用与生活行为",
+      "definition": "数字使用与生活行为；须结合原来源、人群及研究草稿状态。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "construct:smartphone_use_difficulties",
+      "axis": "construct",
+      "label": "手机使用相关困扰",
+      "definition": "手机使用相关困扰；须结合原来源、人群及研究草稿状态。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "population:grade_8_research",
+      "axis": "population",
+      "label": "八年级学生研究",
+      "definition": "八年级学生研究；须结合原来源、人群及研究草稿状态。",
+      "evidenceRequired": true
+    },
+    {
+      "id": "license:cc_by",
+      "axis": "license",
+      "label": "CC Attribution署名许可",
+      "definition": "CC Attribution署名许可；须结合原来源、人群及研究草稿状态。",
+      "evidenceRequired": true
+    }
+  ],
+  "newMappings": [
+    {
+      "identity": {
+        "instrumentKey": "sci8_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+      "status": "EXECUTABLE_DRAFT",
+      "tags": [
+        "domain:sleep_recovery",
+        "construct:sleep_condition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ],
+      "sourceBasis": {
+        "title": "Sleep Condition Indicator — 2014 original Appendix, eight-item version",
+        "citation": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183.",
+        "url": "https://bmjopen.bmj.com/content/4/3/e004183",
+        "publicationYear": 2014
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "djgls6_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "status": "EXECUTABLE_DRAFT",
+      "tags": [
+        "domain:social_emotional",
+        "construct:loneliness",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_2_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ],
+      "sourceBasis": {
+        "title": "De Jong Gierveld Short Loneliness Scale — English items as published by original authors in 2010 article, grouped emotional then social",
+        "citation": "De Jong Gierveld J, Van Tilburg T. The De Jong Gierveld short scales for emotional and social loneliness: tested on data from 7 countries in the UN generations and gender surveys. Eur J Ageing. 2010;7:121–130.",
+        "url": "https://link.springer.com/article/10.1007/s10433-010-0144-6",
+        "publicationYear": 2010
+      }
+    },
+    {
+      "identity": {
+        "instrumentKey": "sas_sv10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+      "status": "EXECUTABLE_DRAFT",
+      "tags": [
+        "domain:digital_behavior",
+        "construct:smartphone_use_difficulties",
+        "population:grade_8_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:cc_by",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ],
+      "sourceBasis": {
+        "title": "Smartphone Addiction Scale – Short Version — 2013 Appendix S1",
+        "citation": "Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558.",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+        "publicationYear": 2013
+      }
+    }
+  ],
+  "rules": [
+    "中文label面向读者；prefix机器可识别。",
+    "非商业不是整个系统新门禁，也不代表收费学校活动自动合规。",
+    "仅包含已完成开源/公共再分发核验的新增可执行草稿，不把外部候选登记为库内量表。"
+  ]
+}

@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -32,7 +32,24 @@
         "research",
         "working_translation",
         "non_diagnostic",
-        "descriptive_report"
+        "descriptive_report",
+        "domain:personality_self",
+        "construct:general_self_efficacy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:share_alike",
+        "license:redistribution_restricted",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
       ]
     },
     "population": {

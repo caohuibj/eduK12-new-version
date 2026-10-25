@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -38,7 +38,24 @@
         "student_self_report",
         "grades_6_8",
         "research",
-        "descriptive_report"
+        "descriptive_report",
+        "domain:wellbeing_strength",
+        "construct:student_school_wellbeing",
+        "construct:school_connectedness",
+        "population:grades_6_8",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
       ]
     },
     "population": {

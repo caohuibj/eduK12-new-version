@@ -1,0 +1,391 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": 1,
+      "en": "Missing planned work due to smartphone use",
+      "zh": "因为使用智能手机而耽误原先计划好的事情。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "en": "Having a hard time concentrating in class, while doing assignments, or while working due to smartphone use",
+      "zh": "因为使用智能手机，在上课、做作业或工作时很难集中注意力。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "en": "Feeling pain in the wrists or at the back of the neck while using a smartphone",
+      "zh": "使用智能手机时，手腕或后颈会疼痛。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "en": "Won’t be able to stand not having a smartphone",
+      "zh": "我会无法忍受没有智能手机。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "en": "Feeling impatient and fretful when I am not holding my smartphone",
+      "zh": "手里没有拿着智能手机时，我会感到不耐烦、烦躁不安。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "en": "Having my smartphone in my mind even when I am not using it",
+      "zh": "即使没有在使用智能手机，我也会想着它。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "en": "I will never give up using my smartphone even when my daily life is already greatly affected by it.",
+      "zh": "即使日常生活已经受到很大影响，我也绝不会放弃使用智能手机。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "en": "Constantly checking my smartphone so as not to miss conversations between other people on Twitter or Facebook",
+      "zh": "我不停地查看智能手机，以免错过其他人在 Twitter 或 Facebook 上的对话。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "en": "Using my smartphone longer than I had intended",
+      "zh": "我使用智能手机的时间比原先打算的更长。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "en": "The people around me tell me that I use my smartphone too much.",
+      "zh": "身边的人说我使用智能手机太多了。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    }
+  ],
+  "instructions": "请按这些说法与你实际情况的符合程度作答。原题本没有固定回顾天数，不另加“过去两周”等时间窗。",
+  "instructionsNote": "中文导语为编辑性说明，不冒充作者原文。原附录只有题目与六级同意程度。",
+  "rights": {
+    "id": "CC-BY",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "copyright_holder": "Kwon et al. 2013",
+    "authority_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+    "evidence_location": "Copyright paragraph explicitly licenses original authors article under CC Attribution; current license link resolves to CC BY 4.0; original scale Appendix S1 is author-created supporting material without separate restrictive credit notice. Do not claim historical version number is printed in 2013 article.",
+    "noncommercial_only": false,
+    "permissions": [
+      "reproduction",
+      "redistribution",
+      "translation/adaptation with attribution and change notice"
+    ]
+  },
+  "attribution": "©2013 Kwon et al. Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558. https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558；CC Attribution（当前链接 https://creativecommons.org/licenses/by/4.0/）。本中文翻译与数字排版/反馈为独立改编，无原作者背书；不声称2013原文印有4.0版本号。"
+}

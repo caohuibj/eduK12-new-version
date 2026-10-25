@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -31,7 +31,23 @@
         "working_translation",
         "research",
         "descriptive_report",
-        "no_verified_norms"
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:responsive_joy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
       ]
     },
     "population": {

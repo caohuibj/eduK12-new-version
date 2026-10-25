@@ -1,0 +1,625 @@
+{
+  "researched_at": "2026-10-25",
+  "artifact_kind": "research-sourcepack-not-runtime-ingestion",
+  "id": "SAS-SV10",
+  "name_en": "Smartphone Addiction Scale – Short Version",
+  "name_zh": "智能手机成瘾量表简版（SAS-SV，10题）",
+  "public_report_title": "手机使用与生活节奏",
+  "version": "Kwon et al. 2013 original English Appendix S1, 10-item adolescent short version",
+  "translation_status": "独立中文工作稿，未认知访谈、回译或中文版心理测量验证；不得冒充已验证中文版。保留 Twitter/Facebook 原例，未擅自改成国内平台。",
+  "publication_gate": [
+    "CC BY署名、来源、许可证与翻译修改声明必须保留",
+    "研究工作稿；未完成中文验证不进入诊断/自动风险分层",
+    "原韩国青少年性别阈值只存外部证据，不能按中国/成人或用户性别自动调用"
+  ],
+  "domains": [
+    "数字使用与行为习惯",
+    "手机使用带来的生活影响"
+  ],
+  "tags": [
+    "数字使用",
+    "智能手机",
+    "行为习惯",
+    "青少年原始验证",
+    "自评",
+    "10题",
+    "CC-BY",
+    "中文工作稿",
+    "非诊断",
+    "外部阈值未启用"
+  ],
+  "tag_axes": {
+    "domain": [
+      "数字行为",
+      "生活功能"
+    ],
+    "construct": [
+      "手机使用困扰"
+    ],
+    "population": [
+      "原始验证：韩国初二学生，均龄14.5岁"
+    ],
+    "respondent": [
+      "本人自评"
+    ],
+    "rights": [
+      "CC BY，不限非商业"
+    ],
+    "evidence": [
+      "原版已研究",
+      "独立中译待验证"
+    ],
+    "usage": [
+      "自我觉察",
+      "研究"
+    ],
+    "therapy_relation": [
+      "无特定ACT/CBT/DBT疗效归属"
+    ]
+  },
+  "license": {
+    "id": "CC-BY",
+    "url": "https://creativecommons.org/licenses/by/4.0/",
+    "copyright_holder": "Kwon et al. 2013",
+    "authority_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+    "evidence_location": "Copyright paragraph explicitly licenses original authors article under CC Attribution; current license link resolves to CC BY 4.0; original scale Appendix S1 is author-created supporting material without separate restrictive credit notice. Do not claim historical version number is printed in 2013 article.",
+    "noncommercial_only": false,
+    "permissions": [
+      "reproduction",
+      "redistribution",
+      "translation/adaptation with attribution and change notice"
+    ]
+  },
+  "references": [
+    {
+      "citation": "Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558.",
+      "doi": "10.1371/journal.pone.0083558",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+      "use": "Development, original adolescent sample, 10-item scoring, external ROC evidence, copyright"
+    },
+    {
+      "citation": "Kwon et al. (2013), Appendix S1. English version of SAS-SV.",
+      "doi": "10.1371/journal.pone.0083558.s001",
+      "url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0083558.s001&type=supplementary",
+      "local_file": "SAS-SV-original.xlsx",
+      "sha256": "212748526fb7436390f73810bad468ed0ec6c5ffd9a32b7389d2b39c2ef28ac3",
+      "use": "Exact original English wording and all six response anchors"
+    }
+  ],
+  "instructions_zh": "请按这些说法与你实际情况的符合程度作答。原题本没有固定回顾天数，不另加“过去两周”等时间窗。",
+  "instructions_note": "中文导语为编辑性说明，不冒充作者原文。原附录只有题目与六级同意程度。",
+  "items": [
+    {
+      "id": 1,
+      "en": "Missing planned work due to smartphone use",
+      "zh": "因为使用智能手机而耽误原先计划好的事情。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "en": "Having a hard time concentrating in class, while doing assignments, or while working due to smartphone use",
+      "zh": "因为使用智能手机，在上课、做作业或工作时很难集中注意力。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "en": "Feeling pain in the wrists or at the back of the neck while using a smartphone",
+      "zh": "使用智能手机时，手腕或后颈会疼痛。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "en": "Won’t be able to stand not having a smartphone",
+      "zh": "我会无法忍受没有智能手机。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "en": "Feeling impatient and fretful when I am not holding my smartphone",
+      "zh": "手里没有拿着智能手机时，我会感到不耐烦、烦躁不安。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "en": "Having my smartphone in my mind even when I am not using it",
+      "zh": "即使没有在使用智能手机，我也会想着它。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "en": "I will never give up using my smartphone even when my daily life is already greatly affected by it.",
+      "zh": "即使日常生活已经受到很大影响，我也绝不会放弃使用智能手机。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "en": "Constantly checking my smartphone so as not to miss conversations between other people on Twitter or Facebook",
+      "zh": "我不停地查看智能手机，以免错过其他人在 Twitter 或 Facebook 上的对话。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "en": "Using my smartphone longer than I had intended",
+      "zh": "我使用智能手机的时间比原先打算的更长。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "en": "The people around me tell me that I use my smartphone too much.",
+      "zh": "身边的人说我使用智能手机太多了。",
+      "options": [
+        {
+          "en": "Strongly disagree",
+          "zh": "非常不同意",
+          "score": 1
+        },
+        {
+          "en": "Disagree",
+          "zh": "不同意",
+          "score": 2
+        },
+        {
+          "en": "Weakly disagree",
+          "zh": "有些不同意",
+          "score": 3
+        },
+        {
+          "en": "Weakly agree",
+          "zh": "有些同意",
+          "score": 4
+        },
+        {
+          "en": "Agree",
+          "zh": "同意",
+          "score": 5
+        },
+        {
+          "en": "Strongly agree",
+          "zh": "非常同意",
+          "score": 6
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "type": "sum",
+    "range": [
+      10,
+      60
+    ],
+    "item_scores": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reverse_items": [],
+    "dimensions": [
+      {
+        "id": "total",
+        "items": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "direction": "higher_more_self_reported_phone_use_difficulties"
+      }
+    ],
+    "subscales": "仅总分；不得从33题长版六因素借用分量表keys",
+    "missing": {
+      "source": "Original study mentions EM handling in sample analysis, not a reusable individual scoring/proration rule.",
+      "implementation_policy": "complete-case-only: any missing/invalid response => no total, no bands, no imputation. This is conservative product policy, not original author rule."
+    },
+    "cutoffs_active": false,
+    "external_thresholds": [
+      {
+        "source": "Kwon et al. 2013 ROC analysis and Table 5",
+        "population": "South Korea Kangwon province, second-year junior-high pupils; n=540, 343 boys and 197 girls, mean age14.5; data April–May2013. Clinical psychologist comparison subset n=150 (90 boys,60 girls).",
+        "cutoffs": [
+          {
+            "group": "boys in original study",
+            "value": 31,
+            "sensitivity": 0.867,
+            "specificity": 0.893
+          },
+          {
+            "group": "girls in original study",
+            "value": 33,
+            "sensitivity": 0.875,
+            "specificity": 0.886
+          }
+        ],
+        "status": "external_evidence_only",
+        "do_not_use_for": [
+          "Chinese independent translation",
+          "adults",
+          "diagnosis",
+          "automatic sex-based branching"
+        ],
+        "note": "The article reports cutoff values; do not interpret them as universal clinical diagnostic boundaries."
+      }
+    ],
+    "empirical_parameters": {
+      "sample_n": 540,
+      "mean_age": 14.5,
+      "mean_total": 25.26,
+      "boys_mean": 23.75,
+      "girls_mean": 27.89,
+      "alpha": 0.911,
+      "use": "source-population context only, not Chinese norms or percentiles"
+    }
+  },
+  "reports": {
+    "disclaimer": "这份中文内容是研究工作稿，用来帮助你观察手机与生活的关系，不是诊断，也不能凭一次回答判断你是否“成瘾”。",
+    "universal": [
+      "手机可以帮我们联系朋友、查资料，也可能悄悄挤占原本想做的事。比起一个标签，更值得留意的是：它是否打断了你的学习、工作、休息或与人相处。",
+      "回看你比较认同的几句话：你是在等待消息时反复查看，还是原本只想看一眼，却停留得比计划更久？这些生活片段通常比单看分数更有用。"
+    ],
+    "reflection": [
+      "选一个你想拿回注意力的时刻，例如写作业前的十分钟。先想清楚这段时间要做什么，再决定手机放在哪里。",
+      "如果拿起手机是在躲开无聊、压力或孤单，也可以温和地问自己：此刻除了手机，我还需要什么？"
+    ],
+    "action": [
+      "可以试试把一段不紧急的通知集中查看，或把手机放到伸手够不到的位置；把它当作小实验，不要求一次做到完美。",
+      "如果手机使用已经持续影响睡眠、学习、人际关系，或让你很难受，可以和可信任的家人、老师或专业人员一起讨论。帮助的目标是改善生活，不是责备。"
+    ],
+    "missing": "有些题还没有完成，目前不生成总分或分层结论。你可以补充答案，也可以只回看已作答的生活线索。",
+    "safety": "不以总分判定未成年人好坏；不自动通知家长，不作纪律处分依据。任何真实儿童数据采集需另行按同意与隐私流程。"
+  },
+  "synthetic_tests": [
+    {
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expected_total": 10
+    },
+    {
+      "answers": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ],
+      "expected_total": 60
+    },
+    {
+      "answers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        1,
+        2,
+        3,
+        4
+      ],
+      "expected_total": 31
+    },
+    {
+      "answers": [
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expected_total": null
+    }
+  ],
+  "limitations": [
+    "没有中国成人/儿童通用临床诊断阈值",
+    "未核验任何现有中文版全文再分发权，故只用独立翻译",
+    "第8题平台例子具有时代/文化限制，不能静默替换后冒充原版",
+    "原33题SAS与本10题SAS-SV不能混用题本或计分维度"
+  ]
+}

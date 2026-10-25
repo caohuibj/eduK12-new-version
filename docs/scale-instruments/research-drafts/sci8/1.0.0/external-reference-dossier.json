@@ -1,0 +1,93 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "parameters": [
+    {
+      "id": "original_screening_reference",
+      "bands": [
+        {
+          "min": 0,
+          "max": 16,
+          "code": "follow_up"
+        },
+        {
+          "min": 17,
+          "max": 32,
+          "code": "not_flagged"
+        }
+      ],
+      "population": "2014 adult development study total n=30941 (71% female), mainly self-selected online adults; threshold evaluated in Science Centre sample against ISI classification (n=255 usable, 27 ISI>=15,228 ISI<15)",
+      "comparison": "SCI<=16 identified 89% of ISI>=15 group; >16 identified82% of ISI<15 group. Not evaluated against independent clinical diagnosis in this paper.",
+      "not_applicable_as": "Chinese validated cutoff, child/adolescent cutoff, diagnosis, prevalence estimate",
+      "source": "2014 paper page3 concurrent validity; page4 limitations"
+    },
+    {
+      "id": "original_appendix_shading",
+      "itemScoresShaded": [
+        0,
+        1,
+        2
+      ],
+      "appliesToItems": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "meaning": "Original appendix marks symptom-criterion ranges, not independently validated per-item clinical categories. Archived only; no runtime item labels/diagnosis.",
+      "runtimeSelected": false
+    }
+  ],
+  "scoring": {
+    "method": "sum all 8 scored responses",
+    "range": [
+      0,
+      32
+    ],
+    "higher_means": "better sleep",
+    "reverse_items": [],
+    "optional_rescale": "total / 3.2 gives 0–10; keep out of main lay report to avoid redundant score jargon",
+    "missing": "Original appendix does not specify imputation. Project conservative rule: any missing item => no total/band; invite completion; never zero-fill.",
+    "parameters": [
+      {
+        "id": "original_screening_reference",
+        "bands": [
+          {
+            "min": 0,
+            "max": 16,
+            "code": "follow_up"
+          },
+          {
+            "min": 17,
+            "max": 32,
+            "code": "not_flagged"
+          }
+        ],
+        "population": "2014 adult development study total n=30941 (71% female), mainly self-selected online adults; threshold evaluated in Science Centre sample against ISI classification (n=255 usable, 27 ISI>=15,228 ISI<15)",
+        "comparison": "SCI<=16 identified 89% of ISI>=15 group; >16 identified82% of ISI<15 group. Not evaluated against independent clinical diagnosis in this paper.",
+        "not_applicable_as": "Chinese validated cutoff, child/adolescent cutoff, diagnosis, prevalence estimate",
+        "source": "2014 paper page3 concurrent validity; page4 limitations"
+      }
+    ]
+  },
+  "references": [
+    {
+      "citation": "Espie CA, Kyle SD, Hames P, Gardani M, Fleming L, Cape J. The Sleep Condition Indicator: a clinical screening tool to evaluate insomnia disorder. BMJ Open. 2014;4:e004183.",
+      "doi": "10.1136/bmjopen-2013-004183",
+      "url": "https://bmjopen.bmj.com/content/4/3/e004183",
+      "author_paper_pdf_mirror": "https://www.antoniocasella.eu/salute/Espie_2014.pdf",
+      "local_pdf": "Espie_2014.pdf",
+      "use": "original eight-item appendix; scoring; rights; adult validation; initial screening reference"
+    }
+  ],
+  "existingChineseValidationNotOurForm": {
+    "url": "https://doi.org/10.1186/s12888-024-05844-7",
+    "note": "Existing Chinese healthcare-student study identified; its translation text and cutoffs are not copied or claimed for this independent translation."
+  },
+  "currentTranslationValidated": false,
+  "noClinicalInference": true
+}

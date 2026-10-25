@@ -1,0 +1,59 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "originalSample": {
+    "sample_n": 540,
+    "mean_age": 14.5,
+    "mean_total": 25.26,
+    "boys_mean": 23.75,
+    "girls_mean": 27.89,
+    "alpha": 0.911,
+    "use": "source-population context only, not Chinese norms or percentiles"
+  },
+  "originalThresholds": [
+    {
+      "source": "Kwon et al. 2013 ROC analysis and Table 5",
+      "population": "South Korea Kangwon province, second-year junior-high pupils; n=540, 343 boys and 197 girls, mean age14.5; data April–May2013. Clinical psychologist comparison subset n=150 (90 boys,60 girls).",
+      "cutoffs": [
+        {
+          "group": "boys in original study",
+          "value": 31,
+          "sensitivity": 0.867,
+          "specificity": 0.893
+        },
+        {
+          "group": "girls in original study",
+          "value": 33,
+          "sensitivity": 0.875,
+          "specificity": 0.886
+        }
+      ],
+      "status": "external_evidence_only",
+      "do_not_use_for": [
+        "Chinese independent translation",
+        "adults",
+        "diagnosis",
+        "automatic sex-based branching"
+      ],
+      "note": "The article reports cutoff values; do not interpret them as universal clinical diagnostic boundaries."
+    }
+  ],
+  "currentChineseTranslationValidated": false,
+  "references": [
+    {
+      "citation": "Kwon M, Kim D-J, Cho H, Yang S (2013). The Smartphone Addiction Scale: Development and Validation of a Short Version for Adolescents. PLoS ONE 8(12): e83558.",
+      "doi": "10.1371/journal.pone.0083558",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0083558",
+      "use": "Development, original adolescent sample, 10-item scoring, external ROC evidence, copyright"
+    },
+    {
+      "citation": "Kwon et al. (2013), Appendix S1. English version of SAS-SV.",
+      "doi": "10.1371/journal.pone.0083558.s001",
+      "url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0083558.s001&type=supplementary",
+      "local_file": "SAS-SV-original.xlsx",
+      "sha256": "212748526fb7436390f73810bad468ed0ec6c5ffd9a32b7389d2b39c2ef28ac3",
+      "use": "Exact original English wording and all six response anchors"
+    }
+  ],
+  "noAutomatedSexBranch": true
+}
