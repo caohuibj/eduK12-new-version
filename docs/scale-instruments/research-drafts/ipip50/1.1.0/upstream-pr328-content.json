@@ -1,0 +1,754 @@
+{
+  "schemaVersion": "ipip50-unregistered-content-draft-v1",
+  "status": "AI_RESEARCH_WORKING_TRANSLATION_UNVALIDATED",
+  "runtimeRegistration": false,
+  "versionIntent": {
+    "instrumentKey": "ipip50_zh_cn_research",
+    "instrumentVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "releaseStatus": "DRAFT"
+  },
+  "sourceEnglish": {
+    "source_url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "key_url": "https://ipip.ori.org/newBigFive5broadKey.htm",
+    "source_title": "How Accurately Can You Describe Yourself?",
+    "instructions_verbatim_historical_evidence": "Describe yourself as you generally are now, not as you wish to be in the future. Describe yourself as you honestly see yourself, in relation to other people you know of the same sex as you are, and roughly your same age. So that you can describe yourself in an honest manner, your responses will be kept in absolute confidence. Indicate for each statement whether it is 1. Very Inaccurate, 2. Moderately Inaccurate, 3. Neither Accurate Nor Inaccurate, 4. Moderately Accurate, or 5. Very Accurate as a description of you.",
+    "administration_gate": "Historical original includes absolute confidentiality promise and same-sex/age comparison. Preserve only as source evidence; do NOT ship the promise without an actual privacy contract. Any deployed adaptation needs separately versioned instructions/review, not silent rewriting.",
+    "recall": "As you generally are now; no fixed day/week recall period.",
+    "response_options": [
+      {
+        "value": 1,
+        "label": "Very Inaccurate"
+      },
+      {
+        "value": 2,
+        "label": "Moderately Inaccurate"
+      },
+      {
+        "value": 3,
+        "label": "Neither Accurate Nor Inaccurate"
+      },
+      {
+        "value": 4,
+        "label": "Moderately Accurate"
+      },
+      {
+        "value": 5,
+        "label": "Very Accurate"
+      }
+    ],
+    "items": [
+      {
+        "number": 1,
+        "text": "Am the life of the party.",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 2,
+        "text": "Feel little concern for others.",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 3,
+        "text": "Am always prepared.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 4,
+        "text": "Get stressed out easily.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 5,
+        "text": "Have a rich vocabulary.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 6,
+        "text": "Don't talk a lot.",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 7,
+        "text": "Am interested in people.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 8,
+        "text": "Leave my belongings around.",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 9,
+        "text": "Am relaxed most of the time.",
+        "dimension": "Emotional Stability",
+        "key": "+"
+      },
+      {
+        "number": 10,
+        "text": "Have difficulty understanding abstract ideas.",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 11,
+        "text": "Feel comfortable around people.",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 12,
+        "text": "Insult people.",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 13,
+        "text": "Pay attention to details.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 14,
+        "text": "Worry about things.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 15,
+        "text": "Have a vivid imagination.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 16,
+        "text": "Keep in the background.",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 17,
+        "text": "Sympathize with others' feelings.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 18,
+        "text": "Make a mess of things.",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 19,
+        "text": "Seldom feel blue.",
+        "dimension": "Emotional Stability",
+        "key": "+"
+      },
+      {
+        "number": 20,
+        "text": "Am not interested in abstract ideas.",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 21,
+        "text": "Start conversations.",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 22,
+        "text": "Am not interested in other people's problems.",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 23,
+        "text": "Get chores done right away.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 24,
+        "text": "Am easily disturbed.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 25,
+        "text": "Have excellent ideas.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 26,
+        "text": "Have little to say.",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 27,
+        "text": "Have a soft heart.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 28,
+        "text": "Often forget to put things back in their proper place.",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 29,
+        "text": "Get upset easily.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 30,
+        "text": "Do not have a good imagination.",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 31,
+        "text": "Talk to a lot of different people at parties.",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 32,
+        "text": "Am not really interested in others.",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 33,
+        "text": "Like order.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 34,
+        "text": "Change my mood a lot.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 35,
+        "text": "Am quick to understand things.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 36,
+        "text": "Don't like to draw attention to myself.",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 37,
+        "text": "Take time out for others.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 38,
+        "text": "Shirk my duties.",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 39,
+        "text": "Have frequent mood swings.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 40,
+        "text": "Use difficult words.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 41,
+        "text": "Don't mind being the center of attention.",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 42,
+        "text": "Feel others' emotions.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 43,
+        "text": "Follow a schedule.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 44,
+        "text": "Get irritated easily.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 45,
+        "text": "Spend time reflecting on things.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 46,
+        "text": "Am quiet around strangers.",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 47,
+        "text": "Make people feel at ease.",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 48,
+        "text": "Am exacting in my work.",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 49,
+        "text": "Often feel blue.",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 50,
+        "text": "Am full of ideas.",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      }
+    ],
+    "transcription": "Exact item order/text/periods from official sample. Display key/dimension only in research record, not respondent questionnaire."
+  },
+  "chineseWorkingTranslation": {
+    "status": "UNVALIDATED_AI_WORKING_TRANSLATION",
+    "instructions": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+    "responseOptions": [
+      {
+        "value": 1,
+        "label": "非常不符合"
+      },
+      {
+        "value": 2,
+        "label": "比较不符合"
+      },
+      {
+        "value": 3,
+        "label": "既谈不上符合，也谈不上不符合"
+      },
+      {
+        "value": 4,
+        "label": "比较符合"
+      },
+      {
+        "value": 5,
+        "label": "非常符合"
+      }
+    ],
+    "items": [
+      {
+        "number": 1,
+        "itemCode": "IPIP50-01",
+        "text": "我是聚会中活跃气氛的人。",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 2,
+        "itemCode": "IPIP50-02",
+        "text": "我很少关心别人。",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 3,
+        "itemCode": "IPIP50-03",
+        "text": "我总是做好准备。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 4,
+        "itemCode": "IPIP50-04",
+        "text": "我容易感到压力很大。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 5,
+        "itemCode": "IPIP50-05",
+        "text": "我的词汇丰富。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 6,
+        "itemCode": "IPIP50-06",
+        "text": "我的话不多。",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 7,
+        "itemCode": "IPIP50-07",
+        "text": "我对他人感兴趣。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 8,
+        "itemCode": "IPIP50-08",
+        "text": "我把自己的东西随处放。",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 9,
+        "itemCode": "IPIP50-09",
+        "text": "我大多数时候都很放松。",
+        "dimension": "Emotional Stability",
+        "key": "+"
+      },
+      {
+        "number": 10,
+        "itemCode": "IPIP50-10",
+        "text": "我理解抽象概念有困难。",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 11,
+        "itemCode": "IPIP50-11",
+        "text": "和他人在一起时，我感到自在。",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 12,
+        "itemCode": "IPIP50-12",
+        "text": "我会侮辱别人。",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 13,
+        "itemCode": "IPIP50-13",
+        "text": "我留意细节。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 14,
+        "itemCode": "IPIP50-14",
+        "text": "我会为各种事情担忧。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 15,
+        "itemCode": "IPIP50-15",
+        "text": "我的想象力很生动。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 16,
+        "itemCode": "IPIP50-16",
+        "text": "我保持低调，不让自己引人注目。",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 17,
+        "itemCode": "IPIP50-17",
+        "text": "我体谅他人的感受。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 18,
+        "itemCode": "IPIP50-18",
+        "text": "我把事情弄得一团糟。",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 19,
+        "itemCode": "IPIP50-19",
+        "text": "我很少感到低落。",
+        "dimension": "Emotional Stability",
+        "key": "+"
+      },
+      {
+        "number": 20,
+        "itemCode": "IPIP50-20",
+        "text": "我对抽象概念不感兴趣。",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 21,
+        "itemCode": "IPIP50-21",
+        "text": "我主动开始交谈。",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 22,
+        "itemCode": "IPIP50-22",
+        "text": "我对别人的问题不感兴趣。",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 23,
+        "itemCode": "IPIP50-23",
+        "text": "我会马上做完日常杂务。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 24,
+        "itemCode": "IPIP50-24",
+        "text": "我很容易心神不宁。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 25,
+        "itemCode": "IPIP50-25",
+        "text": "我有很棒的想法。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 26,
+        "itemCode": "IPIP50-26",
+        "text": "我没什么话可说。",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 27,
+        "itemCode": "IPIP50-27",
+        "text": "我心肠软。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 28,
+        "itemCode": "IPIP50-28",
+        "text": "我常忘记把东西放回它们应放的位置。",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 29,
+        "itemCode": "IPIP50-29",
+        "text": "我容易心烦。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 30,
+        "itemCode": "IPIP50-30",
+        "text": "我的想象力不太好。",
+        "dimension": "Intellect/Imagination",
+        "key": "-"
+      },
+      {
+        "number": 31,
+        "itemCode": "IPIP50-31",
+        "text": "在聚会上，我会和许多不同的人交谈。",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 32,
+        "itemCode": "IPIP50-32",
+        "text": "我并不怎么对他人感兴趣。",
+        "dimension": "Agreeableness",
+        "key": "-"
+      },
+      {
+        "number": 33,
+        "itemCode": "IPIP50-33",
+        "text": "我喜欢井然有序。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 34,
+        "itemCode": "IPIP50-34",
+        "text": "我的情绪经常变化。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 35,
+        "itemCode": "IPIP50-35",
+        "text": "我理解事情很快。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 36,
+        "itemCode": "IPIP50-36",
+        "text": "我不喜欢让别人注意到我。",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 37,
+        "itemCode": "IPIP50-37",
+        "text": "我会抽出时间给别人。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 38,
+        "itemCode": "IPIP50-38",
+        "text": "我逃避自己的职责。",
+        "dimension": "Conscientiousness",
+        "key": "-"
+      },
+      {
+        "number": 39,
+        "itemCode": "IPIP50-39",
+        "text": "我的情绪常常起伏不定。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 40,
+        "itemCode": "IPIP50-40",
+        "text": "我使用难懂的词语。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 41,
+        "itemCode": "IPIP50-41",
+        "text": "我不介意成为众人关注的焦点。",
+        "dimension": "Extraversion",
+        "key": "+"
+      },
+      {
+        "number": 42,
+        "itemCode": "IPIP50-42",
+        "text": "我能感受到他人的情绪。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 43,
+        "itemCode": "IPIP50-43",
+        "text": "我按日程安排做事。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 44,
+        "itemCode": "IPIP50-44",
+        "text": "我容易烦躁。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 45,
+        "itemCode": "IPIP50-45",
+        "text": "我会花时间反思事情。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      },
+      {
+        "number": 46,
+        "itemCode": "IPIP50-46",
+        "text": "在陌生人面前，我很安静。",
+        "dimension": "Extraversion",
+        "key": "-"
+      },
+      {
+        "number": 47,
+        "itemCode": "IPIP50-47",
+        "text": "我让人感到自在。",
+        "dimension": "Agreeableness",
+        "key": "+"
+      },
+      {
+        "number": 48,
+        "itemCode": "IPIP50-48",
+        "text": "我对自己的工作要求严格。",
+        "dimension": "Conscientiousness",
+        "key": "+"
+      },
+      {
+        "number": 49,
+        "itemCode": "IPIP50-49",
+        "text": "我经常感到低落。",
+        "dimension": "Emotional Stability",
+        "key": "-"
+      },
+      {
+        "number": 50,
+        "itemCode": "IPIP50-50",
+        "text": "我有很多想法。",
+        "dimension": "Intellect/Imagination",
+        "key": "+"
+      }
+    ]
+  },
+  "derivedTranslationRevisions": [
+    {
+      "number": 16,
+      "from": "我不引人注目。",
+      "to": "我保持低调，不让自己引人注目。",
+      "reason": "Preserve active background stance rather than merely being unnoticed."
+    },
+    {
+      "number": 28,
+      "from": "我常忘记把东西放回原处。",
+      "to": "我常忘记把东西放回它们应放的位置。",
+      "reason": "Proper place is the appropriate place, not necessarily original location."
+    }
+  ],
+  "exactFormEvidenceBoundary": "当前官网50题与2008论文50题子集逐项对应尚未独立建立；Xu100题和Jhu50题的证据不能转移给本AI译稿。",
+  "platformInstructionsNotOriginalItems": {
+    "draftNotice": "AI 辅助生成的简体中文研究工作译稿，尚未验证。题项公有领域许可不代表原作者认可此译稿。仅供文本、计分和报告方案审查，不供实际施测或临床使用。",
+    "instructions": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+    "adaptationDisclosure": "独立平台说明：省略原示例的同性别/近龄比较及未经核实的绝对保密承诺。不改变50项正文，不宣称与原施测条件完全等价。",
+    "privacyNotice": "本材料不收集作答数据。若未来开展施测，应先明确收集哪些数据、用途、访问范围、保存期限与退出方式；此处不承诺绝对保密。",
+    "missingNotice": "可跳过或退出。某维度十项未完整合法作答时，该维度不计分，其他完整维度可显示并明确标注结果不完整。",
+    "displayRequirement": "Before/during answering and all reports; separate from original items."
+  },
+  "reviewStatus": {
+    "reviewType": "AI_TEXT_REVIEW_WITH_TWO_TARGETED_REVISIONS",
+    "humanReview": "NOT_CLAIMED",
+    "scientificReview": "NOT_CLAIMED",
+    "psychometricValidation": "NOT_ESTABLISHED",
+    "authorization": "NO_DEPLOYMENT_AUTHORIZATION_CREATED"
+  }
+}

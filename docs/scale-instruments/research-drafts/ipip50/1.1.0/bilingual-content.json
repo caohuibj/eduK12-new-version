@@ -1,0 +1,406 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "code": "IPIP50-01",
+      "zh": "我是聚会中活跃气氛的人。",
+      "en": "Am the life of the party.",
+      "reverse": false,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-02",
+      "zh": "我很少关心别人。",
+      "en": "Feel little concern for others.",
+      "reverse": true,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-03",
+      "zh": "我总是做好准备。",
+      "en": "Am always prepared.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-04",
+      "zh": "我容易感到压力很大。",
+      "en": "Get stressed out easily.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-05",
+      "zh": "我的词汇丰富。",
+      "en": "Have a rich vocabulary.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-06",
+      "zh": "我的话不多。",
+      "en": "Don't talk a lot.",
+      "reverse": true,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-07",
+      "zh": "我对他人感兴趣。",
+      "en": "Am interested in people.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-08",
+      "zh": "我把自己的东西随处放。",
+      "en": "Leave my belongings around.",
+      "reverse": true,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-09",
+      "zh": "我大多数时候都很放松。",
+      "en": "Am relaxed most of the time.",
+      "reverse": false,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-10",
+      "zh": "我理解抽象概念有困难。",
+      "en": "Have difficulty understanding abstract ideas.",
+      "reverse": true,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-11",
+      "zh": "和他人在一起时，我感到自在。",
+      "en": "Feel comfortable around people.",
+      "reverse": false,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-12",
+      "zh": "我会侮辱别人。",
+      "en": "Insult people.",
+      "reverse": true,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-13",
+      "zh": "我留意细节。",
+      "en": "Pay attention to details.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-14",
+      "zh": "我会为各种事情担忧。",
+      "en": "Worry about things.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-15",
+      "zh": "我的想象力很生动。",
+      "en": "Have a vivid imagination.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-16",
+      "zh": "我保持低调，不让自己引人注目。",
+      "en": "Keep in the background.",
+      "reverse": true,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-17",
+      "zh": "我体谅他人的感受。",
+      "en": "Sympathize with others' feelings.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-18",
+      "zh": "我把事情弄得一团糟。",
+      "en": "Make a mess of things.",
+      "reverse": true,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-19",
+      "zh": "我很少感到低落。",
+      "en": "Seldom feel blue.",
+      "reverse": false,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-20",
+      "zh": "我对抽象概念不感兴趣。",
+      "en": "Am not interested in abstract ideas.",
+      "reverse": true,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-21",
+      "zh": "我主动开始交谈。",
+      "en": "Start conversations.",
+      "reverse": false,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-22",
+      "zh": "我对别人的问题不感兴趣。",
+      "en": "Am not interested in other people's problems.",
+      "reverse": true,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-23",
+      "zh": "我会马上做完日常杂务。",
+      "en": "Get chores done right away.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-24",
+      "zh": "我很容易心神不宁。",
+      "en": "Am easily disturbed.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-25",
+      "zh": "我有很棒的想法。",
+      "en": "Have excellent ideas.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-26",
+      "zh": "我没什么话可说。",
+      "en": "Have little to say.",
+      "reverse": true,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-27",
+      "zh": "我心肠软。",
+      "en": "Have a soft heart.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-28",
+      "zh": "我常忘记把东西放回它们应放的位置。",
+      "en": "Often forget to put things back in their proper place.",
+      "reverse": true,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-29",
+      "zh": "我容易心烦。",
+      "en": "Get upset easily.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-30",
+      "zh": "我的想象力不太好。",
+      "en": "Do not have a good imagination.",
+      "reverse": true,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-31",
+      "zh": "在聚会上，我会和许多不同的人交谈。",
+      "en": "Talk to a lot of different people at parties.",
+      "reverse": false,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-32",
+      "zh": "我并不怎么对他人感兴趣。",
+      "en": "Am not really interested in others.",
+      "reverse": true,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-33",
+      "zh": "我喜欢井然有序。",
+      "en": "Like order.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-34",
+      "zh": "我的情绪经常变化。",
+      "en": "Change my mood a lot.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-35",
+      "zh": "我理解事情很快。",
+      "en": "Am quick to understand things.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-36",
+      "zh": "我不喜欢让别人注意到我。",
+      "en": "Don't like to draw attention to myself.",
+      "reverse": true,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-37",
+      "zh": "我会抽出时间给别人。",
+      "en": "Take time out for others.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-38",
+      "zh": "我逃避自己的职责。",
+      "en": "Shirk my duties.",
+      "reverse": true,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-39",
+      "zh": "我的情绪常常起伏不定。",
+      "en": "Have frequent mood swings.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-40",
+      "zh": "我使用难懂的词语。",
+      "en": "Use difficult words.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-41",
+      "zh": "我不介意成为众人关注的焦点。",
+      "en": "Don't mind being the center of attention.",
+      "reverse": false,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-42",
+      "zh": "我能感受到他人的情绪。",
+      "en": "Feel others' emotions.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-43",
+      "zh": "我按日程安排做事。",
+      "en": "Follow a schedule.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-44",
+      "zh": "我容易烦躁。",
+      "en": "Get irritated easily.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-45",
+      "zh": "我会花时间反思事情。",
+      "en": "Spend time reflecting on things.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    },
+    {
+      "code": "IPIP50-46",
+      "zh": "在陌生人面前，我很安静。",
+      "en": "Am quiet around strangers.",
+      "reverse": true,
+      "dim": "extraversion"
+    },
+    {
+      "code": "IPIP50-47",
+      "zh": "我让人感到自在。",
+      "en": "Make people feel at ease.",
+      "reverse": false,
+      "dim": "agreeableness"
+    },
+    {
+      "code": "IPIP50-48",
+      "zh": "我对自己的工作要求严格。",
+      "en": "Am exacting in my work.",
+      "reverse": false,
+      "dim": "conscientiousness"
+    },
+    {
+      "code": "IPIP50-49",
+      "zh": "我经常感到低落。",
+      "en": "Often feel blue.",
+      "reverse": true,
+      "dim": "emotional_stability"
+    },
+    {
+      "code": "IPIP50-50",
+      "zh": "我有很多想法。",
+      "en": "Am full of ideas.",
+      "reverse": false,
+      "dim": "intellect_imagination"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "instructions": {
+    "draftNotice": "AI 辅助生成的简体中文研究工作译稿，尚未验证。题项公有领域许可不代表原作者认可此译稿。仅供文本、计分和报告方案审查，不供实际施测或临床使用。",
+    "instructions": "请描述您目前通常的样子，而不是您希望将来成为的样子。请如实判断每项描述与自己的符合程度。",
+    "adaptationDisclosure": "独立平台说明：省略原示例的同性别/近龄比较及未经核实的绝对保密承诺。不改变50项正文，不宣称与原施测条件完全等价。",
+    "privacyNotice": "本材料不收集作答数据。若未来开展施测，应先明确收集哪些数据、用途、访问范围、保存期限与退出方式；此处不承诺绝对保密。",
+    "missingNotice": "可跳过或退出。某维度十项未完整合法作答时，该维度不计分；当前系统将整份结果标为无效，不显示得分解释或参照。其他完整维度的底层原始值不代表可展示解释。",
+    "displayRequirement": "Before/during answering and all reports; separate from original items."
+  },
+  "rights": {
+    "type": "public_domain",
+    "source": "https://www.ipip.ori.org/",
+    "electronic_and_translation_source": "https://www.ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "summary": "IPIP官方允许复制、编辑、翻译及任何用途，包括网上施测；仍保留来源署名。"
+  },
+  "references": {
+    "norms": {
+      "clinical_cutoffs": null,
+      "norm_percentiles": null,
+      "reference_status": "NO_VERIFIED_TARGET_POPULATION_NORMS",
+      "source": "https://www.ipip.ori.org/newNorms.htm",
+      "note": "IPIP官方不提供通用常模，提醒按适当样本建立本地参照。不能用量尺等分点或任意均值±SD冒称经验阈值；不移植所对应原版权量表常模。"
+    },
+    "keys": "https://ipip.ori.org/newBigFive5broadKey.htm"
+  }
+}
