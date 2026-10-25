@@ -5,6 +5,7 @@ import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
 import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
+import { resolveFrozenScaleInstructionForScale } from './onboarding/instrument-registry'
 import { canStudentAccessScale, canStartLibraryCourseScale } from './scale-access'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import { loadStoredScaleAdmission, standaloneAdmissionPersistenceForRuntime } from './scale-admission.service'
@@ -89,6 +90,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
       instrumentVersion: current.scale.instrumentVersion,
       definition,
       frozenAt,
+      instruction: resolveFrozenScaleInstructionForScale(current.scale),
     })
     const supplied = contextInput ?? priorAdmission?.contextValues
     const keys = runtimeSnapshot.schemaVersion === 2 ? requiredScaleContextKeys(runtimeSnapshot.compiledPolicy.applicability) : []

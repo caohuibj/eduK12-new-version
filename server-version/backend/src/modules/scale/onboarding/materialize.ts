@@ -42,6 +42,9 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
         itemCount: definitionCounts.itemCount,
         dimensionCount: definitionCounts.dimensionCount,
         estimatedTime: source.catalog.administration.estimatedMinutes,
+        // STANDARD rows are platform-owned content: the source instruction is
+        // the authoritative wording and is materialized with the definition.
+        ...(source.instruction ? { instruction: source.instruction.text } : {}),
         creatorId: input.actorUserId,
         tags: [source.catalog.construct.primaryDomain],
       },
@@ -63,6 +66,7 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
           itemCount: definitionCounts.itemCount,
           dimensionCount: definitionCounts.dimensionCount,
           estimatedTime: source.catalog.administration.estimatedMinutes,
+          ...(source.instruction ? { instruction: source.instruction.text } : {}),
         },
       })
     }

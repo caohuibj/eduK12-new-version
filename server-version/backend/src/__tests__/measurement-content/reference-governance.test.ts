@@ -17,3 +17,31 @@ describe('method-based empirical candidate governance',()=>{
     expect(validateReferenceGovernance(missing)).toContain('EMPIRICAL_REVIEW_REQUIRED')
   })
 })
+describe('adult reference population identity',()=>{
+  const adult=():AssessmentReferenceEntry=>({...fixture(),population:{match:{minAgeMonthsInclusive:216,maxAgeMonthsExclusive:1440},language:'zh-CN'},governance:{...fixture().governance!,schoolStage:'adult'}})
+  it('accepts an explicit adult age window without any grade identity',()=>expect(validateReferenceGovernance(adult())).toEqual([]))
+  it('rejects adult entries that fake school grades',()=>{
+    const bad=adult();bad.population={...bad.population!,match:{...bad.population!.match!,gradeLevels:['10','11','12']}}
+    expect(validateReferenceGovernance(bad)).toContain('REFERENCE_POPULATION_IDENTITY_INVALID')
+  })
+  it('rejects adult entries without an explicit 18+ age window',()=>{
+    const none=adult();none.population={language:'zh-CN'}
+    expect(validateReferenceGovernance(none)).toContain('REFERENCE_POPULATION_IDENTITY_INVALID')
+    const under=adult();under.population={match:{minAgeMonthsInclusive:144,maxAgeMonthsExclusive:720},language:'zh-CN'}
+    expect(validateReferenceGovernance(under)).toContain('REFERENCE_POPULATION_IDENTITY_INVALID')
+    const openEnded=adult();openEnded.population={match:{minAgeMonthsInclusive:216},language:'zh-CN'}
+    expect(validateReferenceGovernance(openEnded)).toContain('REFERENCE_POPULATION_IDENTITY_INVALID')
+  })
+  it('rejects cross-stage re-reference claims on adult entries',()=>{
+    const bad=adult();bad.governance!.crossStageReReferenceAllowed=true
+    expect(validateReferenceGovernance(bad)).toContain('ADULT_CROSS_STAGE_FORBIDDEN')
+  })
+  it('keeps school-stage grade identity unchanged',()=>{
+    const school=fixture()
+    expect(validateReferenceGovernance(school)).toEqual([])
+    const wrongGrades=fixture();wrongGrades.governance!.schoolStage='upper_secondary'
+    expect(validateReferenceGovernance(wrongGrades)).toContain('REFERENCE_POPULATION_IDENTITY_INVALID')
+    const withAgeWindow=fixture();withAgeWindow.population={...withAgeWindow.population!,match:{...withAgeWindow.population!.match!,minAgeMonthsInclusive:144,maxAgeMonthsExclusive:216}}
+    expect(validateReferenceGovernance(withAgeWindow)).toEqual([])
+  })
+})

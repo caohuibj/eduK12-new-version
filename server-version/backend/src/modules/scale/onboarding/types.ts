@@ -88,8 +88,25 @@ export interface ScaleInstrumentSourceV1 {
   /** Repository-reviewed authorship provenance, not a client authorization grant. */
   authorship?: { revision: number; confirmedBy: string; confirmedOn: string; basis: string }
   scientificReview?: ScaleScientificReviewV1
+  /** Independent administration instruction; excluded from measurement identity. */
+  instruction?: ScaleInstructionSourceV1
   candidatePreview?: ScaleCatalogOnlyPreviewV1
   executable?: ScaleExecutableSourceV1
+}
+
+/**
+ * Versioned administration instruction shipped with the instrument source.
+ * It is presentation content, not part of the measurement/definition hash:
+ * editing wording must not change measurement identity, and the distributed
+ * version freezes the exact text shown at first answer and resume.
+ */
+export interface ScaleInstructionSourceV1 {
+  schemaVersion: 1
+  text: string
+  language: string
+  version: string
+  /** Provenance of the wording (e.g. translation basis or original manual). */
+  source: string
 }
 
 /** Human-reviewed claim; excluded from executable and runtime policy identity. */

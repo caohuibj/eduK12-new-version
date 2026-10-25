@@ -16,3 +16,15 @@ it('frozen historical replay survives supersession but detects changed payload',
  const r=testReference(),h=referenceSetHash(r);r.status='SUPERSEDED';expect(referenceSetHash(r)).toBe(h);const db={assessmentReferenceSet:{findMany:async()=>[{instrumentType:'SCALE' as const,instrumentKey:r.instrumentKey,referenceVersion:'v1',status:'SUPERSEDED' as const,definition:r}]}};const input={instrumentType:'SCALE' as const,instrumentKey:r.instrumentKey,bindings:[{referenceKey:r.instrumentKey,referenceVersion:'v1',referenceHash:h}]};expect((await loadFrozenReferenceSets(db,input))[0].status).toBe('ACTIVE');r.entries[0].disclaimer='changed';await expect(loadFrozenReferenceSets(db,input)).rejects.toThrow('hash mismatch')
 })
 })
+describe('Adult reference resolution',()=>{
+ it('matches adult references through the frozen age window, not grades',()=>{
+  const adult=testReference()
+  adult.entries[0].population={language:'zh-CN',match:{minAgeMonthsInclusive:216,maxAgeMonthsExclusive:1440}}
+  adult.entries[0].governance!.schoolStage='adult'
+  const input={instrumentType:'scale' as const,instrumentKey:adult.instrumentKey,instrumentVersion:'1.0.0',scoringVersion:'1.0.0',references:[adult],selections:[{scoreKey:'wellbeing',referenceVersion:'v1',referenceKind:'theoretical_range' as const}],score:{key:'wellbeing',value:2}}
+  const [inWindow]=resolveAssessmentReference({...input,context:{ageMonthsAtFreeze:360,language:'zh-CN'}})
+  expect(inWindow.status).toBe('available');expect(inWindow.criterionBand?.key).toBe('low')
+  expect(resolveAssessmentReference({...input,context:{ageMonthsAtFreeze:144,language:'zh-CN'}})[0].status).toBe('unavailable')
+  expect(resolveAssessmentReference({...input,context:{gradeLevel:'11',language:'zh-CN'}})[0].status).toBe('unavailable')
+ })
+})

@@ -14,6 +14,18 @@ import {
 } from '../scale/policy/compile'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
 
+/** Frozen administration instruction of the distributed version. Presentation
+ * content only: outside the definition/measurement hash, immutable per
+ * attempt once frozen, and resumed sessions read it instead of the live
+ * Scale row. */
+export const frozenScaleInstructionSchema = z.object({
+  text: z.string().min(1),
+  language: z.string().min(2).optional(),
+  version: z.string().min(1).optional(),
+  origin: z.enum(['INSTRUMENT_SOURCE', 'SCALE_FIELD']),
+}).strict()
+export type FrozenScaleInstruction = z.infer<typeof frozenScaleInstructionSchema>
+
 export interface FrozenScaleRuntimeSnapshotV2 {
   schemaVersion: 2
   runtimeGeneration: 'UNIFIED_V1'
@@ -28,6 +40,7 @@ export interface FrozenScaleRuntimeSnapshotV2 {
   compiledPolicy: CompiledScalePolicyV1
   runtimePolicyHash: string
   measurementPresentation?: FrozenScalePresentation
+  instruction?: FrozenScaleInstruction
   snapshotHash: string
 }
 
@@ -43,6 +56,7 @@ export interface FrozenScaleRuntimeSnapshotV1Like {
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
   measurementPresentation?: FrozenScalePresentation
+  instruction?: FrozenScaleInstruction
   snapshotHash: string
 }
 
@@ -69,6 +83,7 @@ const frozenScaleRuntimeSnapshotV2Schema = z.object({
   definition: scaleDefinitionSchema,
   compiledPolicy: compiledScalePolicyV1Schema,
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
+  instruction: frozenScaleInstructionSchema.optional(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
@@ -110,6 +125,7 @@ const unsignedV2 = (input: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'>) =
   referenceBindings: input.referenceBindings,
   definition: input.definition,
   ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
+  ...(input.instruction ? { instruction: input.instruction } : {}),
   compiledPolicy: input.compiledPolicy,
   runtimePolicyHash: input.runtimePolicyHash,
 })
@@ -226,6 +242,7 @@ export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
     referenceBindings: v1.referenceBindings,
     definition: v1.definition,
     ...(v1.measurementPresentation ? { measurementPresentation: v1.measurementPresentation } : {}),
+    ...(v1.instruction ? { instruction: v1.instruction } : {}),
     compiledPolicy,
     runtimePolicyHash: compiledPolicy.runtimePolicyHash,
   }

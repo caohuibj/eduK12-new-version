@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { referenceSetHash } from '../assessment-runtime/reference-binding'
-import { resolveAssessmentReference, type AssessmentReferenceSetDefinition, type ResolvedScaleReference } from './reference'
+import { resolveAssessmentReference, type AssessmentReferenceSetDefinition, type ReferenceContext, type ResolvedScaleReference } from './reference'
 export type ReferenceResolutionMode = 'ORIGINAL' | 'TIME_MATCHED' | 'LATER_REFERENCE'
 export interface ScaleReferenceIdentityV1 {
  instrumentKey:string; instrumentVersion:string; scoringVersion:string; measurementHash:string
- subjectKey:string; locale:string; schoolStage:'junior_secondary'|'upper_secondary'; scoreKey:string
+ subjectKey:string; locale:string; schoolStage:'junior_secondary'|'upper_secondary'|'adult'; scoreKey:string
  direction:string; range:{min:number;max:number}; reportVersion:string
  originalReferenceVersion:string; originalReferenceHash:string
 }
@@ -39,7 +39,13 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
  const project=(p:LongitudinalReferencePoint,r:AssessmentReferenceSetDefinition):ResolvedScaleReference|null=>{
   const e=entryFor(r,p.identity)
   if(!e) return null
-  return resolveAssessmentReference({instrumentType:'scale',instrumentKey:r.instrumentKey,instrumentVersion:p.identity.instrumentVersion,scoringVersion:p.identity.scoringVersion,selections:[{scoreKey:p.identity.scoreKey,referenceVersion:r.referenceVersion,referenceKind:e.referenceKind}],references:[{...r,status:'ACTIVE'}],score:{key:p.identity.scoreKey,value:p.value},context:{gradeLevel:e.governance!.schoolStage==='junior_secondary'?'8':'11',language:p.identity.locale}})[0]
+  const g=e.governance!
+  // School stages project through their canonical grade; adult references
+  // project through the midpoint of their declared age window instead.
+  const context:ReferenceContext=g.schoolStage==='junior_secondary'?{gradeLevel:'8',language:p.identity.locale}
+   :g.schoolStage==='upper_secondary'?{gradeLevel:'11',language:p.identity.locale}
+   :{ageMonthsAtFreeze:Math.floor(((e.population?.match?.minAgeMonthsInclusive??0)+(e.population?.match?.maxAgeMonthsExclusive??0))/2),language:p.identity.locale}
+  return resolveAssessmentReference({instrumentType:'scale',instrumentKey:r.instrumentKey,instrumentVersion:p.identity.instrumentVersion,scoringVersion:p.identity.scoringVersion,selections:[{scoreKey:p.identity.scoreKey,referenceVersion:r.referenceVersion,referenceKind:e.referenceKind}],references:[{...r,status:'ACTIVE'}],score:{key:p.identity.scoreKey,value:p.value},context})[0]
  }
  const projected=points.map(p=>{
   const timeMatched=mode==='TIME_MATCHED' || (mode==='LATER_REFERENCE' && !later) ? [...pool].filter(r=>effectiveAt(r,p)<=Date.parse(p.at)).sort((a,b)=>effectiveAt(b,p)-effectiveAt(a,p))[0] : undefined
@@ -54,6 +60,6 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
 
 export const scaleReferenceIdentitySchema = z.object({
  instrumentKey:z.string().min(1),instrumentVersion:z.string().min(1),scoringVersion:z.string().min(1),measurementHash:z.string().regex(/^[a-f0-9]{64}$/),
- subjectKey:z.string().min(1),locale:z.string().min(1),schoolStage:z.enum(['junior_secondary','upper_secondary']),scoreKey:z.string().min(1),direction:z.string().min(1),
+ subjectKey:z.string().min(1),locale:z.string().min(1),schoolStage:z.enum(['junior_secondary','upper_secondary','adult']),scoreKey:z.string().min(1),direction:z.string().min(1),
  range:z.object({min:z.number().finite(),max:z.number().finite()}).strict().refine(r=>r.min<r.max),reportVersion:z.string().min(1),originalReferenceVersion:z.string().min(1),originalReferenceHash:z.string().regex(/^[a-f0-9]{64}$/)
 }).strict()

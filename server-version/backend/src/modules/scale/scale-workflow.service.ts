@@ -311,6 +311,7 @@ export const scaleAssessmentForResponse = (
         result: result.result,
         context: projectionContext,
         decryptError: result.decryptError || resolved.snapshotError,
+        frozenInstruction: verifiedRuntime?.instruction,
       })
     } catch {
       // Scoring/persistence has already completed before this serializer runs.
@@ -326,6 +327,7 @@ export const scaleAssessmentForResponse = (
           currentRestrictions: DISCLOSURE_PRESETS.NONE(),
         },
         decryptError: true,
+        frozenInstruction: verifiedRuntime?.instruction,
       })
     }
   }
@@ -335,6 +337,7 @@ export const scaleAssessmentForResponse = (
     deviceInputProvenance: answers.deviceInputProvenance ?? (directProvenance.success ? directProvenance.data : undefined),
     includeAnswers: options.includeResumeAnswers ?? audience === 'respondent',
     decryptError: answers.decryptError || resolved.snapshotError,
+    frozenInstruction: verifiedRuntime?.instruction,
   })
 }
 

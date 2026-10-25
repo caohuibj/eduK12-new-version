@@ -101,6 +101,7 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
+import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
@@ -282,6 +283,7 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
                     code: true,
                     name: true,
                     description: true,
+                    instruction: true,
                     instrumentClass: true,
                     instrumentVersion: true,
                     definition: true,
@@ -2522,6 +2524,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             instrumentVersion: item.scale.instrumentVersion,
             definition: frozenDatabaseScaleDefinition(item.scale),
             requestedMode: 'COMPOSITE',
+            instruction: resolveFrozenScaleInstructionForScale(item.scale),
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
@@ -2855,6 +2858,7 @@ const createAttempt = async (
       else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
         definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',
+        instruction:resolveFrozenScaleInstructionForScale(item.scale),
       }))
       if (item.type === 'COGNITIVE') {
         assertCognitiveModuleEnabled()

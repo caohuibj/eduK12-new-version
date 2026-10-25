@@ -24,6 +24,7 @@ import {
   scaleDefinitionFromRecord,
 } from './scale-workflow.service'
 import { freezeScaleRuntimeAtAttemptStart, persistFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { resolveFrozenScaleInstructionForScale } from './onboarding/instrument-registry'
 import { encryptField } from '../../utils/encryption'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import {
@@ -159,6 +160,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           instrumentVersion: currentScale.instrumentVersion,
           definition: currentDefinition,
           frozenAt,
+          instruction: resolveFrozenScaleInstructionForScale(currentScale),
         })
         const admission = await standaloneAdmissionPersistenceForRuntime({
           db: tx,
