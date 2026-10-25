@@ -66,3 +66,16 @@ dot 确认依赖闭包及许可适配前，不 cherry-pick 整段 PR356，也不
 普通项目导出当前经analytics.export.service的owner与MFA边界，没有逐次人工审批；系统跨项目查阅当前仍可凭本次审计receipt读取，导出去标识另有项目/范围/期限grant。后者尚未完成本轮“一次明确数据范围权限”的收口，不能将现有系统身份与审计直接称为目标项目授权，未擅自放宽。
 
 84请求原探针的实际冻结publication已只读核验：一份单题SINGLE FORM和一份自编描述性SCALE（两题五级选项、一题反向、两个维度），fixture/result/数据库definitionDigest一致。它不代表注册公库量表、native/认知、整包或完整混合协议；只绑定db225657，不能给这次许可整合继承数值。
+
+## 后续接线的最小边界，供dot统一选择
+
+继续只读核对PR356后，具体依赖为：
+
+1. 公共组合映射/正文：`d7826bfe`的`measurement-content/standard-combination.ts`，以及`be67440f52dba90576e3640a8d3987ae5b7d7c19`、`29f22d656471e67a43d2d4f1b6e2c202949d1732`中的`standard-combination-source.ts`、`standard-combination-content.ts`和Survey模型接线。355已有`retainImmutableCanonicalValue`及measurement hashScheme，不需要重新建立这两套基础合同。be674本身没有schema/migration，不能将其描述成已带齐数据库模型。
+2. 用户精确组合引用：`f74c9badf0a454ba15e7c3aa43d0fbb2babd22c8`带4个迁移（`20261025070000`至`20261025070300`）、MaterialGrant类型/字段及`standard-combination-use.ts`。必须适配而非原样搬入：该版本请求/receipt仍要求grantId/authorityGrantId，数据库CHECK也要求authority_grant_id非空，与本轮正式入口管理员无需逐工具委托许可冲突。应保留普通委托的精确能力及FK/不可变性，明确记录入口资格或精确委托两种已验证签发依据，不能仅删非空检查或把ONLINE当Training准入。
+3. 实际消费者：`c370bdc2`中的发布、Training组合/普通问卷绑定、FINAL、reference/report-selection及报告读取接线。355的composite与checkpoint已改为入场后按冻结规则完成，需逐段接入；不得复活逐操作当前issuer/工具审批链。`standard-combination-source`的同事务不可变事实复用可以保留，但其current状态判定要与绑定/新START和已入场执行的职责分开。
+4. 不纳入：`e2f4b0ef`的版权控制、其他标签/分类/旧性能成绩、整段356全量变动。以上来源尚未移植；先由dot决定来源闭包，避免两个PR重复实现/冲突。精确组合引用本身也不证明每份答卷已去掉参数、模板全文，后续仍需核实际runtimeSnapshot与结果保存内容。
+
+目录/分配的反例清单已明确：全局ONLINE但未选Training入口须拒绝；正式本入口管理员可分配本入口准入版本，不能跨入口；普通委托仍需精确版本能力；使用者目录仅列已获权精确版本；客户端伪造可见/版本/批准标记拒绝；第26条及筛选后续页不能丢失；授权撤回阻止新START但不截断已入场。批准入口与组合版本应使用现有治理事实，不另造第二套版本库。
+
+数据权限的剩余差异不是普通owner导出审批：`system-data.service::viewSystemSurveyAnswers/viewSystemSurveyReport`现通过当前SYSTEM_ADMIN和本次审计receipt读取，没有一次明确的项目/数据范围许可；去标识导出才查`survey_system_export_grants`。后续应沿现有项目授权记录收口读/导出范围，保持去标识/原始明细/汇总权区别及MFA、撤回、到期与最终授权检查。不把现有DEIDENTIFIED_EXPORT擅自扩成有标识原始数据读权，也不以移除current认证代替去重复审批。
