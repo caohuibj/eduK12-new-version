@@ -6,7 +6,7 @@ import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { UserRound, X } from 'lucide-react'
+import { UserRound, X, BookOpen, Compass, FileText, ClipboardList, Sprout, UsersRound, Info, MessageSquare, TrendingUp, BarChart3 } from 'lucide-react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
@@ -438,25 +438,26 @@ export default function HuiteacherApp(){
       <>
       <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
-          onClick={()=>changeWorkspaceTab('teacher')}>教师成长</button>
-        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}>我的工具</button>}
+          onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
+        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
         {me.organizations.some(o=>o.productAdmin)&&<button type="button"
           aria-pressed={workspaceTab==='school'}
-          onClick={()=>changeWorkspaceTab('school')}>学校改进</button>}
+          onClick={()=>changeWorkspaceTab('school')}><UsersRound size={18} aria-hidden="true"/>学校改进</button>}
         <button type="button" aria-pressed={workspaceTab==='expert'}
-          onClick={()=>changeWorkspaceTab('expert')}>专家实践</button>
+          onClick={()=>changeWorkspaceTab('expert')}><Compass size={18} aria-hidden="true"/>专业实践</button>
       </nav>
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
-        <p className="ht-notice">个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</p>
+        <p className="ht-workspace-context"><Info size={16} aria-hidden="true"/><span>个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</span></p>
         <div className="ht-workspace-body">
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
-          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}>自主测评</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-forms" selected={personalSection} onSelect={setPersonalSection}>表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-private-forms" selected={personalSection} onSelect={setPersonalSection}>私有表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-scales" selected={personalSection} onSelect={setPersonalSection}>量表任务</WorkspaceJump>
-          {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}>学生反馈</WorkspaceJump>}
-          {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}>我的成长</WorkspaceJump>}
+          <span className="ht-workspace-nav-label">我的任务</span>
+          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>自主测评</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-forms" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>表单任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-private-forms" selected={personalSection} onSelect={setPersonalSection}><FileText size={18} aria-hidden="true"/>私有表单任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-scales" selected={personalSection} onSelect={setPersonalSection}><BarChart3 size={18} aria-hidden="true"/>量表任务</WorkspaceJump>
+          {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}><MessageSquare size={18} aria-hidden="true"/>学生反馈</WorkspaceJump>}
+          {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}><TrendingUp size={18} aria-hidden="true"/>我的成长</WorkspaceJump>}
         </nav>
         <div className="ht-workspace-sections">
         <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="自主测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
@@ -526,8 +527,11 @@ export default function HuiteacherApp(){
       </div></div>
       </>}
       {workspaceTab==='expert'&&<>
-        <HuiteacherFieldWorkspace api={teacherApi}/>
-        <HuiteacherConsensusReviews api={teacherApi}/>
+        <p className="ht-workspace-context"><Compass size={16} aria-hidden="true"/><span>专业实践 · 现场观察、专业反馈与同行协作</span></p>
+        <div className="ht-practice-layout">
+          <HuiteacherFieldWorkspace api={teacherApi}/>
+          <HuiteacherConsensusReviews api={teacherApi}/>
+        </div>
       </>}
       </>}
     </div>:null}
