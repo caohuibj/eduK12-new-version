@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "gse3_asku_zh_cn_research",
+    "name": "一般自我效能短量表（3题，中文工作译稿）【非商业研究】",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "9fa68f4016d21e1a564781535e16d29332513869adbac30afd9bfebdd4c977e9",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "gse3_1",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "gse3_2",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "gse3_3",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "general_self_efficacy",
+      "type": "total",
+      "label": "一般自我效能均分",
+      "description": "面对困难及复杂任务时对自己能力的信心自述，不是实际能力测验。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 3,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "expectedItems": [
+        "gse3_1",
+        "gse3_2",
+        "gse3_3"
+      ],
+      "answeredItems": [
+        "gse3_1",
+        "gse3_2",
+        "gse3_3"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "general_self_efficacy",
+      "headline": "应对困难的信心：非商业研究描述",
+      "label": null,
+      "interpretation": "这份小问卷关注的是：遇到难题时，你对“自己能想出办法”有多大信心。三道题的平均分在1到5之间；分数越高，表示你这次越认同自己能应对困难，并不是说实际能力一定更强。比如，接到一项没做过的任务，有人会先想“我可以试着拆成几步”，也有人会先想“我还需要更多准备”。这些想法都可能随经验、时间和支持而变化，没有必要据此给自己贴标签。目前这份中文工作译稿还缺少充分验证，所以不把你分成高、中、低，也不拿国外人群的平均分给你排名。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "想想最近一次有点棘手、但最后处理好了的事情：你做了什么？有没有人或工具帮上忙？这些支持同样算数。"
+        },
+        {
+          "category": "strategy",
+          "text": "下次遇到难题时，不妨先列出“我已经会的”“我还需要的”和“今天能做的一小步”。这不是提高问卷分数的练习，而是给自己找一个更容易开始的入口。"
+        }
+      ],
+      "limitations": [
+        "仅限符合CC BY-NC-SA4.0条件的非商业研究使用，公共库收录不等于商业用途许可。",
+        "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+        "不启用英德成人在线配额样本常模；没有可用的临床阈值或高低分档，3仅是理论中点。",
+        "三题均合法有效才计算均分；个人报告不插补。原文讨论的研究级MI/FIML不在此执行。",
+        "GSE-3与ASKU属同一家族，不计为两个工具；与Schwarzer/Jerusalem GSE10、IPIP-NEO C1不是同一工具。",
+        "不用于诊断、能力鉴定、高风险选择或学生排名。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "仅限符合CC BY-NC-SA4.0条件的非商业研究使用，公共库收录不等于商业用途许可。",
+    "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+    "不启用英德成人在线配额样本常模；没有可用的临床阈值或高低分档，3仅是理论中点。",
+    "三题均合法有效才计算均分；个人报告不插补。原文讨论的研究级MI/FIML不在此执行。",
+    "GSE-3与ASKU属同一家族，不计为两个工具；与Schwarzer/Jerusalem GSE10、IPIP-NEO C1不是同一工具。",
+    "不用于诊断、能力鉴定、高风险选择或学生排名。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "非商业研究专用。中文工作译稿未经验证，不用于心理诊断或能力鉴定。Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. 本包中文题本及随附反馈以同一CC BY-NC-SA4.0许可分发：https://creativecommons.org/licenses/by-nc-sa/4.0/ 。收费/学校场景不自动合规，须核实实际用途；不暗示原作者认可。"
+}

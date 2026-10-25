@@ -1,0 +1,65 @@
+{
+  "status": "NONCOMMERCIAL_RESEARCH_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "gse3_1",
+      "en": "I can rely on my own abilities in difficult situations.",
+      "zh": "在困难的情况下，我可以依靠自己的能力。",
+      "reverse": false
+    },
+    {
+      "id": "gse3_2",
+      "en": "I am able to solve most problems on my own.",
+      "zh": "我能够独立解决大多数问题。",
+      "reverse": false
+    },
+    {
+      "id": "gse3_3",
+      "en": "I can usually solve even challenging and complex tasks well.",
+      "zh": "即使是具有挑战性且复杂的任务，我通常也能很好地完成。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大部分符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "instructions": {
+    "en": "The following statements may apply more or less to you. To what extent do you think each statement applies to you personally?",
+    "zh": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？"
+  },
+  "license": {
+    "identifier": "CC-BY-NC-SA-4.0",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "evidence": "Official 2021 documentation AND questionnaire PDF, page2 Terms of use",
+    "commercial_cleared": false,
+    "translation_allowed": "Noncommercial adaptation with attribution and ShareAlike; do not imply original authors endorse translation. Commercial platform permission unresolved.",
+    "source_version_warning": "Older PsychArchives ASKU materials have CC BY-NC-ND3; do not treat them as the same grant. Current ZIS landing Standard License also does not establish CC BY4.",
+    "attribution": "Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0."
+  },
+  "adaptationLicense": "CC-BY-NC-SA-4.0",
+  "note": "2026-10-25用户允许非商业研究材料入库，原商业使用HOLD不再阻挡NC研究DRAFT；中文验证状态不变。"
+}

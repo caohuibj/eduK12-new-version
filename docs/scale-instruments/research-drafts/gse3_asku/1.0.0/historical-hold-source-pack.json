@@ -1,0 +1,182 @@
+{
+  "schema": "research-candidate-source-pack/v1",
+  "reviewed_at": "2026-10-25",
+  "inventory_status": "pending_existing_library_deduplication",
+  "translation": {
+    "language": "zh-CN",
+    "status": "AI-assisted working translation, NOT validated Chinese adaptation",
+    "requires": [
+      "bilingual review",
+      "independent back-translation/adjudication",
+      "cognitive interviews",
+      "target-population validation before assessment deployment"
+    ]
+  },
+  "empirical_thresholds": {
+    "clinical_cutoffs": [],
+    "severity_bands": [],
+    "percentile_norms": null,
+    "policy": "No clinical thresholds established in sources reviewed; do not invent low/medium/high bands from reference means or response midpoint."
+  },
+  "deployment": {
+    "enabled": false,
+    "k12_validated": false,
+    "individual_diagnosis_supported": false,
+    "report_policy": "Descriptive response explanation only; no clinical, ability, placement or counseling decisions from score."
+  },
+  "illustration": {
+    "status": "not_created",
+    "brief": "Optional original neutral abstract horizon/steps icon; avoid borrowed scale diagrams and diagnostic traffic-light zones."
+  },
+  "id": "gesis-gse3-2021-zh-working",
+  "name": {
+    "en": "General Self-Efficacy Short Scale–3 (GSE-3)",
+    "zh": "一般自我效能短量表（3题，中文工作译稿）"
+  },
+  "aliases": [
+    "ASKU English adaptation",
+    "GSE-3"
+  ],
+  "tags": [
+    "nonclinical",
+    "self-efficacy",
+    "psychological-resources",
+    "adult-research",
+    "ultrashort"
+  ],
+  "deduplication": {
+    "family": "ASKU/GSE-3",
+    "not_same_as": [
+      "Schwarzer and Jerusalem 10-item General Self-Efficacy Scale"
+    ],
+    "note": "ASKU and GSE-3 are language adaptations in one family, not two new independent additions."
+  },
+  "status": "HOLD_LICENSE_AND_TRANSLATION",
+  "license": {
+    "identifier": "CC-BY-NC-SA-4.0",
+    "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    "evidence": "Official 2021 documentation AND questionnaire PDF, page2 Terms of use",
+    "commercial_cleared": false,
+    "translation_allowed": "Noncommercial adaptation with attribution and ShareAlike; do not imply original authors endorse translation. Commercial platform permission unresolved.",
+    "source_version_warning": "Older PsychArchives ASKU materials have CC BY-NC-ND3; do not treat them as the same grant. Current ZIS landing Standard License also does not establish CC BY4.",
+    "attribution": "Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0."
+  },
+  "instructions": {
+    "en": "The following statements may apply more or less to you. To what extent do you think each statement applies to you personally?",
+    "zh": "以下陈述与你的实际情况可能有不同程度的符合。你认为每项陈述在多大程度上符合你个人的情况？"
+  },
+  "response_options": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大部分符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "items": [
+    {
+      "id": "gse3_1",
+      "en": "I can rely on my own abilities in difficult situations.",
+      "zh": "在困难的情况下，我可以依靠自己的能力。",
+      "reverse": false
+    },
+    {
+      "id": "gse3_2",
+      "en": "I am able to solve most problems on my own.",
+      "zh": "我能够独立解决大多数问题。",
+      "reverse": false
+    },
+    {
+      "id": "gse3_3",
+      "en": "I can usually solve even challenging and complex tasks well.",
+      "zh": "即使是具有挑战性且复杂的任务，我通常也能很好地完成。",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "valid_values": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "formula": "(q1+q2+q3)/3",
+    "range": [
+      1,
+      5
+    ],
+    "reverse_items": [],
+    "minimum_answered": 3,
+    "missing_result": null,
+    "imputation": false,
+    "direction": "Higher reflects greater reported confidence in own competence, not tested competence.",
+    "precision": "Keep full precision internally; display at most2decimals."
+  },
+  "references": [
+    {
+      "url": "https://access.gesis.org/zis/1436",
+      "role": "exact English questionnaire/instructions and license",
+      "pages": "2–3"
+    },
+    {
+      "url": "https://access.gesis.org/zis/1435",
+      "role": "documentation, scoring, source lineage, reference samples and license",
+      "pages": "2,4,14"
+    },
+    {
+      "url": "https://doi.org/10.6102/zis294",
+      "role": "canonical citation"
+    }
+  ],
+  "empirical_reference": {
+    "purpose": "metadata only, NOT Chinese or youth norms",
+    "design": "January2018 native-speaker online quota samples, CASI, ages18–69; not national probability samples",
+    "samples": [
+      {
+        "country": "UK",
+        "n": 468,
+        "mean": 3.78,
+        "sd": 0.94,
+        "omega": 0.91,
+        "retest_r": 0.71
+      },
+      {
+        "country": "DE",
+        "n": 474,
+        "mean": 3.99,
+        "sd": 0.67
+      }
+    ],
+    "activate_norm_comparison": false
+  },
+  "feedback": {
+    "complete": "你的作答均分为 {score}（取值范围1–5）。较高的分数表示你更认同自己能够应对困难和解决问题。这描述的是自我效能信念，并不等于实际能力测验结果。本中文版本尚未经验证，不能据此判断能力高低、心理健康状况或作出教育决策。",
+    "incomplete": "有题目尚未作答，因此不计算均分。",
+    "reflection": "如果仅用于自我思考，可以记录一个你曾成功处理的困难，以及当时对你有帮助的行动或支持。此建议不是量表作者的计分解释。"
+  },
+  "original_german": {
+    "included": false,
+    "reason": "English official adaptation selected as canonical source for Chinese working translation. Do not merge German-source license with English adaptation grant. German wording can be consulted at original ZIS source, but is not an additional deployable language pack here.",
+    "source": "https://doi.org/10.6102/zis35"
+  }
+}

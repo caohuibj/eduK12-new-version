@@ -1,0 +1,15 @@
+{
+  "validatedAt": "2026-10-25T14:50:19Z",
+  "sourceSha256": "75bda70ce84c927a46899a2250d8be2075211cb33d40881c7976dd196d8c91b6",
+  "node": "v24.22.1",
+  "toolTests": 15,
+  "combinedToolAndRegistryTests": 21,
+  "testsExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorCheckExitCode": 0,
+  "scope": "Source/scoring/synthetic report only; no DB writes or new license gates; independent content review tracked separately.",
+  "logs": [
+    "gse3-tests-final.log",
+    "gse3-typecheck.log"
+  ]
+}

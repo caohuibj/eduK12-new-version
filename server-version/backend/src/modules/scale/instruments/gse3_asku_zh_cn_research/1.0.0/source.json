@@ -1,0 +1,479 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "gse3_asku_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "一般自我效能短量表（3题，中文工作译稿）【非商业研究】",
+      "abbreviation": "GSE-3 / ASKU",
+      "instrumentFamily": "ASKU / General Self-Efficacy Short Scale–3"
+    },
+    "construct": {
+      "primaryDomain": "SELF_EFFICACY",
+      "secondaryDomains": [
+        "PERSONALITY"
+      ],
+      "constructDefinition": "面对困难和复杂任务时对自己能力的总体信心；不是客观能力测验，也不等同GSE10或IPIP-NEO C1。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "非商业",
+        "non_commercial",
+        "cc_by_nc_sa_4_0",
+        "share_alike",
+        "self_efficacy",
+        "gse3_asku",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "descriptive_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 3,
+      "estimatedMinutes": 1,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "一般自我描述，无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留三题原序及完整五点符合度文字锚点。",
+        "三题均有效才计算等权均值；无反向题。",
+        "对外分发须保留署名、CC BY-NC-SA4链接和中文改动说明。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅非商业研究；中文工作译稿未验证。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "依据Doll等2021 GSE-3官方英文题本的独立中文工作译稿；CC BY-NC-SA4非商业同许可改编。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "不是验证中文版，人工译审/认知访谈待完成。原英文ASKU适配与本中文工作译稿严格区分。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "gse3-asku-zh-cn-noncommercial-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "gse3-asku-zh-cn-noncommercial-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "gse3-asku-zh-cn-noncommercial-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0.",
+      "License: https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "仅非商业使用；翻译和改编的题本及随附反馈以CC BY-NC-SA4.0分发，保留署名/许可/改动说明，不暗示作者认可。",
+      "收费培训、商业平台服务或学校合作不因研究名义自动满足NC；须逐项评估实际用途。此声明和tag不是新增技术授权门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "General Self-Efficacy Short Scale–3 (GSE-3)",
+        "citation": "Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0.",
+        "url": "https://doi.org/10.6102/zis294",
+        "publicationYear": 2021
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. License: https://creativecommons.org/licenses/by-nc-sa/4.0/ ; Noncommercial only; adaptations ShareAlike; no author endorsement."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "gse3_applies_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有一点符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "大部分符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "完全符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "gse3_1",
+          "content": "在困难的情况下，我可以依靠自己的能力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "gse3_applies_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "gse3_2",
+          "content": "我能够独立解决大多数问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "gse3_applies_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "gse3_3",
+          "content": "即使是具有挑战性且复杂的任务，我通常也能很好地完成。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "gse3_applies_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "gse3_1",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "gse3_2",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "gse3_3",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "general_self_efficacy",
+            "type": "total",
+            "label": "一般自我效能均分",
+            "description": "面对困难及复杂任务时对自己能力的信心自述，不是实际能力测验。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "gse3_1",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "gse3_2",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "gse3_3",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "general_self_efficacy"
+        ],
+        "scoreOrder": [
+          "general_self_efficacy"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "general_self_efficacy",
+            "headline": "应对困难的信心：非商业研究描述",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份小问卷关注的是：遇到难题时，你对“自己能想出办法”有多大信心。三道题的平均分在1到5之间；分数越高，表示你这次越认同自己能应对困难，并不是说实际能力一定更强。比如，接到一项没做过的任务，有人会先想“我可以试着拆成几步”，也有人会先想“我还需要更多准备”。这些想法都可能随经验、时间和支持而变化，没有必要据此给自己贴标签。目前这份中文工作译稿还缺少充分验证，所以不把你分成高、中、低，也不拿国外人群的平均分给你排名。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想想最近一次有点棘手、但最后处理好了的事情：你做了什么？有没有人或工具帮上忙？这些支持同样算数。"
+              },
+              {
+                "category": "strategy",
+                "text": "下次遇到难题时，不妨先列出“我已经会的”“我还需要的”和“今天能做的一小步”。这不是提高问卷分数的练习，而是给自己找一个更容易开始的入口。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅限符合CC BY-NC-SA4.0条件的非商业研究使用，公共库收录不等于商业用途许可。",
+          "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+          "不启用英德成人在线配额样本常模；没有可用的临床阈值或高低分档，3仅是理论中点。",
+          "三题均合法有效才计算均分；个人报告不插补。原文讨论的研究级MI/FIML不在此执行。",
+          "GSE-3与ASKU属同一家族，不计为两个工具；与Schwarzer/Jerusalem GSE10、IPIP-NEO C1不是同一工具。",
+          "不用于诊断、能力鉴定、高风险选择或学生排名。"
+        ],
+        "disclaimer": "非商业研究专用。中文工作译稿未经验证，不用于心理诊断或能力鉴定。Doll, E. S., Nießen, D., Schmidt, I., Rammstedt, B., & Lechner, C. M. (2021). The General Self-Efficacy Short Scale–3 (GSE-3): An English-language adaptation. ZIS. https://doi.org/10.6102/zis294. Chinese working translation/adaptation prepared 2026-10-25; changes: Chinese text and original explanatory feedback. CC BY-NC-SA4.0. 本包中文题本及随附反馈以同一CC BY-NC-SA4.0许可分发：https://creativecommons.org/licenses/by-nc-sa/4.0/ 。收费/学校场景不自动合规，须核实实际用途；不暗示原作者认可。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:48:00Z",
+            "basis": "AI editorial check: noncommercial/ShareAlike notice, adult research description, faithful anchors and no unsupported norms; not human expert translation approval."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "gse3_asku",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "gse3_1",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "gse3_2",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "gse3_3",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_self_efficacy": 3
+          },
+          "totalScoreKeys": [
+            "general_self_efficacy"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "gse3_1",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "gse3_2",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "gse3_3",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_self_efficacy": 5
+          },
+          "totalScoreKeys": [
+            "general_self_efficacy"
+          ]
+        }
+      },
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "gse3_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "gse3_2",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "gse3_3",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_self_efficacy": 1
+          },
+          "totalScoreKeys": [
+            "general_self_efficacy"
+          ]
+        }
+      },
+      {
+        "name": "fractional",
+        "answers": [
+          {
+            "itemCode": "gse3_1",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "gse3_2",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "gse3_3",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "general_self_efficacy": 1.6666666666666667
+          },
+          "totalScoreKeys": [
+            "general_self_efficacy"
+          ]
+        }
+      }
+    ]
+  }
+}
