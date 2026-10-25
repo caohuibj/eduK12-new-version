@@ -358,9 +358,13 @@ export default function SchoolApp(){
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
       onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome} appearance={appearance}/>:<header className="hs-header">
       <a href="/workspace" className="hs-workspace-brand" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('overview')}}><SchoolMark/></a>
+      {ordinaryTeacher&&<nav className="hs-educator-navigation" aria-label="校园功能入口">
+        {schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools).filter(item=>!['overview','account'].includes(item.id)).map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined}
+          onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace(item.id)}}><item.icon size={18} aria-hidden="true"/>{item.label}</a>)}
+      </nav>}
       <nav className="hs-account-actions" aria-label="校园导航">
         <span className="hs-account">{user.username}</span>
-        {(user.role==='STUDENT'||ordinaryTeacher)&&<SchoolLearnerMenu items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
+        {user.role==='STUDENT'&&<SchoolLearnerMenu items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
         <a className="hs-profile-entry" href={workspaceHref('account')} aria-label="个人信息编辑" title="个人信息编辑"
           aria-current={page==='account'?'page':undefined}
           onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>
