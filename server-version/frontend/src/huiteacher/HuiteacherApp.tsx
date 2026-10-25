@@ -6,7 +6,7 @@ import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
-import { UserRound } from 'lucide-react'
+import { UserRound, X } from 'lucide-react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
@@ -73,12 +73,25 @@ const Field=({label,value,set,type='text',required=true}:{
   autoComplete={type==='password'?(label==='设置密码'?'new-password':'current-password'):label.includes('账号')?'username':'off'}/></label>
 
 
-// Capture the initial invitation state once; changing schools must not close an edited form.
-function WorkspaceAccount({initialOpen,children}:{initialOpen:boolean;children:React.ReactNode}){
-  const [open,setOpen]=useState(initialOpen)
-  return <details id="ht-workspace-account" className="ht-workspace-account" open={open} onToggle={event=>setOpen(event.currentTarget.open)}>
-    <summary>账号与学校邀请</summary>{children}
-  </details>
+// Keep the form mounted when closed so reopening never discards unsaved input.
+function AccountDialog({open,onClose,children}:{open:boolean;onClose:()=>void;children:React.ReactNode}){
+  const dialog=useRef<HTMLDialogElement>(null)
+  useEffect(()=>{
+    const target=dialog.current
+    if(!target)return
+    if(open&&!target.open){target.showModal();target.querySelector('h2')?.focus()}
+    else if(!open&&target.open)target.close()
+  },[open])
+  return <dialog id="ht-account-settings" className="ht-account-dialog" ref={dialog}
+    aria-labelledby="ht-account-title" onCancel={onClose} onClose={onClose}>
+    <header className="ht-account-dialog-header">
+      <h2 id="ht-account-title" tabIndex={-1}>账号设置</h2>
+      <button type="button" className="ht-account-dialog-close" aria-label="关闭账号设置" onClick={onClose}>
+        <X size={20} aria-hidden="true" focusable="false"/>
+      </button>
+    </header>
+    {children}
+  </dialog>
 }
 function WorkspaceJump({id,children,selected,onSelect}:{id:string;children:React.ReactNode;selected:string;onSelect:(id:string)=>void}){
   return <a href={`#${id}`} aria-current={selected===id?'location':undefined} onClick={event=>{
@@ -126,6 +139,7 @@ export default function HuiteacherApp(){
   const appearance=useProductTheme('teacher',me?.id)
   const [loading,setLoading]=useState(true)
   const [working,setWorking]=useState(false)
+  const [accountOpen,setAccountOpen]=useState(false)
   useEffect(()=>{
     const previousTitle=document.title
     const icon=document.querySelector<HTMLLinkElement>('link[rel="icon"]')
@@ -142,8 +156,8 @@ export default function HuiteacherApp(){
     }
   },[])
   useEffect(()=>{
-    if(loading||screen==='home'||screen==='workspace')return
-    const heading=appRoot.current?.querySelector<HTMLElement>('.ht-form-panel h1')
+    if(loading||screen==='workspace')return
+    const heading=appRoot.current?.querySelector<HTMLElement>(screen==='home'?'.ht-journal h1':'.ht-form-panel h1')
     if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
   },[screen,loading])
   const [message,setMessage]=useState('')
@@ -206,7 +220,12 @@ export default function HuiteacherApp(){
     if(data.recoveryCodes?.length)setRecoveryCodes(data.recoveryCodes)
     else await reload()
   })
-  const changeScreen=(next:Screen)=>{if(!canLeaveForm())return;setMessage('');setScreen(next)}
+  const changeScreen=(next:Screen)=>{
+    if(!canLeaveForm())return
+    setMessage('');setScreen(next)
+    if(next==='home')window.history.pushState(null,'','/')
+    if(next==='home'||next==='workspace')window.scrollTo({top:0})
+  }
   const org=me?.organizations.find(o=>o.organizationId===selectedOrg)??null
   useEffect(()=>{
     if(!me||!org||me.role==='STUDENT'){setUnits([]);setMembers([]);return}
@@ -285,14 +304,14 @@ export default function HuiteacherApp(){
   })
   const changeAccountPassword=(oldPassword:string,newPassword:string)=>run(async()=>{
     await teacherApi('/auth/change-password','POST',{oldPassword,newPassword})
-    setMe(null);setSelectedOrg('');setScreen('login')
+    setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('login')
     setMessage('教育账号密码已修改，School 和 Teacher 需要分别重新登录')
   })
   const logout=()=>{
     if(!canLeaveForm())return
     run(async()=>{
     await teacherApi('/auth/logout','POST',{})
-    setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
+    setAccountOpen(false);setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
     })
   }
   useEffect(()=>{
@@ -313,21 +332,13 @@ export default function HuiteacherApp(){
     window.addEventListener('hashchange',restoreSection)
     return ()=>{window.removeEventListener('popstate',restoreSection);window.removeEventListener('hashchange',restoreSection)}
   },[workspaceTab,loading,me?.id,selectedOrg])
-  const openAccountSettings=()=>{
-    const account=appRoot.current?.querySelector<HTMLDetailsElement>('#ht-workspace-account')
-    const summary=account?.querySelector('summary')
-    if(!account||!summary)return
-    if(!account.open)summary.click()
-    summary.focus({preventScroll:true})
-    account.scrollIntoView?.({block:'start'})
-  }
-  const publicHome=!me&&screen==='home'
+  const publicHome=screen==='home'
   const publicAuth=!me&&screen!=='home'
-  return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
+  return <main ref={appRoot} className={`ht-app${!me||publicHome?' ht-app-public':''}${me?' ht-app-signed-in':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
     <header className="ht-topbar">
-      {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
-        onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
+      <button type="button" className="ht-brand-home" aria-label="Teacher 首页"
+        onClick={()=>changeScreen('home')}><TeacherBrand/></button>
       <nav aria-label="产品导航">
         {!me&&<>
           {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
@@ -336,18 +347,18 @@ export default function HuiteacherApp(){
             onClick={()=>changeScreen('join')}>注册</button>
         </>}
         {me&&<><span className="ht-welcome">{me.username}</span>
-          {screen==='workspace'&&!me.mustChangePassword&&<button type="button" className="ht-account-entry"
-            aria-label="账号设置" title="账号设置与修改密码" aria-controls="ht-workspace-account" onClick={openAccountSettings}>
+          {!me.mustChangePassword&&<button type="button" className="ht-account-entry"
+            aria-label="账号设置" title="账号设置与修改密码" aria-controls="ht-account-settings" aria-haspopup="dialog" onClick={()=>{setMessage('');setAccountOpen(true)}}>
             <UserRound size={20} aria-hidden="true" focusable="false"/>
           </button>}
           <button onClick={()=>void logout()} disabled={working}>退出</button></>}
         <ProductThemeControl appearance={appearance} product="Teacher"/>
       </nav>
     </header>
-    {message&&<p role="status" className="ht-notice">{message}</p>}
+    {message&&!accountOpen&&<p role="status" className="ht-notice">{message}</p>}
     <div id="ht-main-content" tabIndex={-1} className={publicAuth?'ht-auth-surface':'ht-page-content'}>
     {loading?<section className="ht-panel ht-session-loading" aria-live="polite"><p>正在检查教育账号登录状态…</p></section>:
-    publicHome?<HuiteacherLanding theme={appearance.theme} onEnter={()=>changeScreen('login')}/>:
+    publicHome?<HuiteacherLanding theme={appearance.theme} onEnter={()=>changeScreen(me?'workspace':'login')}/>:
     !me&&screen==='join'?<section className="ht-panel ht-form-panel">
       <h1>受邀创建教育账号</h1>
       <p>选择与你收到的邀请相符的身份，<br/>我们会引导你完成注册。</p>
@@ -418,19 +429,7 @@ export default function HuiteacherApp(){
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
           </select></label>}
         </div>
-        <WorkspaceAccount initialOpen={me.organizations.length===0}>
-        <p className="ht-muted">Teacher 学校业务必须经学校开通及本人授权；Huischool 数据不在此显示。</p>
-        <details className="ht-panel"><summary>账号安全 · 修改密码</summary>
-          <ProductPasswordChange product="teacher" busy={working} onChangePassword={changeAccountPassword}/>
-        </details>
-        <div className="ht-inline"><Field label="已收到的学校邀请代码" value={inviteCode} set={setInviteCode}/>
-          {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
-            <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>
-           :<button onClick={joinStaff} disabled={working||!inviteCode}>使用已有教师账号加入</button>}</div>
-        {me.organizations.length===0&&<p className="ht-empty">{me.role==='STUDENT'
-          ?'当前没有开通 Huiteacher 的学生评教任务；请使用本校正式邀请补齐学生资格。'
-          :'当前没有开通 Huiteacher 的学校任务授权。若拥有个人 Scale 许可，可前往教师成长工作台。'}</p>}
-        </WorkspaceAccount>
+
       </section>
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
@@ -541,6 +540,26 @@ export default function HuiteacherApp(){
       </>}
     </div>:null}
     </div>
+    {me&&!me.mustChangePassword&&<>
+        <AccountDialog open={accountOpen} onClose={()=>setAccountOpen(false)}>
+        <p className="ht-muted">Teacher 学校业务必须经学校开通及本人授权；Huischool 数据不在此显示。</p>
+        {message&&<p role="status" className="ht-notice">{message}</p>}
+        <section className="ht-account-dialog-section" aria-labelledby="ht-password-title">
+          <h3 id="ht-password-title">修改密码</h3>
+          <ProductPasswordChange product="teacher" busy={working} onChangePassword={changeAccountPassword}/>
+        </section>
+        <section className="ht-account-dialog-section" aria-labelledby="ht-invite-title">
+        <h3 id="ht-invite-title">学校邀请</h3>
+        <div className="ht-inline"><Field label="已收到的学校邀请代码" value={inviteCode} set={setInviteCode}/>
+          {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
+            <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>
+           :<button onClick={joinStaff} disabled={working||!inviteCode}>使用已有教师账号加入</button>}</div>
+        {me.organizations.length===0&&<p className="ht-empty">{me.role==='STUDENT'
+          ?'当前没有开通 Huiteacher 的学生评教任务；请使用本校正式邀请补齐学生资格。'
+          :'当前没有开通 Huiteacher 的学校任务授权。若拥有个人 Scale 许可，可前往教师成长工作台。'}</p>}
+        </section>
+        </AccountDialog>
+    </>}
     <footer className="ht-footer">{publicHome?`© ${new Date().getFullYear()} Teacher`:'Teacher · 教师发展与学校改进'}</footer>
   </main>
 }

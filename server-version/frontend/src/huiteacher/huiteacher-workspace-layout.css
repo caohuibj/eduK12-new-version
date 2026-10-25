@@ -61,3 +61,20 @@
 
 .ht-workspace-jumps a[aria-current=location]{background:var(--ht-copper);color:var(--ht-on-primary,#fff)}
 .ht-workspace-section[hidden]{display:none}
+
+/* Account settings live in the native modal top layer, separate from workspace content. */
+.ht-app .ht-account-dialog{width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:24px;overflow:auto;overscroll-behavior:contain;border:1px solid var(--ht-line);border-radius:18px;background:var(--ht-paper);color:var(--ht-ink);box-shadow:0 24px 80px #211c1a40}
+.ht-account-dialog::backdrop{background:#211c1a99;backdrop-filter:blur(3px)}
+.ht-account-dialog>.ht-muted{margin:0 0 24px}
+.ht-account-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.ht-account-dialog-header h2{margin:0;font-size:23px}
+.ht-account-dialog-header h2:focus{outline:none}
+.ht-app .ht-account-dialog-close{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;padding:0;border-radius:50%;background:transparent}
+.ht-account-dialog-section+.ht-account-dialog-section{margin-top:24px;padding-top:24px;border-top:1px solid var(--ht-line)}
+.ht-account-dialog-section h3{margin:0 0 16px;font-size:17px}
+.ht-account-dialog .ht-notice{margin:16px 0;max-width:100%}
+@media(max-width:600px){
+ .ht-app .ht-account-dialog{padding:20px;max-height:calc(100dvh - 24px)}
+ .ht-app.ht-app-landing.ht-app-signed-in .ht-topbar{flex-wrap:wrap}
+ .ht-app.ht-app-landing.ht-app-signed-in .ht-topbar nav{width:100%;margin-left:auto}
+}

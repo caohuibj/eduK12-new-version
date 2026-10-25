@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
+import {cleanup,fireEvent,render,screen,within} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import HuiteacherApp from './HuiteacherApp'
 
@@ -29,30 +29,53 @@ function session(organizations:ReturnType<typeof organization>[],role='TEACHER')
 afterEach(()=>{window.history.replaceState(null,'','/');cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();vi.unstubAllEnvs()})
 
 describe('Teacher compact workspace',()=>{
- it('starts account details closed for members and keeps edited password and invitation inputs mounted across school changes',async()=>{
+ it('keeps the account dialog closed until requested and preserves inputs across close and school changes',async()=>{
   session([organization('a'),organization('b')])
   render(<HuiteacherApp/>)
-  const summary=await screen.findByText('账号与学校邀请')
-  const details=summary.closest('details')!
-  expect(details).not.toHaveAttribute('open')
-  expect(screen.getByLabelText('当前学校管理范围')).toHaveValue('a')
-  fireEvent.click(screen.getByRole('button',{name:'账号设置'}))
-  await waitFor(()=>expect(details).toHaveAttribute('open'))
-  expect(summary).toHaveFocus()
-  fireEvent.click(screen.getByText('账号安全 · 修改密码'))
-  fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'draft-pass-123'}})
-  fireEvent.change(screen.getByLabelText('已收到的学校邀请代码'),{target:{value:'draft-invite'}})
+  const trigger=await screen.findByRole('button',{name:'账号设置'})
+  expect(screen.queryByRole('dialog',{name:'账号设置'})).not.toBeInTheDocument()
+  expect(screen.queryByText('账号与学校邀请')).not.toBeInTheDocument()
+  fireEvent.click(trigger)
+  const dialog=await screen.findByRole('dialog',{name:'账号设置'})
+  expect(within(dialog).getByRole('heading',{name:'账号设置'})).toHaveFocus()
+  expect(within(dialog).getByRole('heading',{name:'修改密码'})).toBeInTheDocument()
+  expect(within(dialog).getByRole('heading',{name:'学校邀请'})).toBeInTheDocument()
+  fireEvent.change(within(dialog).getByLabelText('新密码'),{target:{value:'draft-pass-123'}})
+  fireEvent.change(within(dialog).getByLabelText('已收到的学校邀请代码'),{target:{value:'draft-invite'}})
+  fireEvent.click(within(dialog).getByRole('button',{name:'关闭账号设置'}))
+  expect(dialog).not.toHaveAttribute('open')
+  expect(screen.getByLabelText('新密码')).not.toBeVisible()
   fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
-  expect(details).toHaveAttribute('open')
-  expect(screen.getByLabelText('新密码')).toHaveValue('draft-pass-123')
-  expect(screen.getByLabelText('已收到的学校邀请代码')).toHaveValue('draft-invite')
+  fireEvent.click(trigger)
+  expect(dialog).toHaveAttribute('open')
+  expect(within(dialog).getByLabelText('新密码')).toHaveValue('draft-pass-123')
+  expect(within(dialog).getByLabelText('已收到的学校邀请代码')).toHaveValue('draft-invite')
  })
- it('starts joining expanded for a user without school membership',async()=>{
+ it('keeps joining inside settings for a user without school membership',async()=>{
   session([])
   render(<HuiteacherApp/>)
-  expect((await screen.findByText('账号与学校邀请')).closest('details')).toHaveAttribute('open')
-  expect(screen.getByLabelText('已收到的学校邀请代码')).toBeVisible()
+  const trigger=await screen.findByRole('button',{name:'账号设置'})
+  expect(screen.getByLabelText('已收到的学校邀请代码')).not.toBeVisible()
   expect(screen.queryByLabelText('当前学校管理范围')).not.toBeInTheDocument()
+  fireEvent.click(trigger)
+  const dialog=await screen.findByRole('dialog',{name:'账号设置'})
+  expect(within(dialog).getByLabelText('已收到的学校邀请代码')).toBeVisible()
+ })
+ it('returns home from the logo and reenters the workspace without signing out',async()=>{
+  const fetch=session([organization('a')])
+  vi.spyOn(window,'scrollTo').mockImplementation(()=>{})
+  window.history.replaceState(null,'','/#ht-personal-private-forms')
+  render(<HuiteacherApp/>)
+  await screen.findByRole('heading',{name:'我的教育发展空间'})
+  fireEvent.click(screen.getByRole('button',{name:'Teacher 首页'}))
+  expect(await screen.findByRole('heading',{name:/从每一次思考/})).toBeInTheDocument()
+  expect(window.location.hash).toBe('')
+  expect(screen.getByRole('button',{name:'退出'})).toBeInTheDocument()
+  expect(screen.queryByRole('heading',{name:'我的教育发展空间'})).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'进入 Teacher',exact:true}))
+  expect(await screen.findByRole('heading',{name:'我的教育发展空间'})).toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'退出'})).toBeInTheDocument()
+  expect(fetch.mock.calls.some(([url])=>url.endsWith('/auth/logout'))).toBe(false)
  })
  it('jumps between mounted personal sections without losing an answer or filtering by school',async()=>{
   const fetch=session([organization('a'),organization('b')])
