@@ -1,0 +1,11 @@
+{
+  "scope": "Zod 4 private Scale draft empty-array compatibility",
+  "baseHead": "77ccbb9b102a5a0133a0c75243de61071984fd45",
+  "environment": "original isolated cloud, synthetic PostgreSQL 16 / Redis, no CI identity spoofing",
+  "command": "npx vitest run <9 previously failed integration/educationPrivate*.postgres.integration.test.ts files> --no-file-parallelism --reporter=json",
+  "passed": 41,
+  "failed": 3,
+  "rawReportSha256": "0d5aa06dff18bfb6909096ad4c69dd631a089c8d6f9f0e2b2be145ec29c9506b",
+  "remainingFailureCause": "3 existing media-sharing cases still use SYSTEM_ADMIN as Training distributor; maintained separately with exact entry/capability fixtures",
+  "runtimeChange": "Build empty-array draft schemas from unchanged element validators. Full native Scale validator still gates preview/freeze. No authorization change."
+}
