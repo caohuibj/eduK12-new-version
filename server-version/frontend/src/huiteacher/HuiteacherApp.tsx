@@ -318,7 +318,7 @@ export default function HuiteacherApp(){
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
     <header className="ht-topbar">
       {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
-        onClick={()=>changeScreen('home')}><TeacherBrand home={publicHome}/></button>}
+        onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
       <nav aria-label="产品导航">
         <ProductThemeControl appearance={appearance} product="Teacher"/>
         {!me&&<>

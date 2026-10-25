@@ -1,9 +1,9 @@
-/* Match Training's public-home proportions without changing Teacher's journal palette. */
+/* Match Training's public-home proportions; Teacher identity stays consistent on every page. */
 .ht-app.ht-app-landing{position:relative;--ht-home-gutter:max(32px,calc((100vw - 1200px)/2))}
 .ht-app.ht-app-landing .ht-topbar{position:absolute;inset:0 0 auto;min-height:118px;padding:24px var(--ht-home-gutter);background:transparent;flex-wrap:nowrap;gap:24px;z-index:3}
-.ht-app.ht-app-landing .ht-brand{gap:14px}
-.ht-app.ht-app-landing .ht-brand-b3{width:58px;height:66px}
-.ht-app.ht-app-landing .ht-brand-wordmark{width:158px}
+.ht-app .ht-brand{gap:14px}
+.ht-app .ht-brand-b3{width:58px;height:66px}
+.ht-app .ht-brand-wordmark{width:158px}
 .ht-app.ht-app-landing .ht-topbar nav{gap:10px;flex-wrap:nowrap}
 .ht-app.ht-app-landing .ht-topbar nav button{min-width:70px;min-height:44px;padding:10px 18px;border-radius:9px;font-size:14px;font-weight:600}
 .ht-app.ht-app-landing .ht-topbar nav .ht-login-entry{background:var(--ht-copper);border:1px solid var(--ht-copper);color:#fffaf6}
@@ -32,9 +32,9 @@
 @media(max-width:600px){
  .ht-app.ht-app-landing{--ht-home-gutter:18px}
  .ht-app.ht-app-landing .ht-topbar{min-height:86px;padding-block:16px;gap:8px}
- .ht-app.ht-app-landing .ht-brand{gap:8px}
- .ht-app.ht-app-landing .ht-brand-b3{width:36px;height:44px}
- .ht-app.ht-app-landing .ht-brand-wordmark{width:100px}
+ .ht-app .ht-brand{gap:8px}
+ .ht-app .ht-brand-b3{width:36px;height:44px}
+ .ht-app .ht-brand-wordmark{width:100px}
  .ht-app.ht-app-landing .ht-topbar nav{gap:4px;margin-left:auto}
  .ht-app.ht-app-landing .ht-topbar nav button{min-width:44px;padding:8px 9px;font-size:12px}
  .ht-app.ht-app-landing .ht-journal{min-height:940px;padding-top:142px;gap:40px}
@@ -46,4 +46,4 @@
  .ht-app.ht-app-landing .ht-journal-actions button,.ht-app.ht-app-landing .ht-journal-actions>a{padding-inline:10px;font-size:14px}
  .ht-app.ht-app-landing .ht-journal-actions .ht-primary{min-width:150px}
 }
-@media(max-width:360px){.ht-app.ht-app-landing{--ht-home-gutter:12px}.ht-app.ht-app-landing .ht-brand-wordmark{width:88px}}
+@media(max-width:360px){.ht-app.ht-app-landing{--ht-home-gutter:12px}.ht-app .ht-brand-wordmark{width:88px}}
