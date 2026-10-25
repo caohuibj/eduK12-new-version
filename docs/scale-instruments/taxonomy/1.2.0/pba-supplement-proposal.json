@@ -1,0 +1,113 @@
+{
+  "proposalVersion": "1.2.0-pba-supplement",
+  "status": "DOCS_ONLY_PROPOSAL",
+  "sourceCommit": "18263dd1440709d7cf1391949a0056bf1825a989",
+  "sourceSha256": "c915616f9515b4e100787cf6bc142a8e23059330c043a79116343e78719911bb",
+  "note": "Supplement to 09450a3 fixed35-source audit; no source/manifest/C/P/R/runtime changes. Parent/source-condition tags do not prove enforced eligibility. PBA 后续报告条件化修订不改变此处标签证据；本文件仍锁定原候选提交18263dd，不声明原source哈希等于最终发布source哈希。",
+  "terms": [
+    {
+      "id": "construct:parental_burnout",
+      "namespace": "construct",
+      "label": "父母养育倦怠",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[3]",
+      "rawValue": "construct:parental_burnout",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。"
+    },
+    {
+      "id": "construct:parental_exhaustion",
+      "namespace": "construct",
+      "label": "养育角色中的耗竭",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[4]",
+      "rawValue": "construct:parental_exhaustion",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。"
+    },
+    {
+      "id": "construct:parental_self_contrast",
+      "namespace": "construct",
+      "label": "与过去养育自我相比的落差",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[5]",
+      "rawValue": "construct:parental_self_contrast",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。"
+    },
+    {
+      "id": "construct:parenting_fed_up",
+      "namespace": "construct",
+      "label": "养育中难以承受的感受",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[6]",
+      "rawValue": "construct:parenting_fed_up",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。"
+    },
+    {
+      "id": "construct:emotional_distancing",
+      "namespace": "construct",
+      "label": "亲子互动中的情感距离（本包语境）",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[7]",
+      "rawValue": "construct:emotional_distancing",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "父母对自身养育耗竭、与过往自我落差、难以承受感和情感距离的自述，不评价孩子、爱意或监护资格。"
+    },
+    {
+      "id": "population:adult_parent_self",
+      "namespace": "population",
+      "label": "成年父母自评自身体验",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[9]",
+      "rawValue": "population:adult_parent_self",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "成人父母评价自己的体验，不是家长代评孩子。研究部署须至少有一名子女仍同住；原2018样本20–59岁英/法语父母，18岁为项目保守下限而非源验证界值。中文工作稿无本地验证；同住前提为研究使用要求，不声明系统已核验。"
+    },
+    {
+      "id": "population:co_resident_child_source_condition",
+      "namespace": "population",
+      "label": "原研究至少一名子女同住的使用前提",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[10]",
+      "rawValue": "population:co_resident_child_source_condition",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "成人父母评价自己的体验，不是家长代评孩子。研究部署须至少有一名子女仍同住；原2018样本20–59岁英/法语父母，18岁为项目保守下限而非源验证界值。中文工作稿无本地验证；同住前提为研究使用要求，不声明系统已核验。"
+    },
+    {
+      "id": "response:parent_self",
+      "namespace": "response",
+      "label": "父母自身体验自评（不是代评儿童）",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "jsonPath": "$.catalog.construct.constructOverlapTags[12]",
+      "rawValue": "response:parent_self",
+      "identity": {
+        "instrumentKey": "pba23_2018_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "relatedSourceField": "成人父母评价自己的体验，不是家长代评孩子。研究部署须至少有一名子女仍同住；原2018样本20–59岁英/法语父母，18岁为项目保守下限而非源验证界值。中文工作稿无本地验证；同住前提为研究使用要求，不声明系统已核验。"
+    }
+  ]
+}

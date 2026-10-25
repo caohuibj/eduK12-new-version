@@ -1,0 +1,116 @@
+{
+  "activationStatus": "EXTERNAL_ONLY_NOT_RUNTIME",
+  "evidence": {
+    "activate": false,
+    "developmentPopulation": {
+      "n": 901,
+      "languages": {
+        "en": 647,
+        "fr": 254
+      },
+      "ageRange": [
+        20,
+        59
+      ],
+      "ageMean": 36.71,
+      "ageSD": 6.84,
+      "mothers": 717,
+      "fathers": 184,
+      "eligibility": "At least one child still living at home",
+      "territories": "England53.38%, Belgium26.41%, USA9.65%, remaining France/Canada/Ireland/Wales/Scotland/other Europe. Not representative China norms.",
+      "source": "2018 Methods Sample/Procedure"
+    },
+    "descriptiveParameters": [
+      {
+        "scoreKey": "exhaustion",
+        "mean": 15.08,
+        "sd": 12.5,
+        "n": 901,
+        "active": false
+      },
+      {
+        "scoreKey": "contrast_previous_self",
+        "mean": 5.8,
+        "sd": 7.6,
+        "n": 901,
+        "active": false
+      },
+      {
+        "scoreKey": "fed_up",
+        "mean": 3.27,
+        "sd": 5.03,
+        "n": 901,
+        "active": false
+      },
+      {
+        "scoreKey": "emotional_distancing",
+        "mean": 1.9,
+        "sd": 2.97,
+        "n": 901,
+        "active": false
+      },
+      {
+        "scoreKey": "parental_burnout",
+        "mean": 26.05,
+        "sd": 24.96,
+        "n": 901,
+        "active": false
+      }
+    ],
+    "thresholds": [],
+    "thresholdEvidence": {
+      "status": "EXTERNAL_ONLY_NOT_EXECUTABLE",
+      "studyCitation": "Brianda et al. (2023). Assessment 30(7):2234–2246. DOI 10.1177/10731911221141873. Author manuscript retrieved; PubMed 36609160 confirms bibliographic record.",
+      "sourceUrl": "https://www.burnoutparental.com/_files/ugd/5660ec_a1171bb4a79f42f58940cf2e4192bd2d.pdf",
+      "n": 192,
+      "population": "French-speaking Belgium;92.7% mothers;130 treatment-seeking and62 controls. Not a general-population norm or Chinese cutoff.",
+      "conservativeEstimate": 86.26,
+      "confidenceInterval95": [
+        79.49,
+        93.03
+      ],
+      "alternativeRocMean": 52.67,
+      "alternativeRocCI95": [
+        40.91,
+        64.43
+      ],
+      "caution": "Different estimation methods, not interchangeable severity bands. Do not round into active thresholds. Later handbook suggests >86 and >53, but not locally calibrated.2018 categorical heuristic differs: Methods66.6% vs Results65%; do not implement that discrepant heuristic."
+    },
+    "localNormStatus": "NONE for this independent Chinese wording; no percentile, diagnostic band, Chinese equivalence, age/school-stage reference or reference activation."
+  },
+  "sources": [
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.00758/pdf",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-wellbeing-parenting-20261025/pba2018.pdf",
+      "sha256": "9043a0fb473fb4d20ad78c1819a424ffb1eb6b08b4ff6fb32dc090dae8395e81",
+      "bytes": 464506,
+      "accessedUTC": "2026-10-25",
+      "role": "Original 2018 CC BY instrument Table 1 and scoring"
+    },
+    {
+      "url": "https://en.burnoutparental.com/_files/ugd/5660ec_17a6caf331a64b14926ac86b6fdc0bee.pdf",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-wellbeing-parenting-20261025/pba-current-author-en.pdf",
+      "sha256": "a9c29ece5dc61ef6e2113130c24a2b952ad76130af54dac4cbf7c44063e867e3",
+      "bytes": 44275,
+      "accessedUTC": "2026-10-25",
+      "role": "Reference only: do not redistribute this later file or substitute its wording"
+    },
+    {
+      "url": "https://www.burnoutparental.com/_files/ugd/5660ec_a1171bb4a79f42f58940cf2e4192bd2d.pdf",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-wellbeing-parenting-20261025/pba-cutoffs-author.pdf",
+      "sha256": "466de4f5fb953ca7a165dc14c9bbf39b2670454c2ff4561d4cf28d6192320763",
+      "bytes": 369361,
+      "accessedUTC": "2026-10-25",
+      "role": "Reference only: do not redistribute this later file or substitute its wording"
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.00758/full",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-wellbeing-parenting-20261025/pba.html",
+      "sha256": "0e9b1fac57bb67c33eb0d2d68ddef7acb9c69f9d125422a58d6a449344397d58",
+      "bytes": 876157,
+      "accessedUTC": "2026-10-25",
+      "role": "Original 2018 CC BY instrument Table 1 and scoring"
+    }
+  ],
+  "currentChineseValidated": false
+}

@@ -1,0 +1,235 @@
+{
+  "items": [
+    {
+      "itemCode": "EX1",
+      "originalEnglish": "I feel completely run down by my role as a parent",
+      "workingChinese": "作为父母，我感到自己已经完全筋疲力尽。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX2",
+      "originalEnglish": "I have the sense that I'm really worn out as a parent",
+      "workingChinese": "我感觉自己作为父母真的已经累垮了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX3",
+      "originalEnglish": "I'm so tired out by my role as a parent that sleeping doesn't seem like enough",
+      "workingChinese": "做父母让我累得似乎连睡觉都不足以恢复过来。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX4",
+      "originalEnglish": "When I get up in the morning and have to face another day with my child(ren), I feel exhausted before I've even started",
+      "workingChinese": "早上起床，想到又要和孩子度过一天，我还没开始就已经觉得精疲力尽了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX5",
+      "originalEnglish": "I find it exhausting just thinking of everything I have to do for my child(ren)",
+      "workingChinese": "只要想到要为孩子做的所有事情，我就觉得疲惫不堪。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX6",
+      "originalEnglish": "I have zero energy for looking after my child(ren)",
+      "workingChinese": "我一点照顾孩子的精力都没有了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX7",
+      "originalEnglish": "My role as a parent uses up all my resources",
+      "workingChinese": "做父母这件事耗尽了我所有可以调动的资源。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX8",
+      "originalEnglish": "I sometimes have the impression that I'm looking after my child(ren) on autopilot",
+      "workingChinese": "有时我觉得自己像开着自动驾驶一样照顾孩子。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "EX9",
+      "originalEnglish": "I'm in survival mode in my role as a parent",
+      "workingChinese": "在做父母这件事上，我正处在勉强撑下去的“生存模式”。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO1",
+      "originalEnglish": "I don't think I'm the good father/mother that I used to be to my child(ren)",
+      "workingChinese": "我觉得对孩子来说，我已经不再是以前那个好爸爸／好妈妈了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO2",
+      "originalEnglish": "I tell myself that I'm no longer the parent I used to be",
+      "workingChinese": "我告诉自己，我已经不再是以前那个做父母的自己了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO3",
+      "originalEnglish": "I'm ashamed of the parent that I've become",
+      "workingChinese": "对于自己变成了现在这样的父母，我感到羞愧。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO4",
+      "originalEnglish": "I'm no longer proud of myself as a parent",
+      "workingChinese": "作为父母，我不再为自己感到自豪。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO5",
+      "originalEnglish": "I have the impression that I'm not myself any more when I'm interacting with my child(ren)",
+      "workingChinese": "和孩子相处时，我觉得自己已经不像自己了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "CO6",
+      "originalEnglish": "I feel as though I've lost my direction as a dad/mum",
+      "workingChinese": "我觉得自己已经失去了做爸爸／妈妈的方向。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "FU1",
+      "originalEnglish": "I can't stand my role as father/mother any more",
+      "workingChinese": "我再也忍受不了自己作为爸爸／妈妈的角色了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "FU2",
+      "originalEnglish": "I can't take being a parent any more",
+      "workingChinese": "做父母这件事，我再也承受不了了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "FU3",
+      "originalEnglish": "I feel like I can't take any more as a parent",
+      "workingChinese": "作为父母，我觉得自己再也撑不下去了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "FU4",
+      "originalEnglish": "I feel like I can't cope as a parent",
+      "workingChinese": "作为父母，我觉得自己已经应付不过来了。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "FU5",
+      "originalEnglish": "I don't enjoy being with my child(ren)",
+      "workingChinese": "和孩子在一起时，我感受不到乐趣。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "ED1",
+      "originalEnglish": "I do what I'm supposed to do for my child(ren), but nothing more",
+      "workingChinese": "我只做那些应该为孩子做的事，不会再做更多。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "ED2",
+      "originalEnglish": "Outside the usual routines (lifts in the car, bedtime, meals), I'm no longer able to make an effort for my child(ren)",
+      "workingChinese": "除了日常的例行事务（开车接送、就寝、吃饭），我已经没有能力再为孩子付出更多努力。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    },
+    {
+      "itemCode": "ED3",
+      "originalEnglish": "I'm no longer able to show my child(ren) how much I love them",
+      "workingChinese": "我已经没有能力向孩子表达我有多么爱他们。",
+      "responseSetKey": "pba_frequency_0_6",
+      "reverse": false
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "pba_frequency_0_6",
+      "options": [
+        {
+          "value": "0",
+          "label": "never",
+          "score": 0
+        },
+        {
+          "value": "1",
+          "label": "a few times a year or less",
+          "score": 1
+        },
+        {
+          "value": "2",
+          "label": "once a month or less",
+          "score": 2
+        },
+        {
+          "value": "3",
+          "label": "a few times a month",
+          "score": 3
+        },
+        {
+          "value": "4",
+          "label": "once a week",
+          "score": 4
+        },
+        {
+          "value": "5",
+          "label": "a few times a week",
+          "score": 5
+        },
+        {
+          "value": "6",
+          "label": "every day",
+          "score": 6
+        }
+      ]
+    }
+  ],
+  "responseSetsZh": {
+    "pba_frequency_0_6": [
+      "从不",
+      "一年几次或更少",
+      "一个月一次或更少",
+      "一个月几次",
+      "一周一次",
+      "一周几次",
+      "每天"
+    ]
+  },
+  "administration": {
+    "instructionsZh": "下面的问题关注你作为父母的感受，而不是评价孩子。请根据自己的实际体验，选择每种感受出现的频率。没有对错答案，不愿作答时可以暂停或退出。爱孩子和感到疲惫可以同时存在。",
+    "instructionProvenance": "New platform introduction, not verbatim author instruction. Does not add a fixed recall window.",
+    "timeframe": "No fixed retrospective interval in 2018 published PBA description; frequency from never to every day. Do NOT add past 2 weeks/month.",
+    "fixedItemOrder": true,
+    "orderBasis": "2018 published Table 1 grouped order; do not claim this is the 2018 administered survey random/order schedule.",
+    "respondent": "Adult parent rating their own parenting experience, not rating the child; original study required >=1 child still living at home.",
+    "notFor": [
+      "child self-rating",
+      "teacher rating of child",
+      "custody/parenting eligibility decisions",
+      "school ranking",
+      "diagnosis"
+    ]
+  },
+  "sourceVersion": "Exact 2018 Frontiers Table 1 English wording and grouped source order EX1–9, CO1–6, FU1–5, ED1–3; independent Chinese translation. This is not the shuffled current author PDF or the author-hosted Chinese translation. DRAFT/HIDDEN pending expert review.",
+  "translationStatus": "INDEPENDENT_WORKING_TRANSLATION_NOT_VALIDATED"
+}

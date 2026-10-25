@@ -1,0 +1,27 @@
+{
+  "status": "PASS_DOCUMENTATION_CHECKS_ONLY",
+  "proposalStatus": "DOCS_ONLY_PROPOSAL",
+  "lockedCommits": [
+    "09450a350326ab520795dc6c2953341f0946187e",
+    "18263dd1440709d7cf1391949a0056bf1825a989"
+  ],
+  "baseAuditedSources": 35,
+  "baseTerms": 61,
+  "separatePbaTerms": 8,
+  "uniqueCombinedIds": 69,
+  "exactTagAndSupportingFieldChecks": 142,
+  "checks": [
+    "JSON parse and structure",
+    "eight-axis namespaces",
+    "term ID uniqueness within and across separate proposals",
+    "all evidence paths and exact JSONPath values at locked commits",
+    "audited source tag arrays and catalog manifests at locked commit",
+    "PBA historical source SHA256",
+    "extends file paths",
+    "relations remain PROPOSED_NOT_APPLIED",
+    "project markdown excludes local workspace paths"
+  ],
+  "scaleTestsRerun": false,
+  "runtimeChanges": false,
+  "sourceChanges": false
+}

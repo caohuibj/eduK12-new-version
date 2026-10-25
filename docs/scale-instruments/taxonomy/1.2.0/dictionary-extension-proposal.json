@@ -1,0 +1,2966 @@
+{
+  "proposalVersion": "1.2.0",
+  "status": "DOCS_ONLY_PROPOSAL",
+  "sourceCommit": "09450a350326ab520795dc6c2953341f0946187e",
+  "baselineCommit": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "scope": "35 newly added source packages only; 34 prior additions plus ORVIS candidate. Not all main inventory.",
+  "extends": [
+    "1.0.0/eight-axis-tag-mapping.json",
+    "1.1.0/dictionary-extension-and-new-mappings.json"
+  ],
+  "axes": [
+    "domain",
+    "construct",
+    "orientation",
+    "population",
+    "response",
+    "use",
+    "license",
+    "language_validation"
+  ],
+  "rules": [
+    "Keep all existing source IDs and legacy tags.",
+    "No source/catalogManifestVersion/C/P/R/localization/snapshot changes.",
+    "Labels are proposed reader-facing glosses, not validated translations or measurement interpretations.",
+    "Only explicit alias is a synonym proposal; broader/related links require next-PR consumer design.",
+    "A broader target is a suggested ancestor or attribute facet, never permission to widen administration.",
+    "Source-evidence-only population tags must not grant current eligibility.",
+    "Free auxiliary tags are not invalid controlled vocabulary."
+  ],
+  "newDictionaryTerms": [
+    {
+      "id": "domain:teacher_workplace",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "教师与成人工作场域",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:teacher_workplace",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "职业疲惫、工作消耗与服务互动消耗；不是诊断或教师能力考核。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:teacher_workplace",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "tswq_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:teacher_workplace",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "成人教师的学校归属与主观教学效能感，不是客观教学能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:personal_burnout",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "个人疲惫体验",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:personal_burnout",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "职业疲惫、工作消耗与服务互动消耗；不是诊断或教师能力考核。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:work_related_burnout",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作相关疲惫",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "construct:work_related_burnout",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "职业疲惫、工作消耗与服务互动消耗；不是诊断或教师能力考核。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:client_related_burnout",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "服务对象相关疲惫",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "construct:client_related_burnout",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "职业疲惫、工作消耗与服务互动消耗；不是诊断或教师能力考核。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:adult",
+      "namespace": "population",
+      "axis": "population",
+      "label": "成人（目录范围）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[5]",
+          "tagValue": "population:adult",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[10]",
+          "tagValue": "population:adult",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "tswq_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[5]",
+          "tagValue": "population:adult",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:teacher",
+      "namespace": "population",
+      "axis": "population",
+      "label": "教师本人（目录范围）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[6]",
+          "tagValue": "population:teacher",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[11]",
+          "tagValue": "population:teacher",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        },
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "tswq_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[6]",
+          "tagValue": "population:teacher",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "license:author_free_use",
+      "namespace": "license",
+      "axis": "license",
+      "label": "作者允许免费使用（详见具体许可）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "cbi_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[13]",
+          "tagValue": "license:author_free_use",
+          "supportingJsonPath": "$.usageRequirements",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "policyVersion": "cbi_zh_cn-1.0.0",
+            "requiredRightsActions": [
+              "electronicAdministration",
+              "scoring",
+              "display"
+            ],
+            "allowedCommercialNatures": [
+              "NON_COMMERCIAL",
+              "COMMERCIAL"
+            ],
+            "notes": [
+              "Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58. Also Kristensen TS, Borritz M, Villadsen E, Christensen KB (2005). The Copenhagen Burnout Inventory: A new tool for the assessment of burnout. Work & Stress 19(3):192–207. DOI:10.1080/02678370500297720.",
+              "{\"basis\": \"NFA explicit free commercial and noncommercial use with attribution; author original program free exchange/public-domain rationale. Not CC BY and not NC.\", \"attribution\": \"Borritz M et al. Burnout among employees in human service work: design and baseline findings of the PUMA study. Scandinavian Journal of Public Health. 2006;34:49–58. Also Kristensen TS, Borritz M, Villadsen E, Christensen KB (2005). The Copenhagen Burnout Inventory: A new tool for the assessment of burnout. Work & Stress 19(3):192–207. DOI:10.1080/02678370500297720.\", \"adaptationEvidence\": \"Official first-edition p4 explicitly allows appropriate client term (patients/students/children). This package conservatively preserves generic 服务对象; explanatory note may say students in school context. Independent translation marked, no claim NFA endorsement.\"}",
+              "独立工作中译与原创通俗反馈，未建立本地常模；不得用于绩效、诊断或排名。"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:psychological_flexibility",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "心理灵活性相关过程",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:psychological_flexibility",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "ACT以己为景过程：在想法与情绪变化中保持观察视角与应对空间；不是完整心理灵活性、人格、临床诊断或ACT掌握程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:self_as_context",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "以己为景",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:self_as_context",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "ACT以己为景过程：在想法与情绪变化中保持观察视角与应对空间；不是完整心理灵活性、人格、临床诊断或ACT掌握程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:centering",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "保持观察视角",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "construct:centering",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "ACT以己为景过程：在想法与情绪变化中保持观察视角与应对空间；不是完整心理灵活性、人格、临床诊断或ACT掌握程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:transcending",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "超越当下体验",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "construct:transcending",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "ACT以己为景过程：在想法与情绪变化中保持观察视角与应对空间；不是完整心理灵活性、人格、临床诊断或ACT掌握程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:adult_university_student",
+      "namespace": "population",
+      "axis": "population",
+      "label": "成年在校大学生（目录范围）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[6]",
+          "tagValue": "population:adult_university_student",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "原2022中国大学生便利样本17–25岁；当前候选限定18–25岁在校大学生自我了解/研究，不将结论外推中小学生、所有成年人或临床人群。年龄与学生身份的目录描述不等于系统已做资格核验。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "PARTIAL",
+            "minAge": 18,
+            "maxAge": 25
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:chinese_university_source_evidence",
+      "namespace": "population",
+      "axis": "population",
+      "label": "中国大学生来源样本证据（非额外施测许可）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[7]",
+          "tagValue": "population:chinese_university_source_evidence",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "原2022中国大学生便利样本17–25岁；当前候选限定18–25岁在校大学生自我了解/研究，不将结论外推中小学生、所有成年人或临床人群。年龄与学生身份的目录描述不等于系统已做资格核验。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "PARTIAL",
+            "minAge": 18,
+            "maxAge": 25
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "language_validation:published_chinese_items",
+      "namespace": "language_validation",
+      "axis": "language_validation",
+      "label": "采用已发表中文题文",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[15]",
+          "tagValue": "language_validation:published_chinese_items",
+          "supportingJsonPath": "$.localization",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "sourceLocale": "zh-CN",
+            "targetLocale": "zh-CN",
+            "localizationVersion": "1.0.0",
+            "translationSource": "Fang、Huang、Wang(2022) Appendix 1 已发表中文题文，按最终9题模型去原7；本项目没有重新翻译题干。",
+            "adaptationMethod": "ORIGINAL_SOURCE",
+            "expertReviewStatus": "PENDING",
+            "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+            "localEvidenceRefs": [
+              "csacs9-fang2022-structural"
+            ],
+            "reviewStatus": "PENDING",
+            "notes": "源论文已报告经原作者同意翻译修订、专家讨论、20名学生理解性评估；此处待审状态指本次数字呈现和新增报告，不否定原中文源研究。两端选项和首题说明为平台界面译注/文案，未声明原作者审定。"
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "language_validation:digital_presentation_review_pending",
+      "namespace": "language_validation",
+      "axis": "language_validation",
+      "label": "本次数字呈现审核待完成",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "csacs9_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[16]",
+          "tagValue": "language_validation:digital_presentation_review_pending",
+          "supportingJsonPath": "$.localization",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "sourceLocale": "zh-CN",
+            "targetLocale": "zh-CN",
+            "localizationVersion": "1.0.0",
+            "translationSource": "Fang、Huang、Wang(2022) Appendix 1 已发表中文题文，按最终9题模型去原7；本项目没有重新翻译题干。",
+            "adaptationMethod": "ORIGINAL_SOURCE",
+            "expertReviewStatus": "PENDING",
+            "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+            "localEvidenceRefs": [
+              "csacs9-fang2022-structural"
+            ],
+            "reviewStatus": "PENDING",
+            "notes": "源论文已报告经原作者同意翻译修订、专家讨论、20名学生理解性评估；此处待审状态指本次数字呈现和新增报告，不否定原中文源研究。两端选项和首题说明为平台界面译注/文案，未声明原作者审定。"
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:psychosocial_work_environment",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作场所心理社会环境",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:psychosocial_work_environment",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:demands",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作要求",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "construct:demands",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:control",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作自主控制",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "construct:control",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:managerial_support",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "管理者支持",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[5]",
+          "tagValue": "construct:managerial_support",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:peer_support",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "同事支持",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[6]",
+          "tagValue": "construct:peer_support",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:relationships",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作人际关系",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[7]",
+          "tagValue": "construct:relationships",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:role",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "工作角色清晰度",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[8]",
+          "tagValue": "construct:role",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:change",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "组织变化管理",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:change",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "license:ogl_3_0",
+      "namespace": "license",
+      "axis": "license",
+      "label": "开放政府许可 OGL 3.0",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "hse_msit_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[18]",
+          "tagValue": "license:ogl_3_0",
+          "supportingJsonPath": "$.usageRequirements",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "policyVersion": "hse_msit_zh_cn-1.0.0",
+            "requiredRightsActions": [
+              "electronicAdministration",
+              "scoring",
+              "display"
+            ],
+            "allowedCommercialNatures": [
+              "NON_COMMERCIAL",
+              "COMMERCIAL"
+            ],
+            "notes": [
+              "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+              "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"}",
+              "独立工作中译与原创通俗反馈，未建立本地常模；不得用于绩效、诊断或排名。"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:emotion_based_decision",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "情绪影响决策倾向",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:emotion_based_decision",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "Self-reported preference for feelings rather than logical reasoning in decision-making; not decision quality, impulsivity, psychological flexibility, emotion regulation or emotional-intelligence ability.",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:empathic_concern",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "共情关怀",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:empathic_concern",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "Self-reported sympathy and concern for others, including socially disadvantaged groups; not the Interpersonal Reactivity Index Empathic Concern subscale, not perspective-taking accuracy, helping behavior, morality or clinical empathy capacity.",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:negative_expressivity",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "负向情绪表达倾向",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:negative_expressivity",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "Self-reported outward expression versus concealment of negative emotions; not symptom severity, aggression diagnosis, emotional regulation skill or a universally desirable direction.",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:positive_expressivity",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "正向情绪表达倾向",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:positive_expressivity",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "Self-reported outward expression of positive feelings and affection; not happiness level, emotion-regulation ability, social competence or relationship quality.",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:responsive_distress",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "回应他人困扰的情绪倾向",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:responsive_distress",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "Self-reported distress resonance and emotional reactivity to others suffering and tense situations; not total empathy, compassion, helpful behavior, trauma, or objective crisis-response skill.",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:justice_sensitivity",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "公正敏感性",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "jss8_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:justice_sensitivity",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "从自身吃亏、旁观、被动获益和主动造成不公四个视角自述对不公的反应，不是人品或实际行为。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:psychological_distress",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "非特异性心理困扰",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "identity": {
+            "instrumentKey": "k6_zh_cn_research",
+            "instrumentVersion": "1.1.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:psychological_distress",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "过去30天非特异性心理困扰自述频率，非SMI诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "license:author_unrestricted_use",
+      "namespace": "license",
+      "axis": "license",
+      "label": "作者声明不限制使用（保留版权及署名要求）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "identity": {
+            "instrumentKey": "k6_zh_cn_research",
+            "instrumentVersion": "1.1.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[10]",
+          "tagValue": "license:author_unrestricted_use",
+          "supportingJsonPath": "$.usageRequirements",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "policyVersion": "k6-zh-cn-research-1.1.0",
+            "requiredRightsActions": [
+              "electronicAdministration",
+              "scoring",
+              "display"
+            ],
+            "allowedCommercialNatures": [
+              "NON_COMMERCIAL",
+              "COMMERCIAL"
+            ],
+            "notes": [
+              "© Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview © 2001 Ronald C. Kessler, PhD. All rights reserved. Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189. https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+              "作者当前免费/不需许可及unrestricted译本使用声明；保留原版权，不是公共领域/CC。",
+              "研究DRAFT，不启用诊断/人群分档或自动危机处置。"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "language_validation:official_author_hosted_translation",
+      "namespace": "language_validation",
+      "axis": "language_validation",
+      "label": "作者官网托管的译文",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "identity": {
+            "instrumentKey": "k6_zh_cn_research",
+            "instrumentVersion": "1.1.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[12]",
+          "tagValue": "language_validation:official_author_hosted_translation",
+          "supportingJsonPath": "$.localization",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "sourceLocale": "zh-CN",
+            "targetLocale": "zh-CN",
+            "localizationVersion": "1.0.0",
+            "translationSource": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.；直接转录作者托管普通话题文；不自创中译。",
+            "adaptationMethod": "ORIGINAL_SOURCE",
+            "expertReviewStatus": "PENDING",
+            "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+            "localEvidenceRefs": [],
+            "reviewStatus": "PENDING",
+            "notes": "原中文翻译作者已署名；本项目数字呈现审核和精确版本效度匹配待完成，不声称中文缺乏所有研究或原译者未审核。 本次instrumentVersion1.1.0接续历史PR328 1.0.0候选，未覆盖已公开旧身份。"
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "language_validation:presentation_review_pending",
+      "namespace": "language_validation",
+      "axis": "language_validation",
+      "label": "本次呈现审核待完成",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+          "identity": {
+            "instrumentKey": "k6_zh_cn_research",
+            "instrumentVersion": "1.1.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[14]",
+          "tagValue": "language_validation:presentation_review_pending",
+          "supportingJsonPath": "$.localization",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "sourceLocale": "zh-CN",
+            "targetLocale": "zh-CN",
+            "localizationVersion": "1.0.0",
+            "translationSource": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.；直接转录作者托管普通话题文；不自创中译。",
+            "adaptationMethod": "ORIGINAL_SOURCE",
+            "expertReviewStatus": "PENDING",
+            "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+            "localEvidenceRefs": [],
+            "reviewStatus": "PENDING",
+            "notes": "原中文翻译作者已署名；本项目数字呈现审核和精确版本效度匹配待完成，不声称中文缺乏所有研究或原译者未审核。 本次instrumentVersion1.1.0接续历史PR328 1.0.0候选，未覆盖已公开旧身份。"
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:well_being",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "幸福感相关体验",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "l1_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:well_being",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "对近来整体生活的满意程度，不是心理健康或人生成功程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:life_satisfaction",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "生活满意度",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "l1_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:life_satisfaction",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "对近来整体生活的满意程度，不是心理健康或人生成功程度。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "license:cc_by_nc_sa_4_0",
+      "namespace": "license",
+      "axis": "license",
+      "label": "CC BY-NC-SA 4.0 署名、非商业、相同方式共享",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "l1_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[10]",
+          "tagValue": "license:cc_by_nc_sa_4_0",
+          "supportingJsonPath": "$.usageRequirements",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "policyVersion": "l1-zh-cn-research-1.0.0",
+            "requiredRightsActions": [
+              "electronicAdministration",
+              "scoring",
+              "display"
+            ],
+            "allowedCommercialNatures": [
+              "NON_COMMERCIAL"
+            ],
+            "notes": [
+              "Nießen, D., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2020). An English-language adaptation of the General Life Satisfaction Short Scale (L-1). ZIS. https://access.gesis.org/zis/624 https://creativecommons.org/licenses/by-nc-sa/4.0/；本项目据作者英文题本独立翻译为中文工作稿，另编写通俗反馈；尚非经验证的中文版本。原作者未背书本译本或反馈。",
+              "本题本、中文译文与反馈依CC BY-NC-SA 4.0同许可提供，代码仓库许可不覆盖这些内容；不得商业使用。"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:learning_self_management",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "学习策略与自我管理",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:learning_self_management",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "选定一门大学课程中的批判性思考策略使用自述；不是推理能力实测、完整MSLQ或通用学习能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:course_critical_thinking_strategy",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "特定课程中的批判性思考策略",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:course_critical_thinking_strategy",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "选定一门大学课程中的批判性思考策略使用自述；不是推理能力实测、完整MSLQ或通用学习能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:adult_college_research",
+      "namespace": "population",
+      "axis": "population",
+      "label": "成人大学生课程研究（目录范围）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "population:adult_college_research",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "成人大学课程研究；原380名美国大学生证据不是本中文或K12验证。ADULT_SELF/student技术角色。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "use:course_research",
+      "namespace": "use",
+      "axis": "use",
+      "label": "特定课程研究",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[7]",
+          "tagValue": "use:course_research",
+          "supportingJsonPath": "$.catalog.intendedUse",
+          "supportingValue": {
+            "intendedUses": [
+              {
+                "use": "RESEARCH",
+                "evidenceStatus": "EVIDENCE_UNKNOWN",
+                "notes": "成人课程特定研究，实施者需记录同一具体课程。"
+              },
+              {
+                "use": "INDIVIDUAL_REFLECTION",
+                "evidenceStatus": "EVIDENCE_UNKNOWN",
+                "notes": "只讨论所选课程的策略，不外推通用能力。"
+              }
+            ],
+            "forbiddenUses": [
+              "DIAGNOSIS",
+              "HIGH_STAKES_SELECTION",
+              "SCHOOL_RANKING",
+              "TEACHER_ACCOUNTABILITY",
+              "UNSUPPORTED_GROUP_COMPARISON"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:attention_cognition",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "注意与认知体验",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mwq5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:attention_cognition",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "任务无关思维打断当前专注的自述频率，不是ADHD诊断、客观注意监测或学习能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:mind_wandering",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "走神倾向",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mwq5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:mind_wandering",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "任务无关思维打断当前专注的自述频率，不是ADHD诊断、客观注意监测或学习能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "population:adolescent_source_evidence_only",
+      "namespace": "population",
+      "axis": "population",
+      "label": "仅有原版青少年来源证据（非本版本施测范围）",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mwq5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "population:adolescent_source_evidence_only",
+          "supportingJsonPath": "$.catalog.population",
+          "supportingValue": {
+            "populationNotes": "当前中文仅限成人研究与自我了解；原英文大学与中学生研究仅存来源档案，不授权本中文自动K12施测。ADULT_SELF/student是技术角色，不表示儿童。",
+            "respondentTypes": [
+              "SELF"
+            ],
+            "developmentalEvidence": "UNKNOWN",
+            "minAge": 18
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "license:cc_by_3_0",
+      "namespace": "license",
+      "axis": "license",
+      "label": "CC BY 3.0 署名",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "mwq5_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[11]",
+          "tagValue": "license:cc_by_3_0",
+          "supportingJsonPath": "$.usageRequirements",
+          "supportingValue": {
+            "schemaVersion": 1,
+            "policyVersion": "mwq5-zh-cn-research-1.0.0",
+            "requiredRightsActions": [
+              "electronicAdministration",
+              "scoring",
+              "display"
+            ],
+            "allowedCommercialNatures": [
+              "NON_COMMERCIAL",
+              "COMMERCIAL"
+            ],
+            "notes": [
+              "Mrazek, M. D., Phillips, D. T., Franklin, M. S., Broadway, J. M., & Schooler, J. W. (2013). Young and restless: validation of the Mind-Wandering Questionnaire (MWQ) reveals disruptive impact of mind-wandering for youth. Frontiers in Psychology, 4, 560. https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00560/full https://creativecommons.org/licenses/by/3.0/；本项目据原作者2013年MWQ发布文字独立翻译并编写通俗反馈。保留五题顺序与六级频率锚点；尚非经验证的中文版本，原作者未背书。",
+              "CC BY 3.0；保留署名/许可/改动说明；作者未背书。3/4题原作者脚注明来自MAAS改编，此处仅复现作者发布MWQ五题，不复制MAAS整表。"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:interests_career_exploration",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "活动兴趣与职业探索",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:interests_career_exploration",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:activity_preferences",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "活动偏好",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:activity_preferences",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_leadership",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 领导活动兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "construct:orvis_leadership",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_organization",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 组织事务兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "construct:orvis_organization",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_altruism",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 助人活动兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[5]",
+          "tagValue": "construct:orvis_altruism",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_creativity",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 创造活动兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[6]",
+          "tagValue": "construct:orvis_creativity",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_analysis",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 分析活动兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[7]",
+          "tagValue": "construct:orvis_analysis",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_production",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 制作生产兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[8]",
+          "tagValue": "construct:orvis_production",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_adventure",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 探险活动兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[9]",
+          "tagValue": "construct:orvis_adventure",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:orvis_erudition",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "ORVIS 博学求知兴趣",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[10]",
+          "tagValue": "construct:orvis_erudition",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "八类职业相关活动的自述喜欢程度；不是能力、职业适配、录用资格、人格优劣或诊断。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "use:not_selection",
+      "namespace": "use",
+      "axis": "use",
+      "label": "不用于甄选或录取决策",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "orvis92_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[18]",
+          "tagValue": "use:not_selection",
+          "supportingJsonPath": "$.catalog.intendedUse",
+          "supportingValue": {
+            "intendedUses": [
+              {
+                "use": "RESEARCH",
+                "evidenceStatus": "EVIDENCE_UNKNOWN",
+                "notes": "当前中文译稿的心理测量属性未验证。"
+              },
+              {
+                "use": "INDIVIDUAL_REFLECTION",
+                "evidenceStatus": "EVIDENCE_UNKNOWN"
+              }
+            ],
+            "forbiddenUses": [
+              "DIAGNOSIS",
+              "HIGH_STAKES_SELECTION",
+              "SCHOOL_RANKING",
+              "TEACHER_ACCOUNTABILITY",
+              "UNSUPPORTED_GROUP_COMPARISON"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "domain:self_regulation",
+      "namespace": "domain",
+      "axis": "domain",
+      "label": "行为自我调节",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "srq63_brown_miller_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[1]",
+          "tagValue": "domain:self_regulation",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "行为自我调节的自陈总体功能：围绕目标接收信息、评价、改变与计划实施；不是SDT自我调节问卷，不输出七阶段能力分。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:behavioral_self_regulation",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "行为自我调节过程",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "srq63_brown_miller_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[2]",
+          "tagValue": "construct:behavioral_self_regulation",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "行为自我调节的自陈总体功能：围绕目标接收信息、评价、改变与计划实施；不是SDT自我调节问卷，不输出七阶段能力分。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "use:professional_research",
+      "namespace": "use",
+      "axis": "use",
+      "label": "专业人员组织的研究",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "srq63_brown_miller_zh_cn_research",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[7]",
+          "tagValue": "use:professional_research",
+          "supportingJsonPath": "$.catalog.intendedUse",
+          "supportingValue": {
+            "intendedUses": [
+              {
+                "use": "RESEARCH",
+                "evidenceStatus": "EVIDENCE_UNKNOWN",
+                "notes": "仅专业人员组织的成人研究；不是个人自诊工具，不用于临床决策。"
+              }
+            ],
+            "forbiddenUses": [
+              "DIAGNOSIS",
+              "HIGH_STAKES_SELECTION",
+              "SCHOOL_RANKING",
+              "TEACHER_ACCOUNTABILITY",
+              "UNSUPPORTED_GROUP_COMPARISON"
+            ]
+          },
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:teaching_efficacy",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "教学效能体验",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "tswq_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[3]",
+          "tagValue": "construct:teaching_efficacy",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "成人教师的学校归属与主观教学效能感，不是客观教学能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    },
+    {
+      "id": "construct:teacher_subjective_wellbeing",
+      "namespace": "construct",
+      "axis": "construct",
+      "label": "教师主观幸福感",
+      "status": "PROPOSED_DOCUMENTATION_OF_EXISTING_SOURCE_TAG",
+      "evidenceRequired": true,
+      "sourceEvidence": [
+        {
+          "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+          "identity": {
+            "instrumentKey": "tswq_zh_cn",
+            "instrumentVersion": "1.0.0"
+          },
+          "tagJsonPath": "$.catalog.construct.constructOverlapTags[4]",
+          "tagValue": "construct:teacher_subjective_wellbeing",
+          "supportingJsonPath": "$.catalog.construct.constructDefinition",
+          "supportingValue": "成人教师的学校归属与主观教学效能感，不是客观教学能力。",
+          "limitations": "目录标签不是施测资格或许可门禁；来源事实及适用边界以本精确 source 完整记录为准。"
+        }
+      ]
+    }
+  ],
+  "relationProposals": [
+    {
+      "from": "domain:digital_behavior",
+      "relation": "alias",
+      "to": "domain:digital_lifestyle",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "现有1.1与1.0中文标签均为“数字使用与生活行为”；建议保留两个ID并归一化检索。"
+    },
+    {
+      "from": "domain:well_being",
+      "relation": "broader",
+      "to": "domain:wellbeing_strength",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为建议上位类；非同义全量替换。"
+    },
+    {
+      "from": "domain:self_regulation",
+      "relation": "broader",
+      "to": "domain:selfreg_executive",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为建议上位类；不将一般自我调节等同执行功能。"
+    },
+    {
+      "from": "domain:learning_self_management",
+      "relation": "related",
+      "to": "domain:motivation_learning",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "课程策略与学习动机存在交叉；需下一PR确定领域层级。"
+    },
+    {
+      "from": "domain:teacher_workplace",
+      "relation": "related",
+      "to": "domain:stress_work",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "工作场域交叉，教师幸福感不等同职业压力。"
+    },
+    {
+      "from": "construct:teacher_subjective_wellbeing",
+      "relation": "related",
+      "to": "construct:teacher_school_wellbeing",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "可能存在宽窄关系，不能仅凭词形判同义。"
+    },
+    {
+      "from": "license:ogl_3_0",
+      "relation": "broader",
+      "to": "license:ogl",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为许可族；版本限制不得丢失。"
+    },
+    {
+      "from": "license:cc_by_nc_sa_4_0",
+      "relation": "broader",
+      "to": "license:share_alike",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为许可属性，补全检索而非重新授权。"
+    },
+    {
+      "from": "license:cc_by_nc_sa_4_0",
+      "relation": "broader",
+      "to": "license:noncommercial",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为许可属性；当前L1已同时标注。"
+    },
+    {
+      "from": "use:course_research",
+      "relation": "broader",
+      "to": "use:research",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为通用研究用途；必须保留课程限定。"
+    },
+    {
+      "from": "use:professional_research",
+      "relation": "broader",
+      "to": "use:research",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为通用研究用途；必须保留专业人员限定。"
+    },
+    {
+      "from": "population:adult_college_research",
+      "relation": "broader",
+      "to": "population:adult_research",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "后者为通用成人研究集合；不能反向扩充可施测范围。"
+    },
+    {
+      "from": "population:adult_university_student",
+      "relation": "related",
+      "to": "population:adult_college_research",
+      "status": "PROPOSED_NOT_APPLIED",
+      "rationale": "一个为人群身份，一个含研究情境，非无条件同义。"
+    }
+  ],
+  "auditedSources": [
+    {
+      "identity": {
+        "instrumentKey": "cbi_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "cbi_zh_cn",
+        "domain:teacher_workplace",
+        "construct:personal_burnout",
+        "construct:work_related_burnout",
+        "construct:client_related_burnout",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:author_free_use",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "cesd10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "cesd10",
+        "depressive_symptoms",
+        "past_week",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "public_domain",
+        "non_diagnostic",
+        "descriptive_report",
+        "domain:distress_behavior",
+        "construct:depressive_experience",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "csacs9_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "csacs9_zh_cn",
+        "domain:psychological_flexibility",
+        "construct:self_as_context",
+        "construct:centering",
+        "construct:transcending",
+        "orientation:ACT",
+        "population:adult_university_student",
+        "population:chinese_university_source_evidence",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:published_chinese_items",
+        "language_validation:digital_presentation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "djgls6_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "孤独感",
+        "社会联结",
+        "情感联结",
+        "成人",
+        "老年人",
+        "自评",
+        "非商业",
+        "CC-BY-NC-2.0",
+        "独立中译待验证",
+        "非诊断",
+        "domain:social_emotional",
+        "construct:loneliness",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_2_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "gad7_zh_cn_research",
+        "instrumentVersion": "1.1.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "gad7",
+        "domain:distress_behavior",
+        "construct:anxiety_experience",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "gse3_asku_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "非商业",
+        "non_commercial",
+        "cc_by_nc_sa_4_0",
+        "share_alike",
+        "self_efficacy",
+        "gse3_asku",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "descriptive_report",
+        "domain:personality_self",
+        "construct:general_self_efficacy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:share_alike",
+        "license:redistribution_restricted",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "hse_msit_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "hse_msit_zh_cn",
+        "domain:teacher_workplace",
+        "construct:psychosocial_work_environment",
+        "construct:demands",
+        "construct:control",
+        "construct:managerial_support",
+        "construct:peer_support",
+        "construct:relationships",
+        "construct:role",
+        "construct:change",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:ogl_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip50_zh_cn_research",
+        "instrumentVersion": "1.1.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip",
+        "public_domain",
+        "self_report",
+        "non_diagnostic",
+        "working_translation",
+        "extraversion",
+        "agreeableness",
+        "conscientiousness",
+        "emotional_stability",
+        "intellect_imagination",
+        "adult_self_report",
+        "research",
+        "individual_reflection",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:personality_self",
+        "construct:big_five",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip_attending_emotions10",
+        "emotional_tendency",
+        "adult_self_report",
+        "self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:emotion_attention",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "ipip_emotion_based_decision9",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:emotion_based_decision",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "ipip_empathic_concern10",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:empathic_concern",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "ipip_negative_expressivity10",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:negative_expressivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip_neo_c1_self_efficacy10",
+        "general_task_self_efficacy",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "public_domain",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:personality_self",
+        "construct:task_self_efficacy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip_neo_c5_self_discipline10",
+        "task_initiation",
+        "self_discipline",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "public_domain",
+        "descriptive_report",
+        "domain:selfreg_executive",
+        "construct:self_discipline",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_nfc10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip",
+        "public_domain",
+        "self_report",
+        "non_diagnostic",
+        "working_translation",
+        "need_for_cognition",
+        "adult_self_report",
+        "research",
+        "individual_reflection",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:motivation_learning",
+        "construct:need_for_cognition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_opt10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip",
+        "optimism",
+        "positive_expectations",
+        "public_domain",
+        "adult_self_report",
+        "non_diagnostic",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_local_norms",
+        "domain:wellbeing_strength",
+        "construct:optimism",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "ipip_positive_expressivity9",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:positive_expressivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "ipip_responsive_distress10",
+        "adult_self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:responsive_distress",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "ipip_responsive_joy10",
+        "emotional_tendency",
+        "adult_self_report",
+        "self_report",
+        "non_diagnostic",
+        "public_domain",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:social_emotional",
+        "construct:responsive_joy",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "jss8_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "jss8",
+        "domain:social_emotional",
+        "construct:justice_sensitivity",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "k6_zh_cn_research",
+        "instrumentVersion": "1.1.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "k6",
+        "domain:distress_behavior",
+        "construct:psychological_distress",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:not_diagnostic",
+        "license:author_unrestricted_use",
+        "language_validation:content_zh-CN",
+        "language_validation:official_author_hosted_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:presentation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "kseg6_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "自我呈现",
+        "社会期许",
+        "成人",
+        "研究用途",
+        "中文工作译稿",
+        "CC BY 4.0",
+        "kseg6",
+        "adult_self_report",
+        "descriptive_report",
+        "non_diagnostic",
+        "domain:personality_self",
+        "construct:self_presentation",
+        "population:ages_18_unspecified",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "kusiv3_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "人际关系",
+        "人际信任",
+        "自我了解",
+        "成人",
+        "研究用途",
+        "中文工作译稿",
+        "CC BY 4.0",
+        "kusiv3",
+        "adult_self_report",
+        "descriptive_report",
+        "non_diagnostic",
+        "domain:social_emotional",
+        "construct:interpersonal_trust",
+        "population:ages_18_unspecified",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "l1_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "l1",
+        "domain:well_being",
+        "construct:life_satisfaction",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_nc_sa_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot",
+        "非商业",
+        "license:noncommercial"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "mslq_critical_thinking5",
+        "domain:learning_self_management",
+        "construct:course_critical_thinking_strategy",
+        "population:adult_college_research",
+        "response:self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:course_research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "mwq5_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "mwq5",
+        "domain:attention_cognition",
+        "construct:mind_wandering",
+        "population:adult_research",
+        "population:adolescent_source_evidence_only",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "orvis92_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "orvis92_zh_cn_research",
+        "domain:interests_career_exploration",
+        "construct:activity_preferences",
+        "construct:orvis_leadership",
+        "construct:orvis_organization",
+        "construct:orvis_altruism",
+        "construct:orvis_creativity",
+        "construct:orvis_analysis",
+        "construct:orvis_production",
+        "construct:orvis_adventure",
+        "construct:orvis_erudition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "phq4_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "phq4",
+        "anxiety_symptoms",
+        "depressive_symptoms",
+        "ultra_brief_screening",
+        "public_domain",
+        "adult_self_report",
+        "non_diagnostic",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_local_norms",
+        "domain:distress_behavior",
+        "construct:depressive_experience",
+        "construct:anxiety_experience",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "rses10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "rses10",
+        "self_esteem",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "non_diagnostic",
+        "public_domain",
+        "descriptive_report",
+        "no_verified_norms",
+        "domain:personality_self",
+        "construct:self_esteem",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "sas_sv10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "数字使用",
+        "智能手机",
+        "行为习惯",
+        "青少年原始验证",
+        "自评",
+        "10题",
+        "CC-BY",
+        "中文工作稿",
+        "非诊断",
+        "外部阈值未启用",
+        "domain:digital_behavior",
+        "construct:smartphone_use_difficulties",
+        "population:grade_8_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:cc_by",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "sci8_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "睡眠",
+        "失眠筛查",
+        "成人",
+        "自评",
+        "过去一个月",
+        "非商业",
+        "CC-BY-NC-4.0",
+        "独立中译待验证",
+        "非诊断",
+        "domain:sleep_recovery",
+        "construct:sleep_condition",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "use:research",
+        "use:not_diagnostic",
+        "license:noncommercial",
+        "license:cc_by_nc_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "sop2_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "optimism",
+        "pessimism",
+        "future_expectations",
+        "ultra_short",
+        "adult_self_report",
+        "research",
+        "individual_reflection",
+        "working_translation",
+        "cc_by_4_0",
+        "non_diagnostic",
+        "descriptive_report",
+        "domain:wellbeing_strength",
+        "construct:optimism_pessimism",
+        "population:adult_research",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "srq63_brown_miller_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "srq63_brown_miller",
+        "domain:self_regulation",
+        "construct:behavioral_self_regulation",
+        "population:adult_research",
+        "response:self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:professional_research",
+        "use:not_diagnostic",
+        "license:public_domain",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "sswq16_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tags": [
+        "学校幸福感",
+        "学习乐趣",
+        "学校归属",
+        "学习意义",
+        "学习表现体验",
+        "青少年",
+        "自评",
+        "CC-BY-4.0",
+        "独立中译待验证",
+        "非诊断",
+        "sswq16",
+        "student_self_report",
+        "grades_6_8",
+        "research",
+        "descriptive_report",
+        "domain:wellbeing_strength",
+        "construct:student_school_wellbeing",
+        "construct:school_connectedness",
+        "population:grades_6_8",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:local_validation_pending",
+        "language_validation:translation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    {
+      "identity": {
+        "instrumentKey": "tswq_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tags": [
+        "tswq_zh_cn",
+        "domain:teacher_workplace",
+        "construct:school_connectedness",
+        "construct:teaching_efficacy",
+        "construct:teacher_subjective_wellbeing",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:cc_by_4_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    }
+  ]
+}
