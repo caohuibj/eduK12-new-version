@@ -28,6 +28,8 @@ it('keeps teacher task panels unique when organization context loads',async()=>{
   await screen.findByRole('heading',{name:'我的学生观察任务'})
   await screen.findByText('目前没有可作答的教师观察任务。请确认任教关系、活动状态和测评发布情况。')
   await waitFor(()=>expect(screen.getAllByRole('heading',{name:'我的学生观察任务'})).toHaveLength(1))
+  const inbox=screen.getByText('目前没有可作答的教师观察任务。请确认任教关系、活动状态和测评发布情况。').closest('section')!
+  expect(inbox.compareDocumentPosition(screen.getByLabelText('当前学校'))&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   expect(errors.mock.calls.flat().join(' ')).not.toMatch(/same key/)
  }finally{errors.mockRestore();vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
