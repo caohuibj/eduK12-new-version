@@ -1042,5 +1042,6 @@
     "checkout": "2580cdbd24dbd41df306c81b9a00a53ad0f963a7",
     "artifact": 12580477362,
     "zipSHA256": "aa1b2ba5da15276c4dca3ba93c287816d55df9ae1893ef48aea9c83dc8e45adf"
-  }
+  },
+  "browserOrigin": "https://training.eduk12.top"
 }

@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
-import {binding,branch,surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
+import {binding,branch,surveyGovernancePlan,surveyGovernanceOutputs,assertBrowserOrigin} from './survey-governance-scope.mjs';
 import {verifyEvidence,loadEvidence,verifyReport,verifyTestRepairs,selectedOutcomes,changedLanguages,verifyBuiltFiles,sha} from './survey-governance-checks.mjs';import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const entries=()=>[...Object.entries(binding.source).map(([file,s])=>({file,status:s.status,oldMode:s.oldMode,newMode:s.newMode})),...binding.controls.map(file=>({file,status:binding.controlBefore[file]?'M':'A',oldMode:binding.controlBefore[file]?'100644':'000000',newMode:'100644'}))];
 const head='1'.repeat(40),source='2'.repeat(40),env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:source,CI_PR_NUMBER:'354',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version'};
@@ -35,3 +35,5 @@ const files={'index.html':Buffer.from('<script src="/assets/a.js"></script>'),'a
 const buildManifest=()=>({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,{bytes:b.length,sha256:sha(b)}]))});
 test('same complete original compiled artifact is admitted without rebuild',()=>verifyBuiltFiles(buildManifest(),p=>files[p],Object.keys(files)));
 test('changed or missing emitted bytes cannot retain original qualification',()=>{assert.throws(()=>verifyBuiltFiles(buildManifest(),p=>p==='assets/a.js'?Buffer.from('modified'):files[p],Object.keys(files)));assert.throws(()=>verifyBuiltFiles(buildManifest(),p=>files[p],['index.html']));});
+
+test("compiled UI origin preserves native HTTPS context and refuses insecure/lookalike origins",()=>{assertBrowserOrigin("https://training.eduk12.top");assert.throws(()=>assertBrowserOrigin("http://training.eduk12.top"));assert.throws(()=>assertBrowserOrigin("https://training.eduk12.top.evil.test"));});

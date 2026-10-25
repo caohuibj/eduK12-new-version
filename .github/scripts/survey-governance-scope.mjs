@@ -4,9 +4,11 @@ import {participantAccessOutputs} from './participant-access-scope.mjs';
 export const branch='work/survey-governance-20261025',marker='.github/scripts/survey-governance-bindings.json';
 export const binding=JSON.parse(readFileSync(new URL('./survey-governance-bindings.json',import.meta.url)));
 const git=(...a)=>execFileSync('git',a,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+export function assertBrowserOrigin(origin){assert.equal(origin,'https://training.eduk12.top','Compiled browser must use the fixed secure production context');}
 export function surveyGovernancePlan(entries,base,head,read=git,env=process.env){
  const selected=entries.some(e=>e.file===marker),ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
  if(!selected){if(ref===branch)throw Error('Survey governance binding missing; no platform/manual fallback');return null;}
+ assertBrowserOrigin(binding.browserOrigin);
  assert(['pull_request','push'].includes(env.CI_EVENT),'Manual/probe refused');
  assert.notEqual(env.CI_FORCE_FULL,'true','Full platform refused');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true');
  assert.equal(base,binding.base,'Main base drift');assert.equal(binding.base,'31d9e4cb933395acda3e2123f100a0a1a66a869b');

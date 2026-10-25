@@ -1840,3 +1840,14 @@ there is no second application build, DB restore, schema preparation or business
 test execution. Current browser reports keep new consumer execution identity
 separate from the original immutable build identity. Unknown requests and all
 mutations remain rejected; the stable selected-outcome check remains fail-closed.
+
+
+Run `40146622347` preserved the same qualified artifact and failed before any
+compiled-browser case completed: its plain HTTP simulated product origin lacks
+native crypto.randomUUID required by package UI initialization. The browser now
+fulfils the exact canonical HTTPS origin from the already hash-verified local
+artifact; it asserts native secure-context capabilities and never contacts live
+production. Insecure/lookalike origins are refused. No browser security flag,
+application fallback, weakened response validation or source rebuild is used.
+The new fixed secure browser origin is part of the candidate binding and scope
+contract; its direct control consumers and changed SAST run with those new inputs.
