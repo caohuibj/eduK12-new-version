@@ -1,5 +1,6 @@
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {ArrowLeft} from 'lucide-react'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import { MemoryRouter } from 'react-router-dom'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
@@ -19,8 +20,8 @@ export type CampusExecutionRef={
   resumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
-  api:SchoolApi;execution:CampusExecutionRef;title?:string
+export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,observer=false,observerTaskTitle}:{
+  api:SchoolApi;execution:CampusExecutionRef;title?:string;observer?:boolean;observerTaskTitle?:string
   onExit:()=>void;onFinished:()=>void
 }){
   const panelRef=useRef<HTMLElement>(null)
@@ -128,11 +129,19 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
   }
   const studentAnswer=Boolean(title&&state&&!done&&!child&&['FORM_SECTION','SCALE'].includes(state.currentItem?.type??''))
   const compactNotes=studentAnswer||Boolean(title&&child)
-  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(title&&child?' hs-school-task-runner--child':'')+(studentAnswer?' hs-school-task-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
+  const observerReady=observer&&!state&&!done
+  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(title&&child?' hs-school-task-runner--child':'')+(studentAnswer?' hs-school-task-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
+    {observerReady?<>
+      <div className="hs-observer-ready-toolbar"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回任务</button>
+        <SchoolTaskHelp label="作答与隐私说明" buttonText="作答说明"><p><strong>离开与提交</strong><br/>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p><strong>结果可见性</strong><br/>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></SchoolTaskHelp>
+      </div>
+      <header className="hs-observer-ready-heading"><p>教师观察测评</p><h2>{observerTaskTitle||'校园正式测评'}</h2></header>
+    </>:<>
     <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
     {!compactNotes&&<p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>}
     {title?<h1 hidden={Boolean(state)&&!done}>{title}</h1>:<h2 hidden={Boolean(state)}>校园正式测评</h2>}
     {compactNotes?<details className="hs-school-runner-help"><summary>任务与隐私说明</summary><p>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p>答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p></details>:<p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>}
+    </>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {done?<div role="status" className="hs-message">
       <h3>本次测评已完成</h3>
@@ -189,6 +198,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
         setChild(item)
       }}
     />:<div className="hs-school-task-launch">
+      {observerReady&&<p className="hs-observer-ready-prompt">确认任务后，开始或继续本次测评。</p>}
       {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">
         <h3>本次受控观察测评的知情同意</h3>
         <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>
@@ -199,9 +209,9 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
           <span>我已阅读本次测评的用途与可见性说明，自愿同意作答。</span>
         </label>
       </div>}
-      <button className="hs-primary" disabled={busy||(needsAdmissionConsent&&!consentAccepted)}
+      <button className="hs-primary" aria-label={observerReady&&!busy?'开始或继续正式测评':undefined} disabled={busy||(needsAdmissionConsent&&!consentAccepted)}
         onClick={()=>void start()}>
-        {busy?'正在核对正式测评…':'开始或继续正式测评'}
+        {busy?'正在核对正式测评…':observerReady?'开始／继续测评':'开始或继续正式测评'}
       </button>
     </div>}
   </section>

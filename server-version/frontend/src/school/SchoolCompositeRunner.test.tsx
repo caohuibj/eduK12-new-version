@@ -105,3 +105,24 @@ it('returns without promising to save or sending a submission',()=>{
   expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({campusMode:true,instructionsSummary:'作答说明'}))
   expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
  })
+
+
+it('keeps observer preparation concise without hiding required consent or starting automatically',()=>{
+ const api=vi.fn(),onExit=vi.fn()
+ render(<SchoolCompositeRunner observer observerTaskTitle="成长支持多角色问卷" api={api as unknown as SchoolApi}
+   execution={{...execution,consentRequired:true,consentPurpose:'教育观察',consentVisibility:'授权专业人员'}} onExit={onExit} onFinished={vi.fn()}/>)
+ expect(screen.getByRole('heading',{name:'成长支持多角色问卷'})).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'返回活动'})).not.toBeInTheDocument()
+ expect(screen.queryByText(/返回不会提交当前作答/)).not.toBeInTheDocument()
+ const start=screen.getByRole('button',{name:'开始或继续正式测评'})
+ expect(start).toBeDisabled()
+ expect(screen.getByText('用途：教育观察')).toBeVisible()
+ expect(screen.getByText('可见性政策：授权专业人员')).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'作答与隐私说明'}))
+ expect(screen.getByRole('note',{name:'作答与隐私说明'})).toHaveTextContent('尚未提交的内容可能无法保留')
+ fireEvent.click(screen.getByRole('checkbox',{name:'我已阅读本次测评的用途与可见性说明，自愿同意作答。'}))
+ expect(start).toBeEnabled()
+ fireEvent.click(screen.getByRole('button',{name:'返回任务'}))
+ expect(onExit).toHaveBeenCalledOnce()
+ expect(api).not.toHaveBeenCalled()
+})

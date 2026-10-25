@@ -1,7 +1,8 @@
-import { useCallback,useEffect,useId,useMemo,useRef,useState } from 'react'
-import {ClipboardList,Info,RefreshCw} from 'lucide-react'
+import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
+import {ClipboardList,RefreshCw} from 'lucide-react'
 import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollectionControls'
 import {schoolSearchText,schoolDeadline} from './school-collection'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
 
@@ -13,23 +14,6 @@ type TeacherRunTask={
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
 }
 type Inbox={list:TeacherRunTask[];truncated:boolean}
-
-function TeacherTaskHelp(){
-  const [open,setOpen]=useState(false)
-  const root=useRef<HTMLDivElement>(null),toggle=useRef<HTMLButtonElement>(null),id=useId()
-  useEffect(()=>{
-    if(!open)return
-    const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false)}
-    const close=()=>setOpen(false)
-    document.addEventListener('pointerdown',outside)
-    document.addEventListener('scroll',close,true)
-    return()=>{document.removeEventListener('pointerdown',outside);document.removeEventListener('scroll',close,true)}
-  },[open])
-  return <div ref={root} className="hs-teacher-task-help" onMouseLeave={()=>setOpen(false)} onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setOpen(false)}} onKeyDown={event=>{if(event.key==='Escape'){setOpen(false);toggle.current?.focus()}}}>
-    <button ref={toggle} type="button" aria-label="观察任务与隐私说明" aria-expanded={open} aria-controls={open?id:undefined} onClick={()=>setOpen(value=>!value)}><Info size={16} aria-hidden="true"/>任务说明</button>
-    {open&&<div id={id} className="hs-teacher-task-help-content" role="note" aria-label="观察任务与隐私说明"><p>仅显示学校正式发布、本人当前任教班级内的观察测评。学生使用独立校园观察编号核对身份；这里不显示登录名、其他学生答案或心理报告。</p><p>学生个人心理结果不会因教师作答自动开放。</p></div>}
-  </div>
-}
 
 /** Observers never receive student login names, responses or individual
  * psychological results. Execution rights remain with the canonical Run.
@@ -67,8 +51,8 @@ export function SchoolTeacherTasks({api,organizationId,compact=false}:{api:Schoo
   const refreshButton=<button type="button" disabled={busy} onClick={()=>void refresh()} aria-label={busy?'正在读取…':error?'重试读取观察任务':'刷新观察任务'} title="刷新观察任务"><RefreshCw size={18} aria-hidden="true"/></button>
   return <section className={'hs-panel hs-task-view hs-teacher-tasks'+(compact?' hs-teacher-tasks--compact':'')}>
     <details className="hs-task-inbox" open={!active}>
-    <summary hidden={!active}>查看任务列表</summary>
-    <header className="hs-teacher-task-heading"><div className="hs-teacher-task-summary"><h2>我的学生观察任务</h2>{inbox&&<p className="hs-collection-summary" role="status">{query?`检索到 ${visible.length} 项`:`${inbox.list.length} 项观察任务`}{inbox.truncated?' · 检索和排序仅作用于当前已加载任务':''}</p>}{compact&&<TeacherTaskHelp/>}</div>
+    <summary hidden={!active||compact}>查看任务列表</summary>
+    <header className="hs-teacher-task-heading"><div className="hs-teacher-task-summary"><h2>我的学生观察任务</h2>{inbox&&<p className="hs-collection-summary" role="status">{query?`检索到 ${visible.length} 项`:`${inbox.list.length} 项观察任务`}{inbox.truncated?' · 检索和排序仅作用于当前已加载任务':''}</p>}{compact&&<SchoolTaskHelp><p>仅显示学校正式发布、本人当前任教班级内的观察测评。学生使用独立校园观察编号核对身份；这里不显示登录名、其他学生答案或心理报告。</p><p>学生个人心理结果不会因教师作答自动开放。</p></SchoolTaskHelp>}</div>
     {inbox?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel="检索观察任务" placeholder="搜索任务、活动名称或观察编号" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={refreshButton}/>:refreshButton}</header>
     {!compact&&<details className="hs-teacher-task-help"><summary>观察任务与隐私说明</summary><p>仅显示学校正式发布、本人当前任教班级内的观察测评。学生使用独立校园观察编号核对身份；这里不显示登录名、其他学生答案或心理报告。</p></details>}
     {error&&<p role="alert" className="hs-alert">{error}</p>}
@@ -93,7 +77,8 @@ export function SchoolTeacherTasks({api,organizationId,compact=false}:{api:Schoo
     {inbox&&inbox.list.length>0&&visible.length===0&&<p className="hs-collection-empty">没有匹配的已加载观察任务，请尝试其他关键词。</p>}
     {inbox?.truncated&&<p>任务数量较多，仅展示最近的部分任务；请联系学校管理员核查分配。</p>}
     </details>
-    {active&&<SchoolCompositeRunner api={api} execution={active}
+    {active&&<SchoolCompositeRunner api={api} execution={active} observer={compact}
+      observerTaskTitle={compact?inbox?.list.find(item=>item.executionId===active.executionId)?.runTitle:undefined}
       onExit={()=>setActive(null)}
       onFinished={()=>{setActive(null);void refresh()}}/>}
   </section>
