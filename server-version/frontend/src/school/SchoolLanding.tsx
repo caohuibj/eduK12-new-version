@@ -34,7 +34,7 @@ export function SchoolPublicHeader({ onHome, onLogin, onRegister, onExplore, hom
   }, [open])
   const act = (action: () => void) => { setOpen(false); action() }
   return <header className={`hs-public-header${home ? ' hs-public-header--landing' : ''}`} ref={header}>
-    <button className="hs-home-link" type="button" onClick={() => act(onHome)} aria-label="School 首页"><SchoolMark home={home} /></button>
+    <button className="hs-home-link" type="button" onClick={() => act(onHome)} aria-label="School 首页"><SchoolMark /></button>
     <nav className={`hs-public-nav${open ? ' hs-public-nav-open' : ''}`} id="hs-public-navigation" aria-label="校园导航">
       <button type="button" onClick={() => act(onHome)} aria-current={home ? 'page' : undefined}>首页</button>
       <a href="#hs-features" onClick={event => { event.preventDefault(); act(() => onExplore('hs-features')) }}>产品功能</a>

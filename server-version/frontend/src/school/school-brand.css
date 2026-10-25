@@ -1,0 +1,21 @@
+/* One outlined School wordmark on public, account, workspace and management pages.
+   Only the emblem palette changes at night; its original vector contours remain. */
+.hs-emblem.hs-emblem--dark{display:none}
+[data-theme=dark] .hs-emblem.hs-emblem--light{display:none}
+[data-theme=dark] .hs-emblem.hs-emblem--dark{display:block}
+.hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand{gap:14px}
+.hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-icon{width:82px;height:60px;object-fit:contain}
+.hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-wordmark{width:142px}
+@media(max-width:1000px){
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-icon{width:70px;height:52px}
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-wordmark{width:130px}
+}
+@media(max-width:600px){
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand{gap:6px}
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-icon{width:44px;height:38px}
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-wordmark{width:92px}
+}
+@media(max-width:360px){
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-icon{width:30px}
+ .hs-app .hs-public-header:not(.hs-public-header--landing) .hs-brand-wordmark{width:68px}
+}

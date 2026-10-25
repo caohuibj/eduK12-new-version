@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { SchoolHeroMark, SchoolMark } from './SchoolMark'
 import emblem from './huischool-a1-emblem.svg?raw'
-import wordmark from './huischool-wordmark.svg?raw'
-import wordmarkUrl from './huischool-wordmark.svg'
+import wordmark from './school-home-wordmark.svg?raw'
+import darkEmblem from './huischool-a1-emblem-dark.svg?raw'
+import wordmarkUrl from './school-home-wordmark.svg'
 
 describe('School approved A1 vector identity',()=>{
  it('renders the original emblem and a two-line themeable vector wordmark',()=>{
@@ -14,7 +15,7 @@ describe('School approved A1 vector identity',()=>{
   expect(container.querySelector('.hs-brand-icon')).toHaveAttribute('src',expect.stringContaining('huischool-a1-emblem.svg'))
   expect(container.querySelector('.hs-brand')).toHaveAttribute('aria-label','School @eduk12.top')
   expect(screen.queryByText(/林间见心|Huischool/)).not.toBeInTheDocument()
-  for(const source of [emblem,wordmark]){
+  for(const source of [emblem,darkEmblem,wordmark]){
    expect(source).toContain('<path')
    expect(source).toContain('viewBox=')
    expect(source).not.toMatch(/<image|data:image|<rect|<text|<foreignObject/)
