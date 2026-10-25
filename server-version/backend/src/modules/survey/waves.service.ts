@@ -7,6 +7,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
+import { compileFrozenResearchUnit,resolveSurveyMeasurementUnit,surveyMeasurementPublicationMode,type ResearchFrozenUnit } from './publication.service'
 import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
@@ -286,10 +287,12 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:'linkage_disclosure',ok:linkedConfirmed,
       issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
   }
+  const measured:ResearchFrozenUnit[]=[]
   for(const draft of input.drafts){
     if(draft.catalogGrantId){
       const compiled=compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!)
       checks.push({key:draft.id,ok:true,issues:[],digest:compiled.sourceDigest})
+      if(surveyMeasurementPublicationMode(compiled)==='EXPLICIT')measured.push(compiled)
       continue
     }
     const compilation=previewResearchInstrument({
@@ -299,14 +302,30 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     checks.push({key:draft.id,ok:compilation.ok,
       issues:compilation.issues.map(issue=>issue.path+': '+issue.message),
       digest:compilation.definitionDigest})
+    if(compilation.ok&&draft.kind!=='FORM')measured.push(compileFrozenResearchUnit(draft))
   }
+  if(measured.length)await prisma.$transaction(async tx=>{
+    await ownProject(tx,uid,pid,false)
+    for(const unit of measured){
+      try{
+        // Resolve the same owner/project/revision/hash as freeze; no publication
+        // or draft pointer writes. Freeze must still recheck under its own locks.
+        const release=await resolveSurveyMeasurementUnit(tx,unit,uid,pid)
+        checks.push({key:unit.draftId+':measurement',ok:true,issues:[],digest:release.contentHash})
+      }catch(error){
+        if(!(error instanceof SurveyWaveError))throw error
+        checks.push({key:unit.draftId+':measurement',ok:false,
+          issues:[unit.title+'（修订 '+unit.draftRevision+'）：'+error.message]})
+      }
+    }
+  })
   // This preflight is NOT a publish operation. It writes no Participant, Wave
   // Attempt, public token or scientific catalog status.
   return {projectId:pid,waveId:wid,revision:input.wave.revision,
     selectionDigest:canonicalHash(input.selected),checks,
     ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
       (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
-      (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)&&checks.every(c=>c.ok),
+      (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)+measured.length&&checks.every(c=>c.ok),
     publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
     reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
       ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'

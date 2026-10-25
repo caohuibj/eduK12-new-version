@@ -81,6 +81,14 @@ export interface ResearchFrozenPublication {
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
 
+/** One publication rule for read-only preflight and locked freeze. Catalog
+ * families still migrated at freeze must not gain an extra manual publish step. */
+export function surveyMeasurementPublicationMode(unit:Pick<ResearchFrozenUnit,'kind'|'sourceProvenance'>):'NONE'|'EXPLICIT'|'AT_FREEZE'{
+  if(unit.kind==='FORM')return 'NONE'
+  return unit.sourceProvenance&&(unit.kind!=='SCALE'||Boolean(unit.sourceProvenance.surveyPackage))
+    ?'AT_FREEZE':'EXPLICIT'
+}
+
 /** Both paths derive identical identity from the existing compiler and adapters. */
 export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:string,projectId:string){
   if(unit.kind==='FORM')throw new SurveyWaveError(400,'普通表单不生成测量版本')
@@ -218,7 +226,7 @@ export async function freezeResearchWaveDraft(input:{
       if (unit.kind === 'FORM') continue
       // Scale catalog imports now use the same explicit publication action as
       // native drafts. Other catalog families retain their separate migration.
-      const release=unit.sourceProvenance&&(unit.kind!=='SCALE'||Boolean(unit.sourceProvenance.surveyPackage))
+      const release=surveyMeasurementPublicationMode(unit)==='AT_FREEZE'
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
