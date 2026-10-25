@@ -117,7 +117,7 @@ it('keeps observer preparation concise without hiding required consent or starti
  const start=screen.getByRole('button',{name:'开始或继续正式测评'})
  expect(start).toBeDisabled()
  expect(screen.getByText('用途：教育观察')).toBeVisible()
- expect(screen.getByText('可见性政策：授权专业人员')).toBeVisible()
+ expect(screen.getByText('共享范围：授权专业人员')).toBeVisible()
  fireEvent.click(screen.getByRole('button',{name:'作答与隐私说明'}))
  expect(screen.getByRole('note',{name:'作答与隐私说明'})).toHaveTextContent('尚未提交的内容可能无法保留')
  fireEvent.click(screen.getByRole('checkbox',{name:'我已阅读本次测评的用途与可见性说明，自愿同意作答。'}))
@@ -155,4 +155,28 @@ it('shows a single plain-language observer completion with one return action',as
  fireEvent.click(screen.getByRole('button',{name:'返回任务列表'}))
  expect(finished).toHaveBeenCalledOnce()
  expect(api).toHaveBeenCalledTimes(2)
+})
+
+
+it.each([
+ ['PRIVATE_RESPONDENT','本次同意不额外授权向其他人员共享结果。'],
+ ['ASSIGNING_TEACHER','本次同意包含向任务布置方共享结果的授权。'],
+ ['SHARED_COURSE_LEAD','本次同意包含向课程负责人共享结果的授权。'],
+])('presents the existing observer consent scope %s readably without accepting it', (visibility,text)=>{
+ const api=vi.fn()
+ const purpose='organization_run:FORM:private-form:SCHOOL:synthetic:STUDENT:TEACHER_REPORT:1.0.0'
+ render(<SchoolCompositeRunner observer api={api as unknown as SchoolApi} execution={{...execution,consentRequired:true,consentPurpose:purpose,consentVisibility:visibility}} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ expect(screen.getByText('用途：填写本次学校安排的观察问卷。')).toBeVisible()
+ expect(screen.getByText('共享范围：'+text)).toBeVisible()
+ expect(screen.queryByText(purpose,{exact:false})).not.toBeInTheDocument()
+ expect(screen.getByRole('checkbox')).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'开始或继续正式测评'})).toBeDisabled()
+ expect(api).not.toHaveBeenCalled()
+})
+
+it('preserves unfamiliar consent wording instead of guessing its permissions',()=>{
+ render(<SchoolCompositeRunner observer api={vi.fn() as unknown as SchoolApi} execution={{...execution,consentRequired:true,consentPurpose:'学校提供的具体用途',consentVisibility:'CUSTOM_REVIEW_ONLY'}} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ expect(screen.getByText('用途：学校提供的具体用途')).toBeVisible()
+ expect(screen.getByText('共享范围：CUSTOM_REVIEW_ONLY')).toBeVisible()
+ expect(screen.getByRole('checkbox')).not.toBeChecked()
 })

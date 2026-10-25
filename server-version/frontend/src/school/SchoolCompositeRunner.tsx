@@ -132,6 +132,19 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
   const observerReady=observer&&!state&&!done
   const observerAnswer=observer&&ordinaryAnswer
   const observerComplete=observer&&done
+  const consentPurpose=observer&&execution.consentPurpose?.startsWith('organization_run:FORM:')
+    ?'填写本次学校安排的观察问卷。'
+    :observer&&execution.consentPurpose?.startsWith('organization_run:SCALE:')
+      ?'完成本次学校安排的观察量表。'
+      :execution.consentPurpose||'学校正式授权的教育观察'
+  const observerVisibility:Record<string,string>={
+    PRIVATE_RESPONDENT:'本次同意不额外授权向其他人员共享结果。',
+    ASSIGNING_TEACHER:'本次同意包含向任务布置方共享结果的授权。',
+    SHARED_COURSE_LEAD:'本次同意包含向课程负责人共享结果的授权。',
+  }
+  const consentVisibility=observer&&execution.consentVisibility&&observerVisibility[execution.consentVisibility]
+    ||execution.consentVisibility||'仅限经授权人员'
+
   return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(observerComplete?' hs-observer-runner--done':'')+(title&&child?' hs-school-task-runner--child':'')+(ordinaryAnswer?' hs-school-task-runner--answer':'')+(observerAnswer?' hs-observer-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答"
     onMouseOut={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
     onPointerDownCapture={observerAnswer?event=>{const details=panelRef.current?.querySelector<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.target as Node))details.open=false}:undefined}
@@ -207,10 +220,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
     />:<div className="hs-school-task-launch">
       {observerReady&&<p className="hs-observer-ready-prompt">确认任务后，开始或继续本次测评。</p>}
       {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">
-        <h3>本次受控观察测评的知情同意</h3>
-        <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>
-        <p>可见性政策：{execution.consentVisibility||'仅限经授权人员'}</p>
-        <p>是否可披露任何个人心理报告仍由独立的报告政策决定，拒绝同意不会触发作答。</p>
+        <h3>{observer?'测评知情同意':'本次受控观察测评的知情同意'}</h3>
+        <p>用途：{consentPurpose}</p>
+        <p>{observer?'共享范围：':'可见性政策：'}{consentVisibility}</p>
+        <p className="hs-consent-report-note">{observer?'完成作答不会自动开放学生个人心理报告；不同意则不会开始测评。':'是否可披露任何个人心理报告仍由独立的报告政策决定，拒绝同意不会触发作答。'}</p>
         <label className="hs-consent"><input type="checkbox"
           checked={consentAccepted} onChange={e=>setConsentAccepted(e.target.checked)}/>
           <span>我已阅读本次测评的用途与可见性说明，自愿同意作答。</span>
