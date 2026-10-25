@@ -134,10 +134,14 @@ type FrozenRawItem=Readonly<{
 const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly FrozenRawItem[]=>{
   const output:FrozenRawItem[]=[]
   const emptyOptions:FrozenRawItem['options']=Object.freeze([])
-  const optionsFor=(options:readonly {optionKey:string;label:string;nonanswerReason?:string}[])=>includeOptions
-    ?Object.freeze(options.map(o=>Object.freeze({code:o.optionKey,label:o.label,
-      ...(o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})})))
-    :emptyOptions
+  const optionTables=new Map<readonly {optionKey:string;label:string;nonanswerReason?:string}[],FrozenRawItem['options']>()
+  const optionsFor=(options:readonly {optionKey:string;label:string;nonanswerReason?:string}[])=>{
+    if(!includeOptions)return emptyOptions
+    let table=optionTables.get(options)
+    if(!table){table=Object.freeze(options.map(o=>Object.freeze({code:o.optionKey,label:o.label,
+      ...(o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})})));optionTables.set(options,table)}
+    return table
+  }
   const add=(item:FrozenRawItem)=>output.push(Object.freeze(item))
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
