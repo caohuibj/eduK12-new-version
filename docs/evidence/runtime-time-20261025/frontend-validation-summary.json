@@ -1,0 +1,41 @@
+{
+  "kind": "local-development-diagnostic-not-ci-qualification",
+  "base": "25215dc",
+  "files": {
+    "server-version/frontend/src/product-entry.ts": "74de6ff88d4b980d88426efbcd77cf3f6922c5464590853a32cb4ed04186a7c8",
+    "server-version/frontend/src/product-entry.development.test.ts": "db7435a7f4362002f6bb5b5c81dd064387ef4096068b8ac5f897e8192c3f810f",
+    "server-version/frontend/src/products/development-entry.ts": "dbebf41646f94bd6e52ec191176694e6150cae02ec961c560c05c077566ed72a",
+    "server-version/frontend/src/products/origins.ts": "94eed0ccb129c808a7e7f2d7a9ffba74618a431271668f1db2d5588bfcb33e44",
+    "server-version/frontend/src/products/origins.development.test.ts": "c0976121b72f854a8ca5160d33fe5116a75c2ebf6deaa53d6ee059f5045dd300",
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": "aab4d3e1ba400adc23c924ca11203437688f075640a01ac526fee4528685b9ca",
+    "docs/local-survey-development-entry.md": "5065c58ad555975f1aed04f1b79db0ef16ff94ccc412b6b970059aa45c8a0d82",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "test_report": "loopback-links-tests.json",
+  "passed_tests": 160,
+  "test_exit": 0,
+  "changed_file_eslint_exit": 0,
+  "app_types_exit": 0,
+  "diff_check_exit": 0,
+  "checks_scope": "Current changed entry/helper/origin graph, existing origin and entry contracts, actual AdminLogin component. No production build, CI, login or backend authorization qualification.",
+  "browser": "Root owns live CUA verification; not duplicated by this worker.",
+  "browserObservation": {
+    "observedAt": "2026-10-25T04:00:59Z",
+    "method": "Root CUA observation of isolated Vite development source; no credentials entered",
+    "frontendPort": 5174,
+    "backendUnchanged": true,
+    "checks": [
+      "Research homepage rendered on localhost",
+      "Researcher login page rendered with password and two-factor flow",
+      "Administrator login remained the platform route with password and TOTP controls",
+      "Administrator home link returned to the localhost Research homepage without the failed subdomain"
+    ],
+    "notVerified": [
+      "authenticated login",
+      "activation or invitation tokens",
+      "participant submission",
+      "production build",
+      "root cause of the original subdomain TLS error"
+    ]
+  }
+}

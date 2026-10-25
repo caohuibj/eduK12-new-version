@@ -1,3 +1,4 @@
+import { isLoopbackSurveyDevelopment } from './development-entry'
 import { TRAINING_HOST } from '../training/context'
 import { SURVEY_HOST } from '../survey/context'
 
@@ -19,7 +20,7 @@ export function productOrigins(origin = currentOrigin(), development = import.me
       const suffix = url.port ? `:${url.port}` : ''
       return {
         admin: `${url.protocol}//${host === '127.0.0.1' ? host : 'localhost'}${suffix}`,
-        survey: `${url.protocol}//survey.localhost${suffix}`,
+        survey: isLoopbackSurveyDevelopment(host, development) ? url.origin : `${url.protocol}//survey.localhost${suffix}`,
       }
     }
   } catch { /* Unsupported origins must not silently send a local capability to production. */ }

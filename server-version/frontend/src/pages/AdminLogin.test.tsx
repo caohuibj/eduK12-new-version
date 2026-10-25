@@ -23,7 +23,7 @@ beforeEach(()=>{
   csrf.mockResolvedValue({code:0,data:{csrfToken:'synthetic-csrf'}})
   login.mockResolvedValue({code:0,data:{user:{id:'admin',username:'synthetic-admin',role:'ADMIN',platformRole:'SYSTEM_ADMIN',entryGrants:[]}}})
 })
-afterEach(()=>vi.unstubAllGlobals())
+afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs()})
 describe('administrator login flow',()=>{
   it('keeps Survey appearance through login and enrollment without theming the generic entry',async()=>{
     login.mockResolvedValue({code:0,data:{user:{id:'survey-admin',username:'survey-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}}})
@@ -54,6 +54,16 @@ describe('administrator login flow',()=>{
     expect(screen.getByRole('button',{name:'如何使用验证器'})).toBeVisible()
     submit()
     expect(await screen.findByText('destination:/admin/survey-researchers')).toBeInTheDocument()
+  })
+  it('keeps Survey administrator home and feature links on the explicit loopback entry',()=>{
+    vi.stubEnv('DEV',true);vi.stubEnv('VITE_DEV_PRODUCT','survey')
+    mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+    expect(screen.getByRole('link',{name:'首页'})).toHaveAttribute('href',window.location.origin+'/?appearance=auto')
+    expect(screen.getByRole('link',{name:'Research 首页'})).toHaveAttribute('href',window.location.origin+'/?appearance=auto')
+    for(const link of screen.getByRole('navigation',{name:'研究平台导航'}).querySelectorAll('a')){
+      expect(new URL(link.href).origin).toBe(window.location.origin)
+    }
+    expect(login).not.toHaveBeenCalled()
   })
   it('presents Training management and returns a Training-only administrator to its workspace',async()=>{
     login.mockResolvedValue({code:0,data:{user:{id:'training-admin',username:'synthetic-training-admin',role:'ADMIN',businessRole:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]}}})
