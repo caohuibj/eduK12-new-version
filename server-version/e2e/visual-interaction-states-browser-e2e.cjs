@@ -221,42 +221,52 @@ async function main() {
           let release
           const wait = new Promise(resolve => { release = resolve })
           let failed = state === 'error'
-          const deepLink = ['populated', 'filtered-empty'].includes(state)
+          const deepLink = state === 'populated'
           const assignmentRequests = new Set()
+          let filteredRequest = false
+          const assignment = {
+            id: 'visual-list', title: longTitle, courseId: sampleCourse.id,
+            course: { id: sampleCourse.id, title: '跨学科学习与成长观察课程 · Long Course Name', courseCode: sampleCourse.courseCode, creatorId: sampleCourse.creatorId },
+            status: 'PUBLISHED', description: '', content: '', deadline: '2099-10-01T10:00:00Z',
+            tags: ['学习反思', '成长观察'], questions: [], videos: [], images: [], documents: [],
+            createdAt: '2026-09-01T00:00:00.000Z', updatedAt: '2026-09-01T00:00:00.000Z',
+            _count: { submissions: 13 }, mySubmission: null,
+          }
           await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
           await page.route(/\/api\/assignments(?:\?.*)?$/, async route => {
             assignmentRequests.add('/assignments')
             assert.equal(route.request().method(), 'GET')
             if (state === 'loading') await wait
-            return fulfill(route, { list: [] }, failed ? 503 : 200)
+            const search = new URL(route.request().url()).searchParams.get('search')
+            if (search === 'unmatched') filteredRequest = true
+            const list = state === 'filtered-empty' && !search ? [assignment] : []
+            return fulfill(route, { list, total: list.length }, failed ? 503 : 200)
           })
           await page.route('**/api/assignments/visual-list', route => {
             assignmentRequests.add('/assignments/visual-list')
             assert.equal(route.request().method(), 'GET')
-            return fulfill(route, {
-              id: 'visual-list', title: longTitle, courseId: sampleCourse.id,
-              course: { id: sampleCourse.id, title: '跨学科学习与成长观察课程 · Long Course Name', courseCode: sampleCourse.courseCode, creatorId: sampleCourse.creatorId },
-              status: 'PUBLISHED', description: '', content: '', deadline: '2099-10-01T10:00:00Z',
-              tags: ['学习反思', '成长观察'], questions: [], videos: [], images: [], documents: [],
-              createdAt: '2026-09-01T00:00:00.000Z', updatedAt: '2026-09-01T00:00:00.000Z',
-              _count: { submissions: 13 }, mySubmission: null,
-            })
+            return fulfill(route, assignment)
           })
           // Empty/loading/error are list states; an id resolves one authorized detail.
           await page.goto(base + (deepLink ? '/assignments?id=visual-list' : '/assignments'))
-          if (state === 'loading') await page.getByText('正在加载作业', { exact: true }).waitFor()
-          else if (failed) await page.getByText('作业列表加载失败', { exact: true }).waitFor()
-          else if (state === 'empty') await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+          if (state === 'loading') await page.getByText('正在加载练习', { exact: true }).waitFor()
+          else if (failed) await page.getByText('练习列表加载失败', { exact: true }).waitFor()
+          else if (state === 'empty') await page.getByText('暂无匹配练习', { exact: true }).waitFor()
           else {
             await page.getByRole('button', { name: longTitle, exact: true }).waitFor()
             assert.equal(await page.locator('#assignment-record-visual-list').count(), 1, 'one record at all widths')
-            await page.locator('#assignment-record-visual-list:focus').waitFor()
-            assert.equal(await page.locator('#assignment-record-visual-list').evaluate(el => el === document.activeElement), true, 'course handoff focuses the record')
-            assert.deepEqual([...assignmentRequests], ['/assignments/visual-list'], 'deep link reads only its exact detail API')
+            if (deepLink) {
+              await page.locator('#assignment-record-visual-list:focus').waitFor()
+              assert.equal(await page.locator('#assignment-record-visual-list').evaluate(el => el === document.activeElement), true, 'course handoff focuses the record')
+              assert.deepEqual([...assignmentRequests], ['/assignments/visual-list'], 'deep link reads only its exact detail API')
+            }
             if (width < 768) assert.equal(await page.locator('.staff-record-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1), true, 'mobile records need no horizontal scrolling')
             if (state === 'filtered-empty') {
-              await page.getByRole('searchbox', { name: '搜索作业' }).fill('unmatched')
-              await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+              await page.getByText('检索与筛选', { exact: true }).click()
+              await page.getByRole('searchbox', { name: '搜索练习' }).fill('unmatched')
+              await page.getByRole('button', { name: '查询', exact: true }).click()
+              await page.getByText('暂无匹配练习', { exact: true }).waitFor()
+              assert.equal(filteredRequest, true, 'list filtering reaches the scoped list API')
             }
           }
           await capture(page, `assignments-${state}`, width)
@@ -264,17 +274,17 @@ async function main() {
             const request = page.waitForRequest(request => request.url().endsWith('/assignments/visual-list/submissions'))
             await page.getByRole('button', { name: '查看提交', exact: true }).press('Enter')
             assert.equal((await request).method(), 'GET')
-            await page.getByRole('dialog', { name: '作业提交列表', exact: true }).waitFor()
-            await page.getByLabel('关闭作业提交列表', { exact: true }).click()
+            await page.getByRole('dialog', { name: '练习提交列表', exact: true }).waitFor()
+            await page.getByLabel('关闭练习提交列表', { exact: true }).click()
             await page.getByLabel(`${longTitle} 的更多操作`, { exact: true }).press('Enter')
             assert.equal(await page.getByRole('button', { name: '导出提交', exact: true }).isVisible(), true)
           }
           release()
           if (failed) {
-            assert.equal(await page.getByText('暂无匹配作业', { exact: true }).count(), 0)
+            assert.equal(await page.getByText('暂无匹配练习', { exact: true }).count(), 0)
             failed = false
             await page.getByRole('button', { name: '重试', exact: true }).click()
-            await page.getByText('暂无匹配作业', { exact: true }).waitFor()
+            await page.getByText('暂无匹配练习', { exact: true }).waitFor()
           }
         }, 'assignment-list-states')
         assignmentResults.push({ state, passed: true })
