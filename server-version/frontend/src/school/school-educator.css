@@ -33,7 +33,7 @@
 @media(max-width:1000px){
  .hs-app.hs-workspace.hs-educator .hs-header{grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
  .hs-app.hs-workspace.hs-educator .hs-header nav.hs-account-actions{grid-column:2;grid-row:1;width:auto}
- .hs-app.hs-workspace.hs-educator .hs-header nav.hs-educator-navigation{grid-column:1/-1;grid-row:2;justify-self:stretch;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding-top:10px;border-top:1px solid var(--hs-border)}
+ .hs-app.hs-workspace.hs-educator .hs-header nav.hs-educator-navigation{grid-column:1/-1;grid-row:2;justify-self:stretch;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;padding-top:10px;border-top:1px solid var(--hs-border)}
 }
 @media(max-width:360px){
  .hs-app.hs-workspace.hs-educator .hs-header{grid-template-columns:minmax(0,1fr)}

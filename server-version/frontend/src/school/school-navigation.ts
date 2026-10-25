@@ -12,6 +12,13 @@ export function canReadSchoolClasses(access:SchoolAccess|null):boolean {
   ||(access.personas.includes('COUNSELOR')&&access.capabilities.includes('PSYCHOLOGY_STAFF'))
 }
 
+/** Activity management is shown to school governors and authorized psychology staff. */
+export function canManageSchoolActivities(access:SchoolAccess|null):boolean {
+ if(!access||access.explicitDenies.some(x=>['*','ORGANIZATION_GOVERNANCE','ACTIVITY_MANAGE'].includes(x)))return false
+ return (access.orgRole==='ORG_ADMIN'&&access.canGovern)
+  ||(access.personas.includes('COUNSELOR')&&access.capabilities.includes('PSYCHOLOGY_STAFF')&&!access.explicitDenies.includes('PSYCHOLOGY_STAFF'))
+}
+
 /** Presentation only: mounted features retain their existing API and capability gates. */
 export function schoolNavigation(role:string,status:string,access:SchoolAccess|null,parentReports:boolean,canAuthorPrivateTools=false):SchoolNavigationItem[]{
  const items:SchoolNavigationItem[]=[{id:'overview',label:'校园概览',group:'校园空间',description:'从这里进入你的校园功能。',icon:House}]
@@ -34,7 +41,7 @@ export function schoolNavigation(role:string,status:string,access:SchoolAccess|n
   if(canAuthorPrivateTools)add('private-tools','我的工具','校园活动','编制本人私有量表和表单，检查并固定版本。',BookOpen)
   if(access){
    if(access.personas.includes('TEACHER'))add('tasks','学生观察任务','校园活动','查看你的教师观察任务。',ClipboardList)
-   add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)
+   if(canManageSchoolActivities(access))add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)
    if(canReadSchoolClasses(access))add('classes','学校与班级','学校管理','查看学校和班级；管理员可维护年级与班级。',School)
    if(admin||psych){
     add('admission','班级注册与审批','学校管理','处理注册进度、名册与班级审批。',ClipboardList)

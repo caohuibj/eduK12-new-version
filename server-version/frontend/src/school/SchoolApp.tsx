@@ -8,7 +8,7 @@ import { useProductTheme } from '../components/product-theme/useProductTheme'
 import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
-import { canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
+import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
@@ -505,12 +505,12 @@ export default function SchoolApp(){
           {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
           {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
             &&page==='activities'&&schoolId
-            &&(schoolAdmin||psychologyStaff||access?.personas.includes('TEACHER'))
+            &&canManageSchoolActivities(access)
             &&<details className="hs-panel"><summary>评价与报告隐私偏好（只需设置一次）</summary>
               <ReportPrivacyPreferences key={schoolId} organizationId={schoolId} api={api}
                 scenarios={['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']}/>
             </details>}
-          {page==='activities'&&schoolId&&access&&<SchoolActivityManager
+          {page==='activities'&&schoolId&&access&&canManageSchoolActivities(access)&&<SchoolActivityManager
             key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
             compact={ordinaryTeacher} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
