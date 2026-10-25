@@ -2155,6 +2155,11 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   const publicationSource=await loadComposite(id,true,db)
   await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
+  // Shared P/R insertion or material locks may have waited past expiry. Repeat
+  // CURRENT exact use/deployment rights after those waits, immediately before
+  // publication; only immutable source bodies can be reused in this transaction.
+  for(const item of publicationSource.items)if(item.standardCombinationSource!=null)
+    await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,publicationSource,item)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
