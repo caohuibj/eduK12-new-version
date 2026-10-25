@@ -35,7 +35,7 @@ import SurveyLibraryAdmin from './SurveyLibraryAdmin'
 import StandardTripletWorkspace from './StandardTripletWorkspace'
 import {useAuth} from '../../contexts/AuthContext'
 export default function ScaleLibraryGovernance(){const location=useLocation(),{user}=useAuth();return new URLSearchParams(location.search).get('workspace')==='survey'?<SurveyLibraryAdmin/>:user?.platformRole==='SYSTEM_ADMIN'?<StandardTripletWorkspace authored={<LegacyScaleLibraryGovernance authoredOnly/>}/>:<LegacyScaleLibraryGovernance/>}
-function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolean}={}) {
+export function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolean}={}) {
   const {user}=useAuth()
   const systemContext=user?.platformRole==='SYSTEM_ADMIN'
   const [view, setView] = useState<'catalog' | 'submissions'>(authoredOnly?'submissions':'catalog')

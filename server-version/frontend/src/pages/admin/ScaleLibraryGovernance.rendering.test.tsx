@@ -1,7 +1,10 @@
 import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {MemoryRouter} from 'react-router-dom'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
-import ScaleLibraryGovernance from './ScaleLibraryGovernance'
+import {LegacyScaleLibraryGovernance} from './ScaleLibraryGovernance'
+import {AuthProvider,useAuth} from '../../contexts/AuthContext'
+const session=vi.hoisted(()=>({me:vi.fn()}))
+vi.mock('../../api/auth',()=>({authApi:{me:session.me}}))
 const api=vi.hoisted(()=>({catalog:vi.fn(),catalogDetail:vi.fn(),capabilities:vi.fn(),submissionDetail:vi.fn(),submissions:vi.fn(),grants:vi.fn(),review:vi.fn(),setStatus:vi.fn(),grant:vi.fn(),revoke:vi.fn()}))
 vi.mock('../../api/scaleLibraryGovernance',()=>({governanceApi:()=>api,submissionStatusLabel:{SUBMITTED:'待审核'}}))
 const metadata={title:'Synthetic scale',author:'Synthetic author',copyright:'Owned',applicability:'Research',scoringDescription:'Sum',reportDescription:'Descriptive'}
@@ -11,9 +14,11 @@ const record={catalogId:'catalog',origin:'AUTHORED',title:metadata.title,exactVe
 let catalogSerialized:ReturnType<typeof vi.fn>,submissionSerialized:ReturnType<typeof vi.fn>
 beforeEach(()=>{
   vi.resetAllMocks()
+  sessionStorage.clear()
+  session.me.mockResolvedValue({code:0,message:'Synthetic session',data:{id:'scoped-reviewer',username:'scoped-reviewer',role:'ADMIN',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1},{entry:'SURVEY',version:1}]}})
   catalogSerialized=vi.fn(()=>({proof:'catalog frozen content'}))
   submissionSerialized=vi.fn(()=>({proof:'submission frozen content'}))
-  api.capabilities.mockResolvedValue({systemAdmin:true,canReview:true,reviewGrants:[],distributionGrants:[]})
+  api.capabilities.mockResolvedValue({systemAdmin:false,reviewGrants:[{grantId:'review-release',releaseIds:['release']}],distributionGrants:[{grantId:'distribute-survey-release',product:'SURVEY',releaseIds:['release']},{grantId:'distribute-training-release',product:'TRAINING',releaseIds:['release']}]})
   api.submissions.mockResolvedValue({list:[submission]})
   api.catalog.mockResolvedValue({list:[record],hasMore:false})
   api.catalogDetail.mockResolvedValue({entry:{...record,toJSON:catalogSerialized}})
@@ -21,7 +26,10 @@ beforeEach(()=>{
   api.grants.mockResolvedValue({list:[]})
 })
 afterEach(cleanup)
-const open=(survey:boolean)=>render(<MemoryRouter initialEntries={[survey?'/admin/scale-library-governance?workspace=survey':'/admin/scale-library-governance']}><ScaleLibraryGovernance/></MemoryRouter>)
+function SessionReady(){const {isLoading,isAuthenticated}=useAuth();return isLoading?<p>正在读取测试会话</p>:isAuthenticated?<LegacyScaleLibraryGovernance/>:<p>需要有效测试会话</p>}
+// These assertions concern the retained shared view, not the outer product
+// router, whose Survey branch now intentionally renders SurveyLibraryAdmin.
+const open=(survey:boolean)=>render(<MemoryRouter initialEntries={[survey?'/admin/scale-library-governance?workspace=survey':'/admin/scale-library-governance']}><AuthProvider><SessionReady/></AuthProvider></MemoryRouter>)
 describe('governance visible workspace construction',()=>{
   it('serializes only the visible Survey detail and preserves inspected data, reason and grants across views',async()=>{
     open(true)
@@ -56,6 +64,7 @@ describe('governance visible workspace construction',()=>{
     expect(api.submissionDetail).toHaveBeenCalledTimes(1)
     expect(api.grants).toHaveBeenCalledTimes(1)
     expect(api.review).not.toHaveBeenCalled()
+    expect(session.me).toHaveBeenCalledTimes(1)
   })
   it('retains both legacy panels and their required full frozen records',async()=>{
     open(false)
@@ -70,6 +79,15 @@ describe('governance visible workspace construction',()=>{
     expect(screen.getByRole('region',{name:'目录版本内容：Synthetic scale'})).toHaveTextContent('catalog frozen content')
     expect(screen.getByRole('region',{name:'审核冻结内容：Synthetic scale · release'})).toHaveTextContent('submission frozen content')
     expect(screen.getByRole('button',{name:'批准精确版本入库'})).toBeEnabled()
+    expect(api.review).not.toHaveBeenCalled()
+    expect(session.me).toHaveBeenCalledTimes(1)
+  })
+  it('does not load protected workspace data when the real provider has no valid session',async()=>{
+    session.me.mockResolvedValue({code:0,message:'No synthetic session',data:null})
+    open(false)
+    await screen.findByText('需要有效测试会话')
+    expect(api.capabilities).not.toHaveBeenCalled()
+    expect(api.catalog).not.toHaveBeenCalled()
     expect(api.review).not.toHaveBeenCalled()
   })
 })
