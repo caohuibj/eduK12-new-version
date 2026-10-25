@@ -258,6 +258,8 @@
     "survey_package_grants": "RUNTIME_RW",
     "survey_package_imports": "RUNTIME_RW",
     "survey_package_members": "RUNTIME_RW",
-    "survey_package_report_artifacts": "RUNTIME_RW"
+    "survey_package_report_artifacts": "RUNTIME_RW",
+    "anonymous_study_codes": "RUNTIME_RW",
+    "anonymous_study_participation_events": "RUNTIME_RW"
   }
 }
