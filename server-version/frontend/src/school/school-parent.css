@@ -34,3 +34,46 @@
  .hs-parent .hs-educator-navigation>a{gap:0;padding-inline:4px;font-size:13px}
  .hs-parent .hs-educator-navigation>a>svg{display:none}
 }
+
+/* Relationship records first, an independent invitation panel beside them. */
+.hs-parent .hs-workspace-content:has(.hs-parent-family)>.hs-workspace-page-heading{position:relative;margin:0 0 24px;padding:0 120px 0 0}
+.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-trail{position:absolute;top:6px;right:0;margin:0}
+.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-section-kicker{display:none}
+.hs-app.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-page-heading h1{font-family:inherit;font-size:28px;font-weight:600;line-height:1.5;margin:0 0 6px}
+.hs-app.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-page-heading>p{font-size:14px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-parent-family{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,360px);gap:24px;align-items:start}
+.hs-app.hs-parent .hs-parent-family>.hs-panel{min-width:0;margin:0;padding:24px;border-radius:16px;background:var(--hs-surface);box-shadow:none}
+.hs-family-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.hs-app.hs-parent .hs-parent-family h2{font-family:inherit;font-size:18px;font-weight:600;line-height:1.5;margin:0;color:var(--hs-ink)}
+.hs-family-heading>button{display:inline-flex;align-items:center;gap:7px;min-height:40px;font-size:13px}
+.hs-app.hs-parent .hs-parent-family p{font-size:14px;line-height:1.85;overflow-wrap:anywhere}
+.hs-app.hs-parent .hs-family-intro{margin:10px 0 20px;color:var(--hs-muted)}
+.hs-family-records{min-width:0}
+.hs-app.hs-parent .hs-family-records .hs-task-card{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:0;padding:18px 0;border:0;border-bottom:1px solid var(--hs-border);border-radius:0;background:transparent;box-shadow:none}
+.hs-app.hs-parent .hs-family-records .hs-task-card p{margin:0;font-size:14px;font-weight:500;color:var(--hs-ink)}
+.hs-family-records .hs-task-card button{min-height:40px;font-size:13px;background:transparent;color:var(--hs-muted);border-color:var(--hs-border)}
+.hs-family-current>.hs-teacher-task-help{position:relative;margin-top:20px;font-size:13px;color:var(--hs-muted)}
+.hs-family-current>.hs-teacher-task-help>button{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:7px 0;border:0;border-radius:0;background:transparent;color:var(--hs-muted);font-size:13px}
+.hs-family-current .hs-teacher-task-help-content{position:absolute;z-index:20;top:100%;left:0;width:min(460px,100%);padding:16px 18px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);box-shadow:0 8px 24px #10251b20}
+.hs-app.hs-parent .hs-family-current .hs-teacher-task-help-content p{font-size:13px;line-height:1.85;margin:0 0 10px}
+.hs-app.hs-parent .hs-family-current .hs-teacher-task-help-content p:last-child{margin-bottom:0}
+.hs-family-claim-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-bottom:16px;border-radius:12px;background:var(--hs-surface-soft);color:var(--hs-primary)}
+.hs-app.hs-parent .hs-family-claim>p{margin:10px 0 20px;color:var(--hs-muted);font-size:13px}
+.hs-app.hs-parent .hs-family-claim .hs-field{display:block;width:100%;margin:0 0 16px}
+.hs-app.hs-parent .hs-family-claim .hs-field>span{font-size:13px;font-weight:500;margin-bottom:8px}
+.hs-family-claim input{width:100%;min-width:0;min-height:46px;font-size:15px}
+.hs-family-claim>.hs-primary{width:100%;min-height:46px;font-size:14px;border-radius:9px}
+.hs-app.hs-parent .hs-family-claim>p.hs-family-claim-note{font-size:12px;line-height:1.8;padding-top:16px;margin:18px 0 0;border-top:1px solid var(--hs-border)}
+@media(max-width:850px){.hs-parent-family{grid-template-columns:minmax(0,1fr);gap:18px}}
+@media(max-width:600px){
+ .hs-parent .hs-workspace-content:has(.hs-parent-family)>.hs-workspace-page-heading{padding-right:90px;margin-bottom:20px}
+ .hs-app.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-page-heading h1{font-size:24px}
+ .hs-app.hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-page-heading>p{font-size:13px}
+ .hs-parent .hs-workspace-content:has(.hs-parent-family) .hs-workspace-trail{top:3px}
+ .hs-app.hs-parent .hs-parent-family>.hs-panel{padding:20px 16px;border-radius:14px}
+ .hs-app.hs-parent .hs-parent-family h2{font-size:17px}
+ .hs-family-heading>button{font-size:12px;padding-inline:9px}
+ .hs-family-current .hs-teacher-task-help-content{position:relative;margin-top:8px;width:100%;box-shadow:none}
+}
+
+.hs-app.hs-workspace.hs-parent[data-theme] .hs-parent-family .hs-family-records .hs-task-card{background:transparent}

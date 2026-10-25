@@ -558,10 +558,6 @@ export default function SchoolApp(){
           {page==='peer'&&<SchoolPeerConsent api={api} role="PARENT"/>}
           {page==='tasks'&&<SchoolParentTasks api={api}/>}
           {page==='parent-reports'&&campusParentReportEnabled&&<SchoolParentReports api={api}/>}
-          {page==='family'&&<section className="hs-panel">
-            <h2>校园家校支持</h2>
-            <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
-          </section>}
         </div>}
         {['admission','recovery'].includes(page)&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
       </SchoolWorkspaceShell>}

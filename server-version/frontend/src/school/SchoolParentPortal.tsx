@@ -1,4 +1,6 @@
 import { useCallback,useEffect,useMemo,useRef,useState,type FormEvent } from 'react'
+import { HeartHandshake, RefreshCw } from 'lucide-react'
+import { SchoolTaskHelp } from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 
 type ParentLink={id:string;status:string;approvedAt:string|null}
@@ -84,6 +86,52 @@ export function SchoolParentLinks({api,role,organizationId}:{
     try{await task()}catch(e){setError(e instanceof Error?e.message:'关联操作未完成')}
     finally{setBusy(false)}
   }
+  const relationshipRecords=!links?null:links.list.length===0?!loading&&!readError&&<p>目前没有亲子关联记录。</p>:
+      <div>{links.list.map(link=><div className="hs-task-card" key={link.id}>
+        <p>关联状态：{link.status==='PENDING'?'等待孩子确认':
+          link.status==='ACTIVE'?'有效亲子关系':'关系已撤销'}</p>
+        {role==='STUDENT'&&link.status==='PENDING'&&
+          <button disabled={busy||loading||!consent} onClick={()=>void execute(async()=>{
+            if(!window.confirm('确认此邀请码确实交给你要关联的监护人，并知晓报告不自动公开？'))return
+            await api('/parent-links/'+link.id+'/approve','POST',{
+              consentVersion:consent!.version,
+            })
+            await reload();setNotice('已确认。个人报告仍受独立披露权限控制。')
+          })}>确认监护人关系</button>}
+        {link.status!=='REVOKED'&&
+          <button disabled={busy||loading} onClick={()=>void execute(async()=>{
+            if(!window.confirm('撤销此亲子关系并停止新的关联授权？'))return
+            await api('/parent-links/'+link.id+'/revoke','POST',{reason:'已由本人撤销校园亲子关联'})
+            await reload();setNotice('关联已撤销。')
+          })}>撤销关联</button>}
+      </div>)}</div>
+  if(role==='PARENT')return <section className="hs-parent-family" aria-label="家校关系管理">
+    <div className="hs-panel hs-family-current">
+      <header className="hs-family-heading"><h2>我的家校关系</h2><button type="button" disabled={busy||loading} onClick={()=>void reload()}><RefreshCw size={16} aria-hidden="true"/>{loading?'正在读取…':readError?'重试读取关系':'刷新关系'}</button></header>
+      <p className="hs-family-intro">查看已建立的亲子关系及确认状态。</p>
+      {error&&<p className="hs-alert" role="alert">{error}</p>}
+      {notice&&<p className="hs-message" role="status">{notice}</p>}
+      {readError&&<p className="hs-alert" role="alert">{readError}</p>}
+      {loading&&<p role="status">正在读取家校关系…</p>}
+      <div className="hs-family-records">{relationshipRecords}</div>
+      <SchoolTaskHelp label="亲子关联与隐私说明" buttonText="关联与隐私说明">
+        <p>新关系需要学生明确确认；撤销立即停止新的关联测评授权。当前列表不包含任何个人量表分数、心理报告或其他学生的信息。</p>
+        <p>只有独立批准的亲子关系可用于家长观察测评。关联成功不会自动公开学生敏感心理结果。</p>
+        {consent&&<><p>{consent.text}</p><p>{consent.reminder}</p></>}
+      </SchoolTaskHelp>
+    </div>
+    <aside className="hs-panel hs-family-claim" aria-labelledby="hs-family-claim-title">
+      <span className="hs-family-claim-icon" aria-hidden="true"><HeartHandshake size={23}/></span>
+      <h2 id="hs-family-claim-title">关联其他孩子</h2>
+      <p>使用孩子提供的一次性亲子邀请码，发送关联申请。</p>
+      <label className="hs-field"><span>亲子邀请码</span><input value={claim} onChange={e=>setClaim(e.target.value)} autoComplete="off" placeholder="输入 24 位邀请码"/></label>
+      <button className="hs-primary" disabled={busy||loading||claim.length!==24} onClick={()=>void execute(async()=>{
+        await api('/parent-links/claims','POST',{inviteCode:claim})
+        setClaim('');await reload();setNotice('关联申请已发送，等待孩子确认。')
+      })}>申请关联</button>
+      <p className="hs-family-claim-note">须经孩子确认后生效；关联不会自动开放心理报告。</p>
+    </aside>
+  </section>
   return <section className={"hs-panel"+(role==='STUDENT'?' hs-student-family':'')}>
     <h2>我的家校关系</h2>
     <p>新关系需要学生明确确认；撤销立即停止新的关联测评授权。
@@ -103,33 +151,7 @@ export function SchoolParentLinks({api,role,organizationId}:{
       {invite&&<div className="hs-secret"><code>{invite}</code>
         <button onClick={()=>setInvite(null)}>已发送，隐藏邀请码</button></div>}
     </div>}
-    {role==='PARENT'&&<div className="hs-actions">
-      <label className="hs-field"><span>已有校园账号，追加关联其他孩子</span>
-        <input value={claim} onChange={e=>setClaim(e.target.value)} autoComplete="off"/></label>
-      <button disabled={busy||loading||claim.length!==24} onClick={()=>void execute(async()=>{
-        await api('/parent-links/claims','POST',{inviteCode:claim})
-        setClaim('');await reload();setNotice('关联申请已发送，等待孩子确认。')
-      })}>申请关联</button>
-    </div>}
-    {!links?null:links.list.length===0?!loading&&!readError&&<p>目前没有亲子关联记录。</p>:
-      <div>{links.list.map(link=><div className="hs-task-card" key={link.id}>
-        <p>关联状态：{link.status==='PENDING'?'等待孩子确认':
-          link.status==='ACTIVE'?'有效亲子关系':'关系已撤销'}</p>
-        {role==='STUDENT'&&link.status==='PENDING'&&
-          <button disabled={busy||loading||!consent} onClick={()=>void execute(async()=>{
-            if(!window.confirm('确认此邀请码确实交给你要关联的监护人，并知晓报告不自动公开？'))return
-            await api('/parent-links/'+link.id+'/approve','POST',{
-              consentVersion:consent!.version,
-            })
-            await reload();setNotice('已确认。个人报告仍受独立披露权限控制。')
-          })}>确认监护人关系</button>}
-        {link.status!=='REVOKED'&&
-          <button disabled={busy||loading} onClick={()=>void execute(async()=>{
-            if(!window.confirm('撤销此亲子关系并停止新的关联授权？'))return
-            await api('/parent-links/'+link.id+'/revoke','POST',{reason:'已由本人撤销校园亲子关联'})
-            await reload();setNotice('关联已撤销。')
-          })}>撤销关联</button>}
-      </div>)}</div>}
+    {relationshipRecords}
     {consent&&<details><summary>查看关系确认说明</summary><p>{consent.text}</p><p>{consent.reminder}</p></details>}
   </section>
 }
