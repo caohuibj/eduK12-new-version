@@ -42,7 +42,7 @@ it('loads management frames only after their existing route and grant checks mat
     view.rerender(frame(path))
     expect(screen.getByText('route content')).toBeVisible()
   }
-  state.user = { id: 'ordinary', role: 'TEACHER', username: 'teacher', entryGrants: [] } as User
+  state.user = { id: 'ordinary', role: 'TEACHER', platformRole: 'STANDARD', username: 'teacher', entryGrants: [] } as User
   for (const path of ['/dashboard', '/admin/training/resources', '/admin/huischool', '/admin/huiteacher', '/admin/survey-researchers']) {
     view.rerender(frame(path))
     expect(screen.queryByRole('region', { name: /frame/ })).not.toBeInTheDocument()

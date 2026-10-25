@@ -745,3 +745,48 @@ CI 最小配置：9 个显式 opt-in 指向现有 job PG（14 个 suite 使用�
 浏览器复用本轮官方前端/UI-lab及backend产物，核ZIP摘要和原manifest的source/run/kind/lock/content；不重复构建。测试只用新建合成库与loopback端口，未改数据库时区、生产角色或数据。专用Bundle fixture server按既有测试路线运行源代码provider，和普通编译产物探针分清。旧失败、错配本地fixture profile、未运行/过滤项目均保留，不将有界probe标成完整CI。
 
 本检查点之后仍需父 dot 对精确候选独立复查并明确同意，再运行最终head全部适用门禁；不得借用9065成功子项伪造新head门禁成功，不force merge、不绕过保护、不部署。
+
+### b376 正式 CI 后的前端合同收口（尚未获下一轮 CI 资格）
+
+父 dot 已复查并批准 `8c1475665d0f98d98062ed19d1bb9f3303f37d50`，tree
+`40412665e1bddeb5a68ece8cf24c9d63ec26afc0`。仅以同 tree 的空提交
+`b3760a4b73c1307952279346bc392ed5eaeacdd7` 正常触发
+[run 40170212567](https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567)。
+原测试 checkout 为 `665c3eef0516e6255403139c5dceb9af398fbb9d`，整体 **failure**。
+
+本轮后端回归 job121099427715 真正 success：主组8401通过，独立导出3通过，
+合计8404通过、0失败、225跳过。原JSON官方artifact12590114361已回读并核验ZIP
+SHA256 `f737a82ffe3a71538dc839108cabed8cd29eea9ecbedd4c481387c4e30b9b563`。
+CodeQL、生产镜像扫描、前端及UI-lab构建也success；独立Situational run40170212455
+success。以上不把其他失败或未来head变成通过。
+
+分类和backend routing boundary共用的旧断言把整个frontend job中的
+`npm ci --ignore-scripts`一概拒绝，误中了新增backend类型依赖步骤。
+`41c58d17`仅修这项直接消费者：frontend仍必须在自身目录执行完整`npm ci`；
+唯一backend准备步骤精确限制为锁文件安装和Prisma生成，不能启动应用、迁移、seed
+或native build。分类与backend直接使用的16文件140项合同全部通过。
+
+前端本轮首次越过typecheck后，完整运行实际为26文件失败/522通过，53项失败、
+3630通过、3跳过。当前25个测试文件的修订覆盖其中52项失败：
+
+- 真实AuthProvider、STANDARD及精确release委托夹具；保会话拒绝、产品匹配和普通
+  角色拒绝。Survey使用当前专用管理API，其他入口保原范围；不伪造系统审批。
+- Teacher分区和Training课程handoff按现有导航；旧测评保存退出后才能打开另一项。
+  复用仍验证来源所有者、独立目标课程、不带历史提交/成绩/匿名凭据。
+- 等待真实lazy编辑器/报告控件；认知恢复等待新的父ID及`current-unit`请求，保旧
+  凭据清理、禁止重启子任务、过期本地草稿保护。无新增生产恢复逻辑。
+- 传输层测试提供局部jsdom Image.decode夹具，不改真正解码门；按需附件还需显式
+  点单个素材预览。保Blob路由、撤回、迟到响应及禁止跨入口回退断言。
+- Survey普通问卷夹具补membership响应；复选操作等待读取完成，换波次显式确认
+  放弃草稿。固定版本按当前分离标题DOM定位，Form提示对齐现行治理准入。
+
+受影响25文件155项合跑全部通过、无跳过；最后两文件查询参数类型修订后5项再次
+通过。app/cognitive两份tsc、相关lint和diff检查通过。原首次局部路径拼接错误
+（0项执行）、中间局部失败和三处ByRole参数类型错误均保留原日志，未声称通过。
+
+剩余1项是School刷新待办未清除旧反馈的原产品断言。新增最小产品修改已经询问
+范围确认，尚未获答；原断言不删不改，生产代码尚未动。分类失败导致本轮下游
+browser/media/三引擎/维护/性能等选中项未执行，仍须正式成功。
+本次不修改工作流或权限、不启动新CI，最终候选仍需父 dot 再次复查。
+精确job、失败项及验证映射见`ci-b376-repair-candidate.json`；原始日志与报告仅存
+任务私有证据目录，公开记录不含会话、连接字符串或真实数据。

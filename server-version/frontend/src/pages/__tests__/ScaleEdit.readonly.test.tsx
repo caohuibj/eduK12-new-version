@@ -39,13 +39,13 @@ const editor = () => <MemoryRouter><ScaleEdit /></MemoryRouter>
 // Version history and library governance are separate sections, not controls
 // that mutate the frozen definition. Scope every lock assertion to the active
 // editor using its real save action, retaining all inputs and buttons inside it.
-const activeEditingSection = () => {
+const activeEditingSection = () => waitFor(() => {
   const save = screen.getAllByRole('button', { name: /^保存/ }).find(button => button.closest('section'))
   expect(save).toBeDefined()
   const section = save!.closest('section')!
   expect(section).not.toBeNull()
   return section
-}
+})
 
 
 beforeEach(() => {
@@ -70,7 +70,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     for (const tab of ['基本信息', '响应选项', '题目', '计分', '报告文案']) {
       await user.click(screen.getByRole('button', { name: tab }))
       if (instrumentClass === 'CUSTOM_DESCRIPTIVE') expect(screen.getAllByRole('button', { name: '查看同量表版本历史' })).toHaveLength(1)
-      const controls = activeEditingSection().querySelectorAll('input, textarea, select, button')
+      const controls = (await activeEditingSection()).querySelectorAll('input, textarea, select, button')
       expect(controls.length).toBeGreaterThan(0)
       controls.forEach(control => expect(control).toBeDisabled())
       const save = Array.from(controls).find(control => control.textContent?.startsWith('保存'))!
@@ -132,7 +132,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     render(editor())
     await user.click(await screen.findByRole('button', { name: '响应选项' }))
     await user.click(screen.getByRole('button', { name: '保存响应集' }))
-    const controls = activeEditingSection().querySelectorAll('input, textarea, select, button')
+    const controls = (await activeEditingSection()).querySelectorAll('input, textarea, select, button')
     expect(controls.length).toBeGreaterThan(0)
     controls.forEach(control => expect(control).toBeDisabled())
     expect(screen.getByRole('button', { name: '查看同量表版本历史' })).toBeEnabled()

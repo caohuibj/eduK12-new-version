@@ -16,6 +16,7 @@ const composite = { ...collection, id: 'attempt', assessmentId: 'questionnaire',
 function mount(path: string, route: string, component: React.ReactElement) { return render(<MemoryRouter initialEntries={[path]}><Routes><Route path={route} element={component} /></Routes></MemoryRouter>) }
 beforeEach(() => {
   vi.clearAllMocks(); sessionStorage.clear(); mocks.user.value = null
+  vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
   Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:authorized-feedback') })
   Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() })
   const bytes = async () => ({ ok: true, blob: async () => new Blob(['png'], { type: 'image/png' }) })

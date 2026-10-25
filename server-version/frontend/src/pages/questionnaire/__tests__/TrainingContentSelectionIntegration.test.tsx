@@ -45,7 +45,7 @@ function pendingSelection() { sessionStorage.setItem('training-content-selection
 function pendingCognitive() { sessionStorage.setItem('training-cognitive-publication:' + JSON.stringify(['actor', 'composite']), JSON.stringify({ actorId: 'actor', id: 'composite', revision: 7, itemIds: ['cog'], hadUnknownOutcome: true })) }
 describe('Training questionnaire workspace mutual exclusion', () => {
   it('blocks metadata, report editing and both publications while selection changes are dirty, then releases them on discard', async () => {
-    mount(); await openChoices(); fireEvent.click(screen.getByRole('checkbox', { name: /effort/ }))
+    mount(); await screen.findByLabelText('报告内容授权 ID'); await openChoices(); fireEvent.click(screen.getByRole('checkbox', { name: /effort/ }))
     expect(screen.getByLabelText('测评名称')).toBeDisabled()
     expect(screen.getByLabelText('报告内容授权 ID')).toBeDisabled()
     expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
