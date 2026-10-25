@@ -1,0 +1,88 @@
+{
+  "status": "PROTOCOL_EXPECTATIONS_NOT_EXECUTED",
+  "vectors": [
+    {
+      "gate": "NO",
+      "answers": null,
+      "total": 0,
+      "answered_symptoms": 0,
+      "expect": "skip symptom pages; gate-based report, not symptoms absent report"
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total": 0
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "total": 5
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "total": 3
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "expect": "reject incomplete"
+    },
+    {
+      "gate": null,
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject missing gate"
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject invalid"
+    },
+    {
+      "gate": "NO",
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expect": "contradictory payload must not sum to5; reject inconsistent stale symptom data or explicitly clear before scoring"
+    }
+  ]
+}

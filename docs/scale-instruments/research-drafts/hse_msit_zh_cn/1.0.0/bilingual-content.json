@@ -1,0 +1,304 @@
+{
+  "items": [
+    {
+      "itemCode": "HSE-01",
+      "originalEnglish": "I am clear what is expected of me at work",
+      "workingChinese": "我清楚工作中对我的要求。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-02",
+      "originalEnglish": "I can decide when to take a break",
+      "workingChinese": "我可以决定什么时候休息一下。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-03",
+      "originalEnglish": "Different groups at work demand things from me that are hard to combine",
+      "workingChinese": "工作中不同群体对我的要求很难兼顾。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-04",
+      "originalEnglish": "I know how to go about getting my job done",
+      "workingChinese": "我知道该怎样完成自己的工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-05",
+      "originalEnglish": "I am subject to personal harassment in the form of unkind words or behaviour",
+      "workingChinese": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-06",
+      "originalEnglish": "I have unachievable deadlines",
+      "workingChinese": "我被要求在无法做到的期限内完成工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-07",
+      "originalEnglish": "If work gets difficult, my colleagues will help me",
+      "workingChinese": "如果工作遇到困难，同事会帮助我。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-08",
+      "originalEnglish": "I am given supportive feedback on the work I do",
+      "workingChinese": "我所做的工作能得到支持性的反馈。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-09",
+      "originalEnglish": "I have to work very intensively",
+      "workingChinese": "我不得不以很高的强度工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-10",
+      "originalEnglish": "I have a say in my own work speed",
+      "workingChinese": "对于自己的工作速度，我有发言权。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-11",
+      "originalEnglish": "I am clear what my duties and responsibilities are",
+      "workingChinese": "我清楚自己的工作职责。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-12",
+      "originalEnglish": "I have to neglect some tasks because I have too much to do",
+      "workingChinese": "因为要做的事情太多，我不得不忽略某些任务。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-13",
+      "originalEnglish": "I am clear about the goals and objectives for my department",
+      "workingChinese": "我清楚所在部门的目标。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-14",
+      "originalEnglish": "There is friction or anger between colleagues",
+      "workingChinese": "同事之间存在摩擦或愤怒情绪。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-15",
+      "originalEnglish": "I have a choice in deciding how I do my work",
+      "workingChinese": "我可以选择怎样开展自己的工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-16",
+      "originalEnglish": "I am unable to take sufficient breaks",
+      "workingChinese": "我无法获得充分的休息。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-17",
+      "originalEnglish": "I understand how my work fits into the overall aim of the organisation",
+      "workingChinese": "我理解自己的工作如何配合组织的总体目标。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-18",
+      "originalEnglish": "I am pressured to work long hours",
+      "workingChinese": "我受到压力，需要长时间工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-19",
+      "originalEnglish": "I have a choice in deciding what I do at work",
+      "workingChinese": "我可以选择自己在工作中做什么。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-20",
+      "originalEnglish": "I have to work very fast",
+      "workingChinese": "我不得不非常快速地工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-21",
+      "originalEnglish": "I am subject to bullying at work",
+      "workingChinese": "我在工作中受到欺凌。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-22",
+      "originalEnglish": "I have unrealistic time pressures",
+      "workingChinese": "我承受着不切实际的时间压力。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-23",
+      "originalEnglish": "I can rely on my line manager to help me out with a work problem",
+      "workingChinese": "遇到工作问题时，我可以依靠直属主管提供帮助。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-24",
+      "originalEnglish": "I get help and support I need from colleagues",
+      "workingChinese": "我能从同事那里得到所需要的帮助和支持。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-25",
+      "originalEnglish": "I have some say over the way I work",
+      "workingChinese": "对于自己的工作方式，我有一定发言权。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-26",
+      "originalEnglish": "I have sufficient opportunities to question managers about change at work",
+      "workingChinese": "关于工作中的变动，我有充分机会向管理者提问。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-27",
+      "originalEnglish": "I receive the respect at work I deserve from my colleagues",
+      "workingChinese": "我在工作中受到同事应有的尊重。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-28",
+      "originalEnglish": "Staff are always consulted about change at work",
+      "workingChinese": "工作发生变动时，总会征求员工的意见。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-29",
+      "originalEnglish": "I can talk to my line manager about something that has upset or annoyed me about work",
+      "workingChinese": "对于工作中让我难过或烦恼的事情，我可以与直属主管交谈。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-30",
+      "originalEnglish": "My working time can be flexible",
+      "workingChinese": "我的工作时间可以灵活安排。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-31",
+      "originalEnglish": "My colleagues are willing to listen to my work-related problems",
+      "workingChinese": "同事愿意倾听我与工作有关的问题。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-32",
+      "originalEnglish": "When changes are made at work, I am clear how they will work out in practice",
+      "workingChinese": "工作发生变动时，我清楚这些变动将如何实际开展。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-33",
+      "originalEnglish": "I am supported through emotionally demanding work",
+      "workingChinese": "面对情绪负荷较高的工作时，我能得到支持。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-34",
+      "originalEnglish": "Relationships at work are strained",
+      "workingChinese": "工作中的人际关系紧张。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-35",
+      "originalEnglish": "My line manager encourages me at work",
+      "workingChinese": "直属主管在工作中鼓励我。",
+      "responseSetKey": "hse_agreement_1_5"
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "hse_frequency_1_5",
+      "options": [
+        {
+          "value": "never",
+          "label": "Never",
+          "score": 1
+        },
+        {
+          "value": "seldom",
+          "label": "Seldom",
+          "score": 2
+        },
+        {
+          "value": "sometimes",
+          "label": "Sometimes",
+          "score": 3
+        },
+        {
+          "value": "often",
+          "label": "Often",
+          "score": 4
+        },
+        {
+          "value": "always",
+          "label": "Always",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "key": "hse_agreement_1_5",
+      "options": [
+        {
+          "value": "strongly_disagree",
+          "label": "Strongly disagree",
+          "score": 1
+        },
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "score": 2
+        },
+        {
+          "value": "neutral",
+          "label": "Neutral",
+          "score": 3
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "score": 4
+        },
+        {
+          "value": "strongly_agree",
+          "label": "Strongly agree",
+          "score": 5
+        }
+      ]
+    }
+  ],
+  "responseSetsZh": {
+    "hse_frequency_1_5": [
+      "从不",
+      "很少",
+      "有时",
+      "经常",
+      "总是"
+    ],
+    "hse_agreement_1_5": [
+      "非常不同意",
+      "不同意",
+      "中立",
+      "同意",
+      "非常同意"
+    ]
+  },
+  "administration": {
+    "instructionsZh": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。",
+    "timeframe": "last six months",
+    "fixedItemOrder": true,
+    "warning": "问的是工作条件，不是你是否抗压。参加应出于自愿；组织调查应保护匿名性，小群体不展示可能识别个人的结果。现系统匿名/小样本抑制未核验，不声称已实现。",
+    "presentationChanges": "Independent zhCN translation and digital presentation; not HSE certified survey, no logos or scoring colours copied."
+  },
+  "translationStatus": "UNVALIDATED_WORKING_TRANSLATION",
+  "presentationChanges": [
+    "保留原题顺序和逐题响应集。",
+    "指导语移入第一题之前，是明确记录的数字呈现调整，不声称原验证版式。"
+  ]
+}

@@ -1,0 +1,1924 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "hse_msit_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "HSE工作环境与压力管理问卷（35题，中文工作稿）",
+      "abbreviation": "HSE MSIT",
+      "instrumentFamily": "HSE Management Standards Indicator Tool"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "心理社会工作环境中的工作要求、自主空间、支持、人际关系、角色和变革；不是个人抗压能力。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "hse_msit_zh_cn",
+        "domain:teacher_workplace",
+        "construct:psychosocial_work_environment",
+        "construct:demands",
+        "construct:control",
+        "construct:managerial_support",
+        "construct:peer_support",
+        "construct:relationships",
+        "construct:role",
+        "construct:change",
+        "population:adult",
+        "population:teacher",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "license:ogl_3_0",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人教师与相关工作群体的中文研究候选；原外文证据不证明当前中文版本适用，不能用于学生测评、教师绩效或学校排名。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 35,
+      "estimatedMinutes": 8,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去六个月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原题顺序和逐题响应集。",
+        "指导语移入第一题之前，是明确记录的数字呈现调整，不声称原验证版式。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "根据原作者英文题本独立翻译的简体中文工作稿；原作者未审定或背书。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工专家审校、认知访谈和本地验证。指导语置于首题；原题顺序不改。官方繁体中文版仅对照，不称本稿为官方简中。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_msit_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_msit_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "hse_msit_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+      "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"}",
+      "独立工作中译与原创通俗反馈，未建立本地常模；不得用于绩效、诊断或排名。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "HSE Management Standards Indicator Tool",
+        "citation": "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+        "url": "https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "{\"license\": \"Open Government Licence v3.0\", \"licenseUrl\": \"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\", \"attribution\": \"Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.\", \"scope\": \"Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.\", \"changes\": \"Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN.\"} https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf https://www.hse.gov.uk/stress/assets/docs/indicatortoolmanual.pdf https://www.hse.gov.uk/help/copyright.htm https://www.hse.gov.uk/stress/assets/docs/chinese.pdf https://www.hse.gov.uk/stress/standards/notesindicatortool.htm https://www.hse.gov.uk/stress/assets/docs/analysistool.xls https://www.di.univr.it/documenti/OccorrenzaIns/matdid/matdid464820.pdf"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "hse_frequency_1_5",
+          "options": [
+            {
+              "value": "never",
+              "label": "从不",
+              "score": 1
+            },
+            {
+              "value": "seldom",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "sometimes",
+              "label": "有时",
+              "score": 3
+            },
+            {
+              "value": "often",
+              "label": "经常",
+              "score": 4
+            },
+            {
+              "value": "always",
+              "label": "总是",
+              "score": 5
+            }
+          ]
+        },
+        {
+          "key": "hse_agreement_1_5",
+          "options": [
+            {
+              "value": "strongly_disagree",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "disagree",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "neutral",
+              "label": "中立",
+              "score": 3
+            },
+            {
+              "value": "agree",
+              "label": "同意",
+              "score": 4
+            },
+            {
+              "value": "strongly_agree",
+              "label": "非常同意",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "HSE-01",
+          "content": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。\n\n我清楚工作中对我的要求。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-02",
+          "content": "我可以决定什么时候休息一下。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-03",
+          "content": "工作中不同群体对我的要求很难兼顾。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-04",
+          "content": "我知道该怎样完成自己的工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-05",
+          "content": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-06",
+          "content": "我被要求在无法做到的期限内完成工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-07",
+          "content": "如果工作遇到困难，同事会帮助我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-08",
+          "content": "我所做的工作能得到支持性的反馈。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-09",
+          "content": "我不得不以很高的强度工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-10",
+          "content": "对于自己的工作速度，我有发言权。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-11",
+          "content": "我清楚自己的工作职责。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-12",
+          "content": "因为要做的事情太多，我不得不忽略某些任务。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-13",
+          "content": "我清楚所在部门的目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-14",
+          "content": "同事之间存在摩擦或愤怒情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-15",
+          "content": "我可以选择怎样开展自己的工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-16",
+          "content": "我无法获得充分的休息。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-17",
+          "content": "我理解自己的工作如何配合组织的总体目标。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 16,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-18",
+          "content": "我受到压力，需要长时间工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 17,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-19",
+          "content": "我可以选择自己在工作中做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 18,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-20",
+          "content": "我不得不非常快速地工作。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 19,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-21",
+          "content": "我在工作中受到欺凌。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 20,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-22",
+          "content": "我承受着不切实际的时间压力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 21,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-23",
+          "content": "遇到工作问题时，我可以依靠直属主管提供帮助。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 22,
+          "responseSetKey": "hse_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-24",
+          "content": "我能从同事那里得到所需要的帮助和支持。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 23,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-25",
+          "content": "对于自己的工作方式，我有一定发言权。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 24,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-26",
+          "content": "关于工作中的变动，我有充分机会向管理者提问。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 25,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-27",
+          "content": "我在工作中受到同事应有的尊重。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 26,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-28",
+          "content": "工作发生变动时，总会征求员工的意见。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 27,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-29",
+          "content": "对于工作中让我难过或烦恼的事情，我可以与直属主管交谈。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 28,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-30",
+          "content": "我的工作时间可以灵活安排。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 29,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-31",
+          "content": "同事愿意倾听我与工作有关的问题。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 30,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-32",
+          "content": "工作发生变动时，我清楚这些变动将如何实际开展。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 31,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-33",
+          "content": "面对情绪负荷较高的工作时，我能得到支持。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 32,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-34",
+          "content": "工作中的人际关系紧张。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 33,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "HSE-35",
+          "content": "直属主管在工作中鼓励我。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 34,
+          "responseSetKey": "hse_agreement_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "HSE-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-14",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-16",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-18",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-20",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-21",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-22",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-24",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-25",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-26",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-27",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-28",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-29",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-30",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-31",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-32",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-33",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "HSE-34",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "HSE-35",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "demands",
+            "type": "dimension",
+            "label": "工作量与节奏",
+            "description": "这部分关注任务是否过多、期限是否现实、有没有足够休息，不是看你够不够能扛。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-22",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "control",
+            "type": "dimension",
+            "label": "对工作安排的自主空间",
+            "description": "看看你能否对工作方式、速度和休息安排有一些选择。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-25",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-30",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "managerial_support",
+            "type": "dimension",
+            "label": "来自管理者的支持",
+            "description": "关注遇到难题或情绪负荷时，能否得到回应、反馈与帮助。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-29",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-33",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-35",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "peer_support",
+            "type": "dimension",
+            "label": "同事之间的支持",
+            "description": "关注日常合作中能否获得帮助、倾听和尊重。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-24",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-27",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-31",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "relationships",
+            "type": "dimension",
+            "label": "人际相处是否安全、尊重",
+            "description": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-34",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "role",
+            "type": "dimension",
+            "label": "工作期待是否清楚",
+            "description": "看看职责、目标和分工是不是足够清晰。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "change",
+            "type": "dimension",
+            "label": "变化是否解释清楚",
+            "description": "关注工作变动前后有没有咨询、说明和可提问的机会。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "HSE-26",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-28",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "HSE-32",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "demands",
+          "control",
+          "managerial_support",
+          "peer_support",
+          "relationships",
+          "role",
+          "change"
+        ],
+        "scoreOrder": [
+          "demands",
+          "control",
+          "managerial_support",
+          "peer_support",
+          "relationships",
+          "role",
+          "change"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "demands",
+            "headline": "工作量与节奏",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注任务是否过多、期限是否现实、有没有足够休息，不是看你够不够能扛。例如，连续的紧急任务让午间休息一再缩短，就值得讨论任务安排与资源。这里经过方向统一后，更高的结果表示自述工作条件更有利，不是表示压力更大，也不证明你更能吃苦。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一项最常超时的任务，与负责人讨论优先级、时限或资源。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "control",
+            "headline": "对工作安排的自主空间",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "看看你能否对工作方式、速度和休息安排有一些选择。例如，你能否调整工作速度，或在合适的时候短暂休息。有时任务本身不变，增加一点可协商的安排就能改善体验。结果描述你感受到的自主空间，不是对管理能力或个人自律的评判。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "找一个可协商的小环节，例如备课时段或休息安排。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "managerial_support",
+            "headline": "来自管理者的支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "关注遇到难题或情绪负荷时，能否得到回应、反馈与帮助。例如，需要协调任务或获得反馈时，是否有可求助的人。这些回答可以帮助把笼统的压力感转成具体支持需求，但不能仅凭一个人的回答判断某位管理者的能力或品格。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "把需要的帮助说具体，例如希望协调一项任务，而不只说压力很大。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "peer_support",
+            "headline": "同事之间的支持",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "关注日常合作中能否获得帮助、倾听和尊重。例如，忙不过来时有没有同事搭把手，遇到困难时能不能被认真倾听。不同班组或时期的体验可能不同，结果用于回顾自己的处境，不用于给同事贴标签或做受欢迎程度排名。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "与可信同事约定一个小而明确的互助方式。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "relationships",
+            "headline": "人际相处是否安全、尊重",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。例如，持续紧张的互动、令人不安的言语或行为，都值得认真看待。结果越高表示自述的人际环境相对更有利，但任何一次伤害也不应被一个总体结果掩盖，更不能要求当事人独自承担改善责任。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果遇到欺凌或骚扰，优先使用可信且安全的组织支持或申诉渠道；不要求独自解决。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "role",
+            "headline": "工作期待是否清楚",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "看看职责、目标和分工是不是足够清晰。例如，同时收到几项相互冲突的要求，或不知道哪一项应当优先，会让日常工作更费力。结果反映你感受到的清晰程度，不是理解力考试；可以先确认目标、分工和寻求澄清的渠道。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "把不清楚或相互冲突的要求列出来，争取一次明确分工的沟通。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "change",
+            "headline": "变化是否解释清楚",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "关注工作变动前后有没有咨询、说明和可提问的机会。例如，安排发生变化时，是否有人解释原因、影响和后续步骤，你是否有机会提出问题。结果描述沟通与参与的体验，不代表你是否愿意改变，也不意味着每一项变动都一定好或不好。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "这一方面，最近哪件具体事情最能说明你的感受？"
+              },
+              {
+                "category": "strategy",
+                "text": "整理一个最影响实际工作的疑问，询问变动怎样落实、何时获得进一步说明。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "把结果当作一张工作环境观察清单：哪些条件在支持你，哪些需要一起改善。它不是个人抗压能力成绩，也不是学校排行榜。单个人的回答不能代表整所学校，组织结论还需员工讨论和其他信息核实。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "问的是工作条件而不是个人抗压能力；本版本各方面要求完整回答，不声称复制官方分析表缺失算法或组织分位颜色。匿名保护与小样本抑制是组织调查的要求，尚未核验现系统实现。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "teacher",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T16:47:00Z",
+            "basis": "AI editorial check only: adult workplace self-report, plain language, no diagnostic or teacher-performance inference; pending human review."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "hse_msit",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "HSE-01",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-02",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-03",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-04",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-06",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-07",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-08",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-09",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-10",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-11",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-12",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-13",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-15",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-16",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-17",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-18",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-19",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-20",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-22",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-23",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-24",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-25",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-27",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-29",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-30",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-31",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-33",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-35",
+            "responseValue": "strongly_disagree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands": 1.0,
+            "control": 1.0,
+            "managerial_support": 1.0,
+            "peer_support": 1.0,
+            "relationships": 1.0,
+            "role": 1.0,
+            "change": 1.0
+          },
+          "totalScoreKeys": [
+            "demands",
+            "control",
+            "managerial_support",
+            "peer_support",
+            "relationships",
+            "role",
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "HSE-01",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-02",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-03",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-04",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-06",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-07",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-08",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-09",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-10",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-11",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-12",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-13",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-15",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-16",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-17",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-18",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-19",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-20",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-22",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-23",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-24",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-25",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-27",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-29",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-30",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-31",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-33",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-35",
+            "responseValue": "strongly_agree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands": 5.0,
+            "control": 5.0,
+            "managerial_support": 5.0,
+            "peer_support": 5.0,
+            "relationships": 5.0,
+            "role": 5.0,
+            "change": 5.0
+          },
+          "totalScoreKeys": [
+            "demands",
+            "control",
+            "managerial_support",
+            "peer_support",
+            "relationships",
+            "role",
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "HSE-01",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-02",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-03",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-04",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-06",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-07",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-08",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-09",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-10",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-11",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-12",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-13",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-15",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-16",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-17",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-18",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-19",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-20",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-22",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-23",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-24",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-25",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-27",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-29",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-30",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-31",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-33",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-35",
+            "responseValue": "neutral"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands": 3.0,
+            "control": 3.0,
+            "managerial_support": 3.0,
+            "peer_support": 3.0,
+            "relationships": 3.0,
+            "role": 3.0,
+            "change": 3.0
+          },
+          "totalScoreKeys": [
+            "demands",
+            "control",
+            "managerial_support",
+            "peer_support",
+            "relationships",
+            "role",
+            "change"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "HSE-01",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-02",
+            "responseValue": "seldom"
+          },
+          {
+            "itemCode": "HSE-03",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-04",
+            "responseValue": "often"
+          },
+          {
+            "itemCode": "HSE-05",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-06",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-07",
+            "responseValue": "seldom"
+          },
+          {
+            "itemCode": "HSE-08",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-09",
+            "responseValue": "often"
+          },
+          {
+            "itemCode": "HSE-10",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-11",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-12",
+            "responseValue": "seldom"
+          },
+          {
+            "itemCode": "HSE-13",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-14",
+            "responseValue": "often"
+          },
+          {
+            "itemCode": "HSE-15",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-16",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-17",
+            "responseValue": "seldom"
+          },
+          {
+            "itemCode": "HSE-18",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-19",
+            "responseValue": "often"
+          },
+          {
+            "itemCode": "HSE-20",
+            "responseValue": "always"
+          },
+          {
+            "itemCode": "HSE-21",
+            "responseValue": "never"
+          },
+          {
+            "itemCode": "HSE-22",
+            "responseValue": "seldom"
+          },
+          {
+            "itemCode": "HSE-23",
+            "responseValue": "sometimes"
+          },
+          {
+            "itemCode": "HSE-24",
+            "responseValue": "agree"
+          },
+          {
+            "itemCode": "HSE-25",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-26",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-27",
+            "responseValue": "disagree"
+          },
+          {
+            "itemCode": "HSE-28",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-29",
+            "responseValue": "agree"
+          },
+          {
+            "itemCode": "HSE-30",
+            "responseValue": "strongly_agree"
+          },
+          {
+            "itemCode": "HSE-31",
+            "responseValue": "strongly_disagree"
+          },
+          {
+            "itemCode": "HSE-32",
+            "responseValue": "disagree"
+          },
+          {
+            "itemCode": "HSE-33",
+            "responseValue": "neutral"
+          },
+          {
+            "itemCode": "HSE-34",
+            "responseValue": "agree"
+          },
+          {
+            "itemCode": "HSE-35",
+            "responseValue": "strongly_agree"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "demands": 3.375,
+            "control": 4.333333333333333,
+            "managerial_support": 3.6,
+            "peer_support": 2.25,
+            "relationships": 2.5,
+            "role": 2.2,
+            "change": 2.0
+          },
+          "totalScoreKeys": [
+            "demands",
+            "control",
+            "managerial_support",
+            "peer_support",
+            "relationships",
+            "role",
+            "change"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "status": "EXTERNAL_DOCUMENTATION_ONLY_NOT_RUNTIME",
+  "parameters": [
+    {
+      "status": "DOCUMENTATION_ONLY",
+      "active": false,
+      "runtimeSelected": false,
+      "cutoff_range": [
+        31,
+        33
+      ],
+      "meaning": "Original adult veteran research optimally efficient probable PTSD cut points; not diagnosis",
+      "population": "Two independent samples of veterans receiving care at a Veterans Affairs Medical Center; total N=468",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/26653052/",
+      "doi": "10.1037/pas0000254",
+      "citation": "Bovin et al. (2016). Psychometric properties of the PCL-5 in Veterans. Psychological Assessment, 28(11), 1379–1391.",
+      "limitations": "Cutoff depends on population and screening purpose; not validated Chinese working-translation norms, not children/adolescents. No single selected runtime cutoff."
+    }
+  ],
+  "scoring": {
+    "total": "sum items 1–20",
+    "range": [
+      0,
+      80
+    ],
+    "reverse_items": [],
+    "direction": "Higher = greater reported symptom burden; not diagnosis",
+    "clinical_clusters_documentation_only": {
+      "B": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "C": [
+        6,
+        7
+      ],
+      "D": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "E": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    "provisional_rule_documentation_only": "Item >=2 counts endorsed; >=1 B, >=1 C, >=2 D, >=2 E. Does not establish all diagnostic criteria. Disabled at runtime."
+  },
+  "currentChineseValidated": false
+}

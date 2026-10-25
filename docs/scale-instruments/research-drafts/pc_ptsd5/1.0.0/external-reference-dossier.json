@@ -1,0 +1,39 @@
+{
+  "status": "EXTERNAL_DOCUMENTATION_ONLY_NOT_RUNTIME",
+  "parameters": [
+    {
+      "status": "DOCUMENTATION_ONLY",
+      "active": false,
+      "runtimeSelected": false,
+      "cutoff": 4,
+      "operator": ">=",
+      "purpose": "Balance false positives and negatives in original overall/male sample; positive screen requires further assessment",
+      "population": "396 US veterans seeking VA primary care; mean age 61.4 (SD15.5), range21–93;333 men (84.1%); not Chinese or school population",
+      "overall_sensitivity": 0.78,
+      "overall_specificity": 0.91,
+      "female_caution": "At cutpoint4 female sensitivity0.67 and 6 of18 CAPS-5-positive women missed; lower cutpoint may be considered by clinicians depending on setting/resources. Do not auto-assign cutoff by user sex.",
+      "alternative_cutpoint3": {
+        "overall_sensitivity": 0.9,
+        "overall_specificity": 0.8,
+        "female_sensitivity": 0.89,
+        "female_specificity": 0.7
+      },
+      "source": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2775926",
+      "doi": "10.1001/jamanetworkopen.2020.36733",
+      "citation": "Bovin MJ, Kimerling R, Weathers FW, et al. (2021). Diagnostic Accuracy and Acceptability of the PC-PTSD-5 Among US Veterans. JAMA Network Open,4(2),e2036733.",
+      "limitations": "Clinical screening, not diagnosis. Performance changes by population and purpose; no norm/threshold validated for this Chinese working translation. No automatic active cut-point."
+    }
+  ],
+  "scoring": {
+    "total": "If gate NO then 0 and stop; if gate YES then sum of YES in symptom items 1–5",
+    "range": [
+      0,
+      5
+    ],
+    "reverse_items": [],
+    "exposure_gate_contributes": 0,
+    "direction": "Higher = more endorsed past-month experiences; not diagnosis",
+    "routing_implementation_gate": "Do not instantiate executable instrument unless exposure gate is required, NO branch stops with 0, YES branch requires all 5 items, and missing gate cannot score. The 5 symptoms cannot be substituted as standalone form or ordinary six-item summed scale."
+  },
+  "currentChineseValidated": false
+}

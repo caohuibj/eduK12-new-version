@@ -1,0 +1,14 @@
+{
+  "sourceSha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62",
+  "canonicalSourceHash": "6706f27f8d02416cd675398b3a4a2caef6e88112c9fdef408acdc73fd573a8d1",
+  "measurementHash": "8ebd141cd2188570a112ffbae1de388219e0999e69d355ce627c7dfac44f3407",
+  "checkedAt": "2026-10-25T16:48:17.944Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 4,
+  "dbWrites": false,
+  "toolTests": 12,
+  "testExitCode": 0,
+  "testEvidence": "local-test-output.txt",
+  "generatorExitCode": 0,
+  "typecheckStatus": "PASS_BATCH_SEE_teacher-trauma-batch-20261025"
+}

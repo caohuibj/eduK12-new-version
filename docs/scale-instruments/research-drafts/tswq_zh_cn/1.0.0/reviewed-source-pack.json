@@ -1,0 +1,508 @@
+{
+  "status": "BUILD_READY_RESEARCH_SOURCEPACK",
+  "existingIdentity": {
+    "instrumentKey": "tswq_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "suggestedIdentity": {
+    "instrumentKey": "tswq_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "versionStrategy": "Separate Chinese localization key; preserve existing English 1.0.0 byte-for-byte. Do not claim validated equivalence. DRAFT/HIDDEN until human review.",
+  "titleZh": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+  "sourceLocale": "en",
+  "targetLocale": "zh-CN",
+  "localizationStatus": "INDEPENDENT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "items": [
+    {
+      "itemCode": "TSWQ-01",
+      "originalEnglish": "I feel like I belong at this school.",
+      "workingChinese": "我觉得自己属于这所学校。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-02",
+      "originalEnglish": "I am a successful teacher.",
+      "workingChinese": "我是一名成功的教师。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-03",
+      "originalEnglish": "I can really be myself at this school.",
+      "workingChinese": "在这所学校，我能够真正做自己。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-04",
+      "originalEnglish": "I am good at helping students learn new things.",
+      "workingChinese": "我善于帮助学生学习新的东西。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-05",
+      "originalEnglish": "I feel like people at this school care about me.",
+      "workingChinese": "我觉得这所学校的人关心我。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-06",
+      "originalEnglish": "I have accomplished a lot as a teacher.",
+      "workingChinese": "作为教师，我已经取得了不少成就。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-07",
+      "originalEnglish": "I am treated with respect at this school.",
+      "workingChinese": "在这所学校，我受到尊重。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-08",
+      "originalEnglish": "I feel like my teaching is effective and helpful.",
+      "workingChinese": "我觉得自己的教学是有效而且有帮助的。",
+      "responseSetKey": "tswq_1_4"
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "tswq_1_4",
+      "options": [
+        {
+          "value": "1",
+          "label": "Almost Never",
+          "score": 1
+        },
+        {
+          "value": "2",
+          "label": "Sometimes",
+          "score": 2
+        },
+        {
+          "value": "3",
+          "label": "Often",
+          "score": 3
+        },
+        {
+          "value": "4",
+          "label": "Almost Always",
+          "score": 4
+        }
+      ]
+    }
+  ],
+  "originalScoringForInspection": {
+    "scoringVersion": "1.0.0",
+    "itemRules": [
+      {
+        "itemCode": "TSWQ-01",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-02",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-03",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-04",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-05",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-06",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-07",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "TSWQ-08",
+        "transform": {
+          "type": "identity"
+        }
+      }
+    ],
+    "defaultMissingPolicy": {
+      "type": "complete_required"
+    },
+    "scores": [
+      {
+        "key": "school_connectedness",
+        "type": "dimension",
+        "label": "School Connectedness",
+        "description": "Sum of TSWQ items 1, 3, 5, and 7.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 0,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "TSWQ-01",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-03",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-05",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-07",
+              "weight": 1
+            }
+          ],
+          "aggregation": "sum"
+        }
+      },
+      {
+        "key": "teaching_efficacy",
+        "type": "dimension",
+        "label": "Teaching Efficacy",
+        "description": "Sum of TSWQ items 2, 4, 6, and 8.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 0,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "TSWQ-02",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-04",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-06",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-08",
+              "weight": 1
+            }
+          ],
+          "aggregation": "sum"
+        }
+      },
+      {
+        "key": "teacher_subjective_wellbeing",
+        "type": "total",
+        "label": "Teacher Subjective Wellbeing",
+        "description": "Composite sum of all eight TSWQ items.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 0,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "TSWQ-01",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-02",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-03",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-04",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-05",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-06",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-07",
+              "weight": 1
+            },
+            {
+              "itemCode": "TSWQ-08",
+              "weight": 1
+            }
+          ],
+          "aggregation": "sum"
+        }
+      }
+    ]
+  },
+  "existingEvidenceForVerification": [
+    {
+      "evidenceId": "tswq-renshaw-2015",
+      "evidenceType": "STRUCTURAL_VALIDITY",
+      "population": "US elementary and middle school teachers",
+      "locale": "en",
+      "territory": "US",
+      "sampleSize": 185,
+      "studyDesign": "Initial instrument development; exploratory psychometric analyses, internal consistency, convergent/divergent validity, plus a smaller target teacher sample.",
+      "rating": "SUFFICIENT",
+      "citation": "Renshaw TL, Long ACJ, Cook CR. (2015). Assessing teachers' positive psychological functioning at work: Development and validation of the Teacher Subjective Wellbeing Questionnaire. School Psychology Quarterly, 30(2), 289–306.",
+      "doi": "10.1037/spq0000112",
+      "url": "https://doi.org/10.1037/spq0000112",
+      "notes": "Original development supports a two-factor structure: school connectedness and teaching efficacy."
+    },
+    {
+      "evidenceId": "tswq-mankin-2018",
+      "evidenceType": "MEASUREMENT_INVARIANCE",
+      "population": "US teachers across elementary, middle, and high school settings",
+      "locale": "en",
+      "territory": "US",
+      "sampleSize": 1883,
+      "studyDesign": "Confirmatory factor analysis and measurement invariance analyses across teacher/school groups.",
+      "rating": "SUFFICIENT",
+      "citation": "Mankin A, von der Embse N, Renshaw TL, Ryan SV. (2018). Assessing Teacher Wellness: Confirmatory Factor Analysis and Measurement Invariance of the Teacher Subjective Wellbeing Questionnaire. Journal of Psychoeducational Assessment, 36(3), 219–232.",
+      "doi": "10.1177/0734282917707142",
+      "url": "https://doi.org/10.1177/0734282917707142"
+    },
+    {
+      "evidenceId": "tswq-xie-2024-cn",
+      "evidenceType": "CROSS_CULTURAL_VALIDITY",
+      "population": "Teachers from 56 middle schools across nine provinces in mainland China",
+      "locale": "zh-CN",
+      "territory": "CN",
+      "sampleSize": 1463,
+      "studyDesign": "Chinese revision validation with CFA, reliability, criterion associations, one-month retest subsample, and invariance across gender and teaching stages.",
+      "rating": "SUFFICIENT",
+      "citation": "Xie et al. (2024). Chinese revision of the Teacher Subjective Wellbeing Questionnaire. Chinese Journal of Clinical Psychology.",
+      "doi": "10.16128/j.cnki.1005-3611.2024.04.030",
+      "url": "https://doi.org/10.16128/j.cnki.1005-3611.2024.04.030",
+      "notes": "Evidence supports a Chinese revision, but the exact Chinese item wording is not included in this English executable and must be separately source-verified before any zh-CN package is authored."
+    }
+  ],
+  "activeReferences": [],
+  "reportGeneral": {
+    "title": "给自己的工作状态留一点观察空间",
+    "limitation": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "invalid": "这部分回答不足，暂时不能形成可靠结果。你可以补充作答，也可以保留空白；缺失不等于没有困难。",
+    "reading": "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。"
+  },
+  "tags8Axes": {
+    "domain": [
+      "教师心理与职业健康"
+    ],
+    "construct": [
+      "学校归属感",
+      "教学自我效能",
+      "教师主观幸福感"
+    ],
+    "orientation": [
+      "非治疗流派专属"
+    ],
+    "population": [
+      "成人",
+      "教师"
+    ],
+    "responseMode": [
+      "自评"
+    ],
+    "useContext": [
+      "研究",
+      "个人反思"
+    ],
+    "license": [
+      "CC BY 4.0",
+      "可商业使用",
+      "须署名",
+      "改编需注明"
+    ],
+    "languageValidation": [
+      "中文工作译稿",
+      "待专家审校",
+      "未建立本地常模"
+    ]
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "permission": "Author2022permissionletter explicitly lists Teacher Subjective Wellbeing Questionnaire and grants use/share/adapt for research/practice underCCBY4;2020author guide also carriesCCBY4. Do not confuse with SSWQ16.",
+    "attribution": "Renshaw, T. L. (2020). Teacher Subjective Wellbeing Questionnaire (TSWQ): Measure and user guide. Open Science Framework. https://osf.io/6548v. Renshaw, T. L., Long, A. C. J., & Cook, C. R. (2015). Assessing teachers’ positive psychological functioning at work: Development and validation of the Teacher Subjective Wellbeing Questionnaire. School Psychology Quarterly,30(2),289–306. https://doi.org/10.1037/spq0000112.",
+    "changes": "Independent Simplified Chinese working translation and new explanatory feedback; not approved/validated by Renshaw."
+  },
+  "sources": [
+    {
+      "url": "https://bradfordatrpartnership.co.uk/Resources/3%20Resilience/Student%20and%20Teacher%20Well-being%20Scales/Teacher%20Wellbeing%20Questionnaire.pdf",
+      "role": "mirror of author2020 original instrument+guide, version03-28-20; self-identifies author OSF6548v",
+      "localFile": null,
+      "sha256": null,
+      "hashStatus": "binary_download_403_do_not_invent_hash",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://www.tyrenshaw.org/content/files/2022/08/Renshaw-measures-permission-letter.pdf",
+      "role": "officialauthorpermission indexed search text; binary403",
+      "localFile": null,
+      "sha256": null,
+      "hashStatus": "binary_download_403_do_not_invent_hash",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://osf.io/6548v",
+      "role": "canonical author guide landing",
+      "accessStatus": "403; do not pretend direct download succeeded"
+    },
+    {
+      "url": "https://www.apa.org/pubs/journals/features/spq-spq0000112.pdf",
+      "role": "originaldevelopmentstudy; abstract confirms185general and21target educators; not republishing article"
+    },
+    {
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-teacher-workplace-20261025/web-evidence.json",
+      "sha256": "13bb8ab6c1771e1c4e87e00d847ce75ce2a4ae58d471cd8eba1a8cb1c36afc3c",
+      "hashStatus": "WEB_TOOL_EXTRACT_NOT_ORIGINAL_PDF"
+    }
+  ],
+  "administration": {
+    "instructionsEnglish": "Below are some questions about your experiences as a teacher. Read each sentence and choose the one response that best describes how you felt in the past month.",
+    "instructionsZh": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。",
+    "timeframe": "past month",
+    "fixedItemOrder": true
+  },
+  "responseSetsZh": {
+    "tswq_1_4": [
+      "几乎从不",
+      "有时",
+      "经常",
+      "几乎总是"
+    ]
+  },
+  "responseAnchorMapping": [
+    {
+      "value": 1,
+      "english": "Almost Never",
+      "chinese": "几乎从不"
+    },
+    {
+      "value": 2,
+      "english": "Sometimes",
+      "chinese": "有时"
+    },
+    {
+      "value": 3,
+      "english": "Often",
+      "chinese": "经常"
+    },
+    {
+      "value": 4,
+      "english": "Almost Always",
+      "chinese": "几乎总是"
+    }
+  ],
+  "scoringNotes": {
+    "reverse": [],
+    "school_connectedness": {
+      "items": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "aggregation": "sum",
+      "range": [
+        4,
+        16
+      ]
+    },
+    "teaching_efficacy": {
+      "items": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "aggregation": "sum",
+      "range": [
+        4,
+        16
+      ]
+    },
+    "teacher_subjective_wellbeing": {
+      "items": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "aggregation": "sum",
+      "range": [
+        8,
+        32
+      ]
+    },
+    "missing": "Author guide does not specify missing-value imputation; complete_required is explicit conservative implementation, not author-derived rule. Invalid means unavailable, notzero.",
+    "optionalDerivedMean": "Author explicitly permits sum/itemcount for response-anchor interpretation. If adding mean as separate score, mark derived, preserve canonical sum; no arbitrary low/moderate/high categories."
+  },
+  "externalReferenceDossier": {
+    "activate": false,
+    "developmentPopulation": "2015 two samples:185elementary/middle school teachers;21elementary teachers experiencing classroom-management challenges. Not Chinese calibration or national norms.",
+    "guideStatement": "2020 guide explicitly says no large-scale national/regional/local normative data are available.",
+    "thresholds": [],
+    "interpretation": "Response-anchored means only: exact2 corresponds sometimes;3.5 lies between often/almostalways. This is an average subjective experience, not teacher effectiveness observed by others.",
+    "evidenceRefs": [
+      "https://doi.org/10.1037/spq0000112",
+      "https://osf.io/6548v"
+    ]
+  },
+  "reportDimensions": {
+    "school_connectedness": {
+      "title": "在学校有没有“自己人”的感觉",
+      "meaning": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。",
+      "reflection": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？",
+      "action": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+    },
+    "teaching_efficacy": {
+      "title": "你对自己教学的信心与成就感",
+      "meaning": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。",
+      "reflection": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？",
+      "action": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+    },
+    "teacher_subjective_wellbeing": {
+      "title": "这个月的教师生活，感觉怎么样",
+      "meaning": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。",
+      "reflection": "你更想先改善支持感，还是找回教学中的小成就？",
+      "action": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+    }
+  }
+}

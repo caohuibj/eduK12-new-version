@@ -1,0 +1,305 @@
+{
+  "researched_at": "2026-10-25",
+  "artifact_kind": "research-sourcepack-not-runtime-ingestion",
+  "class": 1,
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "copyrighted": false,
+    "public_github": true,
+    "translation_basis": "Independent derivative of public-domain original; no third-party Chinese translation copied.",
+    "official_statement": "This measure was developed by staff at VA's National Center for PTSD and is in the public domain and not copyrighted.",
+    "professional_use_statement": "In accordance with the American Psychological Association's ethical guidelines, this instrument is intended for use by qualified health professionals and researchers."
+  },
+  "translation_status": "独立中文工作译稿，非官方中文版，未回译、认知访谈或中文版心理测量验证；专家审核 PENDING。",
+  "governance": {
+    "status": "DRAFT",
+    "visibility": "HIDDEN",
+    "professional_use_only": true,
+    "adult_reference_only": true,
+    "chinese_norm": false,
+    "runtime_references": [],
+    "clinical_thresholds_active": false,
+    "runtimeSelected": false,
+    "no_school_stage_fabrication": true
+  },
+  "missing_policy": {
+    "source": "所查官方页面/PDF未给出缺失题插补规则。",
+    "project_policy": "NO gate is an intentional structural skip with total0, not missing-data imputation. YES requires all5 valid answers. Missing gate or missing required symptom cannot score."
+  },
+  "tags": [
+    "创伤与应激",
+    "专业评估辅助",
+    "成人原版证据",
+    "本人自评",
+    "公共领域",
+    "中文工作译稿",
+    "非诊断",
+    "外部阈值未启用"
+  ],
+  "no_therapy_orientation_claim": true,
+  "report": {
+    "title": "了解困扰留下的影响",
+    "meaning": "这份记录整理了你最近一个月的体验，帮助你和专业人员交流；它不是诊断，也不评价你是否坚强。",
+    "life_example": "相似的提醒、睡眠变化或在人群中的感受，可能影响不同人的日常生活；请以你实际经历为准。",
+    "reflection": "哪些体验最影响你的睡眠、日常安排或与人相处？有没有你希望向专业人员说明、但题目没有问到的部分？",
+    "action": "可以把最想讨论的体验记下来，在合适的专业评估中说明。你无需在报告中公开事件细节。",
+    "limits": "较少勾选或较低得分不代表没有困扰、没有风险，也不能排除需要帮助。当前中文工作稿不提供自动诊断、严重程度标签或中国人群比较。",
+    "illustration_brief": "可选抽象日常记录卡插图，不出现创伤场景、病名标签或风险仪表盘。",
+    "gate_no": "你未报告题目列出的这类经历，因此按原量表规则到此结束。这不代表已经逐项了解你的所有体验，也不代表没有其他困扰。"
+  },
+  "publication_gate": [
+    "保留作者、版本、官方来源、公共领域说明及独立翻译声明",
+    "专业用途与知情同意、可停止答题、不强迫披露事件细节",
+    "未经临床人员确认，不按阈值自动诊断或形成临床处置",
+    "成人外部证据仅 DOCUMENTATION_ONLY，不冒充中国常模，不映射学生学段",
+    "Conditional routing must be faithful; no routing engine means source pack may be public but executable candidate HOLD"
+  ],
+  "id": "PC-PTSD-5",
+  "name_en": "Primary Care PTSD Screen for DSM-5 (PC-PTSD-5)",
+  "name_zh": "基层医疗创伤后应激障碍筛查（PC-PTSD-5）",
+  "version": "Official 2022 form; instrument citation 2015",
+  "citation": "Prins, A., Bovin, M. J., Kimerling, R., Kaloupek, D. G., Marx, B. P., Pless Kaiser, A., & Schnurr, P. P. (2015). Primary Care PTSD Screen for DSM-5 (PC-PTSD-5) [Measurement instrument]. National Center for PTSD.",
+  "timeframe": "Lifetime exposure gate, followed by past-month symptoms / 终生暴露门题，随后过去一个月体验",
+  "source_files": [
+    {
+      "url": "https://www.ptsd.va.gov/PTSD/professional/assessment/documents/pc-ptsd-5-v6.pdf",
+      "local_path": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-trauma-20261025/sources/pc-ptsd-5-v6.pdf",
+      "sha256": "70c1ef7ccad2423d39ef9f50e46d50faa36f8ad71d9d8479641029f80860702e"
+    },
+    {
+      "url": "https://www.ptsd.va.gov/professional/assessment/screens/pc-ptsd.asp",
+      "local_path": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-trauma-20261025/sources/PCPTSD5_license_scoring.html",
+      "sha256": "dab9b27b5e2f1a2b2196d48b49c32265cdc43355dca7a485c6e36c2ed9a5f81b"
+    }
+  ],
+  "exposure_gate": {
+    "id": "trauma_exposure",
+    "scored_as_symptom": false,
+    "required": true,
+    "instruction_en": "Sometimes things happen to people that are unusually or especially frightening, horrible, or traumatic. For example:",
+    "instruction_zh": "有时，人们会经历异常或特别令人害怕、恐怖或造成创伤的事情。例如：",
+    "examples_en": [
+      "a serious accident or fire",
+      "a physical or sexual assault or abuse",
+      "an earthquake or flood",
+      "a war",
+      "seeing someone be killed or seriously injured",
+      "having a loved one die through homicide or suicide."
+    ],
+    "examples_zh": [
+      "严重事故或火灾",
+      "身体或性方面的侵犯或虐待",
+      "地震或洪水",
+      "战争",
+      "目睹有人被杀害或严重受伤",
+      "所爱的人死于他杀或自杀。"
+    ],
+    "question_en": "Have you ever experienced this kind of event?",
+    "question_zh": "你是否曾经经历过这类事件？",
+    "anchors": [
+      {
+        "value": "YES",
+        "en": "YES",
+        "zh": "是"
+      },
+      {
+        "value": "NO",
+        "en": "NO",
+        "zh": "否"
+      }
+    ],
+    "no_branch": {
+      "instruction_en": "If no, screen total = 0. Please stop here.",
+      "instruction_zh": "如果回答“否”，筛查总分为0。请到此停止。",
+      "skip_symptoms": true,
+      "total": 0,
+      "report_distinguish": "按未报告所列经历的停止规则结束；并非已否认五项症状，不意味着排除困扰或风险。"
+    },
+    "yes_branch": {
+      "instruction_en": "If yes, please answer the questions below.",
+      "instruction_zh": "如果回答“是”，请回答下面的问题。",
+      "required_items": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "missing_branch": "Stop, incomplete, no total. Never treat missing exposure as NO."
+  },
+  "stem_en": "In the past month, have you...",
+  "stem_zh": "在过去一个月里，你是否……",
+  "response_anchors": [
+    {
+      "value": 1,
+      "en": "YES",
+      "zh": "是"
+    },
+    {
+      "value": 0,
+      "en": "NO",
+      "zh": "否"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "had nightmares about the event(s) or thought about the event(s) when you did not want to?",
+      "zh": "做过与那件事（或那些事）有关的噩梦，或者在不想回想时仍想到那件事（或那些事）？",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "tried hard not to think about the event(s) or went out of your way to avoid situations that reminded you of the event(s)?",
+      "zh": "努力不去想那件事（或那些事），或特意避开会让你想起那件事（或那些事）的情境？",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "been constantly on guard, watchful, or easily startled?",
+      "zh": "一直保持戒备、留意周围，或容易受惊？",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "en": "felt numb or detached from people, activities, or your surroundings?",
+      "zh": "感到麻木，或与他人、活动或周围环境疏离？",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "felt guilty or unable to stop blaming yourself or others for the event(s) or any problems the event(s) may have caused?",
+      "zh": "因为那件事（或那些事）或它们可能造成的任何问题而感到内疚，或无法停止责怪自己或他人？",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "total": "If gate NO then 0 and stop; if gate YES then sum of YES in symptom items 1–5",
+    "range": [
+      0,
+      5
+    ],
+    "reverse_items": [],
+    "exposure_gate_contributes": 0,
+    "direction": "Higher = more endorsed past-month experiences; not diagnosis",
+    "routing_implementation_gate": "Do not instantiate executable instrument unless exposure gate is required, NO branch stops with 0, YES branch requires all 5 items, and missing gate cannot score. The 5 symptoms cannot be substituted as standalone form or ordinary six-item summed scale."
+  },
+  "external_reference_dossier": [
+    {
+      "status": "DOCUMENTATION_ONLY",
+      "active": false,
+      "runtimeSelected": false,
+      "cutoff": 4,
+      "operator": ">=",
+      "purpose": "Balance false positives and negatives in original overall/male sample; positive screen requires further assessment",
+      "population": "396 US veterans seeking VA primary care; mean age 61.4 (SD15.5), range21–93;333 men (84.1%); not Chinese or school population",
+      "overall_sensitivity": 0.78,
+      "overall_specificity": 0.91,
+      "female_caution": "At cutpoint4 female sensitivity0.67 and 6 of18 CAPS-5-positive women missed; lower cutpoint may be considered by clinicians depending on setting/resources. Do not auto-assign cutoff by user sex.",
+      "alternative_cutpoint3": {
+        "overall_sensitivity": 0.9,
+        "overall_specificity": 0.8,
+        "female_sensitivity": 0.89,
+        "female_specificity": 0.7
+      },
+      "source": "https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2775926",
+      "doi": "10.1001/jamanetworkopen.2020.36733",
+      "citation": "Bovin MJ, Kimerling R, Weathers FW, et al. (2021). Diagnostic Accuracy and Acceptability of the PC-PTSD-5 Among US Veterans. JAMA Network Open,4(2),e2036733.",
+      "limitations": "Clinical screening, not diagnosis. Performance changes by population and purpose; no norm/threshold validated for this Chinese working translation. No automatic active cut-point."
+    }
+  ],
+  "test_vectors": [
+    {
+      "gate": "NO",
+      "answers": null,
+      "total": 0,
+      "answered_symptoms": 0,
+      "expect": "skip symptom pages; gate-based report, not symptoms absent report"
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total": 0
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "total": 5
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "total": 3
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "expect": "reject incomplete"
+    },
+    {
+      "gate": null,
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject missing gate"
+    },
+    {
+      "gate": "YES",
+      "answers": [
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject invalid"
+    },
+    {
+      "gate": "NO",
+      "answers": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expect": "contradictory payload must not sum to5; reject inconsistent stale symptom data or explicitly clear before scoring"
+    }
+  ],
+  "implementationStatus": {
+    "publicSourceArchive": "ALLOWED_PUBLIC_DOMAIN",
+    "executable": "HOLD_SYSTEM_CAPABILITY",
+    "registered": false,
+    "dbImported": false,
+    "selectedFormUnmodified": true,
+    "note": "仅公开研究资料，未采用删字段或把原门题改为普通计分题的简化方式。源包privacy中的替代呈现建议未实施。"
+  }
+}

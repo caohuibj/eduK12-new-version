@@ -1,0 +1,207 @@
+{
+  "items": [
+    {
+      "itemCode": "CBI-P1",
+      "originalEnglish": "How often do you feel tired?",
+      "workingChinese": "你多久会感到疲倦？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-P2",
+      "originalEnglish": "How often are you physically exhausted?",
+      "workingChinese": "你多久会感到身体精疲力竭？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-P3",
+      "originalEnglish": "How often are you emotionally exhausted?",
+      "workingChinese": "你多久会感到情绪上精疲力竭？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-P4",
+      "originalEnglish": "How often do you think: “I can’t take it anymore”?",
+      "workingChinese": "你多久会觉得：“我再也撑不下去了”？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-P5",
+      "originalEnglish": "How often do you feel worn out?",
+      "workingChinese": "你多久会感到筋疲力尽？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-P6",
+      "originalEnglish": "How often do you feel weak and susceptible to illness?",
+      "workingChinese": "你多久会感到虚弱、容易生病？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-W1",
+      "originalEnglish": "Is your work emotionally exhausting?",
+      "workingChinese": "你的工作在多大程度上让你情绪耗竭？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-W2",
+      "originalEnglish": "Do you feel burnt out because of your work?",
+      "workingChinese": "你在多大程度上因工作而感到身心耗竭？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-W3",
+      "originalEnglish": "Does your work frustrate you?",
+      "workingChinese": "你的工作在多大程度上让你感到挫败？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-W4",
+      "originalEnglish": "Do you feel worn out at the end of the working day?",
+      "workingChinese": "一天工作结束时，你多久会感到筋疲力尽？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-W5",
+      "originalEnglish": "Are you exhausted in the morning at the thought of another day at work?",
+      "workingChinese": "早上想到又要工作一天时，你多久会感到精疲力竭？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-W6",
+      "originalEnglish": "Do you feel that every working hour is tiring for you?",
+      "workingChinese": "你多久会觉得工作中的每一个小时都很累？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-W7",
+      "originalEnglish": "Do you have enough energy for family and friends during leisure time?",
+      "workingChinese": "在闲暇时间，你多久有足够的精力陪伴家人和朋友？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-C1",
+      "originalEnglish": "Do you find it hard to work with clients?",
+      "workingChinese": "你在多大程度上觉得与服务对象一起工作很困难？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-C2",
+      "originalEnglish": "Do you find it frustrating to work with clients?",
+      "workingChinese": "你在多大程度上觉得与服务对象一起工作令人挫败？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-C3",
+      "originalEnglish": "Does it drain your energy to work with clients?",
+      "workingChinese": "与服务对象一起工作在多大程度上消耗你的精力？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-C4",
+      "originalEnglish": "Do you feel that you give more than you get back when you work with clients?",
+      "workingChinese": "与服务对象一起工作时，你在多大程度上觉得自己的付出多于得到的回报？",
+      "responseSetKey": "cbi_degree"
+    },
+    {
+      "itemCode": "CBI-C5",
+      "originalEnglish": "Are you tired of working with clients?",
+      "workingChinese": "你多久会对与服务对象一起工作感到厌倦？",
+      "responseSetKey": "cbi_frequency"
+    },
+    {
+      "itemCode": "CBI-C6",
+      "originalEnglish": "Do you sometimes wonder how long you will be able to continue working with clients?",
+      "workingChinese": "你多久会想，自己还能继续与服务对象一起工作多长时间？",
+      "responseSetKey": "cbi_frequency"
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "cbi_frequency",
+      "options": [
+        {
+          "value": "always",
+          "label": "Always",
+          "score": 100
+        },
+        {
+          "value": "often",
+          "label": "Often",
+          "score": 75
+        },
+        {
+          "value": "sometimes",
+          "label": "Sometimes",
+          "score": 50
+        },
+        {
+          "value": "seldom",
+          "label": "Seldom",
+          "score": 25
+        },
+        {
+          "value": "never_almost_never",
+          "label": "Never/almost never",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "key": "cbi_degree",
+      "options": [
+        {
+          "value": "very_high",
+          "label": "To a very high degree",
+          "score": 100
+        },
+        {
+          "value": "high",
+          "label": "To a high degree",
+          "score": 75
+        },
+        {
+          "value": "somewhat",
+          "label": "Somewhat",
+          "score": 50
+        },
+        {
+          "value": "low",
+          "label": "To a low degree",
+          "score": 25
+        },
+        {
+          "value": "very_low",
+          "label": "To a very low degree",
+          "score": 0
+        }
+      ]
+    }
+  ],
+  "responseSetsZh": {
+    "cbi_frequency": [
+      "总是",
+      "经常",
+      "有时",
+      "很少",
+      "从不或几乎从不"
+    ],
+    "cbi_degree": [
+      "程度非常高",
+      "程度较高",
+      "有一些",
+      "程度较低",
+      "程度非常低"
+    ]
+  },
+  "administration": {
+    "instructionsZh": "请结合自己的实际感受作答。前两部分关注整体疲惫和工作相关疲惫；第三部分关注与服务对象互动带来的疲惫。在学校情境中，服务对象可以指学生。各部分的选项不同，请留意选项文字。",
+    "timeframe": "Original does not specify a fixed lookback; do not invent past2weeks/month.",
+    "layout": "Official recommends interspersing with unrelated questionnaire items to reduce stereotyped responses. Standalone grouped digital layout is a declared presentation change, not identical PUMA administration."
+  },
+  "translationStatus": "UNVALIDATED_WORKING_TRANSLATION",
+  "presentationChanges": [
+    "保留原题顺序和逐题响应集。",
+    "指导语移入第一题之前，是明确记录的数字呈现调整，不声称原验证版式。",
+    "Official recommends interspersing with unrelated questionnaire items to reduce stereotyped responses. Standalone grouped digital layout is a declared presentation change, not identical PUMA administration."
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "exposure_gate": {
+    "id": "trauma_exposure",
+    "scored_as_symptom": false,
+    "required": true,
+    "instruction_en": "Sometimes things happen to people that are unusually or especially frightening, horrible, or traumatic. For example:",
+    "instruction_zh": "有时，人们会经历异常或特别令人害怕、恐怖或造成创伤的事情。例如：",
+    "examples_en": [
+      "a serious accident or fire",
+      "a physical or sexual assault or abuse",
+      "an earthquake or flood",
+      "a war",
+      "seeing someone be killed or seriously injured",
+      "having a loved one die through homicide or suicide."
+    ],
+    "examples_zh": [
+      "严重事故或火灾",
+      "身体或性方面的侵犯或虐待",
+      "地震或洪水",
+      "战争",
+      "目睹有人被杀害或严重受伤",
+      "所爱的人死于他杀或自杀。"
+    ],
+    "question_en": "Have you ever experienced this kind of event?",
+    "question_zh": "你是否曾经经历过这类事件？",
+    "anchors": [
+      {
+        "value": "YES",
+        "en": "YES",
+        "zh": "是"
+      },
+      {
+        "value": "NO",
+        "en": "NO",
+        "zh": "否"
+      }
+    ],
+    "no_branch": {
+      "instruction_en": "If no, screen total = 0. Please stop here.",
+      "instruction_zh": "如果回答“否”，筛查总分为0。请到此停止。",
+      "skip_symptoms": true,
+      "total": 0,
+      "report_distinguish": "按未报告所列经历的停止规则结束；并非已否认五项症状，不意味着排除困扰或风险。"
+    },
+    "yes_branch": {
+      "instruction_en": "If yes, please answer the questions below.",
+      "instruction_zh": "如果回答“是”，请回答下面的问题。",
+      "required_items": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "missing_branch": "Stop, incomplete, no total. Never treat missing exposure as NO."
+  },
+  "stem_en": "In the past month, have you...",
+  "stem_zh": "在过去一个月里，你是否……",
+  "response_anchors": [
+    {
+      "value": 1,
+      "en": "YES",
+      "zh": "是"
+    },
+    {
+      "value": 0,
+      "en": "NO",
+      "zh": "否"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "had nightmares about the event(s) or thought about the event(s) when you did not want to?",
+      "zh": "做过与那件事（或那些事）有关的噩梦，或者在不想回想时仍想到那件事（或那些事）？",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "tried hard not to think about the event(s) or went out of your way to avoid situations that reminded you of the event(s)?",
+      "zh": "努力不去想那件事（或那些事），或特意避开会让你想起那件事（或那些事）的情境？",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "been constantly on guard, watchful, or easily startled?",
+      "zh": "一直保持戒备、留意周围，或容易受惊？",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "en": "felt numb or detached from people, activities, or your surroundings?",
+      "zh": "感到麻木，或与他人、活动或周围环境疏离？",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "felt guilty or unable to stop blaming yourself or others for the event(s) or any problems the event(s) may have caused?",
+      "zh": "因为那件事（或那些事）或它们可能造成的任何问题而感到内疚，或无法停止责怪自己或他人？",
+      "reverse": false
+    }
+  ]
+}

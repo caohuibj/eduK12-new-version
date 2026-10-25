@@ -1,0 +1,30 @@
+{
+  "base": "02db018a3d1a7a17894123f140f06d95546f7616",
+  "executablePackages": [
+    "cbi_zh_cn@1.0.0",
+    "tswq_zh_cn@1.0.0",
+    "hse_msit_zh_cn@1.0.0"
+  ],
+  "documentationOnly": [
+    "pcl5",
+    "pc_ptsd5"
+  ],
+  "uniqueTests": 53,
+  "contentTests": 39,
+  "sourceContractTests": 6,
+  "catalogRegistryTests": 8,
+  "reviewRerunTests": 14,
+  "actualEngineExampleCount": 12,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "testExitCode": 0,
+  "noBrowserAcceptance": true,
+  "dbWrites": false,
+  "pushPerformed": false,
+  "independentReview": "PENDING",
+  "notes": [
+    "首次误指定不存在的 instrument-registry.test.ts，没有执行任何测试；已改跑真实 instrument-source.test.ts(6) 与 scale-library-catalog-registry.test.ts(8)，均通过。",
+    "CBI标题方向经独立审查后修正并重生成实际报告；14项对应测试重跑通过。",
+    "typecheck在文案修正前通过，后续仅JSON标题与文档更新，没有TS类型或执行逻辑变化。"
+  ]
+}

@@ -1,0 +1,425 @@
+{
+  "researched_at": "2026-10-25",
+  "artifact_kind": "research-sourcepack-not-runtime-ingestion",
+  "class": 1,
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "copyrighted": false,
+    "public_github": true,
+    "translation_basis": "Independent derivative of public-domain original; no third-party Chinese translation copied.",
+    "official_statement": "This measure was developed by staff at VA's National Center for PTSD and is in the public domain and not copyrighted.",
+    "professional_use_statement": "In accordance with the American Psychological Association's ethical guidelines, this instrument is intended for use by qualified health professionals and researchers."
+  },
+  "translation_status": "独立中文工作译稿，非官方中文版，未回译、认知访谈或中文版心理测量验证；专家审核 PENDING。",
+  "governance": {
+    "status": "DRAFT",
+    "visibility": "HIDDEN",
+    "professional_use_only": true,
+    "adult_reference_only": true,
+    "chinese_norm": false,
+    "runtime_references": [],
+    "clinical_thresholds_active": false,
+    "runtimeSelected": false,
+    "no_school_stage_fabrication": true
+  },
+  "missing_policy": {
+    "source": "所查官方页面/PDF未给出缺失题插补规则。",
+    "project_policy": "完整必要题目才计算；拒绝缺失、越界或非整数输入，不插补、不折算。该规则为保守实现而非作者规则。"
+  },
+  "tags": [
+    "创伤与应激",
+    "专业评估辅助",
+    "成人原版证据",
+    "本人自评",
+    "公共领域",
+    "中文工作译稿",
+    "非诊断",
+    "外部阈值未启用"
+  ],
+  "no_therapy_orientation_claim": true,
+  "report": {
+    "title": "了解困扰留下的影响",
+    "meaning": "这份记录整理了你最近一个月的体验，帮助你和专业人员交流；它不是诊断，也不评价你是否坚强。",
+    "life_example": "相似的提醒、睡眠变化或在人群中的感受，可能影响不同人的日常生活；请以你实际经历为准。",
+    "reflection": "哪些体验最影响你的睡眠、日常安排或与人相处？有没有你希望向专业人员说明、但题目没有问到的部分？",
+    "action": "可以把最想讨论的体验记下来，在合适的专业评估中说明。你无需在报告中公开事件细节。",
+    "limits": "较少勾选或较低得分不代表没有困扰、没有风险，也不能排除需要帮助。当前中文工作稿不提供自动诊断、严重程度标签或中国人群比较。",
+    "illustration_brief": "可选抽象日常记录卡插图，不出现创伤场景、病名标签或风险仪表盘。"
+  },
+  "publication_gate": [
+    "保留作者、版本、官方来源、公共领域说明及独立翻译声明",
+    "专业用途与知情同意、可停止答题、不强迫披露事件细节",
+    "未经临床人员确认，不按阈值自动诊断或形成临床处置",
+    "成人外部证据仅 DOCUMENTATION_ONLY，不冒充中国常模，不映射学生学段"
+  ],
+  "id": "PCL-5",
+  "name_en": "PTSD Checklist for DSM-5 (PCL-5), Past Month, Standard",
+  "name_zh": "创伤后应激障碍检查表（PCL-5，过去一个月标准版）",
+  "version": "Official 2023 PDF cover version 29 August 2023; form footer 18 August 2023; instrument citation 2013",
+  "citation": "Weathers, F. W., Litz, B. T., Keane, T. M., Palmieri, P. A., Marx, B. P., & Schnurr, P. P. (2013). The PTSD Checklist for DSM-5 (PCL-5) – Standard [Measurement instrument]. National Center for PTSD.",
+  "timeframe": "past month / 过去一个月",
+  "completion_minutes": "5–10",
+  "source_files": [
+    {
+      "url": "https://www.ptsd.va.gov/PTSD/professional/assessment/documents/PCL5_Standard_form.pdf",
+      "local_path": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-trauma-20261025/sources/PCL5_Standard_form.pdf",
+      "sha256": "80e133dd9eb977bef1aa21401ec8c8b19fecaec7856437bc2dcc3a44b5c07bd3"
+    },
+    {
+      "url": "https://www.ptsd.va.gov/professional/assessment/adult-sr/ptsd-checklist.asp",
+      "local_path": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-trauma-20261025/sources/PCL5_license_scoring.html",
+      "sha256": "c61e54e9b55fc3b11d3579f514324956d12422c669fba535ea569ae789fd0126"
+    }
+  ],
+  "instructions_en": "Below is a list of problems that people sometimes have in response to a very stressful experience. Keeping your worst event in mind, please read each problem carefully and then select one of the numbers to the right to indicate how much you have been bothered by that problem in the past month.",
+  "instructions_zh": "以下列出了一些人们在经历极大压力的事件后有时会遇到的问题。请想着你经历过的最糟糕的事件，仔细阅读每个问题，然后选择一个数字，表示在过去一个月里这个问题给你带来了多大困扰。",
+  "context_field": {
+    "en": "Your worst event:",
+    "zh": "你经历过的最糟糕的事件：",
+    "scored": false,
+    "privacy": "原表含非计分事件自由文本框；不得强迫公开事件详情。仅在心中确定同一事件可作为待专业审查的隐私最小化方案，但本轮未确认其呈现等效性，未批准删字段，不实施该替代流程。"
+  },
+  "stem_en": "In the past month, how much were you bothered by:",
+  "stem_zh": "在过去一个月里，以下问题给你带来了多大困扰？",
+  "response_anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "A little bit",
+      "zh": "有一点"
+    },
+    {
+      "value": 2,
+      "en": "Moderately",
+      "zh": "中等程度"
+    },
+    {
+      "value": 3,
+      "en": "Quite a bit",
+      "zh": "相当多"
+    },
+    {
+      "value": 4,
+      "en": "Extremely",
+      "zh": "极其严重"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "Repeated, disturbing, and unwanted memories of the stressful experience?",
+      "zh": "反复出现关于那段压力经历的令人不安、并非你想要的回忆？",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "Repeated, disturbing dreams of the stressful experience?",
+      "zh": "反复梦到那段压力经历，梦境让你不安？",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "Suddenly feeling or acting as if the stressful experience were actually happening again (as if you were actually back there reliving it)?",
+      "zh": "突然感觉或表现得像那段压力经历正在再次发生（仿佛你真的回到当时，重新经历了一遍）？",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "en": "Feeling very upset when something reminded you of the stressful experience?",
+      "zh": "当某些事物让你想起那段压力经历时，感到非常难受？",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "Having strong physical reactions when something reminded you of the stressful experience (for example, heart pounding, trouble breathing, sweating)?",
+      "zh": "当某些事物让你想起那段压力经历时，出现强烈的身体反应（例如心跳剧烈、呼吸困难、出汗）？",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "en": "Avoiding memories, thoughts, or feelings related to the stressful experience?",
+      "zh": "回避与那段压力经历有关的回忆、想法或感受？",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "en": "Avoiding external reminders of the stressful experience (for example, people, places, conversations, activities, objects, or situations)?",
+      "zh": "回避会让你想起那段压力经历的外界事物（例如某些人、地方、谈话、活动、物品或情境）？",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "en": "Trouble remembering important parts of the stressful experience?",
+      "zh": "难以记起那段压力经历中的重要部分？",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "en": "Having strong negative beliefs about yourself, other people, or the world (for example, having thoughts such as: I am bad, there is something seriously wrong with me, no one can be trusted, the world is completely dangerous)?",
+      "zh": "对自己、他人或世界抱有强烈的负面看法（例如：我是个坏人、我有很严重的问题、没有人值得信任、这个世界到处都是危险）？",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "en": "Blaming yourself or someone else for the stressful experience or what happened after it?",
+      "zh": "因为那段压力经历或之后发生的事情而责怪自己或其他人？",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "en": "Having strong negative feelings such as fear, horror, anger, guilt, or shame?",
+      "zh": "出现强烈的负面情绪，例如害怕、惊恐、愤怒、内疚或羞耻？",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "en": "Loss of interest in activities that you used to enjoy?",
+      "zh": "对以前喜欢的活动失去兴趣？",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "en": "Feeling distant or cut off from other people?",
+      "zh": "感到与他人疏远或隔绝？",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "en": "Trouble experiencing positive feelings (for example, being unable to feel happiness or have loving feelings for people close to you)?",
+      "zh": "难以感受到积极的情绪（例如无法感到快乐，或无法对亲近的人产生爱的感受）？",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "en": "Irritable behavior, angry outbursts, or acting aggressively?",
+      "zh": "表现得易怒、突然发火或有攻击性行为？",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "en": "Taking too many risks or doing things that could cause you harm?",
+      "zh": "过度冒险，或做可能伤害自己的事情？",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "en": "Being “superalert” or watchful or on guard?",
+      "zh": "处于“高度警觉”、留意周围或戒备的状态？",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "en": "Feeling jumpy or easily startled?",
+      "zh": "感到紧张不安或容易受惊？",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "en": "Having difficulty concentrating?",
+      "zh": "难以集中注意力？",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "en": "Trouble falling or staying asleep?",
+      "zh": "难以入睡或难以保持睡眠？",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "total": "sum items 1–20",
+    "range": [
+      0,
+      80
+    ],
+    "reverse_items": [],
+    "direction": "Higher = greater reported symptom burden; not diagnosis",
+    "clinical_clusters_documentation_only": {
+      "B": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "C": [
+        6,
+        7
+      ],
+      "D": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "E": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    "provisional_rule_documentation_only": "Item >=2 counts endorsed; >=1 B, >=1 C, >=2 D, >=2 E. Does not establish all diagnostic criteria. Disabled at runtime."
+  },
+  "administration_blocker": "This selected standard form omits Criterion A. Official VA says appropriate only when trauma exposure is measured by another method. Require a professionally established exposure assessment outside this instrument; cannot present as unrestricted general-stress quiz. Interpretation by clinician.",
+  "external_reference_dossier": [
+    {
+      "status": "DOCUMENTATION_ONLY",
+      "active": false,
+      "runtimeSelected": false,
+      "cutoff_range": [
+        31,
+        33
+      ],
+      "meaning": "Original adult veteran research optimally efficient probable PTSD cut points; not diagnosis",
+      "population": "Two independent samples of veterans receiving care at a Veterans Affairs Medical Center; total N=468",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/26653052/",
+      "doi": "10.1037/pas0000254",
+      "citation": "Bovin et al. (2016). Psychometric properties of the PCL-5 in Veterans. Psychological Assessment, 28(11), 1379–1391.",
+      "limitations": "Cutoff depends on population and screening purpose; not validated Chinese working-translation norms, not children/adolescents. No single selected runtime cutoff."
+    }
+  ],
+  "test_vectors": [
+    {
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "total": 0
+    },
+    {
+      "answers": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "total": 80
+    },
+    {
+      "answers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "total": 40
+    },
+    {
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject incomplete; no total"
+    },
+    {
+      "answers": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expect": "reject out of range"
+    }
+  ],
+  "implementationStatus": {
+    "publicSourceArchive": "ALLOWED_PUBLIC_DOMAIN",
+    "executable": "HOLD_SYSTEM_CAPABILITY",
+    "registered": false,
+    "dbImported": false,
+    "selectedFormUnmodified": true,
+    "note": "仅公开研究资料，未采用删字段或把原门题改为普通计分题的简化方式。源包privacy中的替代呈现建议未实施。"
+  }
+}

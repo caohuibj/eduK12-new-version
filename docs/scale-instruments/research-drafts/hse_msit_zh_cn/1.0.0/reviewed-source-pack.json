@@ -1,0 +1,1125 @@
+{
+  "status": "BUILD_READY_RESEARCH_SOURCEPACK",
+  "existingIdentity": {
+    "instrumentKey": "hse_msit_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "suggestedIdentity": {
+    "instrumentKey": "hse_msit_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "versionStrategy": "Separate Chinese localization key; preserve existing English 1.0.0 byte-for-byte. Do not claim validated equivalence. DRAFT/HIDDEN until human review.",
+  "titleZh": "HSE工作环境与压力管理问卷（35题，中文工作稿）",
+  "sourceLocale": "en",
+  "targetLocale": "zh-CN",
+  "localizationStatus": "INDEPENDENT_WORKING_SIMPLIFIED_CHINESE_TRANSLATION_NOT_VALIDATED_OFFICIAL_TRADITIONAL_REFERENCE_AVAILABLE",
+  "items": [
+    {
+      "itemCode": "HSE-01",
+      "originalEnglish": "I am clear what is expected of me at work",
+      "workingChinese": "我清楚工作中对我的要求。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-02",
+      "originalEnglish": "I can decide when to take a break",
+      "workingChinese": "我可以决定什么时候休息一下。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-03",
+      "originalEnglish": "Different groups at work demand things from me that are hard to combine",
+      "workingChinese": "工作中不同群体对我的要求很难兼顾。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-04",
+      "originalEnglish": "I know how to go about getting my job done",
+      "workingChinese": "我知道该怎样完成自己的工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-05",
+      "originalEnglish": "I am subject to personal harassment in the form of unkind words or behaviour",
+      "workingChinese": "我遭受到针对个人的骚扰，例如不友善的言语或行为。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-06",
+      "originalEnglish": "I have unachievable deadlines",
+      "workingChinese": "我被要求在无法做到的期限内完成工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-07",
+      "originalEnglish": "If work gets difficult, my colleagues will help me",
+      "workingChinese": "如果工作遇到困难，同事会帮助我。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-08",
+      "originalEnglish": "I am given supportive feedback on the work I do",
+      "workingChinese": "我所做的工作能得到支持性的反馈。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-09",
+      "originalEnglish": "I have to work very intensively",
+      "workingChinese": "我不得不以很高的强度工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-10",
+      "originalEnglish": "I have a say in my own work speed",
+      "workingChinese": "对于自己的工作速度，我有发言权。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-11",
+      "originalEnglish": "I am clear what my duties and responsibilities are",
+      "workingChinese": "我清楚自己的工作职责。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-12",
+      "originalEnglish": "I have to neglect some tasks because I have too much to do",
+      "workingChinese": "因为要做的事情太多，我不得不忽略某些任务。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-13",
+      "originalEnglish": "I am clear about the goals and objectives for my department",
+      "workingChinese": "我清楚所在部门的目标。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-14",
+      "originalEnglish": "There is friction or anger between colleagues",
+      "workingChinese": "同事之间存在摩擦或愤怒情绪。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-15",
+      "originalEnglish": "I have a choice in deciding how I do my work",
+      "workingChinese": "我可以选择怎样开展自己的工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-16",
+      "originalEnglish": "I am unable to take sufficient breaks",
+      "workingChinese": "我无法获得充分的休息。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-17",
+      "originalEnglish": "I understand how my work fits into the overall aim of the organisation",
+      "workingChinese": "我理解自己的工作如何配合组织的总体目标。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-18",
+      "originalEnglish": "I am pressured to work long hours",
+      "workingChinese": "我受到压力，需要长时间工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-19",
+      "originalEnglish": "I have a choice in deciding what I do at work",
+      "workingChinese": "我可以选择自己在工作中做什么。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-20",
+      "originalEnglish": "I have to work very fast",
+      "workingChinese": "我不得不非常快速地工作。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-21",
+      "originalEnglish": "I am subject to bullying at work",
+      "workingChinese": "我在工作中受到欺凌。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-22",
+      "originalEnglish": "I have unrealistic time pressures",
+      "workingChinese": "我承受着不切实际的时间压力。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-23",
+      "originalEnglish": "I can rely on my line manager to help me out with a work problem",
+      "workingChinese": "遇到工作问题时，我可以依靠直属主管提供帮助。",
+      "responseSetKey": "hse_frequency_1_5"
+    },
+    {
+      "itemCode": "HSE-24",
+      "originalEnglish": "I get help and support I need from colleagues",
+      "workingChinese": "我能从同事那里得到所需要的帮助和支持。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-25",
+      "originalEnglish": "I have some say over the way I work",
+      "workingChinese": "对于自己的工作方式，我有一定发言权。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-26",
+      "originalEnglish": "I have sufficient opportunities to question managers about change at work",
+      "workingChinese": "关于工作中的变动，我有充分机会向管理者提问。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-27",
+      "originalEnglish": "I receive the respect at work I deserve from my colleagues",
+      "workingChinese": "我在工作中受到同事应有的尊重。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-28",
+      "originalEnglish": "Staff are always consulted about change at work",
+      "workingChinese": "工作发生变动时，总会征求员工的意见。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-29",
+      "originalEnglish": "I can talk to my line manager about something that has upset or annoyed me about work",
+      "workingChinese": "对于工作中让我难过或烦恼的事情，我可以与直属主管交谈。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-30",
+      "originalEnglish": "My working time can be flexible",
+      "workingChinese": "我的工作时间可以灵活安排。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-31",
+      "originalEnglish": "My colleagues are willing to listen to my work-related problems",
+      "workingChinese": "同事愿意倾听我与工作有关的问题。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-32",
+      "originalEnglish": "When changes are made at work, I am clear how they will work out in practice",
+      "workingChinese": "工作发生变动时，我清楚这些变动将如何实际开展。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-33",
+      "originalEnglish": "I am supported through emotionally demanding work",
+      "workingChinese": "面对情绪负荷较高的工作时，我能得到支持。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-34",
+      "originalEnglish": "Relationships at work are strained",
+      "workingChinese": "工作中的人际关系紧张。",
+      "responseSetKey": "hse_agreement_1_5"
+    },
+    {
+      "itemCode": "HSE-35",
+      "originalEnglish": "My line manager encourages me at work",
+      "workingChinese": "直属主管在工作中鼓励我。",
+      "responseSetKey": "hse_agreement_1_5"
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "hse_frequency_1_5",
+      "options": [
+        {
+          "value": "never",
+          "label": "Never",
+          "score": 1
+        },
+        {
+          "value": "seldom",
+          "label": "Seldom",
+          "score": 2
+        },
+        {
+          "value": "sometimes",
+          "label": "Sometimes",
+          "score": 3
+        },
+        {
+          "value": "often",
+          "label": "Often",
+          "score": 4
+        },
+        {
+          "value": "always",
+          "label": "Always",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "key": "hse_agreement_1_5",
+      "options": [
+        {
+          "value": "strongly_disagree",
+          "label": "Strongly disagree",
+          "score": 1
+        },
+        {
+          "value": "disagree",
+          "label": "Disagree",
+          "score": 2
+        },
+        {
+          "value": "neutral",
+          "label": "Neutral",
+          "score": 3
+        },
+        {
+          "value": "agree",
+          "label": "Agree",
+          "score": 4
+        },
+        {
+          "value": "strongly_agree",
+          "label": "Strongly agree",
+          "score": 5
+        }
+      ]
+    }
+  ],
+  "originalScoringForInspection": {
+    "scoringVersion": "1.0.0",
+    "itemRules": [
+      {
+        "itemCode": "HSE-01",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-02",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-03",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-04",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-05",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-06",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-07",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-08",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-09",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-10",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-11",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-12",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-13",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-14",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-15",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-16",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-17",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-18",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-19",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-20",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-21",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-22",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-23",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-24",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-25",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-26",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-27",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-28",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-29",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-30",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-31",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-32",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-33",
+        "transform": {
+          "type": "identity"
+        }
+      },
+      {
+        "itemCode": "HSE-34",
+        "transform": {
+          "type": "reverse"
+        }
+      },
+      {
+        "itemCode": "HSE-35",
+        "transform": {
+          "type": "identity"
+        }
+      }
+    ],
+    "defaultMissingPolicy": {
+      "type": "complete_required"
+    },
+    "scores": [
+      {
+        "key": "demands",
+        "type": "dimension",
+        "label": "Demands",
+        "description": "HSE Management Standards Indicator Tool Demands scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-03",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-06",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-09",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-12",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-16",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-18",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-20",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-22",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "control",
+        "type": "dimension",
+        "label": "Control",
+        "description": "HSE Management Standards Indicator Tool Control scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-02",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-10",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-15",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-19",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-25",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-30",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "managerial_support",
+        "type": "dimension",
+        "label": "Managerial Support",
+        "description": "HSE Management Standards Indicator Tool Managerial Support scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-08",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-23",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-29",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-33",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-35",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "peer_support",
+        "type": "dimension",
+        "label": "Peer Support",
+        "description": "HSE Management Standards Indicator Tool Peer Support scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-07",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-24",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-27",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-31",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "relationships",
+        "type": "dimension",
+        "label": "Relationships",
+        "description": "HSE Management Standards Indicator Tool Relationships scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-05",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-14",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-21",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-34",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "role",
+        "type": "dimension",
+        "label": "Role",
+        "description": "HSE Management Standards Indicator Tool Role scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-01",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-04",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-11",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-13",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-17",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      },
+      {
+        "key": "change",
+        "type": "dimension",
+        "label": "Change",
+        "description": "HSE Management Standards Indicator Tool Change scale mean (1–5); higher values indicate a more favourable reported psychosocial work environment on this dimension.",
+        "direction": "higher_is_better",
+        "canonical": true,
+        "displayPrecision": 2,
+        "missingPolicy": {
+          "type": "complete_required"
+        },
+        "source": {
+          "type": "items",
+          "items": [
+            {
+              "itemCode": "HSE-26",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-28",
+              "weight": 1
+            },
+            {
+              "itemCode": "HSE-32",
+              "weight": 1
+            }
+          ],
+          "aggregation": "mean"
+        }
+      }
+    ]
+  },
+  "existingEvidenceForVerification": [
+    {
+      "evidenceId": "hse-msit-edwards-2008",
+      "evidenceType": "STRUCTURAL_VALIDITY",
+      "population": "Employees from 39 UK organisations",
+      "locale": "en-GB",
+      "territory": "GB",
+      "sampleSize": 26382,
+      "studyDesign": "Large-sample confirmatory factor analysis of the 35-item HSE Indicator Tool; first-order seven-factor and higher-order models evaluated.",
+      "rating": "SUFFICIENT",
+      "citation": "Edwards JA, Webster S, Van Laar D, Easton S. (2008). Psychometric analysis of the UK Health and Safety Executive's Management Standards work-related stress Indicator Tool. Work & Stress, 22(2).",
+      "doi": "10.1080/02678370802166599",
+      "url": "https://doi.org/10.1080/02678370802166599"
+    }
+  ],
+  "activeReferences": [],
+  "reportGeneral": {
+    "title": "给自己的工作状态留一点观察空间",
+    "limitation": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+    "invalid": "这部分回答不足，暂时不能形成可靠结果。你可以补充作答，也可以保留空白；缺失不等于没有困难。",
+    "reading": "把结果当作一张工作环境观察清单：哪些条件在支持你，哪些需要一起改善。它不是个人抗压能力成绩，也不是学校排行榜。单个人的回答不能代表整所学校，组织结论还需员工讨论和其他信息核实。"
+  },
+  "tags8Axes": {
+    "domain": [
+      "教师心理与职业健康"
+    ],
+    "construct": [
+      "心理社会工作环境",
+      "工作要求",
+      "自主空间",
+      "组织与同伴支持",
+      "角色清晰",
+      "变革沟通"
+    ],
+    "orientation": [
+      "非治疗流派专属"
+    ],
+    "population": [
+      "成人",
+      "教师"
+    ],
+    "responseMode": [
+      "自评"
+    ],
+    "useContext": [
+      "研究",
+      "个人反思",
+      "工作环境改善候选"
+    ],
+    "license": [
+      "OGL v3.0",
+      "可商业使用",
+      "须署名",
+      "不含HSE标识授权"
+    ],
+    "languageValidation": [
+      "中文工作译稿",
+      "待专家审校",
+      "未建立本地常模"
+    ]
+  },
+  "rights": {
+    "license": "Open Government Licence v3.0",
+    "licenseUrl": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+    "attribution": "Contains public sector information published by the Health and Safety Executive and licensed under the Open Government Licence.",
+    "scope": "Crown questionnaire text only. HSE website copyright applies to Crown material in any medium unless indicated otherwise. Original35itemPDF and officialChinesePDF show no third-party copyright or special restriction in extracted text. Exclude HSElogo/images/design; no claim endorsement. Hosted commercialSIT subscription terms are a different service and not the licence for the freely downloaded35item questionnaire.",
+    "changes": "Independent Simplified Chinese translation from originalEnglish; official Traditional Chinese preserved separately for reference, not silently simplified or claimed official zhCN."
+  },
+  "sources": [
+    {
+      "url": "https://www.hse.gov.uk/stress/assets/docs/indicatortool.pdf",
+      "role": "official English35items exactnumber/reverse/anchors and6monthlookback",
+      "localFile": null,
+      "sha256": null,
+      "hashStatus": "binary_download_403_do_not_invent_hash",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://www.hse.gov.uk/stress/assets/docs/indicatortoolmanual.pdf",
+      "role": "officialadministrationmanual",
+      "localFile": null,
+      "sha256": null,
+      "hashStatus": "binary_download_403_do_not_invent_hash",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://www.hse.gov.uk/help/copyright.htm",
+      "role": "officialCrownOGLrights/exclusions",
+      "localFile": null,
+      "sha256": null,
+      "hashStatus": "binary_download_403_do_not_invent_hash",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://www.hse.gov.uk/stress/assets/docs/chinese.pdf",
+      "role": "officialTraditionalChinese35item form; webreadsuccess; binarynotdownloaded"
+    },
+    {
+      "url": "https://www.hse.gov.uk/stress/standards/notesindicatortool.htm",
+      "role": "officialacceptsonlinesurveys andothersoftwarepreliminaryanalysis; recommendsretainwording/order/scoring"
+    },
+    {
+      "url": "https://www.hse.gov.uk/stress/assets/docs/analysistool.xls",
+      "role": "officialrecommendedanalysisworksheet; not downloaded/verified this research pass; no claims reproducingbenchmark"
+    },
+    {
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-teacher-workplace-20261025/web-evidence.json",
+      "sha256": "13bb8ab6c1771e1c4e87e00d847ce75ce2a4ae58d471cd8eba1a8cb1c36afc3c",
+      "hashStatus": "WEB_TOOL_EXTRACT_NOT_ORIGINAL_PDF"
+    },
+    {
+      "url": "https://www.di.univr.it/documenti/OccorrenzaIns/matdid/matdid464820.pdf",
+      "doi": "10.1080/02678370802166599",
+      "citation": "Edwards JA, Webster S, Van Laar D, Easton S (2008). Psychometric analysis of the UK Health and Safety Executive’s Management Standards work-related stress Indicator Tool. Work & Stress22(2):96–107.",
+      "role": "Originalresearch coauthored byHSE; seven-factor itemmappingpp99–101; aggregate referenceTable2p102. Readonly, NOpaperfulltextredistribution."
+    }
+  ],
+  "officialTraditionalChineseReference": [
+    "我在工作地方很清楚自己要做的工作。",
+    "我可以決定在何時小息。",
+    "我在工作地方為應付不同組別的要求令我吃不消。",
+    "我知道怎樣把我的工作完成。",
+    "我遭到刻薄語言或不體諒行為之類的個人騷擾。",
+    "我要承擔難以在最終期限前完成的工作。",
+    "如果工作困難，我的同事會幫助我。",
+    "我幹的工作得到有支持性的回饋。",
+    "我的工作非常緊迫。",
+    "對於我自己的工作速度，我有權決定。",
+    "我很清楚我自己的本分和責任。",
+    "由於我的工作太多，有的工作漏做了。",
+    "我很清楚我工作部門的目標和宗旨。",
+    "各同事之間發生磨擦或激怒。",
+    "我可以決定怎樣進行我的工作。",
+    "我不能夠充分地休息。",
+    "我明暸我的工作怎樣配合這個組織的全面目標。",
+    "我被迫要長時間工作。",
+    "我可以選擇在工作地方幹什麼工作。",
+    "我要迅速地工作。",
+    "我在工作地方受人欺負。",
+    "我要應付不切實際的時間壓力。",
+    "當遇到問題，我可以依賴我的直接主管幫助解決。",
+    "我的同事給予我需要的幫助和支持。",
+    "對於我進行工作的方式，我有一點決定權。",
+    "我有充分機會向主管詢問有關在工作地方的更改。",
+    "我在工作地方得到同事們給以應有的尊重。",
+    "每當在工作地方有更改，一定徵詢職工的意見。",
+    "如果在工作地方遇到令我不快或惱怒的事件，我可以跟我的直接主管談論。",
+    "我的工作時間可採用彈性制度。",
+    "我的同事願意聆聽我提出有關工作的問題。",
+    "每當在工作地方進行更改，我很清楚這些更改實際上如何實行。",
+    "我幹情緒方面有苛求的工作，得到支援。",
+    "在工作地方的人際關係很緊張。",
+    "我在工作地方得到直接主管的鼓勵。"
+  ],
+  "administration": {
+    "instructionsZh": "工作条件会影响身心状态。以下问题帮助了解当前工作环境，并为后续改善提供线索。为便于比较，请根据过去六个月的工作经历作答。",
+    "timeframe": "last six months",
+    "fixedItemOrder": true,
+    "warning": "问的是工作条件，不是你是否抗压。参加应出于自愿；组织调查应保护匿名性，小群体不展示可能识别个人的结果。现系统匿名/小样本抑制未核验，不声称已实现。",
+    "presentationChanges": "Independent zhCN translation and digital presentation; not HSE certified survey, no logos or scoring colours copied."
+  },
+  "responseSetsZh": {
+    "hse_frequency_1_5": [
+      "从不",
+      "很少",
+      "有时",
+      "经常",
+      "总是"
+    ],
+    "hse_agreement_1_5": [
+      "非常不同意",
+      "不同意",
+      "中立",
+      "同意",
+      "非常同意"
+    ]
+  },
+  "scoringNotes": {
+    "frequencyItems": "1–23",
+    "agreementItems": "24–35",
+    "rawResponseValues": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reverseItemNumbers": [
+      3,
+      5,
+      6,
+      9,
+      12,
+      14,
+      16,
+      18,
+      20,
+      21,
+      22,
+      34
+    ],
+    "reverseFormula": "6-x exactly once; originalPDF already prints reversedscores for thoseitems, digital use ascendingresponsevalues then reverse, NEVERdouble reverse",
+    "dimensionMap": {
+      "demands": [
+        3,
+        6,
+        9,
+        12,
+        16,
+        18,
+        20,
+        22
+      ],
+      "control": [
+        2,
+        10,
+        15,
+        19,
+        25,
+        30
+      ],
+      "managerial_support": [
+        8,
+        23,
+        29,
+        33,
+        35
+      ],
+      "peer_support": [
+        7,
+        24,
+        27,
+        31
+      ],
+      "relationships": [
+        5,
+        14,
+        21,
+        34
+      ],
+      "role": [
+        1,
+        4,
+        11,
+        13,
+        17
+      ],
+      "change": [
+        26,
+        28,
+        32
+      ]
+    },
+    "aggregation": "7 separate means1–5, all higher indicates more favourable reported workplace conditions; NO35item stress total",
+    "missing": "Existing complete_required retained as conservative per-dimension implementation. Original HSE spreadsheet missing-data algorithm not verified this pass; do not claim exact spreadsheet equivalence.",
+    "mappingEvidence": "Independently verified everydimension against Edwards etal2008 prose pp99–101 andTable1 p100; mappings identical. Table1 has typesetting error Item6 for insufficientbreaks; precedingprose states16 andofficialquestionnaire confirms16. Use16, not duplicate6."
+  },
+  "externalReferenceDossier": {
+    "activate": false,
+    "thresholds": [],
+    "reason": "HSE organisational benchmarking is not an individualclinicalcutoff or Chinese teacher norm. No local validated norm, no invented high/medium/low bands. Originalanalysisxlsx unavailable inthispass; do not transplant modern subscriptionSITreport thresholds to legacy35itemdigitalcandidate.",
+    "administrationParameters": {
+      "source": "officialuser manualp1",
+      "responseRateIndicativeBelow": 0.5,
+      "responseRateAdequateAbove": 0.5,
+      "responseRateDesirableAbove": 0.6,
+      "responseRateGoodAbove": 0.7,
+      "responseRateVeryGoodAbove": 0.8,
+      "note": "Rough organisationalsurvey responsequality guidance, NOT personscorethresholds. Responsebalance acrosslocations/jobs important."
+    },
+    "developmentReference": "Cousins R et al. (2004). Management Standards and work-related stress in the UK: Practical development. Work & Stress18(2),113–136. https://doi.org/10.1080/02678370410001734322; existingEnglish2008psychometricref retained as evidence, not localizednorm.",
+    "originalStudyAggregateStats": {
+      "source": "Edwards2008 Table2p102",
+      "unit": "ORGANISATIONAL MEANS, NOT individual scores",
+      "population": "39UKorganisations;30903respondents,26382completecases;15NHS,9localauthority,8university/college,7other. Meanresponserate45%.",
+      "dimensionOrder": [
+        "demands",
+        "control",
+        "managerial_support",
+        "peer_support",
+        "relationships",
+        "role",
+        "change"
+      ],
+      "mean": [
+        3.05,
+        3.42,
+        3.47,
+        3.8,
+        3.77,
+        4.18,
+        3.0
+      ],
+      "sd": [
+        0.15,
+        0.32,
+        0.19,
+        0.11,
+        0.44,
+        0.12,
+        0.24
+      ],
+      "limitations": "NoChineseindividualstandardization; no runtimezscore/percentile/trafficlights. Study deleted incompletecases for analysis; not an authoritative digital missingpolicy."
+    }
+  },
+  "reportDimensions": {
+    "demands": {
+      "title": "工作量与节奏",
+      "meaning": "这部分关注任务是否过多、期限是否现实、有没有足够休息，不是看你够不够能扛。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "挑一项最常超时的任务，与负责人讨论优先级、时限或资源。"
+    },
+    "control": {
+      "title": "对工作安排的自主空间",
+      "meaning": "看看你能否对工作方式、速度和休息安排有一些选择。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "找一个可协商的小环节，例如备课时段或休息安排。"
+    },
+    "managerial_support": {
+      "title": "来自管理者的支持",
+      "meaning": "关注遇到难题或情绪负荷时，能否得到回应、反馈与帮助。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "把需要的帮助说具体，例如希望协调一项任务，而不只说压力很大。"
+    },
+    "peer_support": {
+      "title": "同事之间的支持",
+      "meaning": "关注日常合作中能否获得帮助、倾听和尊重。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "与可信同事约定一个小而明确的互助方式。"
+    },
+    "relationships": {
+      "title": "人际相处是否安全、尊重",
+      "meaning": "关注冲突、紧张、骚扰或欺凌，不把问题归咎于个人性格。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "如果遇到欺凌或骚扰，优先使用可信且安全的组织支持或申诉渠道；不要求独自解决。"
+    },
+    "role": {
+      "title": "工作期待是否清楚",
+      "meaning": "看看职责、目标和分工是不是足够清晰。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "把不清楚或相互冲突的要求列出来，争取一次明确分工的沟通。"
+    },
+    "change": {
+      "title": "变化是否解释清楚",
+      "meaning": "关注工作变动前后有没有咨询、说明和可提问的机会。",
+      "reflection": "这一方面，最近哪件具体事情最能说明你的感受？",
+      "action": "整理一个最影响实际工作的疑问，询问变动怎样落实、何时获得进一步说明。"
+    }
+  }
+}

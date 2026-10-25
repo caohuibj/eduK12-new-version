@@ -1,0 +1,92 @@
+{
+  "activationStatus": "EXTERNAL_DOCUMENTATION_ONLY_NOT_BOUND",
+  "currentTranslationValidated": false,
+  "sourceParameters": {
+    "activate": false,
+    "source": "cbi-first-edition.pdf pp5–8, February2004",
+    "references": [
+      {
+        "population": "Representative Danish adults20–59, N1498 valid, telephone interviews75% response",
+        "score": "personal_burnout",
+        "mean": 32.7,
+        "sd": 15.7,
+        "alpha": 0.8
+      },
+      {
+        "population": "Employed Danish adults20–59,N1186",
+        "score": "personal_burnout",
+        "mean": 31.7,
+        "sd": 14.8
+      },
+      {
+        "population": "PUMA1917 human-service employees83%women; score valid Ns differ",
+        "scores": {
+          "personal_burnout": {
+            "n": 1898,
+            "mean": 35.9,
+            "sd": 16.5,
+            "alpha": 0.87
+          },
+          "work_related_burnout": {
+            "n": 1910,
+            "mean": 33.0,
+            "sd": 17.7,
+            "alpha": 0.87
+          },
+          "client_related_burnout": {
+            "n": 1752,
+            "mean": 30.9,
+            "sd": 17.6,
+            "alpha": 0.85
+          }
+        }
+      }
+    ],
+    "thresholdNote": "Original2004 p8 defines high degree descriptively as >=50 for PUMA prevalence22.2%personal/19.8%work/15.9%client. This is not diagnostic calibration, not a Chinese teacher cutoff. No75 severe threshold. No automatic bands or zscore/percentiles."
+  },
+  "scoringNotes": {
+    "anchorsScores": [
+      100,
+      75,
+      50,
+      25,
+      0
+    ],
+    "reverse": [
+      "CBI-W7"
+    ],
+    "scores": "3 independent dimension means0–100; no global19item total",
+    "minimumAnswered": {
+      "personal_burnout": 3,
+      "work_related_burnout": 4,
+      "client_related_burnout": 3
+    },
+    "missing": "Average only answered items if minimum met. Otherwise dimension invalid, not zero. Do not require all19 in a way that negates original partial-response rules."
+  },
+  "sources": [
+    {
+      "url": "https://nfa.dk/media/a4wheblj/cbi-scales.pdf",
+      "role": "official19items/anchors/scoring",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-teacher-workplace-20261025/cbi-scales.pdf",
+      "sha256": "d75709eeb2089094672a6633ebb8372eaff3b3e04f8784b1bbc23b739751d9ca",
+      "hashStatus": "original_download",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://nfa.dk/media/hl5nbers/cbi-first-edition.pdf",
+      "role": "official2004manual/norms/adaptation",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-teacher-workplace-20261025/cbi-first-edition.pdf",
+      "sha256": "fd0264a6f6f948d82df4b42b5abb57f6748bfb23c0ad52a211759d4ef6b553ea",
+      "hashStatus": "original_download",
+      "accessedUTC": "2026-10-25"
+    },
+    {
+      "url": "https://nfa.dk/vaerktoejer/spoergeskemaer/spoergeskema-til-maaling-af-udbraendthed-cbi/copenhagen-burnout-inventory-cbi",
+      "role": "officialrights",
+      "localFile": "/workspace/scratch/5a77e8bdc1ae/scale-source-packs-teacher-workplace-20261025/cbi-rights.html",
+      "sha256": "16ac60ec7b51540d65f1e622025eb5ec9be81e3070c579b1d32db0301bef9ef0",
+      "hashStatus": "original_download",
+      "accessedUTC": "2026-10-25"
+    }
+  ]
+}

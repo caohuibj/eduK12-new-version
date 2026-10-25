@@ -1,0 +1,1149 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "TSWQ-01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-08",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "tswq_zh_cn",
+          "name": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "8ebd141cd2188570a112ffbae1de388219e0999e69d355ce627c7dfac44f3407",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "TSWQ-01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "school_connectedness",
+            "type": "dimension",
+            "label": "在学校有没有“自己人”的感觉",
+            "description": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 4,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teaching_efficacy",
+            "type": "dimension",
+            "label": "你对自己教学的信心与成就感",
+            "description": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 4,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teacher_subjective_wellbeing",
+            "type": "total",
+            "label": "这个月的教师生活，感觉怎么样",
+            "description": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 8,
+            "range": {
+              "min": 8,
+              "max": 32
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "school_connectedness",
+            "headline": "在学校有没有“自己人”的感觉",
+            "label": null,
+            "interpretation": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。例如，遇到难题时是否有人愿意听你说，表达不同意见时能否仍被尊重。一次不顺利的互动不能代表整个月，也不应让一个结果定义你与学校的关系。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teaching_efficacy",
+            "headline": "你对自己教学的信心与成就感",
+            "label": null,
+            "interpretation": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。例如，一次讲解终于让学生明白，或一个尝试暂时没有达到预期，都可能影响当下的信心。可以回看具体经历，同时留意教学资源与同伴支持，而不是把感受当成绩。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？"
+              },
+              {
+                "category": "strategy",
+                "text": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teacher_subjective_wellbeing",
+            "headline": "这个月的教师生活，感觉怎么样",
+            "label": null,
+            "interpretation": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。例如，你可能对教学很有成就感，却仍希望在学校里得到更多支持；也可能归属感不错，但最近教学遇到了挑战。分开观察这两部分，比寻找一条及格线更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你更想先改善支持感，还是找回教学中的小成就？"
+              },
+              {
+                "category": "strategy",
+                "text": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "TSWQ-01",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-05",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-06",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-07",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-08",
+          "responseValue": "4"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "tswq_zh_cn",
+          "name": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "8ebd141cd2188570a112ffbae1de388219e0999e69d355ce627c7dfac44f3407",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "TSWQ-01",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-02",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-03",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-04",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-05",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-06",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-07",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-08",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          }
+        ],
+        "scores": [
+          {
+            "key": "school_connectedness",
+            "type": "dimension",
+            "label": "在学校有没有“自己人”的感觉",
+            "description": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 16,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teaching_efficacy",
+            "type": "dimension",
+            "label": "你对自己教学的信心与成就感",
+            "description": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 16,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teacher_subjective_wellbeing",
+            "type": "total",
+            "label": "这个月的教师生活，感觉怎么样",
+            "description": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 32,
+            "range": {
+              "min": 8,
+              "max": 32
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "school_connectedness",
+            "headline": "在学校有没有“自己人”的感觉",
+            "label": null,
+            "interpretation": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。例如，遇到难题时是否有人愿意听你说，表达不同意见时能否仍被尊重。一次不顺利的互动不能代表整个月，也不应让一个结果定义你与学校的关系。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teaching_efficacy",
+            "headline": "你对自己教学的信心与成就感",
+            "label": null,
+            "interpretation": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。例如，一次讲解终于让学生明白，或一个尝试暂时没有达到预期，都可能影响当下的信心。可以回看具体经历，同时留意教学资源与同伴支持，而不是把感受当成绩。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？"
+              },
+              {
+                "category": "strategy",
+                "text": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teacher_subjective_wellbeing",
+            "headline": "这个月的教师生活，感觉怎么样",
+            "label": null,
+            "interpretation": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。例如，你可能对教学很有成就感，却仍希望在学校里得到更多支持；也可能归属感不错，但最近教学遇到了挑战。分开观察这两部分，比寻找一条及格线更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你更想先改善支持感，还是找回教学中的小成就？"
+              },
+              {
+                "category": "strategy",
+                "text": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "TSWQ-01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-08",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "tswq_zh_cn",
+          "name": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "8ebd141cd2188570a112ffbae1de388219e0999e69d355ce627c7dfac44f3407",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "TSWQ-01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "school_connectedness",
+            "type": "dimension",
+            "label": "在学校有没有“自己人”的感觉",
+            "description": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 12,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teaching_efficacy",
+            "type": "dimension",
+            "label": "你对自己教学的信心与成就感",
+            "description": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 12,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teacher_subjective_wellbeing",
+            "type": "total",
+            "label": "这个月的教师生活，感觉怎么样",
+            "description": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 24,
+            "range": {
+              "min": 8,
+              "max": 32
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "school_connectedness",
+            "headline": "在学校有没有“自己人”的感觉",
+            "label": null,
+            "interpretation": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。例如，遇到难题时是否有人愿意听你说，表达不同意见时能否仍被尊重。一次不顺利的互动不能代表整个月，也不应让一个结果定义你与学校的关系。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teaching_efficacy",
+            "headline": "你对自己教学的信心与成就感",
+            "label": null,
+            "interpretation": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。例如，一次讲解终于让学生明白，或一个尝试暂时没有达到预期，都可能影响当下的信心。可以回看具体经历，同时留意教学资源与同伴支持，而不是把感受当成绩。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？"
+              },
+              {
+                "category": "strategy",
+                "text": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teacher_subjective_wellbeing",
+            "headline": "这个月的教师生活，感觉怎么样",
+            "label": null,
+            "interpretation": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。例如，你可能对教学很有成就感，却仍希望在学校里得到更多支持；也可能归属感不错，但最近教学遇到了挑战。分开观察这两部分，比寻找一条及格线更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你更想先改善支持感，还是找回教学中的小成就？"
+              },
+              {
+                "category": "strategy",
+                "text": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "mixed",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "TSWQ-01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "TSWQ-03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "TSWQ-05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "TSWQ-06",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "TSWQ-07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "TSWQ-08",
+          "responseValue": "4"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "tswq_zh_cn",
+          "name": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "8ebd141cd2188570a112ffbae1de388219e0999e69d355ce627c7dfac44f3407",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "TSWQ-01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "TSWQ-03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-04",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "TSWQ-05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "TSWQ-06",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "TSWQ-07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "TSWQ-08",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          }
+        ],
+        "scores": [
+          {
+            "key": "school_connectedness",
+            "type": "dimension",
+            "label": "在学校有没有“自己人”的感觉",
+            "description": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 8,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-03",
+              "TSWQ-05",
+              "TSWQ-07"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teaching_efficacy",
+            "type": "dimension",
+            "label": "你对自己教学的信心与成就感",
+            "description": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 12,
+            "range": {
+              "min": 4,
+              "max": 16
+            },
+            "expectedItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-02",
+              "TSWQ-04",
+              "TSWQ-06",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "teacher_subjective_wellbeing",
+            "type": "total",
+            "label": "这个月的教师生活，感觉怎么样",
+            "description": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。",
+            "direction": "higher_is_better",
+            "canonical": true,
+            "displayPrecision": 0,
+            "value": 20,
+            "range": {
+              "min": 8,
+              "max": 32
+            },
+            "expectedItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "answeredItems": [
+              "TSWQ-01",
+              "TSWQ-02",
+              "TSWQ-03",
+              "TSWQ-04",
+              "TSWQ-05",
+              "TSWQ-06",
+              "TSWQ-07",
+              "TSWQ-08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "school_connectedness",
+            "headline": "在学校有没有“自己人”的感觉",
+            "label": null,
+            "interpretation": "这里关注你是否觉得被接纳、被关心、被尊重，以及能否自在地做自己。它不是受欢迎程度排名。例如，遇到难题时是否有人愿意听你说，表达不同意见时能否仍被尊重。一次不顺利的互动不能代表整个月，也不应让一个结果定义你与学校的关系。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "在学校里，谁或哪种场景最让你感到被支持？还有哪种支持你希望获得？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一位可信同事，从一次简短交流开始，具体说说最近需要什么帮助。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teaching_efficacy",
+            "headline": "你对自己教学的信心与成就感",
+            "label": null,
+            "interpretation": "这里记录的是你自己感受到的教学信心与成就，不是对实际教学质量的考试。忙碌时期信心变化也很常见。例如，一次讲解终于让学生明白，或一个尝试暂时没有达到预期，都可能影响当下的信心。可以回看具体经历，同时留意教学资源与同伴支持，而不是把感受当成绩。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一个月，有没有一个学生理解了新内容、一次互动更顺畅的小片段？"
+              },
+              {
+                "category": "strategy",
+                "text": "记下一件具体有效的小做法，下周有机会再试一次；需要时与同伴讨论教学支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "teacher_subjective_wellbeing",
+            "headline": "这个月的教师生活，感觉怎么样",
+            "label": null,
+            "interpretation": "把归属感与教学信心放在一起，帮助你回顾这个月的工作体验。两部分值得分别看，不能只用一个数字定义自己。例如，你可能对教学很有成就感，却仍希望在学校里得到更多支持；也可能归属感不错，但最近教学遇到了挑战。分开观察这两部分，比寻找一条及格线更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你更想先改善支持感，还是找回教学中的小成就？"
+              },
+              {
+                "category": "strategy",
+                "text": "只选一个可以改变的小环节，过一段时间再回顾它对自己的影响。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "读报告先看两个生活主题，而不是找“及格线”。如展示平均回答，只用原选项频率作说明，不给好老师/差老师标签。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    }
+  ]
+}

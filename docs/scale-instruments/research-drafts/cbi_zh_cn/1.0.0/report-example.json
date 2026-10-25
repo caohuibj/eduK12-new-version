@@ -1,0 +1,1629 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "CBI-P1",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P2",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P3",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P4",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P5",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P6",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W1",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-W2",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-W3",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-W4",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W5",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W6",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W7",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-C1",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-C2",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-C3",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-C4",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-C5",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-C6",
+          "responseValue": "never_almost_never"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "cbi_zh_cn",
+          "name": "哥本哈根倦怠量表（CBI，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "83b4158536e3a1ddf22d98e6707f6d500280520e432197a4905faaefaec7fe32",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "CBI-P1",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P2",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P3",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P4",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P5",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P6",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W1",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W2",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W3",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W4",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W5",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W6",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W7",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C1",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C2",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C3",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C4",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C5",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C6",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          }
+        ],
+        "scores": [
+          {
+            "key": "personal_burnout",
+            "type": "dimension",
+            "label": "整体的身体与情绪疲惫",
+            "description": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 0,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "answeredItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "work_related_burnout",
+            "type": "dimension",
+            "label": "工作带来的消耗",
+            "description": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 0,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "answeredItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "client_related_burnout",
+            "type": "dimension",
+            "label": "与服务对象互动时的消耗",
+            "description": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 0,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "answeredItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "personal_burnout",
+            "headline": "整体的身体与情绪疲惫",
+            "label": null,
+            "interpretation": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。例如，一天还没结束就觉得精力见底，或明明停下来了，身心仍难以恢复。它提醒你关注恢复条件，但不能单凭这些回答确定原因。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪些时段最容易没电？休息后是否稍有恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个最容易坚持的恢复时段，先保护十分钟；若疲惫持续或影响生活，可寻求专业评估。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "work_related_burnout",
+            "headline": "工作带来的消耗",
+            "label": null,
+            "interpretation": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。例如，下班后脑子仍被工作占满，原本留给生活的力气所剩不多。可以把任务量、可支配时间和可获得的支持一起考虑，而不只要求自己再努力一点。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最消耗你的，是任务量、节奏，还是总要保持在线？"
+              },
+              {
+                "category": "strategy",
+                "text": "记录一项最消耗精力的工作，与可信同事或负责人商量减量、调整优先级或增加支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "client_related_burnout",
+            "headline": "与服务对象互动时的消耗",
+            "label": null,
+            "interpretation": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。例如，连续回应学生或其他服务对象的需求后，会格外需要安静和休息。这种体验不等于你不关心他们，关注互动中的支持条件往往更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些互动后你最需要缓一缓？什么支持能让你更好地恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试在高负荷互动后留一个短暂停顿，并讨论可获得的同伴支持与合理边界。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "CBI-P1",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P2",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P3",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P4",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P5",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P6",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-W1",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-W2",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-W3",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-W4",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-W5",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-W6",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-W7",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-C1",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-C2",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-C3",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-C4",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-C5",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-C6",
+          "responseValue": "always"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "cbi_zh_cn",
+          "name": "哥本哈根倦怠量表（CBI，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "83b4158536e3a1ddf22d98e6707f6d500280520e432197a4905faaefaec7fe32",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "CBI-P1",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P2",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P3",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P4",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P5",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P6",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W1",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W2",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W3",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W4",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W5",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W6",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W7",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C1",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C2",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C3",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C4",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C5",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C6",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          }
+        ],
+        "scores": [
+          {
+            "key": "personal_burnout",
+            "type": "dimension",
+            "label": "整体的身体与情绪疲惫",
+            "description": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 100,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "answeredItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "work_related_burnout",
+            "type": "dimension",
+            "label": "工作带来的消耗",
+            "description": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 100,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "answeredItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "client_related_burnout",
+            "type": "dimension",
+            "label": "与服务对象互动时的消耗",
+            "description": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 100,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "answeredItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "personal_burnout",
+            "headline": "整体的身体与情绪疲惫",
+            "label": null,
+            "interpretation": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。例如，一天还没结束就觉得精力见底，或明明停下来了，身心仍难以恢复。它提醒你关注恢复条件，但不能单凭这些回答确定原因。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪些时段最容易没电？休息后是否稍有恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个最容易坚持的恢复时段，先保护十分钟；若疲惫持续或影响生活，可寻求专业评估。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "work_related_burnout",
+            "headline": "工作带来的消耗",
+            "label": null,
+            "interpretation": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。例如，下班后脑子仍被工作占满，原本留给生活的力气所剩不多。可以把任务量、可支配时间和可获得的支持一起考虑，而不只要求自己再努力一点。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最消耗你的，是任务量、节奏，还是总要保持在线？"
+              },
+              {
+                "category": "strategy",
+                "text": "记录一项最消耗精力的工作，与可信同事或负责人商量减量、调整优先级或增加支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "client_related_burnout",
+            "headline": "与服务对象互动时的消耗",
+            "label": null,
+            "interpretation": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。例如，连续回应学生或其他服务对象的需求后，会格外需要安静和休息。这种体验不等于你不关心他们，关注互动中的支持条件往往更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些互动后你最需要缓一缓？什么支持能让你更好地恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试在高负荷互动后留一个短暂停顿，并讨论可获得的同伴支持与合理边界。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "CBI-P1",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P2",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P3",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P4",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P5",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P6",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W1",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W2",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W3",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W4",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W5",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W6",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-W7",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-C1",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-C2",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-C3",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-C4",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-C5",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-C6",
+          "responseValue": "sometimes"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "cbi_zh_cn",
+          "name": "哥本哈根倦怠量表（CBI，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "83b4158536e3a1ddf22d98e6707f6d500280520e432197a4905faaefaec7fe32",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "CBI-P1",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P2",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P3",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P4",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P5",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P6",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W1",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W2",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W3",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W4",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W5",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W6",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W7",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C1",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C2",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C3",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C4",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C5",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C6",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          }
+        ],
+        "scores": [
+          {
+            "key": "personal_burnout",
+            "type": "dimension",
+            "label": "整体的身体与情绪疲惫",
+            "description": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 50,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "answeredItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "work_related_burnout",
+            "type": "dimension",
+            "label": "工作带来的消耗",
+            "description": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 50,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "answeredItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "client_related_burnout",
+            "type": "dimension",
+            "label": "与服务对象互动时的消耗",
+            "description": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 50,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "answeredItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "personal_burnout",
+            "headline": "整体的身体与情绪疲惫",
+            "label": null,
+            "interpretation": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。例如，一天还没结束就觉得精力见底，或明明停下来了，身心仍难以恢复。它提醒你关注恢复条件，但不能单凭这些回答确定原因。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪些时段最容易没电？休息后是否稍有恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个最容易坚持的恢复时段，先保护十分钟；若疲惫持续或影响生活，可寻求专业评估。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "work_related_burnout",
+            "headline": "工作带来的消耗",
+            "label": null,
+            "interpretation": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。例如，下班后脑子仍被工作占满，原本留给生活的力气所剩不多。可以把任务量、可支配时间和可获得的支持一起考虑，而不只要求自己再努力一点。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最消耗你的，是任务量、节奏，还是总要保持在线？"
+              },
+              {
+                "category": "strategy",
+                "text": "记录一项最消耗精力的工作，与可信同事或负责人商量减量、调整优先级或增加支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "client_related_burnout",
+            "headline": "与服务对象互动时的消耗",
+            "label": null,
+            "interpretation": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。例如，连续回应学生或其他服务对象的需求后，会格外需要安静和休息。这种体验不等于你不关心他们，关注互动中的支持条件往往更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些互动后你最需要缓一缓？什么支持能让你更好地恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试在高负荷互动后留一个短暂停顿，并讨论可获得的同伴支持与合理边界。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    },
+    {
+      "fixture": "mixed",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "CBI-P1",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-P2",
+          "responseValue": "seldom"
+        },
+        {
+          "itemCode": "CBI-P3",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-P4",
+          "responseValue": "often"
+        },
+        {
+          "itemCode": "CBI-P5",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-P6",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W1",
+          "responseValue": "low"
+        },
+        {
+          "itemCode": "CBI-W2",
+          "responseValue": "somewhat"
+        },
+        {
+          "itemCode": "CBI-W3",
+          "responseValue": "high"
+        },
+        {
+          "itemCode": "CBI-W4",
+          "responseValue": "always"
+        },
+        {
+          "itemCode": "CBI-W5",
+          "responseValue": "never_almost_never"
+        },
+        {
+          "itemCode": "CBI-W6",
+          "responseValue": "seldom"
+        },
+        {
+          "itemCode": "CBI-W7",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-C1",
+          "responseValue": "high"
+        },
+        {
+          "itemCode": "CBI-C2",
+          "responseValue": "very_high"
+        },
+        {
+          "itemCode": "CBI-C3",
+          "responseValue": "very_low"
+        },
+        {
+          "itemCode": "CBI-C4",
+          "responseValue": "low"
+        },
+        {
+          "itemCode": "CBI-C5",
+          "responseValue": "sometimes"
+        },
+        {
+          "itemCode": "CBI-C6",
+          "responseValue": "often"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "cbi_zh_cn",
+          "name": "哥本哈根倦怠量表（CBI，中文工作稿）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "83b4158536e3a1ddf22d98e6707f6d500280520e432197a4905faaefaec7fe32",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "teacher",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "CBI-P1",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-P2",
+            "responseValue": "seldom",
+            "baseScore": 25,
+            "score": 25
+          },
+          {
+            "itemCode": "CBI-P3",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-P4",
+            "responseValue": "often",
+            "baseScore": 75,
+            "score": 75
+          },
+          {
+            "itemCode": "CBI-P5",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-P6",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W1",
+            "responseValue": "low",
+            "baseScore": 25,
+            "score": 25
+          },
+          {
+            "itemCode": "CBI-W2",
+            "responseValue": "somewhat",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-W3",
+            "responseValue": "high",
+            "baseScore": 75,
+            "score": 75
+          },
+          {
+            "itemCode": "CBI-W4",
+            "responseValue": "always",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-W5",
+            "responseValue": "never_almost_never",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-W6",
+            "responseValue": "seldom",
+            "baseScore": 25,
+            "score": 25
+          },
+          {
+            "itemCode": "CBI-W7",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C1",
+            "responseValue": "high",
+            "baseScore": 75,
+            "score": 75
+          },
+          {
+            "itemCode": "CBI-C2",
+            "responseValue": "very_high",
+            "baseScore": 100,
+            "score": 100
+          },
+          {
+            "itemCode": "CBI-C3",
+            "responseValue": "very_low",
+            "baseScore": 0,
+            "score": 0
+          },
+          {
+            "itemCode": "CBI-C4",
+            "responseValue": "low",
+            "baseScore": 25,
+            "score": 25
+          },
+          {
+            "itemCode": "CBI-C5",
+            "responseValue": "sometimes",
+            "baseScore": 50,
+            "score": 50
+          },
+          {
+            "itemCode": "CBI-C6",
+            "responseValue": "often",
+            "baseScore": 75,
+            "score": 75
+          }
+        ],
+        "scores": [
+          {
+            "key": "personal_burnout",
+            "type": "dimension",
+            "label": "整体的身体与情绪疲惫",
+            "description": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 41.666666666666664,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "answeredItems": [
+              "CBI-P1",
+              "CBI-P2",
+              "CBI-P3",
+              "CBI-P4",
+              "CBI-P5",
+              "CBI-P6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "work_related_burnout",
+            "type": "dimension",
+            "label": "工作带来的消耗",
+            "description": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 46.42857142857143,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "answeredItems": [
+              "CBI-W1",
+              "CBI-W2",
+              "CBI-W3",
+              "CBI-W4",
+              "CBI-W5",
+              "CBI-W6",
+              "CBI-W7"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "client_related_burnout",
+            "type": "dimension",
+            "label": "与服务对象互动时的消耗",
+            "description": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 1,
+            "value": 54.166666666666664,
+            "range": {
+              "min": 0,
+              "max": 100
+            },
+            "expectedItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "answeredItems": [
+              "CBI-C1",
+              "CBI-C2",
+              "CBI-C3",
+              "CBI-C4",
+              "CBI-C5",
+              "CBI-C6"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "personal_burnout",
+            "headline": "整体的身体与情绪疲惫",
+            "label": null,
+            "interpretation": "关注的不只是上班累不累，也包括整体的身体和情绪疲惫。它不会告诉你疲惫一定来自哪里。例如，一天还没结束就觉得精力见底，或明明停下来了，身心仍难以恢复。它提醒你关注恢复条件，但不能单凭这些回答确定原因。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪些时段最容易没电？休息后是否稍有恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个最容易坚持的恢复时段，先保护十分钟；若疲惫持续或影响生活，可寻求专业评估。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "work_related_burnout",
+            "headline": "工作带来的消耗",
+            "label": null,
+            "interpretation": "看看工作是否正在挤占恢复空间。感到耗竭不等于你不够努力，也不等于教学能力差。例如，下班后脑子仍被工作占满，原本留给生活的力气所剩不多。可以把任务量、可支配时间和可获得的支持一起考虑，而不只要求自己再努力一点。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最消耗你的，是任务量、节奏，还是总要保持在线？"
+              },
+              {
+                "category": "strategy",
+                "text": "记录一项最消耗精力的工作，与可信同事或负责人商量减量、调整优先级或增加支持。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "client_related_burnout",
+            "headline": "与服务对象互动时的消耗",
+            "label": null,
+            "interpretation": "长期面对他人的需求也会消耗精力。这描述互动体验，不是在评价学生或责怪任何人。例如，连续回应学生或其他服务对象的需求后，会格外需要安静和休息。这种体验不等于你不关心他们，关注互动中的支持条件往往更有帮助。这是一张观察近况的便条，不是给自己贴标签的结论。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪些互动后你最需要缓一缓？什么支持能让你更好地恢复？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试在高负荷互动后留一个短暂停顿，并讨论可获得的同伴支持与合理边界。"
+              }
+            ],
+            "limitations": [
+              "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+              "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+              "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+              "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+              "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。",
+          "这三个方面像三扇观察窗，分开看更有帮助；不是三项考试，也不合成一张总成绩单。不要用轻中重标签定义自己。",
+          "没有绑定本地常模或个体分级线；国外参数仅作来源资料，不产生低中高或临床标签。",
+          "若回答不足则相关结果无法计算；缺失不表示没有困难。",
+          "个人、工作、服务互动分别至少回答3、4、3题，计算已答题均值；不产生19题总分。若某方面不足，当前整体报告可能无法解释，不能据此推断其他方面正常。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "这是一份待人工审校的中文工作稿，不是临床诊断，不评价教师能力，不用于绩效问责、录用或学校排名。结果反映这次自述体验；中文分数不能自动与国外样本比较。"
+      }
+    }
+  ]
+}

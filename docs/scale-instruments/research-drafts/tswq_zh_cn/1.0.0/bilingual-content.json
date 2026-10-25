@@ -1,0 +1,98 @@
+{
+  "items": [
+    {
+      "itemCode": "TSWQ-01",
+      "originalEnglish": "I feel like I belong at this school.",
+      "workingChinese": "我觉得自己属于这所学校。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-02",
+      "originalEnglish": "I am a successful teacher.",
+      "workingChinese": "我是一名成功的教师。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-03",
+      "originalEnglish": "I can really be myself at this school.",
+      "workingChinese": "在这所学校，我能够真正做自己。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-04",
+      "originalEnglish": "I am good at helping students learn new things.",
+      "workingChinese": "我善于帮助学生学习新的东西。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-05",
+      "originalEnglish": "I feel like people at this school care about me.",
+      "workingChinese": "我觉得这所学校的人关心我。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-06",
+      "originalEnglish": "I have accomplished a lot as a teacher.",
+      "workingChinese": "作为教师，我已经取得了不少成就。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-07",
+      "originalEnglish": "I am treated with respect at this school.",
+      "workingChinese": "在这所学校，我受到尊重。",
+      "responseSetKey": "tswq_1_4"
+    },
+    {
+      "itemCode": "TSWQ-08",
+      "originalEnglish": "I feel like my teaching is effective and helpful.",
+      "workingChinese": "我觉得自己的教学是有效而且有帮助的。",
+      "responseSetKey": "tswq_1_4"
+    }
+  ],
+  "originalResponseSets": [
+    {
+      "key": "tswq_1_4",
+      "options": [
+        {
+          "value": "1",
+          "label": "Almost Never",
+          "score": 1
+        },
+        {
+          "value": "2",
+          "label": "Sometimes",
+          "score": 2
+        },
+        {
+          "value": "3",
+          "label": "Often",
+          "score": 3
+        },
+        {
+          "value": "4",
+          "label": "Almost Always",
+          "score": 4
+        }
+      ]
+    }
+  ],
+  "responseSetsZh": {
+    "tswq_1_4": [
+      "几乎从不",
+      "有时",
+      "经常",
+      "几乎总是"
+    ]
+  },
+  "administration": {
+    "instructionsEnglish": "Below are some questions about your experiences as a teacher. Read each sentence and choose the one response that best describes how you felt in the past month.",
+    "instructionsZh": "下面是一些关于你作为教师的经历的问题。请阅读每句话，选择最能描述你在过去一个月中感受的选项。",
+    "timeframe": "past month",
+    "fixedItemOrder": true
+  },
+  "translationStatus": "UNVALIDATED_WORKING_TRANSLATION",
+  "presentationChanges": [
+    "保留原题顺序和逐题响应集。",
+    "指导语移入第一题之前，是明确记录的数字呈现调整，不声称原验证版式。"
+  ]
+}
