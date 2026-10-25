@@ -1,0 +1,61 @@
+{
+  "scope": "Bounded content-capability UTC time contract; not HTTP E2E, production or CI qualification",
+  "baseCommit": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "candidateIdentity": "uncommitted candidate bytes identified by direct SHA-256 bindings",
+  "nodeVersion": "v24.22.1",
+  "startedAt": "2026-10-25T03:52:52.615Z",
+  "results": {
+    "focusedAuthorityAssertions": {
+      "passed": 127,
+      "failed": 0
+    },
+    "sqlAndMigrationContracts": {
+      "passed": 4,
+      "failed": 0
+    },
+    "postgresSessions": {
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "zones": [
+        "UTC",
+        "Asia/Tokyo",
+        "America/Los_Angeles"
+      ]
+    },
+    "productionBackendTypes": "passed; direct tsc --noEmit exit 0",
+    "newTestScopedTypes": "passed; direct tsc --noEmit exit 0",
+    "isolatedSchemaSetup": {
+      "migrationCount": 230,
+      "status": "passed; new isolated database, not an existing-data upgrade/restore test"
+    }
+  },
+  "postgresDirectInputSha256": {
+    "src/modules/measurement-content/admin-authority.service.ts": "e56f33598a157cef45c009ff9159d71dd539962997e9726a39e8d103b46b254f",
+    "src/modules/measurement-content/content-authority.repository.ts": "0ca17d2000286382945e589c2dc2ce2121a0785356e9a0668325bfd754c01313",
+    "src/modules/measurement-content/formal-reference-authority.ts": "23f2250538d1b6bdd887d4beef3841e410927b903cdb6215dc47d9befa89337b",
+    "src/modules/scale-library-governance/authority.ts": "cbdc3fa5a36b2a26fb6324b74006ed6888537d675e88465c1f4a3865bb9b4f1d",
+    "src/modules/situational/entry-authority.ts": "fd9571c64b3d17259c941edb5133ae47ae06b8172bd24b6586367c3ee1f4bd50",
+    "src/__tests__/measurement-content/content-grant-time.postgres.integration.test.ts": "79da7bd2294e29dc583f5ad982d8e6c87ee176bc1aca014537999a9ca7c8ccab",
+    "prisma/migrations/20261025040000_content_grant_utc_time/migration.sql": "2847458653247da107a82260f19f69bc8dd13caa786c4924e50a5f1ede3a0a76",
+    "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "evidenceSha256": {
+    "candidate-migrations.log": "87f74aee4f3717e9313ac6f31d7f27441abab420274b7b20b021e4e3d73c6897",
+    "three-session-contract.log": "e8fb20da760d16da5ea297747fc2fa3ce03012423f44a9d86f13310109938649",
+    "three-session-contract-attempt2.json": "6da7d894adc91d55479396f41ade72521a54052b8c01987e533f2aad2c796251",
+    "three-session-contract-attempt2.log": "43fd0f543ad68030b957b74b01c2fc98d7a47983e5f4c9f1f22c87af4dec22d5",
+    "input-binding.json": "5fc0dd5470cc71eeb25b199474bf4fcdbd2fae8d6157c202f5c2e360975de1dd",
+    "grant-time-unit.json": "1f3fce8d0d0b25ccdd3dc6e269c6013ffdd31c73d6023b88a973245412dd6f63",
+    "grant-time-sql-contract.json": "976f17505d5a406a9f120e6fb360013e757d2e6689b7ab80f461103d19bef90d",
+    "grant-time-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "grant-time-test-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limitations": [
+    "Temporary shadow tables and pg_temp candidate trigger, transaction rollback; no existing business rows changed.",
+    "Actual service/raw SQL/trigger time behavior; admin audit persistence is mocked in memory.",
+    "Direct inputs verified against current candidate; this is not a complete runtime/dependency-byte attestation or full transitive closure manifest.",
+    "First PostgreSQL test invocation stopped in CLI parsing because --minWorkers was unsupported; no tests ran. Second invocation ran only the tests, without repeating schema setup.",
+    "No CI, merge, deployment, production authorization validation or historical grant correction is asserted."
+  ]
+}

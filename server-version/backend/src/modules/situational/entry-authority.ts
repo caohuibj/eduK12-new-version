@@ -166,7 +166,7 @@ export async function assertSjtEntryDistributionAuthority(tx: Prisma.Transaction
         WHERE subject_id=${input.actorId} AND product='SURVEY' AND scope_kind='PLATFORM'
           AND scope_id='situational-library-governance' AND resource_kind='material'
           AND ${source.measurementReleaseId}=ANY(resource_keys) AND 'material.distribute'=ANY(capabilities)
-          AND revoked_at IS NULL AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp()
+          AND revoked_at IS NULL AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
         ORDER BY id LIMIT 129`)
       if (candidates.length > 128) fail('SOURCE_SJT_ENTRY_GRANT_LIMIT')
       for (const candidate of candidates) {

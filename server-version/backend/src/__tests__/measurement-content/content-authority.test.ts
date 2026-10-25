@@ -82,11 +82,13 @@ describe('bounded permanent content authority', () => {
     const ok=dbFor([root()])
     await expect(delegateContentAuthority(ok.db,{actorId:'entry-admin',parentGrantId:'root',expectedParentVersion:1,grant:input()})).resolves.toMatch(/^[a-f0-9-]+$/)
     expect(ok.execute).toHaveBeenCalledTimes(1)
+    expect(ok.execute.mock.calls[0][0].sql.match(/::timestamptz AT TIME ZONE 'UTC'/g)).toHaveLength(2)
   })
   it('revokes only issuer/recipient with reason and CAS; never rewrites descendants', async () => {
     const {db,execute}=dbFor()
     await revokeContentAuthority(db,{actorId:'entry-admin',grantId:'child',expectedVersion:1,reason:'Removed project responsibility'})
     expect(execute).toHaveBeenCalledTimes(1)
+    expect(execute.mock.calls[0][0].sql).toContain("revoked_at=(clock_timestamp() AT TIME ZONE 'UTC')")
     expect(execute.mock.calls[0][0].sql).toContain('issuer_id=')
     expect(execute.mock.calls[0][0].sql).toContain('version=version+1')
     execute.mockResolvedValueOnce(0)

@@ -28,7 +28,7 @@ export async function listFormalReferenceAuthorities(tx:Prisma.TransactionClient
   const rows=await tx.$queryRaw<Array<{id:string;resource_keys:string[];capabilities:string[]}>>(Prisma.sql`
     SELECT id,resource_keys,capabilities FROM content_capability_grants
     WHERE subject_id=${actorId} AND product='TRAINING' AND scope_kind='PLATFORM' AND scope_id=${FORMAL_REFERENCE_SCOPE_ID}
-      AND resource_kind='reference' AND revoked_at IS NULL AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp()
+      AND resource_kind='reference' AND revoked_at IS NULL AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
     ORDER BY id LIMIT 25 FOR SHARE`)
   const result:Array<{grantId:string;measurementReleaseIds:string[];capabilities:Array<'reference.review'|'reference.publish'>}>=[]
   for(const row of rows){
