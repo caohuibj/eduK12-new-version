@@ -1,11 +1,12 @@
 import {createHmac} from 'node:crypto'
 import type {SurveySourceProjection} from './analytics.source'
+export const DEIDENTIFIED_SURVEY_RESPONSE_TYPES:ReadonlySet<string>=new Set(['SINGLE','MULTIPLE','LIKERT','MATRIX','MATRIX_MULTIPLE','SJT_SINGLE','SJT_MULTIPLE'])
 /** Positive allowlist: no object spreads from raw observations, account joins,
  * names, codes, dates, IP/device data, free text, prose, assets or foreign entries.
  * Choice codes are translated to ordinal positions; authored strings never leave. */
 export function projectDeidentifiedSurveyPage(source:SurveySourceProjection,salt:string){
  const alias=(kind:string,value:string)=>createHmac('sha256',salt).update(JSON.stringify([source.projectId,kind,value])).digest('hex').slice(0,24)
- const allowed=new Set(['SINGLE','MULTIPLE','LIKERT','MATRIX','MATRIX_MULTIPLE','SJT_SINGLE','SJT_MULTIPLE'])
+ const allowed=DEIDENTIFIED_SURVEY_RESPONSE_TYPES
  const raw=[]
  for(const row of source.raw){
   if(row.projectId!==source.projectId||!allowed.has(row.responseType))continue

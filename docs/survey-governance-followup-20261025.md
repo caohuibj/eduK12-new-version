@@ -211,3 +211,28 @@ lint 0 error/4 warning（含数值 epoch ref 和既有 effect 依赖提示）。
 
 原件：`05-12-list-postgres-{fixed,retry}.json`、`05-07-ui-{existing,paging,navigation}.json`、
 `13-independent-pages.json`、`13-researcher-ui.json`、`05-source-contracts{,-retry}.json`。
+
+## B：旧性能分支的精确整合
+
+`9a1cc14240919055adcbf63ce17ad3f9abcbb939` 只采用以下三份原提交的完整局部 diff，
+没有 merge/cherry-pick 整个分支。已核 main31d9 → main25215 这三份生产文件无变化，
+逐 patch `git apply --check` 成功；当前消费路径再运行新输入的合同。
+
+| 原提交 | 本次采用范围 | 必须保持的合同 |
+| --- | --- | --- |
+| c73976cc1119222baeaa29944c7c9b6af40699e4 | form-facts.ts + single-parse test | V2/V3 strict schema、去重及 512 KB 均保留，只消除第二次 parse |
+| a2180188db5283c15b0ea66ab1e1bd90f65afed9 | report-outbox.service.ts + definition projection test | async=false 且未入组才省 definition；已有入组、flow、fresh parent 与配置切换仍校验 |
+| dd69272c6f88b5816957935644102f378a15ca12 | cognitive/assignment.service.ts + metadata test | 原归属、PUBLISHED、独立任务筛选/顺序、恢复与冻结 hash 保留，DTO 不变 |
+
+实际命令为 backend `vitest run` 上述三个 test 文件，36 项通过
+（`B-perf-selected.json`）。没有新的全流程 CPU/时延或容量结论。
+receipt-only、窄 composite 状态、Scale runtime 复用、Training report single-view、
+overview opt-in 仍待逐消费者整合；不把旧候选已测误写为 main 已有。
+
+## D：15 去标识投影提前
+
+系统独立导出在已授权 source load 时显式选择正向 choice 白名单，在访问值/转成
+raw observation 前跳过自由文本、日期等。最终去标识白名单仍保留，导出前后 grant
+核对不变。普通授权 raw 查看仍可读取原值，未从原件删除任何内容或重计分。
+14 项定向合同通过，包括用访问即抛错的排除字段证明它未被投影（默认普通路径
+仍访问），以及原隐私/链接/analytics 消费者（`15-deidentified.json`）。

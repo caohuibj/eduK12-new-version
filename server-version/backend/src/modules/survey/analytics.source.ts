@@ -1,3 +1,4 @@
+import {DEIDENTIFIED_SURVEY_RESPONSE_TYPES} from './deidentified-export'
 import {missingSurveyFlowUnit} from './flow.runtime'
 import { situationalResponseHistoryIdentities } from '../situational/situation-research-capture'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
@@ -193,7 +194,7 @@ const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly
   }
   return Object.freeze(output)
 }
-const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,onlyItemKey?:string)=>{
+export const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,onlyItemKey?:string,deidentifiedChoicesOnly=false)=>{
   // Match Array.find's first occurrence, including duplicate missing entries.
   // Matrix rows retain their explicit reason before the parent-question reason.
   const missing=new Map<string,MissingReason|null>()
@@ -209,6 +210,7 @@ const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,only
   let matrixAnswerKey:string|undefined
   let matrixAnswers:Record<string,string|string[]>={}
   for(const item of items){
+    if(deidentifiedChoicesOnly&&!DEIDENTIFIED_SURVEY_RESPONSE_TYPES.has(item.responseType))continue
     if(onlyItemKey&&item.itemKey!==onlyItemKey)continue
     let value:AnswerPrimitive=values[item.answerKey]??null
     let missingReason=missing.get(item.itemKey)??null
@@ -471,6 +473,8 @@ type SurveySourceInput = {
    * each verified FINAL, instead of rejecting an otherwise valid high-item
    * study against the 25k intermediate-row cap. No public raw API shortcut. */
   selectRaw?:false|{instrumentKey:string;itemKey:string}
+  /** Internal positive projection for the separately authorized system export. */
+  deidentifiedChoicesOnly?:true
   selectScore?:false|{instrumentKey:string;scoreKey:string}
   includeInterpretation?:boolean
   /** Paired score aggregation does not need longitudinal attendance matrices. */
@@ -1097,7 +1101,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           if(input.selectRaw!==false&&(!input.selectRaw||
             frozen.instrumentKey===input.selectRaw.instrumentKey)){
             const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
-            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
+            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined,input.deidentifiedChoicesOnly)){
             const missingReason=nativeMissing.get(r.itemKey)??baseMissingReason
             const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
             if(raw.length>=25000)

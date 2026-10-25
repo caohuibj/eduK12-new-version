@@ -74,7 +74,7 @@ export async function exportDeidentifiedSurvey(actorId:string,proof:AdminSession
  })
  const permission=await grant()
  const source=await loadSurveySource({actorUserId:actorId,projectId:input.projectId,systemAccess,maxFinals:25,pageMode:true,
-  stableIdCursor:true,includeInterpretation:false,includeAttendance:false,...(input.afterId?{afterFinal:{id:input.afterId,completedAt:new Date(0)}}:{})})
+  stableIdCursor:true,includeInterpretation:false,includeAttendance:false,deidentifiedChoicesOnly:true,...(input.afterId?{afterFinal:{id:input.afterId,completedAt:new Date(0)}}:{})})
  const result=projectDeidentifiedSurveyPage(source,permission.salt)
  await grant()
  return {...result,nextAfterId:source.nextFinalCursor?.id??null}
