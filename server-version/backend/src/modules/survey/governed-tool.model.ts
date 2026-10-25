@@ -12,6 +12,7 @@ import {toolReference,type ToolReference} from './tool-reference'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenUnit} from './publication.service'
 import type {StoredRelease} from '../measurement-content/repository'
+import {packageReportWorstCaseBytes,assertPackageReportBytes} from './governed-package.budget'
 export const governedFamily=z.enum(['SCALE','COGNITIVE','SJT','FORM','COMBINATION','BUNDLE'])
 export type GovernedFamily=z.infer<typeof governedFamily>
 export type UnitFamily=SurveyKind
@@ -34,7 +35,9 @@ export const clone=<T>(value:T):T=>JSON.parse(JSON.stringify(value))
 export const packageFamily=(family:GovernedFamily)=>family==='COMBINATION'||family==='BUNDLE'
 export function snapshotUnit(snapshot:CatalogSourceSnapshot,id='trial-unit',key='tool'):ResearchFrozenUnit{
  return {draftId:id,instrumentKey:key,kind:snapshot.ref.kind,title:snapshot.title,draftRevision:1,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,
- compiledDefinition:clone(snapshot.compiledDefinition),displayDefinition:clone(snapshot.displayDefinition),...(snapshot.answerMapping?{sourceAnswerMapping:clone(snapshot.answerMapping)}:{}),sourceProvenance:{...clone(snapshot.provenance),source:clone(snapshot.ref)}}
+ compiledDefinition:clone(snapshot.compiledDefinition),displayDefinition:clone(snapshot.displayDefinition),...(snapshot.answerMapping?{sourceAnswerMapping:clone(snapshot.answerMapping)}:{}),
+ ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,nativeSituational:clone(snapshot.nativeSituational)}:{}),
+ sourceProvenance:{...clone(snapshot.provenance),source:clone(snapshot.ref)}}
 }
 export function governedMeasurementInput(unit:ResearchFrozenUnit,scope:ReleaseInput['scope'],localId:string,version:string):ReleaseInput{
  if(unit.kind==='FORM')throw new Error('表单没有测量、参数或报告发布层')
@@ -70,7 +73,9 @@ export function artifactBlockers(a:GovernedArtifact):string[]{
     }else{
      if(component.unit.ref.kind!=='FORM'||!(component.unit.displayDefinition as FormDraft).pages.some(p=>p.questions.some(q=>q.itemKey===b.itemKey)))blockers.push('组合报告表单字段不存在：'+b.slotKey+'/'+b.itemKey)
     }
-   }}
+   }
+    assertPackageReportBytes(packageReportWorstCaseBytes(a.packageReport,a.components,a.title))
+   }
   }else{
    if(a.unit){const media=governedMediaBlocker(a.unit);if(media)blockers.push(media)}
    if(!a.unit||a.unit.ref.kind!==a.family)blockers.push('工具类型与内容版本不一致')

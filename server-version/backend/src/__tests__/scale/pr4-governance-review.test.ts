@@ -12,12 +12,12 @@ const approved = () => approveInstrumentAuthorization({ record: createInstrument
 }), actorUserId: 'reviewer', now: nowIso }).record
 
 describe('PR1–4 governance review regressions', () => {
-  it('blocks revoked lineage fallback in shared diagnostics but preserves independent grants and newer drafts', () => {
+  it('preserves legacy lineage reads without imposing a runtime license gate', () => {
     const grant = approved()
     const revoked = { ...grant, version: 2, status: 'REVOKED' as const }
     const input = { instrumentKey: 'who5', instrumentVersion: '1.0.0', nowIso }
     expect(resolveEffectiveAuthorization({ ...input, authorizations: [grant, revoked] })?.status).toBe('REVOKED')
-    expect(evaluateDurableInstrumentRights({ ...input, locale: 'zh-CN', territory: 'CN', authorizations: [grant, revoked] }).ok).toBe(false)
+    expect(evaluateDurableInstrumentRights({ ...input, locale: 'zh-CN', territory: 'CN', authorizations: [grant, revoked] })).toMatchObject({ ok: true, status: 'NOT_EVALUATED' })
     expect(resolveEffectiveAuthorization({ ...input, authorizations: [grant, { ...revoked, status: 'DRAFT' }] })).toEqual(grant)
     const independent = { ...grant, authorizationId: 'independent' }
     expect(resolveEffectiveAuthorization({ ...input, authorizations: [grant, revoked, independent] })).toEqual(independent)

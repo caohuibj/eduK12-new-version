@@ -1,0 +1,199 @@
+{
+  "runId": 40177411402,
+  "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402",
+  "head": "fedc8629bdc0748bfec0cfe5cbc041c20a9e16bc",
+  "checkout": "03a4318563c66caf4a42d0b06bc362dede9c7664",
+  "tree": "82c947d93721c039913ed7fa058dc4d415e813cc",
+  "result": "failure",
+  "scope": {
+    "route": "legacy",
+    "scenario": "platform"
+  },
+  "frontend": {
+    "passedFiles": 548,
+    "passed": 3688,
+    "failed": 0,
+    "skipped": 3
+  },
+  "backendRegression": {
+    "basePassed": 8401,
+    "isolatedExportPassed": 3,
+    "passed": 8404,
+    "failed": 0,
+    "skipped": 225
+  },
+  "independentSituational": {
+    "runId": 40177411250,
+    "result": "success"
+  },
+  "jobs": [
+    {
+      "id": 121121006731,
+      "name": "classify changed content",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121006731",
+      "failedSteps": []
+    },
+    {
+      "id": 121121072985,
+      "name": "codeql (javascript/typescript SAST)",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121072985",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073041,
+      "name": "mini program / foundation contract and page smoke",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073041",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073217,
+      "name": "frontend artifacts / release consumers early / UI-lab artifact",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073217",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073225,
+      "name": "maintenance / attachment deduplication, indexes and protected cleanup",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073225",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073247,
+      "name": "backend regression (isolated job database) / backend regression (isolated job database)",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073247",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073268,
+      "name": "frontend artifacts / release consumers early / build",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073268",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073269,
+      "name": "docker (compose config + production builds) / production image build and scan",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073269",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073279,
+      "name": "frontend (lint + types + full tests + build) / frontend checks",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073279",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073333,
+      "name": "backend (migrate + build + performance gate) / backend (migrate + build + performance gate)",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073333",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073531,
+      "name": "accept-perf / Scale + Cognitive + SJT fresh accounting",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073531",
+      "failedSteps": []
+    },
+    {
+      "id": 121121073549,
+      "name": "accept-ops / runtime-recovery",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121073549",
+      "failedSteps": []
+    },
+    {
+      "id": 121121217508,
+      "name": "accept-visual (webkit) / webkit frontend acceptance",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121217508",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121121217535,
+      "name": "accept-visual (chromium) / chromium frontend acceptance",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121217535",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121121217548,
+      "name": "accept-ui (chromium) / chromium frontend acceptance",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121217548",
+      "failedSteps": []
+    },
+    {
+      "id": 121121217694,
+      "name": "accept-visual (firefox) / firefox frontend acceptance",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121217694",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121121545548,
+      "name": "accept-media / cognitive-situational",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121545548",
+      "failedSteps": [
+        "situational_branching independent scenario"
+      ]
+    },
+    {
+      "id": 121121545551,
+      "name": "accept-media / images-video",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121545551",
+      "failedSteps": []
+    },
+    {
+      "id": 121121545559,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / products / seeded browser acceptance",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121545559",
+      "failedSteps": [
+        "anonymous study identity responsive acceptance"
+      ]
+    },
+    {
+      "id": 121121545563,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / security / seeded browser acceptance",
+      "result": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121545563",
+      "failedSteps": []
+    },
+    {
+      "id": 121121545564,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / foundation / seeded browser acceptance",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121121545564",
+      "failedSteps": [
+        "certify three PR5 business scenarios"
+      ]
+    },
+    {
+      "id": 121125090691,
+      "name": "merge gate / ready PR",
+      "result": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402/job/121125090691",
+      "failedSteps": [
+        "require exact success for the selected route"
+      ]
+    }
+  ]
+}

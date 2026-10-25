@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "ownedLoopbackContainersVerified": true,
+  "restrictedRuntimeRole": {
+    "rolsuper": false,
+    "rolcreaterole": false,
+    "rolcreatedb": false,
+    "rolreplication": false,
+    "rolbypassrls": false
+  },
+  "owned_public_tables": 0,
+  "postgresVersion": "16.15 (Debian 16.15-1.pgdg12+2)",
+  "redisImage": "redis:7.4.11-bookworm",
+  "runtimePolicySha256": "f3f3e81075e9518a5963304522c21e85978b606d60b5881f969b005922e059c5",
+  "noOwnerBusinessExecution": true,
+  "noRealData": true
+}

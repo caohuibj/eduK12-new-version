@@ -15,6 +15,7 @@ beforeEach(()=>{added=false;savedBody=null;window.history.replaceState(null,'','
  if(url.endsWith('/auth/me'))return reply({id:'r',username:'合成研究者',mustChangePassword:false})
  if(url.endsWith('/auth/capabilities'))return reply({analytics:false,publication:true})
  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic'})
+ if(url.includes('/package-memberships?'))return reply({list:[]})
  if(url.includes('/projects?page='))return reply({list:[project]})
  if(url.endsWith('/projects/p'))return reply(project)
  if(url.includes('/instruments?page='))return reply({list:added?[draft('copyA','第二份表单'),draft('copyB','第一份表单')]:[]})

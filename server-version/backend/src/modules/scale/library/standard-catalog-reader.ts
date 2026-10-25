@@ -1,8 +1,7 @@
 /** Shared read-only registry projection. Both catalogs use the same scientific,
- * rights, exact deployment and participant gates; this never grants permission. */
+ * exact deployment and participant gates; this never grants permission. */
 import { UserRole } from '../../../types'
 import { prisma } from '../../../config/database'
-import { createPrismaAuthorizationRepository } from '../../assessment-authorization'
 import { canStudentAccessScale } from '../scale-access'
 import { resolveScaleStartDeployment } from '../deployment/service'
 import { listScaleInstrumentSources } from '../onboarding/instrument-registry'
@@ -10,12 +9,11 @@ import { buildUnifiedScaleLibraryReadModel } from './catalog-only-read-model'
 import type { ScaleLibraryReadModelContext } from './scale-library-read-model'
 
 export interface StandardCatalogActor { userId: string; role: UserRole }
-const authorizationRepository = createPrismaAuthorizationRepository(prisma)
 
 /**
  * Only executable Wave 0 packages can currently have Scale deployment rows.
  * Wave 1 P1 catalog-first entries deliberately have no deployment until their
- * exact-form package / rights / report contract is closed.
+ * exact-form package / localization / report contract is closed.
  */
 const deployedScalePairs = listScaleInstrumentSources().filter(source => source.executable).map((manifest) => ({
   code: manifest.identity.instrumentKey,
@@ -110,7 +108,6 @@ export async function readStandardScaleLibraryForActor(
 ) {
   return buildLibraryModel({
     ...context,
-    authorizations: await authorizationRepository.list(),
     deployments: await loadDeployments(actor),
     viewerRole: actor.role === UserRole.ADMIN ? 'ADMIN' : actor.role === UserRole.TEACHER ? 'TEACHER' : 'STUDENT',
   })

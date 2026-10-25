@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const { db } = vi.hoisted(() => ({ db: { scale: { findUnique: vi.fn(), update: vi.fn() }, $transaction: vi.fn() } }))
+const { db } = vi.hoisted(() => ({ db: { $executeRaw:vi.fn(async()=>1), scale: { findUnique: vi.fn(), update: vi.fn() }, $transaction: vi.fn() } }))
+vi.mock('../../modules/measurement-content/scale',()=>({publishScaleMeasurement:vi.fn(async()=>({releaseId:'synthetic-release'}))}))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../modules/scale/scale-image.adapter', () => ({ retainScaleAssessmentImages: vi.fn(), publishedScaleMediaOwner: vi.fn(() => ({})), retainFrozenScaleAssessmentImages: vi.fn() }))
 import { scaleController } from '../../controllers/scaleController'

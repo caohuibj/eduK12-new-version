@@ -173,20 +173,16 @@ export async function transitionWave(userId:string,projectId:string,waveId:strin
     const changes:Prisma.SurveyWaveUpdateManyMutationInput={
       status:nextStatus,revision:{increment:1},updatedAt:now,
     }
-    if(action==='CLOSE'){
-      const latest=wave.groupIpPolicy?now:new Date(now.getTime()+2*3600000)
-      changes.finishUntil=wave.finishUntil&&wave.finishUntil<latest?wave.finishUntil:latest
-    }
+    // Closing recruitment never changes the frozen completion deadline.
+    // HARD_STOP is retained as a historical command/event name; both actions
+    // deny new STARTs while admitted participants finish their original attempt.
     if(action==='HARD_STOP'){
       changes.hardStopAt=now
-      changes.finishUntil=wave.groupIpPolicy&&wave.finishUntil&&wave.finishUntil<now?wave.finishUntil:now
     }
     const row=await tx.surveyWave.updateMany({
       where:{id:waveId,projectId,status:wave.status,revision},data:changes,
     })
     if(row.count!==1)fail('波次状态变更并发冲突')
-    if(action==='HARD_STOP')
-      await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId,waveId}})
     if(action==='HARD_STOP'||action==='CLOSE')
       await tx.surveyEntryToken.updateMany({
         where:{projectId,waveId,revokedAt:null},data:{revokedAt:now},

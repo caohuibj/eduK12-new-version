@@ -17,10 +17,10 @@ export const previewScaleInstrument = (input: {
   source?: unknown
   instrumentKey?: string
   instrumentVersion?: string
-  authorizations: InstrumentAuthorizationRecordV1[]
+  authorizations?: InstrumentAuthorizationRecordV1[]
   locale: string
   territory: string
-  commercialNature: 'NON_COMMERCIAL' | 'COMMERCIAL'
+  commercialNature?: 'NON_COMMERCIAL' | 'COMMERCIAL'
   deploymentModes: ScaleDeploymentModeV1[]
   authorizationRefs?: string[]
   nowIso?: string
@@ -45,18 +45,12 @@ export const previewScaleInstrument = (input: {
   if (source.executable) {
     const runtime = compileScalePolicy(source)
     runtimePolicyHash = runtime.runtimePolicyHash
-    const refs = input.authorizationRefs?.length
-      ? input.authorizationRefs
-      : [...new Set(input.authorizations.map(record => record.authorizationId))]
     const policy = {
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       revision: 1,
       locale: input.locale,
       territory: input.territory,
       deploymentModes: modes,
-      commercialNature: input.commercialNature,
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
-      authorizationRefs: refs.length ? refs : ['__MISSING_AUTHORIZATION__'],
       runtimePolicyHash: runtime.runtimePolicyHash,
       ...(localization?.localizationVersion ? { localizationVersion: localization.localizationVersion } : {}),
       inFlightCompletion: 'FROZEN_DEADLINE' as const,
@@ -64,12 +58,11 @@ export const previewScaleInstrument = (input: {
     blockers.push(...scaleLocalizationReasons(source, policy))
     for (const requestedMode of modes) {
       const decision = evaluateScaleDeployment({
-        policy: { ...policy, requiredRightsActions: [...policy.requiredRightsActions] },
+        policy,
         requestedMode,
         instrumentKey: source.identity.instrumentKey,
         instrumentVersion: source.identity.instrumentVersion,
         compiledRuntimePolicyHash: runtime.runtimePolicyHash,
-        authorizations: input.authorizations,
         usageRequirements: runtime.usageRequirements,
         nowIso: input.nowIso,
       })

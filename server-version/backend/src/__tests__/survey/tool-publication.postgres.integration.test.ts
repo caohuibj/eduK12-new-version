@@ -1,3 +1,4 @@
+import {isActionsServiceDatabase} from '../integration/integration-env'
 import {randomUUID} from 'node:crypto'
 import {afterAll,describe,expect,it,vi} from 'vitest'
 import {Prisma} from '@prisma/client'
@@ -17,6 +18,7 @@ function requireFixtureDatabase(){
  if(process.env.NODE_ENV==='production')throw new Error('Production fixture execution forbidden')
  const url=new URL(process.env.DATABASE_URL!)
  if(actions){
+  if(isActionsServiceDatabase(process.env.DATABASE_URL!))return
   if(process.env.SURVEY_TOOL_PUBLICATION_ACCEPTANCE!=='1'||process.env.GITHUB_ACTIONS!=='true'||
    process.env.NODE_ENV!=='test'||process.env.SCHOOL_TEACHER_ISOLATED_DB!=='1'||
    !/^[a-f0-9]{64}$/.test(process.env.CI_POSTGRES_SERVICE_ID??'')||
@@ -76,8 +78,8 @@ suite('Standalone Survey scale publication and library application — rollback-
   const application=await submit(owner,'SURVEY',input)
   expect(application).toMatchObject({sourceId:row.id,status:'SUBMITTED',releaseId:release.releaseId})
   expect((await submit(owner,'SURVEY',input)).id).toBe(application.id)
-  await expect(review(owner,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Unauthorized'})).rejects.toMatchObject({statusCode:403})
-  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Rollback-only synthetic review'})
+  await expect(review(owner,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Unauthorized'})).rejects.toMatchObject({statusCode:403})
+  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Rollback-only synthetic review'})
   const [entry]=await tx.$queryRaw<Array<{release_id:string}>>(Prisma.sql`SELECT release_id FROM scale_library_entries WHERE id=${approved.entryId}`)
   expect(entry.release_id).toBe(release.releaseId)
   const [grants]=await tx.$queryRaw<Array<{n:bigint}>>(Prisma.sql`SELECT count(*) AS n FROM scale_library_use_grants WHERE entry_id=${approved.entryId}`)

@@ -1,0 +1,147 @@
+{
+  "scope": "Explicit bundle publication supplies missing frozen cognitive-copy measurement identity, same transaction",
+  "authorization": "User approved minimal connection fix; existing permissions and exact versions remain unchanged. No next-phase Training scope/model migration.",
+  "environment": "Original cloud; task-owned synthetic PostgreSQL 16 / Redis only",
+  "reports": [
+    {
+      "name": "merge355-product-pg-after1",
+      "sha256": "465aa30460ca81ec2bd44300fbe1ea88fa6310f58e415fef4559bd87220e526e",
+      "bundleAssertions": [
+        {
+          "test": "enforces authorization and exact concurrent creation idempotency",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: standalone-first",
+          "status": "failed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: bundle-first",
+          "status": "failed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: concurrent",
+          "status": "failed"
+        },
+        {
+          "test": "completes four canonical sources, persists once, and appends reanalysis without changing original facts",
+          "status": "failed"
+        },
+        {
+          "test": "retains completed FINALs after an engine failure and recovers the same analysis while creation is closed",
+          "status": "failed"
+        },
+        {
+          "test": "keeps draft state when publication authorization is revoked",
+          "status": "passed"
+        },
+        {
+          "test": "rejects incomplete completion and supports anonymous admission with recovery isolation",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "name": "merge355-core-pg-after3",
+      "sha256": "9cad14033fbf7b0eaab4a9a7bb9ad8779a805bba458374812f5ca1b74cfff331",
+      "bundleAssertions": [
+        {
+          "test": "shares one cognitive quota across all four entrances: standalone-first",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: bundle-first",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: concurrent",
+          "status": "passed"
+        },
+        {
+          "test": "publishes the frozen cognitive copy in the same transaction, rejects foreign ownership and rolls back a failed bundle publication",
+          "status": "passed"
+        },
+        {
+          "test": "completes four canonical sources, persists once, and appends reanalysis without changing original facts",
+          "status": "passed"
+        },
+        {
+          "test": "retains completed FINALs after an engine failure and recovers the same analysis while creation is closed",
+          "status": "passed"
+        },
+        {
+          "test": "rejects incomplete completion and supports anonymous admission with recovery isolation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "merge355-bundle-final",
+      "sha256": "6ab419358ef88182745ddaf9fe914dcda4716d969ceb5cedfdcee1ab17e92862",
+      "bundleAssertions": [
+        {
+          "test": "enforces authorization and exact concurrent creation idempotency",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: standalone-first",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: bundle-first",
+          "status": "passed"
+        },
+        {
+          "test": "shares one cognitive quota across all four entrances: concurrent",
+          "status": "passed"
+        },
+        {
+          "test": "publishes the frozen cognitive copy in the same transaction, rejects foreign ownership and rolls back a failed bundle publication",
+          "status": "failed"
+        },
+        {
+          "test": "completes four canonical sources, persists once, and appends reanalysis without changing original facts",
+          "status": "passed"
+        },
+        {
+          "test": "retains completed FINALs after an engine failure and recovers the same analysis while creation is closed",
+          "status": "passed"
+        },
+        {
+          "test": "keeps draft state when publication authorization is revoked",
+          "status": "passed"
+        },
+        {
+          "test": "rejects incomplete completion and supports anonymous admission with recovery isolation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "name": "merge355-focused-after5",
+      "sha256": "f131e883b47ecd631a55572f9ab042b1ca5d75a65453bfc9eda4e9fc6e2012cb",
+      "bundleAssertions": [
+        {
+          "test": "publishes the frozen cognitive copy in the same transaction, rejects foreign ownership and rolls back a failed bundle publication",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "server-version/backend/src/modules/bundle-product/service.ts": "08036e4bd414a1525afc461ffbe9a9aaaea6cfe9a7b5f33fb4d2e2497e4f2055",
+    "server-version/backend/src/__tests__/bundle-product/product.postgres.integration.test.ts": "884f96f0665f14a6b87e1ac67402f8617959dcf13163c5eb218afe4f451ae7f1",
+    "server-version/backend/src/__tests__/fixtures/published-measurement.ts": "413241fdc497b959a0dcc189db453c93d6c1714c67b1d69e082d307957ace0f6",
+    "server-version/backend/src/__tests__/fixtures/library-distribution.ts": "37042d0c60201a45565e172a7c475f1f1823abe2db8e37016bcc93cdc43f0eeb"
+  },
+  "typecheck": {
+    "command": "npx tsc --noEmit --incremental false",
+    "exitCode": 0,
+    "logSha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+  },
+  "limits": [
+    "Original failed reports retained. No claim that the full file ran green in one invocation; final 8 passed old bodies and repaired new case have separate executions.",
+    "This is local targeted evidence, not final-head official CI.",
+    "Fault injection creates and removes only this synthetic fixture trigger; immutable protections stay installed."
+  ]
+}

@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { PrismaClient, type Prisma } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -89,7 +90,7 @@ suite('Survey bounded native conditional flow — real PostgreSQL', () => {
     await reviewSjtDraft({ userId: admin, admin: true }, authored.id, authored.revision, authored.contentDigest, true,
       'Independent synthetic conditional host test; no new scientific claims or real participant data')
     const release = await db.sjtAuthorRelease.findFirstOrThrow({ where: { instrumentKey: template.instrumentKey } })
-    const grant = await grantCatalogSource(admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
+    const grant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
     nativeAId = (await importCatalogDraft(owner, projectId, grant.id, { requestId: randomUUID(), instrumentKey: 'nativea', title: 'Synthetic native route A' })).id
     nativeBId = (await importCatalogDraft(owner, projectId, grant.id, { requestId: randomUUID(), instrumentKey: 'nativeb', title: 'Synthetic native route B' })).id
     for (const [kind, instrumentKey, definition] of [['FORM', 'screen', form], ['SCALE', 'tail', scale]] as const) {

@@ -4,7 +4,7 @@ import {SchoolStudentTasks} from '../../school/SchoolStudentTasks'
 import {HuiteacherMyScaleTasks} from '../../huiteacher/HuiteacherMyScaleTasks'
 import type {EducationReportApi} from './EducationScalePersonalReport'
 const report={schemaVersion:1,kind:'EDUCATION_SCALE_PERSONAL_REPORT',state:'READY',mode:'INDIVIDUAL_SUMMARY',unitReports:[{itemId:'u',type:'SCALE',kind:'scale',scaleName:'个人量表',scaleCode:'private',caveats:[],disclaimer:'描述性',completedAt:null,totalTime:0,rawScoreFeedback:[{scoreKey:'total',rangeKey:'range',text:'上一轮获准的私有反馈'}]}]}
-function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(yes=>{resolve=yes});return {promise,resolve}}
+function deferred<T>(){let resolve!:(value:T)=>void;let reject!:(reason:Error)=>void;const promise=new Promise<T>((yes,no)=>{resolve=yes;reject=no});return {promise,resolve,reject}}
 afterEach(cleanup)
 describe.each(['SCHOOL','TEACHER'] as const)('%s real task report consumer',entry=>{
  it('clears the previous report before denied rereads and ignores a late reply after API scope changes',async()=>{
@@ -61,6 +61,47 @@ it('School clears authorized feedback even when refreshing tasks fails',async()=
  expect(screen.queryByText('上一轮获准的私有反馈')).not.toBeInTheDocument()
  await screen.findByText('待办刷新失败')
  expect(screen.queryByText('上一轮获准的私有反馈')).not.toBeInTheDocument()
+})
+it.each([
+ {refreshFails:false,reply:'ready'},
+ {refreshFails:true,reply:'ready'},
+ {refreshFails:false,reply:'error'},
+ {refreshFails:true,reply:'error'},
+] as const)('School discards an old $reply feedback reply during list refresh (refresh failure: $refreshFails)',async({refreshFails,reply})=>{
+ const page={list:[{id:'exec',activityId:'a',activityTitle:'活动',kind:'MEASUREMENT',title:'本人测评',status:'COMPLETED',href:null,deadline:null}],total:1,page:1,hasMore:false,truncated:false}
+ const late=deferred<typeof report>(),refresh=deferred<typeof page>()
+ const fresh={...report,unitReports:report.unitReports.map(unit=>({...unit,rawScoreFeedback:unit.rawScoreFeedback.map(item=>({...item,text:'刷新后新授权的反馈'}))}))}
+ let loads=0,reads=0
+ const api=vi.fn(async(path:string)=>{
+  if(path.startsWith('/my/activity-tasks'))return ++loads===1?page:refresh.promise
+  if(path==='/my/student-reference')return {reference:'student'}
+  if(path==='/reports/student/executions/exec')return ++reads===1?late.promise:fresh
+  throw Error(`Unexpected ${path}`)
+ })
+ render(<SchoolStudentTasks api={api as EducationReportApi}/>)
+ fireEvent.click(await screen.findByRole('button',{name:'查看我的测评反馈'}))
+ await waitFor(()=>expect(reads).toBe(1))
+ fireEvent.click(screen.getByRole('button',{name:'刷新待办'}))
+ expect(screen.getByRole('button',{name:'正在读取…'})).toBeDisabled()
+ await act(async()=>{
+  if(reply==='ready')late.resolve(report)
+  else late.reject(Error('旧反馈请求失败'))
+ })
+ expect(screen.queryByText('上一轮获准的私有反馈')).not.toBeInTheDocument()
+ expect(screen.queryByText('旧反馈请求失败')).not.toBeInTheDocument()
+ expect(screen.queryByRole('region',{name:'获准的个人测评反馈'})).not.toBeInTheDocument()
+ await act(async()=>{
+  if(refreshFails)refresh.reject(Error('待办刷新失败'))
+  else refresh.resolve(page)
+ })
+ if(refreshFails)expect(await screen.findByRole('alert')).toHaveTextContent('待办刷新失败')
+ else await waitFor(()=>expect(screen.getByRole('button',{name:'刷新待办'})).toBeEnabled())
+ expect(screen.queryByText('上一轮获准的私有反馈')).not.toBeInTheDocument()
+ expect(screen.queryByText('旧反馈请求失败')).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'查看我的测评反馈'}))
+ await screen.findByText('刷新后新授权的反馈')
+ expect(reads).toBe(2)
+ expect(api.mock.calls.every(([path])=>path.startsWith('/my/activity-tasks')||path==='/my/student-reference'||path==='/reports/student/executions/exec')).toBe(true)
 })
 it('Teacher retains the separately authorized legacy READY summary when kind is absent',async()=>{
  const api=vi.fn(async(path:string)=>path==='/my-scale-tasks'?{list:[{executionId:'exec',eventId:'event',eventTitle:'活动',runId:'run',organizationId:'school',status:'COMPLETED',runtimeBindingRef:'attempt',resourceKey:'scale',title:'本人测评',runStatus:'CLOSED'}]}:{state:'READY',explanation:'原有本人反馈仍可读',metrics:[],limitations:[],disclaimer:'原有说明'})

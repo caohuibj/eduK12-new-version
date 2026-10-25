@@ -64,10 +64,8 @@ describe('Survey assertion shares validation without an unused draft digest',()=
     const expected=fixture(),input=structuredClone(expected)
     if('pages' in input){
       input.pages[0].title='  Page  '
-      // The parser still supplies defaults and preserves known optional undefined fields.
+      // HTTP JSON omits absent optional fields; retain parser defaults.
       delete (input.pages[0].questions[1] as Partial<FormDraft['pages'][number]['questions'][number]>).rows
-      input.pages[0].questions[1].maxLength=undefined
-      ;(expected as FormDraft).pages[0].questions[1].maxLength=undefined
     }else if('items' in input)input.items[0].prompt='  First  '
     else input.title='  Scene  '
     const original=structuredClone(input),digest=expectedDigest(kind,expected)
@@ -121,7 +119,8 @@ describe('Survey assertion shares validation without an unused draft digest',()=
     expect(valid.issues).toEqual([])
     expect(valid.digest).toBe(expectedDigest('FORM',accepted))
     const invalid=rejected('FORM',exactBytesForm(480001),true,legacy)
-    expect(invalid.issues).toEqual([{path:'definition',message:'单份研究工具数据体积不能超过 480 KB',severity:'error'}])
+    expect(invalid.issues).toEqual([{path:'definition',message:'单份研究工具数据体积不能超过 480 KB',severity:'error'},
+      {path:'definition',message:'定义超过大小限制',severity:'error'}])
   })
   it('keeps historical condition operators opt-in without accepting broken frozen references',()=>{
     const input=form()

@@ -24,7 +24,7 @@ suite('Education library emergency collection stop at real runtime boundaries', 
   afterAll(async () => { await db?.$disconnect() })
 
   for (const product of ['SCHOOL', 'TEACHER'] as const) {
-    it(`${product}: committed release stop rejects a new START and an already-started FINAL without saving results`, async () => {
+    it(`${product}: committed release stop rejects a new START while an already-started FINAL completes under frozen rules`, async () => {
       const fixture = await setupEducationLibraryRuntimeFixture({ db, product, trackCount: 2 })
       const executions = await fixture.executions()
       expect(executions).toHaveLength(2)
@@ -52,19 +52,18 @@ suite('Education library emergency collection stop at real runtime boundaries', 
         FROM assessment_run_executions WHERE id=${executions[1].id}`
       expect(unstarted).toMatchObject({ status: 'ASSIGNED', runtimeBindingRef: null })
 
-      await expect(submitScaleAssessmentFinal({ assessmentId: child.id, submissionId: randomUUID(),
+      // The stop blocks new admission only; the server-established attempt
+      // finishes under its frozen runtime and keeps the saved facts.
+      await submitScaleAssessmentFinal({ assessmentId: child.id, submissionId: randomUUID(),
         attemptEpoch: child.attemptEpoch, definitionHash: frozen.legacyDefinitionHash,
         contextSnapshotHash: parent.contextSnapshotHash, userId: actorUserId,
-        compositeAttemptId: parent.id, answers: fixture.answers })).rejects.toThrow('紧急停用')
+        compositeAttemptId: parent.id, answers: fixture.answers })
       const retained = await db.assessment.findUniqueOrThrow({ where: { id: child.id } })
-      expect(retained.status).toBe('IN_PROGRESS')
-      expect(retained.submissionId).toBeNull()
-      expect(retained.answers).toEqual(child.answers)
-      expect(retained.result).toEqual(child.result)
+      expect(retained.status).toBe('COMPLETED')
+      expect(retained.submissionId).toBeTypeOf('string')
       expect(await db.assessmentUnitSnapshot.count({ where: {
-        compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch, terminalState: 'COMPLETED',
-      } })).toBe(0)
-      expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: parent.id } })).status).not.toBe('COMPLETED')
+        compositeAttemptId: parent.id, attemptEpoch: child.attemptEpoch, terminalState: 'COMPLETED',
+      } })).toBeGreaterThan(0)
     }, 30000)
   }
 })

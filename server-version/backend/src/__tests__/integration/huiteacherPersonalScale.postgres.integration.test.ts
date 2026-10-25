@@ -95,7 +95,8 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       accountDomain:'TRAINING',role:'ADMIN',platformRole:'SYSTEM_ADMIN',
     }})
     const actor={userId:admin.id,platformRole:'SYSTEM_ADMIN'}
-    await db.adminEntryGrant.create({data:{id:randomUUID(),userId:admin.id,entry:'HUITEACHER',grantedBy:admin.id}})
+    const entryAdmin=await db.user.create({data:{username:'teacher-entry-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole:'STANDARD',role:'TEACHER',teacherApproved:true}})
+    await db.adminEntryGrant.create({data:{id:randomUUID(),userId:entryAdmin.id,entry:'HUITEACHER',grantedBy:admin.id}})
     const definition=createCustomScaleDefinition()
     definition.respondentType='teacher_self_report'
     definition.source.title='原创合成教师工作体验'
@@ -205,7 +206,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       code:'HUITEACHER_SCALE_NOT_LICENSED_FOR_RUN',
     })
     const licensed=await changeTeacherScaleLicense({
-      organizationId:school.id,resourceId:resource.id,actorUserId:admin.id,
+      organizationId:school.id,resourceId:resource.id,actorUserId:entryAdmin.id,
       action:'GRANT',
     })
     expect(licensed.status).toBe('ACTIVE')
@@ -262,10 +263,10 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     expect(await listAssignedRunTasks(other.id,{preserveBoundSchoolContinuation:true}))
       .toEqual(await listAssignedRunTasks(other.id))
     await changeTeacherScaleLicense({organizationId:school.id,resourceId:resource.id,
-      actorUserId:admin.id,action:'REVOKE'})
+      actorUserId:entryAdmin.id,action:'REVOKE'})
     expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(0)
     await changeTeacherScaleLicense({organizationId:school.id,resourceId:resource.id,
-      actorUserId:admin.id,action:'GRANT'})
+      actorUserId:entryAdmin.id,action:'GRANT'})
     expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(1)
     await db.$executeRaw`UPDATE organization_memberships SET valid_until=clock_timestamp() WHERE id=${member.id}`
     expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(0)
@@ -334,7 +335,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
 
     await changeTeacherScaleLicense({
       organizationId:school.id,resourceId:resource.id,
-      actorUserId:admin.id,action:'REVOKE',
+      actorUserId:entryAdmin.id,action:'REVOKE',
     })
     await expect(assertTeacherScaleRunUse(db,{
       organizationId:school.id,runId:draft.runId,resource:ref,
@@ -365,7 +366,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       userId:independent.id,resourceId:resource.id,
     })).rejects.toThrow()
     await changeTeacherPersonalGrant({
-      actorUserId:admin.id,teacherUserId:independent.id,
+      actorUserId:entryAdmin.id,teacherUserId:independent.id,
       resourceId:resource.id,action:'GRANT',
     })
     const listed=await listPersonalTeacherScales(independent.id)
@@ -416,11 +417,11 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       userId:manager.id,assessmentId:startedPersonal.assessmentId,
     })).rejects.toThrow()
     await changeTeacherPersonalGrant({
-      actorUserId:admin.id,teacherUserId:independent.id,
+      actorUserId:entryAdmin.id,teacherUserId:independent.id,
       resourceId:resource.id,action:'REVOKE',
     })
     await expect(startPersonalTeacherScale({
       userId:independent.id,resourceId:resource.id,
     })).rejects.toThrow()
-  })
+  },30_000)
 })

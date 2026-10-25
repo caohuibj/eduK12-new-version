@@ -376,8 +376,8 @@ describe('authorized Training numeric source adapter', () => {
   it('ADMIN discovery cannot bypass frozen Cognitive research-only profile restrictions', async () => {
     const f = fixture(), report = {profile: 'research', metricDefinitions: {secret: {key: 'secret', label: 'Research only', role: 'research_only', availableProfiles: ['research'], unit: 'score', valueType: 'number'}}}
     f.task.items = [{id: 'cognitive', type: 'COGNITIVE', cognitiveAssignment: {resolvedReportSnapshotEncrypted: encryptCognitivePayload(report)}}]; f.task.formSections = []
-    const discovery = await listTrainingAnalysisSources(f.db, {...actor, role: 'ADMIN'}, 'course')
-    expect(discovery.list).toEqual([])
+    await expect(listTrainingAnalysisSources(f.db,{...actor,role:'ADMIN'},'course')).rejects.toMatchObject({statusCode:404})
+    expect(f.db.compositeAssessment.findMany).not.toHaveBeenCalled()
   })
   it('rejects a selected snapshot query bind budget before any child or fact reads', async () => {
     const f = fixture(900), selector = request()

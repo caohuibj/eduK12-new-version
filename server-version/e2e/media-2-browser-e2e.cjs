@@ -10,6 +10,10 @@ const assert = require('node:assert/strict')
 const crypto = require('node:crypto')
 const fs = require('node:fs')
 const path = require('node:path')
+// Reuse the real synthetic publication/capability setup. This is never an
+// admission-time publisher and does not replace immutable measurement identity.
+require(require.resolve('tsx/cjs',{paths:[path.resolve(__dirname,'../backend')]}))
+const {publishTrainingSourcesFixture,grantPublicScaleFixture}=require('../backend/src/__tests__/fixtures/published-measurement.ts')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { PrismaClient } = require('../backend/node_modules/@prisma/client')
 const {
@@ -144,6 +148,9 @@ const seed = async () => {
       creatorId: course.creatorId,
     },
   })
+
+  await publishTrainingSourcesFixture(prisma,course.creatorId,{scaleIds:[scale.id]})
+  await grantPublicScaleFixture(prisma,scale.id)
 
   const composite = await prisma.compositeAssessment.create({
     data: {

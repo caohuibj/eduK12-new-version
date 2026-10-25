@@ -162,10 +162,7 @@ const validateSurveyDraftCore=(
       if(d.questions.length<2)err(issues,'questions','共享场景至少两道题目')
       requireText(d.author,'author',issues)
       requireText(d.sourceNote,'sourceNote',issues)
-      if(!d.licenseStatus||d.licenseStatus==='unknown')
-        err(issues,'licenseStatus','必须明确内容为研究者原创或取得合法授权')
-      if(d.redistribution!=='allowed')
-        err(issues,'redistribution','研究公开呈现前必须确认素材允许此用途的展示与分发')
+      // Keep truthful source declarations; copyright is not an instrument admission gate.
     }
     const dims=new Set(d.metrics.map(m=>m.metricKey))
     d.questions.forEach((q,i)=>{

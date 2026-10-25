@@ -269,10 +269,16 @@ export const listStudentAssignments = async (userId: string) => {
   const assignments = await prisma.cognitiveAssignment.findMany({
     where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: true, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
-    include: { config: true, course: true, sessions: {
-      where: { userId, compositeAttemptId: null, status: { in: ['IN_PROGRESS', 'COMPLETED'] } },
-      orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true, frozenAdmissionSnapshotHash: true },
-    } },
+    select: {
+      id: true, courseId: true, title: true, instruction: true, status: true,
+      opensAt: true, dueAt: true, maxAttempts: true, required: true, publishedAt: true,
+      config: { select: { id: true, testType: true, configVersion: true, name: true, engineVersion: true, scoringVersion: true } },
+      course: { select: { id: true, title: true, courseCode: true } },
+      sessions: {
+        where: { userId, compositeAttemptId: null, status: { in: ['IN_PROGRESS', 'COMPLETED'] } },
+        orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true, frozenAdmissionSnapshotHash: true },
+      },
+    },
   })
 
   return assignments.filter(a => isCognitiveNewAdmissionEnabled() || (a.sessions?.length ?? 0) > 0).map((a) => ({

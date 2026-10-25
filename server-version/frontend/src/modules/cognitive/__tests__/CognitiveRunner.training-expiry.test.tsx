@@ -132,7 +132,7 @@ describe('Training cognitive expiry recovery navigation', () => {
     expect(await screen.findByRole('button', { name: '开始/继续认知任务' })).toBeTruthy()
     expect(mocks.parentApi.restart).toHaveBeenCalledExactlyOnceWith(parentId)
     expect(screen.getByTestId('parent-location').textContent).toBe(`/${surface}/composite/attempts/${nextId}`)
-    expect(mocks.parentApi.getAttempt).toHaveBeenCalledWith(nextId)
+    await waitFor(()=>expect(mocks.parentApi.getAttempt).toHaveBeenCalledWith(nextId, 'current-unit'))
     if (surface === 'public') {
       expect(sessionStorage.getItem(`composite:recovery:attempt:${nextId}`)).toBe('new-parent-credential')
       expect(mocks.parentPublicApi).toHaveBeenCalledWith('new-parent-credential')

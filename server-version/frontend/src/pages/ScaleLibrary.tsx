@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpen, CheckCircle, Clock, ExternalLink, FileText, Filter, Lock, Play, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { scaleRightsStatusLabel } from '../modules/scale/rightsPresentation'
 import {
   getScaleLibrary,
   getScaleLibraryEntry,
@@ -66,14 +67,6 @@ const formatAge = (entry: ScaleLibraryEntry): string => {
   if (entry.applicability.minAge === undefined || entry.applicability.maxAge === undefined) return '年龄边界见说明'
   return `${entry.applicability.minAge}–${entry.applicability.maxAge} 岁`
 }
-
-const formatStatus = (value: string): string => ({
-  APPROVED: '已批准',
-  EVIDENCE_PENDING: '证据待补充（不阻断试行）',
-  NOT_GRANTED: '尚无授权记录',
-  SCOPE_MISMATCH: '授权范围不匹配',
-  INELIGIBLE: '授权当前不可用',
-}[value] ?? value)
 
 const LoadingState: React.FC = () => (
   <div className="flex items-center justify-center min-h-64 text-gray-500">量表库加载中...</div>
@@ -307,9 +300,9 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
           {entry.source.citation && <p className="mt-2">{entry.source.citation}</p>}
           {entry.source.url && <a className="mt-2 inline-flex items-center text-action hover:underline" href={entry.source.url} target="_blank" rel="noreferrer">查看来源 <ExternalLink className="ml-1 h-3.5 w-3.5" /></a>}
         </Section>
-        <Section title="授权与参考">
-          <p>授权状态：{formatStatus(entry.rights.status)}；商业性质：{entry.rights.commercialNature}。</p>
-          <p className="mt-2">覆盖语言：{entry.rights.locales.length > 0 ? entry.rights.locales.join('、') : '暂无可用授权范围'}；适用地区：{entry.rights.territories.length > 0 ? entry.rights.territories.join('、') : '暂无'}</p>
+        <Section title="使用边界与参考">
+          <p>{scaleRightsStatusLabel(entry.rights.status)}；入口及用户使用权限另行核验。</p>
+          <p className="mt-2">内容语言、科学适用地区与适用人群请查看版本说明；系统不判断是否已获版权许可。</p>
           <p className="mt-3">{entry.references.displayText}</p>
           <p className="mt-1 text-gray-500">参考版本 {entry.references.packageReferenceCount} 个；适用性记录 {entry.references.applicabilityCount} 条。</p>
         </Section>

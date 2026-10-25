@@ -25,7 +25,9 @@ export const materialExperimentSchema=z.object({
 export type MaterialExperiment=z.infer<typeof materialExperimentSchema>
 export type MaterialOnlyExperiment=z.infer<typeof materialOnlyExperimentSchema>
 export const groupQuotaPolicySchema=z.object({
-  schemaVersion:z.literal(1),groupLimits:z.record(key,z.number().int().min(1).max(10000)),
+  schemaVersion:z.literal(1),groupLimits:z.unknown().refine(value=>
+    value!==null&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).every(k=>key.safeParse(k).success),
+    '配额必须仅包含明确的合法分组键').pipe(z.record(key,z.number().int().min(1).max(10000))),
 }).strict()
 export type MaterialQuotaPolicy=z.infer<typeof groupQuotaPolicySchema>
 export class MaterialDefinitionError extends Error{}

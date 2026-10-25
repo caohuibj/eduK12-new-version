@@ -7,6 +7,7 @@ const { mockService, mockBuildExport, mockWholeSubmit } = vi.hoisted(() => ({
   mockService: {
     isCompositeError: vi.fn(() => false),
     getReport: vi.fn(),
+    getCompositeReportView: vi.fn(),
     getCompositeReportStatus: vi.fn(),
     retryCompositeQuestionnaireReport: vi.fn(),
     getCompositeReportStatusForTeacher: vi.fn(),
@@ -188,4 +189,25 @@ describe('PR9 composite report controller', () => {
     expect(res.status).toHaveBeenCalledWith(500)
   })
 
+})
+
+describe('explicit combined report view routing', () => {
+  it.each([false, true])('passes the participant view context and cancellation signal, public=%s', async publicMode => {
+    const res = { ...response(), once: vi.fn(), off: vi.fn() }
+    const req = { params: { attemptId: 'attempt-1' }, query: { view: 'combined', waitMs: '1000' },
+      user: { userId: 'student-1' }, headers: { 'x-recovery-token': 'a'.repeat(43) } }
+    const value = { generation: { reportStatus: { state: 'WAITING' } }, report: null }
+    mockService.getCompositeReportView.mockResolvedValueOnce(value)
+    await (publicMode ? compositeController.publicReport : compositeController.report)(req as any, res)
+    expect(mockService.getCompositeReportView).toHaveBeenCalledWith('attempt-1', publicMode
+      ? { recoveryTokenHash: hashRecoveryToken('a'.repeat(43)) } : { userId: 'student-1' }, { waitMs: 1000, signal: expect.any(AbortSignal) })
+    expect(mockService.getReport).not.toHaveBeenCalled(); expect(res.off).toHaveBeenCalledWith('close', expect.any(Function))
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ data: value }))
+  })
+  it.each([{ view: 'unknown' }, { view: ['combined','combined'] }, { view: 'combined', partial: '1' },
+    { view: 'combined', snapshotId: 'snapshot' }, { view: 'combined', waitMs: ['1','2'] }, { view: 'combined', waitMs: '-1' }])('rejects invalid opt-in query before any report read: %j', async query => {
+    const res = response()
+    await compositeController.report({ params: { attemptId: 'attempt-1' }, query, user: { userId: 'student-1' } } as any, res)
+    expect(res.status).toHaveBeenCalledWith(400); expect(mockService.getCompositeReportView).not.toHaveBeenCalled(); expect(mockService.getReport).not.toHaveBeenCalled()
+  })
 })

@@ -4,6 +4,7 @@ import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
 import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
+import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
 import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import {attachTrainingReferenceSelection} from './training-reference-selection'
@@ -2517,7 +2518,6 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!])
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2647,13 +2647,10 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
-    if(item.scale.status!=='PUBLISHED')throw compositeForbidden('当前量表已不可准入')
-    await assertTrainingScaleCollectionAllowed(tx,[item.scaleId])
     const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
     prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
   }else if(item.type==='COGNITIVE'){
     assertCognitiveModuleEnabled()
-    if(item.cognitiveAssignment.status!=='PUBLISHED'||item.cognitiveAssignment.config.status!=='PUBLISHED')throw compositeForbidden('当前认知配置已不可准入')
     const loaded=await cognitiveSessionService.loadCognitiveSessionConfig(candidate.references[item.id],tx as any)
     if(!loaded.snapshot?.compiledRuntime)throw compositeForbidden('冻结认知运行时缺失')
     prepared.cognitive.set(item.id,{snapshot:loaded.snapshot,compiledRuntime:loaded.snapshot.compiledRuntime})
@@ -2695,6 +2692,9 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
+  // Parent START and publication stop/archive serialize on the same row. Child
+  // progression later consumes the already-admitted immutable runtime plan.
+  await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
   if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
       select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
@@ -2714,7 +2714,6 @@ const createAttempt = async (
     // A shared publication lock still fences archive, while independent
     // authenticated admissions keep their own participant lock. Other entry
     // paths retain their outer exclusive publication/token locks.
-    await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
@@ -2934,6 +2933,14 @@ const createAttempt = async (
   }) : null
   const trainingFeedbackSnapshot = feedbackBinding ? freezeTrainingFeedbackSnapshot({ ...feedbackBinding, attemptId: newAttemptId, attemptEpoch }) : null
   const selectedContentItems=new Set<string>(composite.items.map((item:any)=>item.id))
+  // Include conditional/unselected slots before admitting the parent; otherwise
+  // a stop could first be discovered halfway through an accepted attempt.
+  // Education organization resources admit through their own education run
+  // boundary (education use grant checked at publication); for them only the
+  // shared emergency-stop/identity lock applies, never Training entry policies.
+  const collectionScaleIds=composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId)
+  if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],collectionScaleIds)
+  else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,collectionScaleIds,composite.createdBy)
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({
@@ -3798,68 +3805,15 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       },
     },
   },
+  // These rows identify children only. Progress comes from frozen snapshot
+  // headers; the current child is loaded below with its authoritative runtime.
+  // Keep every child row so variant scope still detects unselected injections.
   scaleAssessments: {
     orderBy: { startedAt: 'asc' },
-    select: {
-      id: true,
-      userId: true,
-      compositeItemId: true,
-      compositeAttemptId: true,
-      questionnaireAssessmentId: true,
-      scaleId: true,
-      status: true,
-      progress: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      startedAt: true,
-      scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
-    },
+    select: { id: true, compositeItemId: true },
   },
-  cognitiveSessions: {
-    select: {
-      id: true,
-      userId: true,
-      assignmentId: true,
-      compositeItemId: true,
-      compositeAttemptId: true,
-      recoveryTokenHash: true,
-      testType: true,
-      attemptNo: true,
-      status: true,
-      configVersion: true,
-      engineVersion: true,
-      scoringVersion: true,
-      randomSeed: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-    },
-  },
-  situationalAttempts: {
-    select: {
-      id: true,
-      userId: true,
-      compositeAttemptId: true,
-      compositeItemId: true,
-      compositeSlotKey: true,
-      instrumentKey: true,
-      instrumentVersion: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      definitionHash: true,
-      compiledRuntimeHash: true,
-      scorerKey: true,
-      scoringVersion: true,
-      frozenAt: true,
-      progress: true,
-      submissionId: true,
-      submissionPayloadHash: true,
-      submittedAt: true,
-      completedAt: true,
-    },
-  },
+  cognitiveSessions: { select: { id: true, compositeItemId: true } },
+  situationalAttempts: { select: { id: true, compositeItemId: true } },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 
 export type CompositeAttemptStateView = 'full' | 'current-unit'
@@ -5516,9 +5470,9 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
   }
 }
 
-export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
-  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
-  const compact = process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
+const readParticipantReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}, compactView = false) => {
+  const compact = compactView || process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
   if (compact || options.waitMs) await prepareReportReadyNotifications()
   const sequence = reportReadyNotificationSequence()
   const loaded = compact ? await readCompositeReportStatusContext(attemptId) : null
@@ -5530,19 +5484,22 @@ export const getCompositeReportStatus = async (attemptId: string, context: { use
   try {
     const status = await reportStatusForHeader(parent, compact ? loaded!.job : undefined)
     if (!wait || !status.wholeSubmissionReceived || !['PENDING', 'PROCESSING'].includes(status.reportStatus.state)) {
-      return options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status
+      return { parent, status: options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status }
     }
     const result = await wait.done
-    if (options.signal?.aborted) return status
+    if (options.signal?.aborted) return { parent, status }
     // Fresh authorization AND status share one DB snapshot after a hint/timeout.
     const refreshed = compact ? await readCompositeReportStatusContext(attemptId) : null
     const current = compact ? refreshed?.parent : await loadReportReadHeader(attemptId)
     if (!current) throw compositeNotFound('综合测评记录不存在')
     authorizeReportParticipant(current, context)
     const authoritative = await reportStatusForHeader(current, compact ? refreshed!.job : undefined)
-    return result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative
+    return { parent: current, status: result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative }
   } finally { wait?.cancel() }
 }
+
+export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => (await readParticipantReportStatus(attemptId, context, options)).status
 
 export const retryCompositeQuestionnaireReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const parent = await loadReportReadHeader(attemptId)
@@ -5723,6 +5680,44 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   await assertParticipantFeedbackAvailable(attempt, job)
   return projectHttpReport(attempt, 'participant')
+}
+
+/** Opt-in participant page read. The compact locator never authorizes report contents. */
+export const getCompositeReportView = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
+  const ready = (generation: Awaited<ReturnType<typeof reportStatusForHeader>>) => generation.reportStatus.state === 'READY'
+    && (!generation.participantFeedback || generation.participantFeedback.state === 'AVAILABLE')
+  const initial = await readParticipantReportStatus(attemptId, context, options, true)
+  if (!ready(initial.status) || options.signal?.aborted) return { generation: initial.status, report: null }
+
+  if (assessmentReportConfig().enabled && initial.parent.asyncReportEpoch === initial.parent.attemptEpoch) {
+    // Reload the full current projection context, not the compact status JSON.
+    const parent = await loadReportReadHeader(attemptId)
+    authorizeReportParticipant(parent, context)
+    const job = parent.asyncReportEpoch === parent.attemptEpoch ? await prisma.compositeReportJob.findUnique({
+      where: { attemptId_attemptEpoch: { attemptId, attemptEpoch: parent.attemptEpoch } },
+      select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true,
+        wholeSubmissionId: true, attemptEpoch: true, slotSetHash: true, contextHash: true,
+        aggregateInputHash: true, reportEncrypted: true },
+    }) : null
+    const generation = await reportStatusForHeader(parent, job)
+    if (!ready(generation) || options.signal?.aborted) return { generation, report: null }
+    await assertParticipantFeedbackAvailable(parent, job)
+    const report = await materializedReportForHeader(parent, 'participant', job)
+    if (report) return { generation, report }
+  }
+
+  // The original fresh frozen graph remains authoritative after a READY hint.
+  // Recompute status so a restarted epoch or tightened release cannot pair an
+  // earlier status with a different report or expose its contents.
+  const attempt = await findAttempt(attemptId, context, true, true)
+  const job = attempt.asyncReportEpoch === attempt.attemptEpoch
+    ? await readCompositeReportJobHeader(attempt.id, attempt.attemptEpoch) : null
+  const generation = await reportStatusForHeader(attempt, job)
+  if (!ready(generation) || options.signal?.aborted) return { generation, report: null }
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  await assertParticipantFeedbackAvailable(attempt, job)
+  return { generation, report: await projectHttpReport(attempt, 'participant') }
 }
 
 /** Reads completed, frozen children without finalizing the aggregate or admitting a new unit. */

@@ -261,6 +261,8 @@ describe('exact nondelegable Survey SJT distribution preset',()=>{
   expect(screen.queryByLabelText('项目 UUID')).not.toBeInTheDocument();expect(screen.queryByLabelText('课程 UUID')).not.toBeInTheDocument()
   expect(screen.queryByLabelText('资源类型')).not.toBeInTheDocument();expect(screen.queryByLabelText('允许上述能力一层受限委派')).not.toBeInTheDocument()
   expect(screen.getByText(/不升级现有课程授权/)).toBeInTheDocument()
+  expect(screen.getByText(/须为已发布、来源双向对应的原始版本/)).toBeInTheDocument()
+  expect(screen.queryByText(/许可允许再分发/)).not.toBeInTheDocument()
   vi.mocked(window.confirm).mockReturnValueOnce(false)
   fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));expect(mocks.post).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}))

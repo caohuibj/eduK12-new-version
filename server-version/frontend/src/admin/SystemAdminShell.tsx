@@ -10,7 +10,7 @@ export default function SystemAdminShell({children,username,loggingOut,onLogout}
  useEffect(()=>{try{localStorage.setItem(themeKey,theme)}catch{/* Keep the current appearance if storage is unavailable. */}},[theme])
  useEffect(()=>{if(previous.current!==pathname)main.current?.focus();previous.current=pathname},[pathname])
  const links=[{path:'/admin/permissions',label:'管理授权',Icon:KeyRound,active:pathname==='/admin/permissions'||pathname===SYSTEM_HOME},
-  {path:'/admin/scale-library-governance',label:'工具库治理',Icon:LibraryBig,active:['/admin/scale-library-governance','/admin/instrument-authorizations'].includes(pathname)},
+  {path:'/admin/scale-library-governance',label:'工具库治理',Icon:LibraryBig,active:['/admin/scale-library-governance'].includes(pathname)},
   {path:'/admin/reporting-content',label:'报告内容',Icon:FileCheck,active:pathname==='/admin/reporting-content'},
   {path:SYSTEM_SURVEY_AUDIT,label:'数据审计',Icon:ClipboardCheck,active:[SYSTEM_SURVEY_AUDIT,'/admin/survey-system'].includes(pathname)}]
  return <div className="hui-app system-admin-shell" data-system-theme={theme}>

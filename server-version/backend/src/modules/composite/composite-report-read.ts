@@ -37,7 +37,7 @@ export const readCompositeReportStatusContext = async (attemptId: string, includ
   const row = rows[0]
   if (!row) return null
   // jsonb timestamps are strings. Preserve the existing service Date contract.
-  if (row.parent.completedAt) row.parent.completedAt = new Date(/(?:Z|[+-]\\d\\d:\\d\\d)$/.test(row.parent.completedAt) ? row.parent.completedAt : row.parent.completedAt + 'Z')
-  if (row.job?.completedAt) row.job.completedAt = new Date(/(?:Z|[+-]\\d\\d:\\d\\d)$/.test(String(row.job.completedAt)) ? String(row.job.completedAt) : String(row.job.completedAt) + 'Z')
+  if (row.parent.completedAt) row.parent.completedAt = new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(row.parent.completedAt) ? row.parent.completedAt : row.parent.completedAt + 'Z')
+  if (row.job?.completedAt) row.job.completedAt = new Date(/(?:Z|[+-]\d\d:\d\d)$/.test(String(row.job.completedAt)) ? String(row.job.completedAt) : String(row.job.completedAt) + 'Z')
   return row
 }

@@ -12,8 +12,7 @@ export function validateSjtV2(d:SjtDraftV2,forPreview:boolean):Issue[] {
   }
   text(d.title,'title');text(d.author,'author');text(d.sourceNote,'sourceNote')
   if(forPreview){
-    if(d.licenseStatus==='unknown')error('licenseStatus','必须明确内容原创或合法授权')
-    if(d.redistribution!=='allowed')error('redistribution','公开呈现前必须确认允许展示与分发')
+    // Copyright labels remain truthful metadata, not an instrument permission gate.
     if(!d.scenes.length)error('scenes','至少添加一个情境')
     if(!d.metrics.length)error('metrics','至少添加一个描述性维度')
     if(d.scoring.modelKey==='EXPERT_KEY'&&!d.scoring.sourceNote.trim())

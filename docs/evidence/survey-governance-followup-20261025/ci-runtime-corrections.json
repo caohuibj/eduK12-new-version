@@ -1,0 +1,562 @@
+{
+  "scope": [
+    "Preserve completion-specific busy transport before generic busy handling",
+    "Validate quota keys before Zod4 record discards __proto__",
+    "Reuse immutable option tables within the same raw-descriptor build; no cross-request authority cache"
+  ],
+  "environment": "Original cloud, synthetic unit contracts only",
+  "reports": [
+    {
+      "privateReport": "merge355-runtime-unit-final",
+      "sha256": "909bdf8f1500e44fb01d8817f0c9c3e6213d0b87b555474a806120a3347d38e5",
+      "invocation": {
+        "passed": 76,
+        "failed": 2,
+        "pending": 0
+      },
+      "assertions": [
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2024 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2034 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified 40001 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey parent FINAL' retryable completion error transport keeps an unknown failure redacted and does not advertise retries",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey cognitive FINAL' retryable completion error transport returns 503 with Retry-After for classified P2024 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey cognitive FINAL' retryable completion error transport returns 503 with Retry-After for classified P2034 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey cognitive FINAL' retryable completion error transport returns 503 with Retry-After for classified 40001 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Survey cognitive FINAL' retryable completion error transport keeps an unknown failure redacted and does not advertise retries",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Teacher Form FINAL' retryable completion error transport returns 503 with Retry-After for classified P2024 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Teacher Form FINAL' retryable completion error transport returns 503 with Retry-After for classified P2034 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Teacher Form FINAL' retryable completion error transport returns 503 with Retry-After for classified 40001 without exposing internals",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "'Teacher Form FINAL' retryable completion error transport keeps an unknown failure redacted and does not advertise retries",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable sanitizes malformed retry delay undefined",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable sanitizes malformed retry delay NaN",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable sanitizes malformed retry delay Infinity",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable sanitizes malformed retry delay -1",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable sanitizes malformed retry delay 0",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/middleware/completion-busy-transport.test.ts",
+          "name": "only the classified completion code is retryable does not turn unclassified database errors into retryable responses",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: trim-and-default",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: single-unlinked",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: no-experiment",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: duplicate-group",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: blank-material",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: unknown-template",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: expression-template",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: valid-template",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: reserved-block",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: extra-field",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: invalid-mode-and-groups",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: wrong-key",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: fractional-weight",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: too-large-weight",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: one-group",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: nine-groups",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: variant-fields-without-mode",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: variant-missing-labels",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: multiple-semantic-errors",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 0",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 1",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 2",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 3",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 4",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 5",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts legacy quota schema/compiler: 6",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts keeps material schema strict and distinct from instrument subset variants",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts uses durable linked identity capability and disallows undeclared templates",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Shared material core preserves pre-C20 Survey contracts projects only the persisted material and applies a controlled renderer",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans maps every integer boundary to its exact weighted interval",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw -1",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw 6",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw 0.5",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw NaN",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw Infinity",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans rejects invalid injected draw 9007199254740991",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans uses earliest matching history and never consumes later/decrypts unused records",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans renormalizes weights over available candidates without modifying counters",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans does not rerandomize full linked groups and never draws for inherited assignments",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans fails closed on exhaustion or mismatched frozen limits",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/materials-core.test.ts",
+          "name": "Material selection and quota reservations are deterministic pure plans preserves ordinary no-experiment and non-quota assignment algorithms",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey PR4 operations authoring and bounded Flow contracts requires exact, typed non-prototype group quotas and keeps checkpoint disabled by default",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey PR4 operations authoring and bounded Flow contracts rejects unfinishable early termination before an unconditional instrument",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey PR4 operations authoring and bounded Flow contracts rejects runaway recursive conditions before running recursive Zod parse",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey Scale timed FINAL contract and historical compatibility stores verified timing separately from frozen scorer results",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey Scale timed FINAL contract and historical compatibility rejects unrecognized items and impossible or absent timing evidence",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-operations.contract.test.ts",
+          "name": "Survey Scale timed FINAL contract and historical compatibility keeps already frozen no-mode Scale answers valid without fabricated times",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors constructs each unit descriptor and option table once across schema and participant projection",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors enumerates dictionary definitions once and never constructs unused option tables",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors restores and exports quality raw answers independently of scored items with an author codebook",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors indexes missing entries once per participant unit and retains first occurrence and matrix fallback",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors preserves ordered raw value types and complete frozen metadata",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors shares only static metadata while keeping participant values and missing reasons independent",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps selected row values and full-schema collision IDs identical to complete output",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps descriptors and option storage within one request",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for raw",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for dictionary",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection checks the same exact capability once per transaction, each recipient grant, and checks again next request",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection refuses revoked or expired pinned authority without substituting a newer capability",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection still rejects the second recipient grant when the common source capability is valid",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-native-unit-final",
+      "sha256": "46ded03136a3051e8f40efcf69e8817a693d86449301d9e5ae8f8ed6a556c14a",
+      "invocation": {
+        "passed": 26,
+        "failed": 0,
+        "pending": 0
+      },
+      "assertions": [
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing matches the pinned grant added by current compilation without borrowing an identical replacement",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing uses the same exact grant and release-pin policy for native upload images, not just their asset IDs",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing validates only the exact frozen replacement grant, without an unrelated expired chain blocking it",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing fails closed for multiple exact candidates or an identity changed between selection and locked validation",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing uses current grant admission and original release retention without changing private ownership",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing propagates revoked/source-stopped admission and rejects an unrelated active grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy COURSE_GRANT_V1 with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy FUTURE with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy undefined with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing accepts only the exact separately authorized Survey source and retains private asset checks",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing rejects missing source retention, altered hash, public or deleted assets",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing does not fall back to native ownership for malformed source provenance or substituted display",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing leaves native Survey image ownership checks intact",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors constructs each unit descriptor and option table once across schema and participant projection",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors enumerates dictionary definitions once and never constructs unused option tables",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors restores and exports quality raw answers independently of scored items with an author codebook",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors indexes missing entries once per participant unit and retains first occurrence and matrix fallback",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors preserves ordered raw value types and complete frozen metadata",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors shares only static metadata while keeping participant values and missing reasons independent",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps selected row values and full-schema collision IDs identical to complete output",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps descriptors and option storage within one request",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for raw",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for dictionary",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection checks the same exact capability once per transaction, each recipient grant, and checks again next request",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection refuses revoked or expired pinned authority without substituting a newer capability",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection still rejects the second recipient grant when the common source capability is valid",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "server-version/backend/src/modules/assessment-core/materials/definition.ts": "53486fef6dbf39b82d5a5439eaf9cecff474288791526bf80b7918efe5df61d4",
+    "server-version/backend/src/modules/survey/public.routes.ts": "e33df55e2c8e65c0ee6811991d65f901d06eb0a8ec2091d6b2bef687c562cc37",
+    "server-version/backend/src/modules/survey/analytics.source.ts": "b160ac613ab3687b273b6c30e5b25aabb5d8b873444dd3a520be07b5f836a26f"
+  },
+  "limits": [
+    "Original failing reports retained; first invocation still failed on two newly edited test helpers, both corrected in the second invocation",
+    "No formal CI success or general performance claim from local results",
+    "Historical Zod3 golden fixture unchanged; Zod4 invalid issue representation stored separately with unchanged paths and bounds"
+  ]
+}

@@ -81,6 +81,7 @@ afterEach(async()=>{
 
 describe('real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock)',()=>{
   it('START → frozen image/video route → REAL trial draft → exactly one FINAL → parent completion',async()=>{
+    vi.stubGlobal('Image',class {src='';decode=()=>Promise.resolve()})
     const originalCreate=URL.createObjectURL
     const originalRevoke=URL.revokeObjectURL
     Object.defineProperty(URL,'createObjectURL',{configurable:true,value:vi.fn(()=>'blob:school-approved-image')})

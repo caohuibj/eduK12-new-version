@@ -1,4 +1,5 @@
 import {privateToolImageReferences,privateToolMaterialRightsIssues} from './private-tool.media-definition'
+import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {collectAssetReferences} from '../../services/assetStorage'
 import {createCustomScaleDefinition,scaleDefinitionSchema,validateScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
@@ -8,14 +9,14 @@ import {privateToolFail,type PrivateToolKind} from './private-tool.contracts'
 // Drafts may be incomplete, but keep the native authoring shape. Only empty
 // item/score/report-key arrays are relaxed; full validators gate preview and freezing.
 const draftScaleSchema=scaleDefinitionSchema.extend({
- items:scaleDefinitionSchema.shape.items.min(0),
+ items:z.array(scaleDefinitionSchema.shape.items.element),
  report:scaleDefinitionSchema.shape.report.extend({
-  primaryScoreKeys:scaleDefinitionSchema.shape.report.shape.primaryScoreKeys.min(0),
-  scoreOrder:scaleDefinitionSchema.shape.report.shape.scoreOrder.min(0),
+  primaryScoreKeys:z.array(scaleDefinitionSchema.shape.report.shape.primaryScoreKeys.element),
+  scoreOrder:z.array(scaleDefinitionSchema.shape.report.shape.scoreOrder.element),
  }),
  scoring:scaleDefinitionSchema.shape.scoring.extend({
-  itemRules:scaleDefinitionSchema.shape.scoring.shape.itemRules.min(0),
-  scores:scaleDefinitionSchema.shape.scoring.shape.scores.min(0),
+  itemRules:z.array(scaleDefinitionSchema.shape.scoring.shape.itemRules.element),
+  scores:z.array(scaleDefinitionSchema.shape.scoring.shape.scores.element),
  }),
 })
 export const initialPrivateToolDefinition=(kind:PrivateToolKind)=>kind==='SCALE'?createCustomScaleDefinition():{schemaVersion:2,pages:[]}

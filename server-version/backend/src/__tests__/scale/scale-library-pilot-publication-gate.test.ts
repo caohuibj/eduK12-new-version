@@ -124,14 +124,14 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
     expect(wrongPackageContentLocale.localizationUsable).toBe(false)
   })
 
-  it('keeps scoring/display authorization failures as governance warnings, not release blockers', () => {
+  it('ignores retired scoring/display license restrictions', () => {
     const noScoring = runGate({ authorizations: [who5Authorization({ scoring: false })] })
     expect(noScoring.decision.publishable).toBe(true)
-    expect(noScoring.decision.warnings.some((warning) => warning.includes('scoring required'))).toBe(true)
+    expect(noScoring.decision.warnings.some((warning) => warning.includes('scoring required'))).toBe(false)
 
     const noDisplay = runGate({ authorizations: [who5Authorization({ display: false })] })
     expect(noDisplay.decision.publishable).toBe(true)
-    expect(noDisplay.decision.warnings.some((warning) => warning.includes('display required'))).toBe(true)
+    expect(noDisplay.decision.warnings.some((warning) => warning.includes('display required'))).toBe(false)
   })
 
   it('keeps localization review state separate from Product Release', () => {
@@ -154,11 +154,11 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
   it('keeps missing, expired or wrong-locale authorization outside Product Release', () => {
     const noAuth = runGate({ authorizations: [] })
     expect(noAuth.decision.publishable).toBe(true)
-    expect(noAuth.decision.warnings.some((warning) => /authorization/i.test(warning))).toBe(true)
+    expect(noAuth.decision.warnings.some((warning) => /authorization/i.test(warning))).toBe(false)
 
     const expired = runGate({ authorizations: [who5Authorization({ validTo: '2026-06-01T00:00:00.000Z' })] })
     expect(expired.decision.publishable).toBe(true)
-    expect(expired.decision.warnings.some((warning) => /EXPIRED|validFrom\/validTo/.test(warning))).toBe(true)
+    expect(expired.decision.warnings.some((warning) => /EXPIRED|validFrom\/validTo/.test(warning))).toBe(false)
 
     const wrongLocale = runGate({ locale: 'en' })
     expect(wrongLocale.decision.publishable).toBe(true)
@@ -179,10 +179,10 @@ describe('Pilot-first publication gate composition (SL2-C6)', () => {
     expect(result.reportEligibility.maxEligibleLevel).toBeNull()
   })
 
-  it('keeps EVIDENCE_PENDING rights warn-only and surfaces the warning', () => {
+  it('does not emit warnings for legacy EVIDENCE_PENDING records', () => {
     const result = runGate()
     expect(result.decision.publishable).toBe(true)
-    expect(result.decision.warnings.some((warning) => warning.includes('EVIDENCE_PENDING'))).toBe(true)
+    expect(result.decision.warnings.some((warning) => warning.includes('EVIDENCE_PENDING'))).toBe(false)
     expect(result.decision.errors).toHaveLength(0)
   })
 

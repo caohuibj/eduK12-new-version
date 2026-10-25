@@ -33,8 +33,6 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
   const [grantId, setGrantId] = useState(restored.state?.publish?.grantId ?? '')
   const [locale, setLocale] = useState(restored.state?.publish?.deployment.locale ?? '')
   const [territory, setTerritory] = useState(restored.state?.publish?.deployment.territory ?? '')
-  const [grantee, setGrantee] = useState(restored.state?.publish?.deployment.grantee ?? '')
-  const [commercial, setCommercial] = useState<'' | 'NON_COMMERCIAL' | 'COMMERCIAL'>(restored.state?.publish?.deployment.commercialNature ?? '')
   const [busy, setBusy] = useState(false), [error, setError] = useState('')
   const inFlight = useRef(false)
   const pending = state?.preparePending || Boolean(state?.publish)
@@ -53,7 +51,7 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
     if (pending || inFlight.current) return
     try {
       sessionStorage.removeItem(key(actorId)); setState(null); setStorageError(''); setError('')
-      setInstrumentKey(''); setVersion(''); setGrantId(''); setLocale(''); setTerritory(''); setGrantee(''); setCommercial('')
+      setInstrumentKey(''); setVersion(''); setGrantId(''); setLocale(''); setTerritory('')
     } catch { setStorageError('无法清理已核对的来源记录，请勿开始另一份发布。') }
   }
   async function prepare() {
@@ -87,13 +85,13 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
     if (inFlight.current || !state?.mapping || state.preparePending || state.result || restored.error) return
     let request = state.publish
     if (!request) {
-      if (!contentUuid.test(grantId.trim()) || !commercial || !locale.trim() || !territory.trim() || !grantee.trim()) {
-        setError('请填写实际根授权 UUID、来源许可的语言、地域、被许可主体，并明确选择商业性质。'); return
+      if (!contentUuid.test(grantId.trim()) || !locale.trim() || !territory.trim()) {
+        setError('请填写实际根授权 UUID、部署语言与科学适用地域。'); return
       }
-      request = {mappingId: state.mapping.mappingId, grantId: grantId.trim(), deployment: {locale: locale.trim(), territory: territory.trim(), commercialNature: commercial, grantee: grantee.trim()}}
+      request = {mappingId: state.mapping.mappingId, grantId: grantId.trim(), deployment: {locale: locale.trim(), territory: territory.trim()}}
       if (!isSjtPublishRequest(request)) { setError('部署字段不能为空且各不超过 240 个字符。'); return }
     }
-    if (!window.confirm(`确认发布来源 ${state.source.instrumentKey} / ${state.source.instrumentVersion}？映射 ${request.mappingId}，授权 ${request.grantId}，语言 ${request.deployment.locale}，地域 ${request.deployment.territory}，${request.deployment.commercialNature === 'COMMERCIAL' ? '商业' : '非商业'}，被许可主体 ${request.deployment.grantee}。发布后部署字段不可更换；服务器仍需核验独立来源许可。`)) return
+    if (!window.confirm(`确认发布来源 ${state.source.instrumentKey} / ${state.source.instrumentVersion}？映射 ${request.mappingId}，授权 ${request.grantId}，语言 ${request.deployment.locale}，地域 ${request.deployment.territory}。发布后部署字段不可更换；服务器仍需核验内容能力、精确来源与科学适用性。`)) return
     const current = state
     inFlight.current = true; setBusy(true); setError('')
     save({...current, publish: request, publishUnknown: true})
@@ -107,7 +105,7 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
       const rejected = outcome.definiteRejection || (failure as {status?: number})?.status === 409
       if (!current.publishUnknown && rejected) {
         save({...current, publish: null, publishUnknown: false})
-        setError(outcome.message + '；本次发布明确未执行。可核对独立授权和部署字段后重新提交，不能用管理员身份代替许可。')
+        setError(outcome.message + '；本次发布明确未执行。可核对内容能力与部署字段后重新提交，不能用管理员身份代替内容授权。')
       } else {
         save({...current, publish: request, publishUnknown: current.publishUnknown || outcome.unknown})
         setError(outcome.message + '；发布结果尚未确认，精确授权及部署字段已锁定。重新验证安全密钥后仅重试同一请求；后续拒绝不证明之前未成功。')
@@ -117,8 +115,8 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
   const mapping = state?.mapping
   return <section aria-labelledby="static-sjt-title">
     <h3 id="static-sjt-title">已安装 SJT 来源发布</h3>
-    <p>沿用现有 registry 和评分器，不编辑题目或评分 key。流程：准备精确来源 → 显式签发 measurement.publish 根授权 → 核验独立来源许可并发布。管理员身份不自动拥有内容能力或科学审核权。</p>
-    <p>所有请求均需上方近期安全密钥验证。此页不创建来源许可；自编声明不能替代有效许可。</p>
+    <p>沿用现有 registry 和评分器，不编辑题目或评分 key。流程：准备精确来源 → 显式签发 measurement.publish 根授权 → 核验精确部署与科学适用性并发布。管理员身份不自动拥有内容能力或科学审核权。</p>
+    <p>所有请求均需上方近期安全密钥验证。版权许可不作为系统门禁；系统不判断是否已获许可。</p>
     <fieldset disabled={busy || Boolean(state) || Boolean(restored.error)}><legend>1. 精确 registry 来源</legend>
       <label>来源 instrumentKey<input value={instrumentKey} maxLength={240} onChange={event => setInstrumentKey(event.target.value)}/></label>
       <label>来源 instrumentVersion<input value={version} maxLength={240} onChange={event => setVersion(event.target.value)}/></label>
@@ -127,21 +125,19 @@ export default function AdminStaticSjtPublication({actorId, onPrepareGrant, gran
     {state?.preparePending && <p>待核对来源：{state.source.instrumentKey} / {state.source.instrumentVersion}。保留原请求，不更换来源身份。</p>}
     {mapping && <>
       <p>已确认来源 {mapping.instrumentKey} / {mapping.instrumentVersion}；映射 UUID：{mapping.mappingId}；内容摘要：{mapping.contentDigest}。</p>
-      {mapping.measurementReleaseId && !state.result && <p>来源已关联测量 release {mapping.measurementReleaseId}。这不代表本次部署或许可已核验；仍须提交原部署字段核对。</p>}
+      {mapping.measurementReleaseId && !state.result && <p>来源已关联测量 release {mapping.measurementReleaseId}。这不代表本次部署已核验；仍须提交原部署字段核对。</p>}
       <h4>2. 独立内容根授权</h4>
       <p>固定范围：TRAINING / PLATFORM / situational-registry / measurement / {mapping.mappingId}；唯一能力 measurement.publish。目标为当前发布管理员 {actorId}，不允许从管理角色推定。</p>
       <button className="btn-secondary" disabled={busy || grantLocked || Boolean(state.publish) || Boolean(state.result)} onClick={() => onPrepareGrant(mapping.mappingId)}>将此来源填入根授权表单</button>
       {grantLocked && <p>请先处理根授权表单的待核对请求，或明确选择编制另一份授权。</p>}
-      <h4>3. 精确部署与独立来源许可</h4>
+      <h4>3. 精确部署与科学适用性</h4>
       <fieldset disabled={busy || Boolean(state.publish) || Boolean(state.result)}><legend>发布字段</legend>
         <label>SJT 发布授权 UUID<input value={grantId} onChange={event => setGrantId(event.target.value)}/></label>
         {grantReceipt?.mappingId === mapping.mappingId && <button className="btn-secondary" onClick={() => setGrantId(grantReceipt.grantId)}>使用刚签发的 SJT 授权</button>}
-        <label>许可语言 locale<input value={locale} maxLength={240} onChange={event => setLocale(event.target.value)}/></label>
-        <label>许可地域 territory<input value={territory} maxLength={240} onChange={event => setTerritory(event.target.value)}/></label>
-        <label>商业性质<select value={commercial} onChange={event => setCommercial(event.target.value as typeof commercial)}><option value="">请选择实际用途</option><option value="NON_COMMERCIAL">非商业 NON_COMMERCIAL</option><option value="COMMERCIAL">商业 COMMERCIAL</option></select></label>
-        <label>许可被许可主体 grantee<input value={grantee} maxLength={240} onChange={event => setGrantee(event.target.value)}/></label>
+        <label>部署语言 locale<input value={locale} maxLength={240} onChange={event => setLocale(event.target.value)}/></label>
+        <label>科学适用地域 territory<input value={territory} maxLength={240} onChange={event => setTerritory(event.target.value)}/></label>
       </fieldset>
-      {state.publish && <p>待核对发布：映射 {state.publish.mappingId}；授权 {state.publish.grantId}；{state.publish.deployment.locale} / {state.publish.deployment.territory} / {state.publish.deployment.commercialNature} / {state.publish.deployment.grantee}。仅重试这份原请求。</p>}
+      {state.publish && <p>待核对发布：映射 {state.publish.mappingId}；授权 {state.publish.grantId}；{state.publish.deployment.locale} / {state.publish.deployment.territory}。仅重试这份原请求。</p>}
       {!state.result && <button className="btn-primary" disabled={busy} onClick={() => void publish()}>{state.publish ? '重试同一 SJT 发布请求' : '确认发布 SJT 测量版本'}</button>}
       {state.result && <p role="status">发布已确认：测量 release {state.result.measurementReleaseId}；内容 hash {state.result.contentHash}；状态 {state.result.status}。后续使用仍由服务器核验当前授权。</p>}
       {!pending && <button className="btn-secondary" disabled={busy} onClick={reset}>准备另一精确来源</button>}

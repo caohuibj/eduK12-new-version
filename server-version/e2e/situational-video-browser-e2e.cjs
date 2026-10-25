@@ -281,7 +281,7 @@ const enterEmbedded = async (page, parentId, publicMode = false, recoveryToken =
   const prefix = publicMode ? '/public' : '/student'
   await Promise.all([
     page.waitForURL(new RegExp(`${prefix}/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),
-    page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).click(),
+    page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).click(),
   ])
   await waitScene(page, fixture.instrument.videoSceneTitle)
   return childId

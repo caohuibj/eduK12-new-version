@@ -147,7 +147,7 @@ describe('Survey SJT V2 fixed-order measurement contract',()=>{
     const changes:Array<(d:SjtDraftV2)=>void>=[d=>{d.scenes[1].questions[0].questionKey='first'},
       d=>{d.scenes[1].sceneKey='discussion'},d=>{delete d.scenes[0].questions[0].options[0].contributions.risk},
       d=>{d.scenes[0].questions[0].options[0].contributions.unknown=1},d=>{d.scenes[0].questions[0].options[0].contributions.risk=Infinity},
-      d=>{d.redistribution='restricted'},d=>{d.scenes[0].questions[0].options[0].label=''}]
+      d=>{d.scenes[0].questions[0].options[0].label=''}]
     for(const change of changes){const d=fixture();change(d);expect(validateSurveyDraft('SJT',d,true).issues.length).toBeGreaterThan(0)}
     expect(validateSurveyDraft('SJT',{...fixture(),orderPolicy:'RANDOM'},true).issues.length).toBeGreaterThan(0)
     expect(validateSurveyDraft('SJT',{...fixture(),flow:{script:'x'}},true).issues.length).toBeGreaterThan(0)

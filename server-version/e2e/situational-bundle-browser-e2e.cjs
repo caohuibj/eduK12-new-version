@@ -110,7 +110,7 @@ const chooseFirstOption = async (page) => {
     return candidate instanceof HTMLInputElement && candidate.checked
   }, null, { timeout: 30000 })
   assert.equal(await option.isChecked(), true, 'selected option was not reflected in the runner')
-  await page.locator('button[aria-current="step"][aria-label$="，已完成"]').waitFor({ state: 'visible', timeout: 30000 })
+  await page.locator('button[aria-current="step"][aria-label$="，已作答"]').waitFor({ state: 'visible', timeout: 30000 })
 }
 
 const assertVisualScene = async (page, sceneIndex) => {
@@ -149,7 +149,7 @@ const waitForSubmitEnabled = async (page) => {
 }
 
 const navigateToScene = async (page, index, completed) => {
-  const label = `情境 ${index}，${completed ? '已完成' : '未完成'}`
+  const label = `情境 ${index}，${completed ? '已作答' : '未作答'}`
   await page.getByRole('button', { name: label, exact: true }).click()
   await page.getByText(new RegExp(`情境 ${index} \/ 2`)).waitFor({ state: 'visible', timeout: 30000 })
 }
@@ -207,7 +207,7 @@ const startAuthenticatedParent = async (page) => {
   assert.equal(startBody.code, 0, startBody.message || 'authenticated Bundle start failed')
   const parentId = startBody.data.attempt.id
   assert.ok(parentId, 'authenticated parent attempt id is missing')
-  await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   return parentId
 }
 
@@ -217,7 +217,7 @@ const enterEmbeddedRunner = async (page, parentId, publicMode = false, recoveryT
   const childId = parent.currentItem?.situationalAttemptId
   assert.ok(childId, 'Bundle did not expose a Situational child attempt')
   const routePrefix = publicMode ? '/public' : '/student'
-  const button = page.getByRole('button', { name: '开始/继续文字情境测评', exact: true })
+  const button = page.getByRole('button', { name: '开始/继续情境判断测评', exact: true })
   await Promise.all([
     page.waitForURL(new RegExp(`${routePrefix}/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),
     button.click(),
@@ -295,7 +295,7 @@ const assertCompletedSlotDoesNotRestart = async (page, parentId) => {
   const state = await waitForParentState(page, parentId)
   assert.equal(state.status, 'COMPLETED')
   assert.equal(state.progress, 100)
-  assert.equal(await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).count(), 0, 'completed slot became restartable')
+  assert.equal(await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).count(), 0, 'completed slot became restartable')
   record('completed-slot-reopen')
 }
 
@@ -350,7 +350,7 @@ const runPublicFlow = async (browser) => {
     assert.ok(parentId, 'public parent attempt id is missing')
     assert.ok(recoveryToken, 'public recovery token was not issued')
     await page.waitForFunction((key) => Boolean(window.sessionStorage.getItem(key)), `composite:recovery:attempt:${parentId}`, { timeout: 30000 })
-    await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+    await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     const childId = await enterEmbeddedRunner(page, parentId, true, recoveryToken)
     const frozenIdentity = await readFrozenIdentity(childId)
     await completeEmbeddedRunner(page, parentId, childId, true, recoveryToken)

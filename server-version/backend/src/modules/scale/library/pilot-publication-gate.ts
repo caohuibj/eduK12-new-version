@@ -3,7 +3,7 @@ import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
  * Scale governance composition for Pilot-era catalog data.
  *
  * `decision.publishable` now means Product Readiness only: the exact package is
- * executable in the current Huisurvey workflow. Rights, localization,
+ * executable in the current Huisurvey workflow. Localization,
  * respondent/deployment fit and scientific completeness remain visible as
  * diagnostics, but they do not turn an executable package back into DRAFT.
  *
@@ -11,7 +11,6 @@ import { getScaleInstrumentSource } from '../onboarding/instrument-registry'
  * never consulted by participant save/FINAL paths.
  */
 import { validateScalePackage, type ScalePackageV2 } from '../scale-package.registry'
-import { evaluateDurableInstrumentRights } from '../deployment/rights'
 import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authorization'
 import { parseLocalizationManifest } from './localization-manifest'
 import {
@@ -29,7 +28,8 @@ export interface PilotFirstPublicationGateInput {
   pkg: ScalePackageV2
   manifest: unknown
   localizationManifest?: unknown
-  authorizations: InstrumentAuthorizationRecordV1[]
+  /** Legacy caller compatibility only; ignored. */
+  authorizations?: InstrumentAuthorizationRecordV1[]
   locale: string
   territory: string
   requestedRespondent: RespondentType
@@ -64,7 +64,6 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
   // 3) Localization is retained as a deployment diagnostic.
   let localizationUsable = false
   const localizationErrors: string[] = []
-  let localization: { sourceLocale: string; targetLocale: string } | null = null
   if (input.localizationManifest === undefined) {
     localizationErrors.push('localization provenance missing：尚无 LocalizationManifestV1')
   } else {
@@ -72,7 +71,6 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     if (!parsed.ok) {
       localizationErrors.push(`localization manifest invalid: ${parsed.issues.map((issue) => `${issue.path}: ${issue.message}`).join('; ')}`)
     } else {
-      localization = { sourceLocale: parsed.manifest.sourceLocale, targetLocale: parsed.manifest.targetLocale }
       if (parsed.manifest.instrumentKey !== input.pkg.key) {
         localizationErrors.push(`localization instrumentKey=${parsed.manifest.instrumentKey} 与 package key=${input.pkg.key} 不一致`)
       }
@@ -94,23 +92,7 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
     }
   }
 
-  // 4) Rights are governance/operational facts. They may motivate a manual
-  // operational pause, but do not redefine DRAFT/PUBLISHED.
-  const needsTranslation = localization !== null && localization.sourceLocale !== localization.targetLocale
-  const rights = evaluateDurableInstrumentRights({
-    instrumentKey: input.pkg.key,
-    instrumentVersion: input.pkg.instrumentVersion,
-    authorizations: input.authorizations,
-    locale: input.locale,
-    territory: input.territory,
-    nowIso: input.nowIso,
-    requireElectronicAdministration: true,
-    requireScoring: true,
-    requireDisplay: true,
-    requireTranslation: needsTranslation,
-  })
-  gateWarnings.push(...rights.warnings)
-
+  // Copyright licensing is not evaluated; no ledger facts enter this decision.
   const contentLocale = getScaleInstrumentSource(input.pkg.key, input.pkg.instrumentVersion)?.executable?.contentLocale
   if (contentLocale && contentLocale !== input.locale) localizationErrors.push(`contentLocale=${contentLocale} 与部署 locale=${input.locale} 不一致`)
 
@@ -137,7 +119,6 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
   const decision: PilotPublicationDecision = scientific
     ? evaluatePilotPublicationPolicy({
         executableCorrectness: { ok: packageErrors.length === 0, errors: packageErrors },
-        rights: { ok: rights.ok, errors: rights.errors },
         localization: { ok: localizationUsable, errors: localizationErrors },
         respondentMatch: { ok: respondentMatchErrors.length === 0, errors: respondentMatchErrors },
         scientific,
@@ -146,7 +127,6 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         publishable: packageErrors.length === 0,
         errors: packageErrors.map((message) => `[executableCorrectness] ${message}`),
         warnings: [
-          ...rights.errors.map((message) => `[rights/governance] ${message}`),
           ...localizationErrors.map((message) => `[localization/deployment] ${message}`),
           ...respondentMatchErrors.map((message) => `[respondent/deployment] ${message}`),
         ],

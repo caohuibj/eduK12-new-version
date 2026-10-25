@@ -1,7 +1,7 @@
 import type { ScaleInstrumentSourceV1 } from '../onboarding/types'
-import type { ScaleDeploymentPolicyV1 } from './deployment'
+import type { ScaleDeploymentPolicy } from './deployment'
 
-export const scaleLocalizationReasons = (source: ScaleInstrumentSourceV1, policy: ScaleDeploymentPolicyV1): string[] => {
+export const scaleLocalizationReasons = (source: ScaleInstrumentSourceV1, policy: ScaleDeploymentPolicy): string[] => {
   const localization = source.localization
   if (!localization) return ['LOCALIZATION_MISSING']
   const reasons: string[] = []

@@ -1,3 +1,9 @@
+import {grantLibraryUseFixture,libraryDistributorFixture} from '../fixtures/library-distribution'
+import {publishContentRelease} from '../../modules/measurement-content/repository'
+import {scaleMeasurementRelease} from '../../modules/measurement-content/scale'
+import {revokeUse} from '../../modules/scale-library-governance/distribution'
+import {submit,review} from '../../modules/scale-library-governance/service'
+import {publishSurveyMeasurementDraft} from '../../modules/survey/measurement-publication.service'
 import {randomUUID} from 'node:crypto'
 import {PrismaClient} from '@prisma/client'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
@@ -10,12 +16,12 @@ import {freezeResearchWaveDraft} from '../../modules/survey/publication.service'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PR26_INTEGRATION_DATABASE_URL')
 const suite=url?describe:describe.skip
 suite('Survey immutable catalog grants PostgreSQL',()=>{
- let db:PrismaClient,admin:string,owner:string,other:string,pid:string,sourceId:string,grantId:string,draftId:string
+ let db:PrismaClient,admin:string,owner:string,other:string,pid:string,sourceId:string,grantId:string,draftId:string,system:string,entryId:string
  const sourceVersion='2.0.0'
  beforeAll(async()=>{
   requireIsolatedReleaseDatabase(url!);db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()
-  admin=(await db.user.create({data:{username:'catalog-admin-'+randomUUID(),passwordHash:'synthetic',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})).id
-  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:admin,entry:'SURVEY',grantedBy:admin}})
+  system=(await db.user.create({data:{username:'catalog-system-'+randomUUID(),passwordHash:'synthetic',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})).id
+  admin=await libraryDistributorFixture(db,system)
   const ids=[]
   for(let i=0;i<2;i++){
    const login='catalog_'+randomUUID().replace(/-/g,'').slice(0,16);const u=await db.user.create({data:{username:login,passwordHash:'synthetic',role:'STUDENT',accountDomain:'SURVEY'}})
@@ -27,15 +33,31 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
   await db.surveyProject.create({data:{id:pid,ownerUserId:owner,title:'Catalog test',collectionMode:'SINGLE_UNLINKED'}})
   const definition=compileResearchScale('Source',{schemaVersion:1,respondentType:'participant_self_report',responseOptions:[{optionKey:'no',label:'No',score:0},{optionKey:'yes',label:'Yes',score:1}],dimensions:[{dimensionKey:'sum',label:'Sum',direction:'descriptive'}],aggregation:'sum',items:[{itemKey:'original',prompt:'Source question',required:true,reverse:false,dimensionKeys:['sum']}]})
   definition.responseSets[0].options[0].value=0;definition.responseSets[0].options[1].value=1
-  sourceId=(await db.scale.create({data:{code:'catalog_'+randomUUID(),name:'Source',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:sourceVersion,definition:definition as any,definitionHash:hashScaleDefinition(definition),creatorId:admin}})).id
+  const author=(await db.user.create({data:{username:'catalog-author-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
+  const scale=await db.scale.create({data:{code:'catalog_'+randomUUID(),name:'Source',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:sourceVersion,definition:definition as any,definitionHash:hashScaleDefinition(definition),creatorId:author}})
+  const release=await db.$transaction(tx=>publishContentRelease(tx,scaleMeasurementRelease({localId:scale.id,version:sourceVersion,instrumentVersion:sourceVersion,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:author,resourceId:scale.id},provenance:{authoringRelationship:'ORIGINAL',authoringSnapshot:{title:'Source',definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'TRAINING'}}}),author))
+  await db.scale.update({where:{id:scale.id},data:{measurementReleaseId:release.releaseId}})
+  const application=await submit(author,'TRAINING',{requestId:randomUUID(),releaseId:release.releaseId,metadata:{title:'Source',author:'Synthetic author',copyright:'Self authored; redistribution permitted',applicability:'Synthetic only',scoringDescription:'Sum',reportDescription:'Descriptive only'}})
+  entryId=(await review(system,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Independent synthetic catalog approval'})).entryId!
+  sourceId='library:'+entryId
+
  })
+ const issue=async(requestId=randomUUID())=>{
+  const use=await grantLibraryUseFixture(db,system,entryId,{requestId,userId:owner,product:'SURVEY'})
+  const [row]=await db.$queryRaw<Array<{id:string}>>`SELECT survey_tool_grant_id AS id FROM scale_library_use_grants WHERE id=${use.id}`
+  return row
+ }
+ const revokeCatalogUse=async(id:string)=>{
+  const [use]=await db.$queryRaw<Array<{id:string;issuer_id:string;version:number}>>`SELECT id,issuer_id,version FROM scale_library_use_grants WHERE survey_tool_grant_id=${id}`
+  return revokeUse(use.issuer_id,use.id,{expectedVersion:use.version,reason:'Synthetic exact use withdrawal'})
+ }
  afterAll(async()=>{await db?.$disconnect()})
  it('rejects nonadministrator, arbitrary version, foreign researcher import and prevents source editing/copy laundering',async()=>{
   const ref={kind:'SCALE' as const,sourceId,sourceVersion}
   await expect(grantCatalogSource(owner,owner,ref)).rejects.toThrow()
   await expect(grantCatalogSource(admin,owner,{...ref,sourceVersion:'999'})).rejects.toThrow('SOURCE_NOT_PUBLISHED')
-  const grant=await grantCatalogSource(admin,owner,ref);grantId=grant.id
-  expect((await grantCatalogSource(admin,owner,ref)).id).toBe(grantId)
+  const requestId=randomUUID(),grant=await issue(requestId);grantId=grant.id
+  expect((await issue(requestId)).id).toBe(grantId)
   expect((await listToolGrants(admin,owner)).list).toHaveLength(1)
   expect((await listResearcherCatalog(owner,pid,1)).list).toHaveLength(1)
   await expect(importCatalogDraft(other,pid,grantId,{requestId:randomUUID(),instrumentKey:'evil',title:'Evil'})).rejects.toThrow()
@@ -51,6 +73,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
  })
  it('freezes native scoring and exact provenance; revocation stops future imports/freezes without changing frozen research',async()=>{
   const waveId=randomUUID()
+  await publishSurveyMeasurementDraft(owner,pid,draftId,0)
   const waveData={projectId:pid,title:'Wave',consentText:'This is a synthetic consent notice for a controlled test only.',instrumentIds:[draftId]}
   await db.surveyWave.create({data:{id:waveId,ordinal:1,...waveData}})
   const published=await freezeResearchWaveDraft({actorUserId:owner,projectId:pid,waveId,revision:0})
@@ -59,7 +82,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
   expect(unit.sourceAnswerMapping.options).toEqual({o_0:0,o_1:1})
   expect(unit.sourceProvenance.source).toEqual({kind:'SCALE',sourceId,sourceVersion})
   expect(unit.compiledDefinition.responseSets[0].options[1].value).toBe(1)
-  await revokeToolGrant(admin,grantId)
+  await revokeCatalogUse(grantId)
   expect((await getDraft(owner,pid,draftId)).readOnly).toBe(true)
   expect((await listResearcherCatalog(owner,pid,1)).list).toHaveLength(0)
   await expect(importCatalogDraft(owner,pid,grantId,{requestId:randomUUID(),instrumentKey:'later',title:'Later'})).rejects.toThrow('撤销')
@@ -70,7 +93,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
  })
  it('serializes revocation against freezing in both lock orders without altering historical publications',async()=>{
   const ref={kind:'SCALE' as const,sourceId,sourceVersion}
-  const createWave=async(ordinal:number)=>{const id=randomUUID();await db.surveyWave.create({data:{id,projectId:pid,ordinal,title:'Race',
+  const createWave=async(ordinal:number)=>{await publishSurveyMeasurementDraft(owner,pid,draftId,0);const id=randomUUID();await db.surveyWave.create({data:{id,projectId:pid,ordinal,title:'Race',
     consentText:'Synthetic consent notice for a controlled concurrency test.',instrumentIds:[draftId]}});return id}
   const blocked=async(fragment:string)=>{
     for(let i=0;i<100;i++){
@@ -82,7 +105,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
     throw new Error('Expected transactional lock contention was not observed: '+fragment)
   }
   // Regrant immutable source with a new grant ID. Fresh imported row only; original sourced draft cannot be rebound.
-  let g=await grantCatalogSource(admin,owner,ref)
+  let g=await issue()
   let d=await importCatalogDraft(owner,pid,g.id,{requestId:randomUUID(),instrumentKey:'race_first',title:'Race first'})
   draftId=d.id
   let waveId=await createWave(3)
@@ -90,25 +113,36 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
   const gate=new Promise<void>(r=>release=r),ready=new Promise<void>(r=>locked=r)
   const holder=db.$transaction(async tx=>{await tx.$queryRaw`SELECT id FROM survey_tool_grants WHERE id=${g.id} FOR UPDATE`;locked();await gate},{timeout:15000})
   await ready
-  const revoke=revokeToolGrant(admin,g.id);await blocked('UPDATE survey_tool_grants')
+  const revoke=revokeCatalogUse(g.id);await blocked('UPDATE survey_tool_grants')
   const freeze=freezeResearchWaveDraft({actorUserId:owner,projectId:pid,waveId,revision:0}).then(v=>({value:v}),e=>({error:e}))
-  await blocked('FROM survey_tool_grants');release();await holder;await revoke
+  await blocked('FROM scale_library_use_grants');release();await holder;await revoke
   expect(await freeze).toHaveProperty('error');expect((await db.surveyWave.findUniqueOrThrow({where:{id:waveId}})).publicationId).toBeNull()
-  g=await grantCatalogSource(admin,owner,ref)
+  g=await issue()
   d=await importCatalogDraft(owner,pid,g.id,{requestId:randomUUID(),instrumentKey:'race_second',title:'Race second'});draftId=d.id
   waveId=await createWave(4)
+  const trigger='catalog_publish_'+randomUUID().replaceAll('-',''),lock='catalog-publication:'+randomUUID()
+  await db.$executeRawUnsafe(`CREATE FUNCTION ${trigger}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.compiled_snapshot->>'waveId'=TG_ARGV[0] THEN PERFORM pg_advisory_xact_lock(hashtext(TG_ARGV[1])); END IF; RETURN NEW; END $$`)
+  await db.$executeRawUnsafe(`CREATE TRIGGER ${trigger} BEFORE INSERT ON survey_publications FOR EACH ROW EXECUTE FUNCTION ${trigger}('${waveId}','${lock}')`)
   let releaseSource!:()=>void,sourceLocked!:()=>void
   const sourceGate=new Promise<void>(r=>releaseSource=r),sourceReady=new Promise<void>(r=>sourceLocked=r)
-  const sourceHolder=db.$transaction(async tx=>{await tx.$queryRaw`SELECT id FROM scales WHERE id=${sourceId} FOR UPDATE`;sourceLocked();await sourceGate},{timeout:15000})
+  const sourceHolder=db.$transaction(async tx=>{await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lock}))`;sourceLocked();await sourceGate},{timeout:15000})
   await sourceReady
   const freezeFirst=freezeResearchWaveDraft({actorUserId:owner,projectId:pid,waveId,revision:0})
-  await blocked('FROM "scales"')
-  const revokeSecond=revokeToolGrant(admin,g.id);await blocked('UPDATE survey_tool_grants')
-  releaseSource();await sourceHolder
-  const published=await freezeFirst;await revokeSecond
-  const historical=await db.surveyPublication.findUniqueOrThrow({where:{id:published.publicationId}})
-  expect((historical.compiledSnapshot as any).units[0].sourceProvenance.source).toEqual(ref)
+  let revokeSecond:ReturnType<typeof revokeCatalogUse>|undefined
+  try{
+    // Reach the actual INSERT only after fresh exact admission/share locks.
+    await blocked('survey_publications')
+    revokeSecond=revokeCatalogUse(g.id);await blocked('UPDATE scale_library_use_grants')
+  }finally{releaseSource();await sourceHolder}
+  try{
+    const published=await freezeFirst;await revokeSecond
+    const historical=await db.surveyPublication.findUniqueOrThrow({where:{id:published.publicationId}})
+    expect((historical.compiledSnapshot as any).units[0].sourceProvenance.source).toEqual(ref)
+  }finally{
+    await db.$executeRawUnsafe(`DROP TRIGGER IF EXISTS ${trigger} ON survey_publications`)
+    await db.$executeRawUnsafe(`DROP FUNCTION IF EXISTS ${trigger}()`)
+  }
   expect((await listToolGrants(admin,owner)).list.find(x=>x.id===g.id)?.status).toBe('REVOKED')
- })
+ },30_000)
 
 })

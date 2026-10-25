@@ -181,6 +181,11 @@ describe('catalog single-source-of-truth boundaries', () => {
   it('catalog metadata is not imported by any runtime/scorer/hash path (hash stability by construction)', () => {
     const offenders = collectSourceFiles(SRC_DIR).filter((file) => {
       if (file.startsWith(LIBRARY_DIR)) return false
+      // Publication readiness imports contract declarations; never catalog metadata.
+      if (file === path.join(SRC_DIR, 'src/modules/measurement-content/cognitive.ts')) {
+        expect(fs.readFileSync(file, 'utf8').match(/from\s+['"][^'"]*cognitive\/library[^'"]*/g))
+          .toEqual(["from '../cognitive/library/product-readiness"]); return false
+      }
       const content = fs.readFileSync(file, 'utf8')
       return /from\s+['"][^'"]*cognitive\/library/.test(content)
     })

@@ -102,21 +102,21 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
   })
 
   describe('governance/deployment diagnostics do not rewrite Product Release', () => {
-    it('keeps wrong territory, expired authorization and denied electronic administration visible as warnings', () => {
+    it('retains scientific territory diagnostics but ignores expired or denied licenses', () => {
       const wrongTerritory = gate({ territory: 'GB' })
       expect(wrongTerritory.decision.publishable).toBe(true)
       expect(wrongTerritory.decision.warnings.length).toBeGreaterThan(0)
 
       const expired = gate({ authorizations: [authorization({ validTo: '2026-06-01T00:00:00.000Z' })] })
       expect(expired.decision.publishable).toBe(true)
-      expect(expired.decision.warnings.some((warning) => /EXPIRED|validFrom\/validTo/.test(warning))).toBe(true)
+      expect(expired.decision.warnings.some((warning) => /EXPIRED|validFrom\/validTo/.test(warning))).toBe(false)
 
       const noElectronic = gate({ authorizations: [authorization({ electronicAdministration: false })] })
       expect(noElectronic.decision.publishable).toBe(true)
-      expect(noElectronic.decision.warnings.some((warning) => warning.includes('electronicAdministration'))).toBe(true)
+      expect(noElectronic.decision.warnings.some((warning) => warning.includes('electronicAdministration'))).toBe(false)
     })
 
-    it('keeps denied translation rights as governance warning for that deployment', () => {
+    it('ignores denied translation license while retaining localization checks', () => {
       const result = gate({
         authorizations: [authorization({ translation: false })],
         localizationManifest: localizationManifest({
@@ -126,7 +126,7 @@ describe('Pilot publication boundary matrix (SL2-C7)', () => {
         }),
       })
       expect(result.decision.publishable).toBe(true)
-      expect(result.decision.warnings.some((warning) => warning.includes('translation required'))).toBe(true)
+      expect(result.decision.warnings.some((warning) => warning.includes('translation required'))).toBe(false)
     })
 
     it('keeps unusable localization and respondent mismatch as deployment diagnostics', () => {
