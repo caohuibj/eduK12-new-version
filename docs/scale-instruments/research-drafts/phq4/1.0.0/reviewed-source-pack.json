@@ -1,0 +1,162 @@
+{
+  "code": "PHQ4",
+  "name_zh": "超简抑郁焦虑筛查量表（PHQ-4）",
+  "status": "CONTENT_DRAFT_REQUIRES_EXISTING_TRANSLATION_DEDUP",
+  "rights": {
+    "type": "public_domain",
+    "author_manual": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+    "location": "Table1 p3含PHQ4；p8明示复制、翻译、显示、分发无需许可"
+  },
+  "primary_measure_source": "https://www.reviva.org.co/wp-content/uploads/2021/09/Ultrabrief-PHQ-4-2009.pdf",
+  "original_study": "https://doi.org/10.1016/S0033-3182(09)70864-3",
+  "tags": [
+    "情绪困扰",
+    "抑郁症状",
+    "焦虑症状",
+    "超短筛查",
+    "自评",
+    "4题",
+    "非诊断"
+  ],
+  "timeframe": "过去两周",
+  "translation_status": "下列为工作译稿；优先与现有PHQ9/GAD7经核实的中文版本逐字对齐后派生，不能称为2025研究采用的译本。",
+  "instructions_zh": "过去两周里，以下问题困扰你的频率如何？",
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "items": [
+    {
+      "id": "PHQ4_A1",
+      "en": "Feeling nervous, anxious or on edge",
+      "zh_draft": "感到紧张、焦虑或坐立不安",
+      "subscale": "GAD2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_A2",
+      "en": "Not being able to stop or control worrying",
+      "zh_draft": "不能停止或控制担忧",
+      "subscale": "GAD2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_D2",
+      "en": "Feeling down, depressed, or hopeless",
+      "zh_draft": "感到情绪低落、沮丧或绝望",
+      "subscale": "PHQ2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_D1",
+      "en": "Little interest or pleasure in doing things",
+      "zh_draft": "做事时少有兴趣或乐趣",
+      "subscale": "PHQ2",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "total": "sum(all4)",
+    "total_range": [
+      0,
+      12
+    ],
+    "PHQ2": "sum(D1,D2)",
+    "GAD2": "sum(A1,A2)",
+    "subscale_range": [
+      0,
+      6
+    ],
+    "missing": "项目实现选择：四题均有有效答案才给总分；对应两题均有有效答案才给该分量表分；缺失不计零、不推算；未完成不是筛查阴性。"
+  },
+  "reference_profiles": [
+    {
+      "id": "US_PRIMARY_CARE_2009",
+      "status": "SOURCE_VERIFIED_ADULT_REFERENCE_NOT_CHINESE_DIAGNOSTIC_NORM",
+      "sample": "2149名美国15家初级保健门诊成人；18–95岁",
+      "source": "https://www.sciencedirect.com/science/article/abs/pii/S0033318209708643",
+      "total_bands": [
+        {
+          "min": 0,
+          "max": 2,
+          "label": "原研究最低症状档"
+        },
+        {
+          "min": 3,
+          "max": 5,
+          "label": "原研究轻度症状档"
+        },
+        {
+          "min": 6,
+          "max": 8,
+          "label": "原研究中度症状档"
+        },
+        {
+          "min": 9,
+          "max": 12,
+          "label": "原研究重度症状档"
+        }
+      ],
+      "PHQ2_screen_positive": ">=3",
+      "GAD2_screen_positive": ">=3",
+      "note": "分档为症状程度参照，不是临床诊断；不能称中国学生常模；量表不直接评估自杀风险。",
+      "activation": "EXPLICIT_SELECTION_AND_MATCHED_POPULATION_ONLY"
+    },
+    {
+      "id": "CN_ADOLESCENTS_2025_PENDING_METHOD_REVIEW",
+      "status": "RESEARCH_ONLY_NOT_EXECUTABLE",
+      "source": "https://doi.org/10.1016/j.jad.2025.119505",
+      "sample": "8778名中国12–18岁学生，便利样本",
+      "hold_reason": "摘要报道cutoff3，但需核清ROC参照标准（正文片段出现PHQ9/GAD7>=5，条目重叠会影响独立诊断效度）；原文学校数量摘要/片段也不一致。未读取全文和对应中文条目前不默认启用。",
+      "executable": false,
+      "research_only_findings": {
+        "reported_cutoff": 3,
+        "reported_auc": 0.94
+      }
+    }
+  ],
+  "report": {
+    "summary": "这是过去两周焦虑和抑郁相关困扰的简短筛查，不是诊断。总分为{score}/12，焦虑相关分为{gad2}/6，抑郁相关分为{phq2}/6。",
+    "screen_positive": "某一分量表达到研究中的筛查参考值，表示值得进一步了解相应困扰及其对生活的影响，不表示已经患有某种疾病。可考虑与有资质的专业人员讨论。",
+    "screen_negative": "此次未达到所用参考值，但不能据此排除所有心理困扰。如果困扰持续、影响生活，仍值得寻求支持。",
+    "illustration": "用两个0–6标尺展示焦虑/抑郁相关得分，旁注筛查非诊断；不做健康/患病二分红绿图。",
+    "display_conditions": {
+      "total": "4题有效作答才显示总分；缺失时不渲染含总分的完整summary。",
+      "subscale": "各分量表2题有效作答才显示该分数；不完整时不作该分量表筛查判定。",
+      "reference": "screen_positive及screen_negative仅在相应分量表完整、明确选择适用且匹配的已核验参照后显示；否则仅显示描述性分数。"
+    },
+    "incomplete": "作答尚未完成，暂不计算缺失项目所属的总分或分量表分，也不能据此判断筛查阴性。"
+  },
+  "unverified_source_links": [
+    {
+      "url": "https://www.nih.gov/node/21506",
+      "status": "HTTP_403_NOT_VERIFIED",
+      "note": "不可作为已核验题目或计分依据。"
+    }
+  ],
+  "item_order_note": "按2009年原论文Appendix顺序A1、A2、D2、D1；语义ID保持不变，不按位置推断分量表。",
+  "reference_selection_policy": {
+    "default": "DESCRIPTIVE_ONLY",
+    "require_explicit_selection": true,
+    "require_matching_population": true,
+    "note": "只有明确选择且适用人群匹配的已核验参照才显示其分档或筛查参考值；否则仅描述完整得分，不自动套用美国成人参照。"
+  }
+}

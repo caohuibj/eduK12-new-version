@@ -1,0 +1,17 @@
+{
+  "validatedAt": "2026-10-25T14:14:59Z",
+  "sourceSha256": "65ad0172588530775e11bbe6994e724772d956fed095d83d3489200d3a43d905",
+  "node": "v24.22.1",
+  "contentTests": {
+    "toolTests": 14,
+    "combinedToolAndRegistryTests": 32,
+    "exitCode": 0,
+    "log": "/workspace/scratch/5a77e8bdc1ae/local-scale-validation-20261025/batch2-tests-final.log"
+  },
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc --noEmit",
+    "exitCode": 0
+  },
+  "independentReview": "AI read-only content comparison; no human expert approval claimed.",
+  "scope": "Content registry and synthetic score/report tests only; DB import handled separately. No clinical validation or production activation."
+}

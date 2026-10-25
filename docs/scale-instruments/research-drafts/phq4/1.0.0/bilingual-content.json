@@ -1,0 +1,61 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "PHQ4_A1",
+      "en": "Feeling nervous, anxious or on edge",
+      "zh_draft": "感到紧张、焦虑或坐立不安",
+      "subscale": "GAD2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_A2",
+      "en": "Not being able to stop or control worrying",
+      "zh_draft": "不能停止或控制担忧",
+      "subscale": "GAD2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_D2",
+      "en": "Feeling down, depressed, or hopeless",
+      "zh_draft": "感到情绪低落、沮丧或绝望",
+      "subscale": "PHQ2",
+      "reverse": false
+    },
+    {
+      "id": "PHQ4_D1",
+      "en": "Little interest or pleasure in doing things",
+      "zh_draft": "做事时少有兴趣或乐趣",
+      "subscale": "PHQ2",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "en": "Not at all",
+      "zh_draft": "完全没有"
+    },
+    {
+      "value": 1,
+      "en": "Several days",
+      "zh_draft": "有几天"
+    },
+    {
+      "value": 2,
+      "en": "More than half the days",
+      "zh_draft": "超过一半的天数"
+    },
+    {
+      "value": 3,
+      "en": "Nearly every day",
+      "zh_draft": "几乎每天"
+    }
+  ],
+  "instructions": "过去两周里，以下问题困扰你的频率如何？",
+  "rights": {
+    "type": "public_domain",
+    "author_manual": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+    "location": "Table1 p3含PHQ4；p8明示复制、翻译、显示、分发无需许可"
+  }
+}

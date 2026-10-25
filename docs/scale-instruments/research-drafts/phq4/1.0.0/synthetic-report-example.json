@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "phq4_zh_cn_research",
+    "name": "超简抑郁焦虑筛查量表（PHQ-4） — 中文研究工作译稿",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "703f0db7a319334c085cb427b1d1942c0d537cfc7d025d008abe1d76b796fe1a",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "PHQ4_A1",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "PHQ4_A2",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "PHQ4_D2",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "PHQ4_D1",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    }
+  ],
+  "scores": [
+    {
+      "key": "phq4_total",
+      "type": "total",
+      "label": "困扰总分",
+      "description": "过去两周相关症状自报频率之和；不等于诊断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 4,
+      "range": {
+        "min": 0,
+        "max": 12
+      },
+      "expectedItems": [
+        "PHQ4_A1",
+        "PHQ4_A2",
+        "PHQ4_D2",
+        "PHQ4_D1"
+      ],
+      "answeredItems": [
+        "PHQ4_A1",
+        "PHQ4_A2",
+        "PHQ4_D2",
+        "PHQ4_D1"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "gad2",
+      "type": "dimension",
+      "label": "焦虑相关分",
+      "description": "过去两周相关症状自报频率之和；不等于诊断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 2,
+      "range": {
+        "min": 0,
+        "max": 6
+      },
+      "expectedItems": [
+        "PHQ4_A1",
+        "PHQ4_A2"
+      ],
+      "answeredItems": [
+        "PHQ4_A1",
+        "PHQ4_A2"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "phq2",
+      "type": "dimension",
+      "label": "抑郁相关分",
+      "description": "过去两周相关症状自报频率之和；不等于诊断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 2,
+      "range": {
+        "min": 0,
+        "max": 6
+      },
+      "expectedItems": [
+        "PHQ4_D2",
+        "PHQ4_D1"
+      ],
+      "answeredItems": [
+        "PHQ4_D2",
+        "PHQ4_D1"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "phq4_total",
+      "headline": "困扰总分：描述性反馈",
+      "label": null,
+      "interpretation": "该分数描述你在过去两周中报告的困扰总分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+        "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+        "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+        "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+        "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+        "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "gad2",
+      "headline": "焦虑相关分：描述性反馈",
+      "label": null,
+      "interpretation": "该分数描述你在过去两周中报告的焦虑相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+        "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+        "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+        "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+        "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+        "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "phq2",
+      "headline": "抑郁相关分：描述性反馈",
+      "label": null,
+      "interpretation": "该分数描述你在过去两周中报告的抑郁相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+        "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+        "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+        "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+        "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+        "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+    "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+    "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+    "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+    "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+    "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。"
+}
