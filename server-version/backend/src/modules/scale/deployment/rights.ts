@@ -1,3 +1,4 @@
+import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
 import {
   assertLocaleTerritoryMatch,
   evaluateAuthorizationOverlayStatus,
@@ -20,6 +21,7 @@ export const evaluateDurableInstrumentRights = (input: {
   requireTranslation?: boolean
   requireDisplay?: boolean
 }): { ok: boolean; errors: string[]; warnings: string[] } => {
+  if (registeredSelfAuthoredSourceProof(input.instrumentKey, input.instrumentVersion)) return { ok: true, errors: [], warnings: [] }
   const errors: string[] = []
   const warnings: string[] = []
   const nowIso = input.nowIso ?? new Date().toISOString()

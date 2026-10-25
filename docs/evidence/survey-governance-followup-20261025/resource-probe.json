@@ -1,0 +1,1317 @@
+{
+  "schemaVersion": 1,
+  "kind": "bounded-synthetic-resource-probe",
+  "source": {
+    "commit": "28d9889f7078cafe97254950fb5d7ed768b12a50",
+    "tree": "24e08a96cbf77902f45f07ce0992d83e1dcde3da",
+    "node": "v24.21.0",
+    "backendLock": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "harness": {
+      "run.mjs": "4177ab3a421d18668d99e1e082ab20a2783286015aa827a2689083968168167d",
+      "fixture.ts": "a43bddfa345b37bba7dbcd2cd9d216ea397e7133e7aa4615823ff71ecb814934",
+      "api.ts": "063267805d72819c7d374aa7baa3afcb58bc5752a7ededdb166a6ec0d0b5e512"
+    }
+  },
+  "results": [
+    {
+      "group": "ordinary",
+      "frozenDefinitionDigest": "20d033535f3969747aa4cc7a1da0a96f2b27398f7e6336a9531b272fec744118",
+      "protocols": [
+        {
+          "kind": "FORM",
+          "protocol": "SURVEY_FINAL_V1",
+          "sourceDigest": "1a9d2902f7d2dee466a5bc24d408cb4ffc38160d63a1669a16695a0136796438",
+          "scoringDigest": null
+        }
+      ],
+      "series": [
+        {
+          "cache": "PROCESS_FIRST",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 110.22285999999986,
+              "processCpuMs": 101.496,
+              "observedPeakRssBytes": 296554496,
+              "processLifetimeMaxRssBytes": 296554496,
+              "sqlEvents": 16,
+              "sqlClasses": {
+                "SELECT": 9,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 1,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 16,
+              "dbSentBytes": 8870,
+              "dbReceivedBytes": 20749,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                25.87736500000028
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 48.53803700000026,
+              "processCpuMs": 44.457,
+              "observedPeakRssBytes": 299307008,
+              "processLifetimeMaxRssBytes": 299307008,
+              "sqlEvents": 11,
+              "sqlClasses": {
+                "SELECT": 5,
+                "BEGIN": 3,
+                "COMMIT": 3
+              },
+              "queryEventDurationMs": 7,
+              "dbSentBytes": 3739,
+              "dbReceivedBytes": 9885,
+              "responseBodyBytes": 3979,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 49.002962000000025,
+              "processCpuMs": 79.804,
+              "observedPeakRssBytes": 320278528,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 12,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 20,
+              "dbSentBytes": 9028,
+              "dbReceivedBytes": 12851,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                19.92440499999975
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 52.55251999999973,
+              "processCpuMs": 59.016,
+              "observedPeakRssBytes": 316334080,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 23,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 16,
+              "dbSentBytes": 6141,
+              "dbReceivedBytes": 10621,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                27.625406999999996
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 45.77714799999967,
+              "processCpuMs": 78.056,
+              "observedPeakRssBytes": 319389696,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 19,
+              "sqlClasses": {
+                "SELECT": 12,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 22,
+              "dbSentBytes": 1629,
+              "dbReceivedBytes": 9637,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                26.01401199999964
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 19.524603000000297,
+              "processCpuMs": 14.593,
+              "observedPeakRssBytes": 319389696,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 6,
+              "dbSentBytes": 1298,
+              "dbReceivedBytes": 8951,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            }
+          ],
+          "relationAllocatedBytesDelta": {},
+          "storedCipherSizes": {
+            "final_cipher_bytes": 1116,
+            "package_report_cipher_bytes": 0
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        },
+        {
+          "cache": "PROCESS_WARM",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 42.438548999999966,
+              "processCpuMs": 25.919,
+              "observedPeakRssBytes": 319389696,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 16,
+              "sqlClasses": {
+                "SELECT": 9,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 1,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 19,
+              "dbSentBytes": 8065,
+              "dbReceivedBytes": 20311,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                19.517011999999795
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 25.421285999999782,
+              "processCpuMs": 18.283,
+              "observedPeakRssBytes": 319520768,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 11,
+              "sqlClasses": {
+                "SELECT": 5,
+                "BEGIN": 3,
+                "COMMIT": 3
+              },
+              "queryEventDurationMs": 9,
+              "dbSentBytes": 758,
+              "dbReceivedBytes": 8699,
+              "responseBodyBytes": 3979,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 31.24411400000008,
+              "processCpuMs": 22.902,
+              "observedPeakRssBytes": 319913984,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 12,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 7,
+              "dbSentBytes": 2840,
+              "dbReceivedBytes": 10605,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                11.04560900000024
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 28.211227000000235,
+              "processCpuMs": 24.998,
+              "observedPeakRssBytes": 320045056,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 23,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 1,
+              "dbSentBytes": 3698,
+              "dbReceivedBytes": 9674,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                15.706090000000131
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 22.00710600000002,
+              "processCpuMs": 18.222,
+              "observedPeakRssBytes": 320045056,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 19,
+              "sqlClasses": {
+                "SELECT": 12,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 1,
+              "dbSentBytes": 1629,
+              "dbReceivedBytes": 9637,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                8.542978999999832
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 16.1182060000001,
+              "processCpuMs": 13.165,
+              "observedPeakRssBytes": 320176128,
+              "processLifetimeMaxRssBytes": 320802816,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 4,
+              "dbSentBytes": 922,
+              "dbReceivedBytes": 8818,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            }
+          ],
+          "relationAllocatedBytesDelta": {},
+          "storedCipherSizes": {
+            "final_cipher_bytes": 1116,
+            "package_report_cipher_bytes": 0
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        }
+      ],
+      "limits": {
+        "samplesPerGroup": 2,
+        "freshApiProcessPerGroup": true,
+        "warmupRuns": 0,
+        "coldDatabase": false,
+        "browser": false,
+        "publicNetwork": false,
+        "capacity": false,
+        "productionMiddleware": false,
+        "processCpuIncludesLocalHttpDriver": true,
+        "lockIntervalIsUpperBoundIncludingWaits": true,
+        "dbServerCpuMeasured": false
+      }
+    },
+    {
+      "group": "native-mixed",
+      "frozenDefinitionDigest": "90a7301a6e04201f299763702e76501fe81b6e0abca6cadf5644a07ddbd83e28",
+      "protocols": [
+        {
+          "kind": "FORM",
+          "protocol": "SURVEY_FINAL_V1",
+          "sourceDigest": "1a9d2902f7d2dee466a5bc24d408cb4ffc38160d63a1669a16695a0136796438",
+          "scoringDigest": null
+        },
+        {
+          "kind": "SJT",
+          "protocol": "SITUATIONAL_NATIVE_V1",
+          "sourceDigest": "a6f351c2d24f159c1a3840b2d9f46deabe1f585ee446cc9a23af6761d1139553",
+          "scoringDigest": "f0b3694a86e8d5e9bcf428dc84c43f60237b2ba5d8576a8b5e578cebff27a889"
+        }
+      ],
+      "series": [
+        {
+          "cache": "PROCESS_FIRST",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 325.09662400000025,
+              "processCpuMs": 171.345,
+              "observedPeakRssBytes": 252768256,
+              "processLifetimeMaxRssBytes": 252768256,
+              "sqlEvents": 24,
+              "sqlClasses": {
+                "SELECT": 16,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 2,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 205,
+              "dbSentBytes": 12223,
+              "dbReceivedBytes": 92122,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                248.15162699999973
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 295.7649540000002,
+              "processCpuMs": 123.527,
+              "observedPeakRssBytes": 266149888,
+              "processLifetimeMaxRssBytes": 266149888,
+              "sqlEvents": 33,
+              "sqlClasses": {
+                "SELECT": 25,
+                "BEGIN": 4,
+                "COMMIT": 4
+              },
+              "queryEventDurationMs": 192,
+              "dbSentBytes": 10678,
+              "dbReceivedBytes": 106102,
+              "responseBodyBytes": 4247,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                57.18926899999997,
+                120.922278
+              ]
+            },
+            {
+              "label": "native-start",
+              "httpStatus": 200,
+              "elapsedMs": 243.1877989999998,
+              "processCpuMs": 126.828,
+              "observedPeakRssBytes": 286539776,
+              "processLifetimeMaxRssBytes": 286539776,
+              "sqlEvents": 26,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 18,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 182,
+              "dbSentBytes": 39535,
+              "dbReceivedBytes": 113967,
+              "responseBodyBytes": 6211,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                173.78300899999977
+              ]
+            },
+            {
+              "label": "native-final",
+              "httpStatus": 200,
+              "elapsedMs": 382.9702360000001,
+              "processCpuMs": 161.851,
+              "observedPeakRssBytes": 320225280,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 43,
+              "sqlClasses": {
+                "BEGIN": 4,
+                "SELECT": 31,
+                "COMMIT": 4,
+                "SET": 2,
+                "UPDATE": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 278,
+              "dbSentBytes": 21557,
+              "dbReceivedBytes": 174699,
+              "responseBodyBytes": 6624,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                172.15835400000014,
+                143.1204389999998
+              ]
+            },
+            {
+              "label": "native-lost-response-recovery",
+              "httpStatus": 200,
+              "elapsedMs": 182.02903300000025,
+              "processCpuMs": 55.634,
+              "observedPeakRssBytes": 320225280,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 24,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 17,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 135,
+              "dbSentBytes": 2124,
+              "dbReceivedBytes": 117328,
+              "responseBodyBytes": 6607,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                116.10305000000017
+              ]
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 149.48768599999994,
+              "processCpuMs": 49.266,
+              "observedPeakRssBytes": 305549312,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 27,
+              "sqlClasses": {
+                "SELECT": 19,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 107,
+              "dbSentBytes": 7228,
+              "dbReceivedBytes": 54005,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                129.33238999999958
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 99.27153199999975,
+              "processCpuMs": 87.657,
+              "observedPeakRssBytes": 306204672,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 35,
+              "sqlClasses": {
+                "SELECT": 25,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 26,
+              "dbSentBytes": 14567,
+              "dbReceivedBytes": 72497,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                67.86527400000068
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 31.859174999999595,
+              "processCpuMs": 24.585,
+              "observedPeakRssBytes": 306204672,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 1832,
+              "dbReceivedBytes": 27011,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                12.495168000000376
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 19.071810999999798,
+              "processCpuMs": 15.991,
+              "observedPeakRssBytes": 306860032,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 4,
+              "dbSentBytes": 1297,
+              "dbReceivedBytes": 26253,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            }
+          ],
+          "relationAllocatedBytesDelta": {
+            "situational_raw_submissions": 40960,
+            "situational_attempts": 147456,
+            "survey_wave_finals": 16384
+          },
+          "storedCipherSizes": {
+            "final_cipher_bytes": 6686,
+            "package_report_cipher_bytes": 0
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        },
+        {
+          "cache": "PROCESS_WARM",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 49.02601799999957,
+              "processCpuMs": 37.832,
+              "observedPeakRssBytes": 306991104,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 24,
+              "sqlClasses": {
+                "SELECT": 16,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 2,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 10,
+              "dbSentBytes": 4508,
+              "dbReceivedBytes": 87899,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                33.46158799999921
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 56.978227999999945,
+              "processCpuMs": 50.545,
+              "observedPeakRssBytes": 307253248,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 33,
+              "sqlClasses": {
+                "SELECT": 25,
+                "BEGIN": 4,
+                "COMMIT": 4
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 3137,
+              "dbReceivedBytes": 103197,
+              "responseBodyBytes": 4247,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                7.99054999999953,
+                21.133569000000534
+              ]
+            },
+            {
+              "label": "native-start",
+              "httpStatus": 200,
+              "elapsedMs": 45.01213600000028,
+              "processCpuMs": 41.597,
+              "observedPeakRssBytes": 308039680,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 26,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 18,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 5,
+              "dbSentBytes": 35008,
+              "dbReceivedBytes": 111553,
+              "responseBodyBytes": 6211,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                33.01500800000031
+              ]
+            },
+            {
+              "label": "native-final",
+              "httpStatus": 200,
+              "elapsedMs": 80.78884300000027,
+              "processCpuMs": 87.56,
+              "observedPeakRssBytes": 310661120,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 43,
+              "sqlClasses": {
+                "BEGIN": 4,
+                "SELECT": 31,
+                "COMMIT": 4,
+                "SET": 2,
+                "UPDATE": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 18107,
+              "dbReceivedBytes": 173129,
+              "responseBodyBytes": 6623,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                33.47903299999962,
+                31.059392999999545
+              ]
+            },
+            {
+              "label": "native-lost-response-recovery",
+              "httpStatus": 200,
+              "elapsedMs": 48.6572129999995,
+              "processCpuMs": 39.77,
+              "observedPeakRssBytes": 310661120,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 24,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 17,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 2124,
+              "dbReceivedBytes": 117328,
+              "responseBodyBytes": 6606,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                31.33188500000051
+              ]
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 32.96290500000032,
+              "processCpuMs": 29.354,
+              "observedPeakRssBytes": 310792192,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 27,
+              "sqlClasses": {
+                "SELECT": 19,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 4,
+              "dbSentBytes": 3552,
+              "dbReceivedBytes": 52384,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                22.328323000000637
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 60.49540900000011,
+              "processCpuMs": 50.506,
+              "observedPeakRssBytes": 310792192,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 35,
+              "sqlClasses": {
+                "SELECT": 25,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 9,
+              "dbSentBytes": 10621,
+              "dbReceivedBytes": 70690,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                49.430866000000606
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 65.7062079999996,
+              "processCpuMs": 19.634,
+              "observedPeakRssBytes": 310923264,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 45,
+              "dbSentBytes": 1832,
+              "dbReceivedBytes": 27011,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                54.06668199999967
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 14.047481999999945,
+              "processCpuMs": 12.545,
+              "observedPeakRssBytes": 310923264,
+              "processLifetimeMaxRssBytes": 320225280,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 0,
+              "dbSentBytes": 921,
+              "dbReceivedBytes": 26120,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            }
+          ],
+          "relationAllocatedBytesDelta": {
+            "situational_raw_submissions": 32768,
+            "situational_attempts": 40960,
+            "survey_wave_finals": 32768,
+            "survey_wave_attempts": 32768
+          },
+          "storedCipherSizes": {
+            "final_cipher_bytes": 6686,
+            "package_report_cipher_bytes": 0
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        }
+      ],
+      "limits": {
+        "samplesPerGroup": 2,
+        "freshApiProcessPerGroup": true,
+        "warmupRuns": 0,
+        "coldDatabase": false,
+        "browser": false,
+        "publicNetwork": false,
+        "capacity": false,
+        "productionMiddleware": false,
+        "processCpuIncludesLocalHttpDriver": true,
+        "lockIntervalIsUpperBoundIncludingWaits": true,
+        "dbServerCpuMeasured": false
+      }
+    },
+    {
+      "group": "whole-package",
+      "frozenDefinitionDigest": "f2e0b63c1b5812fd0a014efc26c3855986d3d0eb4eead9dfcd86dd09d7ba0b3d",
+      "protocols": [
+        {
+          "kind": "FORM",
+          "protocol": "SURVEY_FINAL_V1",
+          "sourceDigest": "1a9d2902f7d2dee466a5bc24d408cb4ffc38160d63a1669a16695a0136796438",
+          "scoringDigest": null
+        },
+        {
+          "kind": "SJT",
+          "protocol": "SITUATIONAL_NATIVE_V1",
+          "sourceDigest": "a6f351c2d24f159c1a3840b2d9f46deabe1f585ee446cc9a23af6761d1139553",
+          "scoringDigest": "f0b3694a86e8d5e9bcf428dc84c43f60237b2ba5d8576a8b5e578cebff27a889"
+        }
+      ],
+      "series": [
+        {
+          "cache": "PROCESS_FIRST",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 213.96412800000007,
+              "processCpuMs": 160.487,
+              "observedPeakRssBytes": 259821568,
+              "processLifetimeMaxRssBytes": 259821568,
+              "sqlEvents": 34,
+              "sqlClasses": {
+                "SELECT": 26,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 2,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 76,
+              "dbSentBytes": 13496,
+              "dbReceivedBytes": 141690,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                128.67255999999998
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 348.32601799999975,
+              "processCpuMs": 157.396,
+              "observedPeakRssBytes": 276996096,
+              "processLifetimeMaxRssBytes": 276996096,
+              "sqlEvents": 53,
+              "sqlClasses": {
+                "SELECT": 45,
+                "BEGIN": 4,
+                "COMMIT": 4
+              },
+              "queryEventDurationMs": 207,
+              "dbSentBytes": 12642,
+              "dbReceivedBytes": 196542,
+              "responseBodyBytes": 4306,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                123.0890589999999,
+                134.4849610000001
+              ]
+            },
+            {
+              "label": "native-start",
+              "httpStatus": 200,
+              "elapsedMs": 280.3225010000001,
+              "processCpuMs": 180.908,
+              "observedPeakRssBytes": 305725440,
+              "processLifetimeMaxRssBytes": 305725440,
+              "sqlEvents": 36,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 28,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 206,
+              "dbSentBytes": 40549,
+              "dbReceivedBytes": 162688,
+              "responseBodyBytes": 6211,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                258.18092499999966
+              ]
+            },
+            {
+              "label": "native-final",
+              "httpStatus": 200,
+              "elapsedMs": 127.90370100000018,
+              "processCpuMs": 127.802,
+              "observedPeakRssBytes": 306642944,
+              "processLifetimeMaxRssBytes": 306642944,
+              "sqlEvents": 63,
+              "sqlClasses": {
+                "BEGIN": 4,
+                "SELECT": 51,
+                "COMMIT": 4,
+                "SET": 2,
+                "UPDATE": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 16,
+              "dbSentBytes": 23537,
+              "dbReceivedBytes": 268672,
+              "responseBodyBytes": 6624,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                53.623951000000034,
+                47.98607800000036
+              ]
+            },
+            {
+              "label": "native-lost-response-recovery",
+              "httpStatus": 200,
+              "elapsedMs": 59.927120000000286,
+              "processCpuMs": 60.848,
+              "observedPeakRssBytes": 307036160,
+              "processLifetimeMaxRssBytes": 307036160,
+              "sqlEvents": 34,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 27,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 5,
+              "dbSentBytes": 3122,
+              "dbReceivedBytes": 166049,
+              "responseBodyBytes": 6607,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                41.79424400000016
+              ]
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 68.3518369999997,
+              "processCpuMs": 58.097,
+              "observedPeakRssBytes": 307691520,
+              "processLifetimeMaxRssBytes": 307691520,
+              "sqlEvents": 37,
+              "sqlClasses": {
+                "SELECT": 29,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 11,
+              "dbSentBytes": 8278,
+              "dbReceivedBytes": 99277,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                49.61114600000019
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 92.5196289999999,
+              "processCpuMs": 86.21,
+              "observedPeakRssBytes": 309002240,
+              "processLifetimeMaxRssBytes": 309002240,
+              "sqlEvents": 46,
+              "sqlClasses": {
+                "SELECT": 35,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 2,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 14,
+              "dbSentBytes": 17815,
+              "dbReceivedBytes": 118234,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                72.96267200000011
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 44.71083499999986,
+              "processCpuMs": 29.707,
+              "observedPeakRssBytes": 309133312,
+              "processLifetimeMaxRssBytes": 309133312,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 18,
+              "dbSentBytes": 1832,
+              "dbReceivedBytes": 30480,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                16.20998899999995
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 23.24275200000011,
+              "processCpuMs": 27.963,
+              "observedPeakRssBytes": 311230464,
+              "processLifetimeMaxRssBytes": 311230464,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 1297,
+              "dbReceivedBytes": 29722,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            },
+            {
+              "label": "authorized-combined-report",
+              "httpStatus": 200,
+              "elapsedMs": 109.00105699999995,
+              "processCpuMs": 104.635,
+              "observedPeakRssBytes": 328007680,
+              "processLifetimeMaxRssBytes": 328007680,
+              "sqlEvents": 8,
+              "sqlClasses": {
+                "SELECT": 5,
+                "BEGIN": 1,
+                "WITH": 1,
+                "COMMIT": 1
+              },
+              "queryEventDurationMs": 9,
+              "dbSentBytes": 4461,
+              "dbReceivedBytes": 3567,
+              "responseBodyBytes": 953,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                10.611181000000215
+              ]
+            }
+          ],
+          "relationAllocatedBytesDelta": {
+            "situational_raw_submissions": 8192,
+            "situational_attempts": 40960,
+            "survey_wave_finals": 8192,
+            "survey_wave_attempts": 16384,
+            "survey_package_report_artifacts": 32768
+          },
+          "storedCipherSizes": {
+            "final_cipher_bytes": 6786,
+            "package_report_cipher_bytes": 1376
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        },
+        {
+          "cache": "PROCESS_WARM",
+          "requests": [
+            {
+              "label": "join",
+              "httpStatus": 200,
+              "elapsedMs": 62.465940000000046,
+              "processCpuMs": 48.27,
+              "observedPeakRssBytes": 328269824,
+              "processLifetimeMaxRssBytes": 328269824,
+              "sqlEvents": 34,
+              "sqlClasses": {
+                "SELECT": 26,
+                "BEGIN": 2,
+                "COMMIT": 2,
+                "UPDATE": 2,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 9,
+              "dbSentBytes": 5522,
+              "dbReceivedBytes": 136951,
+              "responseBodyBytes": 227,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                47.93608800000038
+              ]
+            },
+            {
+              "label": "task",
+              "httpStatus": 200,
+              "elapsedMs": 80.22235300000011,
+              "processCpuMs": 77.336,
+              "observedPeakRssBytes": 328400896,
+              "processLifetimeMaxRssBytes": 328400896,
+              "sqlEvents": 53,
+              "sqlClasses": {
+                "SELECT": 45,
+                "BEGIN": 4,
+                "COMMIT": 4
+              },
+              "queryEventDurationMs": 8,
+              "dbSentBytes": 5101,
+              "dbReceivedBytes": 193637,
+              "responseBodyBytes": 4306,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                18.58850900000016,
+                35.310011999999915
+              ]
+            },
+            {
+              "label": "native-start",
+              "httpStatus": 200,
+              "elapsedMs": 98.08240100000057,
+              "processCpuMs": 67.236,
+              "observedPeakRssBytes": 328794112,
+              "processLifetimeMaxRssBytes": 328794112,
+              "sqlEvents": 36,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 28,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 33,
+              "dbSentBytes": 45821,
+              "dbReceivedBytes": 167434,
+              "responseBodyBytes": 6211,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                63.52998599999955
+              ]
+            },
+            {
+              "label": "native-final",
+              "httpStatus": 200,
+              "elapsedMs": 117.65409900000031,
+              "processCpuMs": 111.21,
+              "observedPeakRssBytes": 329842688,
+              "processLifetimeMaxRssBytes": 329842688,
+              "sqlEvents": 63,
+              "sqlClasses": {
+                "BEGIN": 4,
+                "SELECT": 51,
+                "COMMIT": 4,
+                "SET": 2,
+                "UPDATE": 1,
+                "INSERT": 1
+              },
+              "queryEventDurationMs": 18,
+              "dbSentBytes": 24046,
+              "dbReceivedBytes": 268976,
+              "responseBodyBytes": 6623,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                50.02296100000058,
+                50.38050300000032
+              ]
+            },
+            {
+              "label": "native-lost-response-recovery",
+              "httpStatus": 200,
+              "elapsedMs": 102.50337000000036,
+              "processCpuMs": 65.072,
+              "observedPeakRssBytes": 331153408,
+              "processLifetimeMaxRssBytes": 331153408,
+              "sqlEvents": 34,
+              "sqlClasses": {
+                "BEGIN": 3,
+                "SELECT": 27,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 48,
+              "dbSentBytes": 3123,
+              "dbReceivedBytes": 166049,
+              "responseBodyBytes": 6606,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                87.22132200000033
+              ]
+            },
+            {
+              "label": "checkpoint",
+              "httpStatus": 200,
+              "elapsedMs": 145.55133000000023,
+              "processCpuMs": 50.765,
+              "observedPeakRssBytes": 331284480,
+              "processLifetimeMaxRssBytes": 331284480,
+              "sqlEvents": 37,
+              "sqlClasses": {
+                "SELECT": 29,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "INSERT": 2
+              },
+              "queryEventDurationMs": 98,
+              "dbSentBytes": 10339,
+              "dbReceivedBytes": 99477,
+              "responseBodyBytes": 150,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                126.326325
+              ]
+            },
+            {
+              "label": "final",
+              "httpStatus": 200,
+              "elapsedMs": 84.52917400000024,
+              "processCpuMs": 72.571,
+              "observedPeakRssBytes": 331284480,
+              "processLifetimeMaxRssBytes": 331284480,
+              "sqlEvents": 46,
+              "sqlClasses": {
+                "SELECT": 35,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1,
+                "INSERT": 2,
+                "UPDATE": 1,
+                "DELETE": 1
+              },
+              "queryEventDurationMs": 17,
+              "dbSentBytes": 17857,
+              "dbReceivedBytes": 118234,
+              "responseBodyBytes": 469,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                65.7757189999993
+              ]
+            },
+            {
+              "label": "final-lost-response-replay",
+              "httpStatus": 200,
+              "elapsedMs": 72.21614399999999,
+              "processCpuMs": 25.871,
+              "observedPeakRssBytes": 331284480,
+              "processLifetimeMaxRssBytes": 331284480,
+              "sqlEvents": 20,
+              "sqlClasses": {
+                "SELECT": 13,
+                "BEGIN": 3,
+                "COMMIT": 3,
+                "SET": 1
+              },
+              "queryEventDurationMs": 49,
+              "dbSentBytes": 1841,
+              "dbReceivedBytes": 30480,
+              "responseBodyBytes": 263,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                53.00057299999935
+              ]
+            },
+            {
+              "label": "general",
+              "httpStatus": 200,
+              "elapsedMs": 62.96515199999976,
+              "processCpuMs": 20.482,
+              "observedPeakRssBytes": 331415552,
+              "processLifetimeMaxRssBytes": 331415552,
+              "sqlEvents": 10,
+              "sqlClasses": {
+                "SELECT": 6,
+                "BEGIN": 2,
+                "COMMIT": 2
+              },
+              "queryEventDurationMs": 48,
+              "dbSentBytes": 1302,
+              "dbReceivedBytes": 29722,
+              "responseBodyBytes": 252,
+              "authorityTransactionIntervalUpperBoundsMs": []
+            },
+            {
+              "label": "authorized-combined-report",
+              "httpStatus": 200,
+              "elapsedMs": 20.347682000000532,
+              "processCpuMs": 14.525,
+              "observedPeakRssBytes": 331546624,
+              "processLifetimeMaxRssBytes": 331546624,
+              "sqlEvents": 8,
+              "sqlClasses": {
+                "SELECT": 5,
+                "BEGIN": 1,
+                "WITH": 1,
+                "COMMIT": 1
+              },
+              "queryEventDurationMs": 6,
+              "dbSentBytes": 4482,
+              "dbReceivedBytes": 3567,
+              "responseBodyBytes": 953,
+              "authorityTransactionIntervalUpperBoundsMs": [
+                9.592929999999797
+              ]
+            }
+          ],
+          "relationAllocatedBytesDelta": {
+            "situational_raw_submissions": 8192,
+            "situational_attempts": 40960,
+            "survey_wave_finals": 40960
+          },
+          "storedCipherSizes": {
+            "final_cipher_bytes": 6786,
+            "package_report_cipher_bytes": 1376
+          },
+          "verified": true,
+          "receiptReplayExact": true
+        }
+      ],
+      "limits": {
+        "samplesPerGroup": 2,
+        "freshApiProcessPerGroup": true,
+        "warmupRuns": 0,
+        "coldDatabase": false,
+        "browser": false,
+        "publicNetwork": false,
+        "capacity": false,
+        "productionMiddleware": false,
+        "processCpuIncludesLocalHttpDriver": true,
+        "lockIntervalIsUpperBoundIncludingWaits": true,
+        "dbServerCpuMeasured": false
+      }
+    }
+  ]
+}

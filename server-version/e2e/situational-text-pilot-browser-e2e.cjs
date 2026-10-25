@@ -76,7 +76,7 @@ async function main() {
     // Verify the first raw answer survives a page reload against the same
     // server-owned in-progress attempt before completing the happy path.
     await chooseFirstRadio(page)
-    await page.getByRole('button', { name: '情境 1，已完成', exact: true }).waitFor()
+    await page.getByRole('button', { name: '情境 1，已作答', exact: true }).waitFor()
     await page.reload()
     await page.getByRole('heading', { name: '情境内容', exact: true }).waitFor()
     await page.getByRole('button', { name: /情境 1/ }).click()

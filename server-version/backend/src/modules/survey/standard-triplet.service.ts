@@ -1,3 +1,4 @@
+import {scaleSourceClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {toolReference} from './tool-reference'
 import {copyTripletContent} from './standard-triplet.content'
 import {randomUUID} from 'node:crypto'
@@ -7,7 +8,8 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
 import {resolveScaleReference} from '../assessment-reference/reference'
 import {hashScaleDefinition} from '../scale/scale-definition'
-import {publishContentRelease} from '../measurement-content/repository'
+import {getContentReleaseBatch,publishContentRelease} from '../measurement-content/repository'
+import {describeStandardCombination,standardCombinationMeasurementInput} from '../measurement-content/standard-combination'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {renderDeclaredReport,type ReportReferenceFact} from '../measurement-content/report-renderer'
 import {computeSurveyFinal} from './final.compute'
@@ -50,16 +52,19 @@ export async function previewStandardTriplet(db:Db,actor:string,selection:Select
  triplet.reference=toolReference('SCALE',selection.toolKey,{...triplet.reference.metadata,originalScaleRecord:scale,rightsRecords:rights},applications,publications)
  return triplet
 }
-export async function standardTripletCatalog(actor:string,page=1){
+export async function standardTripletCatalog(actor:string,page=1,filters:CatalogDiscoveryFilters={}){
  await assertStandardSystem(prisma,actor)
- const sources=listScaleInstrumentSources().slice().sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`)),selected=sources.slice((page-1)*25,page*25)
+ const all=listScaleInstrumentSources().slice().sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
+ const tagFacets=catalogTagFacets(all.map(source=>scaleSourceClassificationTags(source)))
+ const sources=all.filter(source=>matchesCatalogDiscovery([source.catalog.identity.canonicalName,source.identity.instrumentKey,source.identity.instrumentVersion,source.catalog.identity.instrumentFamily??'',source.catalog.construct.constructDefinition],scaleSourceClassificationTags(source),filters))
+ const selected=sources.slice((page-1)*25,page*25)
  const keys=selected.map(s=>s.identity.instrumentKey)
  const states=keys.length?await prisma.$queryRaw<StandardRelease[]>(Prisma.sql`SELECT * FROM survey_standard_releases WHERE tool_key IN (${Prisma.join(keys)}) ORDER BY created_at DESC`):[]
- return {page,hasMore:page*25<sources.length,list:selected.map(s=>{
+ return {page,hasMore:page*25<sources.length,tagFacets,list:selected.map(s=>{
   const parts=sourceParts(s.identity.instrumentKey,s.identity.instrumentVersion),p=Object.fromEntries(parts.map(p=>[p.axis,p])) as Record<Axis,Part>
   let candidate:Triplet|undefined,blockers:string[]=[]
   try{if(parts.length===3)candidate=composeTriplet(s.identity.instrumentKey,p);else blockers=['尚缺完整的内容、参数与报告版本，当前只有目录资料']}catch(e){blockers=[e instanceof Error?e.message:'版本结构不完整']}
-  return {toolKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,title:s.catalog.identity.canonicalName,versions:parts.map(p=>({axis:p.axis,version:p.version,hash:p.hash})),combinationHash:candidate?.combinationHash??null,blockers:[...blockers,...(candidate?.blockers??[])],releases:states.filter(r=>r.tool_key===s.identity.instrumentKey).map(stateView),tags:s.catalog.construct.constructOverlapTags}
+  return {toolKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,title:s.catalog.identity.canonicalName,versions:parts.map(p=>({axis:p.axis,version:p.version,hash:p.hash})),combinationHash:candidate?.combinationHash??null,blockers:[...blockers,...(candidate?.blockers??[])],releases:states.filter(r=>r.tool_key===s.identity.instrumentKey).map(stateView),tags:s.catalog.construct.constructOverlapTags,classificationTags:scaleSourceClassificationTags(s)}
  })}
 }
 export async function standardTripletDetail(actor:string,key:string,version:string){
@@ -67,7 +72,9 @@ export async function standardTripletDetail(actor:string,key:string,version:stri
  const available=await partsFor(prisma,key),defaults=sourceParts(key,version),selection=Object.fromEntries(defaults.map(p=>[p.axis,p.hash])) as Omit<Selection,'toolKey'>
  const history=await prisma.$queryRaw<StandardRelease[]>`SELECT * FROM survey_standard_releases WHERE tool_key=${key} ORDER BY created_at DESC LIMIT 50`
  const trials=history.length?await prisma.$queryRaw(Prisma.sql`SELECT release_id AS "releaseId",run_id AS "runId",case_index AS "caseIndex",record_hash AS "recordHash",created_at AS "createdAt",scores,report FROM survey_standard_trials WHERE release_id IN (${Prisma.join(history.map(r=>r.id))}) ORDER BY created_at DESC LIMIT 150`):[]
- return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),trials,reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
+ const measurements=await getContentReleaseBatch(prisma,history.flatMap(r=>r.measurement_release?[r.measurement_release.releaseId]:[]))
+ const versionMappings=history.map(r=>describeStandardCombination(r,r.measurement_release?measurements.get(r.measurement_release.releaseId)??null:null))
+ return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),versionMappings,trials,reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
 }
 async function audit(db:Prisma.TransactionClient,actor:string,action:string,metadata:object){await db.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action,metadata:metadata as Prisma.InputJsonValue}})}
 export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string},proof?:AdminSessionProof){
@@ -135,8 +142,7 @@ export async function runStandardTrial(actor:string,id:string,expectedVersion:nu
   await prisma.$transaction(async tx=>{
    await assertStandardSystem(tx,actor,proof);const current=await standardReleaseRow(tx,id,true)
    if(current.state!=='TRIAL_RUNNING'||current.latest_trial!==runId)fail(409,'试运行已被另一轮操作替换')
-   const triplet=row.snapshot
-   const measurement=await publishContentRelease(tx,scaleMeasurementRelease({localId:'survey-standard:'+triplet.toolKey,version:triplet.parts.CONTENT.hash,instrumentVersion:triplet.instrumentVersion,definition:triplet.definition,instrumentClass:'STANDARD',scope:{kind:'PLATFORM',ownerId:row.approved_by},provenance:{surveyStandardContentHash:triplet.parts.CONTENT.hash,toolKey:triplet.toolKey}}),actor)
+   const measurement=await publishContentRelease(tx,standardCombinationMeasurementInput(row),actor)
    if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容发布版本当前不能用于新增使用')
    await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,lease_until=NULL,measurement_release=${JSON.stringify({releaseId:measurement.releaseId,contentHash:measurement.contentHash})}::jsonb,blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
    await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,scope:'SURVEY_ONLY',researcherGrantsCreated:0})

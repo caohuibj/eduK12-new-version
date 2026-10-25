@@ -97,7 +97,7 @@ describe('C23 persistence admission projection (schema-aware mock DB, actual sta
     for (const [args] of selected) expect(args.select).not.toHaveProperty('deliveryMode')
     expect(Object.keys(selected[0][0].select).sort()).toEqual([
       'status', 'publicEnabled', 'opensAt', 'expiresAt', 'trainingPersistencePolicy', 'trainingPersistencePolicyHash',
-      'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash',
+      'trainingFeedbackPolicy', 'trainingFeedbackPolicyHash', 'trainingContentSnapshot', 'trainingContentSnapshotHash',
     ].sort())
     if (!enabled) expect(db.$queryRaw.mock.calls.some(([query]) => query.join('').includes('FOR SHARE OF c,u'))).toBe(false)
     expect(state.order).toEqual(enabled

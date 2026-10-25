@@ -88,15 +88,14 @@ export default function SurveyResearchersAdmin(){
   const [unconfirmed,setUnconfirmed]=useState<string|null>(null)
   const sections=[['researchers','研究者','资格、认证与恢复'],['invitations','邀请','签发与未领取状态'],['tools','工具授权','对象与精确版本']] as const
   const statusLabel=(status:string)=>(({ACTIVE:'已激活',PENDING_MFA:'待绑定双因素认证',SUSPENDED:'已暂停',REVOKED:'已永久撤销',UNAVAILABLE:'资格不可用'} as Record<string,string>)[status]||'状态待核对')
-  const refresh=async(researcher=researcherPage,invitation=invitationPage)=>{
+  const refresh=async(researcher=researcherPage,invitation=invitationPage,only?:'researchers'|'invitations')=>{
     setLoading(true)
     try{
     const [researchers,invitations]=await Promise.all([
-      platformApi<{list:Researcher[]}>('/researchers?page='+researcher),
-      platformApi<{list:Invitation[]}>('/researcher-invitations?page='+invitation),
+      only==='invitations'?Promise.resolve(null):platformApi<{list:Researcher[]}>('/researchers?page='+researcher),
+      only==='researchers'?Promise.resolve(null):platformApi<{list:Invitation[]}>('/researcher-invitations?page='+invitation),
     ])
-    setList(researchers.list);setPending(invitations.list)
-    setResearcherPage(researcher);setInvitationPage(invitation)
+    if(researchers){setList(researchers.list);setResearcherPage(researcher)}if(invitations){setPending(invitations.list);setInvitationPage(invitation)}
     }finally{setLoading(false)}
   }
   useEffect(()=>{void refresh().catch(e=>setError(e instanceof Error?e.message:'研究者列表暂不可用'))},[])
@@ -238,10 +237,10 @@ export default function SurveyResearchersAdmin(){
     {!loading&&!error&&!pending.length&&<div className="survey-admin-empty-state"><span className="survey-admin-empty-icon"><MailPlus size={28} aria-hidden="true"/></span><p>{invitationPage===1?'目前没有未领取的研究者邀请。':'本页没有未领取的研究者邀请，可返回上一页。'}</p><span>邀请领取后，账号将在“研究者”中管理。</span></div>}
     <div className="survey-admin-pagination">
       <button type="button" className="btn-secondary" disabled={busy||invitationPage<=1}
-        onClick={()=>void refresh(researcherPage,invitationPage-1).catch(e=>setError(String(e)))}>邀请上一页</button>
+        onClick={()=>void refresh(researcherPage,invitationPage-1,'invitations').catch(e=>setError(String(e)))}>邀请上一页</button>
       <span>邀请第 {invitationPage} 页</span>
       <button type="button" className="btn-secondary" disabled={busy||pending.length<25}
-        onClick={()=>void refresh(researcherPage,invitationPage+1).catch(e=>setError(String(e)))}>邀请下一页</button>
+        onClick={()=>void refresh(researcherPage,invitationPage+1,'invitations').catch(e=>setError(String(e)))}>邀请下一页</button>
     </div>
     </section>
     <section role="tabpanel" id="survey-admin-panel-researchers" aria-labelledby="survey-admin-tab-researchers" hidden={section!=='researchers'} className="survey-admin-panel">
@@ -272,10 +271,10 @@ export default function SurveyResearchersAdmin(){
     {!loading&&!error&&!list.length&&<p className="survey-admin-empty">{researcherPage===1?'暂无可见研究者。':'本页没有研究者，可返回上一页。'}</p>}
     <div className="survey-admin-pagination">
       <button type="button" className="btn-secondary" disabled={busy||researcherPage<=1}
-        onClick={()=>void refresh(researcherPage-1,invitationPage).catch(e=>setError(String(e)))}>研究者上一页</button>
+        onClick={()=>void refresh(researcherPage-1,invitationPage,'researchers').catch(e=>setError(String(e)))}>研究者上一页</button>
       <span>研究者第 {researcherPage} 页</span>
       <button type="button" className="btn-secondary" disabled={busy||list.length<25}
-        onClick={()=>void refresh(researcherPage+1,invitationPage).catch(e=>setError(String(e)))}>研究者下一页</button>
+        onClick={()=>void refresh(researcherPage+1,invitationPage,'researchers').catch(e=>setError(String(e)))}>研究者下一页</button>
     </div>
     </section>
         <details className="survey-admin-scope"><summary>管理范围说明</summary><p>此处管理研究者资格与工具的精确版本授权，不授予研究原始答案访问权。公库收录、版本审核和使用分配在“工具公库与审批”中按现有权限提供。</p></details>

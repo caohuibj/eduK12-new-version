@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import {beforeAll,afterAll,describe,expect,it} from 'vitest'
 import express from 'express'
 import {prisma} from '../../config/database'
-import {integrationDatabaseUrl} from './integration-env'
+import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
 import * as study from '../../modules/anonymous-study/service'
 import * as composite from '../../modules/composite/composite.service'
 import {ensureCompositeFormSections,submitCompositeFormSectionFinal} from '../../modules/composite/final-submit.service'
@@ -14,6 +14,7 @@ const suite=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')?describe:
 suite('anonymous research identity and exact-wave PostgreSQL',()=>{
  let owner:string,other:string,cid:string,itemId:string
  beforeAll(async()=>{
+  requireIsolatedReleaseDatabase(process.env.RELEASE_INTEGRATION_DATABASE_URL!)
   owner=(await prisma.user.create({data:{username:randomUUID(),passwordHash:'test',role:'TEACHER'}})).id
   other=(await prisma.user.create({data:{username:randomUUID(),passwordHash:'test',role:'TEACHER'}})).id
   const course=await prisma.course.create({data:{title:'anonymous study test',courseCode:randomUUID(),status:'PUBLISHED',creatorId:owner}})
@@ -23,15 +24,11 @@ suite('anonymous research identity and exact-wave PostgreSQL',()=>{
   await composite.publishComposite(owner,'TEACHER',cid)
  })
  afterAll(async()=>{
-  if(!owner)return
-  await prisma.$executeRaw`DELETE FROM anonymous_study_attempts WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
-  await prisma.$executeRaw`DELETE FROM anonymous_study_participants WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
-  await prisma.$executeRaw`DELETE FROM anonymous_study_waves WHERE study_id IN (SELECT id FROM anonymous_studies WHERE owner_user_id=${owner})`
-  await prisma.$executeRaw`DELETE FROM anonymous_studies WHERE owner_user_id=${owner}`
-  await prisma.compositeAssessment.deleteMany({where:{createdBy:owner}})
-  await prisma.course.deleteMany({where:{creatorId:owner}})
-  await prisma.user.deleteMany({where:{id:{in:[owner,other].filter(Boolean)}}})
+  // Bound attempts and their audit graph are deliberately retained. This entire
+  // synthetic database belongs to the disposable job; do not bypass its triggers.
+  await prisma.$disconnect()
  })
+
  const token=(limit=0)=>composite.createAccessTokenForComposite(owner,'TEACHER',cid,new Date(Date.now()+86400000).toISOString(),limit)
  const complete=async(a:{attemptId:string;recoveryToken:string},answer:string)=>{
   const state=await composite.getAttemptState(a.attemptId,{recoveryTokenHash:hashRecoveryToken(a.recoveryToken)})

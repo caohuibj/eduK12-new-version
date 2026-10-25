@@ -1,3 +1,4 @@
+import {catalogKeywordTerms} from '../scale/library/catalog-discovery'
 import {assertSurveyLibraryManager} from '../survey/admin-role'
 import {compileEducationApplicability,readFrozenEducationApplicability} from './education-applicability'
 import {buildLibraryMediaManifest,assertLibraryMediaConsent,retainLibrarySubmissionMedia,approveLibraryMedia} from './media'
@@ -138,15 +139,16 @@ export async function review(actorId:string,id:string,raw:unknown){
     return {...submissionView(updated),entryId}
   })
 }
-export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number}){
+export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number;keyword?:string}){
   const limit=pagination?.limit??100,offset=pagination?.offset??0
   if(!Number.isInteger(limit)||limit<0||limit>100||!Number.isSafeInteger(offset)||offset<0)fail('目录分页参数无效',400)
   return prisma.$transaction(async tx=>{
     const capabilities=await libraryCapabilities(tx,actorId)
     const ids=[...capabilities.reviewGrants.flatMap(g=>g.releaseIds),...capabilities.distributionGrants.flatMap(g=>g.releaseIds)]
+    const terms=catalogKeywordTerms(pagination?.keyword),discovery=terms.length?Prisma.sql`AND ${Prisma.join(terms.map(term=>Prisma.sql`strpos(lower(concat_ws(' ',s.metadata->>'title',s.metadata->>'author',s.metadata->>'applicability',e.release_id)),${term})>0`),' AND ')}`:Prisma.empty
     const entries=await tx.$queryRaw<EntryRow[]>(Prisma.sql`SELECT e.* FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id
       WHERE (${entryId??null}::text IS NULL OR e.id=${entryId??null}) AND (e.status='ACTIVE' OR ${capabilities.systemAdmin} OR s.author_id=${actorId} OR e.release_id=ANY(${ids}::text[])
-      OR EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id AND g.user_id=${actorId} AND g.status='ACTIVE')) ORDER BY e.created_at DESC,e.id LIMIT ${limit+1} OFFSET ${offset}`)
+      OR EXISTS(SELECT 1 FROM scale_library_use_grants g WHERE g.entry_id=e.id AND g.user_id=${actorId} AND g.status='ACTIVE')) ${discovery} ORDER BY e.created_at DESC,e.id LIMIT ${limit+1} OFFSET ${offset}`)
     const list=[]
     for(const e of entries.slice(0,limit)){const {entry,submission}=await loadEntry(tx,e.id);list.push(entryView(entry,submission))}
     return {list,hasMore:entries.length>limit}

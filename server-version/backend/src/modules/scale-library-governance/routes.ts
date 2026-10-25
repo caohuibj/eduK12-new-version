@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {readUnifiedCatalog,readUnifiedStandardCatalogEntry,readUnifiedAuthoredCatalogEntry} from './unified-catalog'
 import {libraryMediaRouter} from './media.routes'
 import {Router,type Request,type Response,type NextFunction} from 'express'
@@ -31,7 +32,7 @@ function router(product:'TRAINING'|'SURVEY'){
  if(product==='TRAINING')result.use(platformSurveyOriginGuard)
  result.use(limiter,(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
  result.use(libraryMediaRouter(product))
- result.get('/catalog',handle(req=>readUnifiedCatalog(req.user!.userId,product,z.object({page:z.coerce.number().int().min(1).max(Math.floor(Number.MAX_SAFE_INTEGER/100)).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(25)}).parse(req.query))))
+ result.get('/catalog',handle(req=>readUnifiedCatalog(req.user!.userId,product,z.object({page:z.coerce.number().int().min(1).max(Math.floor(Number.MAX_SAFE_INTEGER/100)).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(25),...catalogDiscoveryQueryFields,origin:z.enum(['ALL','STANDARD_REGISTRY','AUTHORED']).default('ALL')}).parse(req.query))))
  result.get('/catalog/standard/:instrumentKey/:instrumentVersion',handle(req=>readUnifiedStandardCatalogEntry(req.user!.userId,product,z.string().min(1).max(200).parse(req.params.instrumentKey),z.string().min(1).max(100).parse(req.params.instrumentVersion))))
  result.get('/catalog/authored/:id',handle(req=>readUnifiedAuthoredCatalogEntry(req.user!.userId,product,uuid.parse(req.params.id))))
  result.get('/capabilities',handle(req=>service.readCapabilities(req.user!.userId)))

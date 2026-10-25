@@ -1,0 +1,253 @@
+{
+  "runId": 40166806895,
+  "head": "9065bb0ee73916d5e35f913b389f2ea55a9f0818",
+  "testedMergeSha": "af94aaadccdd52a1d7c7b33c2ff0aca5845c19f8",
+  "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40166806895",
+  "result": "failure",
+  "jobs": [
+    {
+      "id": 121089431395,
+      "name": "classify changed content",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:47:41Z",
+      "completedAt": "2026-10-25T05:48:00Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495133,
+      "name": "mini program / foundation contract and page smoke",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:48:15Z",
+      "failedSteps": [
+        "verify Web feature inventory"
+      ]
+    },
+    {
+      "id": 121089495165,
+      "name": "codeql (javascript/typescript SAST)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:03Z",
+      "completedAt": "2026-10-25T06:02:10Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495363,
+      "name": "backend regression (isolated job database) / backend regression (isolated job database)",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T06:00:10Z",
+      "failedSteps": [
+        "full functional regression",
+        "preserve both disjoint functional reports and require their complete union"
+      ]
+    },
+    {
+      "id": 121089495366,
+      "name": "frontend artifacts / release consumers early / build",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:48:41Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495381,
+      "name": "docker (compose config + production builds) / production image build and scan",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:50:26Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495395,
+      "name": "frontend (lint + types + full tests + build) / frontend checks",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:48:57Z",
+      "failedSteps": [
+        "typecheck"
+      ]
+    },
+    {
+      "id": 121089495401,
+      "name": "frontend artifacts / release consumers early / UI-lab artifact",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:48:44Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495414,
+      "name": "maintenance / attachment deduplication, indexes and protected cleanup",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:49:38Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495447,
+      "name": "backend (migrate + build + performance gate) / backend (migrate + build + performance gate)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:49:54Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495785,
+      "name": "accept-ops / runtime-recovery",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:09Z",
+      "completedAt": "2026-10-25T05:49:42Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089495803,
+      "name": "accept-perf / Scale + Cognitive + SJT fresh accounting",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:48:04Z",
+      "completedAt": "2026-10-25T05:50:47Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089623876,
+      "name": "accept-ui (chromium) / chromium frontend acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:47Z",
+      "completedAt": "2026-10-25T05:50:33Z",
+      "failedSteps": [
+        "QA round 3 real components with synthetic local APIs"
+      ]
+    },
+    {
+      "id": 121089623938,
+      "name": "accept-visual (chromium) / chromium frontend acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:47Z",
+      "completedAt": "2026-10-25T05:50:04Z",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121089623967,
+      "name": "accept-visual (webkit) / webkit frontend acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:46Z",
+      "completedAt": "2026-10-25T05:50:23Z",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121089624005,
+      "name": "accept-visual (firefox) / firefox frontend acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:48:47Z",
+      "completedAt": "2026-10-25T05:50:03Z",
+      "failedSteps": [
+        "canonical visual and interaction acceptance"
+      ]
+    },
+    {
+      "id": 121089820527,
+      "name": "accept-media / cognitive-situational",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:49:56Z",
+      "completedAt": "2026-10-25T05:53:09Z",
+      "failedSteps": [
+        "situational_video independent scenario"
+      ]
+    },
+    {
+      "id": 121089820543,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / products / seeded browser acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:49:57Z",
+      "completedAt": "2026-10-25T05:52:35Z",
+      "failedSteps": [
+        "verify Bundle V3 browser lifecycle in isolated catalog"
+      ]
+    },
+    {
+      "id": 121089820556,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / security / seeded browser acceptance",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-25T05:49:57Z",
+      "completedAt": "2026-10-25T05:52:03Z",
+      "failedSteps": []
+    },
+    {
+      "id": 121089820564,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / foundation / seeded browser acceptance",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:49:56Z",
+      "completedAt": "2026-10-25T05:52:24Z",
+      "failedSteps": [
+        "run seeded browser acceptance"
+      ]
+    },
+    {
+      "id": 121089820648,
+      "name": "accept-media / images-video",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T05:49:57Z",
+      "completedAt": "2026-10-25T05:53:17Z",
+      "failedSteps": [
+        "media2 independent scenario"
+      ]
+    },
+    {
+      "id": 121091910588,
+      "name": "merge gate / ready PR",
+      "status": "completed",
+      "conclusion": "failure",
+      "startedAt": "2026-10-25T06:02:13Z",
+      "completedAt": "2026-10-25T06:02:24Z",
+      "failedSteps": [
+        "require exact success for the selected route"
+      ]
+    }
+  ],
+  "regression": {
+    "passed": 8399,
+    "failed": 3,
+    "pending": 227,
+    "suiteErrors": 1,
+    "artifactId": 12588424512,
+    "artifactZipSha256": "2b2122de6fe1cef811caacba2aaf6bf488156df4b587c2f338927be1025a185e",
+    "base": {
+      "passed": 8396,
+      "failed": 3
+    },
+    "isolatedExport": {
+      "passed": 3,
+      "failed": 0
+    }
+  },
+  "limits": [
+    "The overall run failed; successful selected jobs remain original evidence, not final candidate qualification",
+    "Skipped unselected jobs are omitted, not called successful",
+    "Later local repairs require independent review and actual final-head mandatory checks"
+  ]
+}

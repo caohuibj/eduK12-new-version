@@ -1,0 +1,81 @@
+{
+  "scope": "User-approved minimal School list refresh correction; no new CI before parent final-diff review",
+  "baseHead": "abe7d6b6029babe30449ec09c069a390ada80a30",
+  "baseTree": "a533ce0625e16137defbd66a9fbcdd39485fdb4a",
+  "authorization": "User explicitly approved clearing displayed feedback and invalidating old in-flight replies on task list refresh; permissions and report opening rules unchanged",
+  "change": "After current API scope / pending-load guard, increment existing feedbackEpoch and clear only component feedback state before list request",
+  "preserved": [
+    "Original report endpoint and fresh read authorization",
+    "Current API scope guard and one pending task-list request",
+    "Existing report READY / WITHHELD / projection gates",
+    "Existing task list retention and retry after read failure",
+    "FORM receipt without additional report right",
+    "Saved responses, report data and Teacher behavior"
+  ],
+  "sourceFiles": {
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": "239c152c85c6adf1432f2daf068838074f929750351c1f4e868d9715dcb98c0d",
+    "server-version/frontend/src/components/education-tools/EducationPersonalReportConsumers.test.tsx": "34196bf4dd8f3f24932f24219895de6ee61f82801ec3a8a6fd0c4894b4bc5922"
+  },
+  "originalFailingCase": {
+    "title": "School clears authorized feedback even when refreshing tasks fails",
+    "byteIdenticalToBase": true,
+    "sha256": "0fe9e0cfc9192fa9252f0eca76e7b8a9499b4eb0a1022680eba3c56f1391086f"
+  },
+  "redBeforeProductionFix": {
+    "passed": 3,
+    "failed": 5,
+    "skipped": 0,
+    "meaning": "Original stale-content assertion plus all4 added old-ready/old-error x refresh-success/refresh-failure cases actually failed"
+  },
+  "greenAfterProductionFix": {
+    "command": "npx vitest run src/components/education-tools/EducationPersonalReportConsumers.test.tsx src/school/SchoolStudentTasks.test.tsx src/school/SchoolTaskReadStates.test.tsx src/school/SchoolBoundContinuation.test.tsx --maxWorkers=2 --reporter=json",
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0,
+    "suites": [
+      {
+        "file": "school/SchoolBoundContinuation.test.tsx",
+        "passed": 7
+      },
+      {
+        "file": "school/SchoolStudentTasks.test.tsx",
+        "passed": 5
+      },
+      {
+        "file": "school/SchoolTaskReadStates.test.tsx",
+        "passed": 12
+      },
+      {
+        "file": "components/education-tools/EducationPersonalReportConsumers.test.tsx",
+        "passed": 8
+      }
+    ]
+  },
+  "raceCoverage": "Old report success/error arrives while list refresh is pending; refresh then succeeds/fails; stale result/error never mounts; explicit subsequent report read still succeeds via same scoped endpoint",
+  "otherChecks": {
+    "npm run typecheck": "exit0; existing inventory/session guards and app+cognitive tsc retained",
+    "eslint": "exit0 for the2 changed TSX files",
+    "git diff --check": "exit0"
+  },
+  "rawEvidence": {
+    "merge355-school-refresh-new-cases-red.json": {
+      "sha256": "f5fa6d4e516bae36bcf8881a5e569e3aae473237484248ee6a73557ec883c819"
+    },
+    "merge355-school-refresh-green.json": {
+      "sha256": "f837075dd0d6b962953590bec9460bf28d76c2df1eb28624b0c9bfe139264ccc"
+    },
+    "merge355-school-refresh-types.log": {
+      "sha256": "fac421ab41a5b0f75f4931405153b09c2c2019e2a4d99522d9c3fd3e302aa3b1"
+    },
+    "merge355-school-refresh-lint.log": {
+      "sha256": "630adca7878f05234ad5285c3976647e05814f0e7b34d9b0e033aff94cf323ae"
+    }
+  },
+  "notRun": [
+    "New GitHub CI/re-run/dispatch",
+    "Full frontend/backend/browser matrices",
+    "PostgreSQL tests or migrations",
+    "Deployment"
+  ],
+  "remaining": "No known local blocker from b376 failure groups; exact final candidate still needs parent review and all selected official gate success. b376 overall failure and unexecuted gates remain unqualified. Prior ci-b376-repair-candidate.json records the earlier abe7 pending state."
+}

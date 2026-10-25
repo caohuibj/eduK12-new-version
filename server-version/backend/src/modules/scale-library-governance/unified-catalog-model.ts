@@ -1,3 +1,4 @@
+import {scaleEntryClassificationTags,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import type { UnifiedScaleLibraryEntry } from '../scale/library/catalog-only-read-model'
 import type { LibraryProduct } from './contracts'
 import type { entryView } from './service'
@@ -11,13 +12,14 @@ export type CatalogExactVersion =
 type CatalogAvailability = { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] }
 export interface StandardCatalogRecord {
   catalogId: string
+  classificationTags?: CatalogClassificationTag[]
   origin: 'STANDARD_REGISTRY'
   instrumentClass: 'STANDARD'
   title: string
   exactVersion: Extract<CatalogExactVersion, { origin: 'STANDARD_REGISTRY' }>
   availability: CatalogAvailability
   authorization: {
-    mechanism: 'INSTRUMENT_AUTHORIZATION'
+    mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE'
     rights: UnifiedScaleLibraryEntry['rights']
     requiresRuntimeCheck: true
     useGrantStatus: 'NOT_EVALUATED'
@@ -26,6 +28,7 @@ export interface StandardCatalogRecord {
 }
 export interface AuthoredCatalogRecord {
   catalogId: string
+  classificationTags?: CatalogClassificationTag[]
   origin: 'AUTHORED'
   instrumentClass: 'CUSTOM_DESCRIPTIVE'
   title: string
@@ -47,6 +50,7 @@ export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: 
   const { launch: _launch, ...availability } = entry.availability
   const standard = { ...entry, availability }
   return {
+    classificationTags: scaleEntryClassificationTags(entry),
     catalogId: `standard:${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`,
     origin: 'STANDARD_REGISTRY', instrumentClass: 'STANDARD', title: entry.identity.canonicalName,
     exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: entry.identity.instrumentKey, instrumentVersion: entry.identity.instrumentVersion },
@@ -54,7 +58,7 @@ export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: 
       status: availability.status === 'NOT_AVAILABLE' ? 'NOT_AVAILABLE' : 'RESTRICTED',
       reasons: [...new Set([...availability.reasons, `${product}_EXACT_USER_AUTHORIZATION_NOT_EVALUATED`])],
     },
-    authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
+    authorization: { mechanism: entry.rights.status === 'SELF_AUTHORED' ? 'SELF_AUTHORED_SOURCE' : 'INSTRUMENT_AUTHORIZATION', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
     standard,
   }
 }

@@ -1,3 +1,4 @@
+import {grantLibraryUseFixture} from '../fixtures/library-distribution'
 import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
@@ -61,7 +62,7 @@ suite('library media atomic publication / isolated PostgreSQL',()=>{
  })
  it('bridges exact authorized cross-owner report media and preserves the frozen original ID',async()=>{
   const f=await application(),approved=await review(admin,f.submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic approval'})
-  await grantUse(admin,approved.entryId!,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
+  await grantLibraryUseFixture(db,admin,approved.entryId!,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
   const [grant]=await db.$queryRaw<Array<{snapshot:{displayDefinition:unknown;compiledDefinition:unknown;provenance:Record<string,unknown>}}>>(Prisma.sql`SELECT t.snapshot FROM survey_tool_grants t JOIN scale_library_use_grants g ON g.survey_tool_grant_id=t.id WHERE g.entry_id=${approved.entryId} AND g.user_id=${reader}`)
   const unit={kind:'SCALE' as const,definition:grant.snapshot.displayDefinition,compiledDefinition:grant.snapshot.compiledDefinition,sourceProvenance:grant.snapshot.provenance}
   const publicationId=randomUUID()

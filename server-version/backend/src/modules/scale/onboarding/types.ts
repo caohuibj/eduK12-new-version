@@ -85,6 +85,8 @@ export interface ScaleInstrumentSourceV1 {
   disclosure?: AudienceDisclosurePolicyV1
   usageRequirements?: InstrumentUsageRequirementsV1
   educationalFeedback?: EducationalFeedbackDefinitionV1
+  /** Repository-reviewed authorship provenance, not a client authorization grant. */
+  authorship?: { revision: number; confirmedBy: string; confirmedOn: string; basis: string }
   scientificReview?: ScaleScientificReviewV1
   candidatePreview?: ScaleCatalogOnlyPreviewV1
   executable?: ScaleExecutableSourceV1

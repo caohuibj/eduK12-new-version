@@ -99,6 +99,19 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
 })
 
 describe('ScaleLibrary page', () => {
+  it('offers the Chinese motivation filter and sends its stable domain ID', async () => {
+    mockList.mockResolvedValue({ code: 0, data: { entries: [entry()] } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
+    await screen.findByText('WHO-5 Well-Being Index')
+    await user.click(screen.getByText('更多筛选'))
+    expect(screen.getByRole('option', { name: '学习动机' })).toHaveValue('MOTIVATION')
+    await user.selectOptions(screen.getByLabelText('主要构念'), 'MOTIVATION')
+    await user.click(screen.getByRole('button', { name: '应用筛选' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({ primaryDomain: 'MOTIVATION' }))
+    expect(screen.getByRole('button', { name: '移除主要构念：学习动机' })).toBeInTheDocument()
+  })
+
   it('keeps progressive filters open and ignores late results after a newer filter request', async () => {
     let resolveOld!: (value: unknown) => void
     mockList.mockResolvedValueOnce({ code: 0, data: { entries: [entry()] } })
@@ -159,6 +172,15 @@ describe('ScaleLibrary page', () => {
     mockList.mockResolvedValue({ code: 0, message: 'ok', data: { schemaVersion: 1, generatedAt: '2026-09-07T00:00:00.000Z', entries: [] } })
     screen.getByRole('button', { name: '应用筛选' }).click()
     await waitFor(() => expect(screen.getByText('没有符合条件的量表')).toBeInTheDocument())
+  })
+
+  it('shows confirmed authored provenance without claiming an external license or direct use grant', async () => {
+    mockDetail.mockResolvedValue({ code: 0, data: { entry: entry({ rights: { status: 'SELF_AUTHORED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] } }) } })
+    render(<MemoryRouter initialEntries={['/scale-library/who5/1.0.0']}><Routes><Route path="/scale-library/:instrumentKey/:instrumentVersion" element={<ScaleLibrary />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText(/自编来源已确认/)).toBeInTheDocument()
+    expect(screen.getByText(/不要求外部许可证；入口及用户使用权限另行核验/)).toBeInTheDocument()
+    expect(screen.queryByText(/暂无可用授权范围/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /开始测评/ })).not.toBeInTheDocument()
   })
 
   it('renders detail governance only when the API supplies the controlled projection', async () => {

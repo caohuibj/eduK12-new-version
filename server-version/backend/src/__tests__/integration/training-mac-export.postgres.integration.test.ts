@@ -4,7 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
-import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase, isActionsServiceDatabase } from './integration-env'
 import { courseCatalogPage } from '../../modules/training-catalog/course'
 import { updateCatalogTags } from '../../modules/training-catalog/tags'
 
@@ -44,13 +44,16 @@ suite('Training Mac migrated PostgreSQL catalog and course export qualification'
     const name = process.env.TRAINING_MAC_FIXTURE_REDIS_NAME ?? ''
     const container = process.env.TRAINING_MAC_FIXTURE_REDIS_ID ?? ''
     const image = process.env.TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST ?? ''
-    if (process.env.CI !== 'true' || process.env.GITHUB_ACTIONS !== 'true' || process.env.NODE_ENV !== 'test'
+    const regressionService=process.env.TRAINING_MAC_FIXTURE_CONTRACT==='actions-regression-service-v1'&&isActionsServiceDatabase(url!)
+      &&container===process.env.CI_REDIS_SERVICE_ID&&/^[a-zA-Z0-9_-]+$/.test(name)&&process.env.REDIS_URL==='redis://localhost:6379/15'
+    if (!regressionService && (process.env.CI !== 'true' || process.env.GITHUB_ACTIONS !== 'true' || process.env.NODE_ENV !== 'test'
       || process.env.TRAINING_MAC_FIXTURE_CONTRACT !== 'actions-isolated-v1'
       || !/^[1-9][0-9]*$/.test(run) || !/^[1-9][0-9]*$/.test(attempt)
       || name !== `training-mac-redis-${run}-${attempt}` || !/^[a-f0-9]{64}$/.test(container)
-      || !/^sha256:[a-f0-9]{64}$/.test(image) || process.env.REDIS_URL !== 'redis://127.0.0.1:6379/15') {
+      || !/^sha256:[a-f0-9]{64}$/.test(image) || process.env.REDIS_URL !== 'redis://127.0.0.1:6379/15')) {
       throw new Error('runtime-created Actions Redis identity and reserved fixture DB required')
     }
+    if(!/^[a-f0-9]{64}$/.test(container)||!/^sha256:[a-f0-9]{64}$/.test(image)||!run||!attempt)throw new Error('Exact Actions Redis identity required')
     // Runtime writes this expiring marker into that exact fresh container/DB.
     // Read it before importing Bull, creating fixtures, or mutating any queue.
     const { createClient } = await import('redis')
@@ -65,7 +68,7 @@ suite('Training Mac migrated PostgreSQL catalog and course export qualification'
     process.env.EXPORT_DIR = root
     await prisma.$connect()
     for (const role of ['TEACHER', 'TEACHER', 'STUDENT'] as const) {
-      const user = await prisma.user.create({ data: { username: `mac-fixture-${randomUUID()}`, nickname: 'SYNTHETIC_PRIVATE_NAME', passwordHash: 'synthetic-not-a-login', role, accountDomain: 'TRAINING' } })
+      const user = await prisma.user.create({ data: { username: `mac-fixture-${randomUUID()}`, nickname: 'SYNTHETIC_PRIVATE_NAME', passwordHash: 'synthetic-not-a-login', role, teacherApproved:role==='TEACHER', accountDomain: 'TRAINING' } })
       users.push(user.id)
     }
     ;[teacher, other, learner] = users

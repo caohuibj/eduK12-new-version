@@ -3,6 +3,8 @@ import { UserRole } from '@prisma/client'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    $queryRaw: vi.fn(async () => []),
+    $transaction: vi.fn(),
     questionnaire: { findUnique: vi.fn() },
     scale: { findUnique: vi.fn() },
     questionnaireScale: { findUnique: vi.fn(), create: vi.fn() },
@@ -44,6 +46,7 @@ const makeRes = () => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$transaction.mockImplementation(async run => run(mockPrisma))
   mockPrisma.questionnaire.findUnique.mockResolvedValue(draftQuestionnaire)
   mockPrisma.questionnaireScale.findUnique.mockResolvedValue(null)
   mockPrisma.questionnaireScale.create.mockResolvedValue({ id: 'qs-1' })

@@ -186,6 +186,12 @@ export interface CompositeReportStatus {
   reportStatus: CompositeReportJobState
 }
 
+/** Opt-in participant projection; unavailable feedback never includes a report. */
+export interface CompositeReportView {
+  generation: CompositeReportStatus
+  report: CompositeReport | null
+}
+
 export type TrainingFlowState = {
   materials: Array<{ blockKey: string; kind: 'MATERIAL'; title?: string; body: string }>
   termination: 'PENDING' | 'COMPLETE' | 'SCREEN_OUT' | 'COMPLETE_EARLY'

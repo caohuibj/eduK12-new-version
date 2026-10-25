@@ -88,7 +88,7 @@ const childFor = async (page, parentId) => {
 
 const enterChild = async (page, parentId, childId) => {
   await page.goto(`${BASE_URL}/student/composite/attempts/${parentId}`, { waitUntil: 'domcontentloaded' })
-  const enter = page.getByRole('button', { name: '开始/继续文字情境测评', exact: true })
+  const enter = page.getByRole('button', { name: '开始/继续情境判断测评', exact: true })
   await enter.waitFor({ state: 'visible', timeout: 30000 })
   await Promise.all([
     page.waitForURL(new RegExp(`/student/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),

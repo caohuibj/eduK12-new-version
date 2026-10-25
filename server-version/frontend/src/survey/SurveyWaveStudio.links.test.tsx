@@ -17,7 +17,8 @@ function fixture(origin:string,bad=false,overrides:WaveOverride={}){
   Object.defineProperty(navigator,'clipboard',{value:{writeText},configurable:true})
   let current={...wave,...overrides},issued=0
   const fetcher=vi.fn(async(input:RequestInfo|URL,_init?:RequestInit)=>{
-    const url=String(input)
+    if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
+  const url=String(input)
     if(url.endsWith('/auth/csrf'))return response({csrfToken:'synthetic-csrf'})
     if(url.includes('/waves?page='))return response({list:[current]})
     if(url.includes('/instruments?page='))return response({list:[]})

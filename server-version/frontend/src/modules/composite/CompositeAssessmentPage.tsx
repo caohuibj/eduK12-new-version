@@ -549,7 +549,7 @@ const CompositeAssessmentContent: React.FC = () => {
         publicMode={publicMode}
         recoveryToken={recoveryToken}
         submitFormSection={(id, sectionId, input) => api.submitFinalFormSection(id, sectionId, input)}
-        submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input)}
+        submitScale={(id, itemId, input) => api.submitFinalScale(id, itemId, input, { response: 'receipt' })}
         onReload={() => loadAttempt(state.id, recoveryToken)}
         onExit={() => void saveAndExit()}
         onCompleted={() => goReport(state.id)}

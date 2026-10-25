@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { ParentPortalError } from '../../modules/parent-portal/contracts'
 
 const state = vi.hoisted(() => ({
-  config: { campusParentReportEnabled: true },
+  config: { campusParentReportEnabled: true, uploadDir: '/tmp/campus-report-routes' },
   parent: {
     children: vi.fn(), reports: vi.fn(), readReport: vi.fn(),
     studentReportOptions: vi.fn(), reportConsentPreview: vi.fn(),

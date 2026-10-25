@@ -72,7 +72,7 @@ describe('situation definition schema', () => {
     ] as SituationDefinitionV1['scenes'][number]['channels']
     const result = validateSituationDefinition(definition)
     expect(result.definition).toBeUndefined()
-    expect(JSON.stringify(result.issues)).toContain('at most 3')
+    expect(result.issues).toContainEqual(expect.objectContaining({path:'scenes.0.channels',message:expect.stringContaining('<=3')}))
   })
 
   it('rejects channel constructs that the scene does not declare', () => {
@@ -292,7 +292,7 @@ describe('static visual stimulus contract', () => {
   it('rejects empty comics, missing alt text, unsupported MIME, and external asset URLs', () => {
     const emptyComic = clone(baseDefinition)
     emptyComic.scenes[0]!.stimulus = { type: 'COMIC', panels: [] } as never
-    expect(JSON.stringify(validateSituationDefinition(emptyComic).issues)).toContain('at least 1')
+    expect(JSON.stringify(validateSituationDefinition(emptyComic).issues)).toContain('>=1')
 
     const missingAlt = clone(baseDefinition)
     missingAlt.scenes[0]!.stimulus = { type: 'IMAGE', asset: imageAsset, altText: '' }

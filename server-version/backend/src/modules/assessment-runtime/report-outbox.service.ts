@@ -110,9 +110,22 @@ export const enqueueCompositeReportForUnit = async (
     if (!rows.length) throw new ReportProcessingLeaseLostError()
     return rows[0].id
   }
+  // This only trims a projection, never the fresh parent or eligibility check.
+  // Enrolled jobs and flow advancement remain active when new enrollment is off.
+  const enrollmentExplicitlyOff = () => (process.env.ASSESSMENT_REPORT_ASYNC_ENABLED ?? 'false') === 'false'
+  const omitDefinition = enrollmentExplicitlyOff()
   let parent: any = await tx.compositeAssessmentAttempt.findUnique({
-    where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
+    where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT,
+      compositeAssessment: omitDefinition ? false : REPORT_PARENT_SELECT.compositeAssessment,
+      frozenActiveSlotSetEncrypted: true },
   })
+  // Normally process configuration is stable. Preserve eligibility if an embedded
+  // host changes it while the database read is pending, without caching authority.
+  if (parent && omitDefinition && parent.asyncReportEpoch !== parent.attemptEpoch && !enrollmentExplicitlyOff()) {
+    parent = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
+    })
+  }
   if (!parent) return null
   const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)
   if(!hasTrainingFlow(parent)&&!asyncEligible)return null
@@ -415,7 +428,7 @@ export const assertNoAcceptedWholeQuestionnaire = async (tx: Pick<Prisma.Transac
 
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
-}): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => (detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
+},assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => !assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
   : traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
   markAssessmentTimeline('whole.transaction_callback_start')
@@ -439,6 +452,9 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
     return { acceptedAt: job.wholeAcceptedAt!, replayed: true }
   }
   if (job.status !== 'WAITING' || job.budgetHeld) throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 1)
+  // Exact standard use is checked in the SAME transaction as durable RAW
+  // acceptance. A previously accepted receipt returns above without new use.
+  if(assertCollectionAllowed)await assertCollectionAllowed(tx)
   const headers = await traceAssessmentPhase('whole.tx.snapshot_headers', () => tx.assessmentUnitSnapshot.findMany({
     where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
     select: { slotKey: true, unitType: true, terminalState: true },

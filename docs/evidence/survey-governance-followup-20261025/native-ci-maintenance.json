@@ -1,0 +1,567 @@
+{
+  "scope": "Exact pinned native source grant checks and image publication identity; fixture maintenance uses real governance for supported new text sources, historical storage contract for already-admitted image/source-capability cases",
+  "runtimeChanges": [
+    "Every unfinished Survey collection transaction validates the exact pinned SJT source authority; existing per-recipient/current policy checks remain fresh",
+    "Media admission compares the compiler-added sourceGrantId to the exact matching grant and does not borrow identical replacement authority",
+    "FINAL replay and historical report policy unchanged; no deletion or Training policy migration"
+  ],
+  "environment": "Original cloud, task-owned synthetic PostgreSQL 16 / Redis; no browser coverage",
+  "reports": [
+    {
+      "privateReport": "merge355-native-wiring-after1",
+      "sha256": "95d65aa5a326a0e1dbe36405c96d73d8b3395b2457ef61771b7a85ff9be416a7",
+      "passed": 28,
+      "failed": 8,
+      "pending": 2,
+      "assertions": [
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL stops only the revoked exact researcher grant, retaining a completed native child and serializing stop with collection",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL completes v1 approval and receipts, then immediately stops in-flight collection after withdrawal",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL completes v2 approval and receipts, then immediately stops in-flight collection after withdrawal",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires durable staged SJT before Cognitive, locks only ordinary answers and commits both child receipts once",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires the latest completed Cognitive epoch before a new SJT, while keeping the reverse composition completable",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle requires explicit Survey authority, pins it through import/publication, and preserves frozen participation after revocation",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle rolls back a real import when its pinned capability expires at the synthetic final database clock",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints accepts exact frozen parent/publication and keeps native out of standalone uniqueness",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects a parent with no frozen content binding rather than upgrading it",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects an existing but different publication in the same project",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects a partial Survey binding",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects dual standalone/Survey ownership",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects a second child for the same parent slot epoch",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects changing frozen surveyAttemptId",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects changing frozen surveyPublicationId",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects changing frozen surveySlotKey",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects changing frozen attemptEpoch",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints rejects changing frozen participantKey",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints does not permit adopting a legacy row into Survey",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints retains the existing parent-wave immutability supporting the binding",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+          "name": "Survey SJT additive host binding PostgreSQL constraints retains the existing published-wave immutability supporting the binding",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-flow.postgres.integration.test.ts",
+          "name": "Survey bounded native conditional flow — real PostgreSQL completes route a with immutable prefix, cross-device recovery and NOT_SHOWN export for the other native slot",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-flow.postgres.integration.test.ts",
+          "name": "Survey bounded native conditional flow — real PostgreSQL completes route b with immutable prefix, cross-device recovery and NOT_SHOWN export for the other native slot",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes retains original source/publication/child image, survives future grant revocation, and keeps shared FINAL/report/raw semantics",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes publishes a replacement IMAGE grant without reviving or being blocked by its revoked predecessor",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes refuses foreign proof/asset, absent frozen pins, deleted/public/changed-identity assets without durable mutations",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-termination.postgres.integration.test.ts",
+          "name": "Survey native host termination and material-only assignment — PostgreSQL accepts native facts before COMPLETE_EARLY and marks the unexecuted tail NOT_SHOWN without requiring its answers",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-termination.postgres.integration.test.ts",
+          "name": "Survey native host termination and material-only assignment — PostgreSQL screens out after accepted native facts without a parent FINAL or report, stores only verified reference identities and recovers lost status safely",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-termination.postgres.integration.test.ts",
+          "name": "Survey native host termination and material-only assignment — PostgreSQL uses the real material-only quota allocator and stable recovery without changing native scientific identity",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release validates the independent V1 scalar definition and its hand-calculated golden cases",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release adds only the synthetic identity and keeps all actual registry packages and rights untouched",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release does not widen V1 admission to unsupported media, assignment, stimulus variants or a hidden parent flow",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-A-A scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-B-B scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL persists both selected variants through native resume, parent FINAL, report and union NOT_SHOWN exports",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL fails closed on missing or changed assignment without redrawing, then denies revoked and withdrawn native access",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts",
+          "name": "SDQ and original shared Scale coexist in the actual Survey admin directory reads both real SDQ and the newly approved original entry, then validates the same exact approval fingerprint",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-native-wiring-after2",
+      "sha256": "abe897efd598d585474e0bb70c8b7abb3c8616f568afe5825e457d44fd2fd065",
+      "passed": 12,
+      "failed": 7,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL stops only the revoked exact researcher grant, retaining a completed native child and serializing stop with collection",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL completes v1 approval and receipts, then immediately stops in-flight collection after withdrawal",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/governed-native.postgres.integration.test.ts",
+          "name": "new native governance grants on isolated synthetic PostgreSQL completes v2 approval and receipts, then immediately stops in-flight collection after withdrawal",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle requires explicit Survey authority, pins it through import/publication, and immediately stops unfinished collection while preserving saved FINAL",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle rolls back a real import when its pinned capability expires at the synthetic final database clock",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes retains original source/publication/child image and saved FINAL/report/raw after exact grant revocation",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes publishes a replacement IMAGE grant without reviving or being blocked by its revoked predecessor",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes refuses foreign proof/asset, absent frozen pins, deleted/public/changed-identity assets without durable mutations",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release validates the independent V1 scalar definition and its hand-calculated golden cases",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release adds only the synthetic identity and keeps all actual registry packages and rights untouched",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release does not widen V1 admission to unsupported media, assignment, stimulus variants or a hidden parent flow",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-A-A scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-B-B scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL persists both selected variants through native resume, parent FINAL, report and union NOT_SHOWN exports",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL fails closed on missing or changed assignment without redrawing, then denies revoked and withdrawn native access",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection checks the same exact capability once per transaction, each recipient grant, and checks again next request",
+          "status": "failed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection refuses revoked or expired pinned authority without substituting a newer capability",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection still rejects the second recipient grant when the common source capability is valid",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-native-bundle-after3",
+      "sha256": "d332ed1b995a50ec16ed04e76abff137d12d7e295d2c957f8b7a423b65d08d9f",
+      "passed": 15,
+      "failed": 0,
+      "pending": 5,
+      "assertions": [
+        {
+          "file": "__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+          "name": "actual content packages: install, FINAL, canonical report and audiences has at least one package; no empty-green content suite",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+          "name": "actual content packages: install, FINAL, canonical report and audiences 'example_descriptive_v1@1.0.0'",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+          "name": "actual content packages: install, FINAL, canonical report and audiences 'synthetic four-type driver'",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+          "name": "unknown declarative packages: installation to frozen report onboards scale_sjt without package-name branches, preserves old report after retirement",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+          "name": "unknown declarative packages: installation to frozen report onboards cognitive_scale without package-name branches, preserves old report after retirement",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+          "name": "unknown declarative packages: installation to frozen report supports admin authoring and independent signed approval without exposing signing material",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+          "name": "unknown declarative packages: installation to frozen report rejects changed code-catalog content before saving while allowing the identical immutable package",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+          "name": "unknown declarative packages: installation to frozen report requires a new independent signed review to restore HOLD and never restores RETIRED",
+          "status": "skipped"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle requires explicit Survey authority, pins it through import/publication, and immediately stops unfinished collection while preserving saved FINAL",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+          "name": "Survey SJT explicit entry authority with real published source and frozen FINAL lifecycle rolls back a real import when its pinned capability expires at the synthetic final database clock",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes retains original source/publication/child image and saved FINAL/report/raw after exact grant revocation",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes publishes a replacement IMAGE grant without reviving or being blocked by its revoked predecessor",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-image.postgres.integration.test.ts",
+          "name": "Survey native staged image: formal source, frozen authorization and actual local bytes refuses foreign proof/asset, absent frozen pins, deleted/public/changed-identity assets without durable mutations",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release validates the independent V1 scalar definition and its hand-calculated golden cases",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release adds only the synthetic identity and keeps all actual registry packages and rights untouched",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Original synthetic V1 package contract, not an actual registry release does not widen V1 admission to unsupported media, assignment, stimulus variants or a hidden parent flow",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-A-A scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+          "name": "Survey native V1 TEXT with real PostgreSQL and synthetic registry only shares exact V1 path-B-B scorer, raw, replay, receipt, report and export with standalone Training",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL persists both selected variants through native resume, parent FINAL, report and union NOT_SHOWN exports",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+          "name": "Survey native questionnaire variants — real PostgreSQL fails closed on missing or changed assignment without redrawing, then denies revoked and withdrawn native access",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-native-unit-final",
+      "sha256": "46ded03136a3051e8f40efcf69e8817a693d86449301d9e5ae8f8ed6a556c14a",
+      "passed": 26,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing matches the pinned grant added by current compilation without borrowing an identical replacement",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing uses the same exact grant and release-pin policy for native upload images, not just their asset IDs",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing validates only the exact frozen replacement grant, without an unrelated expired chain blocking it",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing fails closed for multiple exact candidates or an identity changed between selection and locked validation",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing uses current grant admission and original release retention without changing private ownership",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing propagates revoked/source-stopped admission and rejects an unrelated active grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy COURSE_GRANT_V1 with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy FUTURE with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing never replaces source permission policy undefined with a Survey grant",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing accepts only the exact separately authorized Survey source and retains private asset checks",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing rejects missing source retention, altered hash, public or deleted assets",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing does not fall back to native ownership for malformed source provenance or substituted display",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/catalog-sjt-media.authorization.test.ts",
+          "name": "catalog SJT media authority is release-bound, not asset-ID borrowing leaves native Survey image ownership checks intact",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors constructs each unit descriptor and option table once across schema and participant projection",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors enumerates dictionary definitions once and never constructs unused option tables",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors restores and exports quality raw answers independently of scored items with an author codebook",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors indexes missing entries once per participant unit and retains first occurrence and matrix fallback",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors preserves ordered raw value types and complete frozen metadata",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors shares only static metadata while keeping participant values and missing reasons independent",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps selected row values and full-schema collision IDs identical to complete output",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors keeps descriptors and option storage within one request",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for raw",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "name": "Request-local frozen Survey raw descriptors retains the exact post-compute publication fence for dictionary",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection checks the same exact capability once per transaction, each recipient grant, and checks again next request",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection refuses revoked or expired pinned authority without substituting a newer capability",
+          "status": "passed"
+        },
+        {
+          "file": "__tests__/survey/sjt-current-collection.contract.test.ts",
+          "name": "current pinned native source distribution authority at collection still rejects the second recipient grant when the common source capability is valid",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "New governed IMAGE onboarding remains denied without an original-author governed-media consent path; source-capability protected sources likewise need a governed submission identity preserving the exact distributor. Historical fixture insertion does not claim successful new authorization",
+    "Original failed invocations retained, including a lifecycle fixture setup typo fixed independently; no whole-CI success claimed",
+    "No claim that two concurrent scoring requests consume CPU only once"
+  ]
+}

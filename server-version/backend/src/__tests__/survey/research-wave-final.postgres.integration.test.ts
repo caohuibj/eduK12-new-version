@@ -1,10 +1,11 @@
+import {publishSurveyMeasurementDraft} from '../../modules/survey/measurement-publication.service'
 import { prisma } from '../../config/database'
 import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { createHash,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
-import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
+import { createDraft,getDraft,updateDraft,reviseDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
 import { transitionResearchProject } from '../../modules/survey/project-lifecycle'
 import { prepareWave,openWave,updateWaveEntryToken,transitionWave } from '../../modules/survey/waves.publish'
@@ -88,6 +89,10 @@ async function wave(title:string,ids:string[],allowNewParticipants=false,checkpo
     instrumentIds:ids,allowNewParticipants,
     ...(checkpoint?{checkpointPolicy:{schemaVersion:1 as const,enabled:true as const,ttlHours:2}}:{}),
   })
+  for(const id of ids){
+    const draft=await db.surveyInstrumentDraft.findUniqueOrThrow({where:{id}})
+    if(draft.kind!=='FORM')await publishSurveyMeasurementDraft(ownerId,targetProjectId,id,draft.revision)
+  }
   const prepared=await prepareWave(ownerId,targetProjectId,w.id,w.revision)
   expect(prepared.runtimeReady).toBe(true)
   const frozen=await getWave(ownerId,targetProjectId,w.id)
@@ -298,6 +303,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       id:true,definitionDigest:true,resultsHash:true,
     }})
     expect(earlier.length).toBe(2)
+    const publishedScale=await getDraft(ownerId,projectId,toolIds.scale)
+    await reviseDraft(ownerId,projectId,toolIds.scale,publishedScale.revision)
     const scaleBefore=await getDraft(ownerId,projectId,toolIds.scale)
     const revised=structuredClone(scaleBefore.definition) as unknown as ScaleDraft
     revised.items[1].reverse=false

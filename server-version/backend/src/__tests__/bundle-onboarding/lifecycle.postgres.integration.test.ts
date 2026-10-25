@@ -1,3 +1,4 @@
+import {publishTrainingSourcesFixture,publishStaticMeasurementFixture} from '../fixtures/published-measurement'
 import { describe,it,expect,beforeAll,afterAll,vi } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
 import { randomUUID,createHmac } from 'node:crypto'
@@ -34,7 +35,7 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     process.env.DATABASE_URL=url!;process.env.BUNDLE_PRODUCTS_ENABLED='true';process.env.BUNDLE_REVIEW_SIGNING_KEY=secret
     db=new PrismaClient({datasources:{db:{url}}})
     for(const [id,role] of [[actor.userId,'ADMIN'],[reviewer,'ADMIN'],[student,'STUDENT']] as const)await db.user.create({data:{id,username:id,passwordHash:'fixture-only',role}})
-    courseId=(await db.course.create({data:{creatorId:actor.userId,title:'B3 fixture',courseCode:'B3-'+suffix,status:'PUBLISHED'}})).id
+    courseId=(await db.course.create({data:{creatorId:actor.userId,title:'B3 fixture',courseCode:'B3-'+suffix,courseType:'TRAINING_COURSE',status:'PUBLISHED'}})).id
     await db.courseStudent.create({data:{courseId,studentId:student,status:'ACTIVE'}})
     scaleId=((await db.scale.findUnique({where:{code:'who5'}})) ?? await db.scale.create({data:{code:'who5',name:'WHO5 isolated fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'STANDARD',instrumentVersion:'1.0.0',definition:scale.definition as any,definitionHash:hashScaleDefinition(scale.definition),itemCount:5,dimensionCount:1}})).id
     scalePreviousStatus=(await db.scale.findUniqueOrThrow({where:{id:scaleId}})).status
@@ -42,6 +43,8 @@ suite('unknown declarative packages: installation to frozen report',()=>{
     const entry=requireCognitiveRegistryEntry('gonogo','1.0.0','1.0.0'),freeze=freezeAssignmentProfile({entry,profile:'standard',baseConfig:{totalTrials:120,nogoRatio:0.25,stimulusMs:800,isiMs:500,validRtFloorMs:100,report:{reportVersion:'1.0.0',referenceMode:'none'}}})
     const config=await db.cognitiveTestConfig.upsert({where:{testType_configVersion:{testType:'gonogo',configVersion:'1.0.0'}},update:{},create:{testType:'gonogo',configVersion:'1.0.0',name:'B3 fixture',status:'PUBLISHED',engineVersion:'1.0.0',scoringVersion:'1.0.0',config:freeze.resolvedConfig as any,accessPolicy:'OPEN'}})
     assignmentId=(await db.cognitiveAssignment.create({data:{configId:config.id,courseId,createdBy:actor.userId,title:'Go/No-Go',status:'PUBLISHED',listedStandalone:true,...freezeDataForWrite(freeze)}})).id
+    const situational=scaffoldPackage('synthetic_publication_prerequisite').manifest.definition.slots.find(slot=>slot.unitType==='SITUATIONAL')!
+    await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[scaleId],assignmentIds:[assignmentId],situational:[{instrumentKey:situational.instrumentKey,instrumentVersion:situational.instrumentVersion}]})
     runtime=await import('../../modules/composite/composite.service');analysis=await import('../../modules/bundle-product/analysis')
   },60000)
   afterAll(async()=>{

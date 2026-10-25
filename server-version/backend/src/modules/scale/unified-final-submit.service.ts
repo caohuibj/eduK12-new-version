@@ -311,8 +311,12 @@ const prepareUnifiedScaleWrite = async (
 
 export const submitUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
+  receiptOnly = false,
 ) => {
   const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs, wholeReceipt?.studyReceipt)
+  const responseRuntime = { assessmentId: child.id, attemptEpoch: child.attemptEpoch,
+    compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+    encrypted: child.runtimeSnapshotEncrypted, runtime: snapshot }
 
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
@@ -328,7 +332,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         payloadHash,
         replayed: true,
-        assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse(child)),
+        assessment: wholeReceipt || receiptOnly ? null : await loadScaleAssessmentForResponse(child, {}, undefined, responseRuntime),
         parent: null,
       }
     }
@@ -342,7 +346,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
-      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !wholeReceipt },
+      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !(wholeReceipt || receiptOnly) },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
@@ -360,7 +364,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
       return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
-    await assertTrainingScaleCollectionAllowed(tx, [child.scaleId])
+    await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],child.compositeAttemptId,child.compositeItemId?[child.compositeItemId]:[],wholeReceipt)
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
@@ -453,7 +457,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     submissionId,
     payloadHash,
     replayed: committed.replayed,
-    assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse({ ...committed.current, scale: child.scale })),
+    assessment: wholeReceipt || receiptOnly ? null : await loadScaleAssessmentForResponse({ ...committed.current, scale: child.scale }, {}, undefined, responseRuntime),
     parent: null,
   }
 }
@@ -558,7 +562,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
-      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId])
+      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],unit.child.compositeAttemptId,unit.child.compositeItemId?[unit.child.compositeItemId]:[],execution)
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())

@@ -15,7 +15,8 @@ function fixture(overrides:Record<string,unknown>={}){
   const bodies:Record<string,unknown>[]=[]
   const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
   const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
-    const url=String(input)
+    if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
+  const url=String(input)
     if(url.endsWith('/auth/csrf'))return response({csrfToken:'csrf'})
     if(url.includes('/waves?page='))return response({list:[current]})
     if(url.includes('/instruments?page='))return response({list:[]})

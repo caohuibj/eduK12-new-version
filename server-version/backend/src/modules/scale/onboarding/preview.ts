@@ -1,3 +1,4 @@
+import { selfAuthoredSourceProof } from './self-authored'
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
 import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
 import { compileScalePolicy } from '../policy/compile'
@@ -48,6 +49,7 @@ export const previewScaleInstrument = (input: {
     const refs = input.authorizationRefs?.length
       ? input.authorizationRefs
       : [...new Set(input.authorizations.map(record => record.authorizationId))]
+    const authoredHash = selfAuthoredSourceProof(source)
     const policy = {
       schemaVersion: 1 as const,
       revision: 1,
@@ -56,7 +58,8 @@ export const previewScaleInstrument = (input: {
       deploymentModes: modes,
       commercialNature: input.commercialNature,
       requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
-      authorizationRefs: refs.length ? refs : ['__MISSING_AUTHORIZATION__'],
+      authorizationRefs: authoredHash ? [] : (refs.length ? refs : ['__MISSING_AUTHORIZATION__']),
+      ...(authoredHash ? { selfAuthoredSourceHash: authoredHash } : {}),
       runtimePolicyHash: runtime.runtimePolicyHash,
       ...(localization?.localizationVersion ? { localizationVersion: localization.localizationVersion } : {}),
       inFlightCompletion: 'FROZEN_DEADLINE' as const,

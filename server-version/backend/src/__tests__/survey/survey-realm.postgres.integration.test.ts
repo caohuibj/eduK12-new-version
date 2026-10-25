@@ -60,7 +60,7 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     const admin=await db.user.create({data:{
       username:'survey_admin_'+randomUUID().replace(/-/g,''),
       passwordHash:await hashPassword(initialPassword),role:'ADMIN',
-      accountDomain:'LEGACY',platformRole:'SYSTEM_ADMIN',
+      accountDomain:'LEGACY',platformRole:'STANDARD',
     }})
     adminId=admin.id
     await db.adminEntryGrant.create({data:{id:randomUUID(),userId:adminId,entry:'SURVEY',grantedBy:adminId}})

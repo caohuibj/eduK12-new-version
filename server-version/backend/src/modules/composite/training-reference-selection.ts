@@ -10,6 +10,7 @@ import {resolveFormalReferenceRelease} from '../measurement-content/formal-refer
 import type {AssessmentReferenceEntry} from '../assessment-reference/reference'
 import type {VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import type {TrainingContentSnapshot} from './training-content-binding'
+import {validateTrainingStandardDerivedContent} from './training-standard-content'
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().min(1).max(240)
 export const trainingReferenceKindSchema=z.enum(['normative_distribution','criterion_threshold','descriptive_sample','theoretical_range'])
 export const trainingReferencePolicySchema=z.object({policyVersion:z.literal('EXACT_POPULATION_PRIORITY_V1'),measurementReleaseId:uuid,
@@ -38,6 +39,10 @@ export async function validateTrainingReferenceRelease(tx:Prisma.TransactionClie
   if(entry.metricKey!==definition.scoreKey||entry.referenceKind!==definition.referenceKind)trainingReferenceFail('ENTRY_INVALID');return definition})
  if(new Set(entries.map(referenceEntryKey)).size!==entries.length)trainingReferenceFail('ENTRY_INVALID')
  const scope=release.scope
+ if(input.unit.source.standardCombination){
+  await validateTrainingStandardDerivedContent(tx,input.unit,release,{compositeId:input.compositeId,ownerId:input.ownerId})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,status:release.status,measurementReleaseId:input.unit.measurement.releaseId,entries}
+ }
  if(scope.kind==='PLATFORM')return resolveFormalReferenceRelease(tx,{releaseId:release.releaseId,contentHash:release.contentHash,
   measurementReleaseId:input.unit.measurement.releaseId,purpose:input.purpose},release)
  if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==input.ownerId)trainingReferenceFail('SCOPE_DENIED')
@@ -54,6 +59,7 @@ export async function attachTrainingReferenceSelection(tx:Prisma.TransactionClie
  const policies=new Map<string,z.infer<typeof trainingReferencePolicySchema>>()
  for(const selected of selection.units){
   const unit=byItem.get(selected.itemId);if(!unit)trainingReferenceFail()
+  if(unit.source.standardCombination)trainingReferenceFail('STANDARD_COMBINATION_POLICY_FIXED')
   const measurement=input.releases.get(unit.measurement.releaseId)
   if(!measurement||measurement.layer!=='MEASUREMENT')trainingReferenceFail()
   const policy:z.infer<typeof trainingReferencePolicySchema>={policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:unit.measurement.releaseId,choices:[]}

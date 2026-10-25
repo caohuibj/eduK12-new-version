@@ -4,6 +4,7 @@ import { surveySituationalReceiptReferenceSchema } from './situational-native.co
 import {joinMemorableStudy,recoverMemorableIdentity,completeMemorableReset,joinGeneratedCodeStudy} from './memorable-code.service'
 import {memorableCodeRateLimit} from './memorable-code.rate'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
+import {isQuestionnaireCompletionAdmissionBusyError} from '../../services/questionnaireCompletionAdmission'
 import {authorizeSurveyMaterial} from './material.authorization'
 import {serveSurveyMaterial} from './material.delivery'
 import {SurveyMediaError} from './media.references'
@@ -60,6 +61,7 @@ const submission=proof.extend({submissionId:z.string().min(16).max(200),
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
   catch(e){
+    if(isQuestionnaireCompletionAdmissionBusyError(e))return next(e)
     if(e instanceof BoundedAdmissionBusyError)return error(res,'编码验证繁忙，请稍后再试',-1,503)
     if(e instanceof SurveySituationalProtocolError)return error(res,e.code,-1,409)
     if(e instanceof z.ZodError)return error(res,'输入不合法',-1,400)

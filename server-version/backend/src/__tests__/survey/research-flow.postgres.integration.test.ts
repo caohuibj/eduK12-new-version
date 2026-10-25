@@ -1,3 +1,4 @@
+import {publishSurveyMeasurementDraft} from '../../modules/survey/measurement-publication.service'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
@@ -63,6 +64,8 @@ suite('Survey Flow real PostgreSQL assignment / final / withdrawal',()=>{
       linkageNoticeConfirmed:true,instrumentIds:[formId,scaleId],
       flowDefinition:definition,
     })
+    const current=await db.surveyInstrumentDraft.findUniqueOrThrow({where:{id:scaleId}})
+    await publishSurveyMeasurementDraft(owner,project,scaleId,current.revision)
     const prepared=await prepareWave(owner,project,draft.id,draft.revision)
     expect(prepared.runtimeReady).toBe(true)
     const frozen=await getWave(owner,project,draft.id)

@@ -1,5 +1,6 @@
 import apiClient, { sessionFetch } from './client'
 import type { ScaleLibraryEntry } from './scaleLibrary'
+import {catalogQuery,type CatalogClassificationTag,type CatalogFilters,type CatalogTagFacets} from './catalogDiscovery'
 
 export type GovernanceMediaItem = { assetId: string; contentHash: string; mimeType: string; sizeBytes: number; assetVersion: string; usages: string[]; rights: 'AUTHOR_SHARED_FOR_BOUND_SCALE'; dependencyReleaseIds: string[] }
 export type GovernanceMediaManifest = { schemaVersion: 1; releaseIds: string[]; items: GovernanceMediaItem[]; manifestHash: string }
@@ -24,12 +25,13 @@ export type EducationGrantRequest = { product: EducationDistributionProduct; rel
 
 export type GovernanceCatalogRecord = {
   catalogId: string; title: string; origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE';
+  classificationTags?: CatalogClassificationTag[];
   exactVersion: { origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentKey?: string; instrumentVersion?: string; entryId?: string; releaseId?: string; releaseVersion?: string; contentHash?: string };
   availability: { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] };
-  authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
+  authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
   standard?: ScaleLibraryEntry; authored?: GovernanceEntry;
 }
-export type GovernanceCatalogPage = { schemaVersion: 1; list: GovernanceCatalogRecord[]; generatedAt: string; page: number; pageSize: number; hasMore: boolean }
+export type GovernanceCatalogPage = { schemaVersion: 1; list: GovernanceCatalogRecord[]; generatedAt: string; page: number; pageSize: number; hasMore: boolean;tagFacets?:CatalogTagFacets }
 
 async function request<T>(product: GovernanceProduct, path: string, payload?: unknown): Promise<T> {
   const url = `/${product.toLowerCase()}/scale-library-governance${path}`
@@ -52,7 +54,7 @@ async function request<T>(product: GovernanceProduct, path: string, payload?: un
   return body.data
 }
 export const governanceApi = (product: GovernanceProduct) => ({
-  catalog: (page = 1, pageSize = 25) => request<GovernanceCatalogPage>(product, '/catalog?' + new URLSearchParams({ page: String(page), pageSize: String(pageSize) })),
+  catalog: (page = 1, pageSize = 25, filters?:CatalogFilters) => {const query=new URLSearchParams({page:String(page),pageSize:String(pageSize)});if(filters)for(const [key,value] of new URLSearchParams(catalogQuery(page,filters,true)))if(key!=='page')query.set(key,value);return request<GovernanceCatalogPage>(product,'/catalog?'+query)},
   catalogDetail: (row: GovernanceCatalogRecord) => request<{ entry: GovernanceCatalogRecord }>(product, row.origin === 'STANDARD_REGISTRY' ? '/catalog/standard/' + encodeURIComponent(row.exactVersion.instrumentKey || '') + '/' + encodeURIComponent(row.exactVersion.instrumentVersion || '') : '/catalog/authored/' + encodeURIComponent(row.exactVersion.entryId || '')),
   capabilities: () => request<GovernanceCapabilities>(product, '/capabilities'),
   source: (sourceId: string) => request<GovernanceSource>(product, '/sources/' + encodeURIComponent(sourceId)),

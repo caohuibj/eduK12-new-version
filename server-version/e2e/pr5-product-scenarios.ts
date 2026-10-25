@@ -154,12 +154,12 @@ async function finishRuntime(page, attemptId) {
   page.on('response', captureParentRead)
   page.on('pageerror', captureClientError)
   try {
-  await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).click()
+  await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).click()
   for (const scene of [1, 2]) {
     await page.getByText(`情境 ${scene} / 2`, { exact: true }).waitFor()
     await page.locator('input[type="radio"]').first().click()
     await page.waitForFunction(() => document.querySelector('input[type="radio"]')?.checked === true)
-    if (scene === 1) await page.getByRole('button', { name: '情境 2，未完成', exact: true }).click()
+    if (scene === 1) await page.getByRole('button', { name: '情境 2，未作答', exact: true }).click()
   }
   const final = page.waitForResponse(response => response.request().method() === 'POST' && response.url().includes(`/attempts/${attemptId}/items/`) && response.url().endsWith('/submit'))
   await page.getByRole('button', { name: '提交测评', exact: true }).click()

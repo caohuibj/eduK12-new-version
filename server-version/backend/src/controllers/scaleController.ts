@@ -1031,7 +1031,7 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId],assessment.compositeAttemptId,assessment.compositeItemId?[assessment.compositeItemId]:[])
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answer = { itemCode, responseValue, responseTimeMs: responseTimeMs === undefined ? undefined : Number(responseTimeMs), answeredAt: new Date().toISOString() }
         try {
@@ -1108,7 +1108,7 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId],assessment.compositeAttemptId,assessment.compositeItemId?[assessment.compositeItemId]:[])
 
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answers = parsed.data.answers.map((input) => ({
@@ -1194,7 +1194,7 @@ export const scaleController = {
           return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(assessment, undefined, tx)) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId],assessment.compositeAttemptId,assessment.compositeItemId?[assessment.compositeItemId]:[])
         const contextSnapshot = assessment.questionnaireAssessmentId
           ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
           : null

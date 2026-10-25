@@ -376,8 +376,9 @@ export const createGrant = async (input: {
 }
 
 export const deleteGrant = async (id: string) => {
-  const existing = await prisma.materialGrant.findUnique({ where: { id }, select: { id: true } })
+  const existing = await prisma.materialGrant.findUnique({ where: { id }, select: { id: true,resourceType:true } })
   if (!existing) throw grantNotFound()
+  if(existing.resourceType==='STANDARD_COMBINATION')throw grantBadRequest('精确组合使用权须通过版本化撤销接口处理')
   await prisma.materialGrant.delete({ where: { id } })
   return { id }
 }

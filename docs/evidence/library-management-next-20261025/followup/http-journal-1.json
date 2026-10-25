@@ -1,0 +1,4 @@
+{
+  "scope": "isolated synthetic HTTP; no real tool or grant writes",
+  "requests": []
+}

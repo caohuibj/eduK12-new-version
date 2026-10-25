@@ -43,7 +43,7 @@ describe('learning motivation first wave',()=>{
  it('freezes original reference identity in canonical metrics without raw response facts',()=>{
   const s=sources[0],e=s.executable!,r=result(s,3,'8'),runtime=compileScaleRuntime({instrumentKey:s.identity.instrumentKey,instrumentVersion:'1.0.0',definition:e.definition,sourceDefinitionHash:hashScaleDefinition(e.definition)})
   const core=projectScaleCanonicalUnitResult({result:r,runtime,contextHash:null,referenceBindings:e.references.map(ref=>({referenceKey:ref.instrumentKey,referenceVersion:ref.referenceVersion,referenceHash:referenceSetHash(ref)}))})
-  expect(core.metrics[0].scaleReference).toMatchObject({subjectKey:e.definition.versionAxes!.subjectKey,schoolStage:'junior_secondary',originalReferenceVersion:'wave1-20261001-v1',originalReferenceHash:referenceSetHash(e.references[0])});expect(JSON.stringify(core)).not.toContain('responseValue')
+  expect(core.metrics[0].scaleReference).toMatchObject({subjectKey:e.definition.versionAxes!.subjectKey,schoolStage:'junior_secondary',originalReferenceVersion:e.references[0].referenceVersion,originalReferenceHash:referenceSetHash(e.references[0])});expect(JSON.stringify(core)).not.toContain('responseValue')
  })
  it('rejects cross-subject references, empirical fiction and absent report QC',()=>{
   const s=sources.find(s=>s.catalog.scientificMaturity==='PILOT')!,pkg=structuredClone(projectScalePackage(s)!)

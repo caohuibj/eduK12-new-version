@@ -1,0 +1,56 @@
+{
+  "branch": "work/dot-356-integrated-20261025",
+  "mainAtInspection": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "originalDot356": "e1784a86647890d3b2fe1b565f794ddc91ae09d0",
+  "frozen355Prerequisite": "cf08b04ef9624168dddde51c8cb05b0101c0fbc5",
+  "dotAuthoredSource": "02681f0a1a2b4c1d168cf9813cc4133949b72f22",
+  "versionSource": "936fd14fce06b178e68146be020db9a01c48c3ac",
+  "librarySource": "fa0e6b40b75e0dd1651862ec5632419b3d8e56c0",
+  "integratedProductCheckpoint": "188abe8515f2899df820d48662912a2f90512fb0",
+  "integratedProductTree": "e7565a6465f1cae1dde9ca7a18aca703a4a0dfd9",
+  "method": "Original dot356 ancestor retained; frozen PR355 prerequisite merged locally; dot5, B13 and C7 commits cherry-picked once, excluding duplicate prerequisite patches. C final empty backup commit omitted.",
+  "conflicts": [
+    {
+      "file": "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+      "resolution": "Preserved newer PR355 routed Survey tests unchanged. Preserved C original legacy shared-view tests in ScaleLibraryGovernance.legacy-rendering.test.tsx unchanged. Both run, no assertion dropped."
+    }
+  ],
+  "checks": {
+    "frontendFocused": {
+      "passed": 7,
+      "failed": 0,
+      "files": 3,
+      "kind": "local focused integration check, not full acceptance"
+    },
+    "unmergedPaths": [],
+    "productWhitespace": "pass; three inherited raw evidence logs retain blank EOF, not edited as historical artifacts",
+    "ci": "not triggered",
+    "database": "not migrated or changed",
+    "deployment": "not changed",
+    "integratedBranchRemote": "not pushed in this checkpoint"
+  },
+  "backupRemoteReadback": {
+    "tool-onboarding-next-20261025": {
+      "sha": "936fd14fce06b178e68146be020db9a01c48c3ac",
+      "actions": 0,
+      "prs": 0
+    },
+    "work/library-management-next-20261025": {
+      "sha": "fa0e6b40b75e0dd1651862ec5632419b3d8e56c0",
+      "actions": 0,
+      "prs": 0
+    }
+  },
+  "excludedWip": [
+    "server-version/backend/src/modules/composite/composite.service.ts",
+    "server-version/backend/src/modules/composite/training-standard-combination.ts",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-vertical.fixture.ts",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-vertical.postgres.integration.test.ts"
+  ],
+  "validationLimits": [
+    "B WIP achieved FINAL and normalized score12 but parent remained IN_PROGRESS; not included in published code",
+    "Existing 11 fixture failures not yet reclassified on integrated baseline",
+    "Full types, database migration, cross-entry version and report lifecycle, cold/warm benchmarks not rerun",
+    "355 is still separately controlled by user; reconcile its eventual merged main delta once, not continuously"
+  ]
+}

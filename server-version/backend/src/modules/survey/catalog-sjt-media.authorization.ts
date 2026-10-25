@@ -35,19 +35,22 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   // Select by the immutable identity before admission. An unrelated older
   // grant for this source may legitimately have lost its distribution chain.
   // Never replace the unit's pinned provenance with any currently valid grant.
-  const matches=(snapshot:CatalogSnapshot)=>canonicalHash(snapshot.displayDefinition)===canonicalHash(unit.definition)
+  const pinnedGrant=unit.sourceProvenance.sourceGrantId
+  const matches=(snapshot:CatalogSnapshot,grantId:string)=>(pinnedGrant===undefined||pinnedGrant===grantId)
+    && canonicalHash(snapshot.displayDefinition)===canonicalHash(unit.definition)
     && canonicalHash(snapshot.compiledDefinition)===canonicalHash(unit.compiledDefinition)
     && canonicalHash({...snapshot.provenance,originalSource:snapshot.provenance.source??null,source:snapshot.ref,
-      definitionDigest:snapshot.definitionDigest,adapterVersion:snapshot.adapterVersion})===canonicalHash(unit.sourceProvenance)
+      definitionDigest:snapshot.definitionDigest,adapterVersion:snapshot.adapterVersion,
+      ...(pinnedGrant===undefined?{}:{sourceGrantId:grantId})})===canonicalHash(unit.sourceProvenance)
   const candidates = await tx.$queryRaw<Array<{ id: string;snapshot:CatalogSnapshot }>>`SELECT id,snapshot FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND snapshot->'ref'=${JSON.stringify(source)}::jsonb ORDER BY id`
   const selected=candidates.filter(row=>{
-    try{return matches(row.snapshot)}catch{return false}
+    try{return matches(row.snapshot,row.id)}catch{return false}
   })
   if(selected.length!==1)return fail()
   const snapshots=await catalogSnapshotsForDrafts(tx,userId,[selected[0].id])
   const checked=snapshots.get(selected[0].id)
-  const bound=checked&&matches(checked)?checked:undefined
+  const bound=checked&&matches(checked,selected[0].id)?checked:undefined
   if (!bound) return fail()
   const release = await tx.sjtAuthorRelease.findUnique({ where: { id: source.sourceId }, select: {
     status: true, authorizationPolicy: true, instrumentVersion: true, definitionHash: true,

@@ -33,6 +33,7 @@ function fixture(){
     lockedAnswersCipher:encryptUnifiedRuntimePayload({}),lockedAnswersHash:canonicalHash({}),
     retentionReviewAt:new Date(),startedAt:new Date(),interruptedAt:null,finishedAt:null,result:null}
   const tx={$queryRaw:vi.fn().mockResolvedValue([{id:'locked'}]),surveyWaveAttempt:{findFirst:vi.fn().mockResolvedValue(attempt)},
+    situationalAttempt:{findMany:vi.fn().mockResolvedValue([])},
     surveyConsent:{findFirst:vi.fn().mockResolvedValue({id:'consent'})},
     surveyCognitiveResult:{findUnique:vi.fn(),create:vi.fn(async({data,select}:any)=>Object.fromEntries(Object.keys(select).map(key=>[key,data[key]])))},
     surveyCognitiveSession:{findFirst:vi.fn(async(_args:any)=>current),findMany:vi.fn(async(args:any)=>

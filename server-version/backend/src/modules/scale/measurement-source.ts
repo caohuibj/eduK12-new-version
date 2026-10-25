@@ -16,6 +16,12 @@ function fail(code: string): never { throw new ContentReleaseError('CONTENT_SCAL
 export async function readManagedScaleSourceRights(tx: Prisma.TransactionClient, scale: Scale, at: Date) {
   const resolution = await resolveScaleStartDeployment({ db: tx, scale, now: at })
   if (resolution.kind !== 'MANAGED_V2' || !resolution.allowNewStarts) fail('MANAGED_SOURCE_LICENSE_REQUIRED')
+  if (resolution.deployment.policy.selfAuthoredSourceHash) return {
+    basis: 'SELF_AUTHORED_SOURCE' as const, sourceHash: resolution.deployment.policy.selfAuthoredSourceHash,
+    validFrom: null, validTo: null, runtimePolicyHash: resolution.runtimePolicy.runtimePolicyHash,
+    deploymentPolicyHash: resolution.deployment.policyHash, deploymentRevision: resolution.deployment.revision,
+    authorization: null, authorizationStateHash: null,
+  }
   const rows = await tx.instrumentAuthorization.findMany({ where: { instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion },
     orderBy: [{ authorizationKey: 'asc' }, { version: 'desc' }] })
   for (const row of rows) if (hashInstrumentAuthorizationRecord(mapAuthorizationRowToDomain(row)) !== row.recordHash) fail('LICENSE_HASH_MISMATCH')

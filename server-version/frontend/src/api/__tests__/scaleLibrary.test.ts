@@ -25,4 +25,11 @@ describe('scale library API', () => {
       params: { locale: 'zh-CN', territory: 'CN' },
     })
   })
+
+  it('forwards stable classification tag IDs with the keyword to the catalog', async () => {
+    await getScaleLibrary({ keyword: '学生 学习动机', tags: 'student_self_report,MOTIVATION' })
+    expect(mockGet).toHaveBeenCalledWith('/scale-library', {
+      params: { keyword: '学生 学习动机', tags: 'student_self_report,MOTIVATION' },
+    })
+  })
 })

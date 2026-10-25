@@ -1,0 +1,174 @@
+{
+  "scope": "Explicit bounded Archiver output queue for existing XLSX exporter; user approved minimal production resource correction",
+  "officialFailure": {
+    "run": 40166806895,
+    "head": "9065bb0ee73916d5e35f913b389f2ea55a9f0818",
+    "job": 121089495363,
+    "test": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+    "observedRows": 533,
+    "requiredRowsLessThan": 300,
+    "correction": "300 is a row count, not milliseconds; earlier narrative corrected"
+  },
+  "diagnosis": "Installed archiver defaults to an independent 1MiB Transform queue; the small destination writable threshold does not constrain it. Local pre-change probes can pass and do not refute the official failed observation.",
+  "change": "Pass through explicit highWaterMark 64KiB; keep original row/output assertions, ZIP contents, export authorization, limits, cancellation and cleanup",
+  "reports": [
+    {
+      "privateReport": "merge355-zip-stall-probe1.json",
+      "sha256": "253b7a61b4ffa7ce025d6e00578c336dd0fd08c6d60a6be547818cd9b4839c57",
+      "passed": 1,
+      "failed": 0,
+      "pending": 9,
+      "assertions": [
+        {
+          "name": "bounded task XLSX delivery generates complete output before headers and cleans its private files",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects a concurrent export without queuing or creating another snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on snapshot failure without premature headers",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on limit failure without premature headers",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on download failure without premature headers",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on disconnect failure without premature headers",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery round-trips 3000 unique rows through an intentionally slow small-buffer sink",
+          "status": "skipped"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects source/sink failures and cancels stalled output instead of hanging",
+          "status": "skipped"
+        },
+        {
+          "name": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+          "status": "passed"
+        },
+        {
+          "name": "rejects an over-wide row at the existing fields limit before workbook headers and cleans up",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-zip-stall-fullfile.json",
+      "sha256": "585df6e2776fd3a39f27d1df74e1cbdc6231652522424f898a479c235300026e",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "name": "bounded task XLSX delivery generates complete output before headers and cleans its private files",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects a concurrent export without queuing or creating another snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on snapshot failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on limit failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on download failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on disconnect failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery round-trips 3000 unique rows through an intentionally slow small-buffer sink",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects source/sink failures and cancels stalled output instead of hanging",
+          "status": "passed"
+        },
+        {
+          "name": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+          "status": "passed"
+        },
+        {
+          "name": "rejects an over-wide row at the existing fields limit before workbook headers and cleans up",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-zip-bound-candidate.json",
+      "sha256": "b9fa9016c587139c4d9056a78463fa8683a07211cd5a0c01f8902a14197e5035",
+      "passed": 10,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "name": "bounded task XLSX delivery generates complete output before headers and cleans its private files",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects a concurrent export without queuing or creating another snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on snapshot failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on limit failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on download failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery cleans resources on disconnect failure without premature headers",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery round-trips 3000 unique rows through an intentionally slow small-buffer sink",
+          "status": "passed"
+        },
+        {
+          "name": "bounded task XLSX delivery rejects source/sink failures and cancels stalled output instead of hanging",
+          "status": "passed"
+        },
+        {
+          "name": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+          "status": "passed"
+        },
+        {
+          "name": "rejects an over-wide row at the existing fields limit before workbook headers and cleans up",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "backendTypes": {
+    "command": "npx tsc --noEmit",
+    "exitCode": 0,
+    "privateLogSha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec"
+  },
+  "sourceSha256": "39700bc46a3ed9ec3ce841e48b8df909db98347e2e2f9540f76b5b1857a21f18",
+  "limits": [
+    "No universal throughput or peak memory claim",
+    "Whole formal final-head gate remains pending independent review and CI",
+    "No test threshold or business permission changed"
+  ]
+}

@@ -1,0 +1,400 @@
+{
+  "scope": "Minimal repairs after completed official9065 CI; next run requires parent independent exact-candidate approval",
+  "official": {
+    "runId": 40166806895,
+    "head": "9065bb0ee73916d5e35f913b389f2ea55a9f0818",
+    "result": "failure",
+    "regressionPassed": 8399,
+    "failedAssertions": 3,
+    "suiteErrors": 1,
+    "pending": 227,
+    "codeql": "success"
+  },
+  "failureToRepair": [
+    {
+      "failure": "Mini inventory, job121089495133",
+      "cause": "Generated route inventory retained 145 older routes, actual router has159",
+      "fix": "Regenerate with unchanged feature-inventory.cjs; no runtime permissions changed",
+      "validation": "Exact --check succeeds; no removed routes,14 added already-existing routes and source-line updates"
+    },
+    {
+      "failure": "Frontend typecheck, job121089495395",
+      "cause": "Isolated frontend job lacked locked backend dependencies/types consumed by existing cross-boundary contracts",
+      "fix": "npm ci --ignore-scripts in backend, explicit prisma generate; no backend app, migrations, seed, service or native canvas build in that job",
+      "validation": "Fresh backend dependency directory: app+cognitive tsc exit0; shared PrivateFormRuntimeRendering4 tests passed; source strict/types/tests unchanged; same4 shared-form cases also pass with DATABASE_URL and REDIS_URL removed"
+    },
+    {
+      "failure": "Mixed native suite setup, job121089495363",
+      "cause": "Global fixed gonogo@1.1.0 occupied by a DRAFT from another fixture",
+      "fix": "Owned empty migrated database before module loading; explicit real publishCognitiveConfig and real governance/trial grant",
+      "validation": "Current two native lifecycle cases passed, no source identity or scoring/authority mock"
+    },
+    {
+      "failure": "Report permanent conflict two cases, job121089495363",
+      "cause": "Global FIFO claim picked a prior fixture job and global budget already included retained work",
+      "fix": "Owned empty migrated database with real client binding/restoration; preserve original FIFO, budget=0, attempts=2, FAILED and no-retry assertions",
+      "validation": "Both atomic finish modes passed; no queue SQL/permissions changed"
+    },
+    {
+      "failure": "QA round3, job121089623876",
+      "cause": "Registration select is in collapsed details; records became article/details/status badges and report spec uses separate view",
+      "fix": "Open actual controls/records, scope transitions to exact resource/spec, switch views across reloads; retain creator self-review refusal and independent reviewer assertions",
+      "validation": "Unfiltered qa-round3-browser-e2e.cjs passed all6 recorded checks with no page errors"
+    },
+    {
+      "failure": "Shared visual chromium/webkit/firefox, jobs121089623938/3967/4005",
+      "cause": "Old assignment/scene terminology and list route interception omitted pagination query",
+      "fix": "Use current exact visible labels and query-aware fixture routes; complete submission page counts",
+      "validation": "Bounded Chromium diagnostic: affected student submit case3 original viewports; editor/media scenarios360/1440 passed with original focus, keyboard, cancellation and overflow assertions. Other cases/engines not locally claimed"
+    },
+    {
+      "failure": "Foundation and video, jobs121089820564/0527",
+      "cause": "Old parent SJT entry and navigation status labels",
+      "fix": "Exact current 情境判断测评 / 已作答 / 未作答 labels; no timeout extension or step skips",
+      "validation": "Unfiltered real API foundation and video Chromium scripts both ALL PASS, using own synthetic database/localhost runtime; FinalCompositeShell current source2 tests passed; remaining same-label direct consumers get exact string updates only, formal browser coverage remains pending"
+    },
+    {
+      "failure": "MEDIA2, job121089820648",
+      "cause": "Legacy PUBLIC flag lacked exact measurement publication and current distribution capability",
+      "fix": "Reuse existing real fixture publication and grant services, keep private asset checks",
+      "validation": "Unfiltered MEDIA2 real standalone/authenticated/public three paths ALL PASS"
+    },
+    {
+      "failure": "Bundle publication, job121089820543",
+      "cause": "Actual page showed CONTENT_STATIC_SJT_MAPPING_MISSING; status selector remains valid",
+      "fix": "Publish exact Scale/Cognitive/static-SJT source prerequisites through existing services; explicit Training fixture course",
+      "validation": "Owned dedicated existing Bundle fixture server: bounded creation/publication and generic-edit409 checks passed. Remaining participant/report browser flow not locally claimed"
+    },
+    {
+      "failure": "ZIP stall, job121089495363",
+      "cause": "See independent user-approved fd531f11 production queue-bound correction",
+      "fix": "Archiver intermediate HWM64KiB, unchanged original assertions/permissions",
+      "validation": "Original10 tests and production backend tsc passed; xlsx-zip-queue-bound.json"
+    }
+  ],
+  "reports": [
+    {
+      "privateReport": "merge355-local-isolation-after1.json",
+      "sha256": "f3b5097d746f639b98a80d1178d98f7a8c07fc72d4e982b40e5efbdb7bd48d78",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "backend/src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts",
+          "name": "permanent report conflict on isolated PostgreSQL releases budget/lease once and rejects futile retry with atomic finish=false",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts",
+          "name": "permanent report conflict on isolated PostgreSQL releases budget/lease once and rejects futile retry with atomic finish=true",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires durable staged SJT before Cognitive, locks only ordinary answers and commits both child receipts once",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires the latest completed Cognitive epoch before a new SJT, while keeping the reverse composition completable",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-mixed-explicit-publish.json",
+      "sha256": "fc0c5c34399098baef56109f64311e5bc35e45e24375a179831c74a8a5b09932",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires durable staged SJT before Cognitive, locks only ordinary answers and commits both child receipts once",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires the latest completed Cognitive epoch before a new SJT, while keeping the reverse composition completable",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-local-isolation-final.json",
+      "sha256": "711c869e9c92abfc8de8831c38beb012c8942efc1f803e614858bea28cc7c0d8",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "backend/src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts",
+          "name": "permanent report conflict on isolated PostgreSQL releases budget/lease once and rejects futile retry with atomic finish=false",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts",
+          "name": "permanent report conflict on isolated PostgreSQL releases budget/lease once and rejects futile retry with atomic finish=true",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires durable staged SJT before Cognitive, locks only ordinary answers and commits both child receipts once",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+          "name": "Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreSQL requires the latest completed Cognitive epoch before a new SJT, while keeping the reverse composition completable",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-clean-front-shared-tests.json",
+      "sha256": "2b9f60a7ab94fdb5a1cfb860277313a6179ff4bc0fd5e7cb22f6b5d395f89181",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "file": "frontend/src/components/education-tools/PrivateFormRuntimeRendering.test.tsx",
+          "name": "immutable private FORM adapter to real renderers renders actual uppercase SINGLE and MULTIPLE DTOs and preserves conditional visibility and frozen identity",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/components/education-tools/PrivateFormRuntimeRendering.test.tsx",
+          "name": "immutable private FORM adapter to real renderers previews MATRIX row refusal and cancellation without a forbidden aggregate key",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/components/education-tools/PrivateFormRuntimeRendering.test.tsx",
+          "name": "immutable private FORM adapter to real renderers previews MATRIX_MULTIPLE row refusal and cancellation without a forbidden aggregate key",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/components/education-tools/PrivateFormRuntimeRendering.test.tsx",
+          "name": "immutable private FORM adapter to real renderers uses row refusal in the formal MATRIX player without changing the validated aggregate wire shape",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-composite-shell-label.json",
+      "sha256": "81420753ab3144a534373db1767bee16831c800c9d5d3c8420ded158dc302fa5",
+      "passed": 1,
+      "failed": 1,
+      "pending": 0,
+      "assertions": [
+        {
+          "name": "FinalCompositeAssessment Bundle shell uses server parent counts and frozen Cognitive readiness without creating child state",
+          "status": "passed"
+        },
+        {
+          "name": "FinalCompositeAssessment Bundle shell shows frozen Situational runtime support and delegates entry to the existing child attempt",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-composite-shell-label2.json",
+      "sha256": "8f5e329b6715d671c449b461261196c1cf74bd25e8a57e898ba80ae686453ffe",
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "assertions": [
+        {
+          "name": "FinalCompositeAssessment Bundle shell uses server parent counts and frozen Cognitive readiness without creating child state",
+          "status": "passed"
+        },
+        {
+          "name": "FinalCompositeAssessment Bundle shell shows frozen Situational runtime support and delegates entry to the existing child attempt",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "privateReport": "merge355-clean-front-no-services.json",
+      "sha256": "a8c8be70ed49afa29f9e53c42ba0480e10f0a7bd6b4dda04ae20a65834b6bcc2",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0,
+      "environment": "Clean locked backend install with scripts disabled; DATABASE_URL and REDIS_URL explicitly absent; no services required"
+    }
+  ],
+  "privateLogs": {
+    "merge355-clean-front-before.log": {
+      "sha256": "b3e7eb580d8fa2bf05c07d59e1567b7b523752ca1367d20baf7ea5560d3415e7",
+      "bytes": 20069
+    },
+    "merge355-clean-front-after.log": {
+      "sha256": "f25f73ec0299881f2160bb4357bc5e35c5a69275b9e087c8e67236a7763016b5",
+      "bytes": 1299
+    },
+    "merge355-clean-front-after2.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "merge355-clean-front-backend-install.log": {
+      "sha256": "5aed7e7ca6c0310a1b26d935499ac4bcc0f271b88127ee21e5b482c830c29c55",
+      "bytes": 1200
+    },
+    "merge355-clean-front-prisma.log": {
+      "sha256": "b0dfca4ba6bccc67a7989ebcf533f281ba19e55d2e6a430b1121904341ca6629",
+      "bytes": 617
+    },
+    "merge355-qa3-browser-after1.log": {
+      "sha256": "8770e55ef7eaceef6de08bafc18532fd192748a485b19d43d469c722e53afa6c",
+      "bytes": 889
+    },
+    "merge355-visual-canonical-local.log": {
+      "sha256": "daae8a15bc3c33225ea78c942501c97d52e4b8ca7bdd5e976220e0fdaaba55d4",
+      "bytes": 74
+    },
+    "merge355-visual-interaction-local.log": {
+      "sha256": "c79dac20abde8dcf5624ce585e89e38cc4eaf1318b3b0a306b9f1c2e0932b723",
+      "bytes": 1545
+    },
+    "merge355-visual-interaction-local2.log": {
+      "sha256": "63b34fc45b9a5699ab5a6fccbae09a5055ed3d97246286171fb884d5c1753d53",
+      "bytes": 97
+    },
+    "merge355-foundation-browser-local.log": {
+      "sha256": "fbba184572b1cdbb3feae4bc3a300c016ae2e67c3b3058fab1bf96a52482a4ba",
+      "bytes": 931
+    },
+    "merge355-foundation-browser-local2.log": {
+      "sha256": "7d9d7183d85650ff6e258a8e30b2d0b80df63e98bf3fc20f7b6aceef0e72ba00",
+      "bytes": 783
+    },
+    "merge355-foundation-browser-local3.log": {
+      "sha256": "affe3255bcf33bb9afde596c018445d36cfe7ef0feda7466bc496f680f2f7cf7",
+      "bytes": 626
+    },
+    "merge355-foundation-browser-local4.log": {
+      "sha256": "2a6442cec670f7ac0a8455373a8d3c601619fa0040b454fe4fd14d77d4d24b52",
+      "bytes": 2067
+    },
+    "merge355-media2-browser-local.log": {
+      "sha256": "365496796c1f3f073f08e37d2a3645582e88aec224f4f2ea16bdc635061451f1",
+      "bytes": 8216
+    },
+    "merge355-media2-browser-local2.log": {
+      "sha256": "0010af28b848684ecf1e183975d02e72c7dbd5b78ac7bddb076a77d3062c2788",
+      "bytes": 362
+    },
+    "merge355-bundle-publication-browser.log": {
+      "sha256": "b7dd8609bfe0bd52cdfde0d340b67b48e6a66840fd6d1bff64ab0d61cbc7f4dd",
+      "bytes": 923
+    },
+    "merge355-bundle-publication-browser2.log": {
+      "sha256": "b57589f038f4a68f6aa27d5b643ab0d47293030063524c3954799e4c2474afb5",
+      "bytes": 1470
+    },
+    "merge355-bundle-publication-browser3.log": {
+      "sha256": "b57589f038f4a68f6aa27d5b643ab0d47293030063524c3954799e4c2474afb5",
+      "bytes": 1470
+    },
+    "merge355-bundle-publication-browser4.log": {
+      "sha256": "b57589f038f4a68f6aa27d5b643ab0d47293030063524c3954799e4c2474afb5",
+      "bytes": 1470
+    },
+    "merge355-bundle-publication-browser5.log": {
+      "sha256": "200a611eec396aede008575520add0542ea6701791f01ac0c4690d8d7c5dde51",
+      "bytes": 71
+    },
+    "merge355-video-browser-local.log": {
+      "sha256": "261e9d905ac35ffb3bd3c914279a65e697a9fa8c0d619227d04a6722dccc2d85",
+      "bytes": 671
+    },
+    "merge355-video-browser-local2.log": {
+      "sha256": "d72d000107ded2a842188d66b4621c52c63e89c0343293483d85d32933cbd21c",
+      "bytes": 1724
+    },
+    "merge355-next-controls.log": {
+      "sha256": "682ee48ed996e2cf3c6f06c5a5b7376b1971e62d395eb02d68b4023bf07bbecb",
+      "bytes": 1974
+    },
+    "merge355-next-actionlint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "merge355-composite-shell-label.log": {
+      "sha256": "5f933ab4f46d60665fb9ff745ccba0075d80d8d6e629135ae9e0f530cc3e5afa",
+      "bytes": 13241
+    },
+    "merge355-composite-shell-label2.log": {
+      "sha256": "3975e8044c46de272e1b435076a82ec4f8976785d9e73a2b8a37d121052a9495",
+      "bytes": 697
+    },
+    "merge355-shell-label-lint.log": {
+      "sha256": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec",
+      "exitCode": 0
+    }
+  },
+  "browserArtifactReuse": {
+    "head": "9065bb0ee73916d5e35f913b389f2ea55a9f0818",
+    "testedMergeSha": "af94aaadccdd52a1d7c7b33c2ff0aca5845c19f8",
+    "runId": 40166806895,
+    "uiLabArtifactId": 12588573209,
+    "uiLabZipSha256": "637eb8d7a2942c6bdf433d91a02d329f9dbce5c2a4f42558ef829a83f7a532a8",
+    "backendArtifactId": 12587874085,
+    "verification": "Official ZIP digests and existing treeDigest/verifyManifest source/run/kind/lock/content checks passed. No product rebuild. Bundle dedicated fixture server follows existing source-based fixture server, explicitly separate from compiled-runtime probes."
+  },
+  "sourceSha256": {
+    ".github/scripts/ci-topology.test.mjs": "fcfbc3fe0147f7fde75a245ddfb42a612040529a24dfc1a9d8ab7f0cb7d06b4b",
+    ".github/workflows/ci-backend-regression.yml": "58b2101b3f23299e9ce7ac85bee527ea4439d981a33d7ffecfe2bed2f41008f8",
+    ".github/workflows/ci-frontend.yml": "9b087cfc193511bb750215963425deb2b6412c382b20b6f79fc2e7fbf96fae96",
+    "docs/miniprogram-v2/web-feature-inventory.json": "20c0426ce02ecc3a37769fb4ca00c761ca3a2ad0e25c7d8a5868eedeb8cd1ad8",
+    "docs/survey-governance-followup-20261025.md": "b45db0c13e8760c2475bf2d5ca62d31e6b6c30c4dbfa65b1f60b0ebac3959c28",
+    "server-version/backend/src/__tests__/fixtures/isolated-test-database.ts": "9e629ad7c8ad53dcf6bfc02eecaee6db4ba2959adfe4353ec0d7bbe16c01e497",
+    "server-version/backend/src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts": "254f62f0b6fadad63edacaee405146112fcd46d35ae737ac3a3422701befa00e",
+    "server-version/backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts": "497a38e8eef4806e965f9881c03a2ee8457cae1a5b58b6ad8dae812aec401128",
+    "server-version/e2e/bundle-products-browser-e2e.cjs": "a33645453b0e99d7a9e773f29236319fd0ee5be36b5331e407873f47531c8380",
+    "server-version/e2e/bundle-products-fixture.ts": "ddb2e3ca7972e331e08b302a48f33874bc4af62049d6c6ba9d5061da4985260c",
+    "server-version/e2e/fe-11-storage-fault-browser-e2e.cjs": "3c5cf4433bc108c39b06fc1ab01c43ccce4131a590d2e7faf2196788bcef3e36",
+    "server-version/e2e/media-2-browser-e2e.cjs": "8544b2f08d2868f3ca18589dafae837b1894c4adee399f29fd312606407948b6",
+    "server-version/e2e/pr5-product-scenarios.ts": "f7615fdebcf2e20f340838692cc245777e0c326a8486581acb09a5f710ef503c",
+    "server-version/e2e/qa-round3-browser-e2e.cjs": "c43ce5011430c329b30df29432e8ef099c276bdd2da7d7ef0823b27cbba15b61",
+    "server-version/e2e/questionnaire-products-browser-e2e.cjs": "eef285cb0388530efd55326616052ff962da923b6d27c77132e9182d7af83a49",
+    "server-version/e2e/situational-branching-browser-e2e.cjs": "4524fd43d6ba5793e58546dda35d7e72c7d72f12409b2a596c5a7f5f9d060129",
+    "server-version/e2e/situational-bundle-browser-e2e.cjs": "0d0c505794766f2c8fb0af27bf2f05a318eba814f96c495495c7e0afdf3b180f",
+    "server-version/e2e/situational-text-pilot-browser-e2e.cjs": "9321b8e40bee093cf93a50dc7f4ef4d537580486a0c45398b373ad02cd810d34",
+    "server-version/e2e/situational-video-browser-e2e.cjs": "6046467d66f841251761b242ce65f29fa276e8a5c24dadcc99a0b20ab8ab52a4",
+    "server-version/e2e/training-bundle-browser.cjs": "a486ad7929db56b4ec06e7b252a1d66a85d63b3254df7744a4b0d87189b7347d",
+    "server-version/e2e/training-lifecycle-browser.cjs": "320574126de6df2a8eaf8ed6dc5748f9d602601a398bcfb486476069ff09a4db",
+    "server-version/e2e/visual-canonical-browser-e2e.cjs": "24a22a7e2232d26eb316a25411192a71a579f6ba35a0ccf150c5872121493ce8",
+    "server-version/e2e/visual-interaction-states-browser-e2e.cjs": "428593ddb405498ef267681370baa57e030a3f60fb6750edc8a1709fdb1d1c95",
+    "server-version/frontend/src/components/__tests__/FinalCompositeShell.test.tsx": "1cfe43bddfc6c1734e3dafbc8c416377dab335a4fe3942d86138c7c1ad2cd424"
+  },
+  "remaining": [
+    "Parent must independently review the frozen exact candidate and explicitly approve before any new CI/re-run/dispatch",
+    "No final-head formal checks have run; prior overall failed run remains failed",
+    "Full frontend suite and full three-engine browser selection were not rerun locally; candidate must satisfy existing selected formal gates",
+    "No original fixture status, version, scoring, authority, output or refusal assertion is loosened",
+    "No deployment, production data/role/timezone changes or next-phase model/policy work"
+  ],
+  "sharedLabelConsumerScope": [
+    "server-version/e2e/bundle-products-browser-e2e.cjs",
+    "server-version/e2e/bundle-products-fixture.ts",
+    "server-version/e2e/fe-11-storage-fault-browser-e2e.cjs",
+    "server-version/e2e/media-2-browser-e2e.cjs",
+    "server-version/e2e/pr5-product-scenarios.ts",
+    "server-version/e2e/qa-round3-browser-e2e.cjs",
+    "server-version/e2e/questionnaire-products-browser-e2e.cjs",
+    "server-version/e2e/situational-branching-browser-e2e.cjs",
+    "server-version/e2e/situational-bundle-browser-e2e.cjs",
+    "server-version/e2e/situational-text-pilot-browser-e2e.cjs",
+    "server-version/e2e/situational-video-browser-e2e.cjs",
+    "server-version/e2e/training-bundle-browser.cjs",
+    "server-version/e2e/training-lifecycle-browser.cjs",
+    "server-version/e2e/visual-canonical-browser-e2e.cjs",
+    "server-version/e2e/visual-interaction-states-browser-e2e.cjs",
+    "server-version/frontend/src/components/__tests__/FinalCompositeShell.test.tsx"
+  ],
+  "guardDecisions": [
+    "User explicitly approved ZIP minimal production correction",
+    "No new CI after latest double-review instruction; fd531f11 backup used skip and provider run list showed no new run",
+    "Do not infer full workflow success from local subset, prior head or matching file names"
+  ]
+}

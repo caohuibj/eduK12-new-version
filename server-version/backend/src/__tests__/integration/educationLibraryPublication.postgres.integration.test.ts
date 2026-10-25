@@ -1,3 +1,4 @@
+import {grantLibraryUseFixture} from '../fixtures/library-distribution'
 import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
@@ -49,7 +50,7 @@ suite('Education public library actual publication / isolated PostgreSQL',()=>{
  it('revoked distribution blocks new preview/publication, but immutable history remains addressable',async()=>{
   const f=await setupEducationLibraryRuntimeFixture({db,product:'SCHOOL',publish:false})
   await f.open()
-  await grantUse(f.libraryAdminUserId,f.entryId,{requestId:randomUUID(),product:'TRAINING',scopeKind:'USER',userId:f.authorUserId})
+  await grantLibraryUseFixture(db,f.libraryAdminUserId,f.entryId,{requestId:randomUUID(),product:'TRAINING',scopeKind:'USER',userId:f.authorUserId})
   const [grant]=await db.$queryRaw<Array<{id:string;issuer_id:string;version:number}>>(Prisma.sql`SELECT id,issuer_id,version FROM scale_library_use_grants
    WHERE entry_id=${f.entryId} AND product='SCHOOL' AND organization_id=${f.organizationId} AND status='ACTIVE'`)
   expect(grant).toBeTruthy()

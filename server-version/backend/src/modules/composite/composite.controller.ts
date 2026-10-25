@@ -14,6 +14,7 @@ import {
   compositeFormAnswerSchema,
   compositeReanalysisBodySchema,
   compositeReportQuerySchema,
+  compositeReportViewQuerySchema,
   compositeSaveSchema,
   compositeScaleAnswerSchema,
   createCompositeSchema,
@@ -33,7 +34,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { listReportPackageCatalog } from '../cognitive-analysis'
 import { buildCompositeAnalysisExport } from './composite-export.service'
-import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
+import { finalScaleSubmitSchema, compositeScaleFinalResponseQuerySchema } from '../../services/scale-final-submit.schema'
 import { finalCompositeFormSectionSubmitSchema } from '../../services/questionnaire-final-submit.schema'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
@@ -561,12 +562,14 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const input = finalScaleSubmitSchema.parse(req.body)
+      const { response } = compositeScaleFinalResponseQuerySchema.parse(req.query)
       const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
       const data = await submitCompositeScaleFinal(
         req.params.attemptId,
         req.params.itemId,
         input,
         { userId: req.user.userId },
+        response === 'receipt' ? { receiptOnly: true } : undefined,
       )
       const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
       return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
@@ -583,6 +586,7 @@ export const compositeController = {
     res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
+      if (req.query.view !== undefined) return await participantReportView(req, res, { userId: req.user.userId })
       const query = compositeReportQuerySchema.parse(req.query)
       const report = query.partial ? await service.getPartialReport(req.params.attemptId, req.user.userId)
         : await service.getReport(req.params.attemptId, { userId: req.user.userId })
@@ -857,12 +861,14 @@ export const compositeController = {
     res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalScaleSubmitSchema.parse(req.body)
+      const { response } = compositeScaleFinalResponseQuerySchema.parse(req.query)
       const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
       const data = await submitCompositeScaleFinal(
         req.params.attemptId,
         req.params.itemId,
         input,
         { userId: null, recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
+        response === 'receipt' ? { receiptOnly: true } : undefined,
       )
       const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
       return success(res, responseData, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
@@ -886,6 +892,7 @@ export const compositeController = {
   async publicReport(req: Request, res: Response) {
     res.setHeader('Cache-Control', 'no-store')
     try {
+      if (req.query.view !== undefined) return await participantReportView(req, res, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })
       const report = await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })
       return req.params.assetId ? await serveProjectedReportImage(report, req.params.assetId, res) : success(res, report)
     } catch (err) { return handleError(res, err) }
@@ -977,4 +984,13 @@ export const trainingCheckpointHandler = (publicMode:boolean,operation:'read'|'s
     if(result.conflict) return res.status(409).json({success:false,message:'Checkpoint 已过期，请明确选择恢复版本',data:result})
     return success(res,result)
   } catch(err) { return handleError(res,err) }
+}
+
+async function participantReportView(req: Request, res: Response, context: { userId?: string; recoveryTokenHash?: string }) {
+  const query = compositeReportViewQuerySchema.parse(req.query)
+  if (req.params.assetId) return error(res, '报告图片不支持组合视图', -1, 400)
+  const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
+  try { return success(res, await service.getCompositeReportView(req.params.attemptId, context,
+    { waitMs: query.waitMs ?? 0, signal: abort.signal })) }
+  finally { res.off('close', closed) }
 }

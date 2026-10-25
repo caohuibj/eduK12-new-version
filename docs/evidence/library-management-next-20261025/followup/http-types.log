@@ -1,0 +1,17 @@
+src/__tests__/survey/library-management.http.integration.test.ts(32,141): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/survey/library-management.http.integration.test.ts(32,160): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/survey/library-management.http.integration.test.ts(32,323): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/survey/library-management.http.integration.test.ts(33,38): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/survey/library-management.http.integration.test.ts(33,58): error TS18046: 'result' is of type 'unknown'.
+src/__tests__/survey/library-management.http.integration.test.ts(52,39): error TS2550: Property 'replaceAll' does not exist on type '`${string}-${string}-${string}-${string}-${string}`'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2021' or later.
+src/__tests__/survey/library-management.http.integration.test.ts(58,31): error TS2345: Argument of type '{ mfaVerifiedAt?: number | undefined; userId: string; role: "ADMIN"; accountDomain: "TRAINING" | "SURVEY"; tokenVersion: number; adminVerifiedAt: number; adminSessionId: `${string}-${string}-${string}-${string}-${string}`; }' is not assignable to parameter of type 'JwtPayload'.
+  Property 'username' is missing in type '{ mfaVerifiedAt?: number | undefined; userId: string; role: "ADMIN"; accountDomain: "TRAINING" | "SURVEY"; tokenVersion: number; adminVerifiedAt: number; adminSessionId: `${string}-${string}-${string}-${string}-${string}`; }' but required in type 'JwtPayload'.
+src/__tests__/survey/library-management.http.integration.test.ts(101,32): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(102,33): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(102,82): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(107,60): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(113,37): error TS7006: Parameter 'stage' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(114,37): error TS7006: Parameter 'stage' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(119,113): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(121,61): error TS7006: Parameter 'row' implicitly has an 'any' type.
+src/__tests__/survey/library-management.http.integration.test.ts(129,67): error TS7006: Parameter 'row' implicitly has an 'any' type.

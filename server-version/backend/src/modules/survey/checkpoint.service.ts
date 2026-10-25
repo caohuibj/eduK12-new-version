@@ -125,6 +125,7 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
     ?await ensureSurveyFlowAssignment(tx,{...known,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot:frozen!}):null
   const snapshot=assignment?assignedSurveySnapshot(frozen!,assignment):frozen!
+  await assertSurveyScaleCollectionAllowed(tx,snapshot)
   return {policy,wave:attempt.wave,snapshot,hasCognitive:frozen!.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)}
 }
 const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyFinalLocator(proof)
@@ -165,7 +166,6 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
   const known=await context(proof)
   return prisma.$transaction(async tx=>{
     const {policy,wave,snapshot,hasCognitive}=await access(tx,proof,known)
-    await assertSurveyScaleCollectionAllowed(tx,snapshot)
     const answers=validCheckpointAnswers(snapshot,input.answers)
     let itemTimings:SurveyScaleTimings|undefined
     try{
