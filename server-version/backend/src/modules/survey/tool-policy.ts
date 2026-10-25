@@ -4,6 +4,7 @@ import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {getScaleInstrumentSource} from '../scale/onboarding/instrument-registry'
 import {AdminPermissionError} from '../admin-permissions/service'
+import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenPublication} from './publication.service'
 export type PolicyIdentity={resourceKey:string;fingerprint:string}
@@ -40,21 +41,45 @@ export async function readToolPolicies(tx:Prisma.TransactionClient,identities:re
 }
 export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,requireApproval:boolean){
  const policy=await readToolPolicy(tx,identity,true)
- if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 的新增分配与投放：'+policy.reason)
+ if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 分配、准入和后续采集：'+policy.reason)
+ if(policy.decision==='RETURNED')throw new AdminPermissionError(409,'该精确版本的 Survey 准入已撤回：'+policy.reason)
  if(requireApproval&&policy.decision!=='APPROVED')throw new AdminPermissionError(409,'该精确版本尚未通过 Survey 范围审批：'+policy.reason)
 }
-/** New admissions only. Existing attempts, saved FINALs and stored reports never call this gate. */
+/** Fresh exact authority at new admission AND each subsequent collection write.
+ * Saved FINAL receipt replay and historical report reads have separate gates. */
 export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
  await assertFrozenPackageAdmissions(tx,snapshot)
  for(const unit of snapshot.units){
   const p=unit.sourceProvenance,ref=p?.source as CatalogSourceSnapshot['ref']|undefined
   if(!p||!ref)continue
-  if(typeof p.surveyToolReleaseId==='string'&&!p.surveyPackage){
-   await assertGovernedEntryAllowed(tx,p.surveyToolReleaseId,ref.sourceVersion)
-   if(typeof p.sourceGrantId==='string'){const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`;if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销')}
+  // Library revocation locks use-grant before tool-grant. Keep that order.
+  if(typeof p.libraryEntryId==='string'){
+   const [project]=await tx.$queryRaw<Array<{owner_user_id:string}>>`SELECT owner_user_id FROM survey_projects WHERE id=${snapshot.projectId} FOR SHARE`
+   if(!project)throw new AdminPermissionError(403,'研究项目不可用')
+   await assertLibraryUseGrantCurrent(tx,{entryId:p.libraryEntryId,userId:project.owner_user_id,product:'SURVEY'})
+  }
+  const governed=typeof p.surveyToolReleaseId==='string'&&!p.surveyPackage
+  if(governed)await assertGovernedEntryAllowed(tx,p.surveyToolReleaseId as string,ref.sourceVersion)
+  if(typeof p.sourceGrantId==='string'){
+   const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`
+   if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销，停止后续采集；已保存数据保留')
+  }else if(!p.surveyPackage){
+   // Pre-ref publications can use their original immutable sourced-draft FK.
+   // Never search for a newer grant or silently substitute an exact version.
+   const grants=await tx.$queryRaw<Array<{id:string}>>`SELECT g.id FROM survey_instrument_drafts d JOIN survey_tool_grants g ON g.id=d.catalog_grant_id
+    JOIN survey_projects project ON project.id=d.project_id AND project.owner_user_id=g.user_id
+    WHERE d.id=${unit.draftId} AND d.project_id=${snapshot.projectId} AND g.status='ACTIVE'
+      AND g.snapshot->'ref'=${JSON.stringify(ref)}::jsonb AND g.snapshot->>'definitionDigest'=${unit.sourceDigest} FOR SHARE OF d,g,project`
+   if(!grants.length)throw new AdminPermissionError(403,'冻结工具的原精确授权已不可用，停止后续采集；已保存数据保留')
+  }
+  if(governed){
    // The strict governed check already locked the identical policy/hash and
    // required APPROVED. Keep the source grant check above in this transaction.
    continue
+  }
+  if(typeof p.surveyStandardReleaseId==='string'){
+   const [release]=await tx.$queryRaw<Array<{state:string;combination_hash:string}>>`SELECT state,combination_hash FROM survey_standard_releases WHERE id=${p.surveyStandardReleaseId} FOR SHARE`
+   if(release?.state!=='ONLINE'||release.combination_hash!==ref.sourceVersion)throw new AdminPermissionError(409,'冻结批准组合已撤下，停止后续采集；已保存数据保留')
   }
   const identity=await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
   await assertSurveyToolPolicy(tx,identity,false)

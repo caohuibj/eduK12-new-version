@@ -32,7 +32,7 @@ export default function GovernedToolsWorkspace(){
   await api('/submissions/'+(isPackage?'package':'source'),{requestId:pending.current.id,...body});pending.current=null;setNotice('已保存待审精确版本；尚未上线，也未增加研究者授权。');await refresh()
  })
  const transition=(row:GovernedItem,action:'approve'|'return'|'retry'|'withdraw')=>run(async()=>{
-  const message=action==='approve'?'确认批准这份精确版本？系统将自动试运行已配置的评分、报告和数据库记录，通过后上线；不会授权任何研究者。':action==='return'?'退回这份提交，保留原始记录？':action==='withdraw'?'停止这份版本的新增使用？历史答卷与报告保留。':'重试同一份已批准的精确版本？'
+  const message=action==='approve'?'确认批准这份精确版本？系统将自动试运行已配置的评分、报告和数据库记录，通过后上线；不会授权任何研究者。':action==='return'?'退回这份提交，保留原始记录？':action==='withdraw'?'停止这份精确版本的分配、准入和后续采集／提交？已保存数据保留。':'重试同一份已批准的精确版本？'
   if(!window.confirm(message))return
   const result=await api<GovernedItem>('/versions/'+row.id+'/'+(action==='approve'||action==='return'?'review':action),{expectedVersion:row.version,...(action==='approve'||action==='return'?{hash:row.hash,reason,decision:action==='approve'?'APPROVE':'RETURN'}:action==='withdraw'?{reason}:{})})
   setNotice(states[result.state]+(result.blockers.length?'：'+result.blockers.join('；'):'；未增加研究者授权。'));await refresh();await inspect(row.id)

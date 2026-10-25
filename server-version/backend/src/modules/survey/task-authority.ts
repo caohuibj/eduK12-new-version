@@ -4,6 +4,9 @@ import type { verifiedSurveyAttempt } from './admission.service'
 import { hashResearchCredential } from './identity.service'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
+import {assertSurveyScaleCollectionAllowed} from './scale-collection-guard'
+import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
+import type {SurveyFlowAssignment} from './flow.assignment'
 export type SurveyTaskProof={publicId:string;attemptId:string;accessCredential:string;researchCode?:string}
 export type VerifiedSurveyTask=Awaited<ReturnType<typeof verifiedSurveyAttempt>>
 /** Host authority only. Tool-specific eligibility, disclosure and frozen scientific
@@ -52,5 +55,10 @@ export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:Sur
     ?await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
       attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot}):null
-  return {attempt:attempt!,snapshot:assignment?assignedSurveySnapshot(snapshot,assignment):snapshot}
+  const selected=assignment?assignedSurveySnapshot(snapshot,assignment):snapshot
+  if(attempt!.status==='STARTED'){
+    const stored=attempt!.flowAssignmentCipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt!.flowAssignmentCipher):null
+    await assertSurveyScaleCollectionAllowed(tx,assignedSurveySnapshot(selected,stored))
+  }
+  return {attempt:attempt!,snapshot:selected}
 }

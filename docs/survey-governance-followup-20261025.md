@@ -280,3 +280,29 @@ METRIC 预算移除固定 240 字符单位假设，使用每个冻结 native/cog
 native 并发案例证明一份 raw/结果可靠持久化、重复回执和父 FINAL 重放，
 不证明并发 prepare 总共只执行一次 CPU 计分，也不是全协议或浏览器覆盖。
 旧测试撤权后 in-flight 继续仅记录旧行为，不能冒称政策 22 已完成。
+
+## A：政策 22 的 Survey 消费者实现
+
+采集防线现在覆盖所有 Survey 工具，沿用既有父对象与精确版本/授权/策略锁：
+新准入、在途恢复、task 刺激交付、checkpoint 读写、父 FINAL，以及 native/认知子任务
+准备与 commit 事务均 fresh 检查。新冻结来源保存原 sourceGrantId；旧冻结来源只沿
+不可变 draft→原授权 FK 校验，不搜索新 grant/版本。不缓存“未停用”。
+标准批准组合撤下、治理版本撤下、整包撤权/到期、sourceGrant 撤权、entry pause /
+RETURNED 均阻止后续采集。Library 按 use→tool grant 原锁顺序核对。保存数据不删除，
+已完成 FINAL 的幂等回执及历史报告现有读权/开放检查不扩大；历史报告停止范围仍未决定。
+管理文案同步说明停止后续采集，审计 policy 不再声称仅影响未来导入。
+
+实际合成 PG：native V1/V2 撤下后，新参与、未启动 child、在途 child FINAL、task、
+checkpoint 恢复/保存、父 FINAL 均拒绝；没有部分 FINAL/raw 写入，STARTED 保留，
+此前完成回执/报告不变。2/2 通过（`22-native-stop-postgres.json`）。
+另外 1 项独立范围/锁测试：研究者 A 的授权撤销不影响同工具研究者 B；A 已存 child raw
+保留、不能生成 parent FINAL；B 正常完成；真实 pg_stat_activity 确认 revoke 等待采集
+SHARE 锁，提交后新校验拒绝，已完成回执可重放（`22-grant-scope-lock-postgres.json`）。
+
+这不是 Training 撤权语义完成：Training 公库 wrapper 被不同教师共享，现有 Scale guard
+仅带 scaleId，必须绑定实际发布者/使用授权，不能为一个教师的 revoke 插入全局 stop。
+21 的 Training 显式入口准入和 22 的 Training 精确使用范围是下一片的依赖。
+
+受影响消费者首轮 32 通过，4 个旧 cognitive lifecycle mock 缺 main 已新增 native 锁
+集合而失败；仅添加空 native 夹具，不跳过 authority/锁，四项单独复验，原失败保留。
+证据 `22-stop-consumers{,-retry}.json`；原始类型检查 `backend-types-stop.log` 退出 0。

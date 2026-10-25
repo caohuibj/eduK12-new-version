@@ -28,7 +28,7 @@ export default function StandardTripletWorkspace({authored}:{authored:ReactNode}
   setNotice(states[result.state]+'；未创建研究者授权。');await refresh();await inspect(r)
  })
  const transition=(r:StandardItem,state:StandardState,action:'retry'|'withdraw')=>run(async()=>{
-  if(!window.confirm(action==='retry'?'重新试运行同一份已批准版本？通过后上线，不产生研究者授权。':'停止这份组合的新增分配和投放？已有答卷及历史报告保留。'))return
+  if(!window.confirm(action==='retry'?'重新试运行同一份已批准版本？通过后上线，不产生研究者授权。':'停止这份精确组合的分配、准入和后续采集／提交？已保存数据保留。'))return
   const result=await api<StandardState>('/'+state.id+'/'+action,{expectedVersion:state.version,...(action==='withdraw'?{reason:reason.trim()}:{})})
   setNotice(action==='retry'?(states[result.state]??'试运行完成'):'已停止新增使用，历史数据保留。');await refresh();await inspect(r)
  })

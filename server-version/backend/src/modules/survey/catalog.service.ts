@@ -83,7 +83,7 @@ export async function revokeToolGrant(actorUserId:string,id:string){
       WHERE id=${id} AND status='ACTIVE' RETURNING user_id AS "userId"`
     if(!rows.length)fail(404,'授权不存在或已撤销')
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:rows[0].userId,
-      action:'CATALOG_TOOL_REVOKED',metadata:{grantId:id,policy:'FUTURE_IMPORT_AND_PUBLICATION_ONLY'}}})
+      action:'CATALOG_TOOL_REVOKED',metadata:{grantId:id,policy:'STOP_NEW_ADMISSION_AND_COLLECTION_KEEP_SAVED_DATA'}}})
     return {revoked:true}
   })
 }
@@ -128,7 +128,7 @@ export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:st
     compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,
     ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,
       nativeSituational:snapshot.nativeSituational}:{}),
-    sourceProvenance:{...snapshot.provenance,...(snapshot.provenance.surveyToolReleaseId&&draft.catalogGrantId?{sourceGrantId:draft.catalogGrantId}:{}),originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
+    sourceProvenance:{...snapshot.provenance,...(draft.catalogGrantId?{sourceGrantId:draft.catalogGrantId}:{}),originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
       adapterVersion:snapshot.adapterVersion},...(snapshot.answerMapping?{sourceAnswerMapping:snapshot.answerMapping}:{})}
 }
 export async function researcherCatalog(tx:Tx,userId:string,page:number){

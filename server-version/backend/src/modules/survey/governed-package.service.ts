@@ -130,7 +130,7 @@ export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:s
  }
  return frozen
 }
-/** New admissions only; existing Attempts and stored reports retain their frozen package. */
+/** Fresh new-admission/collection authority; stored results keep their exact package. */
 export async function assertFrozenPackageAdmissions(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
  if(!snapshot.governedPackages?.length)return
  const [project]=await tx.$queryRaw<Array<{owner_user_id:string}>>`SELECT owner_user_id FROM survey_projects WHERE id=${snapshot.projectId} FOR SHARE`

@@ -6,7 +6,7 @@ import {decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/sec
 import {submitGovernedSource,approveGovernedTool,governedRow,withdrawGovernedTool} from '../../modules/survey/governed-tool.service'
 import {governedPolicyIdentity} from '../../modules/survey/governed-tool.model'
 import {syntheticNativeSituationalSubmission} from '../../modules/survey/governed-tool.native-trial'
-import {grantCatalogSource} from '../../modules/survey/catalog.service'
+import {grantCatalogSource,revokeToolGrant} from '../../modules/survey/catalog.service'
 import {changeSurveyToolPolicy} from '../../modules/survey/library-admin.service'
 import {importCatalogDraft} from '../../modules/survey/builder.service'
 import {createWave,getWave} from '../../modules/survey/waves.service'
@@ -22,6 +22,9 @@ import {compileSjtTemplate} from '../../modules/situational/authoring/template'
 import {createSjtDraft,requestSjtReview,reviewSjtDraft} from '../../modules/situational/authoring/service'
 import {sjtNativeStagedTemplate} from '../fixtures/sjt-native-staged.fixture'
 import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
+import {getOwnResearchTask} from '../../modules/survey/task.public'
+import {saveSurveyCheckpoint,readSurveyCheckpoint} from '../../modules/survey/checkpoint.service'
+import {assertSurveyScaleCollectionAllowed} from '../../modules/survey/scale-collection-guard'
 
 const registry=vi.hoisted(()=>({packages:[] as import('../../modules/situational/situation-package').SituationPackage[]}))
 vi.mock('../../modules/situational/situation-package.registry',async original=>{
@@ -53,6 +56,52 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   registry.packages=[compileSjtNativeV1Fixture().package,createSjtNativeStagedPackage()].map(p=>({...p,releaseStatus:'PUBLISHED'}))
  })
  afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect();vi.unstubAllEnvs()})
+ it('stops only the revoked exact researcher grant, retaining a completed native child and serializing stop with collection',async()=>{
+  const pkg=registry.packages[1],submitted=await submitGovernedSource(system,{requestId:randomUUID(),source:{kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},version:'scope-'+randomUUID(),title:'Synthetic scoped stop',report:null,reference:{}},proof)
+  await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic scope approval'},proof)
+  await changeSurveyToolPolicy(manager,{...governedPolicyIdentity(await governedRow(db,submitted.id)),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic exact scope'})
+  const secondOwner=(await db.user.create({data:{username:'native-other-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SURVEY'}})).id
+  const login='r'+randomUUID().replace(/-/g,'').slice(0,18)
+  await db.surveyAccount.create({data:{userId:secondOwner,loginName:login,normalizedLogin:login}})
+  await db.surveyResearcherGrant.create({data:{userId:secondOwner,status:'ACTIVE',grantedBy:manager}})
+  await db.surveyMfaCredential.create({data:{userId:secondOwner,enabled:true,secretCipher:'synthetic-only'}})
+  const setup=async(actor:string)=>{
+   const grant=await grantCatalogSource(manager,actor,{kind:'SJT',sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash}),projectId=randomUUID()
+   await db.surveyProject.create({data:{id:projectId,ownerUserId:actor,title:'Synthetic scoped project',collectionMode:'SINGLE_UNLINKED'}})
+   const draft=await importCatalogDraft(actor,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Frozen scoped native'})
+   const wave=await createWave(actor,projectId,{requestId:randomUUID(),title:'Synthetic scope',consentText:'Synthetic scope consent without human participants.',generalText:'Synthetic',instrumentIds:[draft.id],allowNewParticipants:true})
+   await prepareWave(actor,projectId,wave.id,wave.revision);const prepared=await getWave(actor,projectId,wave.id),opened=await openWave(actor,projectId,wave.id,prepared.revision)
+   const snapshot=(await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}})).compiledSnapshot as unknown as ResearchFrozenPublication
+   const enter=async()=>{const a=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
+   const participant=await enter(),child=await startSurveySituational(participant,'native')
+   const input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:snapshot.units[0].nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(snapshot.units[0],0,child.attempt.id)}
+   const receipt=(await submitSurveySituationalFinal(participant,'native',child.attempt.id,input)).receipt!
+   return {grant,snapshot,enter,participant,child,receipt,parent:{...participant,submissionId:randomUUID(),answers:{native:{}},situationalReferences:[receipt]}}
+  }
+  const stopped=await setup(owner),other=await setup(secondOwner)
+  await revokeToolGrant(manager,stopped.grant.id)
+  await expect(stopped.enter()).rejects.toMatchObject({statusCode:403})
+  await expect(submitResearchFinal(stopped.parent)).rejects.toMatchObject({statusCode:403})
+  expect(await db.situationalRawSubmission.count({where:{attemptId:stopped.child.attempt.id}})).toBe(1)
+  expect(await db.surveyWaveFinal.count({where:{attemptId:stopped.participant.attemptId}})).toBe(0)
+  expect((await submitResearchFinal(other.parent)).status).toBe('COMPLETED')
+  // A revocation cannot commit behind an already-verified collection write.
+  let release!:()=>void,locked!:()=>void
+  const ready=new Promise<void>(resolve=>{locked=resolve}),hold=new Promise<void>(resolve=>{release=resolve})
+  const collection=db.$transaction(async tx=>{await assertSurveyScaleCollectionAllowed(tx,other.snapshot);locked();await hold},{timeout:10000})
+  await ready
+  const revoke=revokeToolGrant(manager,other.grant.id)
+  try{
+   let waiting=false
+   for(let i=0;i<20&&!waiting;i++){
+    const rows=await db.$queryRaw<Array<{waiting:boolean}>>`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%UPDATE survey_tool_grants SET status=%') AS waiting`
+    waiting=rows[0].waiting;if(!waiting)await new Promise(resolve=>setTimeout(resolve,10))
+   }
+   expect(waiting).toBe(true)
+  }finally{release();await collection;await revoke}
+  await expect(db.$transaction(tx=>assertSurveyScaleCollectionAllowed(tx,other.snapshot))).rejects.toMatchObject({statusCode:403})
+  expect((await submitResearchFinal(other.parent)).status).toBe('COMPLETED')
+ },60000)
  it('qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report',async()=>{
   const template={...structuredClone(sjtNativeStagedTemplate),instrumentKey:'synthetic-author-governed-'+randomUUID()},compiled=compileSjtTemplate(template)
   const draft=await createSjtDraft({userId:manager,admin:false},template,{authorizationPolicy:null})
@@ -80,7 +129,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
   expect((await readSurveyStoredReport(owner,{projectId,waveId:wave.id,finalId:final.id,instrumentKey:'native'})).report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',value:5}))
  },60000)
- it.each([1,2])('completes v%i approval/trials, exact grant, frozen child/parent receipts and old-attempt recovery',async version=>{
+ it.each([1,2])('completes v%i approval and receipts, then immediately stops in-flight collection after withdrawal',async version=>{
   const pkg=registry.packages[version-1],source={kind:'SJT' as const,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion}
   await expect(grantCatalogSource(manager,owner,source)).rejects.toThrow()
   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'native-'+version,title:'Synthetic native '+version,
@@ -96,13 +145,15 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   const grant=await grantCatalogSource(manager,owner,ref),projectId=randomUUID()
   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic native research',collectionMode:'SINGLE_UNLINKED'}})
   const draft=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Frozen native'})
-  const wave=await createWave(owner,projectId,{requestId:randomUUID(),title:'Synthetic wave',consentText:'Synthetic isolated consent without human participants.',generalText:'Synthetic feedback',instrumentIds:[draft.id],allowNewParticipants:true})
+  const wave=await createWave(owner,projectId,{requestId:randomUUID(),title:'Synthetic wave',consentText:'Synthetic isolated consent without human participants.',generalText:'Synthetic feedback',instrumentIds:[draft.id],allowNewParticipants:true,checkpointPolicy:{schemaVersion:1,enabled:true,ttlHours:1}})
   await prepareWave(owner,projectId,wave.id,wave.revision)
   const frozen=await getWave(owner,projectId,wave.id),opened=await openWave(owner,projectId,wave.id,frozen.revision)
   const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication,unit=snapshot.units[0]
   expect(unit.executionProtocol).toBe('SITUATIONAL_NATIVE_V1');expect(unit.nativeSituational).toMatchObject({attemptEpoch:1,definitionHash:canonicalHash(pkg.definition)})
   const enter=async()=>{const a=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true});return {publicId:opened.publicId,attemptId:a.attemptId,accessCredential:a.accessCredential}}
-  const first=await enter(),inFlight=await enter()
+  const first=await enter(),inFlight=await enter(),notStarted=await enter()
+  const oldChild=await startSurveySituational(inFlight,'native'),oldInput={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,1,oldChild.attempt.id)}
+  await saveSurveyCheckpoint(inFlight,{revision:0,answers:{native:{}}})
   const child=await startSurveySituational(first,'native')
   expect((await startSurveySituational(first,'native')).attempt.id).toBe(child.attempt.id)
   const input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,0,child.attempt.id)}
@@ -122,10 +173,18 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   const current=await governedRow(db,submitted.id)
   await withdrawGovernedTool(system,submitted.id,current.version,'Synthetic stop new admissions',proof)
   await expect(enter()).rejects.toThrow()
-  // Previously frozen participants still use their original native protocol.
-  const oldChild=await startSurveySituational(inFlight,'native'),oldInput={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,1,oldChild.attempt.id)}
-  const oldReceipt=await submitSurveySituationalFinal(inFlight,'native',oldChild.attempt.id,oldInput)
-  await submitResearchFinal({...inFlight,submissionId:randomUUID(),answers:{native:{}},situationalReferences:[oldReceipt.receipt!]})
+  await expect(startSurveySituational(notStarted,'native')).rejects.toThrow()
+  await expect(submitSurveySituationalFinal(inFlight,'native',oldChild.attempt.id,oldInput)).rejects.toThrow()
+  await expect(getOwnResearchTask(inFlight)).rejects.toThrow()
+  await expect(readSurveyCheckpoint(inFlight)).rejects.toThrow()
+  await expect(saveSurveyCheckpoint(inFlight,{revision:1,answers:{native:{}}})).rejects.toThrow()
+  await expect(submitResearchFinal({...inFlight,submissionId:randomUUID(),answers:{native:{}}})).rejects.toThrow()
+  expect(await db.situationalRawSubmission.count({where:{attemptId:oldChild.attempt.id}})).toBe(0)
+  expect(await db.surveyWaveFinal.count({where:{attemptId:inFlight.attemptId}})).toBe(0)
+  expect((await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:inFlight.attemptId}})).status).toBe('STARTED')
+  expect((await submitResearchFinal(parent)).receiptId).toBe(receipt.receiptId)
+  // No historical-report policy change or deletion is inferred from this stop.
+  expect((await readSurveyStoredReport(owner,{projectId,waveId:wave.id,finalId:final.id,instrumentKey:'native'})).report.blocks).toHaveLength(1)
   expect(await db.surveyWaveFinal.findUniqueOrThrow({where:{id:final.id}})).toEqual(final)
  },60000)
 })
