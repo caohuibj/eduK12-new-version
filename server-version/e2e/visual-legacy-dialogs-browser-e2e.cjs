@@ -61,6 +61,30 @@ async function assertModal(page, panel, trigger) {
   }
 }
 
+// Creation changes courseId and remounts AssignmentListContent. A detached
+// editor is not list readiness: wait for both remount reads before the next
+// scenario performs a full navigation (WebKit otherwise aborts those requests).
+async function retryAssignmentAndWait(page, editor) {
+  const ready = Promise.all(['/api/courses', '/api/assignments'].map(pathname =>
+    page.waitForResponse(response => {
+      const url = new URL(response.url())
+      return response.request().method() === 'GET' && url.pathname === pathname
+        && (pathname !== '/api/assignments' || (url.searchParams.get('view') === 'summary'
+          && url.searchParams.get('courseId') === sampleCourse.id))
+    }).then(async response => {
+      assert.equal(response.status(), 200, `${pathname} remount read succeeds`)
+      assert.equal(await response.finished(), null, `${pathname} remount read finishes`)
+    })
+  ))
+  await Promise.all([
+    ready,
+    (async () => {
+      await editor.getByRole('button', { name: '创建练习', exact: true }).click()
+      await editor.waitFor({ state: 'detached' })
+    })(),
+  ])
+}
+
 async function main() {
   fs.mkdirSync(output, { recursive: true })
   const browser = await browsers[engine].launch({ headless: true })
@@ -169,8 +193,7 @@ async function main() {
         releaseSave()
         await editor.getByRole('alert').waitFor()
         assert.equal(await editor.getByLabel(/练习标题/).inputValue(), '失败重试保留草稿')
-        await editor.getByRole('button', { name: '创建练习', exact: true }).click()
-        await editor.waitFor({ state: 'detached' })
+        await retryAssignmentAndWait(page, editor)
         assert.equal(writes, 2)
         results.push({ engine, width, scenario: 'assignment pending/failure/retry', passed: true })
         await require('./material-recovery-browser-e2e.cjs').verifyRecovery(page, { base, engine, width, results, output })
@@ -217,4 +240,4 @@ if (require.main === module) main().catch(error => {
   reportVisualFailure({ engine, width: 'setup-or-final', url: base, output, script: __filename }, error)
   console.error(error); process.exitCode = 1
 })
-module.exports = { installLegacyFixture }
+module.exports = { installLegacyFixture, retryAssignmentAndWait }
