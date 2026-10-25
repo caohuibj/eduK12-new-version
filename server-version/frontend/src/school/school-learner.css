@@ -183,3 +183,23 @@
  .hs-student-task-heading>div:first-child{flex-basis:100%}
  .hs-student-task-info{align-items:flex-start;gap:6px 16px}
 }
+/* Feedback follows the same single-heading student layout. */
+.hs-app.hs-workspace.hs-learner section.hs-panel.hs-student-feedback{margin:0;padding:24px}
+.hs-student-feedback-trail{margin-bottom:18px;font-size:13px}
+.hs-student-feedback-trail>a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--hs-muted)}
+.hs-student-feedback-header{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.hs-app.hs-learner .hs-student-feedback-header h1{font-family:var(--hs-serif);font-size:28px;line-height:1.35;font-weight:600;margin:0 0 7px}
+.hs-app.hs-learner .hs-student-feedback-header p{font-size:13px;line-height:1.7;color:var(--hs-muted);margin:0}
+.hs-student-feedback-header>a{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:9px 14px;border:1px solid var(--hs-border);border-radius:9px;color:var(--hs-primary);text-decoration:none;font-size:14px;font-weight:600}
+.hs-app.hs-learner .hs-student-feedback-note{font-size:13px;line-height:1.8;margin:0;padding-bottom:18px;border-bottom:1px solid var(--hs-border);color:var(--hs-muted)}
+.hs-student-feedback-empty{display:flex;align-items:flex-start;gap:16px;padding:26px 0 8px}
+.hs-student-feedback-empty>span{display:flex;align-items:center;justify-content:center;flex:none;width:48px;height:48px;border-radius:13px;background:color-mix(in srgb,var(--hs-primary) 8%,var(--hs-surface));color:var(--hs-primary)}
+.hs-app.hs-learner .hs-student-feedback-empty h2{font-family:inherit;font-size:18px;line-height:1.5;font-weight:600;margin:0 0 8px}
+.hs-app.hs-learner .hs-student-feedback-empty p{font-size:14px;line-height:1.8;margin:0;color:var(--hs-muted);max-width:740px}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-learner section.hs-panel.hs-student-feedback{padding:18px 16px}
+ .hs-app.hs-learner .hs-student-feedback-header h1{font-size:25px}
+ .hs-student-feedback-header{align-items:flex-start;gap:14px}
+ .hs-student-feedback-empty{gap:12px;padding-top:22px}
+ .hs-student-feedback-empty>span{width:40px;height:40px;border-radius:10px}
+}

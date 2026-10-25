@@ -168,12 +168,13 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
         </article>})}
       </div>}
     {items&&items.list.length>0&&visibleTasks.length===0&&<p className="hs-collection-empty">{partial?'本页没有匹配的任务。可清空检索或切换其他页面。':'没有匹配的任务，请尝试其他关键词。'}</p>}
-    {items&&<div className="hs-actions hs-student-task-pagination">
+    {items&&(page>1||items.hasMore)&&<div className="hs-actions hs-student-task-pagination">
       <button disabled={page<=1||busy||loading} onClick={()=>void load(page-1)}>上一页</button>
       <span>第 {page} 页 · 共 {items.total} 个任务</span>
       <button disabled={!items.hasMore||busy||loading} onClick={()=>void load(page+1)}>下一页</button>
-      {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
+
     </div>}
+    {items?.truncated&&<p className="hs-collection-summary">部分历史任务较多，请联系学校管理员。</p>}
     </details>
     {!selected&&(execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">

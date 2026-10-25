@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import {ArrowLeft,ArrowRight,MessageSquareText} from 'lucide-react'
+import {workspaceHref} from './school-navigation'
 import type { SchoolApi } from './SchoolRecovery'
 
 type ParentLinks = {list:Array<{id:string;status:string}>}
@@ -203,12 +205,13 @@ export function SchoolStudentFeedback({api}: {api:SchoolApi}) {
       .catch(e=>{if(active)setError(reason(e,'纵向反馈暂不可读取'))})
     return ()=>{active=false}
   },[api])
-  return <section className="hs-panel">
-    <h2>我的测评反馈</h2>
-    <p>完成测评后，只有经授权、科学条件符合的反馈才会在这里显示。某次作答完成不代表立即产生一份心理报告。</p>
+  return <section className="hs-panel hs-student-feedback">
+    <div className="hs-student-feedback-trail"><a href={workspaceHref('overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a></div>
+    <header className="hs-student-feedback-header"><div><h1>我的反馈</h1><p>查看学校向你开放的测评反馈与纵向记录。</p></div><a href={workspaceHref('tasks')}>查看校园任务<ArrowRight size={17} aria-hidden="true"/></a></header>
+    <p className="hs-student-feedback-note">完成测评后，只有经授权、科学条件符合的反馈才会在这里显示。某次作答完成不代表立即产生一份心理报告。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {!reports?<p>正在读取允许查看的个人纵向记录…</p>:reports.list.length===0?
-      <p>目前没有已生成且适合向你展示的纵向反馈。你可以继续查看校园活动，或联系学校心理教师。</p>:
+      <div className="hs-student-feedback-empty"><span aria-hidden="true"><MessageSquareText size={25}/></span><div><h2>暂无可查看的反馈</h2><p>目前没有已生成且适合向你展示的纵向反馈。你可以继续查看校园活动，或联系学校心理教师。</p></div></div>:
       <div className="hs-task-list">{reports.list.map(report=><article key={report.id} className="hs-task-card">
         <h3>多次测评记录</h3><p>{report.projection.waves.length} 次合法记录</p>
         <p>这些记录不能单独用于诊断，也不能说明变化的原因。</p>
