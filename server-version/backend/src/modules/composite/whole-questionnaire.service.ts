@@ -22,6 +22,7 @@ import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, l
 import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUnifiedScaleCollectionBatch } from '../scale/unified-final-submit.service'
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
+import {assertTrainingScaleCollectionAllowed} from '../scale/scale-collection-guard'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -223,7 +224,7 @@ const receiptResponse = (attemptId: string, submissionId: string, payloadHash: s
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   select: typeof REPORT_PARENT_SELECT & { userId: true; recoveryTokenHash: true };
-}> & { consentId: string | null;trainingTimingSnapshot:unknown;
+}> & { consentId: string | null;trainingTimingSnapshot:unknown;hasStandardCombination:boolean;
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
@@ -255,6 +256,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
       parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
       parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
+      (EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=product.id AND i.standard_combination_source IS NOT NULL)
+       OR jsonb_path_exists(COALESCE(parent.training_content_binding,'{}'::jsonb),'$.units[*].source.standardCombination')) AS "hasStandardCombination",
       parent."user_id" AS "userId",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
@@ -348,7 +351,12 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
-  })
+  },parent.hasStandardCombination?async tx=>{
+    const children=await tx.assessment.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
+      compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{scaleId:true,compositeItemId:true}})
+    if(children.length!==prepared.length)throw failure('整卷工具来源已变化')
+    await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),parent.id,children.map(child=>child.compositeItemId!))
+  }:undefined)
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
 })

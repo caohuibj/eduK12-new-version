@@ -104,7 +104,7 @@ async function validateDrafts(tx: Prisma.TransactionClient, context: Awaited<Ret
   // One bounded batch per requested kind; no per-item authorization query.
   const forms = formIds.length ? await tx.compositeFormSectionAttempt.findMany({where:{attemptId:a.id,attemptEpoch:a.attemptEpoch,sectionId:{in:formIds},status:'IN_PROGRESS'},select:{sectionId:true,section:{include:{items:true}}}}) : []
   const scales = scaleIds.length ? await tx.assessment.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:scaleIds},status:'IN_PROGRESS'},select:{scaleId:true,compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
-  await assertTrainingScaleCollectionAllowed(tx,scales.map(row=>row.scaleId))
+  await assertTrainingScaleCollectionAllowed(tx,scales.map(row=>row.scaleId),a.id,scales.map(row=>row.compositeItemId!).filter(Boolean))
   const sjts = sjtIds.length ? await tx.situationalAttempt.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:sjtIds},status:'IN_PROGRESS'},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
   const formsById = new Map(forms.map(row=>[row.sectionId,row]))
   // Historical scale children have no unique composite item constraint. Keep

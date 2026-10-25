@@ -10,6 +10,7 @@ import {ContentReleaseError} from '../measurement-content/release'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR,type ReportMetricFact} from '../measurement-content/report-renderer'
 import {decodeTrainingFinalReceipt} from './training-content-final'
 import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {validateTrainingReportPointer} from './training-report-selection'
 
 type Parent=Parameters<typeof decodeTrainingFinalReceipt>[0]&{compositeAssessment:{id:string;createdBy:string}}
 export interface TrainingContentReport {
@@ -62,9 +63,11 @@ export async function readTrainingContentReports(db:Prisma.TransactionClient,inp
    ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))fail()
   const measurement=await read(bound.measurement),report=await read(bound.report!)
   if(measurement.layer!=='MEASUREMENT'||report.layer!=='REPORT')fail()
-  const reportScope=report.scope
-  if(!await trainingMeasurementSourceScopeMatchesForConsumer(db,measurement,bound.source)
-   ||reportScope.kind!=='PRIVATE'||reportScope.product!=='TRAINING'||reportScope.ownerId!==parent.compositeAssessment.createdBy||reportScope.resourceId!==parent.compositeAssessmentId)fail()
+  if(!await trainingMeasurementSourceScopeMatchesForConsumer(db,measurement,bound.source,
+    {compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy,itemId:bound.itemId}))fail()
+  if(bound.source.standardCombination)await validateTrainingReportPointer(db,{unit:bound,compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy,
+    reportReleaseId:report.releaseId,contentHash:report.contentHash,publication:false,releases:cache})
+  else if(report.scope.kind!=='PRIVATE'||report.scope.product!=='TRAINING'||report.scope.ownerId!==parent.compositeAssessment.createdBy||report.scope.resourceId!==parent.compositeAssessmentId)fail()
   if(measurement.family!==bound.family||measurement.content.measurementHash!==bound.measurement.measurementHash||report.family!==bound.family
    ||report.content.generatorVersion!==DECLARATIVE_REPORT_GENERATOR||interpreted.report.generatorVersion!==report.content.generatorVersion
    ||report.content.measurements.length!==1||canonicalHash(report.content.measurements[0])!==canonicalHash({releaseId:measurement.releaseId,contentHash:measurement.contentHash}))fail()

@@ -10,6 +10,7 @@ import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
@@ -589,6 +590,7 @@ export const assertValidItem = async (
   prisma: Db = defaultPrisma,
   situationalReleases?: Map<string, ResolvedSituationalRelease>,
 ) => {
+  if(input.standardCombination)throw compositeBadRequest('批准组合请选择 Training 课程问卷的精确来源入口')
   if ((input as any).formPolicy != null && composite.productKind !== 'QUESTIONNAIRE') throw compositeBadRequest('Form V3 只支持新版普通问卷')
   if (input.required === false && input.type !== 'FORM') {
     throw compositeBadRequest('只有表单字段可以设置为选填')
@@ -1929,7 +1931,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
-export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
+export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,standardMode:'PREVIEW'|'PUBLISH'='PREVIEW') => {
   assertTeacher(role)
   // Publish validates, it never repairs. The write-time invariant guarantees
   // every FORM module is sectioned on create/copy/import, so a published
@@ -2131,7 +2133,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
   let content = composite.items.some((item:any)=>item.type!=='FORM')
-    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases) : null
+    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases,'NEW_ADMINISTRATION',standardMode) : null
   if(composite.trainingReportSelectionDraft!=null||composite.trainingReferenceSelectionDraft!=null){
     if(!content||!composite.createdBy)throw compositeBadRequest('报告选择缺少测量来源')
     const expiry=await assertCurrentTrainingContentOwner(prisma as Prisma.TransactionClient,{userId},composite)
@@ -2149,9 +2151,9 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
-  const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational)
+  const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
-  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
+  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
   const published = await db.compositeAssessment.update({
     where: { id },
@@ -2517,7 +2519,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!])
+      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],attempt.id,[item.id])
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2648,7 +2650,7 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
     if(item.scale.status!=='PUBLISHED')throw compositeForbidden('当前量表已不可准入')
-    await assertTrainingScaleCollectionAllowed(tx,[item.scaleId])
+    await assertTrainingScaleCollectionAllowed(tx,[item.scaleId],parent.id,[item.id])
     const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
     prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
   }else if(item.type==='COGNITIVE'){
@@ -2817,7 +2819,8 @@ const createAttempt = async (
     if(!userId)composite={...composite,deliveryCourseId:composite.questionnaireCourses[0].courseId}
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2842,7 +2845,9 @@ const createAttempt = async (
   if (prepared) {
     try {
     for (const item of composite.items) {
-      if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
+      if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
+        await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
+      else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
         definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',
       }))

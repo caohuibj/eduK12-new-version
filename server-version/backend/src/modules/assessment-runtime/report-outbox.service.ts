@@ -428,7 +428,7 @@ export const assertNoAcceptedWholeQuestionnaire = async (tx: Pick<Prisma.Transac
 
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
   submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
-}): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => (detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
+},assertCollectionAllowed?: (tx:Prisma.TransactionClient)=>Promise<void>): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => !assertCollectionAllowed&&(detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
   ? registerWholeReceiptAtomic(parent, input)
   : traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
   markAssessmentTimeline('whole.transaction_callback_start')
@@ -452,6 +452,9 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
     return { acceptedAt: job.wholeAcceptedAt!, replayed: true }
   }
   if (job.status !== 'WAITING' || job.budgetHeld) throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 1)
+  // Exact standard use is checked in the SAME transaction as durable RAW
+  // acceptance. A previously accepted receipt returns above without new use.
+  if(assertCollectionAllowed)await assertCollectionAllowed(tx)
   const headers = await traceAssessmentPhase('whole.tx.snapshot_headers', () => tx.assessmentUnitSnapshot.findMany({
     where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
     select: { slotKey: true, unitType: true, terminalState: true },

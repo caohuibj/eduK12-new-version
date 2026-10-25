@@ -10,6 +10,7 @@ import {getContentRelease,type StoredRelease} from '../measurement-content/repos
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
 import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
+import {validateTrainingReportPointer} from './training-report-selection'
 
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const bindingSchema=z.object({schemaVersion:z.literal(1),compositeId:text,attemptId:text,epoch:z.number().int().positive(),
@@ -80,11 +81,16 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     if(!release||release.contentHash!==expectedHash)fail()
     const scope=release.scope
     if(release.layer==='REPORT'){
-      if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
+      const matching=binding.units.filter(unit=>unit.report?.releaseId===id)
+      if(!matching.length)fail()
+      for(const unit of matching)if(unit.source.standardCombination)await validateTrainingReportPointer(tx,{unit,compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,
+        reportReleaseId:id,contentHash:expectedHash,publication:false,releases:cache})
+      else if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
     }else if(release.layer==='MEASUREMENT'){
       const matching=measurementUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
-      for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source))fail()
+      for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source,
+        {compositeId:binding.compositeId,ownerId:parent.compositeAssessment.createdBy,itemId:unit.itemId}))fail()
     }else if(release.layer==='REFERENCE'){
       const matching=selectedReferenceUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
