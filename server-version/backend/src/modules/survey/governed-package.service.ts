@@ -38,6 +38,10 @@ export async function revokeSurveyPackage(actor:string,id:string,version:number,
  await audit(tx,actor,'PACKAGE_USE_REVOKED',{grantId:id,reason,historyRetained:true});return {revoked:true}
 })}
 type ListedPackageGrant=PackageGrantRow&{tool:GovernedSummaryRow;now:Date;decision:string|null;paused:boolean|null}
+function packageAvailability(r:ListedPackageGrant){
+ const reasons=[...(r.status==='ACTIVE'?[]:['整包授权已撤销']),...(r.valid_from>r.now?['整包授权尚未生效']:[]),...(r.expires_at&&r.expires_at<=r.now?['整包授权已到期']:[]),...(r.tool.state==='ONLINE'?[]:['此精确工具版本未上线或已停止使用']),...(r.tool.snapshot_hash===r.snapshot_hash?[]:['整包精确版本摘要不一致']),...(r.decision==='APPROVED'?[]:['此版本尚未批准 Survey 使用范围']),...(r.paused?['此版本 Survey 使用已暂停']:[])]
+ return {ready:reasons.length===0,reasons,requiresFreshCheck:true,summaryOnly:true}
+}
 async function listedPackageGrants(tx:Prisma.TransactionClient,userId:string,page:number,query:string,activeOnly:boolean){
  const pattern='%'+query.trim().replace(/[\\%_]/g,'\\$&')+'%'
  const rows=await tx.$queryRaw<ListedPackageGrant[]>(Prisma.sql`SELECT g.*,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused FROM survey_package_grants g
@@ -45,8 +49,7 @@ async function listedPackageGrants(tx:Prisma.TransactionClient,userId:string,pag
   LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
   WHERE g.user_id=${userId} ${activeOnly?Prisma.sql`AND g.status='ACTIVE'`:Prisma.empty} AND (${query}='' OR tool.title ILIKE ${pattern} OR g.snapshot_hash ILIKE ${pattern})
   ORDER BY g.created_at DESC,g.id LIMIT 26 OFFSET ${(page-1)*25}`)
- return {list:rows.slice(0,25).map(r=>{const reasons=[...(r.status==='ACTIVE'?[]:['整包授权已撤销']),...(r.valid_from>r.now?['整包授权尚未生效']:[]),...(r.expires_at&&r.expires_at<=r.now?['整包授权已到期']:[]),...(r.tool.state==='ONLINE'?[]:['此精确工具版本未上线或已停止新增使用']),...(r.decision==='APPROVED'?[]:['此版本尚未批准 Survey 使用范围']),...(r.paused?['此版本 Survey 使用已暂停']:[])]
-  return {...view(r,r.tool.title,r.tool.family),toolVersion:r.tool.tool_version,versions:r.tool.versions,components:r.tool.components,availability:{ready:!reasons.length,reasons,requiresFreshCheck:true}}}),page,hasMore:rows.length>25}
+ return {list:rows.slice(0,25).map(r=>({...view(r,r.tool.title,r.tool.family),toolVersion:r.tool.tool_version,versions:r.tool.versions,components:r.tool.components,availability:packageAvailability(r)})),page,hasMore:rows.length>25}
 }
 export async function packageGrantsForManager(actor:string,userId:string,page:number,query=''){return prisma.$transaction(async tx=>{await assertSurveyManager(tx,actor);return listedPackageGrants(tx,userId,page,query,false)})}
 export async function packageGrantsForResearcher(actor:string,projectId:string,page:number,query=''){return prisma.$transaction(async tx=>{await authorizedProject(tx,actor,projectId,false);return listedPackageGrants(tx,actor,page,query,true)})}
@@ -142,4 +145,13 @@ export async function assertFrozenPackageAdmissions(tx:Prisma.TransactionClient,
  }
 }
 
-export async function listProjectPackageImports(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{await authorizedProject(tx,actor,projectId,false);const rows=await tx.$queryRaw<Array<{id:string;title:string;family:string;bindings:Array<{draftId:string;slotKey:string;instrumentKey:string}>;status:string}>>`SELECT i.id,t.title,t.family,i.bindings,g.status FROM survey_package_imports i JOIN survey_governed_tools t ON t.id=i.tool_id JOIN survey_package_grants g ON g.id=i.grant_id WHERE i.project_id=${projectId} ORDER BY i.created_at DESC,i.id LIMIT 26 OFFSET ${(page-1)*25}`;return {list:rows.slice(0,25),page,hasMore:rows.length>25}})}
+export async function listProjectPackageImports(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{
+ await authorizedProject(tx,actor,projectId,false)
+ const rows=await tx.$queryRaw<Array<ListedPackageGrant&{import_id:string;bindings:Array<{draftId:string;slotKey:string;instrumentKey:string}>}>>(Prisma.sql`
+  SELECT g.*,i.id AS import_id,i.bindings,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused
+  FROM survey_package_imports i JOIN survey_package_grants g ON g.id=i.grant_id
+  JOIN LATERAL(SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE t.id=i.tool_id AND t.snapshot_hash=i.snapshot_hash) tool ON true
+  LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
+  WHERE i.project_id=${projectId} ORDER BY i.created_at DESC,i.id LIMIT 26 OFFSET ${(page-1)*25}`)
+ return {list:rows.slice(0,25).map(r=>({...view(r,r.tool.title,r.tool.family),id:r.import_id,bindings:r.bindings,versions:r.tool.versions,components:r.tool.components,availability:packageAvailability(r)})),page,hasMore:rows.length>25}
+})}

@@ -4,7 +4,8 @@ import {prisma as db} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {artifactReference,governedSnapshot,type GovernedArtifact} from '../../modules/survey/governed-tool.model'
 import {governedCatalog,governedComponentOptions,governedSources,approveGovernedTool,governedRow} from '../../modules/survey/governed-tool.service'
-import {packageGrantsForManager,packageGrantsForResearcher} from '../../modules/survey/governed-package.service'
+import {packageGrantsForManager,packageGrantsForResearcher,importSurveyPackage,listProjectPackageImports} from '../../modules/survey/governed-package.service'
+import {changeSurveyToolPolicy} from '../../modules/survey/library-admin.service'
 import {SURVEY_GONOGO_CONFIG} from '../../modules/survey/cognitive.definition'
 const suite=process.env.SURVEY_GOVERNED_LIST_ISOLATED==='1'?describe:describe.skip
 suite('bounded exact-version catalog and grant lists on synthetic PostgreSQL',()=>{
@@ -61,5 +62,16 @@ suite('bounded exact-version catalog and grant lists on synthetic PostgreSQL',()
   const expired=await packageGrantsForResearcher(owner,projectId,1,prefix+' Bundle 27')
   expect(expired.list[0].status).toBe('ACTIVE');expect(expired.list[0].availability).toMatchObject({ready:false,reasons:expect.arrayContaining(['整包授权已到期'])})
   await expect(packageGrantsForManager(system,owner,1)).rejects.toMatchObject({statusCode:403})
+ })
+ it('returns exact versions and current entry blockers for imported wave packages without executable bodies',async()=>{
+  const grants=await packageGrantsForResearcher(owner,projectId,1,prefix+' Bundle 00'),grant=grants.list[0]
+  const imported=await importSurveyPackage(owner,projectId,grant.id,randomUUID())
+  const current=await listProjectPackageImports(owner,projectId,1)
+  expect(current.list[0]).toMatchObject({id:imported.importId,versions:grant.versions,bindings:imported.bindings,availability:{ready:true,requiresFreshCheck:true,summaryOnly:true}})
+  expect(current.list[0].components[0].versions).toMatchObject({content:'source-0',parameters:null,report:null})
+  expect(JSON.stringify(current)).not.toContain('DO_NOT_TRANSMIT_EXECUTABLE_BODY')
+  await changeSurveyToolPolicy(manager,{resourceKey:'governed-release:'+grant.toolId,fingerprint:grant.hash,expectedVersion:1,decision:'APPROVED',paused:true,reason:'Synthetic current pause'})
+  expect((await listProjectPackageImports(owner,projectId,1)).list[0].availability).toMatchObject({ready:false,reasons:expect.arrayContaining(['此版本 Survey 使用已暂停'])})
+  await expect(listProjectPackageImports(manager,projectId,1)).rejects.toMatchObject({statusCode:404})
  })
 })

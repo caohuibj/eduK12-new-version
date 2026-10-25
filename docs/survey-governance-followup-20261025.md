@@ -337,3 +337,41 @@ codes 需 SELECT/INSERT/UPDATE（绑定、重置、禁用未认领编号），ev
 新增一份临时未知表后 defaults.sql 仍拒绝，且该角色没有该表 SELECT/INSERT 权限。
 三项定向断言通过（`runtime-policy-full-schema.json`），只清理本测试的临时 DDL/角色，
 合成业务审计保留；本轮不是用 owner 冒充运行时业务权限证明。
+
+## A：05–07 父审查确认的预览竞态与真实入口
+
+GovernedToolsWorkspace 预览以 exact source ref + 独立 request generation 绑定，来源 B
+可以替换在途 A；A 的成功/失败/finally 都不能写入 B。family、来源/目录翻页、搜索变更
+和卸载均使旧预览失效；读取/提交阶段禁用相关控件，缺当前来源的预览不能提交。
+6 个 race/recovery UI 合同通过：A 延迟→选 B→A 返回，提交只含 B 参数/指标；
+三种范围切换、旧 WavePackagePicker 失败/finally 和已 ACK 导入只重试交接。
+
+实际 SurveyProjectTools 新增显式“从授权整包添加”，按需加载当前目录，接原本已存在的
+onBeforeSelect/问卷 epoch 防线，import ACK 后按完整 bindings 原序更新当前问卷和
+共享工具列表；不会再让使用者进 legacyOnly 编制页寻找目录。普通库流程不变。
+真实 SurveyApp `/workspace?project=p1&section=publish` 路由合同验证按 CSRF API 适配
+导入一次、页面显示两份固定组件、波次保存 instrumentIds=[a,b]；没有 mock 掉
+SurveyProjectTools/Builder/ResearchPackageCatalog。此为 DOM+合成 HTTP 响应合同，
+不称真实浏览器或后台授权闭环。
+
+WavePackagePicker 加精确版本/短摘要、组件明细、到期/暂停等当前摘要；后台只读窄
+DTO，不取 executable/template。旧项目的 catch/finally 也受 epoch 保护，空页仍可
+继续 hasMore。列表明确只是当前授权/版本摘要，完整组件准入由动作 fresh 核对。
+新增到期 ACTIVE UI 1 项通过；metadata PG 实际导入/暂停/所有者隐匿 404 通过。
+
+本片 UI 新合同 7+1，现有消费者 33 首轮通过，另一个未改的 completion UI 首轮在
+并行检查时超过原 5 秒，未放宽超时；仅该 case 独立复验 1/1。metadata 首轮夹具在
+复用库遇 1.1.0 config 唯一约束，无断言执行；新 schema-only 库中 grant 例通过，
+新例只因预期 403 与既有隐匿 404 不符失败；修正为原 404、仅此例在新合成库通过。
+源失败/超时证据均保留，未删除其他测试数据。改变的前端文件 lint 0 error / 4 warning。
+
+额外执行 policy22 的整包真实生命周期及必要创建前置，共 10/10 通过：FORM/SJT/
+cognitive 批准组合、真实 compiler 冻结、child/parent/report，再撤权拒绝在途 FINAL，
+旧报告与不可变保护保留。原“FINAL 不查 package gate”断言改为必须查 exact parent，
+而不是把旧性能目标覆盖已批准的立即停止政策。
+
+原件：`05-07-race-journey.json`、`05-07-wave-expiry-ui.json`、
+`05-07-route-consumers{,-timeout-retry}.json`、
+`05-07-imported-metadata-postgres{,-empty,-retry}.json`、
+`22-package-lifecycle-postgres.json`。前端类型首轮只发现测试库不支持 getByRole exact
+选项；删除该无效选项后类型单列复验，不重跑已通过的业务断言。

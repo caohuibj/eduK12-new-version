@@ -522,9 +522,9 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           onReorder={ids=>{if(form.flowDefinition&&!window.confirm('调整内容会重置当前流程与实验组配额，继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}
           onLeaveRiskChange={toolRiskChanged} onNavigateLibrary={onNavigateLibrary||(()=>{window.location.assign('/workspace/tools')})}
           onBeforeSelect={()=>{if(busy||activePending)return false;if(form.flowDefinition&&!window.confirm('添加工具会重置当前问卷的流程与实验组配额，请随后重新编排。继续？'))return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
-          onSelected={async ids=>{
+          onSelected={async(ids,options)=>{
             if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current){setNotice('工具已加入本研究；当前波次已切换，请在当前问卷中重新选择。');return}
-            setForm(old=>({...old,instrumentIds:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
+            setForm(old=>({...old,instrumentIds:options?.wholePackage?[...old.instrumentIds.filter(id=>!ids.includes(id)),...ids]:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
             setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)
           }}/>}
         {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy} onSelect={ids=>{if(form.flowDefinition&&!window.confirm('整包加入会重置当前流程，请随后重新编排。继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}/>}
