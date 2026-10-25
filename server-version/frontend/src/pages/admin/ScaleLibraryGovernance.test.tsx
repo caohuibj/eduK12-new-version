@@ -27,7 +27,7 @@ describe('Scale library system review versus entrance distribution', () => {
     await waitFor(()=>expect(scoped.request).toHaveBeenCalledWith('survey-library','/catalog?'+new URLSearchParams({page:'1',keyword:'不存在'}),undefined))
     await waitFor(()=>expect(screen.queryByRole('heading',{name:'范围内量表'})).not.toBeInTheDocument())
     fireEvent.change(screen.getByLabelText('关键词'),{target:{value:''}})
-    fireEvent.change(screen.getByRole('combobox',{name:'来源'}),{target:{value:'STANDARD_REGISTRY'}})
+    fireEvent.change(screen.getByRole('combobox',{name:'入库来源'}),{target:{value:'STANDARD_REGISTRY'}})
     expect(screen.queryByRole('heading',{name:'范围内量表'})).not.toBeInTheDocument()
     scoped.request.mockResolvedValueOnce({list:[],hasMore:false})
     fireEvent.click(screen.getByRole('button',{name:'检索'}))

@@ -58,12 +58,17 @@ const queryPath=(page:number,keyword:string,tags:string,origin:string)=>'/catalo
 const search=()=>fireEvent.click(screen.getByRole('button',{name:/^检索$/}))
 
 describe('Survey catalog server-side classification search',()=>{
- it('submits trimmed keywords, stable facet IDs and origin together, resets the page, and keeps server matches',async()=>{
+ it('labels ingestion routes independently of authorship and submits stable filters before resetting the page',async()=>{
   const result={...classifiedItem,catalogId:'authored:server-match:1',title:'跨页目录结果',origin:'AUTHORED'}
   mock.request.mockResolvedValue(catalog([classifiedItem],true))
   render(<MemoryRouter><SurveyLibraryAdmin/></MemoryRouter>)
   await screen.findByText('完整内容工具')
   expect(mock.request).toHaveBeenLastCalledWith('survey-library','/catalog?page=1',undefined)
+  const originSelect=screen.getByLabelText('入库来源')
+  expect(within(originSelect).getByRole('option',{name:'注册工具库'})).toHaveValue('STANDARD_REGISTRY')
+  expect(within(originSelect).getByRole('option',{name:'私有工具申请入库'})).toHaveValue('AUTHORED')
+  expect(within(originSelect).queryByRole('option',{name:'标准工具'})).not.toBeInTheDocument()
+  expect(within(originSelect).queryByRole('option',{name:'自编工具'})).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'下一页'}))
   await waitFor(()=>expect(mock.request).toHaveBeenLastCalledWith('survey-library','/catalog?page=2',undefined))
   await waitFor(()=>expect(screen.getByRole('button',{name:'刷新'})).toBeEnabled())
@@ -74,7 +79,7 @@ describe('Survey catalog server-side classification search',()=>{
   fireEvent.change(screen.getByLabelText('测量内容'),{target:{value:'MOTIVATION'}})
   fireEvent.change(screen.getByLabelText('学科'),{target:{value:'MATHEMATICS'}})
   fireEvent.change(screen.getByLabelText('领域'),{target:{value:'LEARNING'}})
-  fireEvent.change(screen.getByLabelText('来源'),{target:{value:'AUTHORED'}})
+  fireEvent.change(screen.getByLabelText('入库来源'),{target:{value:'AUTHORED'}})
   expect(screen.getByText('完整内容工具')).toBeVisible()
   expect(mock.request).toHaveBeenCalledTimes(calls)
 
@@ -92,7 +97,7 @@ describe('Survey catalog server-side classification search',()=>{
   await screen.findByText('完整内容工具')
   fireEvent.change(screen.getByLabelText('关键词'),{target:{value:'学习'}})
   fireEvent.change(screen.getByLabelText('人群'),{target:{value:'student_self_report'}})
-  fireEvent.change(screen.getByLabelText('来源'),{target:{value:'STANDARD_REGISTRY'}})
+  fireEvent.change(screen.getByLabelText('入库来源'),{target:{value:'STANDARD_REGISTRY'}})
   search()
   await waitFor(()=>expect(mock.request).toHaveBeenLastCalledWith('survey-library',queryPath(1,'学习','student_self_report','STANDARD_REGISTRY'),undefined))
   await waitFor(()=>expect(screen.getByRole('button',{name:'下一页'})).toBeEnabled())
@@ -102,7 +107,7 @@ describe('Survey catalog server-side classification search',()=>{
 
   fireEvent.change(screen.getByLabelText('关键词'),{target:{value:'尚未提交'}})
   fireEvent.change(screen.getByLabelText('测量内容'),{target:{value:'MOTIVATION'}})
-  fireEvent.change(screen.getByLabelText('来源'),{target:{value:'AUTHORED'}})
+  fireEvent.change(screen.getByLabelText('入库来源'),{target:{value:'AUTHORED'}})
   fireEvent.change(screen.getByLabelText('学科'),{target:{value:'MATHEMATICS'}})
   fireEvent.change(screen.getByLabelText('领域'),{target:{value:'LEARNING'}})
   const calls=mock.request.mock.calls.length
@@ -115,7 +120,7 @@ describe('Survey catalog server-side classification search',()=>{
   await waitFor(()=>expect(mock.request).toHaveBeenLastCalledWith('survey-library','/catalog?page=1',undefined))
   expect(screen.getByLabelText('关键词')).toHaveValue('')
   for(const label of ['人群','测量内容','学科','领域'])expect(screen.getByLabelText(label)).toHaveValue('')
-  expect(screen.getByLabelText('来源')).toHaveValue('ALL')
+  expect(screen.getByLabelText('入库来源')).toHaveValue('ALL')
   expect(within(screen.getByRole('navigation',{name:'工具库分页'})).getByText('第 1 页')).toBeVisible()
  })
 
@@ -140,7 +145,7 @@ describe('Survey catalog server-side classification search',()=>{
   for(const label of ['人群','测量内容','学科','领域'])expect(within(screen.getByLabelText(label)).getByRole('option',{name:'全部'+label})).toBeInTheDocument()
   expect(within(screen.getByLabelText('人群')).getByRole('option',{name:'教师'})).toHaveValue('teacher_report')
   expect(within(screen.getByLabelText('测量内容')).getByRole('option',{name:'学习动机'})).toHaveValue('MOTIVATION')
-  expect(within(screen.getByLabelText('来源')).getByRole('option',{name:'全部来源'})).toHaveValue('ALL')
+  expect(within(screen.getByLabelText('入库来源')).getByRole('option',{name:'全部来源'})).toHaveValue('ALL')
  })
 
  it('ignores an older successful response after a newer search has completed',async()=>{

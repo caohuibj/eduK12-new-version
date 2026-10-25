@@ -27,9 +27,9 @@ export default function CatalogDiscoveryFilters({ filters, facets, onChange, onA
           {facets[facet].map(tag => <option key={tag.id} value={tag.id}>{catalogTagLabel(tag)}</option>)}
         </select>
       </label>)}
-      {includeOrigin && <label>来源
+      {includeOrigin && <label>入库来源
         <select value={filters.origin} onChange={event => onChange({ ...filters, origin: event.target.value as CatalogOrigin })}>
-          <option value="ALL">全部来源</option><option value="STANDARD_REGISTRY">标准工具</option><option value="AUTHORED">自编工具</option>
+          <option value="ALL">全部来源</option><option value="STANDARD_REGISTRY">注册工具库</option><option value="AUTHORED">私有工具申请入库</option>
         </select>
       </label>}
       <div className="catalog-discovery-actions">
