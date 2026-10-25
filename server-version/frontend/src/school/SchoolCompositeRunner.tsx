@@ -20,8 +20,8 @@ export type CampusExecutionRef={
   resumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,observer=false,observerTaskTitle}:{
-  api:SchoolApi;execution:CampusExecutionRef;title?:string;observer?:boolean;observerTaskTitle?:string
+export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,observer=false,observerTaskTitle,observerRole='teacher'}:{
+  api:SchoolApi;execution:CampusExecutionRef;title?:string;observer?:boolean;observerTaskTitle?:string;observerRole?:'teacher'|'parent'
   onExit:()=>void;onFinished:()=>void
 }){
   const panelRef=useRef<HTMLElement>(null)
@@ -154,7 +154,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
       <div className={'hs-observer-ready-toolbar'+(observerAnswer?' hs-observer-answer-toolbar':'')}><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回任务</button>
         {!observerAnswer&&<SchoolTaskHelp label="作答与隐私说明" buttonText="作答说明"><p><strong>离开与提交</strong><br/>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p><strong>结果可见性</strong><br/>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></SchoolTaskHelp>}
       </div>
-      {observerReady&&<header className="hs-observer-ready-heading"><p>教师观察测评</p><h2>{observerTaskTitle||'校园正式测评'}</h2></header>}
+      {observerReady&&<header className="hs-observer-ready-heading"><p>{observerRole==='parent'?'家长观察测评':'教师观察测评'}</p><h2>{observerTaskTitle||'校园正式测评'}</h2></header>}
     </>:<>
     <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
     {!compactNotes&&<p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>}

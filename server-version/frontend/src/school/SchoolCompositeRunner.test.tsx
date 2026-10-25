@@ -180,3 +180,15 @@ it('preserves unfamiliar consent wording instead of guessing its permissions',()
  expect(screen.getByText('共享范围：CUSTOM_REVIEW_ONLY')).toBeVisible()
  expect(screen.getByRole('checkbox')).not.toBeChecked()
 })
+
+
+it('labels parent observer preparation correctly and preserves the unchecked consent gate',()=>{
+ const api=vi.fn()
+ render(<SchoolCompositeRunner observer observerRole="parent" observerTaskTitle="家长观察任务" api={api as unknown as SchoolApi} execution={{...execution,consentRequired:true,consentPurpose:'organization_run:FORM:private-form:SCHOOL:synthetic:STUDENT:PARENT_REPORT:1.0.0',consentVisibility:'PRIVATE_RESPONDENT'}} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ expect(screen.getByText('家长观察测评')).toBeInTheDocument()
+ expect(screen.queryByText('教师观察测评')).not.toBeInTheDocument()
+ expect(screen.getByText('用途：填写本次学校安排的观察问卷。')).toBeInTheDocument()
+ expect(screen.getByRole('checkbox')).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'开始或继续正式测评'})).toBeDisabled()
+ expect(api).not.toHaveBeenCalled()
+})

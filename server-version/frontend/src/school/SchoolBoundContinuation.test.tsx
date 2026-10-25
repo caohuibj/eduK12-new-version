@@ -10,7 +10,7 @@ vi.mock('../modules/cognitive/pages/CognitiveRunner',()=>({CognitiveRunner:()=>n
 vi.mock('../modules/situational/pages/SituationalRunner',()=>({default:()=>null}))
 afterEach(cleanup)
 const prefix='/organizations/school/activities/activity/runs/run/executions/execution'
-const entryButtons={student:'开始／继续官方测评',parent:'开始／继续校园正式测评',teacher:'开始／继续教师观察测评'}
+const entryButtons={student:'开始／继续官方测评',parent:/查看任务|继续作答/,teacher:'开始／继续教师观察测评'}
 function setup(role:keyof typeof entryButtons,resume:boolean,rejectRead=false){
   const task={id:'execution',executionId:'execution',organizationId:'school',activityId:'activity',
     activityTitle:'学校观察',runId:'run',runTitle:'观察任务',title:'观察任务',kind:'MEASUREMENT',
