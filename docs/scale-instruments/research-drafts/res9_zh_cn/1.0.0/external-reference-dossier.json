@@ -1,0 +1,56 @@
+{
+  "activationStatus": "SOURCE_EVIDENCE_ONLY_NOT_RUNTIME_NORMS",
+  "instrumentKey": "res9_zh_cn",
+  "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358.",
+  "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+  "sample": {
+    "N": 484,
+    "collectionPeriod": "2016-03 to 2016-05",
+    "samplingMethod": "CONVENIENCE",
+    "territory": "CN",
+    "population": "mainland Chinese adults",
+    "inclusionAgeText": "age above 18",
+    "ageRange": null,
+    "meanAge": 27.33,
+    "ageSD": 6.86,
+    "female": 324,
+    "male": 160,
+    "hanEthnicity": 456,
+    "collegeOrHigher": 374,
+    "pteExposed": 116
+  },
+  "structure": {
+    "model": "one_factor",
+    "explainedVariancePercent": 49.92,
+    "originalTwoFactorModelApplied": false
+  },
+  "internalConsistency": {
+    "cronbachAlpha": 0.88,
+    "sameSampleAsStructuralEvidence": true
+  },
+  "descriptiveStatisticsOnly": {
+    "sourceLocator": "2022 Table 1 / section 3.1",
+    "totalMean": 22.43,
+    "totalSD": 5.64,
+    "units": "sum of 9 items scored 0–4; possible range 0–36",
+    "usedForIndividualComparison": false
+  },
+  "thresholdStatus": "NO_VERIFIED_CUTOFF",
+  "thresholds": [],
+  "normPercentiles": [],
+  "runtimeReferenceSets": [],
+  "testRetestEstablished": false,
+  "youthValidationEstablished": false,
+  "crossLanguageInvarianceEstablished": false,
+  "digitalPresentationValidated": false,
+  "limits": [
+    "No Chinese test-retest study in this paper",
+    "No clinical cutoff or low/medium/high ranges established",
+    "Do not transfer original Dutch/English self-confidence/self-efficacy subscales to this Chinese implementation",
+    "No cross-language measurement-invariance or national norms established here",
+    "No youth validation established here",
+    "Convenience-sample means/SD are documented only; no z score, percentile, sex comparison, diagnosis or risk band is generated.",
+    "The PCL-5 cutoff mentioned in the article is not a RES cutoff.",
+    "No subgroup or mediation estimates are imported as individual predictions."
+  ]
+}

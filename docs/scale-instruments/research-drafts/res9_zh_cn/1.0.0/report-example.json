@@ -1,0 +1,71 @@
+{
+  "status": "SYNTHETIC_CONTENT_EXAMPLE_NOT_RUNTIME_OUTPUT",
+  "instrumentKey": "res9_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "reportVersion": "1.0.0",
+  "answers": [
+    {
+      "itemCode": "RES_01",
+      "responseValue": "0"
+    },
+    {
+      "itemCode": "RES_02",
+      "responseValue": "1"
+    },
+    {
+      "itemCode": "RES_03",
+      "responseValue": "2"
+    },
+    {
+      "itemCode": "RES_04",
+      "responseValue": "3"
+    },
+    {
+      "itemCode": "RES_05",
+      "responseValue": "4"
+    },
+    {
+      "itemCode": "RES_06",
+      "responseValue": "0"
+    },
+    {
+      "itemCode": "RES_07",
+      "responseValue": "1"
+    },
+    {
+      "itemCode": "RES_08",
+      "responseValue": "2"
+    },
+    {
+      "itemCode": "RES_09",
+      "responseValue": "3"
+    }
+  ],
+  "expectedRawScore": 16,
+  "possibleRange": [
+    0,
+    36
+  ],
+  "displayTitle": "面对困难时对自己的看法",
+  "summary": "这份问卷关注你通常遇到困难时，怎样看待自己的应对能力，例如适应变化、继续做事，以及相信自己。总分只是这次自我描述的汇总，分数越高，表示你对这些描述越同意；它不是在给你贴“坚强”或“软弱”的标签，也不能预测你遇到某件事后一定会怎样。生活处境、疲惫程度和能得到的支持，都可能影响回答。本版本没有经过验证的高低分界，不给出等级或排名。比起追求某个数字，更有用的是看看哪些具体经历支持你的回答，以及现在还需要哪些帮助。",
+  "guidance": [
+    {
+      "category": "reflection",
+      "text": "回想最近一个困难：当时你做了哪件有帮助的小事？有没有题目没提到、却对你很重要的支持或处境？"
+    },
+    {
+      "category": "strategy",
+      "text": "可以写下一项你已经做到的事，再选一个负担较小的下一步，例如把任务拆小，或向可信赖的人提出一个具体的帮助请求。不需要用分数证明自己。"
+    },
+    {
+      "category": "support",
+      "text": "需要帮助不表示软弱。如果困扰持续影响生活，可以与可信赖的人或合适的专业人员讨论；是否寻求支持不必由这份分数决定。"
+    }
+  ],
+  "scoreDerivedLabel": null,
+  "percentile": null,
+  "referenceVersion": null,
+  "references": [],
+  "disclaimer": "仅供成人非商业研究与非诊断自我了解。源中文题干已有成人研究，本平台选项翻译、数字呈现与反馈仍待审核；不用于诊断、治疗决策、选拔、学校排名或证明个人坚强程度。"
+}

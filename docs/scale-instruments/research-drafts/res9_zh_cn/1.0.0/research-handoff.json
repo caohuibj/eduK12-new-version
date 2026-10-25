@@ -1,0 +1,278 @@
+{
+  "status": "RESEARCH_HANDOFF_NOT_IMPORTED",
+  "suggested_instrument_key": "res9_zh_cn_research",
+  "canonical_name": "Resilience Evaluation Scale (RES), final 9-item Simplified Chinese version",
+  "version": "Qing et al. 2022 Table 2",
+  "item_count": 9,
+  "language": "zh-CN",
+  "construct": "self-perceived psychological resilience / internal coping resources",
+  "source": {
+    "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358.",
+    "doi": "https://doi.org/10.1080/20008066.2022.2133358",
+    "fulltext": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+    "xml_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9621262/fullTextXML",
+    "xml_sha256": "b1a4544a75438a12dce46024fd6db65f8ba3329f19ece9a7347fde8a201167cc",
+    "item_locator": "Table 2 (XML T0002)",
+    "scoring_locator": "section 2.2.2 (XML S002-S2002-S3002)",
+    "structure_locator": "section 3.2 (XML S004-S2001)"
+  },
+  "rights": {
+    "license": "CC-BY-NC-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "copyright": "© 2022 The Author(s). Published by Informa UK Limited, trading as Taylor & Francis Group",
+    "public_redistribution": "Allowed for noncommercial purposes with attribution, license link, and indication of changes; do not relicense the items under repository MIT.",
+    "adaptation": "Allowed for noncommercial purposes subject to attribution; no need to retranslate these published Chinese item stems.",
+    "commercial_use": "Not granted by this license; obtain separate permission.",
+    "third_party_check": "No separate exclusion, external copyright holder, or reproduction-credit line in Table 2 or its footnote; final Chinese version authored/translated in this paper with original RES authors participating. Original 2018 RES authors explicitly generated new items rather than using other resilience scales.",
+    "scope_limit": "This determination covers the RES items in Table 2, not other instruments merely mentioned in the article."
+  },
+  "instructions": {
+    "source_semantics": "Rate agreement with statements about how you usually respond to difficult situations.",
+    "source_timeframe": "Usual/general response; no past-week/month recall window specified.",
+    "exact_published_chinese_instruction_available": false,
+    "implementation_zh_cn_working_text": "请根据自己通常如何应对困难情境，选择你对以下每项陈述的同意程度。",
+    "implementation_text_status": "Project working translation/presentation, NOT a verbatim validated Chinese instruction. The 2022 article and its supplementary DOCX do not print the Chinese instruction or full Chinese response anchors."
+  },
+  "response_options": [
+    {
+      "value": 0,
+      "label_zh_cn": "完全不同意",
+      "label_en": "completely disagree"
+    },
+    {
+      "value": 1,
+      "label_zh_cn": "不同意",
+      "label_en": "disagree"
+    },
+    {
+      "value": 2,
+      "label_zh_cn": "中立",
+      "label_en": "neutral"
+    },
+    {
+      "value": 3,
+      "label_zh_cn": "同意",
+      "label_en": "agree"
+    },
+    {
+      "value": 4,
+      "label_zh_cn": "完全同意",
+      "label_en": "completely agree"
+    }
+  ],
+  "response_option_provenance": "2022 section 2.2.2 establishes 0–4 and English endpoints. Five English labels in original van der Meer et al. 2018 scale/Appendix A. All Chinese option labels above are project working translations, not claimed verbatim from Qing et al. 2022.",
+  "items": [
+    {
+      "id": "RES1",
+      "order": 1,
+      "text_zh_cn": "我对自己有信心",
+      "text_en_reference": "I have confidence in myself",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES2",
+      "order": 2,
+      "text_zh_cn": "我可以很容易就适应困境",
+      "text_en_reference": "I can easily adjust in a difficult situation",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES3",
+      "order": 3,
+      "text_zh_cn": "我有毅力",
+      "text_en_reference": "I am able to persevere",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES4",
+      "order": 4,
+      "text_zh_cn": "遇到挫折后我可以很容易地继续下去",
+      "text_en_reference": "After setbacks, I can easily pick up where I left off",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES5",
+      "order": 5,
+      "text_zh_cn": "我很有韧性",
+      "text_en_reference": "I am resilient",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES6",
+      "order": 6,
+      "text_zh_cn": "我能很好的应对突发问题",
+      "text_en_reference": "I can cope well with unexpected problems",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES7",
+      "order": 7,
+      "text_zh_cn": "我欣赏我自己",
+      "text_en_reference": "I appreciate myself",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES8",
+      "order": 8,
+      "text_zh_cn": "我可以同时处理很多事情",
+      "text_en_reference": "I can handle a lot at the same time",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "id": "RES9",
+      "order": 9,
+      "text_zh_cn": "我相信我自己",
+      "text_en_reference": "I believe in myself",
+      "reverse": false,
+      "weight": 1,
+      "evidence": "Qing et al. (2022), Table 2; wording unmodified"
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "formula": "total = sum(RES1, RES2, RES3, RES4, RES5, RES6, RES7, RES8, RES9)",
+    "valid_item_values": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "minimum": 0,
+    "maximum": 36,
+    "reverse_items": [],
+    "higher_means": "higher self-perceived psychological resilience",
+    "dimension_model": "one-factor Chinese version",
+    "subscale_scores": [],
+    "clinical_cutoffs": null,
+    "severity_bands": null,
+    "norm_percentiles": null,
+    "missing_data_rule": "No validated missing-response rule located. Implementation policy: require all nine responses; do not score partial, impute, or prorate.",
+    "policy_vs_source": "Requiring complete responses is conservative platform policy, not an imputation rule published by authors."
+  },
+  "evidence": {
+    "sample_n": 484,
+    "population": "Adults in mainland China; predominantly female, young, highly educated Han-Chinese convenience sample",
+    "cronbach_alpha": 0.88,
+    "factor_evidence": "Chinese parallel analysis retained one factor, 49.92% explained variance; the original two-factor CFA was adequate to mediocre.",
+    "limits": [
+      "No Chinese test-retest study in this paper",
+      "No clinical cutoff or low/medium/high ranges established",
+      "Do not transfer original Dutch/English self-confidence/self-efficacy subscales to this Chinese implementation",
+      "No cross-language measurement-invariance or national norms established here",
+      "No youth validation established here"
+    ]
+  },
+  "report": {
+    "score_template": "你的 RES 自评总分为 {total}/36。分数越高，表示你通常对自己应对困难的能力评价越积极；它不是诊断，也不能证明你未来一定能或不能应对某种事件。",
+    "interpretation": "本量表没有经该研究验证的临床分界值，不划分高/中/低等级。一次自评分数会受到当时的处境和感受影响，也不涵盖所有外部支持与资源。",
+    "suggestion": "可以回顾一个最近遇到的困难，写下你已经采取的一项有效行动和可以寻求的一种支持。分数不理想不代表你软弱或失败。若困扰持续影响生活，可以与可信赖的人或专业人员讨论。",
+    "status": "Original platform explanatory copy, not author-prescribed treatment or threshold interpretation."
+  },
+  "duplication_check": {
+    "inventory": "docs/scale-instruments/publication/20261025/inventory.json",
+    "result": "Not present among 37 executable packages or 3 documentation holds; RES/Resilience Evaluation Scale not found in inspected instrument source.json registry records.",
+    "checked_date": "2026-10-25"
+  },
+  "tests": [
+    {
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expected_total": 0
+    },
+    {
+      "answers": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "expected_total": 36
+    },
+    {
+      "answers": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "expected_total": 18
+    },
+    {
+      "answers": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        0,
+        1,
+        2,
+        3
+      ],
+      "expected_total": 16
+    },
+    {
+      "answers": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expected": "incomplete_no_score"
+    },
+    {
+      "answers": [
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expected": "invalid_response"
+    }
+  ]
+}

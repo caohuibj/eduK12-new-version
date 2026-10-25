@@ -1,0 +1,123 @@
+{
+  "status": "PUBLISHED_CHINESE_STEMS_PLATFORM_ADMINISTRATION_TRANSLATION_PENDING",
+  "instrumentKey": "res9_zh_cn",
+  "source": {
+    "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358.",
+    "doi": "https://doi.org/10.1080/20008066.2022.2133358",
+    "fulltext": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+    "xml_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9621262/fullTextXML",
+    "xml_sha256": "b1a4544a75438a12dce46024fd6db65f8ba3329f19ece9a7347fde8a201167cc",
+    "item_locator": "Table 2 (XML T0002)",
+    "scoring_locator": "section 2.2.2 (XML S002-S2002-S3002)",
+    "structure_locator": "section 3.2 (XML S004-S2001)"
+  },
+  "instructions": {
+    "source_semantics": "Rate agreement with statements about how you usually respond to difficult situations.",
+    "source_timeframe": "Usual/general response; no past-week/month recall window specified.",
+    "exact_published_chinese_instruction_available": false,
+    "implementation_zh_cn_working_text": "请根据自己通常如何应对困难情境，选择你对以下每项陈述的同意程度。",
+    "implementation_text_status": "Project working translation/presentation, NOT a verbatim validated Chinese instruction. The 2022 article and its supplementary DOCX do not print the Chinese instruction or full Chinese response anchors."
+  },
+  "responseOptionProvenance": "2022 section 2.2.2 establishes 0–4 and English endpoints. Five English labels in original van der Meer et al. 2018 scale/Appendix A. All Chinese option labels above are project working translations, not claimed verbatim from Qing et al. 2022.",
+  "responseOptions": [
+    {
+      "value": 0,
+      "label_zh_cn": "完全不同意",
+      "label_en": "completely disagree"
+    },
+    {
+      "value": 1,
+      "label_zh_cn": "不同意",
+      "label_en": "disagree"
+    },
+    {
+      "value": 2,
+      "label_zh_cn": "中立",
+      "label_en": "neutral"
+    },
+    {
+      "value": 3,
+      "label_zh_cn": "同意",
+      "label_en": "agree"
+    },
+    {
+      "value": 4,
+      "label_zh_cn": "完全同意",
+      "label_en": "completely agree"
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "RES_01",
+      "originalItemNumber": 1,
+      "zh": "我对自己有信心",
+      "enReference": "I have confidence in myself",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_02",
+      "originalItemNumber": 2,
+      "zh": "我可以很容易就适应困境",
+      "enReference": "I can easily adjust in a difficult situation",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_03",
+      "originalItemNumber": 3,
+      "zh": "我有毅力",
+      "enReference": "I am able to persevere",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_04",
+      "originalItemNumber": 4,
+      "zh": "遇到挫折后我可以很容易地继续下去",
+      "enReference": "After setbacks, I can easily pick up where I left off",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_05",
+      "originalItemNumber": 5,
+      "zh": "我很有韧性",
+      "enReference": "I am resilient",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_06",
+      "originalItemNumber": 6,
+      "zh": "我能很好的应对突发问题",
+      "enReference": "I can cope well with unexpected problems",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_07",
+      "originalItemNumber": 7,
+      "zh": "我欣赏我自己",
+      "enReference": "I appreciate myself",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_08",
+      "originalItemNumber": 8,
+      "zh": "我可以同时处理很多事情",
+      "enReference": "I can handle a lot at the same time",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    },
+    {
+      "itemCode": "RES_09",
+      "originalItemNumber": 9,
+      "zh": "我相信我自己",
+      "enReference": "I believe in myself",
+      "reverse": false,
+      "source": "Qing et al. (2022), Table 2; wording unmodified"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "status": "STATIC_CONTENT_CHECKS_PASSED_ENGINE_AND_RUNTIME_NOT_RUN",
+  "observedAt": "2026-10-25T22:03:47Z",
+  "executor": "content builder; read-only static Python XML/JSON comparison",
+  "sourceXmlSha256": "b1a4544a75438a12dce46024fd6db65f8ba3329f19ece9a7347fde8a201167cc",
+  "checks": [
+    {
+      "check": "published_XML_Table2_exact_nine_stems",
+      "status": "PASS"
+    },
+    {
+      "check": "handoff_preserved_verbatim",
+      "status": "PASS"
+    },
+    {
+      "check": "source_XML_identity",
+      "status": "PASS"
+    },
+    {
+      "check": "one_total_positive_unit_weights",
+      "status": "PASS"
+    },
+    {
+      "check": "response_values_0_to_4",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_minimum",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_maximum",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_midpoint",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_mixed",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_one_missing",
+      "status": "PASS"
+    },
+    {
+      "check": "golden_arithmetic_all_missing",
+      "status": "PASS"
+    },
+    {
+      "check": "no_threshold_reference_activation",
+      "status": "PASS"
+    },
+    {
+      "check": "adult_noncommercial_draft_not_approved",
+      "status": "PASS"
+    },
+    {
+      "check": "standalone_instructions_not_inserted",
+      "status": "PASS"
+    },
+    {
+      "check": "all_own_JSON_readable",
+      "status": "PASS"
+    },
+    {
+      "check": "plain_language_summary_minimum",
+      "status": "PASS"
+    }
+  ],
+  "fileSha256": {
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/README.md": "f94cdcfb0fb5d5a98214d58c03e18d24a990f0ce9377731648a410642b5acc1c",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/administration.md": "206d5680c2014d230715aeb9bbef180ba81e6fe23c115d960f8255f0a744e278",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/bilingual-content.json": "72e6eacea2ab17e4c6047c13f1f612c9585e800e094e9f4957dcc753de3892f8",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/external-reference-dossier.json": "1d53b6285dc375197230ab5e3a3f65a59c466b25b237737652bd3d672f96ded5",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/references.md": "1eb513c398f846705d6bf96e7dc2b2446709e78ea091db072374901efdf28e85",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/report-example.json": "33f9862093a5c1b6e5a0edfb58a9a190d18c8dabace4c459047c62336e579bab",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/report-example.md": "0eec18052e9ba02fa65876011e7b89ea98d0411f27dbaf9ff574c3d40ba03ba7",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/research-handoff.json": "5f8434ddce0e17677cb8403ece69c6a22d86bb35b9ce80a321e540e9c4d61807",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/reviewed-source-pack.md": "c0f34ef202f49a9bec1bff80457d130c28e732315d003b7424161d3b6c1c0e73",
+    "docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/scoring-and-thresholds.md": "41fa2b07f5a42625659b755498df39b330accbf3152c48a5117d066c9371bcc0",
+    "server-version/backend/src/__tests__/scale/instruments/res9_zh_cn.test.ts": "a1ec53d0ecd00bd9c60867e343467b3b43da9e1e5e074af48b8cb4be56a63ca6",
+    "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md": "f7a0282b7b1d6ba8cad3e78c2b0ce38aa52690d984e10ac2a8d361a8fe8b79ac",
+    "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json": "2a6ecacecf075de19ad63f7504d26ff3923432770f1e562b2e4610673d0a8368"
+  },
+  "notRun": [
+    "Vitest / actual scoring and report engine",
+    "TypeScript type checking",
+    "Generated registry integration/check",
+    "Prisma generation / migrations",
+    "Database materialization or deployment plan",
+    "Browser administration page",
+    "Publication / CI / deployment"
+  ],
+  "notes": [
+    "Static arithmetic is not evidence of an executed scoring engine.",
+    "DRAFT/HIDDEN materialization is an intended policy, not a claim that a database row has been created.",
+    "Independent new-main executor owns remaining engine/runtime evidence; no shared node_modules modification."
+  ],
+  "fileManifestUpdatedAt": "2026-10-25T22:04:00Z"
+}

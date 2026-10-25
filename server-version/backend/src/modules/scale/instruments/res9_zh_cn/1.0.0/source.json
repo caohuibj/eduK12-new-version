@@ -1,0 +1,812 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "res9_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "中文韧性评估量表（RES，9题数字化候选）",
+      "abbreviation": "RES-9-CN",
+      "instrumentFamily": "Resilience Evaluation Scale"
+    },
+    "construct": {
+      "primaryDomain": "RESILIENCE",
+      "secondaryDomains": [
+        "SELF_EFFICACY"
+      ],
+      "constructDefinition": "通常面对困难时对自身应对资源的评价，包括适应、坚持及相信自己；采用2022中文版单因子总分，不等同于实际抗压表现、人格强弱、外部支持或未来创伤后的结局。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "res9_zh_cn",
+        "domain:resilience",
+        "construct:self_perceived_psychological_resilience",
+        "construct:internal_coping_resources",
+        "orientation:resilience_framework",
+        "orientation:not_therapy_specific",
+        "population:adult",
+        "population:chinese_adult_source_evidence",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "response:nine_items",
+        "response:five_point_agreement",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "use:no_validated_cutoff",
+        "license:cc_by_nc_4_0",
+        "license:noncommercial_only",
+        "license:attribution_required",
+        "language_validation:content_zh-CN",
+        "language_validation:published_chinese_items",
+        "language_validation:platform_anchor_translation_pending",
+        "language_validation:digital_presentation_review_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "populationNotes": "中国成人自陈研究与非诊断自我了解候选。源研究为2016年大陆便利样本N=484，报告纳入标准age above 18，均龄27.33岁；未报告完整年龄范围。平台最低18岁是成人使用边界，不是研究覆盖所有18岁以上人群的证明。ADULT_SELF / student中的student仅为既有报告技术受众角色，不表示中小学生或适用于K12。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "PARTIAL",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "通常如何应对困难情境；原文未指定最近一周、两周或一月",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留2022 Table 2原九题顺序和题干；第6题按原文“很好的”，不润色、不删题、不加英文版分量表。",
+        "0–4五档计分。完整英文锚点据2018最终题本；五档中文标签均为平台工作翻译，不冒充2022中文原版选项。",
+        "独立平台指导语仅保存在docs/scale-instruments/research-drafts/res9_zh_cn/1.0.0/administration.md；当前包不把指导语拼入首题，也不扩展引擎字段。接入独立指导语前不声明完整施测页已可用。",
+        "3分钟为平台负担估计，非论文实测完成时间。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "源中文成人研究提供结构与内部一致性证据；本次响应标签翻译、数字呈现及平台反馈尚未完成治理审核。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "res9-qing2022-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "中国大陆成人网络便利样本，女性66.9%，汉族94.2%，大学或以上教育77.3%；非全国常模",
+        "ageRange": "源文纳入标准age above 18；均值27.33±6.86岁，未报告完整年龄范围",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 484,
+        "studyDesign": "2016年3–5月横断面网络调查；两因子CFA拟合参差，随后平行分析支持单因子，解释49.92%方差",
+        "rating": "MIXED",
+        "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358.",
+        "doi": "10.1080/20008066.2022.2133358",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+        "notes": "中文9题采用单一总分；不把原英文两维度或跨语言可比性移植到本包。没有本平台或未成年人验证。"
+      },
+      {
+        "evidenceId": "res9-qing2022-consistency",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "与res9-qing2022-structure相同的484名成人，非另一独立样本",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 484,
+        "studyDesign": "横断面内部一致性分析；Cronbach alpha=0.88，删除任一题未提高alpha",
+        "rating": "MIXED",
+        "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358.",
+        "doi": "10.1080/20008066.2022.2133358",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+        "notes": "内部一致性不是重测信度、诊断准确性或个人变化的可信界值；论文未完成中文版重测研究。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Qing等(2022) Table 2已发表简体中文9题；本项目没有重新翻译题干。指导语和五档中文响应标签另为平台工作翻译。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "res9-qing2022-structure",
+      "res9-qing2022-consistency"
+    ],
+    "reviewStatus": "PENDING",
+    "notes": "原研究已经完成双人正译、原作者委员会核对、回译及10名中文成人试测。此处待审状态指本平台响应标签、独立指导语、呈现及新增报告；不否定源中文研究。完整中文指导语/选项未公开于论文或补充DOCX，不声称本包完整施测页逐字继承验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "res9_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "res9_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "res9_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358. 中文题干据Table 2，© 2022 The Author(s)，CC BY-NC 4.0：https://creativecommons.org/licenses/by-nc/4.0/ 。仅限非商业使用和再分发，需署名、保留许可链接并注明改动；商业使用须另获许可，题文不被仓库MIT许可证覆盖。保留9条中文题干原文及题序；中文选项为平台工作翻译，通俗报告为平台新增，不是作者审定的完整中文施测页，作者未背书本系统。原RES作者：van der Meer等(2018)，doi:10.3389/fpsyt.2018.00169。",
+      "2022 Table 2和表注未发现第三方版权排除；许可判断只覆盖RES题本，不覆盖文中提及的其他量表。2018原英文许可不能覆盖2022中文译文的非商业限制。",
+      "公开非商业再分发须保留THIRD_PARTY_LICENSE.md及署名/许可/改动说明；付费或商业平台使用未被本许可授权。权利确认不等于科学审核、上线授权或有效部署凭据。",
+      "本包仅为DRAFT候选。独立指导语在研究稿中，未拼入任何题干；本轮不修改共享引擎、不声明完整施测页运行验收。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "RES final nine-item Chinese stems (Qing et al., 2022, Table 2); platform response-label translation",
+        "citation": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9621262/",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "restricted",
+        "note": "Qing, Y., Bakker, A., van der Meer, C. A. I., te Brake, H., & Olff, M. (2022). Assessing psychological resilience: translation and validation of the Chinese version of the resilience evaluation scale (RES). European Journal of Psychotraumatology, 13(2), 2133358. doi:10.1080/20008066.2022.2133358. 中文题干据Table 2，© 2022 The Author(s)，CC BY-NC 4.0：https://creativecommons.org/licenses/by-nc/4.0/ 。仅限非商业使用和再分发，需署名、保留许可链接并注明改动；商业使用须另获许可，题文不被仓库MIT许可证覆盖。保留9条中文题干原文及题序；中文选项为平台工作翻译，通俗报告为平台新增，不是作者审定的完整中文施测页，作者未背书本系统。原RES作者：van der Meer等(2018)，doi:10.3389/fpsyt.2018.00169。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "res_agreement_0_4",
+          "options": [
+            {
+              "value": "0",
+              "label": "完全不同意",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "中立",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "完全同意",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "RES_01",
+          "content": "我对自己有信心",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_02",
+          "content": "我可以很容易就适应困境",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_03",
+          "content": "我有毅力",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_04",
+          "content": "遇到挫折后我可以很容易地继续下去",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_05",
+          "content": "我很有韧性",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_06",
+          "content": "我能很好的应对突发问题",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_07",
+          "content": "我欣赏我自己",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_08",
+          "content": "我可以同时处理很多事情",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "RES_09",
+          "content": "我相信我自己",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "res_agreement_0_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "RES_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "RES_09",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "resilience_total",
+            "type": "total",
+            "label": "面对困难时对自己的看法",
+            "description": "9题0–4分等权相加，总分0–36；越高表示自评应对资源越积极，不是诊断、能力等级或未来结局预测。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "RES_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "RES_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "resilience_total"
+        ],
+        "scoreOrder": [
+          "resilience_total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilience_total",
+            "headline": "面对困难时对自己的看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注你通常遇到困难时，怎样看待自己的应对能力，例如适应变化、继续做事，以及相信自己。总分只是这次自我描述的汇总，分数越高，表示你对这些描述越同意；它不是在给你贴“坚强”或“软弱”的标签，也不能预测你遇到某件事后一定会怎样。生活处境、疲惫程度和能得到的支持，都可能影响回答。本版本没有经过验证的高低分界，不给出等级或排名。比起追求某个数字，更有用的是看看哪些具体经历支持你的回答，以及现在还需要哪些帮助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一个困难：当时你做了哪件有帮助的小事？有没有题目没提到、却对你很重要的支持或处境？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以写下一项你已经做到的事，再选一个负担较小的下一步，例如把任务拆小，或向可信赖的人提出一个具体的帮助请求。不需要用分数证明自己。"
+              },
+              {
+                "category": "support",
+                "text": "需要帮助不表示软弱。如果困扰持续影响生活，可以与可信赖的人或合适的专业人员讨论；是否寻求支持不必由这份分数决定。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文源研究为484名中国成人的便利样本，女性、年轻、高教育和汉族参与者居多；不是全国常模，不证明中小学生、临床筛查或所有成人情境都适用。",
+          "只计算中文版支持的单一总分，不沿用英文/荷兰文的两个分量表；不以分数预测个人创伤结局或判断是否需要治疗。",
+          "没有本中文版已验证的诊断阈值、高中低分档、百分位、可靠变化界值或最小重要差异；分数变化本身不等于改善或恶化。",
+          "9题完整作答才计分，不填补、不按比例推算；这是平台保守缺失处理，不是作者已验证的漏答规则。",
+          "中文题干逐字保留自2022 Table 2；中文响应标签与独立指导语是平台工作翻译，数字呈现及新增反馈尚待审查，不能称为原作者逐字验证的完整施测页。",
+          "仅限非商业使用；代码仓库MIT许可证不覆盖本量表题文。"
+        ],
+        "disclaimer": "仅供成人非商业研究与非诊断自我了解。源中文题干已有成人研究，本平台选项翻译、数字呈现与反馈仍待审核；不用于诊断、治疗决策、选拔、学校排名或证明个人坚强程度。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T22:00:00Z",
+            "basis": "AI content check against published Table 2 XML and independent research handoff; no human scientific approval, platform psychometric validation or runtime verification claimed."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "res9",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "RES_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_09",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilience_total": 0
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "RES_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_09",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilience_total": 36
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "RES_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_09",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilience_total": 18
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "RES_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RES_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "RES_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "RES_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "RES_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "RES_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilience_total": 16
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "RES_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "RES_08",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "resilience_total": null
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "resilience_total": null
+          },
+          "totalScoreKeys": [
+            "resilience_total"
+          ]
+        }
+      }
+    ]
+  }
+}
