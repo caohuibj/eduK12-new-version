@@ -1,3 +1,4 @@
+import {ensureSurveyFlowAssignment} from '../../modules/survey/flow.assignment'
 import { randomBytes,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
@@ -73,6 +74,7 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
     await db.surveyWaveAttempt.create({data:{id:attemptId,projectId,waveId,participantId,
       sessionHash:participantId?null:hashResearchCredential(accessCredential)}})
     await db.surveyConsent.create({data:{id:randomUUID(),projectId,waveId,attemptId,participantId,consentVersion:options.consentVersion??1,accepted:true}})
+    if(options.conditional)await db.$transaction(tx=>ensureSurveyFlowAssignment(tx,{projectId,waveId,attemptId,participantId,snapshot,accessCredential,...(researchCode?{researchCode}:{})}))
     return {projectId,waveId,publicationId,snapshot,participantId,proof:{publicId,attemptId,accessCredential,...(researchCode?{researchCode}:{})}}
   }
   const start=(f:Fixture)=>startSurveyCognitive(f.proof,'go',{priorAnswers,administrationProvenance:provenance})

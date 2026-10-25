@@ -1,3 +1,4 @@
+import {grantLibraryUseFixture} from '../fixtures/library-distribution'
 import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
@@ -124,7 +125,7 @@ suite('Education private SCALE sharing / isolated PostgreSQL',()=>{
   expect(await softDeleteStoredAsset({assetId:f.assetId!,authorize:async()=>true,db})).toBe('referenced')
   await db.organizationCapabilityGrant.update({where:{id:f.capability.id},data:{revokedAt:new Date(),revokedByUserId:admin}})
   const recipient=await db.user.create({data:{username:'share_reader_'+randomUUID(),passwordHash:'synthetic',accountDomain:'TRAINING',role:'TEACHER',teacherApproved:true}})
-  await grantUse(admin,approved.entryId!,{requestId:randomUUID(),product:'TRAINING',userId:recipient.id})
+  await grantLibraryUseFixture(db,admin,approved.entryId!,{requestId:randomUUID(),product:'TRAINING',userId:recipient.id})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:approved.entryId!}})
   const source=await db.$transaction(tx=>readLibraryScaleMeasurementSource(tx,wrapper))
   expect(source.release.releaseId).toBe(p.releaseId)

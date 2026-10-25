@@ -57,10 +57,10 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
   // The internal command is not a valid public request: public distribution
   // must receive the exact immutable release/hash, never infer the latest.
   await expect(grantUse(admin,entryId,request)).rejects.toMatchObject({name:'ZodError',issues:[{
-   code:'invalid_union',unionErrors:expect.arrayContaining([expect.objectContaining({issues:expect.arrayContaining([
-    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['releaseId']}),
-    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['contentHash']}),
-   ])})]),
+   code:'invalid_union',errors:expect.arrayContaining([expect.arrayContaining([
+    expect.objectContaining({code:'invalid_type',expected:'string',path:['releaseId']}),
+    expect.objectContaining({code:'invalid_type',expected:'string',path:['contentHash']}),
+   ])]),
   }]})
   expect(await db.scale.findUnique({where:{libraryEntryId:entryId}})).toBeNull()
   // Deliberate transaction rollback must not leave resources or grants behind.

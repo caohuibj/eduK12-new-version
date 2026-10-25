@@ -1,3 +1,4 @@
+import {grantLibraryUseFixture} from '../fixtures/library-distribution'
 import {educationLibraryRuntimeContext} from '../../modules/scale-library-governance/education-runtime-context'
 import {readEducationLibraryExistingWrapperIdentity} from '../../modules/scale-library-governance/education-runtime-source'
 import {readEducationLibraryUse} from '../../modules/scale-library-governance/education-use'
@@ -67,13 +68,13 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
  it('requires the recipient target-entry identity and ordinary withdrawal preserves frozen collection',async()=>{
   const {entryId,release}=await approved()
   // This SURVEY-only account is not a Training recipient; source origin is not restricted.
-  await expect(grantUse(admin,entryId,{requestId:randomUUID(),userId:reader,product:'TRAINING'})).rejects.toThrow()
-  const grant=await grantUse(admin,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
+  await expect(grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:reader,product:'TRAINING'})).rejects.toThrow('目标不是有效的 Training 教师')
+  const grant=await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
   await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:reader,product:'SURVEY'}))
   await changeEntryStatus(admin,entryId,{expectedVersion:1,status:'WITHDRAWN',reason:'Future use only'})
   await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:reader,product:'SURVEY'}))).rejects.toThrow()
   await db.$transaction(tx=>assertScaleLibraryCollectionAllowed(tx,[release.releaseId]))
-  await revokeUse(admin,grant.id,{expectedVersion:1,reason:'Withdraw explicit use'})
+  await revokeUse(grant.issuerId,grant.id,{expectedVersion:1,reason:'Withdraw explicit use'})
   const [tool]=await db.$queryRaw<Array<{status:string}>>(Prisma.sql`SELECT t.status FROM survey_tool_grants t JOIN scale_library_use_grants g ON g.survey_tool_grant_id=t.id WHERE g.id=${grant.id}`)
   expect(tool.status).toBe('REVOKED')
  })
@@ -81,7 +82,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const {entryId,release}=await approved()
   const teacher=(await db.user.create({data:{username:'libteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
   const entryAdmin=(await db.user.create({data:{username:'libentry'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id
-  const use=await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  const use=await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}})
   expect(wrapper.measurementReleaseId).toBe(release.releaseId)
   expect(wrapper.definition).toEqual(compileResearchScale(metadata.title,definition))
@@ -108,8 +109,8 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const entryId=approval.entryId!
   await db.scale.update({where:{id},data:{status:'ARCHIVED'}})
   await db.user.update({where:{id:author},data:{isFrozen:true}})
-  await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
-  const survey=await grantUse(admin,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
+  await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  const survey=await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}})
   expect(await canUseScale(author,'TEACHER',wrapper,db)).toBe(false)
   expect(await canUseScale(teacher,'TEACHER',wrapper,db)).toBe(true)
@@ -125,7 +126,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const {entryId}=await approved()
   const teacher=(await db.user.create({data:{username:'protocolteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
   const student=(await db.user.create({data:{username:'protocolstudent'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'STUDENT',accountDomain:'TRAINING'}})).id
-  const use=await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  const use=await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}})
   const course=await db.course.create({data:{title:'Synthetic protocol course',courseCode:randomUUID(),creatorId:teacher,status:'PUBLISHED'}})
   await db.courseStudent.create({data:{courseId:course.id,studentId:student,status:'APPROVED'}})
@@ -150,16 +151,17 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
  })
  it('entry admin is a distributor only within the exact explicit parent grant; revocation stops new use',async()=>{
   const {entryId,release}=await approved()
+  const teacher=(await db.user.create({data:{username:'distrib-recipient-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
   const delegate=(await db.user.create({data:{username:'libdelegate'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id
-  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:delegate,entry:'SURVEY',grantedBy:admin}})
-  await expect(grantUse(delegate,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})).rejects.toThrow()
+  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:delegate,entry:'TRAINING',grantedBy:admin}})
+  await expect(grantUse(delegate,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})).rejects.toThrow()
   const parentId=randomUUID()
-  await db.contentCapabilityGrant.create({data:{id:parentId,subjectId:delegate,issuerId:admin,product:'SURVEY',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'material',resourceKeys:[release.releaseId],capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000),expiresAt:new Date(Date.now()+60000),ancestry:[parentId]}})
-  await grantUse(delegate,entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY',grantId:parentId})
+  await db.contentCapabilityGrant.create({data:{id:parentId,subjectId:delegate,issuerId:admin,product:'TRAINING',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'material',resourceKeys:[release.releaseId],capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000),expiresAt:new Date(Date.now()+60000),ancestry:[parentId]}})
+  await grantUse(delegate,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING',grantId:parentId})
   await expect(review(delegate,(await application()).submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Distribution is not review',grantId:parentId})).rejects.toThrow()
-  await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:reader,product:'SURVEY'}))
+  await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:teacher,product:'TRAINING'}))
   await db.contentCapabilityGrant.update({where:{id:parentId},data:{revokedAt:new Date(),revokedBy:admin,revokeReason:'Synthetic parent withdrawal',version:{increment:1}}})
-  await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:reader,product:'SURVEY'}))).rejects.toThrow()
+  await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:teacher,product:'TRAINING'}))).rejects.toThrow()
   await db.$transaction(tx=>assertScaleLibraryCollectionAllowed(tx,[release.releaseId]))
  })
  it('exact emergency stops reject collection but do not cascade across independent native revisions',async()=>{
@@ -177,7 +179,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const {entryId,release}=await approved()
   const teacher=(await db.user.create({data:{username:'finalteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
   const student=(await db.user.create({data:{username:'finalstudent'+randomUUID().slice(0,8),passwordHash:'synthetic',accountDomain:'TRAINING'}})).id
-  await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}})
   const compiled=compileResearchScale(metadata.title,definition)
   const assessment=await db.assessment.create({data:{scaleId:wrapper.id,userId:student,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1}})
@@ -204,7 +206,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const {submitScaleAssessmentFinal}=await import('../../modules/scale/scale-final-submit.service')
   const {entryId,release}=await approved()
   const teacher=(await db.user.create({data:{username:'raceteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
-  await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}}),compiled=compileResearchScale(metadata.title,definition)
   const assessment=await db.assessment.create({data:{scaleId:wrapper.id,userId:teacher,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',attemptEpoch:1}})
   const input={assessmentId:assessment.id,userId:teacher,submissionId:randomUUID(),attemptEpoch:1,definitionHash:hashScaleDefinition(compiled),contextSnapshotHash:null,answers:compiled.items.map(item=>({itemCode:item.itemCode,responseValue:compiled.responseSets.find(set=>set.key===item.responseSetKey)!.options[0].value}))}
@@ -306,7 +308,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const read=(patch:Partial<typeof context>={})=>db.$transaction(tx=>readEducationLibraryExistingWrapperIdentity(tx,{...context,...patch}))
   await expect(read()).rejects.toThrow('EXISTING_WRAPPER_REQUIRED')
   const teacher=(await db.user.create({data:{username:'libwrapper'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
-  await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
   for(const product of ['SCHOOL','TEACHER'] as const){
    const resolved=await read({product})
    expect(resolved).toMatchObject({identityOnly:true,runtimeStatus:'EDUCATION_LIBRARY_ADAPTER_NOT_READY',canDistribute:false,canPublish:false})

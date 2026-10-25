@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
-import {createDraft,updateDraft} from '../../modules/survey/builder.service'
+import {createDraft,updateDraft,reviseDraft} from '../../modules/survey/builder.service'
 import {createWave,getWave} from '../../modules/survey/waves.service'
 import {prepareWave} from '../../modules/survey/waves.publish'
 import {publishSurveyMeasurementDraft} from '../../modules/survey/measurement-publication.service'
@@ -140,13 +140,16 @@ suite('Survey Wave private content options / real isolated PostgreSQL',()=>{
    reportRelease:{releaseId:selected.releaseId,contentHash:selected.contentHash},
    referencePolicy:{choices:[{releaseId:reference.releaseId,contentHash:reference.contentHash,priority:1}]},
   })
-  // Editing the still-authorable draft must not overwrite the already-frozen
-  // measurement, private report/reference selection, or participant feedback.
+  // Published content requires an explicit next revision. Editing that new
+  // draft must not overwrite the already-frozen exact publication.
   const edited=structuredClone(definition)
   edited.rawScoreFeedback!.rules[0].ranges[0].text='仅供后续版本的新反馈'
   edited.items[1].attentionTarget='o3'
   edited.totalScore!.aggregation='mean'
-  await updateDraft(owner,project,instrument,{revision:1,title:'后续草稿版本',definition:edited})
+  const publishedDraft=await db.surveyInstrumentDraft.findUniqueOrThrow({where:{id:instrument}})
+  await expect(updateDraft(owner,project,instrument,{revision:publishedDraft.revision,title:'后续草稿版本',definition:edited})).rejects.toMatchObject({statusCode:409})
+  const revised=await reviseDraft(owner,project,instrument,publishedDraft.revision)
+  await updateDraft(owner,project,instrument,{revision:revised.revision,title:'后续草稿版本',definition:edited})
   const afterEdit=await db.surveyPublication.findUniqueOrThrow({where:{id:publication.id}})
   expect(afterEdit.compiledSnapshot).toEqual(publication.compiledSnapshot)
   expect(afterEdit.definitionDigest).toBe(publication.definitionDigest)

@@ -1,3 +1,4 @@
+import {publishTrainingSourcesFixture} from '../fixtures/published-measurement'
 import { beforeAll, afterAll, describe, expect, it } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -50,10 +51,10 @@ suite('Four-type Questionnaire production lifecycle', () => {
     cogSubmit = await import('../../modules/cognitive/final-submit.service')
     sjtSubmit = await import('../../modules/situational/situational-final-submit.service')
     for (const [id, role] of [[actor.userId, 'TEACHER'], [other.userId, 'TEACHER'], [admin.userId, 'ADMIN'], [student, 'STUDENT'], [student2, 'STUDENT']] as const) {
-      await db.user.create({ data: { id, username: id, passwordHash: 'fixture-only', role } })
+      await db.user.create({ data: { id, username: id, passwordHash: 'fixture-only', role, teacherApproved: role==='TEACHER', accountDomain:'TRAINING' } })
     }
     const cs = []
-    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
+    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseType:'TRAINING_COURSE', courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
     course1=cs[0].id; course2=cs[1].id
     await db.courseStudent.createMany({ data: [{ courseId: course1, studentId: student, status: 'ACTIVE' }, { courseId: course2, studentId: student2, status: 'APPROVED' }] })
     const entry = requireCognitiveRegistryEntry('gonogo','1.0.0','1.0.0')
@@ -65,6 +66,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     configId=config.id
     assignmentId=(await db.cognitiveAssignment.create({ data: { configId,courseId:course1,createdBy:actor.userId,title:'Go/No-Go fixture',status:'PUBLISHED',listedStandalone:true,maxAttempts:100,...freezeDataForWrite(freeze) } })).id
     scaleId=(await db.scale.create({ data: { code:'Q1-'+suffix,name:'Scale fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:MIXED_SCALE_DEFINITION as any,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),itemCount:1,dimensionCount:1 } })).id
+    await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[scaleId],assignmentIds:[assignmentId],situational:[{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion}]})
   },120000)
   afterAll(async () => {
     if (!db) return
@@ -261,7 +263,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     await cogSubmit.submitCognitiveSessionFinal(student,{sessionId:cog.id,submissionId:randomUUID(),attemptEpoch:1,definitionHash:cog.assignment!.resolvedConfigHash!,contextSnapshotHash:null,
       trials:gonogoSequence(cog.randomSeed,120,0.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1000,endedAtPerfMs:trialIndex*1000+300,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))})
     const { listMyHistory } = await import('../../modules/cognitive/history.service')
-    const history = await listMyHistory(student, { page: 1, pageSize: 100, skip: 0, take: 100 })
+    const history = await listMyHistory(student, { page: 1, pageSize: 50, skip: 0, take: 100 })
     expect(history.list.some(entry => entry.sessionId === cog.id)).toBe(false)
     const { getSession } = await import('../../modules/cognitive/session.service')
     expect(await getSession(student, cog.id)).toMatchObject({ status: 'COMPLETED', feedbackDeferred: true })
@@ -284,7 +286,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
       embedded:{compositeAttemptId:attemptId,compositeItemId:child.compositeItemId!,compositeSlotKey:compositeItemSlotKey(child.compositeItemId!,'SITUATIONAL'),userId:student},
     })
     expect(await runtime.getAttemptState(attemptId,{userId:student})).toMatchObject({status:'COMPLETED',progress:100,completedItems:4})
-    expect((await listMyHistory(student, { page: 1, pageSize: 100, skip: 0, take: 100 })).list.find(entry => entry.sessionId === cog.id)).toMatchObject({ source: 'composition', sourceName: row.name, score: null, reportHref: `/student/cognitive/sessions/${cog.id}/result` })
+    expect((await listMyHistory(student, { page: 1, pageSize: 50, skip: 0, take: 100 })).list.find(entry => entry.sessionId === cog.id)).toMatchObject({ source: 'composition', sourceName: row.name, score: null, reportHref: `/student/cognitive/sessions/${cog.id}/result` })
     const ownCompletedSession = await getSession(student, cog.id)
     expect(ownCompletedSession).toHaveProperty('result')
     expect(ownCompletedSession).not.toHaveProperty('feedbackDeferred')
@@ -483,7 +485,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     expect(copied.id).not.toBe(old.id)
     expect(copied.productKind).toBe('QUESTIONNAIRE')
     expect(await db.questionnaire.findUnique({where:{id:old.id},include:{formItems:true}})).toEqual(before)
-    expect((await product.list(actor,1,100)).list.some(v=>v.id===old.id&&v.kind==='LEGACY')).toBe(true)
+    expect((await product.list(actor,1,50,{search:'Legacy'})).list.some(v=>v.id===old.id&&v.kind==='LEGACY')).toBe(true)
   })
   it('allows two slots of the same scale without conflating identity', async () => {
     let row=await fresh()
@@ -511,9 +513,10 @@ suite('Four-type Questionnaire production lifecycle', () => {
   it('copies a published four-type product and can publish the new draft', async () => {
     let row=await mixed()
     row=await product.publish(actor,row.id,{revision:row.revision})
-    const copy=await product.copy({userId:other.userId,role:UserRole.ADMIN},row.id,{requestId:randomUUID()})
+    await expect(product.copy(other,row.id,{requestId:randomUUID()})).rejects.toMatchObject({statusCode:403})
+    const copy=await product.copy(actor,row.id,{requestId:randomUUID()})
     expect(copy.status).toBe('DRAFT')
-    expect((await product.publish({userId:other.userId,role:UserRole.ADMIN},copy.id,{revision:copy.revision})).status).toBe('PUBLISHED')
+    expect((await product.publish(actor,copy.id,{revision:copy.revision})).status).toBe('PUBLISHED')
   },30000)
   it('shares one source quota across standalone, composition and course copies under concurrency', async () => {
     const original = await db.cognitiveAssignment.findUniqueOrThrow({ where: { id: assignmentId } })
@@ -523,6 +526,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
       resolvedConfigHash: original.resolvedConfigHash, resolvedConfigSnapshotEncrypted: original.resolvedConfigSnapshotEncrypted,
       resolvedReportSnapshotEncrypted: original.resolvedReportSnapshotEncrypted,
     } })
+    await publishTrainingSourcesFixture(db,actor.userId,{assignmentIds:[source.id]})
     let combined = await fresh()
     combined = await add(combined, { type: 'COGNITIVE', cognitiveAssignmentId: source.id })
     combined = await product.publish(actor, combined.id, { revision: combined.revision })
@@ -576,7 +580,7 @@ suite('Four-type Questionnaire production lifecycle', () => {
     await runtime.addItem(actor.userId, actor.role, legacy.id, { type: 'SCALE', scaleId, required: true })
     await runtime.publishComposite(actor.userId, actor.role, legacy.id)
     const before = await db.compositeAssessment.findUniqueOrThrow({ where: { id: legacy.id } })
-    expect((await product.list(actor, 1, 100)).list).toContainEqual(expect.objectContaining({ id: legacy.id, kind: 'LEGACY_COMPOSITE', reportMode: 'COLLECTION_ONLY', editHref: '/composite-assessments/' + legacy.id }))
+    expect((await product.list(actor, 1, 50, {search:'Legacy'})).list).toContainEqual(expect.objectContaining({ id: legacy.id, kind: 'LEGACY_COMPOSITE', reportMode: 'COLLECTION_ONLY', editHref: '/composite-assessments/' + legacy.id }))
     const copied = await product.copy(actor, legacy.id, { requestId: randomUUID() })
     expect(copied).toMatchObject({ productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', status: 'DRAFT' })
     expect(copied.questionnaireCourses.map((value: any) => value.courseId)).toEqual([course1])

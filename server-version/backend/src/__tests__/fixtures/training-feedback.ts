@@ -9,6 +9,7 @@ export function feedbackAttempt(overrides: any = {}, policy: any = { schemaVersi
     trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null,
     items: [], formSections: [], ...overrides.compositeAssessment }
   const row: any = { id: 'attempt-1', compositeAssessmentId: definition.id, status: 'COMPLETED', attemptEpoch: 1, asyncReportEpoch: null,
+    trainingContentBindingHash: null, trainingReferenceBindingHash: null,
     userId: 'student-1', recoveryTokenHash: null, deliveryCourseId: 'course-1', accessTokenId: null, accessToken: null,
     frozenActiveSlotSetHash: 'slots', contextSnapshotHash: null, aggregateInputHash: 'aggregate',
     assignmentRef: null, respondentType: null, completedAt: new Date('2026-10-19T00:00:00Z'),

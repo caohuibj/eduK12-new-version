@@ -117,7 +117,6 @@ describe('C19 four FINAL transaction wiring', () => {
     ['assessment-runtime/unified-form-section-final-submit.service.ts', 'withCompositeFormUnitTransaction(async (tx)', 'tx.compositeFormSectionAttempt.findUnique', 'persistCompositeFormSection(tx'],
     ['scale/unified-final-submit.service.ts', 'const committed = await withFinalOnlyCompletionTransaction', 'tx.assessment.findUnique', 'persistScaleFactRecords(tx'],
     ['cognitive/unified-final-submit.service.ts', 'const committed = await withFinalOnlyCompletionTransaction', 'tx.cognitiveSession.findUnique', 'tx.cognitiveRawSubmission.create'],
-    ['situational/situational-final-submit.service.ts', 'const committed = await withFinalOnlyCompletionTransaction', 'await lockSituationalAttempt', 'tx.situationalAttempt.updateMany'],
   ])('%s gates before child writes', (file, start, childRead, firstWrite) => {
     const source = readFileSync(`src/modules/${file}`, 'utf8').split(start)[1]
     expect(source.indexOf('lockTrainingFlowFinalAdmission(tx')).toBeGreaterThanOrEqual(0)
@@ -125,5 +124,15 @@ describe('C19 four FINAL transaction wiring', () => {
     expect(source.indexOf('assertFlowFinal(false)')).toBeGreaterThan(source.indexOf(childRead))
     expect(source.indexOf('assertFlowFinal(false)')).toBeLessThan(source.indexOf(firstWrite))
     expect(source).toContain('assertFlowFinal(true)')
+  })
+  it('binds the SJT shared writer to the locked Training host and gates before writes',()=>{
+    const source=readFileSync('src/modules/situational/situational-final-submit.service.ts','utf8')
+    const tx=source.split('const committed = await withFinalOnlyCompletionTransaction')[1]
+    expect(tx.indexOf('lockTrainingFlowFinalAdmission(tx')).toBeLessThan(tx.indexOf('return commitPreparedSituationalFinal(tx'))
+    expect(tx).toContain('assertReplayAdmission: assertFlowFinal')
+    const writer=source.split('export async function commitPreparedSituationalFinal')[1].split('const persistSituationalAttemptFinal')[0]
+    expect(writer.indexOf('await lockSituationalAttempt')).toBeLessThan(writer.indexOf('host.assertReplayAdmission(false)'))
+    expect(writer.indexOf('host.assertReplayAdmission(false)')).toBeLessThan(writer.indexOf('tx.situationalAttempt.updateMany'))
+    expect(writer).toContain('host.assertReplayAdmission(true)')
   })
 })

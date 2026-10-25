@@ -1,3 +1,4 @@
+import {grantLibraryUseFixture,libraryDistributorFixture} from './fixtures/library-distribution'
 import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
@@ -53,8 +54,8 @@ suite('Training workspace uses authoritative exact-version library permissions',
  afterAll(async()=>{await db?.$disconnect()})
  it('lists only the granted exact version, never confuses author provenance with ownership or adaptation rights',async()=>{
   const first=await approved('1'),second=await approved('2')
-  await grantUse(admin,first.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
-  await grantUse(admin,second.entryId,{requestId:randomUUID(),userId:stranger,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,first.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,second.entryId,{requestId:randomUUID(),userId:stranger,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:first.entryId}})
   const before=await db.scale.findUniqueOrThrow({where:{id:wrapper.id}})
   const result=await catalog(recipient,{source:'granted',pageSize:1})
@@ -63,7 +64,7 @@ suite('Training workspace uses authoritative exact-version library permissions',
   for(const field of ['definition','copySource','courseScales','assessments','_count','creatorId'])expect(result.list[0]).not.toHaveProperty(field)
   expect((await catalog(recipient,{source:'owned'})).total).toBe(0)
   expect((await catalog(author)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)
-  await grantUse(admin,first.entryId,{requestId:randomUUID(),userId:author,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,first.entryId,{requestId:randomUUID(),userId:author,product:'TRAINING'})
   expect((await catalog(author,{source:'granted'})).list).toEqual([expect.objectContaining({id:wrapper.id,ownerId:null,canUpdateVersion:false})])
   await expect(copyScaleToDraft(wrapper.id,author)).rejects.toMatchObject({status:403})
   await expect(copyScaleToDraft(wrapper.id,recipient)).rejects.toMatchObject({status:403})
@@ -71,21 +72,22 @@ suite('Training workspace uses authoritative exact-version library permissions',
  },30000)
  it('excludes revoked and withdrawn grants, even when the material grant or author provenance remains',async()=>{
   const state=await approved('3')
-  const use=await grantUse(admin,state.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
+  const use=await grantLibraryUseFixture(db,admin,state.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:state.entryId}})
   expect((await catalog(recipient)).list.map((row:any)=>row.id)).toContain(wrapper.id)
-  await db.user.update({where:{id:admin},data:{isFrozen:true}})
+  const issuer=await libraryDistributorFixture(db,admin)
+  await db.user.update({where:{id:issuer},data:{isFrozen:true}})
   try{expect((await catalog(recipient)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)}
-  finally{await db.user.update({where:{id:admin},data:{isFrozen:false}})}
+  finally{await db.user.update({where:{id:issuer},data:{isFrozen:false}})}
   await revokeUse(admin,use.id,{expectedVersion:1,reason:'Synthetic revocation'})
   expect((await catalog(recipient)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)
-  await grantUse(admin,state.entryId,{requestId:randomUUID(),userId:author,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,state.entryId,{requestId:randomUUID(),userId:author,product:'TRAINING'})
   await changeEntryStatus(admin,state.entryId,{expectedVersion:1,status:'WITHDRAWN',reason:'Synthetic withdrawal'})
   expect((await catalog(author)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)
  },30000)
  it('keeps approved Survey-authored versions visible to exact Training recipients independently of the legacy feature flag',async()=>{
   const state=await approved('4','SURVEY')
-  await grantUse(admin,state.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
+  await grantLibraryUseFixture(db,admin,state.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:state.entryId}})
   const previous=config.materialGrantsEnabled
   try{config.materialGrantsEnabled=false
