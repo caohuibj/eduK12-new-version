@@ -89,6 +89,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       await db.scale.deleteMany({ where: { creatorId: actor.userId } })
       await db.course.deleteMany({ where: { creatorId: actor.userId } })
       await db.bundlePackageRelease.deleteMany({ where: { installedBy: actor.userId } })
+      await db.$executeRaw`DELETE FROM survey_tool_policies WHERE reviewed_by IN (${actor.userId},${reviewer},${student})`
       await db.user.deleteMany({ where: { id: { in: [actor.userId, reviewer, student] } } })
       await db.$disconnect()
     }

@@ -83,10 +83,10 @@ describe('Survey participant lifecycle query reuse',()=>{
     expect(result).toHaveProperty('cognitiveSessions')
     expect(JSON.stringify(result)).not.toMatch(/Cipher|randomSeed|metrics/)
   })
-  it('a verified locator cannot suppress current hard stop, consent, withdrawal or credential checks',async()=>{
+  it('consent, withdrawal and credential checks still apply; hard stop no longer suspends an established attempt',async()=>{
     const f=fixture()
     f.attempt.wave.hardStopAt=new Date() as any
-    await expect(readSurveyCognitiveProgressFromVerifiedAttempt(f.proof,f.known as any)).rejects.toThrow('窗口')
+    await expect(readSurveyCognitiveProgressFromVerifiedAttempt(f.proof,f.known as any)).resolves.toBeDefined()
     f.attempt.wave.hardStopAt=null
     f.tx.surveyConsent.findFirst.mockResolvedValueOnce(null)
     await expect(readSurveyCognitiveProgressFromVerifiedAttempt(f.proof,f.known as any)).rejects.toThrow('知情同意')

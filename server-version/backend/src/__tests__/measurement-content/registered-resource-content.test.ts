@@ -89,9 +89,11 @@ describe('School/Teacher registered descriptive consumption', () => {
       mocks.release.mockResolvedValueOnce({ ...release(), ...patch })
       await expect(prepare()).rejects.toMatchObject({ code: 'RESOURCE_CONTENT_SOURCE_INVALID' })
     }
-    const denied = scale(); denied.definition.license.redistribution = 'restricted'
-    denied.definitionHash = hashScaleDefinition(denied.definition)
-    await expect(prepare('REGISTER', denied)).rejects.toMatchObject({ code: 'RESOURCE_CONTENT_SOURCE_INVALID' })
+    const restricted = scale(); restricted.definition.license.redistribution = 'restricted'
+    restricted.definitionHash = hashScaleDefinition(restricted.definition)
+    // Redistribution licensing is reference-only metadata now; it no longer
+    // gates registered content preparation.
+    await expect(prepare('REGISTER', restricted)).resolves.toBeDefined()
   })
   it('rejects wrong runtime target, extra items and partial prior freeze before source reads', async () => {
     for (const patch of [{ productKind: 'QUESTIONNAIRE' }, { status: 'PUBLISHED' },

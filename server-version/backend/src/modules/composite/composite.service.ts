@@ -4,6 +4,7 @@ import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
 import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
+import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
 import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import {attachTrainingReferenceSelection} from './training-reference-selection'
@@ -2934,8 +2935,12 @@ const createAttempt = async (
   const selectedContentItems=new Set<string>(composite.items.map((item:any)=>item.id))
   // Include conditional/unselected slots before admitting the parent; otherwise
   // a stop could first be discovered halfway through an accepted attempt.
-  await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,
-    composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId),composite.createdBy)
+  // Education organization resources admit through their own education run
+  // boundary (education use grant checked at publication); for them only the
+  // shared emergency-stop/identity lock applies, never Training entry policies.
+  const collectionScaleIds=composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId)
+  if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],collectionScaleIds)
+  else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,collectionScaleIds,composite.createdBy)
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({

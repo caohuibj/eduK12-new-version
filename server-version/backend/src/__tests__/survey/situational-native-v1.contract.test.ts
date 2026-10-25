@@ -65,9 +65,9 @@ describe('Survey native V1 TEXT uses the existing scientific contract',()=>{
     if(unstaged.schemaVersion===2)for(const node of unstaged.flow.nodes)if(node.nodeType==='SCENE')delete node.responseStages
     expect(()=>assertSurveyNativeSituationalDefinition(unstaged)).toThrow()
   })
-  it('requires published source and source redistribution rights independently of runtime support',()=>{
+  it('requires a published source; redistribution licensing is reference-only and no longer gates adaptation',()=>{
     expect(()=>compileSurveyNativeSituationalHeader(compiled.package)).toThrow()
     const restricted=structuredClone(pkg);restricted.definition.license.redistribution='restricted'
-    expect(()=>adaptCatalogSjt(ref,'Synthetic restricted negative',restricted)).toThrow('SOURCE_RIGHTS_DO_NOT_ALLOW_SURVEY_REDISTRIBUTION')
+    expect(()=>adaptCatalogSjt(ref,'Synthetic restricted reference',restricted)).not.toThrow()
   })
 })

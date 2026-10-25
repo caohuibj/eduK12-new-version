@@ -105,6 +105,7 @@ const main = async () => {
       await db.scale.delete({ where: { id } })
     }
     await db.instrumentAuthorization.deleteMany({ where: { instrumentKey: { in: keys } } })
+    await db.$executeRaw`DELETE FROM survey_tool_policies WHERE reviewed_by IN (${admin.id},${student.id})`
     await db.user.deleteMany({ where: { id: { in: [admin.id, student.id] } } })
     await db.$disconnect()
   }

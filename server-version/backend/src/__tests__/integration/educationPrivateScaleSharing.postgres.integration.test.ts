@@ -54,7 +54,7 @@ suite('Education private SCALE sharing / isolated PostgreSQL',()=>{
    const submitted=await apply(f,p)
    expect(submitted).toMatchObject({product:entry,status:'SUBMITTED',sourceId:f.draft.id,versionId:f.version.id})
    await expect(review(f.user.id,submitted.id,{expectedVersion:1,decision:'APPROVE',reason:'Self approval'})).rejects.toThrow()
-   const approved=await review(admin,submitted.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic platform review'})
+   const approved=await review(admin,submitted.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic platform review'})
    expect(approved.status).toBe('APPROVED');expect(approved.entryId).toBeTruthy()
    await expect(sharing.withdrawPrivateScaleSharing(f.c,f.draft.id,submitted.id,{expectedVersion:2,reason:'Cannot withdraw approved'})).rejects.toThrow()
    const before=(await readSubmission(admin,submitted.id)).snapshot
@@ -119,7 +119,7 @@ suite('Education private SCALE sharing / isolated PostgreSQL',()=>{
   const application=await apply(f,p,extra)
   expect((await apply(f,p,extra)).id).toBe(application.id)
   expect(await db.assetReference.count({where:{entityType:'ScaleLibrarySubmission',entityId:application.id,assetId:f.assetId!}})).toBe(1)
-  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic media review'})
+  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic media review'})
   expect(await db.assetReference.count({where:{entityType:'ScaleLibraryMedia',entityId:approved.entryId!,assetId:f.assetId!}})).toBe(1)
   expect((await db.storedAsset.findUniqueOrThrow({where:{id:f.assetId!}})).accessScope).toBe('PRIVATE')
   expect(await softDeleteStoredAsset({assetId:f.assetId!,authorize:async()=>true,db})).toBe('referenced')

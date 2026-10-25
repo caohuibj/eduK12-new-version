@@ -212,7 +212,7 @@ async function main() {
     assert.equal(await student.getByText('未作答', { exact: true }).count(), 4)
     await shots(student, 'student-report')
     await teacher.goto(base + '/composite-assessments/' + id + '/results')
-    await teacher.getByRole('button', { name: '查看', exact: true }).click()
+    await teacher.getByRole('button', { name: '查看报告', exact: true }).first().click()
     await teacher.getByText('未作答', { exact: true }).first().waitFor()
     assert.equal(await teacher.getByText('未作答', { exact: true }).count(), 4)
     await shots(teacher, 'teacher-report')
