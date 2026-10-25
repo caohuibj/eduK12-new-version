@@ -1,11 +1,11 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ScaleLibraryGovernance from './ScaleLibraryGovernance'
 const scoped=vi.hoisted(()=>({request:vi.fn()}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'manager',platformRole:'STANDARD'}})}))
 vi.mock('../../api/surveyManagement',()=>({surveyManagementRequest:scoped.request}))
-const api = vi.hoisted(() => ({ catalog: vi.fn(), catalogDetail: vi.fn(), capabilities: vi.fn(), submissionDetail: vi.fn(), submissions: vi.fn(), entries: vi.fn(), review: vi.fn(), setStatus: vi.fn(), recipients: vi.fn(), grants: vi.fn(), grant: vi.fn(), revoke: vi.fn() }))
+const api = vi.hoisted(() => ({ catalog: vi.fn(), catalogDetail: vi.fn(), capabilities: vi.fn(), submissionDetail: vi.fn(), submissions: vi.fn(), entries: vi.fn(), review: vi.fn(), setStatus: vi.fn(), setEntrypoints: vi.fn(), recipients: vi.fn(), grants: vi.fn(), grant: vi.fn(), revoke: vi.fn() }))
 vi.mock('../../api/scaleLibraryGovernance', () => ({ governanceApi: () => api, submissionStatusLabel: { SUBMITTED: '待审核' } }))
 const metadata = { title: '范围内量表', author: '作者', copyright: '自有', applicability: '研究', scoringDescription: '求和', reportDescription: '描述性' }
 const application = { id: 'application', releaseId: 'release', metadata, version: 3, status: 'SUBMITTED', product: 'TRAINING', supportedEntrypoints: ['TRAINING', 'SURVEY'] }
@@ -134,4 +134,85 @@ it('system administrators cannot distribute Survey versions from the shared gove
   await screen.findByText('当前账号没有此版本在该入口的分配权限，或该入口尚未开放。')
   expect(screen.queryByRole('button',{name:'读取可见授权对象'})).not.toBeInTheDocument()
   expect(api.recipients).not.toHaveBeenCalled();expect(api.grant).not.toHaveBeenCalled()
+})
+
+describe('entry admission gating when support information is missing or narrowed', () => {
+  const detailOf = (row: typeof application) => ({ ...row, snapshot: { definition: { items: ['frozen question'] } }, mediaManifest: { schemaVersion: 1, manifestHash: 'empty', releaseIds: [row.releaseId], items: [] }, release: { releaseId: row.releaseId, version: '1', contentHash: 'hash' }, dependencies: [] })
+  const approveReady = async (row: typeof application, entriesRow: typeof entry = entry) => {
+    api.submissions.mockResolvedValue({ list: [row] }); api.submissionDetail.mockResolvedValue(detailOf(row)); api.entries.mockResolvedValue({ list: [entriesRow] })
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('范围内量表 · 待审核')
+    fireEvent.click(screen.getByRole('button', { name: '读取精确版本审核内容' }))
+    await screen.findByRole('region', { name: '审核冻结内容：范围内量表 · release' })
+    fireEvent.change(screen.getByLabelText('审核、下架或撤权说明'), { target: { value: '资料完整' } })
+    return screen.getByRole('button', { name: '批准精确版本入库' })
+  }
+  it('keeps approval blocked when supported entrypoints are missing, while return stays available', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    const approve = await approveReady({ ...application, supportedEntrypoints: undefined } as unknown as typeof application)
+    expect(screen.getByText(/支持入口信息缺失或为空，已阻止批准/)).toBeInTheDocument()
+    expect(approve).toBeDisabled()
+    fireEvent.click(approve)
+    expect(api.review).not.toHaveBeenCalled()
+    expect(screen.getByRole('button', { name: '退回并说明原因' })).toBeEnabled()
+  })
+  it('keeps approval and entry saving blocked when no entry is supported', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    const approve = await approveReady({ ...application, supportedEntrypoints: [] }, { ...entry, supportedEntrypoints: [] })
+    expect(approve).toBeDisabled(); fireEvent.click(approve); expect(api.review).not.toHaveBeenCalled()
+    const save = screen.getByRole('button', { name: '保存允许入口' })
+    expect(save).toBeDisabled(); fireEvent.click(save); expect(api.setEntrypoints).not.toHaveBeenCalled()
+  })
+  it('does not save admitted entries when support information is missing', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    api.submissions.mockResolvedValue({ list: [] })
+    api.entries.mockResolvedValue({ list: [{ ...entry, supportedEntrypoints: undefined } as unknown as typeof entry] })
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('范围内量表 · 自编描述性量表 · 已收录')
+    expect(screen.getByText(/支持入口信息缺失，已阻止保存允许入口/)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('审核、下架或撤权说明'), { target: { value: '尝试保存' } })
+    const save = screen.getByRole('button', { name: '保存允许入口' })
+    expect(save).toBeDisabled(); fireEvent.click(save); expect(api.setEntrypoints).not.toHaveBeenCalled()
+  })
+  it('submits only still-supported entries when defaults contain unsupported ones', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    const approve = await approveReady({ ...application, product: 'SURVEY', supportedEntrypoints: ['TRAINING'] })
+    expect(approve).toBeDisabled()
+    fireEvent.click(within(screen.getByRole('group', { name: '允许使用的入口：范围内量表' })).getByRole('checkbox', { name: 'Training' }))
+    await waitFor(() => expect(approve).toBeEnabled())
+    fireEvent.click(approve)
+    await waitFor(() => expect(api.review).toHaveBeenCalled())
+    expect(api.review.mock.calls[0][4]).toEqual(['TRAINING'])
+  })
+  it('drops staged entries that fall out of support after refresh', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    api.submissions.mockResolvedValue({ list: [] })
+    api.entries.mockResolvedValue({ list: [entry] })
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('范围内量表 · 自编描述性量表 · 已收录')
+    const adjust = screen.getByRole('group', { name: '调整允许入口：范围内量表' })
+    fireEvent.click(within(adjust).getByRole('checkbox', { name: 'Survey' }))
+    fireEvent.click(within(adjust).getByRole('checkbox', { name: 'Survey' }))
+    const narrowed = { ...entry, supportedEntrypoints: ['TRAINING'] }
+    api.entries.mockResolvedValue({ list: [narrowed] })
+    fireEvent.click(screen.getByRole('button', { name: '刷新状态' }))
+    await screen.findByText('兼容入口：TRAINING')
+    fireEvent.change(screen.getByLabelText('审核、下架或撤权说明'), { target: { value: '收窄范围' } })
+    const save = screen.getByRole('button', { name: '保存允许入口' })
+    await waitFor(() => expect(save).toBeEnabled())
+    fireEvent.click(save)
+    await waitFor(() => expect(api.setEntrypoints).toHaveBeenCalled())
+    expect(api.setEntrypoints.mock.calls[0][1]).toEqual(['TRAINING'])
+    expect(api.setEntrypoints.mock.calls[0][1]).not.toContain('SURVEY')
+  })
+  it('keeps saving and approval working for fully supported entries', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
+    api.submissions.mockResolvedValue({ list: [] })
+    api.entries.mockResolvedValue({ list: [{ ...entry, admittedEntrypoints: ['SURVEY'] }] })
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('范围内量表 · 自编描述性量表 · 已收录')
+    fireEvent.change(screen.getByLabelText('审核、下架或撤权说明'), { target: { value: '保留Survey' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存允许入口' }))
+    await waitFor(() => expect(api.setEntrypoints).toHaveBeenCalledWith(expect.objectContaining({ id: 'entry' }), ['SURVEY'], '保留Survey'))
+  })
 })
