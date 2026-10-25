@@ -125,7 +125,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
-  return <section className={"hs-panel hs-runner"+(title?" hs-school-task-runner":"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
+  return <section className={"hs-panel hs-runner"+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
     <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
     <p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
     {title?<h1 hidden={Boolean(state)&&!done}>{title}</h1>:<h2 hidden={Boolean(state)}>校园正式测评</h2>}
@@ -183,7 +183,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
         }
         setChild(item)
       }}
-    />:<div>
+    />:<div className="hs-school-task-launch">
       {needsAdmissionConsent&&<div className="hs-panel hs-runner-consent">
         <h3>本次受控观察测评的知情同意</h3>
         <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>

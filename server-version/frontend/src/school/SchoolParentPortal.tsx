@@ -84,7 +84,7 @@ export function SchoolParentLinks({api,role,organizationId}:{
     try{await task()}catch(e){setError(e instanceof Error?e.message:'关联操作未完成')}
     finally{setBusy(false)}
   }
-  return <section className="hs-panel">
+  return <section className={"hs-panel"+(role==='STUDENT'?' hs-student-family':'')}>
     <h2>我的家校关系</h2>
     <p>新关系需要学生明确确认；撤销立即停止新的关联测评授权。
       当前列表不包含任何个人量表分数、心理报告或其他学生的信息。</p>

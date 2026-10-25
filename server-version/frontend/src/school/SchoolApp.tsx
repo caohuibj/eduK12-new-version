@@ -438,10 +438,10 @@ export default function SchoolApp(){
       {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
         {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
-        {page==='account'&&<section className="hs-panel"><h2>校园账号</h2><p>用户名：{user.username}</p>
-          <p>你使用的是独立校园账号。可用功能由学校授权决定。</p>
-          <h3>修改密码</h3>
-          <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/>
+        {page==='account'&&<section className={'hs-panel'+(user.role==='STUDENT'?' hs-student-account':'')}><div><h2>校园账号</h2><p>用户名：{user.username}</p>
+          <p>你使用的是独立校园账号。可用功能由学校授权决定。</p></div>
+          <div><h3>修改密码</h3>
+          <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/></div>
         </section>}
         {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className="hs-panel">
           <h2>敏感操作二次验证</h2>

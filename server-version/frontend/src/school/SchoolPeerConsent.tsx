@@ -19,6 +19,7 @@ export function SchoolPeerConsent({api,role}:{
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
+  const [loading,setLoading]=useState(true)
   const [peerCodes,setPeerCodes]=useState<Record<string,{
     ownAlias:string;list:Array<{assignmentId:string;peerAlias:string}>
   }>>({})
@@ -33,6 +34,7 @@ export function SchoolPeerConsent({api,role}:{
   }
   useEffect(()=>{
     let live=true
+    setLoading(true);setError('')
     const route=role==='STUDENT'?'/my/peer-opportunities':'/guardian/peer-consent-requests'
     void api<{list:Array<StudentOpportunity & GuardianRequest>;policy:Disclosure}>(route)
       .then(result=>{
@@ -40,7 +42,7 @@ export function SchoolPeerConsent({api,role}:{
         if(role==='STUDENT')setStudentItems(result.list)
         else setParentItems(result.list)
         setPolicy(result.policy)
-      }).catch(e=>{if(live)setError(e instanceof Error?e.message:'同伴互评信息暂不可用')})
+      }).catch(e=>{if(live)setError(e instanceof Error?e.message:'同伴互评信息暂不可用')}).finally(()=>{if(live)setLoading(false)})
     return()=>{live=false}
   },[api,role])
   async function act(task:()=>Promise<void>){
@@ -49,11 +51,13 @@ export function SchoolPeerConsent({api,role}:{
     finally{setBusy(false)}
   }
   const list=role==='STUDENT'?studentItems:parentItems
-  if(!list.length&&!error)return null
-  return <section className="hs-panel">
+  if(role==='PARENT'&&!list.length&&!error)return null
+  return <section className={"hs-panel"+(role==='STUDENT'?' hs-student-peer':'')}>
     <h2>自愿参加同伴互评</h2>
     <p>{policy?.text??'同伴互评仅用于安全的班级群体研究，不自动生成同学个人画像。'}
       最少 {policy?.minimumCohort??5} 名同时获得学生及监护人同意的学生才可抽样。</p>
+    {role==='STUDENT'&&loading&&<p role="status">正在读取同伴授权…</p>}
+    {role==='STUDENT'&&!loading&&!error&&list.length===0&&<div className="hs-student-peer-empty"><h3>暂无需要处理的同伴授权</h3><p>学校开放相应活动后，需要你与监护人分别确认，才可参加。</p></div>}
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {notice&&<p role="status" className="hs-message">{notice}</p>}
     {role==='STUDENT'?studentItems.map(item=><article className="hs-task-card" key={item.courseId}>

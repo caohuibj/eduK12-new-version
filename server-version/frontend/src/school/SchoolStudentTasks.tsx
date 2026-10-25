@@ -53,7 +53,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   const detailRef=useRef<HTMLDivElement>(null)
   const inboxTitle=useRef<HTMLHeadingElement>(null),wasDetailOpen=useRef(false)
   useEffect(()=>{
-    if(selected&&details){detailRef.current?.focus({preventScroll:true});detailRef.current?.scrollIntoView?.({block:'start'})}
+    if(selected&&details){detailRef.current?.focus({preventScroll:true});(detailRef.current?.parentElement?.querySelector('.hs-student-task-navigation')??detailRef.current)?.scrollIntoView?.({block:'start'})}
     else if(wasDetailOpen.current){inboxTitle.current?.focus({preventScroll:true});inboxTitle.current?.scrollIntoView?.({block:'start'})}
     wasDetailOpen.current=Boolean(selected&&details)
   },[selected,details])
@@ -122,6 +122,8 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
   const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
   return <section className={'hs-panel hs-task-view hs-student-tasks'+(!selected&&!execution&&!feedback?' hs-student-task-index':'')}>
+    <div className={selected?'hs-student-task-navigation':undefined}>
+    {selected&&<button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>}
     <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
     <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
     <div className="hs-student-task-trail"><a href={workspaceHref('overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')}>查看全部任务</a>}</div>
@@ -176,6 +178,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     </div>}
     {items?.truncated&&<p className="hs-collection-summary">部分历史任务较多，请联系学校管理员。</p>}
     </details>
+    </div>
     {!selected&&(execution||feedback)&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
       <h3>{feedback.title} · 我的反馈</h3>
@@ -195,7 +198,6 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
       onExit={()=>setExecution(null)}
       onFinished={()=>{setExecution(null);void load(page)}}/>}
     {selected&&details&&<div className="hs-task-detail hs-student-task-detail" ref={detailRef} tabIndex={-1} role="region" aria-label={details.title}>
-      <button type="button" className="hs-student-detail-back" disabled={busy} onClick={()=>{setDetails(null);setSelected(null)}}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button>
       <header className="hs-student-detail-header"><p className="hs-student-detail-kicker">{selected.activityTitle} · {kinds[selected.kind]}</p><h1>{details.title}</h1>
         {details.description&&<p className="hs-student-detail-description">{details.description}</p>}
         <div className="hs-student-detail-meta"><span className="hs-student-task-state" data-status={selected.status}>{captions[selected.status]}</span>{selected.deadline&&<span><Clock3 size={15} aria-hidden="true"/>截止 {new Date(selected.deadline).toLocaleString('zh-CN',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>}</div>
