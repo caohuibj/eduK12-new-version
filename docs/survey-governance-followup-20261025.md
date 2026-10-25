@@ -20,7 +20,7 @@ DB 实工量/字节及存储；不以 SQL 数量代替净收益。
 | --- | --- | --- |
 | A 基准及正确性 | 01–07；先复现顺序/native/报告预算/拒答，冻结角色、版本与生命周期合同 | 01–07 已实现并有局部/合成 PG 证据，见各节；用户新政策 21/22 继续实施 |
 | B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 9a1cc142 / 39784cfe / b969c94d 已逐片整合约定的兼容局部 diff，保留新的立即停止检查；未整体合并 |
-| C 新基线 | 依赖实际整合 source/config；普通、native mixed、整包报告，进程冷/热分别记录 | 新系列待冻结；历史 d01、31d9 及各候选原件不覆盖 |
+| C 新基线 | 依赖实际整合 source/config；普通、native mixed、整包报告，进程冷/热分别记录 | 28d9889f 新小型探针完成，三组各进程首份/后续份两样本；非 DB 冷态、非完整容量基线，旧原件不覆盖 |
 | D 核心减工 | 08–13，以及 14–19 中已证明语义/成本的部分；发布编译复用、参与精确绑定、提交 fresh authority 与同请求事实复用 | 08–13、15 已有定向证据；14、16–19 尚需结构和成本证明 |
 | E 推进与报告 | 依赖 B–D 的合同证据；分离纯 next-plan 与准入/推进写，保逐单元保存、GET 恢复及两入口报告开放差异 | 本 PR 仅纳入已证明兼容片；显式 advance、正文迁移等先列方案 |
 
@@ -50,6 +50,15 @@ Redis/IP 限流，不能当生产总成本。报告状态、生成与当前读�
 仅匹配各自固定分支。本分支可分片提交并 push，不靠 skip-ci 文本控制触发。
 创建 draft PR 时仍可能运行分类和 draft 检查；不改弱 required gate、不手动运行
 full/probe、不合并、不部署。
+
+收尾再次枚举全部 workflow 的实际自动事件：仅 `ci.yml` 与独立
+`situational-publication.yml` 接本 PR opened/synchronize；没有 pull_request_target。
+其余自动 push 都限 main 或各自固定专用分支。本候选不适用旧 PR354 的精确接纳范围；
+默认 draft legacy 路线会进入 35 分钟 pr-light-backend，因此最终证据提交用
+`[skip ci]` 创建仅供 review 的 draft，并在创建后检查真实 Actions 状态，不触发无关
+全量。独立 pull_request_review 事件不会因此被跳过，后续 reviewer 提交 review 时
+应重新核对。没有改 workflow/required gate；skip/pending 不是通过，也不具备合并资格。
+未签发本地到 Actions 的新接纳机制，不把本地检查伪装成官方 CI。
 
 ## 旧性能分支交叠
 
@@ -460,3 +469,101 @@ schema-only 合成库单列运行对应 governed-list PG 文件的精确 testNam
 日志与明确退出码分别保留为 `*-types-atomic-final.log` / `.exit`。
 最终受影响前端文件 eslint 退出 0，0 error / 3 warning（epoch cleanup 两条与原有
 publicationId effect dependency 一条），没有关规则或降低阈值。
+
+## C：整合后新的小型正确性/资源探针
+
+独立源码 `28d9889f7078cafe97254950fb5d7ed768b12a50`，tree
+`24e08a96cbf77902f45f07ce0992d83e1dcde3da`。Node 24.21.0，精确依赖锁和三个
+探针源码 SHA-256 均记入[原始数值投影](evidence/survey-governance-followup-20261025/resource-probe.json)。
+后台产品路径须与该 HEAD 相等；新工具在当时尚未 commit，单独记录其 hash，
+不伪称整个当前 Git tree 已经在那次运行。
+
+只有本任务两个 loopback 容器：PG 16.15 / Redis 7.4.11；全新命名合成库实际应用
+当前全部 229 迁移。独立 runtime login 的 superuser/createdb/createrole/replication/
+bypassrls 全 false、拥有 public 业务表 0；业务/夹具均用该角色，见
+[环境投影](evidence/survey-governance-followup-20261025/resource-environment.json)。
+没有生产迁移、复制数据或 owner 业务权限替代。
+
+三组分别新起 API 进程，每组同一 publication 做两份实际作答（PROCESS_FIRST /
+PROCESS_WARM），无隐藏 warmup。普通 20-choice FORM 12 次 HTTP；FORM + native
+staged SJT V2 18 次；整包 FORM/native + field/metric report 20 次。真实来源经独立
+author/reviewer、治理三 case trial、入口 policy、精确授权和冻结链；参与用实际
+Origin/凭证/知情同意，报告用真实 researcher router/current session/MFA timestamp/
+项目权限。会话合成签发，不是真人登录、MFA 或浏览器。总 6 份，50 次 HTTP，全部
+200/code0，整体退出 0；每份确认 parent FINAL 唯一、原 row hash 不变、receiptId
+精确重放，native child receipt 丢响应读取一致，整包报告权威 metric=5。
+
+以下仅列每份 parent FINAL 的原始点值，完整每请求 SQL 类别、DB 协议字节、进程
+CPU/内存、HTTP 正文字节、锁事务上界与存储字段见 JSON，**没有因果优化对照**：
+
+| 工作量 | 样本 | FINAL ms | 进程 CPU ms | DB 下行 bytes | SQL events | FINAL / 包报告 cipher bytes |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| 普通 FORM | 进程首份 | 52.55 | 59.02 | 10,621 | 23 | 1,116 / 0 |
+| 普通 FORM | 同进程后续 | 28.21 | 25.00 | 9,674 | 23 | 1,116 / 0 |
+| native 混合 | 进程首份 | 99.27 | 87.66 | 72,497 | 35 | 6,686 / 0 |
+| native 混合 | 同进程后续 | 60.50 | 50.51 | 70,690 | 35 | 6,686 / 0 |
+| 整包报告 | 进程首份 | 92.52 | 86.21 | 118,234 | 46 | 6,786 / 1,376 |
+| 整包报告 | 同进程后续 | 84.53 | 72.57 | 118,234 | 46 | 6,786 / 1,376 |
+
+DB 缓存可能已由夹具加热，不能叫冷 DB；进程 CPU 含本地 HTTP driver，不是服务端
+独占 CPU；query event duration 不是 DB CPU。5ms RSS 采样与进程 lifetime max 均
+记录，但不是精确请求独占内存。首锁至事务结束是含等待的上界；关系 allocation
+delta 含 heap/index/TOAST 页面，已有页容纳新行时可能为零，不是单行存储大小。
+上表 cipher 只覆盖 FINAL/包报告，不冒充 native 原件与所有行的完整存储成本。
+test 模式跳过普通 Redis/IP 限流；不是公网、生产总开销、容量或所有协议基线，
+不计算冷热均值、不和 d01/31d9 不同功能工作量作提速比较，不据此加索引。
+
+两次手工启动分别被诊断脚本错误拦住（Prisma Date 的严格 canonical 投影、统计列名），
+此前 launcher 路径拼写错误未产生夹具。修的是探针，不改业务/编码器；各次独立目录
+和部分原件保留，见[失败索引](evidence/survey-governance-followup-20261025/resource-failures.json)。
+工具不自动重试、不创建/迁移/清空库、不上传任何请求/凭据/答案/报告正文，复用说明
+见 `server-version/scripts/performance/survey-governance-probe/README.md`。
+最终探针 TS（仅两个独立文件，非全量 backend 再编译）与 launcher `node --check`
+均退出 0；harness 三份 hash 与提交前文件逐一一致，六样本/50 请求/全部状态核对通过。
+
+## 可复用证据与本 PR 后续路线
+
+[本地验证索引](evidence/survey-governance-followup-20261025/local-validation-index.json)
+保存 60 次 invocation 的源 JSON digest、测试文件、实际执行 case/status 与过滤数。
+不含日志、错误 stack、SQL/参数、原始头、凭据或业务正文。计数重叠，不汇总为“全套
+N 项通过”；未做密码学执行认证，不等于完整输入闭包、正式 CI 或生产资格。
+
+本 PR 的 A 正确性/交接缺陷、B 选定兼容整合与 D 已证明低风险片已有独立提交及
+局部证据；C 完成小探针而非完整新容量基线；E 仅有上述纯编辑 next-plan。以下保持
+同一条依赖路线，**没有把已批准 21/23/24 标回未决，也没有宣告整个路线完成**：
+
+1. **21/Training 与 22/Training**：先落精确 release/hash 的 TRAINING 入口准入，
+   沿 `scale-library-governance/authority.ts`、`distribution.ts`、`usage.ts` 分开正式
+   entry admin 和普通精确 capability delegate；仅正式管理员免额外 distribute 能力。
+   当前 Training 只有全局 ACTIVE/兼容声明和每人能力，不存在可直接复用的独立入口
+   准入记录；不可把 ACTIVE 当本入口批准。分发之后必须在真实发布/attempt 上绑定
+   原教师 useGrantId/version 与发布者：`training-content-binding.ts` 当前 library
+   source 只有共享 wrapper/libraryEntryId，同 wrapper 被不同教师使用。
+   再在 task/prepare/commit/FINAL 的当前事务锁原 grant 并复核时钟，撤销 A 不停 B，
+   保原始数据和已完成回执。不能只加全局 scale stop。必须单独补准入/在途/撤权锁
+   竞态/恢复的角色矩阵，现有旧测试通过不能证明新政策完成。本 PR 未冒险加入半套。
+2. **23/24 目标模型**：复用现有 measurement-content 的不可变 release/hash、
+   source snapshot、批准包身份与 current content-binding；不另造 ordinary 协议。
+   先将共享内容/计分参数（含阈值）/文字模板的精确引用收进批准组合，以 FK/hash
+   和 scope 校验绑定发布，再让 attempt 指向该发布/组合及实际随机分配/科学上下文。
+   当前 MEASUREMENT/REFERENCE/REPORT 已有版本正文，但 Reference 中可能有完整来源
+   证据，且 Form/整包尚未全部使用相同正文引用；不能只改字段名就声称已去复制。
+   计分实现 key/version、许可/适用范围和证据仍属于批准闭包，纯文献标签的变化不
+   得偷偷改变权限。无参数/无报告显式为空，不自动追新。
+3. 提交沿现有权威 scorer/严格 child receipt 一次生成可追溯的原始事实、总分、维度分
+   和必要质量标记，引用 scorer/批准组合；报告、分析、导出消费这些 facts，不重算。
+   按需渲染复用原 generator/version，读前后保 current project/撤回/排除/revision/
+   hash/模板 REVOKED/开放 fence。两入口反馈差异与 native/cognitive 原件、时序/路径
+   子事实保留。当前包报告仍在 FINAL 内物化，尚未迁移成目标模型；本 PR 的预算/
+   回滚保护是在此现有模型上的完整修复，不伪称已实现按需包报告。
+4. 在全新隔离库直接验证目标模型，不默认旧协议永久双写/双读。现有库/旧测试版本
+   实际永久清理仍要先列环境、精确 ID、全部引用/附件与必须保留基线，并取得删除
+   范围确认。当前没有删除清单获批，没有删数据/历史/immutable trigger/FK。
+5. 结构 14/16–19 在上述新模型上按相同协议再冻结基线；优先 request-local 有界批量
+   读事实、纯 next-plan/写推进分离、共享正文一次构造。第二次 disclosure fence
+   缩列必须先证明 FINAL/来源闭包不可变；祖先依赖可复用 immutable 集合，不缓存
+   “未停止”。索引只凭真实 EXPLAIN+代表合成数据决定，本 PR 没有新增索引。
+
+唯一仍需用户决定的相关政策为历史报告停止范围；它不阻止当前采集立即停止修复。
+25 单人系统管理员签发仍保留，School/Teacher 不自动扩展。完整目标模型属于可独立
+审查的后续迁移片，不夹进当前已有证据的正确性/低风险提交。

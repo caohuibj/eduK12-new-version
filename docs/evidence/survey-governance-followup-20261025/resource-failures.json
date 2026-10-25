@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "qualification": "Historical partial records retained privately; no success, aggregate or speedup inferred. No automatic retry; each manual rerun followed a concrete harness correction and wrote a new directory. The earlier launcher path typo failed before any fixture action.",
+  "failures": [
+    {
+      "directory": "probe-20261025",
+      "status": "failed-diagnostic-harness",
+      "reason": "Harness hashed the Prisma completedAt Date directly; strict canonical encoder correctly rejected it after the first FINAL. Fixed the explicit timestamp projection, not the encoder.",
+      "retainedPrivateArtifacts": [
+        {
+          "artifact": "ordinary.partial.jsonl",
+          "sha256": "9ca2891790058a6ac26b79e9b6b9d594cc63e5fca029f70deb033735aea4259b",
+          "completedRequestRecords": 4
+        },
+        {
+          "artifact": "source.json",
+          "sha256": "4bc21de956f4f668163b2151ac31213bcb83717ee4fbc1902eebebe014dfa12a",
+          "completedRequestRecords": null
+        }
+      ]
+    },
+    {
+      "directory": "probe-28d9889f",
+      "status": "failed-diagnostic-harness",
+      "reason": "Harness storage query used artifact_cipher instead of the existing report_cipher column. First ordinary submission, exact FINAL replay and feedback succeeded; no complete series was recorded.",
+      "retainedPrivateArtifacts": [
+        {
+          "artifact": "ordinary.partial.jsonl",
+          "sha256": "61cc1dca42e09741d5b3890e2d75782d459f02806aace799a1c0cfed4499dfdf",
+          "completedRequestRecords": 6
+        },
+        {
+          "artifact": "source.json",
+          "sha256": "b45090522f1469ecb52ce33bb69a06b50292c21b5efd3a93cd50373fcf44de2c",
+          "completedRequestRecords": null
+        }
+      ]
+    }
+  ]
+}
