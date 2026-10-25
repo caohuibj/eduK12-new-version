@@ -717,3 +717,6 @@ fail-closed，没有改 skip、退回任意 DATABASE_URL、借共享/真实库�
 CI 最小配置：9 个显式 opt-in 指向现有 job PG（14 个 suite 使用），增加缺失/异库一次性预检；保串行与全部原始保护。导出消费者独立进程/同 job Redis DB15，验证真实 container ID、image 与 expiring run marker；保 base/export 两份原 JSON，并要求不相交完整并集成功，失败不变绿。回归原35分钟预算不变。CodeQL只将20分钟上限提高至30分钟，原查询集/语言/路径不变。控制单元18过、路由84过，YAML及四段Node语法通过；生产 backend tsc 退出0。
 
 普通 synchronize 触发下一轮全部适用正式门禁（含隔离 200 完成与短 k6 smoke），没有借用 PR354 或其他固定候选路线，也没有降低 required。正常最终 head 全部必需检查成功、无其他阻断才合并。此片完成后不自动部署或开始下一阶段迁移。
+
+
+`b59e6af5` 的 GitHub workflow validation 在创建应用作业前拒绝：job-level env 不支持 runner.environment。原失败 runs 40166657738/40166660581 保留，不能称回归已执行。已将该值移入两个实际消费 step env，增加 job/step 层级合同；官方 actionlint 1.7.12 经官方 checksum 核验，两个 workflow 的 expression/semantic 检查退出0，18项控制仍全过。无应用输入变化，不重复本地应用测试；下一次正常 synchronize 执行缺失正式检查。

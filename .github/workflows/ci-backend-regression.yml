@@ -25,7 +25,6 @@ jobs:
     timeout-minutes: 35
     env:
       NODE_ENV: test
-      RUNNER_ENVIRONMENT: ${{ runner.environment }}
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -209,6 +208,7 @@ jobs:
       - name: full functional regression
         if: inputs.focus == 'full'
         env:
+          RUNNER_ENVIRONMENT: ${{ runner.environment }}
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         # Real-PG suites remain serial. The single hardware-sensitive burst is
         # covered by the isolated backend job. The export consumer runs separately
@@ -217,6 +217,7 @@ jobs:
       - name: isolated export consumer on this job Redis DB 15
         if: (success() || failure()) && inputs.focus == 'full'
         env:
+          RUNNER_ENVIRONMENT: ${{ runner.environment }}
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
           REDIS_URL: redis://localhost:6379/15

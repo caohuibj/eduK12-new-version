@@ -218,6 +218,9 @@ test('regression opts in newer suites only to its own database and isolates the 
   for(const key of ['AUTHENTICATED_ADMISSION','TRAINING_ARCHIVE','TRAINING_PARTICIPATION','SURVEY_FOLLOWUP','SURVEY_MEMORABLE','SURVEY_DIRECTORY','SURVEY_SJT_ENTRY_AUTHORITY','SURVEY_SJT_BINDING','SURVEY_NATIVE_SJT'])
     assert.ok(w.includes(key+'_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public'));
   assert.ok(w.includes('RUNNER_ENVIRONMENT: ${{ runner.environment }}'));
+  assert.ok(!w.split('    steps:')[0].includes('${{ runner.environment }}'),'Runner context is unavailable in job-level env');
+  for(const name of ['full functional regression','isolated export consumer on this job Redis DB 15'])
+    assert.ok(w.split('      - name: '+name+'\n')[1].split('      - name:')[0].includes('RUNNER_ENVIRONMENT: ${{ runner.environment }}'));
   assert.ok(w.includes('REDIS_URL: redis://localhost:6379/15'));
   assert.ok(w.includes('CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}'));
   assert.ok(w.includes('docker')&&w.includes('container.Id!==id||!container.State.Running'));
