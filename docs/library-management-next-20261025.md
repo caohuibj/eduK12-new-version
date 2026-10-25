@@ -48,3 +48,28 @@ Library 文件 `libfile_89850517a9b081919bfcc37ae8aafb22`（v0）经当前 Libra
 已读根 AGENTS.md、docs/release/README.md 的统一规则及公库相关段落。仓库无 `.agents/skills`，`/workspace/.agents` 为空。初始本机 Node 为24.19.0，仓库声明>=24.21.0；正式工具链资格不能仅凭旧安装推定，检查环境另行记录。
 
 不操作 Mac、不连接生产数据、不入库实际工具、不自动发布或批准工具、不创建凭据、不扩角色。暂不 push、CI、merge 或部署。
+
+## 本阶段实际交付与暂停检查点
+
+按父对话最新指令，本阶段在封存后暂停，不再扩展功能。代码提交：`8a95facba6157c3f5a1be34ee279f5ea4533abbf`（共享分类、跨页检索、逐项精确版本选择）及 `f269feed24b31d8cf1f276f70cb953b7143fef8c`（只读阶段预检、科学地域提前检查）。
+
+- 共享分类加入声明的人群、年龄/年级、实际语言；认知能力由精确任务的现有 evidence/domain registry 派生，不推定人群或语言。接入既有标准、Survey、governed、通用量表与授权目录，查询在分页前完成。
+- 研究者授权页最多保留10个跨页明确选中版本，切换筛选/来源/目标清空选择，每个版本单独调用原授权接口；没有全结果全选或标签自动授权。写入ACK后的只读刷新失败不自动重放写操作。
+- 标准量表管理页按需只读展示来源→安装→发布→精确版本批准/试运行→Survey可分配状态。复用既有发布计划，目标用户grant保持未评估。安装计划提前拒绝科学地域不匹配；自编身份不放宽科学参考适用范围。
+- 有界只读预检最多10项，拒重复、逐项失败隔离，不执行安装、批准或发布。手动标签写接口与批量写入仍未开发，没有新建版本表。
+
+完整报告已写入并读取核对：[Notion交付报告](https://app.notion.com/p/404d27635a388155941fda24f5b1b666)。原13条问题分类、版本分工及批量幂等/失败恢复边界详见该页；未覆盖或替代另任务的共同C/P/R、Training消费、21B和057f03da。
+
+### 验证与已知失败
+
+本地原始结果的不重复case记录：后端83过；前端61过、2项既有失败。实际PostgreSQL16.15仅运行临时分类/分页夹具，容器已正常停止。后端生产tsc、前端app tsc观察到exit0；变更前端eslint退出0，保留3条既有ref-cleanup警告。原始reporter、失败历史、过滤数、环境与SHA见 [validation.json](evidence/library-management-next-20261025/validation.json) 和 [check-receipts.json](evidence/library-management-next-20261025/check-receipts.json)。收尾清单不追溯伪装成早期执行的运行时签名，不作为正式CI资格。
+
+两项 `ScaleLibraryGovernance.rendering.test.tsx` 的 AuthProvider 缺失已在未改动的八提交集成基线和候选各自复现，保留失败，没有改弱断言。另一个全库统一预期第三方许可机制的旧断言也在未改动集成基线失败，已最小更正为识别可信自编，并继续断言不可自动使用/目标授权未评估。本轮的环境准备失败、新夹具身份错误、空查询/DTO兼容及标签改名失败与其纠正分别留存。
+
+保留#355 SDQ修复，未筛选第二页的目录服务定向用例通过。本轮没有新HTTP、真人浏览器、响应式/WCAG、生产镜像、全量回归、CI或科学验证，不把dot的36/36/108隔离实测转为当前候选的新证明。
+
+### 远端前移与协调点
+
+最后核对#355远端已到`9065bb0ee73916d5e35f913b389f2ea55a9f0818`，main仍25215dcc、#356仍0d2e417d。本分支严格保留指定f7b6c766起点，未擅自重基线；新远端差异与本轮新增代码没有同路径重叠，但 `tool-policy.ts` 等被调用依赖已改变，仍需父对话协调最终集成和相应验证。见 [remote-drift.json](evidence/library-management-next-20261025/remote-drift.json)。
+
+核心文件只改目录读函数与只读过滤；正文、参数、报告、授权/撤权写函数、三轴批准与trial函数、依赖/schema和CI配置相对八提交集成基线均保留，20项精确对照见 [protected-inputs.json](evidence/library-management-next-20261025/protected-inputs.json)。本轮唯一提前执行的安装门禁是保留科学地域保护、在计划阶段更早报错。没有实际工具写入或生产操作。

@@ -1,0 +1,2475 @@
+{
+  "scope": "Local targeted checks only; not formal CI, deployment or real tool ingestion",
+  "baseline": "ad2b1634da90ce08fdc89b8f0d68f92b71e090f1",
+  "toolchain": {
+    "node": "24.21.0",
+    "nodeArchiveSha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+    "dependencies": "Official npm ci --ignore-scripts with unchanged locks; own Prisma 5.22.0 client generated from current schema",
+    "postgresImage": "postgres@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67",
+    "database": "Task-owned disposable PostgreSQL 16.15, loopback, temporary fixture tables only; no production/existing tool database"
+  },
+  "latestCaseUnion": {
+    "failed": 2,
+    "passed": 144
+  },
+  "latestCases": [
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities labels all 36 student versions by population, measurement construct and subject",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject chinese, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject mathematics, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject english, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject physics, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject chemistry, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject biology, including the legacy tag ID",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct academic_self_concept and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct academic_self_efficacy and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct domain_fixed_mindset and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct teacher_subject_liking and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct tutoring_necessity and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct value_cost and one intersecting version",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities matches Chinese aliases and multiple keyword terms while unknown tags stay empty",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities offers complete deduplicated facets independently of a returned page",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities bounds and normalizes query input without accepting arbitrary arrays or oversized searches",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities leaves complete source/policy fingerprints, measurement hash, all axes and frozen Reference unchanged",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+      "name": "content-backed catalog labels without changing approved source identities reuses aliases and exact tag filtering in the general library without altering availability",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption plans fresh installation without a fabricated authorization row, and checks the real system actor",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption keeps installed definition and source identity immutable",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption retains explicit publication proof, without replacing it with a source declaration",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption reaches managed starts but still rejects unpublished scales and missing active deployments",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption carries exact authored provenance through Training/legacy Survey source receipts, not fictitious license dates",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination finds a standard version outside the original first page with an old tag ID and Chinese aliases",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination paginates all 36 matched standard versions without duplicates or missing versions",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination still refuses standard discovery before registry results when administrator authority fails",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination filters Survey standard entries across pages and preserves their current approval/availability",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination returns 25 plus 11 Survey matches and never fills a tag-filtered page with untagged authored tools",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination reports an authored continuation even when standard matches fill exactly the last 25-row page",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination applies authored keyword terms safely in SQL before LIMIT and honors source-only pages",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination does not silently ignore unsupported tags on authored entries or broaden unknown tags",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination refuses Survey discovery when existing management authority is absent",
+      "status": "passed",
+      "invocation": "backend-discovery-2"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+      "name": "shared declared catalog classification uses actual language and population declarations without changing source identities",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+      "name": "shared declared catalog classification derives cognitive ability labels from the exact evidence mapping and refuses inherited applicability",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+      "name": "shared declared catalog classification makes unknown or rights-like tags an empty Prisma OR before skip/take rather than widening the query",
+      "status": "passed",
+      "invocation": "backend-new-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+      "name": "actual PostgreSQL metadata filtering before pagination finds cognitive row 31 by Chinese domain, ANDs facets and never labels an unknown engine",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+      "name": "actual PostgreSQL metadata filtering before pagination joins a standard exact version to student, subject and actual language metadata before LIMIT",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+      "name": "read-only staged library preflight distinguishes a registered executable source from installed, approved and assignable records",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+      "name": "read-only staged library preflight retains a scientific scope blocker separately from trusted authorship before an operator publishes",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+      "name": "read-only staged library preflight does not mistake an ONLINE record for current assignment authority or target-user permission",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+      "name": "read-only staged library preflight checks role first and limits exact batch identities before reading any tool",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+      "name": "read-only staged library preflight isolates a failed exact item and never automatically applies the successful item",
+      "status": "passed",
+      "invocation": "backend-new-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "name": "self-authored formal install, publication and consumption rejects the known scientific territory mismatch in the install plan before creating a deployment",
+      "status": "passed",
+      "invocation": "backend-install-sdq"
+    },
+    {
+      "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "name": "server-wide discovery before public-catalog pagination keeps the #355 SDQ function fingerprint fix on unfiltered second pages after tag integration",
+      "status": "passed",
+      "invocation": "backend-install-sdq"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 39 for 1001 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 39 for 975 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 39 for 962 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 39 for 950 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 40 for 1001 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 40 for 1000 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 40 for 987 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination returns truthful page 40 for 975 sources",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (1001 sources)",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (987 sources)",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (975 sources)",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination preserves the effective helper page rather than echoing an unnormalized request",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination never returns the same source IDs across pages 39 and 40 or loads a page beyond the bound",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+      "name": "bounded source catalog pagination still refuses unauthorized source catalog reads before pagination",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters preserves typed numeric Scale values, exact scorer and source identity without modifying source",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters refuses restricted rights and presentation changes rather than rewriting official source",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters preserves authorized V2 SJT original scoring and every choice matches the source oracle",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters rejects native SJT research capture even for a no-op single assignment",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters does not claim restricted SJT sources or branch flattening is supported",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters accepts only the actual controlled published Cognitive config, never substitutes a template for another task",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters loads an exact version and never falls back to latest or inactive database source",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters denies cross-organization Form reads before touching definition data",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters lists a bounded page and never includes private Form rows without explicit organization",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters rechecks multiple frozen grants with one query per family and rejects changed source",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters copies compatible published Form only under its own product authority and exact digest",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup",
+      "status": "passed",
+      "invocation": "backend-consumers-1"
+    },
+    {
+      "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+      "name": "immutable system catalog source adapters reuses an actual published owner Questionnaire Form section with exact content version and provenance",
+      "status": "passed",
+      "invocation": "backend-consumers-retry"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+      "name": "shared Training catalog discovery before pagination finds a registered authored version beyond page one by multiple facets and preserves use-grant checks",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+      "name": "shared Training catalog discovery before pagination passes private-source keywords to the existing visibility-scoped query before its LIMIT",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+      "name": "shared Training catalog discovery before pagination keeps registered origin independent of authorship and does not broaden an unknown tag",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+      "name": "shared Training catalog discovery before pagination checks the actor before reading source metadata or private entries",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "one platform catalog preserving source-owned exact identities combines real registry projections and approved authored entries in one result",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "one platform catalog preserving source-owned exact identities never promotes an undeployed formal catalog entry to usable or invents approval records",
+      "status": "passed",
+      "invocation": "backend-unified-retry"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "one platform catalog preserving source-owned exact identities does not treat standard rights/deployment availability as this entrypoint user authorization",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "one platform catalog preserving source-owned exact identities keeps authored release identity separate from governance revision and source product",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "one platform catalog preserving source-owned exact identities keeps withdrawal/emergency and unsupported rendering unavailable even for previously approved metadata",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "bounded unified catalog pagination spans the registry/authored boundary without dropping or repeating authored offsets",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "name": "bounded unified catalog pagination supports an empty registry and exact registry page boundaries",
+      "status": "passed",
+      "invocation": "backend-unified-1"
+    },
+    {
+      "file": "frontend/src/api/catalogDiscovery.test.ts",
+      "name": "catalog discovery display and request contract localizes known source IDs without using the display label as the request value",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/api/catalogDiscovery.test.ts",
+      "name": "catalog discovery display and request contract omits empty filters, deduplicates IDs, and scopes origin to the Survey catalog",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority changes researcher or invitation pages without reloading the other list",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority reaches researcher grant 26 and renders its frozen axes/component details",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority uses server search and disables an expired ACTIVE grant",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority lets an entry manager reach catalog page two and keeps grant pagination independent",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority can leave an empty filtered source page when a later page has content",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority keeps chosen component metadata when browsing the next options page",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+      "name": "governed catalog pagination preserves exact selection and authority hands system administrators to entry appointments without exposing an inaccessible personnel link",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.boundary.test.tsx",
+      "name": "clears the selected researcher when the visible page changes, hiding late old grants",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls uses server page and hasMore, blocks repeated asynchronous Next clicks, and stops at the 1000-source cap",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls respects the server terminal state for a page with 25 rows",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls respects the server terminal state for a page with 12 rows",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls respects the server terminal state for a page with 0 rows",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls resets rows, page and terminal metadata on a type change, then queries that type from page 1",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "name": "source catalog pagination controls keeps the accepted page on a failed Next, retries that same page, and refreshes from page 1",
+      "status": "passed",
+      "invocation": "frontend-discovery-1"
+    },
+    {
+      "file": "frontend/src/components/scale-governance/LibraryPreflightPanel.test.tsx",
+      "name": "reads on demand, distinguishes scientific scope from self-authorship and clears stale success after a failed read",
+      "status": "passed",
+      "invocation": "frontend-new-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+      "name": "cognitive classification management ignores an older response after a new query and clears stale actions on failed refresh",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+      "name": "cognitive classification management preserves an acknowledged scope update when only its read refresh fails and never auto repeats it",
+      "status": "passed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+      "name": "classification discovery and explicitly selected version grants keeps exact choices across pages, changes no grants on filter/selection, and grants only the chosen version",
+      "status": "passed",
+      "invocation": "frontend-new-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+      "name": "classification discovery and explicitly selected version grants clears hidden choices when filters or target change and does not grant after a successful write followed by failed refresh",
+      "status": "passed",
+      "invocation": "frontend-new-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page offers the Chinese motivation filter and sends its stable domain ID",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page keeps progressive filters open and ignores late results after a newer filter request",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page keeps an explicit root through loading, failure, retry and empty results",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page renders metadata cards and the no-results state without item content",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page shows confirmed authored provenance without claiming an external license or direct use grant",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page renders detail governance only when the API supplies the controlled projection",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+      "name": "ScaleLibrary page loads an English detail directly and keeps its English locale on remount",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution submits Survey catalog filters to the server and keeps approval controls in their own view",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution keeps Survey frozen version details behind explicit expansion and detail reads",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution keeps Survey management recipients in Survey even when the source supports both entrances",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution does not mistake entrance distribution authority for review authority",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution limits distribution to compatible entrances and uses the scoped recipient API",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution shows registry and authored records together, preserves standard identity and pages using hasMore",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution requires inspecting frozen content before approval",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "Scale library system review versus entrance distribution requires reason and a distinct confirmation before emergency disable",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "name": "system administrators cannot distribute Survey versions from the shared governance page",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard workflow and unified management design UI loads only read-only catalog and defers details until expansion",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard workflow and unified management design UI allows explicit no-report selection and invalidates prior preview",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard workflow and unified management design UI requires explicit approval confirmation and never grants researcher use",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search submits trimmed keywords and stable facet IDs, resets the page, and renders server matches without local filtering",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search keeps applied filters for pagination and refresh, and clears all filters back to page one",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search shows Chinese classification badges before expansion and catalog-wide facet choices even with no matches",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search ignores an older successful response after a newer search has completed",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search keeps loading the newest request when an older request fails first",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "name": "standard catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "scoped Survey library UI separates content, assignment and deployment without opening controls by default",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "scoped Survey library UI requires a reason and sends a Survey-only exact-version decision, not a use grant",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "scoped Survey library UI shows system navigation separately from researcher administration",
+      "status": "passed",
+      "invocation": "frontend-consumers-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search labels ingestion routes independently of authorship and submits stable filters before resetting the page",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search retains applied tags and origin on pagination and refresh, and clears both applied and draft filters",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search shows Chinese classification badges without opening details and keeps global facets when the result is empty",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search ignores an older successful response after a newer search has completed",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search keeps loading the newest request when an older request fails first",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "name": "Survey catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+      "status": "passed",
+      "invocation": "frontend-consumers-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx",
+      "name": "uses shared server filtering across pages instead of hiding returned rows with a local title search",
+      "status": "passed",
+      "invocation": "frontend-unified-retry"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+      "name": "governance visible workspace construction serializes only the visible Survey detail and preserves inspected data, reason and grants across views",
+      "status": "failed",
+      "invocation": "frontend-final-1"
+    },
+    {
+      "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+      "name": "governance visible workspace construction retains both legacy panels and their required full frozen records",
+      "status": "failed",
+      "invocation": "frontend-final-1"
+    }
+  ],
+  "invocations": [
+    {
+      "id": "backend-discovery-existing",
+      "baselineComparison": false,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "report": "reports/backend-discovery-existing.json",
+      "sha256": "1c4dc165a8ceee0320ed47dd85de8c54f9d58388896a9535cb3fc4eb0609d483",
+      "success": false,
+      "cases": []
+    },
+    {
+      "id": "backend-discovery-2",
+      "baselineComparison": false,
+      "passed": 33,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "report": "reports/backend-discovery-2.json",
+      "sha256": "a36d295e6a5fb201e4b84180f4c5188530e2ffc89438a600701ccc12bdaa4182",
+      "success": true,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities labels all 36 student versions by population, measurement construct and subject",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject chinese, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject mathematics, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject english, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject physics, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject chemistry, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six constructs for subject biology, including the legacy tag ID",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct academic_self_concept and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct academic_self_efficacy and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct domain_fixed_mindset and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct teacher_subject_liking and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct tutoring_necessity and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities finds six subjects for construct value_cost and one intersecting version",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities matches Chinese aliases and multiple keyword terms while unknown tags stay empty",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities offers complete deduplicated facets independently of a returned page",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities bounds and normalizes query input without accepting arbitrary arrays or oversized searches",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities leaves complete source/policy fingerprints, measurement hash, all axes and frozen Reference unchanged",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/catalog-discovery.test.ts",
+          "name": "content-backed catalog labels without changing approved source identities reuses aliases and exact tag filtering in the general library without altering availability",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption plans fresh installation without a fabricated authorization row, and checks the real system actor",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption keeps installed definition and source identity immutable",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption retains explicit publication proof, without replacing it with a source declaration",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption reaches managed starts but still rejects unpublished scales and missing active deployments",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption carries exact authored provenance through Training/legacy Survey source receipts, not fictitious license dates",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination finds a standard version outside the original first page with an old tag ID and Chinese aliases",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination paginates all 36 matched standard versions without duplicates or missing versions",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination still refuses standard discovery before registry results when administrator authority fails",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination filters Survey standard entries across pages and preserves their current approval/availability",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination returns 25 plus 11 Survey matches and never fills a tag-filtered page with untagged authored tools",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination reports an authored continuation even when standard matches fill exactly the last 25-row page",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination applies authored keyword terms safely in SQL before LIMIT and honors source-only pages",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination does not silently ignore unsupported tags on authored entries or broaden unknown tags",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination refuses Survey discovery when existing management authority is absent",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "backend-new-1",
+      "baselineComparison": false,
+      "passed": 8,
+      "failed": 2,
+      "pendingOrFiltered": 0,
+      "report": "reports/backend-new-1.json",
+      "sha256": "3c9c48e9febfe426ed35ee176f027088bc4c4a516711a20b4f4794b55e54e164",
+      "success": false,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification uses actual language and population declarations without changing source identities",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification derives cognitive ability labels from the exact evidence mapping and refuses inherited applicability",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification makes unknown or rights-like tags an empty Prisma OR before skip/take rather than widening the query",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination finds cognitive row 31 by Chinese domain, ANDs facets and never labels an unknown engine",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination joins a standard exact version to student, subject and actual language metadata before LIMIT",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+          "name": "read-only staged library preflight distinguishes a registered executable source from installed, approved and assignable records",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+          "name": "read-only staged library preflight retains a scientific scope blocker separately from trusted authorship before an operator publishes",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+          "name": "read-only staged library preflight does not mistake an ONLINE record for current assignment authority or target-user permission",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+          "name": "read-only staged library preflight checks role first and limits exact batch identities before reading any tool",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-preflight.test.ts",
+          "name": "read-only staged library preflight isolates a failed exact item and never automatically applies the successful item",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "backend-new-retry",
+      "baselineComparison": false,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 3,
+      "report": "reports/backend-new-retry.json",
+      "sha256": "5aa1d4446e0af57439bf25edadef22562345358923b78a30ab83f24d13a97949",
+      "success": true,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification uses actual language and population declarations without changing source identities",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification derives cognitive ability labels from the exact evidence mapping and refuses inherited applicability",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-classification.test.ts",
+          "name": "shared declared catalog classification makes unknown or rights-like tags an empty Prisma OR before skip/take rather than widening the query",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination finds cognitive row 31 by Chinese domain, ANDs facets and never labels an unknown engine",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination joins a standard exact version to student, subject and actual language metadata before LIMIT",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "id": "backend-install-sdq",
+      "baselineComparison": false,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 15,
+      "report": "reports/backend-install-sdq.json",
+      "sha256": "68f0815619c27940470e2dd65991113547cb988acc8fa5a539f2f19163f0c637",
+      "success": true,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption rejects the known scientific territory mismatch in the install plan before creating a deployment",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption plans fresh installation without a fabricated authorization row, and checks the real system actor",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption keeps installed definition and source identity immutable",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption retains explicit publication proof, without replacing it with a source declaration",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption reaches managed starts but still rejects unpublished scales and missing active deployments",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+          "name": "self-authored formal install, publication and consumption carries exact authored provenance through Training/legacy Survey source receipts, not fictitious license dates",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination keeps the #355 SDQ function fingerprint fix on unfiltered second pages after tag integration",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination finds a standard version outside the original first page with an old tag ID and Chinese aliases",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination paginates all 36 matched standard versions without duplicates or missing versions",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination still refuses standard discovery before registry results when administrator authority fails",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination filters Survey standard entries across pages and preserves their current approval/availability",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination returns 25 plus 11 Survey matches and never fills a tag-filtered page with untagged authored tools",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination reports an authored continuation even when standard matches fill exactly the last 25-row page",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination applies authored keyword terms safely in SQL before LIMIT and honors source-only pages",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination does not silently ignore unsupported tags on authored entries or broaden unknown tags",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+          "name": "server-wide discovery before public-catalog pagination refuses Survey discovery when existing management authority is absent",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "id": "backend-consumers-1",
+      "baselineComparison": false,
+      "passed": 18,
+      "failed": 9,
+      "pendingOrFiltered": 0,
+      "report": "reports/backend-consumers-1.json",
+      "sha256": "574c4c109d0519543f3ea40e461497c153fe2edd4ed48e5ad491ad968f938d9e",
+      "success": false,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 1001 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 975 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 962 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 950 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 1001 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 1000 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 987 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 975 sources",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (1001 sources)",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (987 sources)",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (975 sources)",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination preserves the effective helper page rather than echoing an unnormalized request",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination never returns the same source IDs across pages 39 and 40 or loads a page beyond the bound",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination still refuses unauthorized source catalog reads before pagination",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters preserves typed numeric Scale values, exact scorer and source identity without modifying source",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters refuses restricted rights and presentation changes rather than rewriting official source",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters preserves authorized V2 SJT original scoring and every choice matches the source oracle",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters rejects native SJT research capture even for a no-op single assignment",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters does not claim restricted SJT sources or branch flattening is supported",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters accepts only the actual controlled published Cognitive config, never substitutes a template for another task",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters loads an exact version and never falls back to latest or inactive database source",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters denies cross-organization Form reads before touching definition data",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters lists a bounded page and never includes private Form rows without explicit organization",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters rechecks multiple frozen grants with one query per family and rejects changed source",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters copies compatible published Form only under its own product authority and exact digest",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters reuses an actual published owner Questionnaire Form section with exact content version and provenance",
+          "status": "failed"
+        }
+      ]
+    },
+    {
+      "id": "backend-consumers-retry",
+      "baselineComparison": false,
+      "passed": 9,
+      "failed": 0,
+      "pendingOrFiltered": 18,
+      "report": "reports/backend-consumers-retry.json",
+      "sha256": "4624e07a094c1f6fedc768de23044ee038daa65be557d19aed975359db787559",
+      "success": true,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 1001 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 975 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 962 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 39 for 950 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 1001 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 1000 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 987 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination returns truthful page 40 for 975 sources",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (1001 sources)",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (987 sources)",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination rejects page 41 before a source query instead of repeating page 40 (975 sources)",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination preserves the effective helper page rather than echoing an unnormalized request",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination never returns the same source IDs across pages 39 and 40 or loads a page beyond the bound",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.pagination.contract.test.ts",
+          "name": "bounded source catalog pagination still refuses unauthorized source catalog reads before pagination",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters preserves typed numeric Scale values, exact scorer and source identity without modifying source",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters refuses restricted rights and presentation changes rather than rewriting official source",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters preserves authorized V2 SJT original scoring and every choice matches the source oracle",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters rejects native SJT research capture even for a no-op single assignment",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters does not claim restricted SJT sources or branch flattening is supported",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters accepts only the actual controlled published Cognitive config, never substitutes a template for another task",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters loads an exact version and never falls back to latest or inactive database source",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters denies cross-organization Form reads before touching definition data",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters lists a bounded page and never includes private Form rows without explicit organization",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters rechecks multiple frozen grants with one query per family and rejects changed source",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters copies compatible published Form only under its own product authority and exact digest",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog.sources.contract.test.ts",
+          "name": "immutable system catalog source adapters reuses an actual published owner Questionnaire Form section with exact content version and provenance",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "backend-unified-1",
+      "baselineComparison": false,
+      "passed": 12,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "report": "reports/backend-unified-1.json",
+      "sha256": "084d428745a323e88f92e49ec17b92a5b954d353e8ce19f17c7d0a2b814bc0fb",
+      "success": false,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+          "name": "shared Training catalog discovery before pagination finds a registered authored version beyond page one by multiple facets and preserves use-grant checks",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+          "name": "shared Training catalog discovery before pagination passes private-source keywords to the existing visibility-scoped query before its LIMIT",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+          "name": "shared Training catalog discovery before pagination keeps registered origin independent of authorship and does not broaden an unknown tag",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+          "name": "shared Training catalog discovery before pagination checks the actor before reading source metadata or private entries",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities combines real registry projections and approved authored entries in one result",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities never promotes an undeployed formal catalog entry to usable or invents approval records",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities does not treat standard rights/deployment availability as this entrypoint user authorization",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps authored release identity separate from governance revision and source product",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps withdrawal/emergency and unsupported rendering unavailable even for previously approved metadata",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination spans the registry/authored boundary without dropping or repeating authored offsets",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination supports an empty registry and exact registry page boundaries",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination finds cognitive row 31 by Chinese domain, ANDs facets and never labels an unknown engine",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+          "name": "actual PostgreSQL metadata filtering before pagination joins a standard exact version to student, subject and actual language metadata before LIMIT",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "backend-unified-retry",
+      "baselineComparison": false,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 6,
+      "report": "reports/backend-unified-retry.json",
+      "sha256": "36534f76cbe135ab32fe8ab688c6f4778fc98fdec1f436f9a3729aab13fbadac",
+      "success": true,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities combines real registry projections and approved authored entries in one result",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities never promotes an undeployed formal catalog entry to usable or invents approval records",
+          "status": "passed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities does not treat standard rights/deployment availability as this entrypoint user authorization",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps authored release identity separate from governance revision and source product",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps withdrawal/emergency and unsupported rendering unavailable even for previously approved metadata",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination spans the registry/authored boundary without dropping or repeating authored offsets",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination supports an empty registry and exact registry page boundaries",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "id": "backend-baseline-unified",
+      "baselineComparison": true,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 6,
+      "report": "reports/backend-baseline-unified.json",
+      "sha256": "5f1d79827ff5f0a7c8a4a0f80b822428589c4ad1b33aae709d74c3a73ffe1280",
+      "success": false,
+      "cases": [
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities combines real registry projections and approved authored entries in one result",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities never promotes an undeployed formal catalog entry to usable or invents approval records",
+          "status": "failed"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities does not treat standard rights/deployment availability as this entrypoint user authorization",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps authored release identity separate from governance revision and source product",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "one platform catalog preserving source-owned exact identities keeps withdrawal/emergency and unsupported rendering unavailable even for previously approved metadata",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination spans the registry/authored boundary without dropping or repeating authored offsets",
+          "status": "skipped"
+        },
+        {
+          "file": "backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+          "name": "bounded unified catalog pagination supports an empty registry and exact registry page boundaries",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "id": "frontend-discovery-1",
+      "baselineComparison": false,
+      "passed": 16,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-discovery-1.json",
+      "sha256": "919b4b26f365407efd56081b6ace5d921988a51778749a1867fffa8196ff0cdf",
+      "success": true,
+      "cases": [
+        {
+          "file": "frontend/src/api/catalogDiscovery.test.ts",
+          "name": "catalog discovery display and request contract localizes known source IDs without using the display label as the request value",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/api/catalogDiscovery.test.ts",
+          "name": "catalog discovery display and request contract omits empty filters, deduplicates IDs, and scopes origin to the Survey catalog",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority changes researcher or invitation pages without reloading the other list",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority reaches researcher grant 26 and renders its frozen axes/component details",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority uses server search and disables an expired ACTIVE grant",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority lets an entry manager reach catalog page two and keeps grant pagination independent",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority can leave an empty filtered source page when a later page has content",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority keeps chosen component metadata when browsing the next options page",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority hands system administrators to entry appointments without exposing an inaccessible personnel link",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.boundary.test.tsx",
+          "name": "clears the selected researcher when the visible page changes, hiding late old grants",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls uses server page and hasMore, blocks repeated asynchronous Next clicks, and stops at the 1000-source cap",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls respects the server terminal state for a page with 25 rows",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls respects the server terminal state for a page with 12 rows",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls respects the server terminal state for a page with 0 rows",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls resets rows, page and terminal metadata on a type change, then queries that type from page 1",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.test.tsx",
+          "name": "source catalog pagination controls keeps the accepted page on a failed Next, retries that same page, and refreshes from page 1",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-new-1",
+      "baselineComparison": false,
+      "passed": 5,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-new-1.json",
+      "sha256": "b4c06386cb2696e86588ded0fc6dcd335f49c2fb63d941dfac8483b08e96f64f",
+      "success": true,
+      "cases": [
+        {
+          "file": "frontend/src/components/scale-governance/LibraryPreflightPanel.test.tsx",
+          "name": "reads on demand, distinguishes scientific scope from self-authorship and clears stale success after a failed read",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+          "name": "cognitive classification management ignores an older response after a new query and clears stale actions on failed refresh",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+          "name": "cognitive classification management preserves an acknowledged scope update when only its read refresh fails and never auto repeats it",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+          "name": "classification discovery and explicitly selected version grants keeps exact choices across pages, changes no grants on filter/selection, and grants only the chosen version",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+          "name": "classification discovery and explicitly selected version grants clears hidden choices when filters or target change and does not grant after a successful write followed by failed refresh",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-consumers-1",
+      "baselineComparison": false,
+      "passed": 33,
+      "failed": 6,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-consumers-1.json",
+      "sha256": "16f95bf23ead3feabad17f00861b9f57ecd843f923cdbf6e17190a4dc5f3787c",
+      "success": false,
+      "cases": [
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page offers the Chinese motivation filter and sends its stable domain ID",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page keeps progressive filters open and ignores late results after a newer filter request",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page keeps an explicit root through loading, failure, retry and empty results",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page renders metadata cards and the no-results state without item content",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page shows confirmed authored provenance without claiming an external license or direct use grant",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page renders detail governance only when the API supplies the controlled projection",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/__tests__/ScaleLibrary.test.tsx",
+          "name": "ScaleLibrary page loads an English detail directly and keeps its English locale on remount",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution submits Survey catalog filters to the server and keeps approval controls in their own view",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey frozen version details behind explicit expansion and detail reads",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey management recipients in Survey even when the source supports both entrances",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution does not mistake entrance distribution authority for review authority",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution limits distribution to compatible entrances and uses the scoped recipient API",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution shows registry and authored records together, preserves standard identity and pages using hasMore",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires inspecting frozen content before approval",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires reason and a distinct confirmation before emergency disable",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "system administrators cannot distribute Survey versions from the shared governance page",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI loads only read-only catalog and defers details until expansion",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI allows explicit no-report selection and invalidates prior preview",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI requires explicit approval confirmation and never grants researcher use",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search submits trimmed keywords and stable facet IDs, resets the page, and renders server matches without local filtering",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search keeps applied filters for pagination and refresh, and clears all filters back to page one",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search shows Chinese classification badges before expansion and catalog-wide facet choices even with no matches",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search ignores an older successful response after a newer search has completed",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search keeps loading the newest request when an older request fails first",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI separates content, assignment and deployment without opening controls by default",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI requires a reason and sends a Survey-only exact-version decision, not a use grant",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI shows system navigation separately from researcher administration",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search labels ingestion routes independently of authorship and submits stable filters before resetting the page",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search retains applied tags and origin on pagination and refresh, and clears both applied and draft filters",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search shows Chinese classification badges without opening details and keeps global facets when the result is empty",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search ignores an older successful response after a newer search has completed",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search keeps loading the newest request when an older request fails first",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-consumers-retry",
+      "baselineComparison": false,
+      "passed": 16,
+      "failed": 0,
+      "pendingOrFiltered": 7,
+      "report": "reports/frontend-consumers-retry.json",
+      "sha256": "3849063e351bcd7b716953ffdcddeddaf8f55ea1f86cf6332dd0f3422742365b",
+      "success": true,
+      "cases": [
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI loads only read-only catalog and defers details until expansion",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI allows explicit no-report selection and invalidates prior preview",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI requires explicit approval confirmation and never grants researcher use",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search submits trimmed keywords and stable facet IDs, resets the page, and renders server matches without local filtering",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search keeps applied filters for pagination and refresh, and clears all filters back to page one",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search shows Chinese classification badges before expansion and catalog-wide facet choices even with no matches",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search ignores an older successful response after a newer search has completed",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search keeps loading the newest request when an older request fails first",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/StandardTripletWorkspace.test.tsx",
+          "name": "standard catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI separates content, assignment and deployment without opening controls by default",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI requires a reason and sends a Survey-only exact-version decision, not a use grant",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "scoped Survey library UI shows system navigation separately from researcher administration",
+          "status": "skipped"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search labels ingestion routes independently of authorship and submits stable filters before resetting the page",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search retains applied tags and origin on pagination and refresh, and clears both applied and draft filters",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search shows Chinese classification badges without opening details and keeps global facets when the result is empty",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search ignores an older successful response after a newer search has completed",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older success",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search preserves the latest refresh error without showing old rows or pagination after an older failure",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search keeps loading the newest request when an older request fails first",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx",
+          "name": "Survey catalog server-side classification search does not surface a stale failure after the latest search succeeds",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-final-1",
+      "baselineComparison": false,
+      "passed": 18,
+      "failed": 3,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-final-1.json",
+      "sha256": "1ee383afbe2f69165d42b560b641bf8f9d215bacfc0a95533df4164974b7eb8d",
+      "success": false,
+      "cases": [
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority changes researcher or invitation pages without reloading the other list",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority reaches researcher grant 26 and renders its frozen axes/component details",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority uses server search and disables an expired ACTIVE grant",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority lets an entry manager reach catalog page two and keeps grant pagination independent",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority can leave an empty filtered source page when a later page has content",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority keeps chosen component metadata when browsing the next options page",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedCatalogPaging.test.tsx",
+          "name": "governed catalog pagination preserves exact selection and authority hands system administrators to entry appointments without exposing an inaccessible personnel link",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+          "name": "cognitive classification management ignores an older response after a new query and clears stale actions on failed refresh",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+          "name": "cognitive classification management preserves an acknowledged scope update when only its read refresh fails and never auto repeats it",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx",
+          "name": "uses shared server filtering across pages instead of hiding returned rows with a local title search",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+          "name": "governance visible workspace construction serializes only the visible Survey detail and preserves inspected data, reason and grants across views",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+          "name": "governance visible workspace construction retains both legacy panels and their required full frozen records",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution submits Survey catalog filters to the server and keeps approval controls in their own view",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey frozen version details behind explicit expansion and detail reads",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey management recipients in Survey even when the source supports both entrances",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution does not mistake entrance distribution authority for review authority",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution limits distribution to compatible entrances and uses the scoped recipient API",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution shows registry and authored records together, preserves standard identity and pages using hasMore",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires inspecting frozen content before approval",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires reason and a distinct confirmation before emergency disable",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "system administrators cannot distribute Survey versions from the shared governance page",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-unified-retry",
+      "baselineComparison": false,
+      "passed": 10,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-unified-retry.json",
+      "sha256": "f0d659813a7053e6afd7272f461e320de9903fe1517e873a203b77387c44a938",
+      "success": true,
+      "cases": [
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx",
+          "name": "uses shared server filtering across pages instead of hiding returned rows with a local title search",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution submits Survey catalog filters to the server and keeps approval controls in their own view",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey frozen version details behind explicit expansion and detail reads",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution keeps Survey management recipients in Survey even when the source supports both entrances",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution does not mistake entrance distribution authority for review authority",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution limits distribution to compatible entrances and uses the scoped recipient API",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution shows registry and authored records together, preserves standard identity and pages using hasMore",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires inspecting frozen content before approval",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "Scale library system review versus entrance distribution requires reason and a distinct confirmation before emergency disable",
+          "status": "passed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+          "name": "system administrators cannot distribute Survey versions from the shared governance page",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "frontend-baseline-rendering",
+      "baselineComparison": true,
+      "passed": 0,
+      "failed": 2,
+      "pendingOrFiltered": 0,
+      "report": "reports/frontend-baseline-rendering.json",
+      "sha256": "4743ed91ca497fc14a1a1a2b74aca72f8d6d633f9cf97195bc34a61ba0122cd7",
+      "success": false,
+      "cases": [
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+          "name": "governance visible workspace construction serializes only the visible Survey detail and preserves inspected data, reason and grants across views",
+          "status": "failed"
+        },
+        {
+          "file": "frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+          "name": "governance visible workspace construction retains both legacy panels and their required full frozen records",
+          "status": "failed"
+        }
+      ]
+    }
+  ],
+  "sourceManifest": {
+    "server-version/backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts": "b6ed5862861788c41d4d51445faf72478ea2428443c38b4d5943fc7c8704548e",
+    "server-version/backend/src/__tests__/scale-library-governance/unified-catalog.test.ts": "20a3a8c1ccef36a294a5ebfe8dcc6bdb07b89aa0f302f47a03bbb6ed7b20c825",
+    "server-version/backend/src/__tests__/scale/self-authored-onboarding.test.ts": "409e7435d612692d7899ffeec7d7841c965bc12a5a21e5796e1e16bb24bf7330",
+    "server-version/backend/src/__tests__/survey/catalog-classification.test.ts": "20f479d8693344dcfc2a9584e9ab2f85b33e27642680a77b7bb08ade433e069c",
+    "server-version/backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts": "e9afc9816e290c3ef507d77703fee5e83920932c30ae213f2201693ba277697d",
+    "server-version/backend/src/__tests__/survey/library-discovery.pagination.test.ts": "63d9ecac69552340e7988f39f57ecb218c78f8b1d611b807320390ba4c9d4b22",
+    "server-version/backend/src/__tests__/survey/library-preflight.test.ts": "9092d95ccd4fcc53543aff53171faab477c85d49919defebb5ee81bc30d5cb8d",
+    "server-version/backend/src/modules/scale-library-governance/routes.ts": "1667ee0978e97e84bfd377c0a4ab14ca96d706d7058914b04691b7c307ea4ab3",
+    "server-version/backend/src/modules/scale-library-governance/service.ts": "b8e2736c929cb5adfb1014e10dc89cf6e626b099f5b8b11d52146aeef141a6f0",
+    "server-version/backend/src/modules/scale-library-governance/unified-catalog-model.ts": "9aa66a3d25bb7648363c1c435c95240782f586e25b17713cc46629671a4ad37f",
+    "server-version/backend/src/modules/scale-library-governance/unified-catalog.ts": "e48e0145734abbf08f89c5054f6e4a1b0144f458a8130773bdf44adb9fe5ad57",
+    "server-version/backend/src/modules/scale/library/catalog-discovery.ts": "0ca7fca96d1583897b83ac48adc3af6b92970f3f8f41ed3f677327af9a401cc5",
+    "server-version/backend/src/modules/scale/library/scale-library-read-model.ts": "a0c14f8a45763ccee9f64a7ec26405329f3fb08bb9d8cf251b23c5c84d7197b5",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "2fd918338dac890e4f8d6bc317024df4d3c23c572d65b4f9cc6ade52137fd0c1",
+    "server-version/backend/src/modules/survey/catalog-discovery.ts": "866555f29ed568e4baa177b5f3848a026ec6bec3fe86515606c755f1d06fd1f2",
+    "server-version/backend/src/modules/survey/catalog.service.ts": "93313b1c0acd18d429e19eca023e007867e4c90e542de75b746d48b66db33781",
+    "server-version/backend/src/modules/survey/catalog.sources.ts": "8eeac46e8e63a7b8c01ba0026eebf9af10650b735a298e000d1a36ad4c0360ed",
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": "b534ad4065cb3748be7f2fa7e7ac0f5cdbd005358ad06f7433068f7830067031",
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": "327dbf6a1334eb4bc2cce6772cd55a3e80c320a55591ffb42fb79e30c0a3162d",
+    "server-version/backend/src/modules/survey/library-admin.service.ts": "9d77d339c2afc4e131e125729dbaef178d0e74159678822033e9a7e856a0f36d",
+    "server-version/backend/src/modules/survey/library-preflight.service.ts": "93deb44b70bf1ee37c7a4766a95e0384cb8f3eecb46bf7e546241d5ad80f94b2",
+    "server-version/backend/src/modules/survey/platform.routes.ts": "2b41ccd37c52d482f04ba61d987807d11327a2974e76b19e134737a0a43e7246",
+    "server-version/backend/src/modules/survey/standard-triplet.routes.ts": "639ec8b09a77ac68181ad966054629885c3e23111e2cc21102791dcfcc3c9129",
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": "ee010ed373ed9c6b8a3760f5160b05377fb709e654b76208b795064dc8eb8127",
+    "server-version/frontend/src/api/catalogDiscovery.ts": "c47e776ac9b3e0ce9d74b08c6ae0001e47979e516f5b7d658caa3e669b82d4d7",
+    "server-version/frontend/src/api/scaleLibraryGovernance.ts": "f02ae0e272fc6de2adadbec962c9e4cc2f5a0b4aad65e201086b1e894f9b9748",
+    "server-version/frontend/src/api/surveyGovernance.ts": "3bef58a6a0ce2acaa9264d183f80af33811acd603602fad8fb0fe558a96b7bcd",
+    "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.tsx": "e0c5da617c49d98e17f20edb39080083cf54bab3311f199e1346c27c4222ae74",
+    "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.test.tsx": "77ecbfa6cd125954215e52936d0ed981fa751d0c574d37d7e318c77e382338fa",
+    "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.tsx": "48c12eb18129842ba1c6d86fb573275800672d67b5f6954c2efeec4c7495ca4f",
+    "server-version/frontend/src/components/scale-governance/catalog-discovery.css": "1b00a7502fd7fbf623cfd680020d5c3e6a9921dc36b8e42fc982a2dd948ef4d7",
+    "server-version/frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx": "d418a65dd4252a2879c3b16004993460dda79a1a0f76473ddfb6978ff2041108",
+    "server-version/frontend/src/pages/admin/GovernedToolLibrary.tsx": "42c4b1571d249268d183b934160646d5ba24430530c736fa7a3d14d1ff865bce",
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.tsx": "951e5e97445fe5665a5516d6dca0d46ac29cebeacf0aa646a33759a1060b2524",
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx": "db544b691b45b55106f2a300fe727769ff28941525c809a1d3ad94259121756a",
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": "32468f21308e56474e94967aa04a0eea2895078d7c0514a5855f0cdbadb522f4",
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": "4d10c7b1f31f16885467a7e3a985a4c5607130089234070b44131edc4c8ebc21",
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx": "bafe7a1b535f8dd72fda5175f3aad9fbee84c806b0ddcd46f48b100b13a35d58",
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": "3f20a8ab421046ac86554e72df8f06ec3c89c3135f051323bf496b3e2e7a017f",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/prisma/schema.prisma": "9793d93c42bf46f415a329211e1f421876101dd36b159ed03ed0256f11354d4a",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+  },
+  "manifestCaveat": "Manifest generated at handoff. Earlier invocations keep original reporter identity; this is not a retroactive run-bound attestation or formal cross-input reuse claim. Scoped retries and overlapping cases are not summed. Final production types have separate observed exit receipts.",
+  "failures": {
+    "environment": [
+      "Preinstalled Zod missing guid(): zero tests executed",
+      "Preinstalled Prisma client mismatched current schema; replaced by own generated client",
+      "Initial npm default cache was unwritable; no repository lock changed",
+      "Initial frontend new test used unsupported Array.findLast; replaced with ES target-compatible expression"
+    ],
+    "newAndCorrected": [
+      "Two new cognitive fixtures used memory engine 1.1.0; authoritative identity is engine 1.0.0/scoring 1.1.0",
+      "No-filter Prisma AND [] and empty classification DTO changed old exact query/row shapes; removed redundant output rather than loosening assertions",
+      "Unnecessary domain label rename broke six established DOM contracts; restored existing Chinese 领域 label",
+      "New legacy UI fixture omitted required authorization.mechanism; fixture completed; shared filters also connected to legacy render branch"
+    ],
+    "inherited": [
+      "Backend all-records INSTRUMENT_AUTHORIZATION expectation failed on unchanged integrated baseline for SELF_AUTHORED_SOURCE; minimally corrected while retaining no-availability/no-grant assertions",
+      "Two ScaleLibraryGovernance.rendering tests fail useAuth without AuthProvider on unchanged integrated baseline and candidate; left failed, not qualified"
+    ]
+  }
+}
