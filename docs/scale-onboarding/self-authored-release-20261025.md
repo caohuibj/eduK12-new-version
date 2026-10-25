@@ -12,7 +12,7 @@ Use the candidate source tree and the already authorized target database environ
 
 `node --import tsx src/scripts/install-scale-instrument.ts --instrument-key <key> --instrument-version 1.0.0 --locale zh-CN --localization-version 1.0.0 --revision 1 --modes STANDALONE,QUESTIONNAIRE,COMPOSITE --actor-user-id <existing-system-actor>`
 
-The reviewed registered authored source selects the provenance branch automatically. No `--authorization`, copyright `--territory` or `--commercial` declaration is required. Internally `ZZ` and `UNSPECIFIED` record the absence of a copyright scope declaration, not a geographical or commercial restriction. Language, applicability, deployment modes and runtime policy remain validated. Add `--apply` only after a successful reviewed dry run. Installation creates a DRAFT/HIDDEN scale and an active versioned deployment; it does not publish or grant use.
+The reviewed registered authored source selects the provenance branch automatically. No `--authorization`, copyright `--territory` or `--commercial` declaration is required. The default territory comes from the trusted source scientificReview.territory when present; otherwise it is `ZZ`. This records existing scientific applicability, not a copyright restriction. `UNSPECIFIED` records the absence of a copyright commercial-scope declaration. Explicit scientific publication-scope checks remain active. Language, applicability, deployment modes and runtime policy remain validated. Add `--apply` only after a successful reviewed dry run. Installation creates a DRAFT/HIDDEN scale and an active versioned deployment; it does not publish or grant use.
 
 2. Create publication JSON with only instrumentKey, instrumentVersion, actorUserId and `visibility: "HIDDEN"`. Run:
 
@@ -39,3 +39,7 @@ Approval owns its genuine low/middle/high synthetic scoring/report trial, persis
 ## Local validation
 
 Focused tests cover source spoofing, cross-identity hash reuse, non-whitelisted authored identities, external authorization preservation, current system actor, immutable old definitions, explicit publication proof, start/locale/lifecycle gates, source receipts and catalog/user-grant separation. Cold starts are checked in both policy-first and registry-first import order. No live database apply or publication was performed as part of this local code validation.
+
+## 2026-10-25 default-territory correction
+
+The initial authored default incorrectly used ZZ for every tool. Actual isolated deployment showed that 10 RESEARCH_READY tools already have reviewed CN scientific applicability: installation succeeded, but formal publication correctly rejected SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH. This is a new authored-default bug, not a PR355 regression. The fix preserves the scientific check and derives the default from the reviewed source. Existing revision1/ZZ deployments require an explicit formal revision2/CN installation, retaining the old revision/history. Do not edit status or scientific evidence to make publication pass. The 25 other ready tools can continue against their original exact reviewed publication proofs.

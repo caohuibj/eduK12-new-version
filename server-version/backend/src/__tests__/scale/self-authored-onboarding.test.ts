@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getScaleInstrumentSource, getScaleInstrumentRuntimePolicy } from '../../modules/scale/onboarding/instrument-registry'
-import { registeredSelfAuthoredSourceProof } from '../../modules/scale/onboarding/self-authored'
+import { registeredSelfAuthoredSourceProof, registeredSelfAuthoredDeploymentTerritory } from '../../modules/scale/onboarding/self-authored'
 import { planScaleInstrumentInstall } from '../../modules/scale/onboarding/install'
 import { planStandardScalePublication } from '../../modules/scale/onboarding/publish'
 import { resolveScaleStartDeployment } from '../../modules/scale/deployment/service'
@@ -51,6 +51,23 @@ describe('self-authored formal install, publication and consumption', () => {
     expect(p.proof.sourceHash).toMatch(/^[a-f0-9]{64}$/)
     const stale = await planStandardScalePublication(db as any, { instrumentKey: key, instrumentVersion: version, actorUserId: 'system', visibility: 'HIDDEN', expectedProofHash: '0'.repeat(64) })
     expect(stale.blockers).toContain('PUBLICATION_PREVIEW_STALE')
+  })
+  it('retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses', async () => {
+    const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
+    const reviewed = getScaleInstrumentSource(reviewedKey, version)!, reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
+    const oldPolicy = { ...policy, selfAuthoredSourceHash: registeredSelfAuthoredSourceProof(reviewedKey, version)!, runtimePolicyHash: reviewedRuntime.runtimePolicyHash }
+    const db = database(true)
+    const reviewedScale = { ...scale, code: reviewedKey, definition: reviewed.executable!.definition, definitionHash: hashScaleDefinition(reviewed.executable!.definition) }
+    db.scale.findUnique.mockResolvedValue(reviewedScale)
+    db.assessmentReferenceSet.findUnique.mockImplementation(async (arg: any) => ({ definition: reviewed.executable!.references.find(r => r.referenceVersion === arg.where.instrumentType_instrumentKey_referenceVersion.referenceVersion), status: 'ACTIVE' }))
+    db.$queryRaw.mockResolvedValue([{ ...deployment, policyJson: oldPolicy, policyHash: hashScaleDeploymentPolicy(oldPolicy) }])
+    const publication = { instrumentKey: reviewedKey, instrumentVersion: version, actorUserId: 'system', visibility: 'HIDDEN' as const }
+    expect((await planStandardScalePublication(db as any, publication)).blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    const revised = { ...oldPolicy, revision: 2, territory: registeredSelfAuthoredDeploymentTerritory(reviewedKey, version)! }
+    db.$queryRaw.mockResolvedValue([{ ...deployment, revision: 2, policyJson: revised, policyHash: hashScaleDeploymentPolicy(revised) }])
+    expect(await planStandardScalePublication(db as any, publication)).toMatchObject({ allowPublish: true, blockers: [] })
+    expect(revised.authorizationRefs).toEqual([])
+    expect(reviewed.catalog.scientificMaturity).toBe('RESEARCH_READY')
   })
   it('reaches managed starts but still rejects unpublished scales and missing active deployments', async () => {
     const db = database(true)

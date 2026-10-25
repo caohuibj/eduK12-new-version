@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { getScaleInstrumentSource, getScaleInstrumentRuntimePolicy } from '../../modules/scale/onboarding/instrument-registry'
-import { selfAuthoredSourceProof, registeredSelfAuthoredSourceProof } from '../../modules/scale/onboarding/self-authored'
+import { selfAuthoredSourceProof, registeredSelfAuthoredSourceProof, registeredSelfAuthoredDeploymentTerritory } from '../../modules/scale/onboarding/self-authored'
 import { evaluateScaleDeployment, scaleDeploymentPolicyV1Schema, type ScaleDeploymentPolicyV1 } from '../../modules/scale/policy/deployment'
 import { evaluateDurableInstrumentRights } from '../../modules/scale/deployment/rights'
 import { previewScaleInstrument } from '../../modules/scale/onboarding/preview'
@@ -43,6 +43,14 @@ describe('registered self-authored source boundary', () => {
     try {
       expect(evaluate({ ...policy(), selfAuthoredSourceHash: proof }, independent.identity.instrumentKey).allowNewStarts).toBe(true)
     } finally { spy.mockRestore() }
+  })
+  it('keeps trusted scientific applicability separate from waived external licensing', () => {
+    const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
+    const reviewed = getScaleInstrumentSource(reviewedKey, version)!
+    expect(reviewed.catalog.scientificMaturity).toBe('RESEARCH_READY')
+    expect(registeredSelfAuthoredDeploymentTerritory(reviewedKey, version)).toBe(reviewed.scientificReview!.territory)
+    expect(registeredSelfAuthoredDeploymentTerritory(key, version)).toBe('ZZ')
+    expect(registeredSelfAuthoredDeploymentTerritory('who5', version)).toBeNull()
   })
   it('retains deployment mode and runtime identity checks', () => {
     expect(evaluate({ ...policy(), deploymentModes: ['QUESTIONNAIRE'] }).reasons).toContain('DEPLOYMENT_MODE_NOT_BOUND')

@@ -1,4 +1,4 @@
-import { registeredSelfAuthoredSourceProof } from '../modules/scale/onboarding/self-authored'
+import { registeredSelfAuthoredSourceProof, registeredSelfAuthoredDeploymentTerritory } from '../modules/scale/onboarding/self-authored'
 import { prisma } from '../config/database'
 import { getScaleInstrumentRuntimePolicy } from '../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument, planScaleInstrumentInstall } from '../modules/scale/onboarding/install'
@@ -25,7 +25,7 @@ const main = async () => {
   const instrumentVersion = required('instrument-version')
   const selfAuthoredSourceHash = registeredSelfAuthoredSourceProof(instrumentKey, instrumentVersion)
   const locale = required('locale')
-  const territory = (selfAuthoredSourceHash ? (flag('territory') ?? 'ZZ') : required('territory')).toUpperCase()
+  const territory = (selfAuthoredSourceHash ? (flag('territory') ?? registeredSelfAuthoredDeploymentTerritory(instrumentKey, instrumentVersion)!) : required('territory')).toUpperCase()
   const revision = Number(required('revision'))
   if (!Number.isInteger(revision) || revision <= 0) throw new Error('--revision must be a positive integer')
   const commercial = selfAuthoredSourceHash ? (flag('commercial') ?? 'UNSPECIFIED') : required('commercial')

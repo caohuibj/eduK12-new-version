@@ -18,3 +18,11 @@ export function registeredSelfAuthoredSourceProof(instrumentKey: string, instrum
   const source = getScaleInstrumentSource(instrumentKey, instrumentVersion)
   return source ? selfAuthoredSourceProof(source) : null
 }
+
+/** The deployment territory also identifies scientific applicability. Authorship
+ * removes external license checks, not the scope of the reviewed evidence. */
+export function registeredSelfAuthoredDeploymentTerritory(instrumentKey: string, instrumentVersion: string): string | null {
+  const source = getScaleInstrumentSource(instrumentKey, instrumentVersion)
+  if (!source || !selfAuthoredSourceProof(source)) return null
+  return source.scientificReview?.territory ?? 'ZZ'
+}
