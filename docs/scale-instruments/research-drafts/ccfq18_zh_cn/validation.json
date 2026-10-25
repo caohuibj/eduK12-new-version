@@ -1,0 +1,119 @@
+{
+  "status": "LOCAL_DRAFT_CONTENT_CHECKED_NOT_RELEASE_QUALIFICATION",
+  "instrumentKey": "ccfq18_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "sourceSha256": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103",
+  "testSha256": "5332a6be7118f7ae980567e96355cd60e4ed0fef560fd722eb78ced39b951382",
+  "checks": [
+    {
+      "name": "initialCommand",
+      "status": "NO_TEST_FILES",
+      "exitCode": 1,
+      "passed": 0
+    },
+    {
+      "name": "initialContentTests",
+      "status": "FAILED_INVOCATION_PRESERVED",
+      "exitCode": 1,
+      "passed": 30,
+      "failed": 1,
+      "cause": "Test asserted nonexistent validator.valid property; source/engine unchanged."
+    },
+    {
+      "name": "repairedValidationCase",
+      "status": "PASSED_TARGETED",
+      "exitCode": 0,
+      "passed": 1,
+      "skipped": 30
+    },
+    {
+      "name": "adultPolicyAffectedTests",
+      "status": "PASSED_TARGETED",
+      "exitCode": 0,
+      "passed": 3,
+      "skipped": 29,
+      "covers": [
+        "strictSource",
+        "reportSerialization",
+        "age215_216_missing"
+      ]
+    },
+    {
+      "name": "finalScopeWordingAffectedTests",
+      "status": "PASSED_TARGETED",
+      "exitCode": 0,
+      "passed": 2,
+      "skipped": 30,
+      "covers": [
+        "strictSource",
+        "reportSerialization"
+      ]
+    },
+    {
+      "name": "initialNonstrictTypecheck",
+      "status": "WRONG_CLI_CONFIGURATION_PRESERVED",
+      "exitCode": 2
+    },
+    {
+      "name": "updatedStrictTypecheck",
+      "status": "PASSED_TARGETED_IMPORT_CLOSURE",
+      "exitCode": 0,
+      "note": "Final subsequent changes were three string literals only; imports, structures and inferred types unchanged."
+    },
+    {
+      "name": "publicDocumentationAlignment",
+      "status": "PASS"
+    }
+  ],
+  "coverage": {
+    "distinctCasesPassed": 32,
+    "singleAllGreenFullInvocation": false,
+    "unchangedCasesNotRepeated": true
+  },
+  "adultPolicy": {
+    "field": "subject.ageMonths",
+    "minInclusive": 216,
+    "age215": "INELIGIBLE",
+    "age216": "ELIGIBLE",
+    "missingAge": "INDETERMINATE",
+    "liveEntryIntegrationTested": false
+  },
+  "externalEvidence": {
+    "storage": "PRIVATE_OUTSIDE_REPOSITORY",
+    "rawLogsPublished": false,
+    "failedInvocationsRetained": true,
+    "sha256": {
+      "age-policy-affected-tests.json": "c18e2467241366a3f30b05dadd6596c695bdb3ca9a97dddac949dd2c617f9725",
+      "age-policy-affected-tests.txt": "758bc56fd9b9af2c11948d36820f3d5245f1e4315280bdb902ccb5bba467d767",
+      "age-policy-targeted-typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content-test-repair.json": "f7b82de52b8bd6c53b7a1042947d6ce480744e43b0372b3a43bd23c0958b959c",
+      "content-test-repair.txt": "269dedc99d45fa8385dced512be7d9157b35af54c0bc4593bdd2a9a1b8255736",
+      "content-tests-first.json": "3d9ec87d36238e02d5b9e352c77dc92de54493b2053c05f135208a7978c536a3",
+      "content-tests-first.txt": "1ab6062972fde578c2169b720f6d63c97f73153744597c97bd3c5c60f6172029",
+      "final-provenance.json": "2f54b4fd878baa2f36d639cfab58965384ebcf81ad70a35e08506cc12eca4691",
+      "final-static-crosscheck.json": "f26c1237c35d7b0aab9c6f59878f1e28f461869ed95b0d7da20655a2b391e9fb",
+      "final-wording-affected-tests.json": "80ad102ec0f122b592e537515f96849db3f6c5ed9fa7fc0eabb2a52654bafcfa",
+      "final-wording-affected-tests.txt": "9f61e62b793bcd6f756218e4065cbb97de710ea609a606e199ff396ae53b30e0",
+      "initial-path-error.json": "ad51cfb9c6caa528bd503391b8f2fd99a08fec3d7ab1c5909b6455fa082b1fce",
+      "initial-path-error.txt": "2821b57ea78103f2bf9b2792f41323fea56ca7e6b402bcbe0b4b2f2aa658386c",
+      "source-before-age-policy.json": "8e1074431c857d83fdbd571bdd40cd256797753dad07c7ddc52813f1f558243e",
+      "source-final.json": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103",
+      "static-crosscheck.json": "1e312ff644c1d5cf26be8d42b0ca055e03873e0853f895a1211a4192b6d81412",
+      "targeted-typecheck-nonstrict-error.txt": "3c0fa715dba9b000cc34b5bce31c0f67d0fa8c880e389d5cd618216215a79ee1",
+      "targeted-typecheck.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test-before-age-policy.ts": "7e44cca50c9e10744f8aeb4a7f4ad801010dce7bd295790251a027e56fabba63",
+      "test-final.ts": "5332a6be7118f7ae980567e96355cd60e4ed0fef560fd722eb78ced39b951382",
+      "test-repair.json": "31575ccdbc8e6bd4dec4a9b7af76f79855f4a4d4af3da25c952f762dde093617",
+      "validation.json": "8701cdcf4d2d3ddaa92c327fa63ed211c976a7c1acbfa4cc048891ec8140840f"
+    }
+  },
+  "limits": [
+    "DRAFT/PENDING; no expert translation review or Chinese validation.",
+    "No registry/database/Prisma/CI/publication operation performed by this content package.",
+    "No independent instructions/stem field in inspected schema; docs content still awaits #356 integration.",
+    "HIDDEN is the required future creation state, not an observed database state.",
+    "Scoring complete_required is per dimension; incomplete overall result suppresses interpretations but may retain the other complete dimension.",
+    "No runtime ReferenceSets, thresholds, bands, percentiles or global total.",
+    "Local results are not signed attestations or CI success; execution wall-clock is preserved only in private raw logs."
+  ]
+}

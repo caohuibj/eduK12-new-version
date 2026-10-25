@@ -1,0 +1,223 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION_NOT_READY_FOR_ADMINISTRATION",
+  "instrumentKey": "ccfq18_zh_cn",
+  "localizationVersion": "1.0.0",
+  "review": {
+    "expert": "PENDING",
+    "cognitiveDebrief": "NOT_ESTABLISHED",
+    "chineseValidation": "NOT_ESTABLISHED"
+  },
+  "source": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.02219/full",
+  "sourceCitation": "Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219",
+  "copyright": "© 2018 Gabrys, Tabri, Anisman and Matheson.",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "changes": "平台中文工作翻译、数字呈现及原创报告；不改变题数、顺序或计分；未获原作者背书。",
+  "administration": {
+    "instructions_en": "The purpose of this questionnaire is to determine what you generally think/feel/do when stressful situations provoke negative thoughts and emotions. Of course, you may act differently depending on the situation, but try to think of what you usually think/feel/do when you are stressed or upset. Using the scale below, indicate the extent to which agree or disagree with the following statements.",
+    "instructions_zh_working": "这份问卷希望了解：当有压力的情境引起消极的想法和情绪时，你通常会怎么想、怎么感受或怎么做。不同情境下你的反应当然可能不同，但请尽量想一想，当你感到有压力或心烦时，你通常的想法、感受或做法。请使用下面的选项，表示你对以下每句话的同意或不同意程度。",
+    "stem_en": "Generally, in stressful situations …",
+    "stem_zh_working": "通常，在有压力的情境中……",
+    "timeFrame": "General/usually; no fixed recent recall period.",
+    "responseEndpoints": [
+      {
+        "value": 1,
+        "en": "strongly disagree",
+        "zh_working": "非常不同意"
+      },
+      {
+        "value": 7,
+        "en": "strongly agree",
+        "zh_working": "非常同意"
+      }
+    ],
+    "intermediateLabels": "2、3、4、5、6仅数字；原文完整中间文字锚点未核实，不补写。",
+    "presentationBlocker": "当前ScaleDefinitionV2没有独立指导语/stem字段。此文档并未被runtime读取，#356接入后须显式迁移并核对展示；不将指导语或stem拼进第1题。"
+  },
+  "items": [
+    {
+      "id": "CCFQ1",
+      "order": 1,
+      "source_table_row": 15,
+      "text_en": "I weigh out my options before choosing how to take action.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "我会先权衡可选的办法，再决定如何行动。"
+    },
+    {
+      "id": "CCFQ2",
+      "order": 2,
+      "source_table_row": 5,
+      "text_en": "I feel like I lose control over my thoughts and emotions.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我觉得自己失去了对想法和情绪的控制。"
+    },
+    {
+      "id": "CCFQ3",
+      "order": 3,
+      "source_table_row": 11,
+      "text_en": "I approach the situation from multiple angles.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "我会从多个角度看待这件事。"
+    },
+    {
+      "id": "CCFQ4",
+      "order": 4,
+      "source_table_row": 7,
+      "text_en": "It’s difficult to let go of intrusive thoughts or emotions.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我很难放下那些不由自主冒出来的想法或情绪。"
+    },
+    {
+      "id": "CCFQ5",
+      "order": 5,
+      "source_table_row": 12,
+      "text_en": "I consider the situation for multiple viewpoints before responding.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "在作出回应之前，我会从多个视角考虑这件事。"
+    },
+    {
+      "id": "CCFQ6",
+      "order": 6,
+      "source_table_row": 14,
+      "text_en": "I take the time to think of several ways to best cope with the situation before acting.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "在行动之前，我会花时间想出几种尽可能妥善应对这件事的办法。"
+    },
+    {
+      "id": "CCFQ7",
+      "order": 7,
+      "source_table_row": 8,
+      "text_en": "I find it easy to set-aside unpleasant thoughts or emotions.",
+      "reverse": false,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我发现自己很容易暂且把令人不快的想法或情绪放到一边。"
+    },
+    {
+      "id": "CCFQ8",
+      "order": 8,
+      "source_table_row": 6,
+      "text_en": "It is easy for me to ignore distracting thoughts.",
+      "reverse": false,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "对我来说，不去理会那些分散注意力的想法很容易。"
+    },
+    {
+      "id": "CCFQ9",
+      "order": 9,
+      "source_table_row": 18,
+      "text_en": "I can easily think of multiple coping options before deciding how to respond.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "在决定如何回应之前，我能很容易地想到多种应对办法。"
+    },
+    {
+      "id": "CCFQ10",
+      "order": 10,
+      "source_table_row": 13,
+      "text_en": "I take the time to see things from different perspectives before reacting.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "在作出反应之前，我会花时间从不同角度看待事情。"
+    },
+    {
+      "id": "CCFQ11",
+      "order": 11,
+      "source_table_row": 1,
+      "text_en": "I get easily distracted by upsetting thoughts or feelings.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "令人心烦的想法或感受很容易分散我的注意力。"
+    },
+    {
+      "id": "CCFQ12",
+      "order": 12,
+      "source_table_row": 10,
+      "text_en": "I take the time to think of more than one way to resolve the problem.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "我会花时间想出不止一种解决问题的办法。"
+    },
+    {
+      "id": "CCFQ13",
+      "order": 13,
+      "source_table_row": 17,
+      "text_en": "I control my thoughts and feelings by putting the situation into context.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "我会通过把事情放在具体背景中理解，来控制自己的想法和感受。"
+    },
+    {
+      "id": "CCFQ14",
+      "order": 14,
+      "source_table_row": 9,
+      "text_en": "I can remain in control of my thoughts and emotions.",
+      "reverse": false,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我能够保持对自己想法和情绪的控制。"
+    },
+    {
+      "id": "CCFQ15",
+      "order": 15,
+      "source_table_row": 3,
+      "text_en": "I have a hard time managing my emotions.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我很难管理自己的情绪。"
+    },
+    {
+      "id": "CCFQ16",
+      "order": 16,
+      "source_table_row": 2,
+      "text_en": "My thoughts and emotions interfere with my ability to concentrate.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我的想法和情绪会妨碍我集中注意力。"
+    },
+    {
+      "id": "CCFQ17",
+      "order": 17,
+      "source_table_row": 16,
+      "text_en": "I manage my thoughts or feelings by reframing the situation.",
+      "reverse": false,
+      "dimension": "appraisal_and_coping_flexibility",
+      "text_zh_working": "我会通过换一种方式理解这件事，来调节自己的想法或感受。"
+    },
+    {
+      "id": "CCFQ18",
+      "order": 18,
+      "source_table_row": 4,
+      "text_en": "It’s hard for me to shift my attention away from negative thoughts or feelings.",
+      "reverse": true,
+      "dimension": "cognitive_control_over_emotion",
+      "text_zh_working": "我很难把注意力从消极的想法或感受上移开。"
+    }
+  ],
+  "reportProvenance": {
+    "scientificBasis": "Gabrys, R. L., Tabri, N., Anisman, H., & Matheson, K. (2018). Cognitive Control and Flexibility in the Context of Stress and Depressive Symptoms: The Cognitive Control and Flexibility Questionnaire. Frontiers in Psychology, 9, 2219. https://doi.org/10.3389/fpsyg.2018.02219",
+    "description": "两个报告解释及反思/行动建议为平台原创通俗说明，非原作者干预手册。",
+    "norms": "NONE",
+    "thresholds": "NONE",
+    "percentiles": "NONE",
+    "suppressionAdvice": false
+  },
+  "implementation": {
+    "releaseStatus": "DRAFT",
+    "visibility": "NOT_MATERIALIZED; HIDDEN_REQUIRED_IF_LATER_CREATED",
+    "registryIntegrated": false,
+    "referenceSets": [],
+    "missingPolicy": "平台选择各九题完整才计算，不插补；任一题缺失整体quality invalid，不显示解释，另一完整维度数值可能保留。",
+    "agePolicy": {
+      "field": "subject.ageMonths",
+      "minInclusive": 216,
+      "belowMin": "INELIGIBLE",
+      "missing": "INDETERMINATE",
+      "integration": "DECLARED; NOT_REGISTERED_OR_DEPLOYED"
+    }
+  }
+}
