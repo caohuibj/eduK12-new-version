@@ -247,3 +247,14 @@ describe('C14 selected child scope enforcement', () => {
     expect(tx.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalled()
   })
 })
+
+describe('identity-only state summaries retain variant injection checks', () => {
+  it.each([
+    ['scaleAssessments', 'scale'], ['cognitiveSessions', 'cognitive'], ['situationalAttempts', 'sjt'],
+  ] as const)('validates every %s row using its selected-item identity', async (relation, prefix) => {
+    const valid = { ...fixture(), [relation]: [{ id: 'child', compositeItemId: `${prefix}-a` }] }
+    await expect(resolveTrainingAttemptScope(valid)).resolves.toMatchObject({ itemIds: expect.any(Set) })
+    const injected = { ...fixture(), [relation]: [{ id: 'child', compositeItemId: `${prefix}-a` }, { id: 'injected', compositeItemId: `${prefix}-b` }] }
+    await expect(resolveTrainingAttemptScope(injected)).rejects.toThrow('概率分卷作答的冻结配置、分配或单元不一致')
+  })
+})

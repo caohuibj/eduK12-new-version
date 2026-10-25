@@ -8,6 +8,7 @@ import { freezeAssignmentProfile, freezeDataForWrite } from '../backend/src/modu
 import { requireCognitiveRegistryEntry } from '../backend/src/modules/cognitive/cognitive.registry'
 import { changeEntryGrant } from '../backend/src/modules/admin-permissions/service'
 import { prisma as authorityDb } from '../backend/src/config/database'
+import {publishTrainingSourcesFixture,grantPublicScaleFixture} from '../backend/src/__tests__/fixtures/published-measurement'
 const { assertSyntheticDatabase } = require('./helpers/synthetic-admin-session.cjs')
 
 async function main() {
@@ -92,6 +93,11 @@ async function main() {
     configId=config.id
     assignmentId=(await db.cognitiveAssignment.create({ data: { configId,courseId:course1,createdBy:actor.userId,title:'Go/No-Go fixture',status:'PUBLISHED',listedStandalone:true,...freezeDataForWrite(freeze) } })).id
     scaleId=(await db.scale.create({ data: { code:'Q1-'+suffix,name:'Scale fixture',creatorId:actor.userId,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:MIXED_SCALE_DEFINITION as any,definitionHash:hashScaleDefinition(MIXED_SCALE_DEFINITION),itemCount:1,dimensionCount:1 } })).id
+    // Exercise the existing exact publication/license services, including the
+    // independent static SJT review. Status labels alone are not releases.
+    await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[scaleId],assignmentIds:[assignmentId],
+      situational:[{instrumentKey:'sjt-assertiveness-golden',instrumentVersion:'1.0.0'}]})
+    await grantPublicScaleFixture(db,scaleId)
 
   await writeFile(process.env.QUESTIONNAIRE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-q1-browser-fixture.json',
     JSON.stringify({ teacher: { username: actor.userId, password }, admin: { username: other.userId, password },

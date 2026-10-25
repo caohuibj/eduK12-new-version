@@ -1,5 +1,4 @@
 import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
@@ -339,7 +338,7 @@ export const createScaleAdmissionForRuntime = async (input: {
     scale: input.scale,
     requestedMode: input.requestedMode,
   })
-  if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts || !deployment.decision.authorization) {
+  if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts) {
     throw new InstrumentFinalSubmitError(
       'STALE_ATTEMPT',
       `量表当前不可启动：${deployment.reasons.join(',') || 'DEPLOYMENT_DENIED'}`,
@@ -427,8 +426,7 @@ export const createScaleAdmissionForRuntime = async (input: {
       deployment: {
         revision: deployment.deployment.revision,
         policyHash: deployment.deployment.policyHash,
-        authorizationId: deployment.decision.authorization.authorizationId,
-        authorizationVersion: deployment.decision.authorization.version,
+        basis: 'DEPLOYMENT_IDENTITY',
         evaluatedAt,
         completionDeadline: new Date(Date.parse(evaluatedAt) + (deployment.deployment.policy.completionWindowMs ?? 7 * 24 * 60 * 60 * 1000)).toISOString(),
       },
@@ -727,7 +725,6 @@ export const activateScaleAdmission = async (
   assertFinalOnly(row.deliveryMode)
   const runtime = (await loadScaleAdmissionRuntime(row))
   if (runtime.schemaVersion === 1) return prisma.$transaction(async tx=>{
-    await assertTrainingScaleCollectionAllowed(tx,[row.scaleId])
     return activateUnstoredScaleAdmission(tx,row,runtime,parent)
   })
 
@@ -738,7 +735,6 @@ export const activateScaleAdmission = async (
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = await loadStoredScaleAdmission(current,tx)
       if (winner) return (await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
-      await assertTrainingScaleCollectionAllowed(tx,[current.scaleId])
       // Load the parent inside this transaction, never use a pre-transaction context.
       return activateUnstoredScaleAdmission(tx, current, (await loadScaleAdmissionRuntime(current, tx)))
     },

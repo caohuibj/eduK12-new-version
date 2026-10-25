@@ -89,7 +89,7 @@ suite('Education library real START→FINAL→personal report and image authoriz
         applicability: 'Synthetic isolated test', scoringDescription: 'One score', reportDescription: 'New descriptive version' },
       educationApplicability: { schemaVersion: 1, administrations: [{ population: product === 'SCHOOL' ? 'STUDENT' : 'TEACHER', responseMode: 'SELF' }] },
       mediaConsent: { manifestHash: manifest.mediaManifest.manifestHash, shareWithAuthorizedUsers: true } })
-    const nextApproved = await review(fixture.libraryAdminUserId, nextApplication.id, { expectedVersion: 1, decision: 'APPROVE', reason: 'Synthetic newer version' })
+    const nextApproved = await review(fixture.libraryAdminUserId, nextApplication.id, { expectedVersion: 1, decision: 'APPROVE', allowedProducts: ['TRAINING', 'SURVEY'], reason: 'Synthetic newer version' })
     expect(nextApproved.entryId).not.toBe(fixture.entryId)
     expect(await readEducationRespondentScaleReport(input)).toEqual(report)
     expect((await db.assessmentUnitSnapshot.findFirstOrThrow({ where: { id: finished.finalUnit.id } })).sourceDefinitionHash)

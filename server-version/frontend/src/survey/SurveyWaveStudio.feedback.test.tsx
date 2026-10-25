@@ -19,6 +19,7 @@ function fixture(frozen=false,nativeDefinition?:Record<string,unknown>){
  const requests:Array<{url:string;body:any}>=[]
  const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
  vi.stubGlobal('fetch',vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
+  if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
   const url=String(input),body=init?.body?JSON.parse(String(init.body)):undefined
   requests.push({url,body})
   if(url.endsWith('/auth/csrf'))return response({csrfToken:'csrf'})
@@ -36,7 +37,7 @@ function fixture(frozen=false,nativeDefinition?:Record<string,unknown>){
 async function select(){fireEvent.click(await screen.findByRole('button',{name:/T1 · 反馈波次/}));await screen.findByRole('heading',{name:'T1 · 反馈波次'})}
 async function enable(){fireEvent.click(await screen.findByLabelText('启用 量表甲 的原始指标反馈'));fireEvent.click(screen.getByLabelText('量表甲：总分（total）'))}
 async function preflight(){fireEvent.click(screen.getByRole('button',{name:'检查知情同意与所有工具'}));await waitFor(()=>expect(screen.getByRole('button',{name:'冻结研究定义'})).toBeEnabled())}
-afterEach(()=>vi.unstubAllGlobals())
+afterEach(()=>{vi.unstubAllGlobals();vi.restoreAllMocks()})
 describe('explicit Wave participant feedback',()=>{
  it('defaults disabled and preserves the old prepare payload, excluding FORM/Cog/catalog',async()=>{
   const requests=fixture();render(<SurveyWaveStudio projectId="p1"/>);await select()
@@ -85,9 +86,17 @@ describe('explicit Wave participant feedback',()=>{
  })
  it('clears selection when a tool is removed/reselected and when the Wave changes',async()=>{
   fixture();render(<SurveyWaveStudio projectId="p1"/>);await select();await enable()
-  fireEvent.click(screen.getByLabelText('SCALE · 量表甲'));fireEvent.click(screen.getByLabelText('SCALE · 量表甲'))
+  fireEvent.click(screen.getByText('选用本研究已加入的工具'))
+  await waitFor(()=>expect(screen.getByLabelText('SCALE · 量表甲')).toBeEnabled())
+  fireEvent.click(screen.getByLabelText('SCALE · 量表甲'))
+  await waitFor(()=>{
+   expect(screen.getByLabelText('SCALE · 量表甲')).not.toBeChecked()
+   expect(screen.getByLabelText('SCALE · 量表甲')).toBeEnabled()
+  })
+  fireEvent.click(screen.getByLabelText('SCALE · 量表甲'))
   await waitFor(()=>expect(screen.getByLabelText('启用 量表甲 的原始指标反馈')).not.toBeChecked())
-  await enable();fireEvent.click(screen.getByRole('button',{name:/T2 · 反馈波次/}))
+  await enable();vi.spyOn(window,'confirm').mockReturnValue(true)
+  fireEvent.click(screen.getByRole('button',{name:/T2 · 反馈波次/}))
   await waitFor(()=>expect(screen.getByLabelText('启用 量表甲 的原始指标反馈')).not.toBeChecked())
  })
  it('clears selection on project switch and instrument-library revision invalidation',async()=>{

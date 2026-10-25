@@ -58,7 +58,9 @@ function parseReferences(value: unknown): SurveySituationalReceiptReference[] {
   return refs
 }
 
-function decodeResult(row: StoredResultRow, reference: SurveySituationalReceiptReference,
+/** Pure stored-fact verification. Callers own current authority/locks; synthetic
+ * governance trials use the identical codec with explicitly synthetic rows. */
+export function decodeSurveySituationalResult(row: StoredResultRow, reference: SurveySituationalReceiptReference,
   unit: ResearchFrozenUnit, input: { surveyAttemptId: string; surveyPublicationId: string; includeRaw?: boolean }): LoadedSurveySituationalResult {
   try {
     const { header, snapshot } = frozenSurveyNativeSituationalRuntime(unit)
@@ -193,7 +195,7 @@ export async function loadSurveySituationalResults(tx: Prisma.TransactionClient,
     if (!row || !unit) return fail('SURVEY_SJT_RECEIPT_SLOT_NOT_SELECTED')
     if (slots.has(unit.instrumentKey)) fail('SURVEY_SJT_RECEIPT_DUPLICATE_SLOT')
     slots.add(unit.instrumentKey)
-    return decodeResult(row, reference, unit, input)
+    return decodeSurveySituationalResult(row, reference, unit, input)
   })
 }
 

@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import {sjtNativeBranchTemplate,createSjtNativeBranchFinalFixture,createSjtNativeBranchInvalidFinalFixtures} from '../fixtures/sjt-native-branch.fixture'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
@@ -53,7 +54,7 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await reviewSjtDraft({userId:admin,admin:true},draft.id,draft.revision,draft.contentDigest,true,'Synthetic independent release, no real participant data')
     const release=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:template.instrumentKey}})
     expect(release.authorizationPolicy).toBeNull()
-    const grant=await grantCatalogSource(admin,owner,{kind:'SJT',sourceId:release.id,sourceVersion:template.instrumentVersion})
+    const grant=await grantGovernedCatalogFixture(db,admin,owner,{kind:'SJT',sourceId:release.id,sourceVersion:template.instrumentVersion})
     grantId=grant.id;projectId=randomUUID();publicId=randomUUID()
     await db.surveyProject.create({data:{id:projectId,publicId,ownerUserId:owner,title:'Synthetic staged SJT',status:'ACTIVE',collectionMode:'SINGLE_UNLINKED'}})
     const imported=await importCatalogDraft(owner,projectId,grantId,{requestId:randomUUID(),instrumentKey:'staged',title:'Synthetic staged tool'})
@@ -64,7 +65,7 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await requestSjtReview({userId:author,admin:false},branchDraft.id,branchDraft.revision,branchDraft.contentDigest)
     await reviewSjtDraft({userId:admin,admin:true},branchDraft.id,branchDraft.revision,branchDraft.contentDigest,true,'Synthetic authored branching coverage')
     const branchRelease=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:branchTemplate.instrumentKey}})
-    const branchGrant=await grantCatalogSource(admin,owner,{kind:'SJT',sourceId:branchRelease.id,sourceVersion:branchTemplate.instrumentVersion})
+    const branchGrant=await grantGovernedCatalogFixture(db,admin,owner,{kind:'SJT',sourceId:branchRelease.id,sourceVersion:branchTemplate.instrumentVersion})
     branchDraftId=(await importCatalogDraft(owner,projectId,branchGrant.id,{requestId:randomUUID(),instrumentKey:'branch',title:'Synthetic branch tool'})).id
   })
   afterAll(async()=>{
@@ -193,13 +194,29 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await expect(submitResearchFinal({...f.proof,submissionId:randomUUID(),answers:{staged:{}},situationalReferences:[{...accepted.receipt!,payloadHash:'f'.repeat(64)}]})).rejects.toThrow()
     expect((await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:f.proof.attemptId}})).status).toBe('STARTED')
   })
-  it('keeps frozen publication use after future-only grant revoke but honors fresh hard stop even for child replay',async()=>{
-    const f=await fixture()
-    await revokeToolGrant(admin,grantId)
-    const child=await startSurveySituational(f.proof,'staged'),payload=input(child.attempt.id)
-    await submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)
+  it('stops new admission after exact grant revocation while retaining frozen receipts until the original completion deadline',async()=>{
+    const f=await fixture(),child=await startSurveySituational(f.proof,'staged'),payload=input(child.attempt.id)
+    const accepted=await submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)
+    const before=await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})
+    await revokeGovernedCatalogFixture(db,admin,grantId)
+    const freshAttemptId=randomUUID(),freshCredential=randomBytes(32).toString('base64url')
+    await expect(db.$transaction(async tx=>{
+      await tx.surveyWaveAttempt.create({data:{id:freshAttemptId,projectId,waveId:f.waveId,status:'STARTED',sessionHash:hashResearchCredential(freshCredential)}})
+      await tx.surveyConsent.create({data:{id:randomUUID(),projectId,waveId:f.waveId,attemptId:freshAttemptId,consentVersion:1,accepted:true}})
+      await bindSurveyAttemptContent(tx,{projectId,waveId:f.waveId,attemptId:freshAttemptId,publicationId:f.publicationId,newAttempt:true})
+    })).rejects.toMatchObject({statusCode:403})
+    expect(await db.surveyWaveAttempt.findUnique({where:{id:freshAttemptId}})).toBeNull()
+    expect(await db.surveyConsent.count({where:{attemptId:freshAttemptId}})).toBe(0)
+    const resumed=await startSurveySituational(f.proof,'staged')
+    expect(resumed.attempt.id).toBe(child.attempt.id)
+    expect(resumed.receipt).toEqual(accepted.receipt)
+    expect((await submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).receipt).toEqual(accepted.receipt)
+    expect(await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})).toEqual(before)
+    // HARD_STOP is now stop-new-recruitment, not revocation of an admitted attempt.
     await db.surveyWave.update({where:{id:f.waveId},data:{hardStopAt:new Date()}})
-    await expect(submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).rejects.toThrow('窗口')
-    expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
-  })
-})
+    expect((await submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).receipt).toEqual(accepted.receipt)
+    expect(await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})).toEqual(before)
+    await db.surveyWave.update({where:{id:f.waveId},data:{finishUntil:new Date(Date.now()-1000)}})
+    await expect(submitSurveySituationalFinal(f.proof,'staged',child.attempt.id,payload)).rejects.toMatchObject({statusCode:403})
+    expect(await db.situationalRawSubmission.findMany({where:{attemptId:child.attempt.id}})).toEqual(before)
+  })})

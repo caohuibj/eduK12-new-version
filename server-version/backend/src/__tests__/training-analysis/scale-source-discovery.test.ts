@@ -134,7 +134,10 @@ describe('Training Scale source discovery uses frozen runtime dictionaries', () 
   })
   it.each(['TEACHER', 'ADMIN'] as const)('keeps %s at teacher numericScores disclosure despite researcher access', async role => {
     const f = fixture(runtime({numeric: false}))
-    expect((await listTrainingAnalysisSources(f.db, {...actor, role}, 'course')).list).toEqual([])
+    if(role==='ADMIN'){
+      await expect(listTrainingAnalysisSources(f.db,{...actor,role},'course')).rejects.toMatchObject({statusCode:404})
+      expect(f.db.assessment.findMany).not.toHaveBeenCalled()
+    }else expect((await listTrainingAnalysisSources(f.db,{...actor,role},'course')).list).toEqual([])
   })
   it.each(['STANDARD', 'CUSTOM_DESCRIPTIVE'])('uses explicit V1 %s policy without guessing an unknown instrument class', async instrumentClass => {
     const f = fixture(runtime({v: 1, key: 'unknown_training_scale'}), instrumentClass)

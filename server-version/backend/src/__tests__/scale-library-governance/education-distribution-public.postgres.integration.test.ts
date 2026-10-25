@@ -36,7 +36,7 @@ suite('Education admin distribution seams / isolated PostgreSQL, public entrypoi
   releaseId=release.releaseId;contentHash=release.contentHash
   const application=await submit(owner,'SURVEY',{requestId:randomUUID(),releaseId,metadata,
    educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'},{population:'TEACHER',responseMode:'SELF'}]}})
-  entryId=(await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic approval'})).entryId!
+  entryId=(await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic approval'})).entryId!
   organizationId=randomUUID();otherOrg=randomUUID()
   for(const id of [organizationId,otherOrg])await db.organization.create({data:{id,name:prefix+id,productDomain:'SCHOOL',createdByUserId:admin}})
   await db.educationProductEntitlement.create({data:{organizationId,product:'HUISCHOOL',grantedByUserId:admin}})
@@ -98,7 +98,7 @@ suite('Education admin distribution seams / isolated PostgreSQL, public entrypoi
     authoringSnapshot:{title:metadata.title,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}}),owner))
   const application=await submit(owner,'SURVEY',{requestId:randomUUID(),releaseId:release.releaseId,metadata,
    educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'}]}})
-  const id=(await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic student-only approval'})).entryId!
+  const id=(await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic student-only approval'})).entryId!
   const input={...query(),product:'TEACHER',releaseId:release.releaseId,contentHash:release.contentHash}
   await expect(db.$transaction(tx=>educationRecipientsInTransaction(tx,admin,id,input))).rejects.toThrow('PRODUCT_VARIANT_ADAPTER_NOT_READY')
   await expect(db.$transaction(tx=>grantEducationPublicUseInTransaction(tx,admin,id,{...input,requestId:randomUUID(),userId:eligible[0]}),

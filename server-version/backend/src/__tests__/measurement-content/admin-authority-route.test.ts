@@ -6,7 +6,7 @@ vi.mock('../../modules/measurement-content/admin-authority.service',()=>({issueA
 vi.mock('../../middleware/auth',()=>({authenticate:mocks.authenticate}))
 vi.mock('../../modules/admin-permissions/guards',()=>({requireSystemAdmin:mocks.system,requireRecentAdminKey:mocks.recent}))
 vi.mock('../../middleware/redisRateLimit',()=>({createRedisRateLimiter:()=>mocks.limit}))
-vi.mock('../../modules/admin-permissions/security',()=>({adminWebAuthnConfig:()=>({origin:'https://admin.example.test'}),beginAdminRegistration:vi.fn(),finishAdminRegistration:vi.fn(),beginAdminLogin:vi.fn(),finishAdminAuthentication:vi.fn()}))
+vi.mock('../../modules/admin-permissions/security',()=>({adminWebAuthnConfig:()=>({origin:'https://admin.example.test'}),adminAuthOrigin:()=> 'https://admin.example.test',beginAdminRegistration:vi.fn(),finishAdminRegistration:vi.fn(),beginAdminLogin:vi.fn(),finishAdminAuthentication:vi.fn()}))
 import {adminPermissionsRouter} from '../../modules/admin-permissions/routes'
 import {AdminPermissionError} from '../../modules/admin-permissions/service'
 const grantId='00000000-0000-4000-8000-000000000001'

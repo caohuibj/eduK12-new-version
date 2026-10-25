@@ -81,11 +81,11 @@ describe('private Survey Wave content options',()=>{
   const result=await listSurveyContentOptions('owner','project','wave',query('REPORT',2))
   expect(result.options).toHaveLength(25);expect(result.hasMore).toBe(true);expect(m.query.mock.calls[0][0].values).toContain(25)
  })
- it('uses existing licensed catalog checks for read-only sources',async()=>{
+ it('uses existing catalog snapshots for read-only sources; license expiry recheck is retired',async()=>{
   const draft={id:iid,kind:'SCALE',instrumentKey:'source',revision:1,catalogGrantId:'grant'}
   m.draft.mockResolvedValue(draft);m.catalog.mockResolvedValue(new Map([['grant',{source:'verified'}]]));m.catalogCompile.mockReturnValue({draftId:iid,kind:'SCALE'})
   await listSurveyContentOptions('owner','project','wave',query())
-  expect(m.catalog).toHaveBeenCalledWith(tx,'owner',['grant']);expect(m.compile).not.toHaveBeenCalled();expect(m.recheck).toHaveBeenCalled()
+  expect(m.catalog).toHaveBeenCalledWith(tx,'owner',['grant']);expect(m.compile).not.toHaveBeenCalled();expect(m.recheck).not.toHaveBeenCalled()
  })
  it('validates pagination and prohibits caller-defined scope',()=>{
   for(const value of [{...query(),page:0},{...query(),page:1001},{...query(),layer:'MEASUREMENT'},{...query(),actorId:'other'}])expect(()=>surveyContentOptionsQuerySchema.parse(value)).toThrow()

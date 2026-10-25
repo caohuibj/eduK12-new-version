@@ -67,11 +67,9 @@ export async function lookupSurveyGroupRateScope(scope:Scope):Promise<boolean>{
     SELECT w.id FROM survey_projects p
     JOIN survey_waves w ON w.project_id=p.id
     JOIN survey_publications pub ON pub.id=w.publication_id AND pub.project_id=p.id
-    JOIN users u ON u.id=p.owner_user_id
-    JOIN survey_researcher_grants g ON g.user_id=u.id
-    JOIN survey_mfa_credentials m ON m.user_id=u.id
-    WHERE p.public_id=${scope.publicId} AND p.status='ACTIVE' AND w.status='OPEN'
-      AND w.hard_stop_at IS NULL AND w.group_ip_activated_at IS NOT NULL
+    WHERE p.public_id=${scope.publicId}
+      ${scope.attemptId?Prisma.empty:Prisma.sql`AND p.status='ACTIVE' AND w.status='OPEN' AND w.hard_stop_at IS NULL`}
+      AND w.group_ip_activated_at IS NOT NULL
       AND w.opens_at=w.group_ip_activated_at AND w.opens_at<=statement_timestamp()
       AND w.closes_at>statement_timestamp() AND w.finish_until>statement_timestamp()
       AND w.closes_at<=w.group_ip_activated_at+interval '48 hours'
@@ -79,8 +77,6 @@ export async function lookupSurveyGroupRateScope(scope:Scope):Promise<boolean>{
       AND w.group_ip_policy IS NOT NULL
       AND w.group_ip_policy->>'schemaVersion'='1'
       AND pub.purpose='RESEARCH_ONLY'
-      AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
-      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp()) AND g.status='ACTIVE' AND m.enabled
       ${scope.waveId?Prisma.sql`AND w.id=${scope.waveId}`:Prisma.empty}
       ${scope.linked===undefined?Prisma.empty:Prisma.sql`AND p.collection_mode=${scope.linked?'LINKED_WAVES':'SINGLE_UNLINKED'}`}
       AND ${entry} AND ${attempt}

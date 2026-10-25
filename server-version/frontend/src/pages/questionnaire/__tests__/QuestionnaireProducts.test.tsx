@@ -531,6 +531,60 @@ describe('C20 material flow editor and attempt budget', () => {
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
     api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, revision: 4, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts } }))
   })
+  it('C20 guided authoring exposes delivery and advanced JSON before saving and publishing', async () => {
+    trainingPresentation.enabled = true
+    const user = userEvent.setup()
+    let current: any = { ...row, trainingFlowDraft: null, maxAttempts: 1 }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : current }))
+    api.post.mockImplementation(async (path, body) => {
+      if (path.endsWith('/preflight')) return { code: 0, data: { revision: current.revision, ok: true, checks: [] } }
+      if (path.endsWith('/training-flow')) current = { ...current, revision: current.revision + 1, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts }
+      else if (path.endsWith('/publish')) current = { ...current, status: 'PUBLISHED', trainingFlowFrozen: current.trainingFlowDraft, trainingFlowDraft: null }
+      else throw new Error('Unexpected synthetic mutation')
+      return { code: 0, data: current }
+    })
+    mount('materials')
+    await screen.findByDisplayValue('材料实验')
+    const steps = screen.getByRole('navigation', { name: '编制步骤' })
+    // jsdom has no scrolling layout API; visibility and disclosure behavior remain real DOM.
+    steps.scrollIntoView = vi.fn()
+    const flowToggle = screen.getByLabelText('启用跨工具条件流程', { exact: true })
+    expect(flowToggle).not.toBeVisible()
+    await user.click(within(steps).getByRole('link', { name: /投放设置/ }))
+    expect(flowToggle).not.toBeVisible()
+    await user.click(screen.getByText('分组与条件路径', { exact: true }))
+    expect(flowToggle).toBeVisible()
+    await user.click(flowToggle)
+    const region = screen.getByRole('region', { name: '跨工具条件流程' })
+    await user.click(within(region).getByRole('button', { name: '启用两组材料实验' }))
+    await user.click(within(region).getByRole('button', { name: '添加配额示例' }))
+    const editor = within(region).getByLabelText('流程 JSON（高级编辑）', { exact: true })
+    expect(editor).not.toBeVisible()
+    await user.click(within(region).getByText('编辑流程规则（高级 JSON）', { exact: true }))
+    expect(editor).toBeVisible()
+    const authored = JSON.parse((editor as HTMLTextAreaElement).value)
+    expect(authored.schemaVersion).toBe(2)
+    authored.experiment = config.experiment
+    authored.quotaPolicy = { schemaVersion: 1, groupLimits: { a: 1, b: 1 } }
+    fireEvent.change(editor, { target: { value: JSON.stringify(authored) } })
+    fireEvent.change(within(region).getByLabelText('最多作答次数（材料实验）'), { target: { value: '2' } })
+    await user.click(within(region).getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/training-flow', { revision: 3, config: authored, maxAttempts: 2 }))
+    await waitFor(() => expect(within(region).getByRole('button', { name: '保存流程设置' })).toBeDisabled())
+    expect(editor).toBeVisible()
+    await user.click(within(steps).getByRole('link', { name: /检查与发布/ }))
+    await user.click(screen.getByRole('button', { name: '发布前自检' }))
+    await screen.findByText('当前草稿自检通过', { exact: true })
+    await user.click(screen.getByRole('button', { name: '发布组合测评' }))
+    expect(api.post.mock.calls.some(([path]) => path.endsWith('/publish'))).toBe(false)
+    await user.click(within(screen.getByRole('dialog', { name: '确认发布组合测评' })).getByRole('button', { name: '确认发布' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/publish', { revision: 4 }))
+    await user.click(within(steps).getByRole('link', { name: /投放设置/ }))
+    expect(editor).toBeVisible()
+    expect(editor).toHaveAttribute('readonly')
+    expect(JSON.parse((editor as HTMLTextAreaElement).value)).toEqual(authored)
+    expect(current.maxAttempts).toBe(2)
+  })
   it('loads the saved budget and sends budget-only changes with V2 config', async () => {
     mount('materials')
     const input = await screen.findByLabelText('最多作答次数（材料实验）')

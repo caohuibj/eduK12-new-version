@@ -8,7 +8,7 @@ import { canStudentAccessScale } from '../../modules/scale/scale-access'
 describe('scale governance consumption boundaries',()=>{
  beforeEach(()=>vi.clearAllMocks())
  it('resolves exact stored release and always protects legacy scale identities',async()=>{
-  const tx={}
+  const tx={$queryRaw:vi.fn().mockResolvedValue([])}
   await assertTrainingScaleCollectionAllowed(tx as never,['scale','legacy','scale'])
   expect(mocks.guard).toHaveBeenCalledWith(tx,[],['legacy','scale'])
  })

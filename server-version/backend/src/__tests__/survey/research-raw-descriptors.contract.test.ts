@@ -1,3 +1,4 @@
+import * as scalePresentation from '../../modules/survey/catalog-scale.presentation'
 import {rawLongExport,rawWideExport} from '../../modules/survey/analytics.raw-export'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
@@ -84,12 +85,15 @@ function fixture(participants=3,quality=false){
 // counters therefore measure schema projection work, not the retained fences.
 function countSchemaWork(snapshot:ResearchFrozenPublication){
   const form=snapshot.units[0].displayDefinition as FormDraft
-  const scale=snapshot.units[1].displayDefinition as ScaleDraft
+  const parse=scalePresentation.readSurveyScalePresentation
   const sjt=snapshot.units[2].displayDefinition as SjtDraft
   const iterations=[...form.pages.map(p=>vi.spyOn(p.questions,Symbol.iterator)),
-    vi.spyOn(scale.items,Symbol.iterator),vi.spyOn(sjt.questions,Symbol.iterator)]
+    vi.spyOn(scalePresentation,'readSurveyScalePresentation'),vi.spyOn(sjt.questions,Symbol.iterator)]
   const optionMaps=[...form.pages.flatMap(p=>p.questions.map(q=>vi.spyOn(q.options,'map'))),
-    vi.spyOn(scale.responseOptions,'map'),...sjt.questions.map(q=>vi.spyOn(q.options,'map'))]
+    ...sjt.questions.map(q=>vi.spyOn(q.options,'map'))]
+  ;(iterations[form.pages.length] as ReturnType<typeof vi.spyOn>).mockImplementation((value:unknown)=>{
+    const normalized=parse(value);optionMaps.push(vi.spyOn(normalized.responseOptions,'map'));return normalized
+  })
   return {iterations,optionMaps}
 }
 const observedMissing=()=>{

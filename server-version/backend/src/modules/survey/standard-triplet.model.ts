@@ -1,5 +1,6 @@
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
+import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {getScaleCustomScorerKeys} from '../scale/scale-scoring'
 import {validateReferenceSetDefinition,type AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
@@ -15,7 +16,7 @@ export function sourceParts(toolKey:string,version:string):Part[]{
  const source=getScaleInstrumentSource(toolKey,version)
  if(!source?.executable)return []
  const {report,referencePolicy,source:provenance,license,...content}=source.executable.definition
- const reference=toolReference('SCALE',toolKey,{...source,executable:{...source.executable,scorerPlugins:(source.executable.scorerPlugins??[]).map(p=>({key:p.key,version:p.version}))},originalProvenance:provenance,originalLicense:license})
+ const reference=toolReference('SCALE',toolKey,{...snapshotScaleInstrumentSource({...source,executable:{...source.executable,scorerPlugins:source.executable.scorerPlugins??[]}}),originalProvenance:provenance,originalLicense:license})
  const make=(axis:Axis,label:string,payload:unknown):Part=>({axis,version:label,hash:canonicalHash(payload),payload:json(payload),sourceVersion:version,reference})
  return [make('CONTENT',version+':'+content.scoring.scoringVersion,content),make('PARAMETERS',source.executable.references.map(r=>r.referenceVersion).sort().join('+')||'none-v1',{referencePolicy,references:source.executable.references}),make('REPORT',report.reportVersion,report)]
 }

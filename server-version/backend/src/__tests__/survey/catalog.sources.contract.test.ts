@@ -51,9 +51,11 @@ describe('immutable system catalog source adapters',()=>{
       expect(scoreScale(imported.compiledDefinition as typeof definition,originalAnswers)).toEqual(scoreScale(original,originalAnswers))
     }
   })
-  it('refuses restricted rights and presentation changes rather than rewriting official source',()=>{
+  it('preserves reference-only rights metadata while still rejecting unsupported presentation changes',()=>{
     const definition=scale();definition.license.redistribution='restricted'
-    expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('SOURCE_RIGHTS')
+    const original=structuredClone(definition)
+    expect(adaptCatalogScale(scaleRef,'Source',definition).compiledDefinition).toEqual(original)
+    expect(definition).toEqual(original)
     definition.license.redistribution='allowed';definition.items[0].randomizeOptions=true
     expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('RANDOMIZATION_RUNTIME_UNSUPPORTED')
   })
@@ -73,9 +75,11 @@ describe('immutable system catalog source adapters',()=>{
     pkg.definition.researchAssignment={assignmentVersion:'source-assignment-v1',groups:[{groupKey:'control',nodeKey:node.nodeKey,variants:[{variantKey:'control',weight:1,omittedChannelKeys:[],probeTiming:'DEFINED'}]}]}
     expect(()=>adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:pkg.instrumentVersion},'Source',pkg)).toThrow('SOURCE_SJT_RESEARCH_CAPTURE_UNSUPPORTED')
   })
-  it('does not claim restricted SJT sources or branch flattening is supported',()=>{
+  it('does not reinterpret restricted SJT metadata as an authorization gate or grant',()=>{
     const pkg=sjt();pkg.definition.license.redistribution='restricted'
-    expect(()=>adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:'1'},'Source',pkg)).toThrow('SOURCE_RIGHTS')
+    const original=structuredClone(pkg)
+    expect(adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:'1'},'Source',pkg).compiledDefinition).toEqual(original.definition)
+    expect(pkg).toEqual(original)
   })
   it('accepts only the actual controlled published Cognitive config, never substitutes a template for another task',()=>{
     const ref={kind:'COGNITIVE' as const,sourceId:'config-id',sourceVersion:'1.1.0'}
@@ -101,7 +105,7 @@ describe('immutable system catalog source adapters',()=>{
     const db={$queryRaw:vi.fn().mockResolvedValue([{platformRole:'SYSTEM_ADMIN'}]),
       scale:{findMany:vi.fn().mockResolvedValue([])},sjtAuthorRelease:{findMany:vi.fn().mockResolvedValue([])},
       cognitiveTestConfig:{findMany:vi.fn().mockResolvedValue([])},huiteacherFormInstrument:{findMany:vi.fn()}}
-    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',limit:500,page:1},db as never)
+    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',limit:500,page:1,includeGoverned:false},db as never)
     expect(result.list.length).toBeLessThanOrEqual(25)
     expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({take:26}))
     expect(db.huiteacherFormInstrument.findMany).not.toHaveBeenCalled()
@@ -144,7 +148,7 @@ describe('immutable system catalog source adapters',()=>{
   it('keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup',async()=>{
     const definition=scale(),rows=Array.from({length:26},(_,i)=>({id:'source-'+i,instrumentVersion:'1',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom-'+i,name:'Source '+i,definition,definitionHash:hashScaleDefinition(definition)}))
     const db={scale:{findMany:vi.fn().mockResolvedValue(rows),findFirst:vi.fn()},$queryRaw:vi.fn()}
-    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25},db as never)
+    const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25,includeGoverned:false},db as never)
     expect(result.list).toHaveLength(25);expect(result.hasMore).toBe(true)
     expect(result.list.every(r=>!r.available&&r.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(db.scale.findMany).toHaveBeenCalledTimes(1)
@@ -170,7 +174,7 @@ describe('immutable system catalog source adapters',()=>{
     expect(()=>adaptCatalogQuestionnaireForm({...ref,sourceVersion:'old'},row,'admin')).toThrow('VERSION_CHANGED')
     expect(()=>adaptCatalogQuestionnaireForm({...ref,sourceVersion:questionnaireFormSourceVersion({...row,contextSection:true})},{...row,contextSection:true},'admin')).toThrow('CONTEXT_UNSUPPORTED')
     const db={$queryRaw:vi.fn().mockResolvedValue([]),questionnaireFormSection:{findMany:vi.fn().mockResolvedValue([row]),findFirst:vi.fn().mockResolvedValue(row)}}
-    const listed=await listCatalogSources({actorUserId:'admin',kind:'FORM'},db as never)
+    const listed=await listCatalogSources({actorUserId:'admin',kind:'FORM',includeGoverned:false},db as never)
     expect(listed.list).toEqual([{ref,title:row.title,available:true,unsupportedReason:null,definitionDigest:ref.sourceVersion}])
     expect(db.$queryRaw).not.toHaveBeenCalled();expect(db.questionnaireFormSection.findFirst).not.toHaveBeenCalled()
     expect(db.questionnaireFormSection.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:'admin',status:'PUBLISHED'}}}))

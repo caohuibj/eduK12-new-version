@@ -99,9 +99,7 @@ export async function readSjtEntryDistributionSource(
     if (!validation.valid || compiled.contentDigest !== release.contentDigest
       || compiled.definitionHash !== release.definitionHash || validation.definitionHash !== release.definitionHash
       || pkg.key !== release.instrumentKey || pkg.instrumentVersion !== release.instrumentVersion
-      || canonicalHash(pkg) !== canonicalHash(release.package)
-      || !['verified', 'authorized', 'self_authored'].includes(pkg.definition.license.status)
-      || pkg.definition.license.redistribution !== 'allowed') fail('SOURCE_SJT_ENTRY_SOURCE_INVALID')
+      || canonicalHash(pkg) !== canonicalHash(release.package)) fail('SOURCE_SJT_ENTRY_SOURCE_INVALID')
     const expected = prepareRelease(sjtMeasurementRelease({
       localId: pkg.key, version: pkg.instrumentVersion, instrumentVersion: pkg.instrumentVersion,
       definition: pkg.definition, onlineProtocol: pkg.online,

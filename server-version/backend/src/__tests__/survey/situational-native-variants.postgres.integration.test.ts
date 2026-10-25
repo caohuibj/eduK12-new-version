@@ -1,3 +1,5 @@
+import {historicalCatalogGrantFixture} from '../fixtures/historical-catalog-grant'
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomUUID } from 'node:crypto'
 import { rm } from 'node:fs/promises'
 import { PrismaClient } from '@prisma/client'
@@ -95,7 +97,11 @@ suite('Survey native questionnaire variants — real PostgreSQL', () => {
     await reviewSjtDraft({ userId: admin, admin: true }, authored.id, authored.revision, authored.contentDigest, true,
       'Original synthetic staged source and image; host variants do not change its scientific protocol')
     const release = await db.sjtAuthorRelease.findFirstOrThrow({ where: { sourceDraftId: authored.id } })
-    const grant = await grantCatalogSource(admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
+    const ref={kind:'SJT' as const,sourceId:release.id,sourceVersion:template.instrumentVersion}
+    // This route still requires original-author media confirmation. Keep the
+    // refusal, then test an explicitly historical grant, not new admission.
+    await expect(grantGovernedCatalogFixture(db,admin,owner,ref)).rejects.toThrow('原作者')
+    const grant=await historicalCatalogGrantFixture(db,admin,owner,ref)
     for (const instrumentKey of ['common', 'native_a', 'native_b']) nativeIds.push((await importCatalogDraft(owner, projectId, grant.id,
       { requestId: randomUUID(), instrumentKey, title: 'Synthetic ' + instrumentKey })).id)
     for (const [kind, instrumentKey, definition] of [['FORM', 'screen', form], ['SCALE', 'tail', scale]] as const) {

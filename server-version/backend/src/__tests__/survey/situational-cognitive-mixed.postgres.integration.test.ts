@@ -1,10 +1,17 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { PrismaClient, type Prisma } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+const isolated=await vi.hoisted(async()=>{
+ vi.resetModules()
+ const {isolatedTestDatabase}=await import('../fixtures/isolated-test-database')
+ return isolatedTestDatabase(['SURVEY_NATIVE_SJT_TEST_DATABASE_URL','SURVEY_COGNITIVE_TEST_DATABASE_URL','RELEASE_INTEGRATION_DATABASE_URL'],'survey_mixed')
+})
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { gonogoSequence } from '../../modules/cognitive/randomization'
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import {publishCognitiveConfig} from '../../modules/cognitive/release.service'
 import { createSjtDraft, requestSjtReview, reviewSjtDraft } from '../../modules/situational/authoring/service'
 import { compileSjtTemplate } from '../../modules/situational/authoring/template'
 import { situationalLegacyFinalSubmitSchema } from '../../modules/situational/situational-final-submit.schema'
@@ -87,22 +94,28 @@ suite('Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreS
     await reviewSjtDraft({ userId: admin, admin: true }, authored.id, authored.revision, authored.contentDigest, true,
       'Independent synthetic software fixture; no participant data or new scientific claims')
     const release = await db.sjtAuthorRelease.findFirstOrThrow({ where: { instrumentKey: template.instrumentKey } })
-    const stagedGrant = await grantCatalogSource(admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
+    const stagedGrant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'SJT', sourceId: release.id, sourceVersion: template.instrumentVersion })
     stagedId = (await importCatalogDraft(owner, projectId, stagedGrant.id, { requestId: randomUUID(),
       instrumentKey: 'staged', title: 'Synthetic native staged task' })).id
 
     // The builder deliberately cannot create Cognitive instruments. Use the
     // actual fixed catalog identity and its real grant/import path instead.
     // A pre-existing seed is never rewritten to make this fixture pass.
-    const config = await db.cognitiveTestConfig.findUnique({ where: {
+    let config = await db.cognitiveTestConfig.findUnique({ where: {
       testType_configVersion: { testType: 'gonogo', configVersion: '1.1.0' },
     } }) ?? await db.cognitiveTestConfig.create({ data: { testType: 'gonogo', configVersion: '1.1.0',
       name: 'Existing fixed Survey Go/No-Go protocol, synthetic catalog fixture', engineVersion: '1.0.0', scoringVersion: '1.0.0',
-      config: SURVEY_GONOGO_CONFIG, status: 'PUBLISHED', accessPolicy: 'OPEN', publishedAt: new Date() } })
+      config: SURVEY_GONOGO_CONFIG, status: 'DRAFT', accessPolicy: 'OPEN' } })
+    expect(config.config).toEqual(SURVEY_GONOGO_CONFIG)
+    if(config.status==='DRAFT'){
+      await publishCognitiveConfig(config.id,admin)
+      config=await db.cognitiveTestConfig.findUniqueOrThrow({where:{id:config.id}})
+    }
+    expect(config.measurementReleaseId).not.toBeNull()
     expect(config).toMatchObject({ testType: 'gonogo', configVersion: '1.1.0', engineVersion: '1.0.0',
       scoringVersion: '1.0.0', status: 'PUBLISHED', accessPolicy: 'OPEN' })
     expect(config.config).toEqual(SURVEY_GONOGO_CONFIG)
-    const cognitiveGrant = await grantCatalogSource(admin, owner, { kind: 'COGNITIVE', sourceId: config.id, sourceVersion: '1.1.0' })
+    const cognitiveGrant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'COGNITIVE', sourceId: config.id, sourceVersion: '1.1.0' })
     cognitiveId = (await importCatalogDraft(owner, projectId, cognitiveGrant.id, { requestId: randomUUID(),
       instrumentKey: 'go', title: 'Fixed Go/No-Go' })).id
     for (const [kind, instrumentKey, definition] of [['FORM', 'screen', form], ['SCALE', 'scale', scale]] as const) {
@@ -115,7 +128,7 @@ suite('Survey fixed mixed native staged SJT and Cognitive lifecycle — PostgreS
       }
     }
   })
-  afterAll(async () => { await db?.$disconnect(); vi.unstubAllEnvs() })
+  afterAll(async () => { await db?.$disconnect(); vi.unstubAllEnvs(); await isolated.restore() })
 
   async function attempt(wave: Omit<Fixture, 'proof'>): Promise<Fixture> {
     const attemptId = randomUUID(), accessCredential = randomBytes(32).toString('base64url')

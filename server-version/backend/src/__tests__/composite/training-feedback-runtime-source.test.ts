@@ -5,8 +5,8 @@ const composite = read('modules/composite/composite.service.ts')
 const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
 describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', () => {
   it('binds feedback under the existing publication/course/round locks and atomic attempt insert', () => {
-    const lock = admission.indexOf('FOR UPDATE'), marker = admission.indexOf('const feedbackConfigured ='), bind = admission.indexOf('feedbackBinding = prepareTrainingFeedbackBinding(')
-    expect(lock).toBeGreaterThan(0); expect(marker).toBeGreaterThan(lock); expect(bind).toBeGreaterThan(admission.indexOf('await assertTrainingTokenRound'))
+    const lock = admission.indexOf('FOR SHARE'), marker = admission.indexOf('const feedbackConfigured ='), bind = admission.indexOf('feedbackBinding = prepareTrainingFeedbackBinding(')
+    expect(lock).toBeGreaterThan(0); expect(marker).toBeGreaterThan(lock); expect(bind).toBeGreaterThan(admission.indexOf('await assertTrainingTokenRound(db as Prisma.TransactionClient, token)'))
     expect(admission).toContain('if (persistence?.checkpoint || persistence?.localCognitive || feedbackConfigured)')
     expect(admission).toContain('FOR SHARE OF c,u'); expect(admission).toContain('accessTokenId, round: feedbackRound')
     const freeze = admission.indexOf('const trainingFeedbackSnapshot ='), insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')

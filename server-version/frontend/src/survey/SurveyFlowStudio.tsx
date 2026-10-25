@@ -2,6 +2,8 @@ import {ConditionEditor} from '../modules/assessment-core/flow/ConditionEditor'
 import {defaultPredicate,type FieldChoice} from '../modules/assessment-core/flow/conditions'
 import { researchKey } from './builder.types'
 import type { FlowBlock,FlowDraft,FlowField } from './flow.client'
+import {useState} from 'react'
+import {packageArrangement,packageFlowProblems,packageFlowChangeAllowed,restorePackage,moveArrangementUnit,type PackageMembership} from './package-arrangement'
 
 export type ToolInfo={id:string;instrumentKey:string;title:string;kind:string}
 export type FormQuestionInfo={instrumentKey:string;itemKey:string;prompt:string;type:string;
@@ -16,14 +18,20 @@ const itemField=(x:FormQuestionInfo):FieldChoice|null=>{
     kind,options:x.options.map(o=>({key:o.optionKey,label:o.label}))}:null
 }
 
-export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,collectionMode}:{
+export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,collectionMode,packages=[],membershipPending=false,onArrange}:{
   value:FlowDraft|null;onChange:(next:FlowDraft|null)=>void;
   tools:ToolInfo[];selectedIds:string[];questions:FormQuestionInfo[];
   collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
+  packages?:PackageMembership[];membershipPending?:boolean;onArrange?:(ids:string[])=>void
 }){
-  const selected=tools.filter(t=>selectedIds.includes(t.id))
+  const [packageError,setPackageError]=useState('')
+  const selected=selectedIds.flatMap(id=>{const tool=tools.find(t=>t.id===id);return tool?[tool]:[]})
   const allAvailable=selectedIds.every(id=>tools.some(t=>t.id===id))
-  const apply=(next:FlowDraft)=>onChange(next)
+  const apply=(next:FlowDraft)=>{
+    if(membershipPending){setPackageError('整包身份尚未读取完成；原流程未改变。');return}
+    if(!packageFlowChangeAllowed(value,next,packages)){setPackageError('整包必须完整、原序且连续执行，不能加入条件跳过或实验分支；原流程未改变。');return}
+    setPackageError('');onChange(next)
+  }
   const addBlock=(kind:FlowBlock['kind'])=>{
     if(!value)return
     let next:FlowBlock
@@ -52,7 +60,8 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
   if(!value)return <section className="rounded-xl border p-4 space-y-2">
     <h4 className="font-semibold">Survey Flow · 实验与流程（可选）</h4>
     <p className="text-sm text-slate-600">默认仍按现有顺序完成全部研究工具。启用后可以配置冻结的材料、随机组、可审核条件路径，不能上传 JS。</p>
-    <button className="btn-secondary" type="button" disabled={!selectedIds.length||!allAvailable}
+    {packageError&&<p role="alert">{packageError}</p>}
+    <button className="btn-secondary" type="button" disabled={!selectedIds.length||!allAvailable||membershipPending||packageArrangement(selectedIds,packages).some(p=>p.issues.length>0)}
       onClick={()=>apply({schemaVersion:1,embeddedData:[],blocks:selected.map(tool=>({
         blockKey:researchKey('b'),kind:'INSTRUMENT' as const,instrumentKey:tool.instrumentKey,
       }))})}>启用 Flow V1</button>
@@ -67,6 +76,9 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
   const unavailable=value.blocks.filter(b=>b.kind==='INSTRUMENT'&&
     !selected.some(t=>t.instrumentKey===b.instrumentKey))
   return <section className="rounded-xl border p-4 space-y-4">
+    <fieldset disabled={membershipPending} className="border-0 p-0 space-y-4">
+    {membershipPending&&<p role="status">正在读取整包身份，原流程暂时保留。</p>}{packageError&&<p role="alert">{packageError}</p>}
+    {packageFlowProblems(value,packages).length>0&&<div role="alert"><p>原流程存在整包顺序、完整性或条件问题，尚未自动改变。原序列：{value.blocks.map(b=>b.kind==='INSTRUMENT'?b.instrumentKey:b.kind).join(' → ')}</p>{packages.map(p=><div key={p.id}>{p.title} #{p.id.slice(0,8)}<button type="button" disabled={!onArrange} onClick={()=>onArrange?.(restorePackage(selectedIds,p))}>恢复此整包及批准顺序</button><button type="button" disabled={!onArrange} onClick={()=>onArrange?.(selectedIds.filter(id=>!p.bindings.some(b=>b.draftId===id)))}>从本波次移除此整包</button></div>)}</div>}
     <div className="flex gap-2 justify-between flex-wrap items-center">
       <div><h4 className="font-semibold">Survey Flow V1 · 冻结执行图</h4>
         <p className="text-xs text-slate-600">研究者配置静态规则；FINAL 将根据经校验的答案计算实际路径。</p></div>
@@ -195,6 +207,12 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
     <fieldset className="space-y-3">
       <legend className="font-medium text-sm">按顺序执行的研究块（最多 64 个）</legend>
       {value.blocks.map((block,index)=>{
+        const pack=block.kind==='INSTRUMENT'?packages.find(p=>p.bindings.some(b=>b.instrumentKey===block.instrumentKey)):undefined
+        if(pack){
+          if(value.blocks.findIndex(b=>b.kind==='INSTRUMENT'&&pack.bindings.some(member=>member.instrumentKey===b.instrumentKey))!==index)return null
+          const units=packageArrangement(selectedIds,packages),at=units.findIndex(p=>p.id===pack.id)
+          return <div className="rounded-lg border p-3" key={pack.id}><strong>{pack.title} · 整包实例 #{pack.id.slice(0,8)}</strong><p>批准顺序固定；无条件材料仍按原流程块保留。</p><details><summary>只读组件顺序（{pack.bindings.length} 项）</summary><ol>{pack.bindings.map((b,i)=><li key={b.draftId}>{i+1}. {tools.find(t=>t.id===b.draftId)?.title??b.instrumentKey}</li>)}</ol></details><button type="button" disabled={!onArrange||at<=0||units.some(u=>u.issues.length>0)} onClick={()=>onArrange?.(moveArrangementUnit(selectedIds,packages,pack.id,-1))}>上移整包</button><button type="button" disabled={!onArrange||at>=units.length-1||units.some(u=>u.issues.length>0)} onClick={()=>onArrange?.(moveArrangementUnit(selectedIds,packages,pack.id,1))}>下移整包</button><button type="button" disabled={!onArrange} onClick={()=>onArrange?.(selectedIds.filter(id=>!pack.bindings.some(b=>b.draftId===id)))}>移除整个包</button>{value.blocks.flatMap((b,i)=>b.kind==='INSTRUMENT'&&b.when&&pack.bindings.some(member=>member.instrumentKey===b.instrumentKey)?[<button type="button" key={b.blockKey} onClick={()=>updateBlock(i,old=>({...old,when:undefined}))}>清除 {b.instrumentKey} 的非法条件</button>]:[])}</div>
+        }
         const available=new Set(value.blocks.slice(0,index).filter(b=>b.kind==='INSTRUMENT').map(b=>b.instrumentKey))
         const fields:FieldChoice[]=[
           ...questions.filter(q=>available.has(q.instrumentKey)).map(itemField).filter((x):x is FieldChoice=>!!x),
@@ -209,23 +227,25 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
             <div className="flex flex-wrap gap-1">
               <button className="btn-secondary text-xs" type="button" disabled={index===0}
                 onClick={()=>{
+                  if(packages.length&&block.kind==='INSTRUMENT'&&onArrange){const tool=tools.find(t=>t.instrumentKey===block.instrumentKey);if(tool)onArrange(moveArrangementUnit(selectedIds,packages,tool.id,-1));return}
                   const blocks=value.blocks.slice();[blocks[index-1],blocks[index]]=[blocks[index],blocks[index-1]]
                   apply({...value,blocks})
                 }}>上移</button>
               <button className="btn-secondary text-xs" type="button" disabled={index===value.blocks.length-1}
                 onClick={()=>{
+                  if(packages.length&&block.kind==='INSTRUMENT'&&onArrange){const tool=tools.find(t=>t.instrumentKey===block.instrumentKey);if(tool)onArrange(moveArrangementUnit(selectedIds,packages,tool.id,1));return}
                   const blocks=value.blocks.slice();[blocks[index+1],blocks[index]]=[blocks[index],blocks[index+1]]
                   apply({...value,blocks})
                 }}>下移</button>
               <button className="btn-secondary text-xs" type="button"
-                onClick={()=>apply({...value,blocks:value.blocks.filter((_,i)=>i!==index)})}>删除</button>
+                onClick={()=>{if(packages.length&&block.kind==='INSTRUMENT'&&onArrange){const tool=tools.find(t=>t.instrumentKey===block.instrumentKey);onArrange(selectedIds.filter(id=>id!==tool?.id));return}apply({...value,blocks:value.blocks.filter((_,i)=>i!==index)})}}>删除</button>
             </div>
           </div>
           {block.kind==='INSTRUMENT'&&<label className="block text-xs">研究工具
             <select className="input block w-full" value={block.instrumentKey??''}
               onChange={e=>updateBlock(index,b=>({...b,instrumentKey:e.target.value}))}>
               <option value="">请选择研究工具</option>
-              {selected.map(t=><option key={t.id} value={t.instrumentKey}>{t.kind} · {t.title}</option>)}
+              {selected.map(t=><option key={t.id} value={t.instrumentKey} disabled={packages.some(p=>p.bindings.some(b=>b.draftId===t.id))}>{t.kind} · {t.title}</option>)}
             </select>
           </label>}
           {block.kind==='MATERIAL'&&<>
@@ -267,6 +287,7 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
             questions.some(q=>q.instrumentKey===b.instrumentKey))}
           onClick={()=>addBlock('END')}>增加条件终止</button>
       </div>
+    </fieldset>
     </fieldset>
   </section>
 }

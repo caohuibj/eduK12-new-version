@@ -108,13 +108,11 @@ describe('Training inline resources and authorization',()=>{
   fireEvent.click(screen.getByRole('button',{name:'撤销'}));fireEvent.click(screen.getByRole('button',{name:'确认撤销'}))
   expect(await screen.findByRole('alert')).toHaveTextContent('权限已撤销');expect(grants.remove).toHaveBeenCalledExactlyOnceWith('g1');expect(screen.getByText(standard.name)).toBeVisible()
  })
- it('renders content rights inline with its original blank draft and approval declaration',async()=>{
-  render(<TrainingAdminResources/>);fireEvent.click(screen.getByRole('button',{name:'内容权利'}))
-  expect(await screen.findByRole('heading',{name:'内容权利授权'})).toBeVisible()
-  expect(screen.queryByPlaceholderText('授权方 grantor')).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button',{name:'新建授权草稿'}))
-  expect(screen.getByPlaceholderText('授权方 grantor')).toHaveValue('');expect(screen.getByPlaceholderText('被授权方 grantee')).toHaveValue('');expect(screen.getByText('预览发布条件',{selector:'button'})).not.toBeVisible()
-  expect(rights.create).not.toHaveBeenCalled();expect(rights.approve).not.toHaveBeenCalled()
+ it('removes license ledger entry while retaining material use grants',async()=>{
+  render(<TrainingAdminResources/>);await screen.findByText(standard.name)
+  expect(screen.queryByRole('button',{name:'内容权利'})).not.toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'使用授权'})).toBeVisible()
+  expect(rights.list).not.toHaveBeenCalled();expect(rights.create).not.toHaveBeenCalled();expect(rights.approve).not.toHaveBeenCalled()
  })
  it('starts with collapsed search and resource actions while all resource metadata remains visible',async()=>{
   render(<TrainingAdminResources/>);await screen.findByText(standard.name)

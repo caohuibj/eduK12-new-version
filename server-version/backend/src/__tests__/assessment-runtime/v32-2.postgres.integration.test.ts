@@ -13,6 +13,9 @@ import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from '../.
 import { createCanonicalUnitResultEnvelope, parseCanonicalUnitResultEnvelope, type CanonicalUnitResultCoreV1 } from '../../modules/assessment-runtime/unit-result'
 import { createFormSectionCollectionFacts } from '../../modules/assessment-runtime/form-facts'
 import { decryptField } from '../../utils/encryption'
+import { approveToolEntryPolicies } from '../../modules/assessment-governance/tool-entry-policy'
+import { scaleSourcePolicyIdentity } from '../../modules/scale/onboarding/source-snapshot'
+import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
 
 const databaseUrl = integrationDatabaseUrl('V32_2_INTEGRATION_DATABASE_URL')
 const suite = databaseUrl ? describe : describe.skip
@@ -508,6 +511,7 @@ const destroyCompositePackageFixture = async (fixture: CompositePackageFixture) 
   await db.courseStudent.deleteMany({ where: { courseId: fixture.courseId } })
   await db.course.deleteMany({ where: { id: fixture.courseId } })
   if (fixture.cognitiveConfigOwned) await db.cognitiveTestConfig.deleteMany({ where: { id: fixture.cognitiveConfigId } })
+  await db.$executeRaw`DELETE FROM survey_tool_policies WHERE reviewed_by=${fixture.userId}`
   await db.user.deleteMany({ where: { id: fixture.userId } })
 }
 
@@ -627,6 +631,12 @@ const createCompositePackageFixture = async (): Promise<CompositePackageFixture>
     || scale.instrumentVersion !== '2.0.0'
     || scale.definitionHash !== scaleDefinitionHash
   ) throw new Error('V32-2 ADEXI package scale is not the expected v2 definition')
+
+  // Publishing the scale no longer implies Training admission; record the exact
+  // registry policy identity the collection guard checks.
+  await db.$transaction(tx => approveToolEntryPolicies(tx,
+    scaleSourcePolicyIdentity(getScaleInstrumentSource(scale.code, scale.instrumentVersion)!),
+    ['TRAINING'], ids.userId, 'Synthetic V32-2 Training admission'))
 
   const cognitiveItem = {
     id: ids.cognitiveItemId,

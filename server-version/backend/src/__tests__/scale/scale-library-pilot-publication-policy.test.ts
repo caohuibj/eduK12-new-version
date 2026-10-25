@@ -69,7 +69,7 @@ describe('Scale product publication policy', () => {
     expect(decision.errors.some((error) => error.includes('executableCorrectness'))).toBe(true)
   })
 
-  it('keeps rights failure as governance warning without changing Product Release', () => {
+  it('ignores retired rights input without changing Product Release', () => {
     const decision = evaluatePilotPublicationPolicy({
       executableCorrectness: ok(),
       rights: failed('who5@1.0.0 requires APPROVED|EVIDENCE_PENDING authorization'),
@@ -79,7 +79,7 @@ describe('Scale product publication policy', () => {
     })
     expect(decision.publishable).toBe(true)
     expect(decision.errors).toHaveLength(0)
-    expect(decision.warnings.some((warning) => warning.includes('rights/governance'))).toBe(true)
+    expect(decision.warnings.some((warning) => warning.includes('rights/governance'))).toBe(false)
   })
 
   it('keeps unusable localization as deployment warning', () => {

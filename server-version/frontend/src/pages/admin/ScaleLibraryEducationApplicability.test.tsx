@@ -2,19 +2,22 @@ import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/r
 import {MemoryRouter} from 'react-router-dom'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import ScaleLibraryGovernance from './ScaleLibraryGovernance'
+import {AuthProvider} from '../../contexts/AuthContext'
+const session=vi.hoisted(()=>({me:vi.fn()}))
+vi.mock('../../api/auth',()=>({authApi:{me:session.me}}))
 const api=vi.hoisted(()=>({capabilities:vi.fn(),submissions:vi.fn(),catalog:vi.fn(),submissionDetail:vi.fn()}))
 vi.mock('../../api/scaleLibraryGovernance',()=>({governanceApi:()=>api,submissionStatusLabel:{SUBMITTED:'待审核'}}))
 const metadata={title:'待审量表',author:'作者',copyright:'自有',applicability:'描述性用途',scoringDescription:'求和',reportDescription:'报告'}
 const declared={schemaVersion:1,administrations:[{population:'TEACHER',responseMode:'STUDENT_REPORT'}]}
-const row={id:'application',releaseId:'r1',version:2,metadata,status:'SUBMITTED',product:'TRAINING',educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'}]}}
+const row={id:'application',releaseId:'r1',version:2,metadata,status:'SUBMITTED',product:'TRAINING',supportedEntrypoints:['TRAINING','SURVEY'],educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'}]}}
 const detail=(overrides:Record<string,unknown>={})=>({...row,educationApplicability:declared,educationApplicabilityHash:'snapshot-hash',snapshot:{definition:{}},mediaManifest:{schemaVersion:1,manifestHash:'empty',releaseIds:['r1'],items:[]},release:{releaseId:'r1',version:'1'},dependencies:[],...overrides})
-beforeEach(()=>{vi.resetAllMocks();api.capabilities.mockResolvedValue({systemAdmin:true,reviewGrants:[],distributionGrants:[]});api.submissions.mockResolvedValue({list:[row]});api.catalog.mockResolvedValue({list:[],page:1,pageSize:25,hasMore:false})})
+beforeEach(()=>{vi.resetAllMocks();session.me.mockResolvedValue({code:0,data:{id:'entry-manager',username:'entry-manager',role:'TEACHER',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}});api.capabilities.mockResolvedValue({systemAdmin:false,reviewGrants:[{grantId:'review-r1',releaseIds:['r1']}],distributionGrants:[]});api.submissions.mockResolvedValue({list:[row]});api.catalog.mockResolvedValue({list:[],page:1,pageSize:25,hasMore:false})})
 afterEach(()=>{cleanup();vi.restoreAllMocks()})
-async function inspect(){render(<MemoryRouter><ScaleLibraryGovernance/></MemoryRouter>);fireEvent.click(await screen.findByRole('button',{name:'读取精确版本审核内容'}));await waitFor(()=>expect(api.submissionDetail).toHaveBeenCalled())}
+async function inspect(){render(<AuthProvider><MemoryRouter><ScaleLibraryGovernance/></MemoryRouter></AuthProvider>);fireEvent.click(await screen.findByRole('button',{name:'读取精确版本审核内容'}));await waitFor(()=>expect(api.submissionDetail).toHaveBeenCalled())}
 describe('administrator exact-version applicability snapshot',()=>{
  it('shows the verified detail declaration and hash read-only rather than using list metadata',async()=>{
   api.submissionDetail.mockResolvedValue(detail())
-  render(<MemoryRouter><ScaleLibraryGovernance/></MemoryRouter>)
+  render(<AuthProvider><MemoryRouter><ScaleLibraryGovernance/></MemoryRouter></AuthProvider>)
   const button=await screen.findByRole('button',{name:'读取精确版本审核内容'})
   expect(screen.queryByRole('region',{name:'本次版本适用方式'})).not.toBeInTheDocument()
   fireEvent.click(button)

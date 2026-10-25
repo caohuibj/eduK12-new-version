@@ -1,0 +1,177 @@
+{
+  "runId": 40180815032,
+  "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032",
+  "head": "788748a1b44989df816401b5803522058656e860",
+  "tree": "3806f2f01a088523ff78a863c9219e0f80a540a1",
+  "checkout": "2fbb6cdaa66cea951ca4ad17e897b0df1074a036",
+  "status": "completed",
+  "conclusion": "failure",
+  "checks": [
+    {
+      "id": 121131306583,
+      "name": "classify changed content",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131306583"
+    },
+    {
+      "id": 121131388332,
+      "name": "codeql (javascript/typescript SAST)",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388332"
+    },
+    {
+      "id": 121131388398,
+      "name": "mini program / foundation contract and page smoke",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388398"
+    },
+    {
+      "id": 121131388598,
+      "name": "frontend artifacts / release consumers early / build",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388598"
+    },
+    {
+      "id": 121131388602,
+      "name": "backend regression (isolated job database) / backend regression (isolated job database)",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388602"
+    },
+    {
+      "id": 121131388603,
+      "name": "backend (migrate + build + performance gate) / backend (migrate + build + performance gate)",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388603"
+    },
+    {
+      "id": 121131388606,
+      "name": "frontend artifacts / release consumers early / UI-lab artifact",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388606"
+    },
+    {
+      "id": 121131388630,
+      "name": "docker (compose config + production builds) / production image build and scan",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388630"
+    },
+    {
+      "id": 121131388658,
+      "name": "maintenance / attachment deduplication, indexes and protected cleanup",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388658"
+    },
+    {
+      "id": 121131388708,
+      "name": "frontend (lint + types + full tests + build) / frontend checks",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131388708"
+    },
+    {
+      "id": 121131389033,
+      "name": "accept-perf / Scale + Cognitive + SJT fresh accounting",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131389033"
+    },
+    {
+      "id": 121131389182,
+      "name": "accept-ops / runtime-recovery",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131389182"
+    },
+    {
+      "id": 121131547219,
+      "name": "accept-ui (chromium) / chromium frontend acceptance",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131547219"
+    },
+    {
+      "id": 121131547230,
+      "name": "accept-visual (webkit) / webkit frontend acceptance",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131547230"
+    },
+    {
+      "id": 121131547295,
+      "name": "accept-visual (chromium) / chromium frontend acceptance",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131547295"
+    },
+    {
+      "id": 121131547345,
+      "name": "accept-visual (firefox) / firefox frontend acceptance",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131547345"
+    },
+    {
+      "id": 121131831002,
+      "name": "accept-media / images-video",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131831002"
+    },
+    {
+      "id": 121131831007,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / foundation / seeded browser acceptance",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131831007"
+    },
+    {
+      "id": 121131831028,
+      "name": "accept-media / cognitive-situational",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131831028"
+    },
+    {
+      "id": 121131831043,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / security / seeded browser acceptance",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131831043"
+    },
+    {
+      "id": 121131831052,
+      "name": "browser (seeded Situational Bundle + static visual acceptance) / products / seeded browser acceptance",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121131831052"
+    },
+    {
+      "id": 121135455562,
+      "name": "merge gate / ready PR",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40180815032/job/121135455562"
+    }
+  ],
+  "regression": {
+    "frontend": {
+      "filesPassed": 548,
+      "testsPassed": 3688,
+      "testsSkipped": 3
+    },
+    "backend": {
+      "testsPassed": 8404,
+      "testsFailed": 0,
+      "testsPending": 225,
+      "requiredSuites": 84,
+      "requiredSuiteMissing": 0,
+      "requiredSuiteSkipped": 0
+    }
+  },
+  "failureGroups": [
+    {
+      "jobs": [
+        121131547230,
+        121131547295,
+        121131547345
+      ],
+      "consumer": "qa-round5-anonymous-browser-e2e.cjs",
+      "failure": "Raw research recovery credential is intentionally inside closed details; old consumer expected it visible without disclosure."
+    },
+    {
+      "jobs": [
+        121131831052
+      ],
+      "consumer": "questionnaire-products-browser-e2e.cjs",
+      "failure": "Entry administrator fixture does not carry the required content-owner teacher business persona. Official screenshot shows teacher login; timeout at the creation link is a downstream symptom."
+    }
+  ],
+  "mergeGate": "failure: selected failures are not accepted as ready"
+}

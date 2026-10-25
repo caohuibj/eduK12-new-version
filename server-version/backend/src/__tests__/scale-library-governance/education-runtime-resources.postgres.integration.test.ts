@@ -47,7 +47,7 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
     authoringSnapshot:{title:metadata.title,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}}),owner))
   const application=await submit(owner,'SURVEY',{requestId:randomUUID(),releaseId:release.releaseId,metadata,
    educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'},{population:'TEACHER',responseMode:'SELF'}]}})
-  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic version approval'})
+  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic version approval'})
   const entryId=approved.entryId!,organizationId=randomUUID()
   await db.organization.create({data:{id:organizationId,name:'Synthetic exact resource school',productDomain:'SCHOOL',createdByUserId:admin}})
   for(const product of ['HUISCHOOL','HUITEACHER'] as const)await db.educationProductEntitlement.create({data:{organizationId,product,grantedByUserId:admin}})
@@ -57,10 +57,10 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
   // The internal command is not a valid public request: public distribution
   // must receive the exact immutable release/hash, never infer the latest.
   await expect(grantUse(admin,entryId,request)).rejects.toMatchObject({name:'ZodError',issues:[{
-   code:'invalid_union',unionErrors:expect.arrayContaining([expect.objectContaining({issues:expect.arrayContaining([
-    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['releaseId']}),
-    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['contentHash']}),
-   ])})]),
+   code:'invalid_union',errors:expect.arrayContaining([expect.arrayContaining([
+    expect.objectContaining({code:'invalid_type',expected:'string',path:['releaseId']}),
+    expect.objectContaining({code:'invalid_type',expected:'string',path:['contentHash']}),
+   ])]),
   }]})
   expect(await db.scale.findUnique({where:{libraryEntryId:entryId}})).toBeNull()
   // Deliberate transaction rollback must not leave resources or grants behind.

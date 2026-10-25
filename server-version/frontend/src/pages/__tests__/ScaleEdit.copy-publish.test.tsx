@@ -107,7 +107,7 @@ describe('ScaleEdit safe copy, draft editing and publication', () => {
     await user.type(screen.getByLabelText('量表名称'), '修改后的独立量表')
     expect(screen.getByText('基本信息待保存')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '题目' }))
-    await user.clear(screen.getAllByPlaceholderText('题目内容')[0])
+    await user.clear((await screen.findAllByPlaceholderText('题目内容'))[0])
     await user.type(screen.getAllByPlaceholderText('题目内容')[0], '修改后的第一题')
     await user.click(screen.getByRole('button', { name: '保存草稿' }))
     await screen.findByText(/基本信息、题目与定义已保存/)

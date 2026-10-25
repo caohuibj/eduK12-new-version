@@ -11,7 +11,9 @@
     "admin_totp_credentials": "RUNTIME_RW",
     "anonymous_studies": "RUNTIME_RW",
     "anonymous_study_attempts": "RUNTIME_RW",
+    "anonymous_study_codes": "RUNTIME_RW",
     "anonymous_study_participants": "RUNTIME_RW",
+    "anonymous_study_participation_events": "RUNTIME_RW",
     "anonymous_study_waves": "RUNTIME_RW",
     "assessment_attempt_consents": "RUNTIME_RW",
     "assessment_composition_templates": "RUNTIME_RW",
@@ -258,8 +260,6 @@
     "survey_package_grants": "RUNTIME_RW",
     "survey_package_imports": "RUNTIME_RW",
     "survey_package_members": "RUNTIME_RW",
-    "survey_package_report_artifacts": "RUNTIME_RW",
-    "anonymous_study_codes": "RUNTIME_RW",
-    "anonymous_study_participation_events": "RUNTIME_RW"
+    "survey_package_report_artifacts": "RUNTIME_RW"
   }
 }

@@ -454,7 +454,7 @@ const cases = [
     role: 'STUDENT',
     ready: async (page) => {
       await page.getByRole('heading', { name: '本周学习反思作业', exact: true }).waitFor()
-      await page.getByRole('heading', { name: '提交作业', exact: true }).waitFor()
+      await page.getByRole('heading', { name: '提交练习', exact: true }).waitFor()
     },
   },
   {

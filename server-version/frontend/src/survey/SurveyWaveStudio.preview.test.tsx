@@ -18,7 +18,8 @@ function fixture(){
   let pending:Promise<unknown>|null=null
   const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
   const fetcher=vi.fn(async(input:RequestInfo|URL)=>{
-    const url=String(input)
+    if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
+  const url=String(input)
     if(url.endsWith('/instruments/tool1')){const request=pending;pending=null;return request?await request:response(draft)}
     if(url.includes('/waves?page='))return response({list:[wave(),wave('w2')]})
     if(url.includes('/instruments?page='))return response({list:[draft]})

@@ -59,6 +59,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   },[selected,details])
   const load=useCallback(async(targetPage:number)=>{
     if(currentScope.current!==scope||scope.pending)return
+    feedbackEpoch.current+=1;setFeedback(null)
     scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
     try{
       const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'+(activityId?'&activityId='+encodeURIComponent(activityId):''))

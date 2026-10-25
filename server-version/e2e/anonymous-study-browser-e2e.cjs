@@ -10,7 +10,7 @@ const credential='x'.repeat(43),sid='11111111-1111-4111-8111-111111111111'
  const browser=await chromium.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})})
  const cases=[]
  try {for(const width of [390,768,1440]){
-  const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[]
+  const context=await browser.newContext({viewport:{width,height:900},acceptDownloads:true}),page=await context.newPage(),errors=[]
   let denied=false,started=false;page.on('pageerror',e=>errors.push(e.message))
   await page.route('**/api/**',async route=>{
    const req=route.request(),url=new URL(req.url());let data={list:[]},status=200
@@ -24,7 +24,15 @@ const credential='x'.repeat(43),sid='11111111-1111-4111-8111-111111111111'
   })
   await page.goto(`${base}/public/studies/waves/wave/token`)
   const join=page.getByRole('button',{name:'创建研究内身份码'});await join.waitFor();assert.equal(await join.isEnabled(),false)
-  await page.getByRole('checkbox').check();await join.click();await page.getByText(credential,{exact:true}).waitFor()
+  await page.getByRole('checkbox').check();await join.click()
+  await page.getByRole('heading',{name:'保存专属链接或二维码',exact:true}).waitFor()
+  const saved=page.waitForEvent('download')
+  await page.getByRole('button',{name:'保存链接文件',exact:true}).click()
+  const download=await saved,downloadPath=await download.path()
+  assert.ok(downloadPath);assert.equal(download.suggestedFilename(),'我的培训参与链接.txt')
+  const link=new URL(fs.readFileSync(downloadPath,'utf8').split('\n').find(line=>/^https?:\/\//.test(line)))
+  assert.equal(link.origin,new URL(base).origin);assert.equal(link.pathname,`/public/studies/${sid}`);assert.equal(link.search,'')
+  assert.equal(link.hash,`#resume=training-study&key=${credential}`)
   await page.getByRole('button',{name:'进入我的研究测评'}).click();await page.getByRole('button',{name:'查看本次个人报告'}).waitFor()
   await page.getByRole('button',{name:'开始本波次测评',exact:true}).click();await page.getByRole('button',{name:'保存并退出',exact:true}).waitFor()
   assert.equal(new URL(page.url()).pathname,'/public/composite/attempts/own-two')

@@ -1,0 +1,1498 @@
+{
+  "scope": "Validation maintenance after official run 40159337918; local grouped probes do not qualify final formal CI",
+  "officialOriginalFailureCount": 203,
+  "latestLocalSameCaseOrExplicitRevisedContract": {
+    "passed": 198,
+    "pending-official-ci": 5
+  },
+  "originalFailures": [
+    {
+      "file": "__tests__/training-workspace-governance.postgres.integration.test.ts",
+      "originalTest": "Training workspace uses authoritative exact-version library permissions lists only the granted exact version, never confuses author provenance with ownership or adaptation rights",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/training-workspace-governance.postgres.integration.test.ts",
+      "originalTest": "Training workspace uses authoritative exact-version library permissions excludes revoked and withdrawn grants, even when the material grant or author provenance remains",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/training-workspace-governance.postgres.integration.test.ts",
+      "originalTest": "Training workspace uses authoritative exact-version library permissions keeps approved Survey-authored versions visible to exact Training recipients independently of the legacy feature flag",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "originalTest": "selected variant aggregate finalization reuses an already verified committed selected graph without a second union load",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "originalTest": "selected variant aggregate finalization accepts a copied committed graph only when it retains the authoritative publication union",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "originalTest": "committed aggregate graph to Training FINAL receipt persists a nonempty bound receipt after completion CAS in the same transaction without reloading the graph",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "originalTest": "committed aggregate graph to Training FINAL receipt propagates a receipt-write failure out of the completion transaction rather than accepting a receiptless success",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+      "originalTest": "actual content packages: install, FINAL, canonical report and audiences 'example_descriptive_v1@1.0.0'",
+      "status": "passed",
+      "report": "merge355-native-bundle-after3.json"
+    },
+    {
+      "file": "__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+      "originalTest": "actual content packages: install, FINAL, canonical report and audiences 'synthetic four-type driver'",
+      "status": "passed",
+      "report": "merge355-native-bundle-after3.json"
+    },
+    {
+      "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+      "originalTest": "unknown declarative packages: installation to frozen report onboards scale_sjt without package-name branches, preserves old report after retirement",
+      "status": "passed",
+      "report": "merge355-missing-db-after1.json"
+    },
+    {
+      "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+      "originalTest": "unknown declarative packages: installation to frozen report onboards cognitive_scale without package-name branches, preserves old report after retirement",
+      "status": "passed",
+      "report": "merge355-missing-db-after1.json"
+    },
+    {
+      "file": "__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+      "originalTest": "unknown declarative packages: installation to frozen report supports admin authoring and independent signed approval without exposing signing material",
+      "status": "passed",
+      "report": "merge355-missing-db-after1.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle shares one cognitive quota across all four entrances: standalone-first",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle shares one cognitive quota across all four entrances: bundle-first",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle shares one cognitive quota across all four entrances: concurrent",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle completes four canonical sources, persists once, and appends reanalysis without changing original facts",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle retains completed FINALs after an engine failure and recovers the same analysis while creation is closed",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/bundle-product/product.postgres.integration.test.ts",
+      "originalTest": "Bundle V3 real FINAL lifecycle rejects incomplete completion and supports anonymous admission with recovery isolation",
+      "status": "passed",
+      "report": "merge355-bundle-final.json"
+    },
+    {
+      "file": "__tests__/campus/teacher-tasks.test.ts",
+      "originalTest": "Huischool teacher observer task boundary uses live school/class/teacher/approved-student constraints and only projects aliases",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/composite/training-feedback-runtime-source.test.ts",
+      "originalTest": "C22 runtime wiring source contracts (not concurrency/HTTP evidence) binds feedback under the existing publication/course/round locks and atomic attempt insert",
+      "status": "passed",
+      "report": "merge355-pure-after3.json"
+    },
+    {
+      "file": "__tests__/composite/training-flow-final-admission.test.ts",
+      "originalTest": "C19 four FINAL transaction wiring situational/situational-final-submit.service.ts gates before child writes",
+      "revisedContract": "C19 four FINAL transaction wiring binds the SJT shared writer to the locked Training host and gates before writes",
+      "status": "passed",
+      "report": "merge355-final-admission-contract.json"
+    },
+    {
+      "file": "__tests__/composite/training-persistence-admission-behavior.test.ts",
+      "originalTest": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits checkpoint only with schema-shaped publication and default FINAL_ONLY",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/composite/training-persistence-admission-behavior.test.ts",
+      "originalTest": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits local cognitive only with schema-shaped publication and default FINAL_ONLY",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/composite/training-persistence-admission-behavior.test.ts",
+      "originalTest": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits both with schema-shaped publication and default FINAL_ONLY",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/composite/training-persistence-admission-behavior.test.ts",
+      "originalTest": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits policy off with schema-shaped publication and default FINAL_ONLY",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/composite/training-variant-markers.test.ts",
+      "originalTest": "Training variant marker projection contract keeps both generated Prisma selectors on the complete marker shape",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "questionnaire addScale grant combinations allows the teacher own DRAFT scale",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "questionnaire addScale grant combinations forbids another teacher published scale without a grant",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "questionnaire addScale grant combinations allows a granted published scale",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "questionnaire addScale grant combinations forbids a granted DRAFT",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "general questionnaire addScale forbids another teacher published scale without a grant",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/addScale.grant.test.ts",
+      "originalTest": "general questionnaire addScale allows a granted published scale",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/controllers/streamingTaskExport.test.ts",
+      "originalTest": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+      "status": "passed",
+      "report": "merge355-pure-before.json"
+    },
+    {
+      "file": "__tests__/education-tools/private-tool.definition.test.ts",
+      "originalTest": "Education private draft contracts keeps incomplete native drafts editable but not freeze-ready",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/education-tools/private-tool.media-upload.test.ts",
+      "originalTest": "Education image upload staged finalization (mocked storage only) stores privately without a usable reference, then registers only after reauthorization",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/hotpath/final-route-inventory.test.ts",
+      "originalTest": "FINAL route inventory matches mounted assessment submit routes to the maintained cost ledger",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/admin-authority-route.test.ts",
+      "originalTest": "system content grant routes reuse real management router boundaries blocks untrusted origin and recent-key denial without entering the mutation",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/measurement-content/admin-authority-route.test.ts",
+      "originalTest": "protects /static-sjt/prepare with existing strong session, origin and exact body",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/measurement-content/admin-authority-route.test.ts",
+      "originalTest": "protects /static-sjt/publish with existing strong session, origin and exact body",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding stores only exact selected pointers, empty population and report availability under CAS",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding keeps frozen SUPERSEDED measurement/report identities for START",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding keeps frozen RETIRED measurement/report identities for START",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding denies revoked measurement but records revoked report as unavailable without blocking collection",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding records reference REVOKED as unavailable",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding records reference RETIRED as unavailable",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding preserves superseded reference candidate and refuses to infer missing population",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding binds new native measurement without selections to empty references and leaves legacy/FORM-only rows null",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding recovers original binding without reselecting or rewriting after release retirement/revocation",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding fails changed stored hash, wrong Attempt, corrupted publication, and CAS conflict",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-binding.test.ts",
+      "originalTest": "Survey START exact encrypted content binding pure recovery validates report and selected reference membership without choosing again",
+      "status": "passed",
+      "report": "merge355-current-source-unit.json"
+    },
+    {
+      "file": "__tests__/measurement-content/survey-content-options.postgres.integration.test.ts",
+      "originalTest": "Survey Wave private content options / real isolated PostgreSQL keeps prepare authoritative after a stale selection and freezes exact successful choices",
+      "status": "passed",
+      "report": "merge355-content-revision-after2.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction writes authentic context and selected binding before section completion/snapshot or next-runner delivery",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction rolls back fresh private reuse when completed-unit writes cross the owner expiry",
+      "status": "passed",
+      "report": "merge355-pure-after3.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction replays accepted context without reading candidates or selecting again",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction rolls back context and section when exact reference identity fails",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction rejects a lost context CAS before reference selection or accepted facts",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/measurement-content/training-reference-unified-context.test.ts",
+      "originalTest": "actual UNIFIED composite context FINAL freezes references inside its transaction rejects missing required demographics before opening the write transaction",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/middleware/completion-busy-transport.test.ts",
+      "originalTest": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2024 without exposing internals",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/middleware/completion-busy-transport.test.ts",
+      "originalTest": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2034 without exposing internals",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/middleware/completion-busy-transport.test.ts",
+      "originalTest": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified 40001 without exposing internals",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/integration/educationLibraryPublication.postgres.integration.test.ts",
+      "originalTest": "Education public library actual publication / isolated PostgreSQL revoked distribution blocks new preview/publication, but immutable history remains addressable",
+      "status": "passed",
+      "report": "merge355-remaining-pg-after1.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL SCHOOL preview is read-only; racing apply commits once and preserves exact frozen snapshot",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL TEACHER preview is read-only; racing apply commits once and preserves exact frozen snapshot",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL SCHOOL rejects current capability revoked after preview without touching draft",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL TEACHER rejects current capability revoked after preview without touching draft",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL SCHOOL cannot replay valid proof through another author or product entry",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+      "originalTest": "Education CSV real authenticated routes / isolated PostgreSQL TEACHER cannot replay valid proof through another author or product entry",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateMaterials.postgres.integration.test.ts",
+      "originalTest": "Education private materials real frozen Teacher consumer authorization selects report materials only after actual FINAL and current report permission, never the stimulus library",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+      "originalTest": "Private exact Scale collection and Teacher media boundaries SCHOOL exact private source stops fresh START and already-started FINAL without persisting results",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+      "originalTest": "Private exact Scale collection and Teacher media boundaries TEACHER exact private source stops fresh START and already-started FINAL without persisting results",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version attachment to existing education drafts only attaches SCHOOL author-selected frozen version with CAS and no hidden publication",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version attachment to existing education drafts only attaches TEACHER author-selected frozen version with CAS and no hidden publication",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version attachment to existing education drafts only rejects foreign author, foreign entry and foreign organization without creating derived source or track",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version attachment to existing education drafts only rolls back actual derived release, wrapper, registry and track when a downstream database write fails",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScalePublication.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education publication and pre-start task state publishes a School author-private frozen scale through real activity lifecycle, with a separate unstarted task",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScalePublication.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education publication and pre-start task state requires current Teacher authorship independently of event admin before real product preview/publication",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScalePublication.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education publication and pre-start task state publishes mixed public/private tracks with one relationship, and public grant revocation rejects the entire next mixed run",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education actual FINAL and report privacy SCHOOL preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education actual FINAL and report privacy TEACHER preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education actual FINAL and report privacy keeps private PARENT_REPORT actual completion NONE for observer, subject and publisher",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "originalTest": "Private fixed-version education actual FINAL and report privacy keeps private TEACHER_REPORT actual completion NONE for observer, subject and publisher",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleRuntime.postgres.integration.test.ts",
+      "originalTest": "Private Scale internal preparation, not activity publication pins both entry sources and explicit variants, prepares idempotently without public grant or author approval",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleRuntime.postgres.integration.test.ts",
+      "originalTest": "Private Scale internal preparation, not activity publication current author capability gates new use but does not retrospectively gate existing identity",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleRuntime.postgres.integration.test.ts",
+      "originalTest": "Private Scale internal preparation, not activity publication rejects incompatible pair and rolls back all derived resources on failed caller transaction",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL shares an unadministered fixed version through the existing administrator workflow in both origins",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL preserves user-before-org writer ordering, reuses runtime identity and never revives retired releases",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL enforces scoped author capability, rejects FORM, and permits only pending withdrawal",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL image/png pins consented report media and makes approved content independent of author membership",
+      "status": "passed",
+      "report": "merge355-remaining-pg-after1.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL video/mp4 pins consented report media and makes approved content independent of author membership",
+      "status": "passed",
+      "report": "merge355-remaining-pg-after1.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+      "originalTest": "Education private SCALE sharing / isolated PostgreSQL application/pdf pins consented report media and makes approved content independent of author membership",
+      "status": "passed",
+      "report": "merge355-remaining-pg-after1.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateTools.postgres.integration.test.ts",
+      "originalTest": "Education author-private tool API services / isolated PostgreSQL isolates author, entry and school; never expands organization-owned Teacher Form authority",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateTools.postgres.integration.test.ts",
+      "originalTest": "Education author-private tool API services / isolated PostgreSQL previews native Scale and unscored Form without publishing or storing participant answers",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/educationPrivateTools.postgres.integration.test.ts",
+      "originalTest": "Education author-private tool API services / isolated PostgreSQL pins report and stimulus images separately and retains frozen images after draft removal",
+      "status": "passed",
+      "report": "merge355-private-pg-after-draft.json"
+    },
+    {
+      "file": "__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts",
+      "originalTest": "Huiteacher PR3: independently released adult self Scale and respondent-only report rejects teacher delivery without independent review and exact school license",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts",
+      "originalTest": "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis teacher grades but cannot freeze globally; SYSTEM_ADMIN freeze refreshes current membership",
+      "status": "pending-official-ci",
+      "reason": "Local exact UTC setup guard refused Etc/UTC; no timezone change. Current job already configures UTC. Two revised native entry refusal contracts need actual CI execution."
+    },
+    {
+      "file": "__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts",
+      "originalTest": "Mini role operations and shared classroom against actual HTTP/PostgreSQL/Redis current legacy ADMIN manages invitations and creates parents without child authority; platform lifecycle needs SYSTEM_ADMIN",
+      "status": "pending-official-ci",
+      "reason": "Local exact UTC setup guard refused Etc/UTC; no timezone change. Current job already configures UTC. Two revised native entry refusal contracts need actual CI execution."
+    },
+    {
+      "file": "__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts",
+      "originalTest": "PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL starts through canonical admission, reads frozen Scale despite source edits, persists one FINAL receipt and rejects foreign/embedded/legacy reads",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/integration/reportingHttp.postgres.integration.test.ts",
+      "originalTest": "PR3 reporting HTTP release gate (real PostgreSQL) protects normal resource/spec management with platform authority, CSRF and publication order",
+      "status": "passed",
+      "report": "merge355-permission-pg-after1.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle puts late background fields first, joins them into one section, repairs old order and submits encrypted answers",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle cleans empty generated sections and prevents empty drafts from reaching students",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle uses the same draft invariants for legacy free composition",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle validates four-type ordering and prevents published mutation",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle binds each enrolled student to their own course and freezes the profile",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle completes four independent FINALs and never creates synthesis",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle withholds anonymous Cognitive and Situational feedback until the final Scale completes the whole battery",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle allows administrator authoring and rejects a retired resource at publication",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle copies legacy definitions without changing legacy history or identity",
+      "status": "passed",
+      "report": "merge355-catalog-quota-after4.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle allows two slots of the same scale without conflating identity",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle copies a published four-type product and can publish the new draft",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle shares one source quota across standalone, composition and course copies under concurrency",
+      "status": "passed",
+      "report": "merge355-catalog-quota-after4.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle preflights without writes and rechecks the same invariants at publish",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/questionnaire/product.postgres.integration.test.ts",
+      "originalTest": "Four-type Questionnaire production lifecycle unifies old composition discovery and copies definitions without mutating history",
+      "status": "passed",
+      "report": "merge355-focused-after5.json"
+    },
+    {
+      "file": "__tests__/questionnaire/training-feedback-authoring.test.ts",
+      "originalTest": "Training feedback authoring contract requires the actual author to own the Training course unless administrator",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/education-runtime-resources.postgres.integration.test.ts",
+      "originalTest": "Education library registered resources / real isolated PostgreSQL atomically binds exact approved resources and scoped grants, rejecting incomplete public identities",
+      "status": "passed",
+      "report": "merge355-permission-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL requires the recipient target-entry identity and ordinary withdrawal preserves frozen collection",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL materializes one immutable platform wrapper, never inherits author or entry-admin privileges",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL an approved Training version survives original private archival and author suspension in both target entries",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL keeps approved Survey ALL_AT_ONCE through the real Training parent publication/start/restore chain",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL entry admin is a distributor only within the exact explicit parent grant; revocation stops new use",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL real FINAL commits before stop retain results and allow only exact replay; new wrapper starts are denied",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL real FINAL waiting on an uncommitted emergency fence cannot collect after the stop commits",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "originalTest": "Scale library governance / real isolated PostgreSQL education runtime identity reads real wrappers without granting education use",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/scale-library-governance/media.postgres.integration.test.ts",
+      "originalTest": "library media atomic publication / isolated PostgreSQL bridges exact authorized cross-owner report media and preserves the frozen original ID",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/scale/scale-draft-write-guard.test.ts",
+      "originalTest": "Scale draft mutation atomic guards publishes only the exact validated draft snapshot",
+      "status": "passed",
+      "report": "merge355-pure-after3.json"
+    },
+    {
+      "file": "__tests__/scale/training-feedback-native.test.ts",
+      "originalTest": "native Scale Training feedback reads checks frozen release before result projection without re-reading the parent",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/scale/training-feedback-native.test.ts",
+      "originalTest": "native Scale Training feedback reads opens at the exact boundary while retaining the existing result projection",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/situation-definition.test.ts",
+      "originalTest": "situation definition schema rejects more than three channels per scene (Decision C)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/situation-definition.test.ts",
+      "originalTest": "static visual stimulus contract rejects empty comics, missing alt text, unsupported MIME, and external asset URLs",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/training-feedback-native.test.ts",
+      "originalTest": "native SJT Training feedback reads withholds results but preserves terminal receipt with one existing parent projection",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/training-feedback-native.test.ts",
+      "originalTest": "native SJT Training feedback reads withholds results but preserves terminal receipt with one existing parent projection",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/training-feedback-native.test.ts",
+      "originalTest": "native SJT Training feedback reads releases the existing frozen scored result at the exact boundary",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/situational/training-feedback-native.test.ts",
+      "originalTest": "native SJT Training feedback reads fails closed for malformed binding and preserves owner checks",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/training-analysis/scale-source-discovery.test.ts",
+      "originalTest": "Training Scale source discovery uses frozen runtime dictionaries keeps ADMIN at teacher numericScores disclosure despite researcher access",
+      "status": "passed",
+      "report": "merge355-pure-after3.json"
+    },
+    {
+      "file": "__tests__/training-analysis/source.test.ts",
+      "originalTest": "authorized Training numeric source adapter ADMIN discovery cannot bypass frozen Cognitive research-only profile restrictions",
+      "status": "passed",
+      "report": "merge355-pure-after3.json"
+    },
+    {
+      "file": "__tests__/survey/catalog-sjt-online.contract.test.ts",
+      "originalTest": "authorized online SJT uses the shared Training protocol core public task preserves multi-select/refusal/scenes but never discloses scoring contributions",
+      "status": "passed",
+      "report": "merge355-pure-before.json"
+    },
+    {
+      "file": "__tests__/survey/materials-assignment-adapter.test.ts",
+      "originalTest": "Survey adapter retains its identity, quota CAS and persistence boundary locks and rechecks credentials before returning a persisted assignment without reserving quota again",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/materials-assignment-adapter.test.ts",
+      "originalTest": "Survey adapter retains its identity, quota CAS and persistence boundary keeps history ordering/bounds and reserves the inherited group with exact CAS before encrypting",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/materials-assignment-adapter.test.ts",
+      "originalTest": "Survey adapter retains its identity, quota CAS and persistence boundary surfaces quota CAS conflicts using the existing error class without assignment writes",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/materials-assignment-adapter.test.ts",
+      "originalTest": "Survey adapter retains its identity, quota CAS and persistence boundary refuses full inherited quotas without switching groups",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: extra-field",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: invalid-mode-and-groups",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: wrong-key",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: fractional-weight",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: too-large-weight",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: one-group",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/materials-core.test.ts",
+      "originalTest": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: nine-groups",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/research-catalog.postgres.integration.test.ts",
+      "originalTest": "Survey immutable catalog grants PostgreSQL rejects nonadministrator, arbitrary version, foreign researcher import and prevents source editing/copy laundering",
+      "status": "passed",
+      "report": "merge355-focused-after5.json"
+    },
+    {
+      "file": "__tests__/survey/research-catalog.postgres.integration.test.ts",
+      "originalTest": "Survey immutable catalog grants PostgreSQL freezes native scoring and exact provenance; revocation stops future imports/freezes without changing frozen research",
+      "status": "passed",
+      "report": "merge355-focused-after5.json"
+    },
+    {
+      "file": "__tests__/survey/research-catalog.postgres.integration.test.ts",
+      "originalTest": "Survey immutable catalog grants PostgreSQL serializes revocation against freezing in both lock orders without altering historical publications",
+      "status": "passed",
+      "report": "merge355-focused-after5.json"
+    },
+    {
+      "file": "__tests__/survey/research-cognitive.postgres.integration.test.ts",
+      "originalTest": "Survey cognitive PostgreSQL authority, immutability and serialized lifecycle validates ordinary prefix, reachability and original answer locks",
+      "status": "passed",
+      "report": "merge355-permission-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-draft-validation.contract.test.ts",
+      "originalTest": "Survey assertion shares validation without an unused draft digest keeps FORM normalization and public digest while assertion skips the draft hash",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-draft-validation.contract.test.ts",
+      "originalTest": "Survey assertion shares validation without an unused draft digest keeps the exact UTF-8 480 KB definition limit with legacy=false",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-draft-validation.contract.test.ts",
+      "originalTest": "Survey assertion shares validation without an unused draft digest keeps the exact UTF-8 480 KB definition limit with legacy=true",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-flow.postgres.integration.test.ts",
+      "originalTest": "Survey Flow real PostgreSQL assignment / final / withdrawal freezes trial, persists group once before participant can view it, rejects client group changes",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-flow.postgres.integration.test.ts",
+      "originalTest": "Survey Flow real PostgreSQL assignment / final / withdrawal commits Form/Scale FINAL once, projects verified trace and enforces frozen display path",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-flow.postgres.integration.test.ts",
+      "originalTest": "Survey Flow real PostgreSQL assignment / final / withdrawal retains original linked experiment group in T2, does not create a second identity",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-flow.postgres.integration.test.ts",
+      "originalTest": "Survey Flow real PostgreSQL assignment / final / withdrawal records SCREENED_OUT without FINAL or transient response; withdrawal destroys assignment cipher",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-media.postgres.integration.test.ts",
+      "originalTest": "Survey authorized project-scoped image references — PostgreSQL authorizes only image identities owned by the correct research project",
+      "revisedContract": "Survey authorized project-scoped image references — PostgreSQL reuses private images across the same owner's projects and rejects foreign owners and changed hashes",
+      "status": "passed",
+      "report": "merge355-core-pg-after3.json"
+    },
+    {
+      "file": "__tests__/survey/research-operations.contract.test.ts",
+      "originalTest": "Survey PR4 operations authoring and bounded Flow contracts requires exact, typed non-prototype group quotas and keeps checkpoint disabled by default",
+      "status": "passed",
+      "report": "merge355-runtime-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/research-preview-transport.contract.test.ts",
+      "originalTest": "Survey SJT preview transport passes exact refusal and explicit null to per-kind semantic validation",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+      "originalTest": "Request-local frozen Survey raw descriptors constructs each unit descriptor and option table once across schema and participant projection",
+      "status": "passed",
+      "report": "merge355-native-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/research-raw-descriptors.contract.test.ts",
+      "originalTest": "Request-local frozen Survey raw descriptors enumerates dictionary definitions once and never constructs unused option tables",
+      "status": "passed",
+      "report": "merge355-native-unit-final.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract computes Survey sources outside business transactions and rechecks current authority before returning",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract publishes a real immutable ResearchOnly Form/Scale/SJT wave and issues separate linked proof",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract finalizes one parent attempt and recovers idempotently without personalized report",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract enables T2 with same research code but another frozen attempt and correctly scoped exports",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract supports T3 draft revisions under ACTIVE project without mutating old FINAL; marks incompatible scoring",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract does not reveal frozen or future-scheduled T2 content before participant admission opens",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract requires fresh Survey TOTP for bounded raw exports and verifies encrypted tickets on download",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract revokes outstanding encrypted export tickets upon linked data withdrawal",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract atomically reserves exactly one T4 parent Attempt when last research slot is contested",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract serializes project PAUSE before linked recruitment and rejects expired publisher access",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract serializes an in-flight FINAL behind a committed Wave HARD_STOP",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract can HARD_STOP after ordinary CLOSE while in-flight FINAL remains possible",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract derives raw and score Wide variables from a frozen Wave with zero FINALs",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract pages 5001 linked non-FINAL attempts without the legacy 5000-row ceiling",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract projects multiple verified FINALs from one frozen Publication without duplicated schema columns",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract rotates and revokes project-scoped recruitment without revoking the participant secret",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract retains valid FINAL and linked code after REVOKE_ACCESS, not after WITHDRAW_DATA",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract aggregates paired Wave counts from FINALs while retaining exclusions, quality and empty cohorts",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract reviews sample quality with durable reasons, exact cohort exclusion and immutable FINAL",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract bounds one-Wave FINAL exports by half-open completion window and records selection",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract persists frozen per-item Scale timing and exports real millisecond columns",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract does not commit a FINAL against a credential revoked during the transaction",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-final.postgres.integration.test.ts",
+      "originalTest": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract adapts 240-item timed FINAL pages and skips raw projection for SCORE_LONG",
+      "status": "passed",
+      "report": "merge355-governance-pg-after2.json"
+    },
+    {
+      "file": "__tests__/survey/research-wave-prepare-transport.contract.test.ts",
+      "originalTest": "Survey wave prepare draft-validation transport returns actionable 400 for a saved one-question SJT that cannot be frozen for publication",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL accepts only current platform administrator and one-time claim",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL enforces setup, non-replay, recovery, and independent realm",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL rejects another owner and stale revision in real project routes",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL suspended researcher cannot recover credentials or bypass mandatory MFA",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL permanently revokes the researcher grant, records audit and forbids restore",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/survey-realm.postgres.integration.test.ts",
+      "originalTest": "Survey realm, TOTP and project ACL — isolated PostgreSQL archives completed research without allowing an old participant study to be reopened",
+      "status": "passed",
+      "report": "merge355-governance-pg-after1.json"
+    },
+    {
+      "file": "__tests__/survey/tool-publication.postgres.integration.test.ts",
+      "originalTest": "Standalone Survey scale publication and library application — rollback-only PostgreSQL publishes idempotently with tool scope; later edits preserve the old exact snapshot",
+      "status": "pending-official-ci",
+      "reason": "Requires actual disposable Actions service identity; no forged local Actions context. Current normal job is explicitly admitted by the existing service-identity helper."
+    },
+    {
+      "file": "__tests__/survey/tool-publication.postgres.integration.test.ts",
+      "originalTest": "Standalone Survey scale publication and library application — rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants",
+      "status": "pending-official-ci",
+      "reason": "Requires actual disposable Actions service identity; no forged local Actions context. Current normal job is explicitly admitted by the existing service-identity helper."
+    },
+    {
+      "file": "__tests__/survey/tool-publication.postgres.integration.test.ts",
+      "originalTest": "Standalone Survey scale publication and library application — rollback-only PostgreSQL rejects non-scale, unfinished content and non-owner publication before creating releases",
+      "status": "pending-official-ci",
+      "reason": "Requires actual disposable Actions service identity; no forged local Actions context. Current normal job is explicitly admitted by the existing service-identity helper."
+    },
+    {
+      "file": "__tests__/cognitive/library-catalog.test.ts",
+      "originalTest": "catalog single-source-of-truth boundaries catalog metadata is not imported by any runtime/scorer/hash path (hash stability by construction)",
+      "status": "passed",
+      "report": "merge355-pure-after2.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads preserves completion and hides result before scheduled release (public=false)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads preserves completion and hides result before scheduled release (public=true)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads keeps malformed configured history closed (public=false)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads keeps malformed configured history closed (public=true)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads releases existing frozen result exactly at the preset boundary (public=false)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads releases existing frozen result exactly at the preset boundary (public=true)",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    },
+    {
+      "file": "__tests__/cognitive/training-feedback-session.test.ts",
+      "originalTest": "Cognitive native Training feedback reads keeps a completed unit hidden until the current parent async report is READY",
+      "status": "passed",
+      "report": "merge355-pure-after1.json"
+    }
+  ],
+  "candidateReports": [
+    {
+      "privateReport": "merge355-sjt-projection-fixed.json",
+      "sha256": "1de596068c284b5a9530cee76fa56b4b7a3c875176915c41fe66f42a923c71df",
+      "passed": 12,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-streaming-isolated.json",
+      "sha256": "85f4827751ac7011adb887f3917240fb2932816b215e6b480a1f29fd960c92f7",
+      "passed": 1,
+      "failed": 0,
+      "pending": 9
+    },
+    {
+      "privateReport": "merge355-pure-before.json",
+      "sha256": "dea32c68c0b66e2f96266508b54d4340ab469b4182e59c141a93a68fadd4ce95",
+      "passed": 404,
+      "failed": 80,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-private-pg-after-draft.json",
+      "sha256": "0d5aa06dff18bfb6909096ad4c69dd631a089c8d6f9f0e2b2be145ec29c9506b",
+      "passed": 41,
+      "failed": 3,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-pure-after1.json",
+      "sha256": "aadc1b6f3a88e6ac70688f38e3bfbce3720a5d66ff2d69099d586a2ff349abca",
+      "passed": 278,
+      "failed": 18,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-governance-pg-after1.json",
+      "sha256": "e6f7fe6833e5aaa3f65719f77cf232417e7ff545dc99a3c192ae82584fdfec3d",
+      "passed": 53,
+      "failed": 10,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-native-fixture-before.json",
+      "sha256": "a8716dba23e527053eb537d5378656b916d639a281c7ab0e50bfd9fd6895e8aa",
+      "passed": 0,
+      "failed": 0,
+      "pending": 19
+    },
+    {
+      "privateReport": "merge355-pure-after2.json",
+      "sha256": "8b63ae14b723394c17519b54db01b4d14f008e7a67ece7951954574eab272290",
+      "passed": 23,
+      "failed": 7,
+      "pending": 281
+    },
+    {
+      "privateReport": "merge355-native-staged-after1.json",
+      "sha256": "a179acef89db8847a6faed7eb8db3bc8f5975e77f31b0d5d0156f2f85227ab77",
+      "passed": 0,
+      "failed": 11,
+      "pending": 1
+    },
+    {
+      "privateReport": "merge355-pure-after3.json",
+      "sha256": "d334cd4e4ed57f59e6a2359dba8ff9c8fe98773a74388a5de607460f249e8dbd",
+      "passed": 8,
+      "failed": 0,
+      "pending": 176
+    },
+    {
+      "privateReport": "merge355-governance-pg-after2.json",
+      "sha256": "c63fb83a39b08c78751239d7ee54ad64bbb81313b8b705e7598160ef2ef8ca27",
+      "passed": 43,
+      "failed": 3,
+      "pending": 19
+    },
+    {
+      "privateReport": "merge355-product-pg-after1.json",
+      "sha256": "465aa30460ca81ec2bd44300fbe1ea88fa6310f58e415fef4559bd87220e526e",
+      "passed": 20,
+      "failed": 10,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-permission-pg-after1.json",
+      "sha256": "0efdca938ac3c9a621d3c026a67894d1e891aab10794c63a6062fe9973dd9486",
+      "passed": 21,
+      "failed": 2,
+      "pending": 20
+    },
+    {
+      "privateReport": "merge355-core-pg-after3.json",
+      "sha256": "9cad14033fbf7b0eaab4a9a7bb9ad8779a805bba458374812f5ca1b74cfff331",
+      "passed": 33,
+      "failed": 4,
+      "pending": 31
+    },
+    {
+      "privateReport": "merge355-catalog-quota-after4.json",
+      "sha256": "8085c8e0f6f413ab09716e6c99ab9febd53a2fea93ff3b42c818ac329a427738",
+      "passed": 4,
+      "failed": 2,
+      "pending": 19
+    },
+    {
+      "privateReport": "merge355-bundle-final.json",
+      "sha256": "6ab419358ef88182745ddaf9fe914dcda4716d969ceb5cedfdcee1ab17e92862",
+      "passed": 8,
+      "failed": 1,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-focused-after5.json",
+      "sha256": "f131e883b47ecd631a55572f9ab042b1ca5d75a65453bfc9eda4e9fc6e2012cb",
+      "passed": 5,
+      "failed": 0,
+      "pending": 29
+    },
+    {
+      "privateReport": "merge355-native-wiring-after1.json",
+      "sha256": "95d65aa5a326a0e1dbe36405c96d73d8b3395b2457ef61771b7a85ff9be416a7",
+      "passed": 28,
+      "failed": 8,
+      "pending": 2
+    },
+    {
+      "privateReport": "merge355-current-source-unit.json",
+      "sha256": "4c28fc54f5e61e656375ab81f240930b0bfd50ed1ea74a23b8e0ac5dd485ba59",
+      "passed": 17,
+      "failed": 2,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-native-wiring-after2.json",
+      "sha256": "abe897efd598d585474e0bb70c8b7abb3c8616f568afe5825e457d44fd2fd065",
+      "passed": 12,
+      "failed": 7,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-runtime-unit-final.json",
+      "sha256": "909bdf8f1500e44fb01d8817f0c9c3e6213d0b87b555474a806120a3347d38e5",
+      "passed": 76,
+      "failed": 2,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-native-unit-final.json",
+      "sha256": "46ded03136a3051e8f40efcf69e8817a693d86449301d9e5ae8f8ed6a556c14a",
+      "passed": 26,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-native-bundle-after3.json",
+      "sha256": "d332ed1b995a50ec16ed04e76abff137d12d7e295d2c957f8b7a423b65d08d9f",
+      "passed": 15,
+      "failed": 0,
+      "pending": 5
+    },
+    {
+      "privateReport": "merge355-missing-db-after1.json",
+      "sha256": "b36284b8a22f9f3b18e388f67b3390e9e8ffcf13e7542a18f925a4bbae12c8e6",
+      "passed": 47,
+      "failed": 0,
+      "pending": 0
+    },
+    {
+      "privateReport": "merge355-final-admission-contract.json",
+      "sha256": "48f61a3e05cfbf102e2898dddffdcf36003ce26c58d094ef47c8ff97c131e4a7",
+      "passed": 4,
+      "failed": 0,
+      "pending": 23
+    },
+    {
+      "privateReport": "merge355-remaining-pg-after1.json",
+      "sha256": "b8d99dfc75d4f1761212dc526768e923677aac7e9fe0b2501f23f1f121dd6a8a",
+      "passed": 5,
+      "failed": 1,
+      "pending": 8
+    },
+    {
+      "privateReport": "merge355-content-revision-after2.json",
+      "sha256": "9f38b7f78bfed8742ce40db2ee332d4b61efd8b6a29bfe8d0ce26ecc67b08e67",
+      "passed": 1,
+      "failed": 0,
+      "pending": 1
+    },
+    {
+      "privateReport": "merge355-mini-roster-after2.json",
+      "sha256": "98b20ba5a87c8dc37dacc4d9c60be8681ac084d5296bebfa040db2fb2f9b9dff",
+      "passed": 0,
+      "failed": 0,
+      "pending": 20
+    },
+    {
+      "privateReport": "merge355-mini-roster-after3.json",
+      "sha256": "b1dc306fddf2ed6bfac21967fb7fc66acd75b995e1b192d6262ae95ce7a44304",
+      "passed": 0,
+      "failed": 0,
+      "pending": 20
+    },
+    {
+      "privateReport": "merge355-anonymous-retention-after1.json",
+      "sha256": "7b55fe4e6aaa8616cb54a2835a7347def597aae5f78d359c60fc1923d7937d92",
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    }
+  ],
+  "currentFixtureSha256": {
+    "server-version/backend/src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts": "3d0ae96c1c29bf3cd2b04d97c72267081182172da66add9c11f9e332a43a9bca",
+    "server-version/backend/src/__tests__/bundle-onboarding/content.postgres.integration.test.ts": "3591be8c2f85688511978740c1a0309e37bd5a2a2c94db9aec1d7f90a28c7488",
+    "server-version/backend/src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts": "7ddb187d36b90dda462abf1872cb67219d7c4b71a3699b294a540c949596320c",
+    "server-version/backend/src/__tests__/campus/report.routes.test.ts": "af76d13a88551f5845ab31922dc75726e49f9191a05a4ee287c98acf85f10454",
+    "server-version/backend/src/__tests__/campus/teacher-tasks.test.ts": "61bf63e75497ea1b2d5a37f719dd393222a9b95d6ed753460d1c1d1d82dd487d",
+    "server-version/backend/src/__tests__/cognitive/library-catalog.test.ts": "2621e949aae8b5a29d0994f727635db9a13844c2e569bbda6663c2e4eedfd7d8",
+    "server-version/backend/src/__tests__/composite/training-feedback-runtime-source.test.ts": "866157e7bba350c7e116bad9673ae56fdfae15a26295f998b5a864e642a845d6",
+    "server-version/backend/src/__tests__/composite/training-flow-final-admission.test.ts": "e5e10aab63ef81ecd0f0a1471da003b5d07dfb623c16781c50b8d595dafebe63",
+    "server-version/backend/src/__tests__/composite/training-persistence-admission-behavior.test.ts": "021c26d82999d303f137267ecbf00bf0dee10487b931bcc262930921ec84605a",
+    "server-version/backend/src/__tests__/composite/training-variant-markers.test.ts": "42431cf24395d1b19cad41068bd5c8802ceff0027f5da330d0ce0f4fbd6f4cea",
+    "server-version/backend/src/__tests__/controllers/addScale.grant.test.ts": "e3b5427a8e7ab825b632737e931454ceeb863f3f230bb10689f0edee2f2e29f3",
+    "server-version/backend/src/__tests__/education-tools/private-tool.media-upload.test.ts": "c46d7454a6e11669530e7ad0d86b63f40d4b4bfe6b2eac63b936ee341b2489b9",
+    "server-version/backend/src/__tests__/education-tools/private-tool.media.routes.test.ts": "891573157aed3a7b1626323b4de711d55fe0fc6bae99d8176cfc91b997809a2d",
+    "server-version/backend/src/__tests__/fixtures/final-route-checker.fixture.mjs": "28399dd55df53780a2a9423b0ffd9f446248681a98b051c5967a7334989f5b81",
+    "server-version/backend/src/__tests__/fixtures/final-route-inventory.fixture.csv": "9af92dd117c159b14a0339bbbabf54da033876f0d3d6bcabefc9dc91806fb86f",
+    "server-version/backend/src/__tests__/fixtures/training-feedback.ts": "e4e93a92b3ce996d09c96f2545cba6ad4b3d4783b98942751bc970991daf0a76",
+    "server-version/backend/src/__tests__/hotpath/final-route-inventory.test.ts": "e3861b5aba15e4a1fec0d6e7cb7332690336cd59dc3a096101ec1fca53df8528",
+    "server-version/backend/src/__tests__/integration/anonymousStudy.postgres.integration.test.ts": "43209850dc2a81035b385777321ce38d1776f20ff4e902bc39d89f002e9c689c",
+    "server-version/backend/src/__tests__/integration/educationLibraryPublication.postgres.integration.test.ts": "71407e6317a0645f126c29475d430cbcb326420051c9d9c5bbafee96bd79a43d",
+    "server-version/backend/src/__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts": "36a97633d637c87cb978f5d11e359824020a0ae00ad96d4a91825af370bdaee5",
+    "server-version/backend/src/__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts": "78d5d2e96d07cbb507cf1fbf7da51560b6d91629f568390b3a73ae65319524df",
+    "server-version/backend/src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts": "790779a6b2aa2538327d9805901920fb99aa2aef46da5c7c8eccd1ac6f9404b2",
+    "server-version/backend/src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts": "2f96f34ea6dd74cd229e824c4fe844cbe28c802aa0fa4e3e5d3b4b3a7636973a",
+    "server-version/backend/src/__tests__/integration/reportingHttp.postgres.integration.test.ts": "7181d5bb14972b451c1a43588df1395cfdd601aa041e102432d000fd688b488b",
+    "server-version/backend/src/__tests__/measurement-content/admin-authority-route.test.ts": "6832c5d0f215f2c892a9f7d17d7d68c9ba187787fa521a3216db762be1fe671d",
+    "server-version/backend/src/__tests__/measurement-content/survey-content-binding.test.ts": "9d24ec4e676d5754884669fbdf99a95390b24154b847b725c27c9718abe270c3",
+    "server-version/backend/src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts": "c7935d0cd55dc0cdfa55e3c34f41e620cbfa4b5fc8a048cac73b7d3f76341abd",
+    "server-version/backend/src/__tests__/measurement-content/training-reference-unified-context.test.ts": "5d26c67f143d5e93f13de0288f7a49783085769ed45af4edc10be4c5a5e74fa5",
+    "server-version/backend/src/__tests__/questionnaire/product.postgres.integration.test.ts": "b59d029958512c5982e347da13c9cdd90d62491fb4b7d80044176b352b6a9de9",
+    "server-version/backend/src/__tests__/questionnaire/training-feedback-authoring.test.ts": "bb74afdb8d016dafec03d4fa34096b739aba41d7c0718d0204b89568367d3e90",
+    "server-version/backend/src/__tests__/scale-library-governance/education-runtime-resources.postgres.integration.test.ts": "4b3b62c95ad32f044a0874d688178e376b77765e8fa9c080bfaf5d19ade27894",
+    "server-version/backend/src/__tests__/scale-library-governance/governance.postgres.integration.test.ts": "923f54181d750fd104ad72ac7ffd9016840e4b957242176f8537bf47be504eac",
+    "server-version/backend/src/__tests__/scale-library-governance/media.postgres.integration.test.ts": "04c0ccf50e726b4990964e7c7382e3d20caa54ba68f36a82eec9af95d2a7d21a",
+    "server-version/backend/src/__tests__/scale/scale-draft-write-guard.test.ts": "7b25834419de992089608201ebea7e799281bbb75850d9d8102d5dab69702ac0",
+    "server-version/backend/src/__tests__/situational/situation-definition.test.ts": "17b2f031b077407b061f5478f972c25aae23a2bfad11c35021db42d2210a5990",
+    "server-version/backend/src/__tests__/survey/materials-assignment-adapter.test.ts": "3bdb2b706b7e4fa164d4862dca35f7c78c5ff964276a6f5140d12ccfbf21b973",
+    "server-version/backend/src/__tests__/survey/research-catalog.postgres.integration.test.ts": "2733f06801352b2d6d3f1ee46c58939a09b9c8bfda1c1b006a4be783e6aa8b09",
+    "server-version/backend/src/__tests__/survey/research-cognitive.postgres.integration.test.ts": "fe4e796b49ef4b8cdfbef1fb4dcf3ec1d2c1f639fa1150986467cdb901cce594",
+    "server-version/backend/src/__tests__/survey/research-draft-validation.contract.test.ts": "85aade16715017f4995423f960fe7009b81758a5adee7c2690a74d0b75abfe82",
+    "server-version/backend/src/__tests__/survey/research-flow.postgres.integration.test.ts": "5d75da3e28e74347d91ba676bdd452c9190244b7e6c79e6b51cfbb2fc826e90a",
+    "server-version/backend/src/__tests__/survey/research-media.postgres.integration.test.ts": "2c7ae97d951a7b3b4836671025a00977c5d3666fdaf38d2cf9049ea5f71dcfe9",
+    "server-version/backend/src/__tests__/survey/research-preview-transport.contract.test.ts": "ed81f95d4a631ef36ea9eecc406690e26cafcedd2fbb91b70e182f6bebcf5b3e",
+    "server-version/backend/src/__tests__/survey/research-wave-final.postgres.integration.test.ts": "40c680fc6f5b25b09585bb4bc2f5008c637c78d5b328431573b074d5a4b69f21",
+    "server-version/backend/src/__tests__/survey/research-wave-prepare-transport.contract.test.ts": "5c65c487cc0017d9b84b4d8fb05145d5596f82054bdfc75d2623c7cdfbeafd55",
+    "server-version/backend/src/__tests__/survey/survey-realm.postgres.integration.test.ts": "d38b304fcacf00d3811ee41c20aa68ca664db66f3f030bb69ba2788d4c2751c2",
+    "server-version/backend/src/__tests__/training-analysis/scale-source-discovery.test.ts": "99ca542ce1dc147807c3550bcf3b5c8a0018321cfc8b6f863879b90e0243bc63",
+    "server-version/backend/src/__tests__/training-analysis/source.test.ts": "5e620d412e193563a1fa257e8d8ff534cad5ecc9f211fd52b8f9e5dd48756575",
+    "server-version/backend/src/__tests__/training-workspace-governance.postgres.integration.test.ts": "2e9cc72218c229b677400b5028f94c8b7b18450e4cbbfe8319f7d8a711162674"
+  },
+  "limits": [
+    "Counts are an evidence ledger across targeted invocations, not a full current regression result",
+    "Original failed and filtered/skipped records remain intact; passed cases do not make their entire invocation successful",
+    "Two native Mini contracts and three Survey publication cases await real CI, plus the export consumer setup",
+    "No database timezone changes, fake Actions service identities, changed required gates or expanded business rights"
+  ]
+}

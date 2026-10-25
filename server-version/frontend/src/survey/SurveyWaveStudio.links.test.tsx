@@ -17,7 +17,8 @@ function fixture(origin:string,bad=false,overrides:WaveOverride={}){
   Object.defineProperty(navigator,'clipboard',{value:{writeText},configurable:true})
   let current={...wave,...overrides},issued=0
   const fetcher=vi.fn(async(input:RequestInfo|URL,_init?:RequestInit)=>{
-    const url=String(input)
+    if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
+  const url=String(input)
     if(url.endsWith('/auth/csrf'))return response({csrfToken:'synthetic-csrf'})
     if(url.includes('/waves?page='))return response({list:[current]})
     if(url.includes('/instruments?page='))return response({list:[]})
@@ -77,8 +78,8 @@ describe('recruitment capability display, clipboard and QR share one trusted URL
     [{status:'DRAFT',publicationId:'pub1'},'已冻结，尚未开放'],
     [{status:'OPEN'},'波次已开放'],
     [{status:'PAUSED'},'已暂停新参与'],
-    [{status:'CLOSED'},'已结束招募'],
-    [{status:'CLOSED',hardStopAt:'2026-01-01T00:00:00Z'},'已紧急终止'],
+    [{status:'CLOSED'},'已停止新参与'],
+    [{status:'CLOSED',hardStopAt:'2026-01-01T00:00:00Z'},'已停止新参与'],
   ])('describes persisted wave state without issuing actions: %s',async(overrides,label)=>{
     const api=fixture('http://survey.localhost:5173',false,overrides as WaveOverride);await mount()
     expect(screen.getByText('当前阶段：'+label).closest('summary')).toBeInTheDocument()

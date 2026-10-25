@@ -63,6 +63,8 @@ describe('private-scale application session',()=>{
   const {rerender}=render(<EducationPrivateScaleSharing {...props} api={api as PrivateToolApi}/>);await prepare()
   expect(api.mock.calls.some(([path])=>path.includes('/preview'))).toBe(false)
   fireEvent.click(screen.getByRole('button',{name:'读取获授权的附件预览'}))
+  expect(api.mock.calls.some(([path])=>path.includes('/preview'))).toBe(false)
+  fireEvent.click(screen.getByRole('button',{name:'查看图片'}))
   await waitFor(()=>expect(create).toHaveBeenCalledTimes(1))
   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools/tool/versions/version/sharing/media/asset/preview?releaseId=release','GET',undefined,{responseType:'blob'})
   fireEvent.change(screen.getByLabelText('量表名称'),{target:{value:'更改文案'}})

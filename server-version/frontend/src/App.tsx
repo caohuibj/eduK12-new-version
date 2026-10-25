@@ -52,7 +52,6 @@ const SystemAdminHome = React.lazy(() => import('./admin/SystemAdminHome'))
 const SurveySystemAdmin = React.lazy(() => import('./pages/admin/SurveySystemAdmin'))
 const SurveyResearchersAdmin = React.lazy(() => import('./pages/admin/SurveyResearchersAdmin'))
 const ScaleLibraryGovernance = React.lazy(() => import('./pages/admin/ScaleLibraryGovernance'))
-const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const EducationProductGovernance = React.lazy(() => import('./pages/admin/EducationProductGovernance'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
@@ -592,14 +591,6 @@ function AppRoutes() {
             element={
               <ProtectedRoute roles={['ADMIN']}>
                 <MaterialGrants />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/instrument-authorizations"
-            element={
-              <ProtectedRoute roles={['ADMIN']}>
-                <InstrumentAuthorization />
               </ProtectedRoute>
             }
           />

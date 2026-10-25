@@ -38,7 +38,8 @@ function fixture({many=false,empty=false,waveCount=1}={}){
   const reports=new Map<string,any>([['report1',{id:'report1',project_id:'p1',owner_id:'researcher',report_key:'feedback',version:'1',revision:0,state:'DRAFT',published_release_id:null,payload:{measurementReleaseId:'measurement1',metricKeys:['score'],audience:'researcher',language:'zh-CN',template:{title:'报告初始标题',blocks:[{type:'TEXT',text:'原文'}],limitations:[]},assets:[]}}]])
   const waits=new Map<string,Promise<Response>[]>()
   const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
-    const url=String(input),method=init?.method??'GET'
+    if(String(input).includes('/package-memberships?'))return {ok:true,status:200,json:async()=>({code:0,data:{list:[]}})} as Response
+  const url=String(input),method=init?.method??'GET'
     const pending=waits.get(method+' '+url)?.shift()
     if(pending)return pending
     if(url.endsWith('/auth/me'))return response({id:'researcher',username:'test',mustChangePassword:false})

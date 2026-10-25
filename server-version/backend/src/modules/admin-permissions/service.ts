@@ -11,16 +11,17 @@ export class AdminPermissionError extends Error {
 
 export async function assertEntryAdmin(db: Prisma.TransactionClient, userId: string, entry: AdminEntry) {
   // Materialization keeps the expiry decision after any row-lock wait.
-  const rows = await db.$queryRaw<Array<{ id: string }>>`
+  const rows = await db.$queryRaw<Array<{ id: string; grantId: string; grantVersion: number }>>`
     WITH locked AS MATERIALIZED (
-      SELECT u."id", u."expires_at" FROM "users" u JOIN "admin_entry_grants" g ON g."user_id"=u."id"
+      SELECT u."id", u."expires_at",g.id AS "grantId",g.version AS "grantVersion" FROM "users" u JOIN "admin_entry_grants" g ON g."user_id"=u."id"
       WHERE u."id"=${userId} AND g."entry"=${entry} AND g."revoked_at" IS NULL
         AND u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password" AND u."platform_role"='STANDARD'
         AND u."account_domain" IN ('LEGACY','TRAINING') LIMIT 1 FOR SHARE OF u,g
     )
-    SELECT "id" FROM locked WHERE "expires_at" IS NULL OR "expires_at">clock_timestamp()
+    SELECT "id","grantId","grantVersion" FROM locked WHERE "expires_at" IS NULL OR "expires_at">clock_timestamp()
   `
   if (!rows.length) throw new AdminPermissionError(403, '缺少当前入口管理授权')
+  return rows[0]
 }
 
 // The caller supplies the version it actually reviewed. Retrying a committed

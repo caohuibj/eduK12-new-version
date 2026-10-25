@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { db, unified, selected } = vi.hoisted(() => ({
-  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() } }, unified: vi.fn(), selected: vi.fn(),
+  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() }, $queryRaw: vi.fn() }, unified: vi.fn(), selected: vi.fn(),
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../modules/scale/unified-final-submit.service', () => ({ submitUnifiedScaleAssessmentFinal: unified }))
@@ -67,5 +67,15 @@ describe('Composite FINAL request-local child locator', () => {
     await submitScaleAssessmentFinal({ ...input, assessmentId: 'child-1', userId: 'student-1' })
     expect(db.assessment.findFirst).not.toHaveBeenCalled()
     expect(db.assessment.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'child-1' }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
+  })
+})
+
+describe('Composite explicit receipt-only response', () => {
+  it.each([false, true])('keeps initial/replayed durable identity and removes all detail %s', async replayed => {
+    unified.mockResolvedValue({ submissionId: input.submissionId, payloadHash: 'hash', replayed, assessment: { private: 'detail' }, parent: { private: 'parent' } })
+    const output = await submitCompositeScaleFinal('parent-1', 'item-1', input, { userId: 'student-1' }, { receiptOnly: true })
+    expect(unified.mock.calls[0].slice(2)).toEqual([undefined, undefined, true])
+    expect(output).toEqual({ submissionId: input.submissionId, payloadHash: 'hash', replayed, completed: true })
+    expect(db.$queryRaw).not.toHaveBeenCalled()
   })
 })

@@ -12,7 +12,7 @@ const flow=compileSurveyFlow({schemaVersion:1,experiment:{experimentKey:'trial',
   {groupKey:'a',weight:1,materialTitle:'A',materialBody:'Alpha'},
   {groupKey:'b',weight:1,materialTitle:'B',materialBody:'Bravo'},
 ]},blocks:[{blockKey:'closing',kind:'MATERIAL',body:'done'}]},[],'LINKED_WAVES')
-const snapshot={flow,quotaPolicy:{schemaVersion:1,groupLimits:{a:2,b:2}}} as ResearchFrozenPublication
+const snapshot={units:[],flow,quotaPolicy:{schemaVersion:1,groupLimits:{a:2,b:2}}} as ResearchFrozenPublication
 const input={projectId:'project',waveId:'wave',attemptId:'attempt',participantId:'subject',
   researchCode:'research-code',accessCredential:'private-credential',snapshot}
 const prior={schemaVersion:1,flowDigest:flow.flowDigest,experimentKey:'trial',groupKey:'b',

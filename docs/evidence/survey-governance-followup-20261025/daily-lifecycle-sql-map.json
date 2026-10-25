@@ -1,0 +1,35 @@
+{
+  "scope": "Read-only mapping invocation excluded from HTTP measurements; same frozen publication",
+  "statements": [
+    {
+      "fingerprint": "a8402858d4f1e1d27afee976520485ebb4b96a5387355b823f0d0b8079729032",
+      "sqlWithoutParameterValues": "BEGIN",
+      "category": "transaction control"
+    },
+    {
+      "fingerprint": "d909a34e34b7c5912079c8df90db70ec6f2a1275e05d427ece63afb23d5c1b52",
+      "sqlWithoutParameterValues": "SELECT id FROM survey_instrument_drafts WHERE id=ANY($1::text[]) ORDER BY id FOR SHARE",
+      "category": "new-admission source identity lock"
+    },
+    {
+      "fingerprint": "7f6e69b7ce910a344db900857e7ead1a6f56fcea1b5ef18ee5b20d5921939c48",
+      "sqlWithoutParameterValues": "WITH RECURSIVE ancestors AS ( SELECT id,CASE WHEN provenance->>'authoringRelationship' IN ('ORIGINAL','REVISION','COPY') THEN NULL ELSE source_release_id END AS source_release_id,ARRAY[id] AS path FROM measurement_content_releases WHERE id=ANY($1::text[]) UNION ALL SELECT r.id,CASE WHEN r.provenance->>'authoringRelationship' IN ('ORIGINAL','REVISION','COPY') THEN NULL ELSE r.source_release_id END,a.path||r.id FROM measurement_content_releases r JOIN ancestors a ON r.id=a.source_release_id WHERE NOT r.id=ANY(a.path) AND cardinality(a.path)<100 ) SELECT id,bool_or(cardinality(path)>=100 AND source_release_id IS NOT NULL) AS truncated FROM ancestors GROUP BY id ORDER BY id",
+      "category": "new-admission dependency ancestry"
+    },
+    {
+      "fingerprint": "4d3efc8ecebc7a27233d2569354deb8d00cc41379834353dc61e60fa1cf760f9",
+      "sqlWithoutParameterValues": "SELECT id FROM measurement_content_releases WHERE id=ANY($1::text[]) ORDER BY id FOR SHARE",
+      "category": "new-admission release identity lock"
+    },
+    {
+      "fingerprint": "30098e980cf09b8a7aaeccc94a4b4c2278c6a0ec85820add99a2365e90407421",
+      "sqlWithoutParameterValues": "SELECT target_id FROM scale_library_emergency_stops WHERE (target_kind='RELEASE' AND target_id=ANY($1::text[])) OR (target_kind='TRAINING_SCALE' AND target_id=ANY($2::text[])) OR (target_kind='SURVEY_INSTRUMENT' AND target_id=ANY($3::text[]))",
+      "category": "new-admission stop"
+    },
+    {
+      "fingerprint": "79663c1d3b43ceaf9ee728e501c64b57ae2e4d6cb36ff5c65eddcda1de27342f",
+      "sqlWithoutParameterValues": "COMMIT",
+      "category": "transaction control"
+    }
+  ]
+}

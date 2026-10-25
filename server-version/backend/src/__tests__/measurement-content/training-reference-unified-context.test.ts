@@ -1,6 +1,6 @@
 import {afterEach,beforeEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({transaction:vi.fn(),get:vi.fn(),parent:vi.fn(),admission:vi.fn(),section:vi.fn(),persist:vi.fn(),snapshot:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
+const mocks=vi.hoisted(()=>({transaction:vi.fn(),get:vi.fn(),parent:vi.fn(),admission:vi.fn(),section:vi.fn(),persist:vi.fn(),snapshot:vi.fn(),study:vi.fn()}))
+vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction,$queryRaw:mocks.study}}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
 vi.mock('../../modules/composite/training-variant-child-scope',async importOriginal=>({...await importOriginal<any>(),
  loadTrainingChildParent:mocks.parent,assertTrainingFormFinalPrincipal:vi.fn(),assertTrainingSectionSelected:mocks.parent,
@@ -30,7 +30,7 @@ function fixture(){
   trainingReferenceBinding:null,trainingReferenceBindingHash:null,contextSnapshotEncrypted:null,contextSnapshotHash:null}
  let section:any={id:'section-attempt',attemptEpoch:1,status:'IN_PROGRESS',submissionId:null,submissionPayloadHash:null,frozenAdmissionSnapshotHash:hash}
  const events:string[]=[],control={contextCount:1}
- const db={compositeAssessmentAttempt:{findUnique:vi.fn(async()=>structuredClone(parent)),updateMany:vi.fn(async({data})=>{
+ const db={$queryRaw:vi.fn(async()=>[]),compositeAssessmentAttempt:{findUnique:vi.fn(async()=>structuredClone(parent)),updateMany:vi.fn(async({data})=>{
   if(data.contextSnapshotHash){events.push('context');if(control.contextCount!==1)return {count:control.contextCount}}
   else events.push('reference')
   Object.assign(parent,data);return {count:1}
@@ -48,7 +48,7 @@ function fixture(){
  const body:any={attemptId:'attempt',sectionId:'section',attemptEpoch:1,submissionId:id(7),definitionHash:hash,userId:'user',answers:[{itemId:'grade',value:'1'}]}
  return {run:()=>submitUnifiedCompositeFormSectionFinal(body),read:()=>parent,section:()=>section,reference,db,body,events,control}
 }
-beforeEach(()=>{vi.resetAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))})
+beforeEach(()=>{vi.resetAllMocks();mocks.study.mockResolvedValue([]);vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))})
 afterEach(()=>vi.unstubAllEnvs())
 describe('actual UNIFIED composite context FINAL freezes references inside its transaction',()=>{
  it('writes authentic context and selected binding before section completion/snapshot or next-runner delivery',async()=>{
@@ -61,7 +61,8 @@ describe('actual UNIFIED composite context FINAL freezes references inside its t
   const f=fixture();f.reference.scope.resourceId='producer';f.reference.provenance={candidateId:'candidate',reviewId:'review'}
   let now=new Date('2026-10-20T00:00:00Z')
   Object.assign(f.db,{$queryRaw:vi.fn(async(sql:any)=>{
-   const q=sql.strings.join('')
+   const q=(sql.strings??sql).join('')
+   if(q.includes('FROM anonymous_study_attempts'))return []
    if(q.includes('FROM training_reference_requests'))return [{course_id:'course',composite_id:'producer'}]
    if(q.includes('FROM composite_assessments'))return ['producer','composite'].map(id=>({id,created_by:'teacher',status:'PUBLISHED',product_kind:'QUESTIONNAIRE',questionnaire_type:'COURSE',public_enabled:false,published_at:now}))
    if(q.includes('FROM questionnaire_course_deliveries'))return ['producer','composite'].map(composite_id=>({composite_id,course_id:'course'}))

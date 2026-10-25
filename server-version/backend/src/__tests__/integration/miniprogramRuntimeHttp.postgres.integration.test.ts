@@ -1,3 +1,5 @@
+import {grantPublicScaleFixture} from '../fixtures/published-measurement'
+import {publishRegisteredScaleFixture} from './registered-resource-fixture'
 import situationalRoutes from '../../routes/situational'
 import * as situationRegistry from '../../modules/situational/situation-package.registry'
 import {SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE} from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
@@ -42,6 +44,8 @@ suite('PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL',()=>{
  it('starts through canonical admission, reads frozen Scale despite source edits, persists one FINAL receipt and rejects foreign/embedded/legacy reads',async()=>{
   const u=await account(),stranger=await account(),c=client(),other=client();await c.runtime.session.login({username:u.username,password});await other.runtime.session.login({username:stranger.username,password})
   const definition=scaleDefinitionFor(2,'NATIVE'),scale=await prisma.scale.create({data:{code:'MINI-'+randomUUID(),name:'HTTP scale',creatorId:u.id,status:'PUBLISHED',visibility:'PUBLIC',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:definition as any,definitionHash:hashScaleDefinition(definition),itemCount:2,dimensionCount:1}})
+  await publishRegisteredScaleFixture(prisma,scale.id)
+  await grantPublicScaleFixture(prisma,scale.id)
   const target={family:'SCALE',resourceId:scale.id},handle=await c.runtime.assessments.begin(target),unit=await c.runtime.assessments.resume(handle)
   expect(unit.meta.definitionHash).toBe(hashScaleDefinition(definition));expect(unit.items).toHaveLength(2)
   const changed=structuredClone(definition);changed.items[0].content='New mutable text';await prisma.scale.update({where:{id:scale.id},data:{definition:changed as any,definitionHash:hashScaleDefinition(changed)}})

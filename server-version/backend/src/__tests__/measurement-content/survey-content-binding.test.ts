@@ -4,9 +4,10 @@ import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../../m
 import {referenceEntryKey} from '../../modules/measurement-content/reference-candidate'
 import type {AssessmentReferenceEntry} from '../../modules/assessment-reference/reference'
 import {bindSurveyAttemptContent,decodeSurveyAttemptContentBinding,surveyAttemptContentBindingSchema} from '../../modules/survey/content-binding.service'
-const mocks=vi.hoisted(()=>({release:vi.fn(),assigned:vi.fn()}))
+const mocks=vi.hoisted(()=>({release:vi.fn(),assigned:vi.fn(),collection:vi.fn()}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
 vi.mock('../../modules/survey/flow.assignment',()=>({assignedSurveySnapshot:mocks.assigned}))
+vi.mock('../../modules/survey/scale-collection-guard',()=>({assertSurveyScaleCollectionAllowed:mocks.collection}))
 const scope={projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'publication'}
 const exact={releaseId:'measurement',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
 const entry={scoreKey:'metric',referenceKind:'descriptive_sample',evidenceLevel:'local_pilot',provenanceType:'local_observed',
@@ -38,6 +39,12 @@ beforeEach(()=>{
   mocks.release.mockImplementation(async(_tx,id)=>releases[id]);mocks.assigned.mockImplementation(value=>value)
 })
 describe('Survey START exact encrypted content binding',()=>{
+  it('refuses a current collection fence before selecting or writing a content binding',async()=>{
+    const f=fixture();mocks.collection.mockRejectedValueOnce(new Error('synthetic collection stop'))
+    await expect(f.run()).rejects.toThrow('synthetic collection stop')
+    expect(mocks.collection).toHaveBeenCalledWith(f.tx,f.frozen)
+    expect(mocks.release).not.toHaveBeenCalled();expect(f.tx.$executeRaw).not.toHaveBeenCalled()
+  })
   it('stores only exact selected pointers, empty population and report availability under CAS',async()=>{
     const f=fixture();await expect(f.run()).resolves.toBeUndefined()
     const binding=f.saved()

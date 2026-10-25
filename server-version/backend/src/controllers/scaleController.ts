@@ -1031,7 +1031,8 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        if(!['LEGACY','TRAINING'].includes(req.user?.accountDomain??''))
+          await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answer = { itemCode, responseValue, responseTimeMs: responseTimeMs === undefined ? undefined : Number(responseTimeMs), answeredAt: new Date().toISOString() }
         try {
@@ -1108,7 +1109,8 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        if(!['LEGACY','TRAINING'].includes(req.user?.accountDomain??''))
+          await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
 
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answers = parsed.data.answers.map((input) => ({
@@ -1194,7 +1196,8 @@ export const scaleController = {
           return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(assessment, undefined, tx)) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
-        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
+        if(!['LEGACY','TRAINING'].includes(req.user?.accountDomain??''))
+          await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
         const contextSnapshot = assessment.questionnaireAssessmentId
           ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
           : null

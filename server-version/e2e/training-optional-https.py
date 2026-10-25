@@ -78,7 +78,9 @@ def main():
     try:
         root = Path(directory)
         home = root / 'home'
-        nss = home / '.pki' / 'nssdb'
+        # The locked Chromium is M151. M146+ uses this NSS shared DB location:
+        # https://chromium.googlesource.com/chromium/src/+/HEAD/docs/linux/cert_management.md
+        nss = home / '.local' / 'share' / 'pki' / 'nssdb'
         nss.mkdir(parents=True, mode=0o700)
         def run(*args):
             subprocess.run(args, cwd=root, check=True, timeout=30, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

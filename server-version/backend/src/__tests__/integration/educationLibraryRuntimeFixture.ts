@@ -127,7 +127,7 @@ export async function setupEducationLibraryRuntimeFixture(input: {
       scoringDescription: 'One descriptive raw score', reportDescription: 'Self reflection only' },
     educationApplicability: { schemaVersion: 1, administrations: [{ population: product === 'SCHOOL' ? 'STUDENT' : 'TEACHER', responseMode }] },
     ...(imageReference ? { mediaConsent: { manifestHash: manifest.mediaManifest.manifestHash, shareWithAuthorizedUsers: true } } : {}) })
-  const approved = await review(libraryAdmin.id, application.id, { expectedVersion: 1, decision: 'APPROVE', reason: 'Synthetic test approval' })
+  const approved = await review(libraryAdmin.id, application.id, { expectedVersion: 1, decision: 'APPROVE', allowedProducts: ['TRAINING', 'SURVEY'], reason: 'Synthetic test approval' })
   if (!approved.entryId) throw new Error('Library approval did not create an entry')
   const granted = await db.$transaction(tx => grantEducationLibraryUseInTransaction(tx, libraryAdmin.id, approved.entryId!, {
     requestId: randomUUID(), product, organizationId, scopeKind: 'ORGANIZATION', userId: null }))

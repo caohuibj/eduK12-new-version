@@ -3,7 +3,6 @@ import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {authorizedProject} from './builder.service'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import {recheckCatalogScaleSourceExpiry} from './catalog.sources'
 import {compileFrozenResearchUnit,resolveSurveyMeasurementUnit} from './publication.service'
 import {SurveyWaveError} from './waves.service'
 import {surveyContentReleaseInScope,surveyContentReleaseMatchesMeasurement} from './content-selection'
@@ -61,7 +60,6 @@ export async function listSurveyContentOptions(actorId:string,projectId:string,w
       return surveyContentOption(release)
     })
     await authorizedProject(tx,actorId,projectId,true)
-    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     return {instrumentId:draft!.id,instrumentKey:draft!.instrumentKey,title:draft!.title,kind:unit.kind,
       draftRevision:draft!.revision,waveRevision:wave!.revision,
       measurement:{releaseId:measurement.releaseId,contentHash:measurement.contentHash,version:measurement.version},

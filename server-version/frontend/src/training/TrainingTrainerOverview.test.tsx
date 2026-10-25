@@ -7,7 +7,7 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teach
 import TrainingTrainerOverview, { type TeachingOverview } from './TrainingTrainerOverview'
 import TrainingTrainerHome from './TrainingTrainerHome'
 const row = { id: 'a', title: '课堂实践练习', course: { id: 'course', title: '跨课程研修' }, pendingCount: 3, oldestSubmittedAt: '2026-10-24T01:00:00Z', href: '/courses/course/detail?section=assignments&assignmentId=a' }
-const data = (extra: Partial<TeachingOverview> = {}): TeachingOverview => ({ summary: { pendingSubmissions: 3, pendingAssignments: 1, courses: 6, publishedCourses: 4 }, list: [row], total: 1, page: 1, pageSize: 5, ...extra })
+const data = (extra: Partial<TeachingOverview> = {}): TeachingOverview => ({ summary: { pendingSubmissions: 3, pendingAssignments: 1 }, list: [row], total: 1, page: 1, pageSize: 5, ...extra })
 const mount = (home = false) => render(<MemoryRouter>{home ? <TrainingTrainerHome /> : <TrainingTrainerOverview />}</MemoryRouter>)
 beforeEach(() => {
   vi.clearAllMocks(); localStorage.clear()
@@ -18,13 +18,27 @@ describe('Training trainer homepage work priorities', () => {
   it('presents true global totals and expands original review links without issuing a mutation', async () => {
     mount()
     const button = await screen.findByRole('button', { name: /待批阅练习.*3/ })
+    expect(get).toHaveBeenCalledExactlyOnceWith('/courses/my/teaching-overview?page=1&pageSize=5&includeCourseCounts=false')
     expect(button).toHaveAttribute('aria-expanded', 'false')
     expect(screen.queryByRole('link', { name: /查看并批阅/ })).not.toBeInTheDocument()
     fireEvent.click(button)
     expect(await screen.findByRole('link', { name: '查看并批阅：课堂实践练习' })).toHaveAttribute('href', row.href)
     expect(screen.queryByRole('button', { name: /课程管理/ })).not.toBeInTheDocument()
     expect(screen.getByText('3 份待批阅')).toBeInTheDocument()
+    expect(get).toHaveBeenCalledTimes(1)
     expect(post).not.toHaveBeenCalled()
+  })
+  it('still accepts a complete legacy summary when course counts are present', async () => {
+    get.mockResolvedValue({ code: 0, data: data({ summary: { pendingSubmissions: 3, pendingAssignments: 1, courses: 6, publishedCourses: 4 } }) })
+    mount()
+    await screen.findByRole('button', { name: /待批阅练习.*3/ })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+  it.each(['pendingSubmissions', 'pendingAssignments', 'courses', 'publishedCourses'] as const)('rejects an invalid %s count rather than displaying a false zero', async key => {
+    get.mockResolvedValue({ code: 0, data: data({ summary: { pendingSubmissions: 3, pendingAssignments: 1, [key]: -1 } }) })
+    mount()
+    await screen.findByRole('alert')
+    expect(screen.getByRole('button', { name: /待批阅练习.*—/ })).toBeInTheDocument()
   })
   it('combines the heading with one review shortcut and keeps search beside creation', async () => {
     mount(true)
@@ -42,7 +56,7 @@ describe('Training trainer homepage work priorities', () => {
     mount()
     fireEvent.click(await screen.findByRole('button', { name: /待批阅练习.*3/ }))
     fireEvent.click(screen.getByRole('button', { name: '下一页练习' }))
-    await waitFor(() => expect(get).toHaveBeenLastCalledWith('/courses/my/teaching-overview?page=2&pageSize=5'))
+    await waitFor(() => expect(get).toHaveBeenLastCalledWith('/courses/my/teaching-overview?page=2&pageSize=5&includeCourseCounts=false'))
     await screen.findByText('共 8 项练习 · 第 2 / 2 页')
   })
   it('keeps unavailable counts unknown and courses accessible, and supports retry', async () => {
@@ -58,7 +72,7 @@ describe('Training trainer homepage work priorities', () => {
     await screen.findByRole('button', { name: /待批阅练习.*3/ })
   })
   it('keeps zero pending work distinct from a failed request', async () => {
-    get.mockResolvedValue({ code: 0, data: data({ summary: { pendingSubmissions: 0, pendingAssignments: 0, courses: 2, publishedCourses: 1 }, list: [], total: 0 }) })
+    get.mockResolvedValue({ code: 0, data: data({ summary: { pendingSubmissions: 0, pendingAssignments: 0 }, list: [], total: 0 }) })
     mount()
     fireEvent.click(await screen.findByRole('button', { name: /待批阅练习.*0/ }))
     await screen.findByText('暂时没有待批阅的练习')
@@ -70,7 +84,7 @@ describe('Training trainer homepage work priorities', () => {
     const view = mount()
     fireEvent.click(await screen.findByRole('button', { name: /待批阅练习.*3/ }))
     fireEvent.click(screen.getByRole('button', { name: '下一页练习' }))
-    await waitFor(() => expect(get).toHaveBeenCalledWith('/courses/my/teaching-overview?page=2&pageSize=5'))
+    await waitFor(() => expect(get).toHaveBeenCalledWith('/courses/my/teaching-overview?page=2&pageSize=5&includeCourseCounts=false'))
     view.unmount()
     await act(async () => finish({ code: 0, data: data({ page: 2 }) }))
     expect(screen.queryByText('课堂实践练习')).not.toBeInTheDocument()

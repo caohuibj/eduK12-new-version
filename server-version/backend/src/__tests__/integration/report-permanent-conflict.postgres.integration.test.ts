@@ -1,4 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+const isolated=await vi.hoisted(async()=>{
+ vi.resetModules()
+ const {isolatedTestDatabase}=await import('../fixtures/isolated-test-database')
+ return isolatedTestDatabase(['REPORT_OUTBOX_INTEGRATION_DATABASE_URL'],'report_conflict')
+})
 import { PrismaClient } from '@prisma/client'
 import { createReportOutboxFixture } from './report-outbox-fixture'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
@@ -24,7 +29,7 @@ suite('permanent report conflict on isolated PostgreSQL', () => {
       await db.scale.deleteMany({ where: { id: { in: f.scaleIds } } })
       await db.user.deleteMany({ where: { id: { in: [f.owner.id, f.participant.id] } } })
     }
-    await db?.$disconnect(); vi.unstubAllEnvs()
+    await db?.$disconnect(); vi.unstubAllEnvs(); await isolated.restore()
   })
   it.each(['false', 'true'])('releases budget/lease once and rejects futile retry with atomic finish=%s', async atomic => {
     vi.stubEnv('ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED', atomic)

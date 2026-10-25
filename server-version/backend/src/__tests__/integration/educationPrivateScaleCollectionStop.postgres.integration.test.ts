@@ -35,7 +35,7 @@ suite('Private exact Scale collection and Teacher media boundaries',()=>{
   base='http://127.0.0.1:'+(server.address() as {port:number}).port
  })
  afterAll(async()=>{if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await db?.$disconnect()})
- it.each(['SCHOOL','TEACHER'] as const)('%s exact private source stops fresh START and already-started FINAL without persisting results',async product=>{
+ it.each(['SCHOOL','TEACHER'] as const)('%s exact private source stops fresh START while an already-started FINAL completes under frozen rules',async product=>{
   const f=await setupPrivateScaleExecutionFixture(db,product,'SELF',2)
   const executions=await f.executions();expect(executions).toHaveLength(2)
   const actorUserId=f.participantUserId,headers={'x-fixture-user':actorUserId}
@@ -72,13 +72,13 @@ suite('Private exact Scale collection and Teacher media boundaries',()=>{
   await expect(startAssessmentRunExecution({executionId:executions[1].id,actorUserId})).rejects.toThrow('紧急停用')
   const [unstarted]=await db.$queryRaw<Array<{status:string;runtimeBindingRef:string|null}>>`SELECT status,runtime_binding_ref AS "runtimeBindingRef" FROM assessment_run_executions WHERE id=${executions[1].id}`
   expect(unstarted).toMatchObject({status:'ASSIGNED',runtimeBindingRef:null})
-  await expect(submitScaleAssessmentFinal({assessmentId:child.id,submissionId:randomUUID(),attemptEpoch:child.attemptEpoch,
+  // The exact release stop blocks new admission only; the server-established
+  // attempt finishes under its frozen runtime and persists its facts.
+  await submitScaleAssessmentFinal({assessmentId:child.id,submissionId:randomUUID(),attemptEpoch:child.attemptEpoch,
    definitionHash:frozen.legacyDefinitionHash,contextSnapshotHash:parent.contextSnapshotHash,userId:actorUserId,
-   compositeAttemptId:parent.id,answers:f.answers})).rejects.toThrow('紧急停用')
+   compositeAttemptId:parent.id,answers:f.answers})
   const retained=await db.assessment.findUniqueOrThrow({where:{id:child.id}})
-  expect(retained.status).toBe('IN_PROGRESS');expect(retained.submissionId).toBeNull()
-  expect(retained.answers).toEqual(child.answers);expect(retained.result).toEqual(child.result)
-  expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,terminalState:'COMPLETED'}})).toBe(0)
-  expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:parent.id}})).status).not.toBe('COMPLETED')
+  expect(retained.status).toBe('COMPLETED');expect(retained.submissionId).toBeTypeOf('string')
+  expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:parent.id,attemptEpoch:child.attemptEpoch,terminalState:'COMPLETED'}})).toBeGreaterThan(0)
  },60_000)
 })
