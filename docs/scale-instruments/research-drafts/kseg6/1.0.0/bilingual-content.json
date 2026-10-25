@@ -1,0 +1,88 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "1",
+      "en": "In an argument, I always remain objective and stick to the facts.",
+      "zh": "争论时，我总能保持客观、就事论事。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "2",
+      "en": "Even if I am feeling stressed, I am always friendly and polite to others.",
+      "zh": "即使感到压力，我也总是友好、有礼貌地对待别人。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "3",
+      "en": "When talking to someone, I always listen carefully to what the other person says.",
+      "zh": "与人交谈时，我总是认真听对方说话。",
+      "reverse": false,
+      "subscale": "PQ_POSITIVE_ENDORSEMENT"
+    },
+    {
+      "id": "4",
+      "en": "It has happened that I have taken advantage of someone in the past.",
+      "zh": "过去我曾占过别人的便宜。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    },
+    {
+      "id": "5",
+      "en": "I have occasionally thrown litter away in the countryside or on to the road.",
+      "zh": "我偶尔曾在郊外或路上乱扔垃圾。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    },
+    {
+      "id": "6",
+      "en": "Sometimes I only help people if I expect to get something in return.",
+      "zh": "有时，只有觉得会得到回报，我才帮助别人。",
+      "reverse": false,
+      "subscale": "NQ_NEGATIVE_ADMISSION_RAW"
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "doesn’t apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "instructions": {
+    "en": "The following statements may apply more or less to you personally. Please indicate to what extent they apply to you.",
+    "zh": "下面这些说法与你的实际情况可能有不同程度的符合。请指出每句话与你有多符合。"
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "copyTranslationDigitalRedistribution": "Permitted with attribution, license link and modification notice.",
+    "basis": "Author-developed English adaptation reproduced in an explicitly named author-supplied English Answer Sheet; full form inspected for exceptions. Published article licenses material under CC BY 4.0. No separate restrictive credit found in the named form. Not inferred from an unrelated open-access paper.",
+    "changesNotice": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "caution": "Do not relabel CC BY as public domain or noncommercial-only. Do not imply original authors endorse translation or report."
+  },
+  "attribution": "An English-Language Adaptation of the Social Desirability–Gamma Short Scale (KSE-G) — Nießen, D., Partsch, M. V., Kemper, C. J., Rammstedt, B. (2019). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。"
+}
