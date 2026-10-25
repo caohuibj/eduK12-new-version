@@ -6,6 +6,7 @@ import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
+import { UserRound } from 'lucide-react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
@@ -75,7 +76,7 @@ const Field=({label,value,set,type='text',required=true}:{
 // Capture the initial invitation state once; changing schools must not close an edited form.
 function WorkspaceAccount({initialOpen,children}:{initialOpen:boolean;children:React.ReactNode}){
   const [open,setOpen]=useState(initialOpen)
-  return <details className="ht-workspace-account" open={open} onToggle={event=>setOpen(event.currentTarget.open)}>
+  return <details id="ht-workspace-account" className="ht-workspace-account" open={open} onToggle={event=>setOpen(event.currentTarget.open)}>
     <summary>账号与学校邀请</summary>{children}
   </details>
 }
@@ -312,6 +313,14 @@ export default function HuiteacherApp(){
     window.addEventListener('hashchange',restoreSection)
     return ()=>{window.removeEventListener('popstate',restoreSection);window.removeEventListener('hashchange',restoreSection)}
   },[workspaceTab,loading,me?.id,selectedOrg])
+  const openAccountSettings=()=>{
+    const account=appRoot.current?.querySelector<HTMLDetailsElement>('#ht-workspace-account')
+    const summary=account?.querySelector('summary')
+    if(!account||!summary)return
+    if(!account.open)summary.click()
+    summary.focus({preventScroll:true})
+    account.scrollIntoView?.({block:'start'})
+  }
   const publicHome=!me&&screen==='home'
   const publicAuth=!me&&screen!=='home'
   return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
@@ -320,14 +329,19 @@ export default function HuiteacherApp(){
       {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
         onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
       <nav aria-label="产品导航">
-        <ProductThemeControl appearance={appearance} product="Teacher"/>
         {!me&&<>
           {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
           <button type="button" className="ht-login-entry" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
           <button type="button" className="ht-register-entry" aria-current={['join','register','student','expert'].includes(screen)?'page':undefined}
             onClick={()=>changeScreen('join')}>注册</button>
         </>}
-        {me&&<><span className="ht-welcome">{me.username}</span><button onClick={()=>void logout()} disabled={working}>退出</button></>}
+        {me&&<><span className="ht-welcome">{me.username}</span>
+          {screen==='workspace'&&!me.mustChangePassword&&<button type="button" className="ht-account-entry"
+            aria-label="账号设置" title="账号设置与修改密码" aria-controls="ht-workspace-account" onClick={openAccountSettings}>
+            <UserRound size={20} aria-hidden="true" focusable="false"/>
+          </button>}
+          <button onClick={()=>void logout()} disabled={working}>退出</button></>}
+        <ProductThemeControl appearance={appearance} product="Teacher"/>
       </nav>
     </header>
     {message&&<p role="status" className="ht-notice">{message}</p>}

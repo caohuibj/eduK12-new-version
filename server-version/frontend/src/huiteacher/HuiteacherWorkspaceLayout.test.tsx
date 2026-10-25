@@ -36,8 +36,9 @@ describe('Teacher compact workspace',()=>{
   const details=summary.closest('details')!
   expect(details).not.toHaveAttribute('open')
   expect(screen.getByLabelText('当前学校管理范围')).toHaveValue('a')
-  fireEvent.click(summary)
+  fireEvent.click(screen.getByRole('button',{name:'账号设置'}))
   await waitFor(()=>expect(details).toHaveAttribute('open'))
+  expect(summary).toHaveFocus()
   fireEvent.click(screen.getByText('账号安全 · 修改密码'))
   fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'draft-pass-123'}})
   fireEvent.change(screen.getByLabelText('已收到的学校邀请代码'),{target:{value:'draft-invite'}})
