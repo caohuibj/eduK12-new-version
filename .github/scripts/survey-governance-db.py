@@ -18,7 +18,15 @@ def digests(db):
   assert re.fullmatch(r'[A-Za-z0-9_]+',t)
   result[t]=sql(db,f'''SELECT count(*)::text||':'||coalesce(md5(string_agg(x.h,',' ORDER BY x.h)),'') FROM (SELECT md5(row_to_json(t)::text) h FROM public."{t}" t)x''')
  return result
-if sys.argv[1]=='upgrade':
+if sys.argv[1]=='prepare':
+ # Previous exact main->candidate upgrade already qualified. This is fresh test infrastructure only.
+ proof=json.loads((out/'official-resume2.json').read_text());assert proof['upgradeQualified']
+ run(['node','node_modules/prisma/build/index.js','migrate','deploy'],root/'server-version/backend')
+ for _,_,database,_ in binding['checks']['postgres'][2:]:
+  assert re.fullmatch(r'survey_(triplet|permissions)_test_[a-z_]+',database)
+  sql('postgres',f'CREATE DATABASE "{database}" TEMPLATE survey_governance_ci')
+ receipt('fresh-test-schema',{'fixturePreparationOnly':True,'originalUpgradeNotReplayed':True})
+elif sys.argv[1]=='upgrade':
  tmp=Path(tempfile.mkdtemp(prefix='survey-governance-schema-',dir=os.environ['RUNNER_TEMP']))
  paths=subprocess.check_output(['git','ls-tree','-r','--name-only',binding['base'],'server-version/backend/prisma'],text=True).splitlines()
  for p in paths:
@@ -36,7 +44,7 @@ if sys.argv[1]=='upgrade':
   assert re.fullmatch(r'survey_(alltools|triplet|permissions)_test_[a-z_]+',database)
   sql('postgres',f'CREATE DATABASE "{database}" TEMPLATE survey_governance_ci')
 elif sys.argv[1]=='restore':
- source=binding['checks']['postgres'][0][2];restored='survey_governance_restore_ci'
+ source=binding['checks']['postgres'][-1][2];restored='survey_governance_restore_ci'
  before=digests(source);assert any(not v.startswith('0:') for t,v in before.items() if t.startswith('survey_governed_')),'No governance rows to restore'
  container=os.environ['POSTGRES_CONTAINER'];assert re.fullmatch(r'[0-9a-f]{64}',container)
  dump=out/'synthetic-governance.dump'

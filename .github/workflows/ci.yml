@@ -1229,13 +1229,9 @@ jobs:
       - name: select exact PR354 directory roots and changed control files
         id: governance-directory-config
         if: needs.scope.outputs.application_route == 'survey-governance'
-        shell: node {0}
-        run: |
-          const fs=require('node:fs');
-          const selected=new Set(['survey-governance-scope.mjs','survey-governance-checks.mjs','survey-governance.test.mjs','survey-governance-db.py','survey-governance-browser.mjs','content-scope.mjs','merge-gate.mjs']);
-          const ignored=fs.readdirSync('.github/scripts').filter(n=>!selected.has(n)).map(n=>'.github/scripts/'+n);
-          const config={paths:['server-version/backend/src','server-version/frontend/src','.github/scripts'],'paths-ignore':ignored};
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify(config)+'\n');
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-governance-checks.mjs codeql-config
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/init@v3
@@ -1542,6 +1538,7 @@ jobs:
       NODE_ENV: test
       NODE_OPTIONS: --max-old-space-size=4096
       TZ: UTC
+      ADMIN_AUTH_ORIGIN: http://localhost:5174
       SURVEY_WORKSPACE_ENABLED: 'true'
       SURVEY_PUBLICATION_ENABLED: 'true'
       SURVEY_MFA_ENCRYPTION_KEY: '4545454545454545454545454545454545454545454545454545454545454545'
@@ -1581,9 +1578,16 @@ jobs:
       - name: affected application consumers excluding admitted cases
         run: node .github/scripts/survey-governance-checks.mjs unit
       - name: real isolated main schema upgrade retaining old records
-        run: python3 .github/scripts/survey-governance-db.py upgrade
+        run: python3 .github/scripts/survey-governance-db.py prepare
       - name: actual HTTP authority export trial package and persistence flows
+        id: businessflows
+        continue-on-error: true
         run: node .github/scripts/survey-governance-checks.mjs postgres
+      - name: prepare fresh synthetic encrypted report rows only for restoration
+        working-directory: server-version/backend
+        env:
+          DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55433/survey_triplet_test_governance
+        run: node --require tsx/cjs ../../.github/scripts/survey-governance-restore-fixture.cjs
       - name: restore exact synthetic rows including completed reports
         env:
           POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
@@ -1594,7 +1598,14 @@ jobs:
         working-directory: server-version/backend
         run: node node_modules/playwright-core/cli.js install --with-deps chromium
       - name: compiled system management light dark desktop and mobile without writes
+        id: compiledbrowser
         run: node .github/scripts/survey-governance-browser.mjs
+      - name: require every selected business and compiled browser outcome
+        if: always()
+        env:
+          BUSINESS_OUTCOME: ${{ steps.businessflows.outcome }}
+          BROWSER_OUTCOME: ${{ steps.compiledbrowser.outcome }}
+        run: node .github/scripts/survey-governance-checks.mjs finish
       - uses: actions/upload-artifact@v4
         if: always()
         with:

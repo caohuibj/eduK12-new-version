@@ -1792,3 +1792,22 @@ requires directory roots. Roots now remain directories and unchanged scripts
 are explicitly excluded, preserving the same selected application/control scope.
 No successful SAST is claimed from that failed invocation. Missing database,
 restore, compilation and compiled-browser stages still must actually succeed.
+
+
+Run `40144378159` then passed the seven repaired UI cases, current frontend types
+and two-file lint, exact main-to-candidate schema upgrade, 19 all-tool flows,
+seven Training boundaries and seven administrator data boundaries. One admin
+HTTP assertion returned 503 before reaching authorization: the synthetic runner
+omitted ADMIN_AUTH_ORIGIN. The fixture now supplies its own localhost origin;
+no product guard, required 403 or authentication rule changes. The 33 passed
+PostgreSQL assertions and successful prior stages retain exact official report,
+job/source and artifact identities; only that failed admin case and the previously
+unexecuted standard triplet suite run next. Input-unchanged backend/frontend
+checks and the qualified main-upgrade are not replayed. Creating candidate schema
+in a fresh ephemeral runner is test infrastructure, not repeated qualification.
+A minimal new synthetic form/package FINAL prepares real encrypted report rows
+for the still-missing dump/restore check; this is new restoration fixture setup,
+not a replay of the original 19 assertions. Independent remaining checks may
+continue after a business-flow failure, but an explicit final outcome check
+requires actual business-flow and compiled-browser success; failure/skips remain
+blocking. This does not authorize deployment or touch any local runtime database.

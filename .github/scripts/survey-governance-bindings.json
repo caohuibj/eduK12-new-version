@@ -841,7 +841,8 @@
     ".github/scripts/content-scope.mjs",
     ".github/scripts/merge-gate.mjs",
     ".github/workflows/ci.yml",
-    "docs/release/README.md"
+    "docs/release/README.md",
+    ".github/scripts/survey-governance-restore-fixture.cjs"
   ],
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "678fdfffd145fa01b3f4afedb8562a630c2154b2",
@@ -1010,5 +1011,16 @@
       "Training management appearance on the admin origin loads the saved Training preference when entering from another admin-origin page",
       "Training management section context keeps the administrator banner and account location on the dedicated profile page"
     ]
+  },
+  "resume2": {
+    "run": 40144378159,
+    "scopeJob": 121022486566,
+    "job": 121022538783,
+    "sastJob": 121022538431,
+    "source": "130409e741a5570067ffe32f297b0b379cb8127c",
+    "checkout": "eee1db1e6b07f27d1fa8c7862e4523c4ed26e73a",
+    "artifact": 12579484251,
+    "zipSHA256": "8e9892294acea21cb1ff06c1cf8c04fea8f379a180f6e0a8671e5aa909f9c321",
+    "adminRetry": "independent Survey admin with real HTTP, current DB and deidentified export denies Survey managers platform authorization and denies self/coexisting Survey role grants"
   }
 }
