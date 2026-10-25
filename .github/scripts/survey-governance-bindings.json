@@ -1022,5 +1022,15 @@
     "artifact": 12579484251,
     "zipSHA256": "8e9892294acea21cb1ff06c1cf8c04fea8f379a180f6e0a8671e5aa909f9c321",
     "adminRetry": "independent Survey admin with real HTTP, current DB and deidentified export denies Survey managers platform authorization and denies self/coexisting Survey role grants"
+  },
+  "resume3": {
+    "run": 40145624195,
+    "scopeJob": 121026220278,
+    "job": 121026295810,
+    "sastJob": 121026295674,
+    "source": "c1ca42f6d7cbfa1cd8d92f3a51ef7e12ac5eb8f1",
+    "checkout": "006be0a361f2bdbe17bf393f746d772dcd6cc467",
+    "artifact": 12580995796,
+    "zipSHA256": "4bfdfe83077fa320bfb606b4205eb5fa05333ac4cc6d013e3d844650f397a090"
   }
 }

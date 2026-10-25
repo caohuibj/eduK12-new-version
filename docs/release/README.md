@@ -1811,3 +1811,17 @@ not a replay of the original 19 assertions. Independent remaining checks may
 continue after a business-flow failure, but an explicit final outcome check
 requires actual business-flow and compiled-browser success; failure/skips remain
 blocking. This does not authorize deployment or touch any local runtime database.
+
+
+Run `40145624195` actually passed the final administrator case, all nine standard
+triplet DB assertions and current changed-control SAST. The complete 43-case
+PostgreSQL union is qualified with its exact official artifact `12580995796` and
+original source/job/digest. Restoration setup then failed because CJS-only tsx
+registration did not resolve a TypeScript dynamic import. The fixture now uses
+the installed full tsx CLI; no application or test assertion changes. All business
+checks remain original qualified successes. Only restoration fixture setup,
+dump/restore, the first frontend compilation and compiled browser remain missing.
+SAST chains the completed full application analysis with the completed prior
+control analysis, then scans only genuinely changed controls and languages;
+unchanged Python inputs are not reanalysed. Action versions/options, original
+success metadata and source trees remain mandatory; no pending result qualifies.
