@@ -375,3 +375,20 @@ cognitive 批准组合、真实 compiler 冻结、child/parent/report，再撤�
 `05-07-imported-metadata-postgres{,-empty,-retry}.json`、
 `22-package-lifecycle-postgres.json`。前端类型首轮只发现测试库不支持 getByRole exact
 选项；删除该无效选项后类型单列复验，不重跑已通过的业务断言。
+
+## A：标准来源指纹不能包含 JavaScript scorer 函数
+
+实际 SDQ teacher 1.0.0 注册项的 plugin.scorer 是函数，main 的目录/策略审批直接
+canonicalHash(source) 会抛错。提取并复用原 axis-snapshot 的显式 plugin key/version
+投影，其余题目、计分、报告、参考、权利和版本仍在严格 canonical 闭包。目录与审批
+调用同一个 standardPolicyIdentity。不是 JSON.stringify 静默丢函数，没有改 canonical
+encoder 或删除工具；未知函数字段及缺 scorer 版本仍拒绝。
+无插件来源原有指纹不变；所有已安装 executable 的 axis snapshot 哈希也保持原样，
+standard triplet Reference 复用相同投影，避免不同摘要规则。
+
+真实 HTTP + 合成 PG 同目录读取 SDQ 与新审批的原创共享量表；目录给出的指纹可用于
+真实策略审批，改 fingerprint 或选择不存在的精确版本均 409。纯合同验证 plugin/
+scoring/report 版本、题目、权利、reference 改变会改变闭包，严格 encoder 仍拒绝原函数。
+首轮新夹具存在括号语法和缺 project.id，无业务断言通过；修夹具后 10 项通过，
+另补既有 axis bytes 不变 1 项单列验证。原件 `standard-fingerprint{,-fixed-fixtures,-axis}.json`。
+策略审计同时明确“停止后续采集、保留已保存数据”，不再用可能误解为允许在途继续的字段。

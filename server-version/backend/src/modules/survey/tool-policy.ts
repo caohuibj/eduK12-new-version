@@ -3,14 +3,17 @@ import {assertFrozenPackageAdmissions} from './governed-package.service'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {getScaleInstrumentSource} from '../scale/onboarding/instrument-registry'
+import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 import type {ResearchFrozenPublication} from './publication.service'
 export type PolicyIdentity={resourceKey:string;fingerprint:string}
 export type ToolPolicy={decision:'PENDING'|'APPROVED'|'RETURNED';paused:boolean;version:number;reason:string}
-export const standardPolicyIdentity=(key:string,version:string):PolicyIdentity=>({resourceKey:`standard:${key}:${version}`,
- fingerprint:canonicalHash(getScaleInstrumentSource(key,version)??{key,version,missing:true})})
+export const standardPolicyIdentity=(key:string,version:string):PolicyIdentity=>{
+ const source=getScaleInstrumentSource(key,version)
+ return {resourceKey:`standard:${key}:${version}`,fingerprint:canonicalHash(source?snapshotScaleInstrumentSource(source):{key,version,missing:true})}
+}
 export async function snapshotPolicyIdentity(tx:Prisma.TransactionClient,snapshot:CatalogSourceSnapshot):Promise<PolicyIdentity>{
  const governed=snapshot.provenance.surveyToolReleaseId
  if(typeof governed==='string')return {resourceKey:'governed-release:'+governed,fingerprint:snapshot.ref.sourceVersion}

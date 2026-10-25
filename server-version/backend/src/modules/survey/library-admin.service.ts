@@ -101,7 +101,7 @@ export async function changeSurveyToolPolicy(actorId:string,input:PolicyIdentity
   }else if(input.resourceKey.startsWith('standard:')){
    const sources=(await import('../scale/onboarding/instrument-registry')).listScaleInstrumentSources()
    const source=sources.find(s=>`standard:${s.identity.instrumentKey}:${s.identity.instrumentVersion}`===input.resourceKey)
-   if(!source||canonicalHash(source)!==input.fingerprint)fail(409,'精确工具版本已变化')
+   if(!source||standardPolicyIdentity(source.identity.instrumentKey,source.identity.instrumentVersion).fingerprint!==input.fingerprint)fail(409,'精确工具版本已变化')
    contentReady=standardContentReadiness(source!.identity.instrumentKey,source!.identity.instrumentVersion).ready
   }else if(input.resourceKey.startsWith('release:')){
    const id=input.resourceKey.slice(8),release=await getContentRelease(tx,id,true)
@@ -117,7 +117,7 @@ export async function changeSurveyToolPolicy(actorId:string,input:PolicyIdentity
    VALUES(${input.resourceKey},${input.fingerprint},${input.decision},${input.paused},${input.reason},${actorId})
    ON CONFLICT(resource_key,fingerprint) DO UPDATE SET decision=EXCLUDED.decision,paused=EXCLUDED.paused,
     reason=EXCLUDED.reason,reviewed_by=EXCLUDED.reviewed_by,version=survey_tool_policies.version+1,updated_at=clock_timestamp()`
-  await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actorId,action:'SURVEY_TOOL_POLICY_CHANGED',metadata:{...input,scope:'SURVEY_ONLY',preserveExistingAttempts:true}}})
+  await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actorId,action:'SURVEY_TOOL_POLICY_CHANGED',metadata:{...input,scope:'SURVEY_ONLY',preserveSavedData:true,collectionEffect:input.paused||input.decision==='RETURNED'?'STOP_NEW_ADMISSION_AND_COLLECTION':'CHECK_CURRENT_EXACT_AUTHORITY'}}})
   return readToolPolicy(tx,input)
  })
 }
