@@ -48,3 +48,14 @@
  .hs-workspace .hs-overview-status>.hs-panel p{font-size:13px;line-height:1.85}
  .hs-workspace .hs-overview-status>.hs-panel p+p{font-size:12px}
 }
+/* Greeting and status content grow naturally when narrow screens need extra lines. */
+.hs-workspace .hs-overview .hs-workspace-welcome>div{min-width:0;width:100%}
+.hs-workspace .hs-overview .hs-workspace-welcome h1 span{max-width:100%;overflow-wrap:anywhere}
+@media(max-width:360px){
+ .hs-workspace .hs-overview .hs-workspace-welcome{min-height:300px;padding:26px 22px}
+ .hs-workspace .hs-overview .hs-workspace-welcome h1{font-size:26px;line-height:1.5}
+ .hs-workspace .hs-overview .hs-workspace-welcome:after{background:linear-gradient(180deg,#fffff6f5 0%,#fffff6e6 70%,#fffff655 100%)}
+ .hs-workspace .hs-overview-status{flex-direction:column;gap:12px;padding:22px}
+ .hs-workspace .hs-overview-status>.hs-panel{width:100%}
+ .hs-app.hs-workspace[data-theme=dark] .hs-overview .hs-workspace-welcome:after{background:linear-gradient(180deg,#15291ff5 0%,#15291fe6 70%,#15291f70 100%)}
+}
