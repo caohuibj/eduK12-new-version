@@ -1,0 +1,33 @@
+{
+  "activationStatus": "SOURCE_EVIDENCE_ONLY_NOT_RUNTIME_NORMS",
+  "citation": "Fang S, Huang M, Wang Y (2022). Measuring self-as-context in Chinese college students: Validity and reliability of the Chinese version of self-as-context scale (C-SACS). Frontiers in Psychology 13:1051661. doi:10.3389/fpsyg.2022.1051661.",
+  "sample": {
+    "N": 708,
+    "ageRange": [
+      17,
+      25
+    ],
+    "meanAge": 20.28,
+    "male": 158,
+    "female": 550,
+    "EFA": 354,
+    "CFA": 354,
+    "convergent": 343,
+    "retest": 217,
+    "retestWeeks": 3
+  },
+  "internalConsistency": {
+    "total": 0.88,
+    "centering": 0.8,
+    "transcending": 0.85
+  },
+  "thresholds": [],
+  "digitalPresentationValidated": false,
+  "limits": "便利/非临床大学生样本；不创造全国常模、性别标签或临床阈值。2025英文临床10题的单维建议不能混写为2022中文9题计分。",
+  "sourceDiscrepancies": [
+    "摘要alpha置信区间与正文Reliability不一致：此处只保留正文明确点估计0.88/0.80/0.85，不使用冲突区间。",
+    "正文重测ICC列0.73/0.72但未清楚逐一对应总/两个分维度，不自行分配参数。",
+    "Table1脚注含C-MPFI字样且SD称standard error，与题文背景不一致，未据此建常模。"
+  ],
+  "aggregationEvidence": "2022 Table4 correlations do not specify sum or mean. Digital implementation uses unweighted sum following same-as-original statement plus original-author sum description; no reference-unit binding."
+}

@@ -1,0 +1,23 @@
+{
+  "base": "08341d4324357802b160b8deac8905ee6f1d21df",
+  "packages": [
+    "csacs9_zh_cn@1.0.0",
+    "ipip_negative_expressivity10_zh_cn_research@1.0.0",
+    "ipip_responsive_distress10_zh_cn_research@1.0.0"
+  ],
+  "uniqueTests": 56,
+  "csacsTests": 14,
+  "ipipTests": 34,
+  "registryTests": 8,
+  "duplicateRegistryRerun": 8,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "testExitCode": 0,
+  "actualEngineExampleCount": 14,
+  "reviewStatus": "INDEPENDENT_REVIEW_FINAL_SNAPSHOT_PENDING",
+  "scopeNotes": [
+    "ACT源码保持4b1f378字节不变，不重跑其14项；final只跑受影响registry8和typecheck。",
+    "IPIP报告MD漏导限制说明已补完整共同limitations；源和实际JSON未改变，未重复跑计分。",
+    "无浏览器验收、DB写入、push或CI触发。"
+  ]
+}

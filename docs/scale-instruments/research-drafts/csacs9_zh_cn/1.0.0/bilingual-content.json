@@ -1,0 +1,85 @@
+{
+  "source": "Fang2022Appendix1 Chinese + Table2 English; exact retained Chinese text",
+  "items": [
+    {
+      "originalItemNumber": 1,
+      "publishedChinese": "当我心烦意乱时，我能在自己的心中找到一个平静的地方。",
+      "itemCode": "CSACS_ORIG_01",
+      "publishedEnglish": "When I am upset, I am able to find a place of calm within myself."
+    },
+    {
+      "originalItemNumber": 2,
+      "publishedChinese": "我对生活有一种领悟，可以让我应对生活中的不如意，而不会被它们压倒。",
+      "itemCode": "CSACS_ORIG_02",
+      "publishedEnglish": "I have a perspective on life that allows me to deal with life’s disappointments without getting overwhelmed with them."
+    },
+    {
+      "originalItemNumber": 3,
+      "publishedChinese": "尽管我的人生发生了许多变化，但有一个最基本的“我”保持不变。",
+      "itemCode": "CSACS_ORIG_03",
+      "publishedEnglish": "Despite the many changes in my life, there is a basic part of who I am that remains unchanged."
+    },
+    {
+      "originalItemNumber": 4,
+      "publishedChinese": "回顾迄今为止的生活，我意识到那个能觉察情绪或想法的“我”一直在那里，陪伴着我。",
+      "itemCode": "CSACS_ORIG_04",
+      "publishedEnglish": "As I look back upon my life so far, I have a sense that part of me has been there for all of it."
+    },
+    {
+      "originalItemNumber": 5,
+      "publishedChinese": "我允许我的情绪起伏变化而不挣扎其中。",
+      "itemCode": "CSACS_ORIG_05",
+      "publishedEnglish": "I allow my emotions to come and go without struggling with them."
+    },
+    {
+      "originalItemNumber": 6,
+      "publishedChinese": "我能够注意到自己不断变化的想法而不会陷入其中。",
+      "itemCode": "CSACS_ORIG_06",
+      "publishedEnglish": "I am able to notice my changing thoughts without getting caught up in them."
+    },
+    {
+      "originalItemNumber": 8,
+      "publishedChinese": "尽管我的人生发生了很多变化，但我意识到心中有个“观察者”见证了这一切。",
+      "itemCode": "CSACS_ORIG_08",
+      "publishedEnglish": "Even though there have been many changes in my life, I’m aware of a part of me that has witnessed it all."
+    },
+    {
+      "originalItemNumber": 9,
+      "publishedChinese": "我能够站在一个更高的视角去觉察我的想法、感受和情绪。",
+      "itemCode": "CSACS_ORIG_09",
+      "publishedEnglish": "I am able to access a perspective from which I can notice my thoughts, feelings, and emotions."
+    },
+    {
+      "originalItemNumber": 10,
+      "publishedChinese": "当我回想曾经的生活，我意识到那个能够观察情绪和感觉的“我”依然存在。",
+      "itemCode": "CSACS_ORIG_10",
+      "publishedEnglish": "When I think back to when I was younger, I recognize that a part of me that was there then is still here now."
+    }
+  ],
+  "deletedOriginalItem": 7,
+  "deletionBasis": "2022 Table2 final nine-item model, not platform item selection",
+  "platformInstructions": "请选择你对每句话的同意程度：1为非常不同意，7为非常同意，2–6表示其间的程度。此说明与两端中文选项为平台界面译注。",
+  "anchors": {
+    "sourceEnglishEndpoints": [
+      "strongly disagree",
+      "strongly agree"
+    ],
+    "platformChineseEndpoints": [
+      "非常不同意",
+      "非常同意"
+    ],
+    "intermediateNumbersOnly": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "presentationChanges": [
+    "原中文题干不重译",
+    "首题附平台说明",
+    "原英文两端翻成界面中文，不虚称中文原锚点",
+    "顺序保留，数据库itemCode含原题号"
+  ]
+}

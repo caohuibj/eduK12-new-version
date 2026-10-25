@@ -1,0 +1,17 @@
+{
+  "sourceSha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf",
+  "canonicalSourceHash": "1ecf7aeb946e1f0966f4aad68031840799fc8129da2b9d95da465f7e777966b0",
+  "measurementHash": "c4da355c0fe6084cf1eafb3ecb94c48b5618755f6e8ba5d5ca0f4b39290b8fc7",
+  "checkedAt": "2026-10-25T16:59:57.710Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 4,
+  "dbWrites": false,
+  "toolTests": 14,
+  "catalogRegistryTests": 8,
+  "uniqueTests": 22,
+  "testExitCode": 0,
+  "generatorExitCode": 0,
+  "typecheckExitCode": 0,
+  "independentReview": "PENDING",
+  "testEvidence": "local-test-output.txt"
+}

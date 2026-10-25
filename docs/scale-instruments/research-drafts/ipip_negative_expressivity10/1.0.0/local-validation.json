@@ -1,0 +1,14 @@
+{
+  "sourceSha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+  "canonicalSourceHash": "90c7291dbca8832a45fe76f5e7be222649de439b7f8d85ebff985047f6f77cc2",
+  "measurementHash": "f1ee55470d9ca96cbf8f20d3240494a24a7118b79ba7bbafd1172cf85d1d37ba",
+  "checkedAt": "2026-10-25T17:04:37.681Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 5,
+  "dbWrites": false,
+  "toolTests": 17,
+  "testExitCode": 0,
+  "generatorExitCode": 0,
+  "typecheckStatus": "PASS_FINAL_BATCH_SEE_act-social-batch-20261025",
+  "testEvidence": "local-test-output.txt"
+}
