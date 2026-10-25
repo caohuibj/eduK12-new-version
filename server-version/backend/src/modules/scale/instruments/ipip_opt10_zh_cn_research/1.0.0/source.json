@@ -1,0 +1,667 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip_opt10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "乐观倾向（IPIP 10题表征版） — 中文研究工作译稿",
+      "abbreviation": "IPIP-OPT10",
+      "instrumentFamily": "International Personality Item Pool"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ipip",
+        "optimism",
+        "positive_expectations",
+        "public_domain",
+        "adult_self_report",
+        "non_diagnostic",
+        "working_translation",
+        "research",
+        "descriptive_report",
+        "no_verified_local_norms"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "目前通常状态；无固定回忆时段",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保持官方题序和五点符合度锚点；反向计分不向答题者标示。",
+        "独立指导语见双语材料，不能声称已由source安装器冻结进Scale.instruction。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "项目 AI 辅助中文工作译稿；未声明与任何既有经验证中文版本相同。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待独立译审、认知访谈与目标人群证据。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_opt10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_opt10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ipip_opt10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "IPIP 官方声明题项公有领域，可复制、改编、翻译及电子施测；权利许可不代表此中文译稿已经验证。",
+      "https://ipip.ori.org/newPermission.htm"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "乐观倾向（IPIP 10题表征版） — 中文研究工作译稿",
+        "citation": "International Personality Item Pool: IPIP representation of Optimism; official items and keys.",
+        "url": "https://www.ipip.ori.org/newSingleConstructsKey.htm"
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "IPIP public domain: https://ipip.ori.org/newPermission.htm ; translation remains unvalidated."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ipip_opt10_responses",
+          "options": [
+            {
+              "value": "1",
+              "label": "很不符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "比较不符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "介于不符合与符合之间",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "很符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPIP_OPT10_01",
+          "content": "我确信自己会取得成功。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_02",
+          "content": "我对自己感到自在。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_03",
+          "content": "我很少感到情绪低落。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_04",
+          "content": "我会看到生活中积极的一面。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_05",
+          "content": "我对未来的看法很悲观。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_06",
+          "content": "我觉得自己的生活缺少方向。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_07",
+          "content": "我不喜欢自己。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_08",
+          "content": "我常常感到情绪低落。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_09",
+          "content": "我觉得处处都是困难。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPIP_OPT10_10",
+          "content": "我经常心情不好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ipip_opt10_responses",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPIP_OPT10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPIP_OPT10_10",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "optimism",
+            "type": "total",
+            "label": "乐观倾向",
+            "description": "本量表反映你对未来、生活积极面及自身状态的整体看法。得分较高表示你的回答更偏向积极预期；它不是抑郁筛查，也不代表你必须一直保持积极。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPIP_OPT10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPIP_OPT10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "optimism"
+        ],
+        "scoreOrder": [
+          "optimism"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "optimism",
+            "headline": "乐观倾向：描述性反馈",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "本量表反映你对未来、生活积极面及自身状态的整体看法。得分较高表示你的回答更偏向积极预期；它不是抑郁筛查，也不代表你必须一直保持积极。 该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。 当前没有与你的人群和中文版本匹配的可靠常模，不提供高／中／低等级、百分位或临床阈值。10–50仅为理论分数范围；30不是人群平均值。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想一想你最近一次对未来抱有期待或担忧的情境：哪些想法与现实支持影响了你？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以把一个当前担忧分为“我能做一点什么”与“我暂时无法控制什么”，选择一个小行动，同时允许难受的感受存在。分数只是一种反思线索，不是对性格好坏的评价。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "中文工作译稿未经本地验证，未完成专家译审或认知访谈。",
+          "没有适用于当前中文版本及目标人群的常模或临床cut-off；30仅是理论中点。",
+          "该IPIP表征含情绪低落、自我感受和生活方向等内容，不是LOT-R原版；不得移用LOT-R分数阈值或替代专业评估。",
+          "全部10题有效作答才计分；不插补、不将漏答当零。缺失时报告invalid。",
+          "不得用于诊断、高风险选拔或对个人价值作评价。"
+        ],
+        "disclaimer": "仅供研究与描述性自我了解，不用于心理诊断。乐观分数不是人格好坏或必须保持积极的要求。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T14:13:00Z",
+            "basis": "AI editorial check: adult self-reflection, non-diagnostic language, no automatic external norm transfer; not expert translation approval or psychometric validation."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ipip_opt10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPIP_OPT10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPIP_OPT10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism": 30
+          },
+          "totalScoreKeys": [
+            "optimism"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "IPIP_OPT10_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism": 50
+          },
+          "totalScoreKeys": [
+            "optimism"
+          ]
+        }
+      },
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "IPIP_OPT10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPIP_OPT10_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPIP_OPT10_10",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "optimism": 10
+          },
+          "totalScoreKeys": [
+            "optimism"
+          ]
+        }
+      }
+    ]
+  }
+}
