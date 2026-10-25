@@ -209,3 +209,46 @@ it('publishes own psychologist batch using server run capabilities without isAdm
     await waitFor(()=>expect(api).toHaveBeenCalledWith(base+'/runs/run-own/publish','POST',{expectedVersion:2}))
   }finally{window.confirm=original}
 })
+
+it('separates compact configuration and preserves unsaved inputs per activity without opening anything',async()=>{
+ const second='00000000-0000-4000-8000-000000000004'
+ const draft={...activity,status:'DRAFT',runs:[],capabilities:{canSubmit:true}}
+ const other={...draft,courseId:second,title:'学习安排'}
+ const api=vi.fn(async(path:string)=>{
+  if(path.endsWith('pageSize=50'))return {list:[draft,other]}
+  if(path.endsWith('/eligible-classes'))return {list:[{id:classUnit,name:'五年级一班'}]}
+  if(path.endsWith('/'+second))return other
+  if(path.endsWith('/'+course))return draft
+  throw Error('unexpected compact activity read '+path)
+ })
+ render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
+ expect(screen.getByRole('button',{name:'创建活动草稿'})).not.toBeVisible()
+ await screen.findByRole('option',{name:'同伴支持（准备中）'})
+ const choose=async(id:string,title:string)=>{
+  fireEvent.change(screen.getByLabelText('选择已有活动'),{target:{value:id}})
+  await screen.findByRole('heading',{name:title})
+ }
+ await choose(course,'同伴支持')
+ expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
+ expect(screen.queryByRole('button',{name:'提交学校审核'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByRole('region',{name:'阅读、练习与打卡'})).toBeVisible()
+ fireEvent.change(screen.getByLabelText('任务名称'),{target:{value:'活动A未保存标题'}})
+ fireEvent.change(screen.getByLabelText('内容'),{target:{value:'活动A未保存内容'}})
+ fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
+ fireEvent.change(screen.getByLabelText('测评批次名称'),{target:{value:'活动A未保存批次'}})
+ fireEvent.click(screen.getByRole('button',{name:'进度与结果说明'}))
+ expect(screen.getByRole('button',{name:'提交学校审核'})).toBeInTheDocument()
+ await choose(second,'学习安排')
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByLabelText('任务名称')).toHaveValue('')
+ expect(screen.getByLabelText('内容')).toHaveValue('')
+ fireEvent.change(screen.getByLabelText('任务名称'),{target:{value:'活动B未保存标题'}})
+ await choose(course,'同伴支持')
+ fireEvent.click(screen.getByRole('button',{name:'阅读／练习／打卡'}))
+ expect(screen.getByLabelText('任务名称')).toHaveValue('活动A未保存标题')
+ expect(screen.getByLabelText('内容')).toHaveValue('活动A未保存内容')
+ fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
+ expect(screen.getByLabelText('测评批次名称')).toHaveValue('活动A未保存批次')
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+})

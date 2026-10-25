@@ -103,3 +103,41 @@
 .hs-app.hs-workspace.hs-educator .hs-teacher-tasks .hs-task-card .hs-teacher-task-copy :is(small,p){font-weight:400}
 .hs-educator .hs-activity-entry-grid :is(input,select){font-weight:400}
 .hs-educator .hs-workspace-content:not(:has(>.hs-workspace-context))>.hs-workspace-page-heading{grid-column:1/-1}
+
+/* Activity creation is separate from the selected activity's configuration. */
+.hs-app.hs-educator .hs-activity-entry-grid--compact{grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:start}
+.hs-app.hs-educator .hs-activity-entry-grid--compact>.hs-activity-select{grid-column:1;grid-row:1;display:flex;align-items:flex-end;gap:12px;padding:0;border:0;background:transparent}
+.hs-activity-entry-grid--compact>.hs-activity-select>h3{display:none}
+.hs-app.hs-educator .hs-activity-entry-grid--compact>.hs-activity-select .hs-field{flex:1;min-width:0;margin:0}
+.hs-activity-entry-grid--compact>.hs-activity-select>button{flex:none}
+.hs-app.hs-educator[data-theme] .hs-activity-entry-grid--compact>details.hs-activity-create{grid-column:2;grid-row:1;align-self:end;padding:0;margin:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-activity-entry-grid--compact>.hs-activity-create>summary{padding:10px 16px;min-height:44px;font-size:14px;line-height:1.6;cursor:pointer;white-space:nowrap}
+.hs-activity-entry-grid--compact>.hs-activity-create[open]{width:340px}
+.hs-activity-create-fields{padding:18px;border-top:1px solid var(--hs-border)}
+.hs-activity-manager--compact:has(.hs-activity-create[open])>.hs-activity-detail{display:none}
+.hs-app.hs-educator .hs-activity-manager--compact>.hs-activity-detail{padding-top:22px;margin-top:22px}
+.hs-app.hs-educator .hs-activity-manager--compact .hs-activity-detail>h3{font-size:22px;margin:0 0 8px;line-height:1.5}
+.hs-app.hs-educator .hs-activity-manager--compact .hs-activity-detail>p{font-size:13px;line-height:1.8;margin:0 0 20px;color:var(--hs-muted)}
+.hs-activity-config-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 18px;margin:0 0 22px;border-bottom:1px solid var(--hs-border)}
+.hs-app.hs-educator .hs-activity-config-tabs>button{min-height:44px;padding:9px 16px;font-size:14px;line-height:1.6;border:1px solid var(--hs-border);border-radius:9px;background:transparent;color:var(--hs-muted)}
+.hs-app.hs-educator[data-theme] .hs-activity-config-tabs>button[aria-pressed=true]{background:var(--hs-primary);border-color:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+.hs-app.hs-educator .hs-activity-manager--compact .hs-activity-config-panel[hidden]{display:none}
+.hs-activity-manager--compact .hs-activity-config-panel{min-width:0}
+.hs-app.hs-educator .hs-activity-manager--compact .hs-activity-config-panel>h3{font-size:18px;margin:0 0 18px;line-height:1.6}
+.hs-app.hs-educator .hs-activity-manager--compact .hs-activity-config-panel>p{font-size:14px;line-height:1.85;margin:12px 0}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field{max-width:760px;margin:0 0 20px}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field>:is(input,select,textarea){width:100%;min-width:0;font-size:16px;font-weight:400}
+.hs-activity-manager--compact .hs-activity-config-panel>.hs-field textarea{min-height:160px}
+.hs-activity-manager--compact .hs-activity-config-panel>button{min-height:44px;margin-bottom:18px}
+.hs-app.hs-educator .hs-activity-config-panel>.hs-task-detail{padding:22px;border:1px solid var(--hs-border);border-radius:12px;margin-top:20px;background:var(--hs-surface)}
+.hs-activity-config-panel :is([aria-label="活动下一步"],[aria-label="进度与结果说明"]){max-width:88ch}
+.hs-app.hs-educator .hs-activity-config-panel [aria-label="进度与结果说明"] h3{font-size:18px;line-height:1.6;margin:24px 0 12px}
+@media(max-width:700px){
+ .hs-app.hs-educator .hs-activity-entry-grid--compact{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-educator[data-theme] .hs-activity-entry-grid--compact>details.hs-activity-create{grid-column:1;grid-row:2;justify-self:start;margin:0;max-width:100%}
+ .hs-app.hs-educator .hs-activity-entry-grid--compact>.hs-activity-select{align-items:stretch;flex-direction:column;gap:12px}
+ .hs-activity-entry-grid--compact>.hs-activity-select>button{align-self:flex-start}
+ .hs-activity-config-tabs{gap:8px;margin-bottom:18px}
+ .hs-app.hs-educator .hs-activity-config-tabs>button{flex:1 1 calc(50% - 8px);padding:8px 10px;font-size:13px}
+ .hs-app.hs-educator .hs-activity-config-panel>.hs-task-detail{padding:18px 14px}
+}

@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
 
+type ActivityInputs={taskTitle:string;taskContent:string;taskKind:'ASSIGNMENT'|'READING'|'CHECKIN';runTitle:string}
+const emptyActivityInputs:ActivityInputs={taskTitle:'',taskContent:'',taskKind:'READING',runTitle:''}
+type ActivityPanel='participants'|'content'|'assessments'|'results'
+const activityPanels:readonly {id:ActivityPanel;label:string}[]=[{id:'participants',label:'班级与参与者'},{id:'content',label:'阅读／练习／打卡'},{id:'assessments',label:'正式测评批次'},{id:'results',label:'进度与结果说明'}]
 type ActivityState='DRAFT'|'SUBMITTED'|'OPEN'|'PAUSED'|'CLOSED'
 type Activity={
   courseId:string;organizationId:string;title:string;purpose:string;status:ActivityState
@@ -50,8 +54,8 @@ const stateText:Record<ActivityState,string>={
   DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束',
 }
 
-export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey=''}: {
-  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string
+export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAuthorPrivateTools=false,actorKey='',compact=false}: {
+  api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean
 }){
   const [list,setList]=useState<Activity[]>([])
   const [selected,setSelected]=useState<Detail|null>(null)
@@ -65,10 +69,16 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const detailRequest=useRef(0)
   const currentBase=useRef('')
   const [peersPerRespondent,setPeersPerRespondent]=useState(1)
-  const [taskTitle,setTaskTitle]=useState('')
-  const [taskContent,setTaskContent]=useState('')
-  const [taskKind,setTaskKind]=useState<'ASSIGNMENT'|'READING'|'CHECKIN'>('READING')
-  const [runTitle,setRunTitle]=useState('')
+  const [activityInputs,setActivityInputs]=useState<Record<string,ActivityInputs>>({})
+  const [panel,setPanel]=useState<ActivityPanel>('participants')
+  const createPanel=useRef<HTMLDetailsElement>(null)
+  const inputKey=actorKey+':'+organizationId+':'+(selected?.courseId??'')
+  const {taskTitle,taskContent,taskKind,runTitle}=activityInputs[inputKey]??emptyActivityInputs
+  const setInput=<K extends keyof ActivityInputs,>(key:K,value:ActivityInputs[K])=>setActivityInputs(previous=>({...previous,[inputKey]:{...emptyActivityInputs,...previous[inputKey],[key]:value}}))
+  const setTaskTitle=(value:string)=>setInput('taskTitle',value)
+  const setTaskContent=(value:string)=>setInput('taskContent',value)
+  const setTaskKind=(value:ActivityInputs['taskKind'])=>setInput('taskKind',value)
+  const setRunTitle=(value:string)=>setInput('runTitle',value)
   const [resources,setResources]=useState<CatalogResource[]>([])
   const [resourceCursor,setResourceCursor]=useState<string|null>(null)
   const [resourceLoading,setResourceLoading]=useState(false)
@@ -124,7 +134,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   useEffect(()=>{
     let live=true
     ++detailRequest.current
-    setSelected(null);setClassId('');setEligibleClasses([]);setList([])
+    setSelected(null);setClassId('');setEligibleClasses([]);setList([]);setPanel('participants')
     void api<{list:Activity[]}>(base+'?page=1&pageSize=50')
       .then(result=>{if(live)setList(result.list)})
       .catch(err=>{if(live)setError(err instanceof Error?err.message:'校园活动加载失败')})
@@ -155,7 +165,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   }
   const create=()=>void execute(async()=>{
     const r=await api<{id:string}> (base,'POST',{title,purpose})
-    setTitle('');await fetchList();await fetchDetail(r.id)
+    setTitle('');await fetchList();await fetchDetail(r.id);setPanel('participants')
+    if(compact)createPanel.current?.removeAttribute('open')
     setNotice('活动草稿已建立，完成配置后由当前获授权人员开放。')
   })
   const transition=(action:'SUBMIT'|'OPEN'|'PAUSE'|'RESUME'|'CLOSE')=>void execute(async()=>{
@@ -181,7 +192,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     if(!selected)return
     await api(path+'/tasks','POST',{kind:taskKind,title:taskTitle,content:taskContent})
     setTaskTitle('');setTaskContent('')
-    setNotice('已加入活动内容。发布活动前学生不可见。')
+    setNotice(compact?`已加入「${selected.title}」的活动内容。发布活动前学生不可见。`:'已加入活动内容。发布活动前学生不可见。')
   })
   const newRun=()=>void execute(async()=>{
     if(!selected)return
@@ -261,22 +272,31 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
 
-  return <section className="hs-panel hs-activity-manager">
-    <h2>校园心理健康活动</h2>
-    <p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>
-    {error&&<p className="hs-alert" role="alert">{error}</p>}
-    {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <div className="hs-grid hs-activity-entry-grid">
-      <div className="hs-activity-create"><h3>准备新活动</h3><label className="hs-field"><span>新建活动名称</span>
+  const createFields=<><label className="hs-field"><span>新建活动名称</span>
         <input value={title} onChange={event=>setTitle(event.target.value)} maxLength={200}/></label>
         <label className="hs-field"><span>活动主题</span>
           <select value={purpose} onChange={event=>setPurpose(event.target.value as typeof purpose)}>
             {purposeOptions.map(([value,text])=><option key={value} value={value}>{text}</option>)}
           </select></label>
-        <button disabled={busy||!title.trim()} onClick={create}>创建活动草稿</button></div>
-      <div className="hs-activity-select"><h3>继续已有活动</h3><label className="hs-field"><span>选择已有活动</span>
+        <button disabled={busy||!title.trim()} onClick={create}>创建活动草稿</button></>
+  const lifecycleControls=selected?<>      {nextStep&&<section aria-label="活动下一步"><p>下一负责角色：{nextStep.owner}</p><p>{nextStep.text}</p></section>}
+      <div className="hs-actions">
+        {actions[selected.status].filter(a=>selected.capabilities?.[({SUBMIT:'canSubmit',OPEN:'canOpen',PAUSE:'canPause',RESUME:'canResume',CLOSE:'canClose'} as const)[a.key]]===true).map(a=>
+          <button key={a.key} disabled={busy} onClick={()=>transition(a.key)}>{selected.capabilities?.ownPsychologyPublisher&&a.key==='SUBMIT'?'完成配置':selected.capabilities?.ownPsychologyPublisher&&a.key==='OPEN'?'开放本人活动':a.label}</button>)}
+      </div>
+</>:null
+  return <section className={"hs-panel hs-activity-manager"+(compact?" hs-activity-manager--compact":"")}>
+
+    <h2>校园心理健康活动</h2>
+    <p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>
+    {error&&<p className="hs-alert" role="alert">{error}</p>}
+    {notice&&<p className="hs-message" role="status">{notice}</p>}
+    <div className={"hs-grid hs-activity-entry-grid"+(compact?" hs-activity-entry-grid--compact":"")}>
+      {compact?<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>:<div className="hs-activity-create"><h3>准备新活动</h3>{createFields}</div>}
+      <div className="hs-activity-select"><h3>{compact?'选择要配置的活动':'继续已有活动'}</h3><label className="hs-field"><span>选择已有活动</span>
         <select value={selected?.courseId??''} onChange={event=>void execute(async()=>{
           const id=event.target.value
+          setPanel('participants');if(compact)createPanel.current?.removeAttribute('open')
           if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}
         })}>
           <option value="">请选择活动</option>
@@ -289,12 +309,11 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       <h3>{selected.title}</h3>
       <p>状态：{selected.status==='SUBMITTED'&&selected.capabilities?.ownPsychologyPublisher?'待开放':stateText[selected.status]} · 当前授权学生 {selected.participantCount} 人
         · 关联测评 {selected.runs.length} 项</p>
-      {nextStep&&<section aria-label="活动下一步"><p>下一负责角色：{nextStep.owner}</p><p>{nextStep.text}</p></section>}
-      <div className="hs-actions">
-        {actions[selected.status].filter(a=>selected.capabilities?.[({SUBMIT:'canSubmit',OPEN:'canOpen',PAUSE:'canPause',RESUME:'canResume',CLOSE:'canClose'} as const)[a.key]]===true).map(a=>
-          <button key={a.key} disabled={busy} onClick={()=>transition(a.key)}>{selected.capabilities?.ownPsychologyPublisher&&a.key==='SUBMIT'?'完成配置':selected.capabilities?.ownPsychologyPublisher&&a.key==='OPEN'?'开放本人活动':a.label}</button>)}
-      </div>
-      {selected.status==='DRAFT'&&<>
+      {!compact&&lifecycleControls}
+      {compact&&<nav className="hs-activity-config-tabs" aria-label="活动配置分区">{activityPanels.map(item=><button type="button" key={item.id} aria-pressed={panel===item.id} aria-controls={'hs-activity-panel-'+item.id} onClick={()=>setPanel(item.id)}>{item.label}</button>)}</nav>}
+      <section className="hs-activity-config-panel" id="hs-activity-panel-participants" aria-label="班级与参与者" hidden={compact&&panel!=='participants'}>
+        {compact&&selected.status!=='DRAFT'&&<p>当前活动已离开准备阶段，参与范围按现有班级分配保留。</p>}
+        {selected.status==='DRAFT'&&<>
         <h3>1. 准备 · 选择获批班级</h3>
         <label className="hs-field"><span>班级</span>
           <select value={classId} disabled={classesLoading||!!classesError} onChange={event=>setClassId(event.target.value)}>
@@ -307,22 +326,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           <button disabled={classesLoading} onClick={()=>setClassesRetry(value=>value+1)}>重试加载班级</button></div>}
         {!classesLoading&&!classesError&&eligibleClasses.length===0&&<p>当前没有可分配的获批班级。心理教师可选择本校获批班级，普通教师仅能选择本人有效任教指派的班级。</p>}
         <button disabled={busy||classesLoading||!!classesError||!eligibleClasses.some(item=>item.id===classId)} onClick={allocate}>加入当前班级学生</button>
-        <h3>添加活动内容</h3>
-        <label className="hs-field"><span>任务类型</span>
-          <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
-            <option value="READING">阅读材料</option><option value="ASSIGNMENT">练习任务</option>
-            <option value="CHECKIN">活动记录</option>
-          </select></label>
-        <label className="hs-field"><span>任务名称</span>
-          <input value={taskTitle} onChange={event=>setTaskTitle(event.target.value)}/></label>
-        <label className="hs-field"><span>内容</span>
-          <textarea rows={4} value={taskContent} onChange={event=>setTaskContent(event.target.value)}/></label>
-        <button disabled={busy||!taskTitle.trim()} onClick={addTask}>加入草稿</button>
-        <h3>准备测评批次</h3>
-        <label className="hs-field"><span>测评活动名称</span>
-          <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
-        <button disabled={busy||!runTitle.trim()} onClick={newRun}>创建测评草稿</button>
-      </>}
+</>}
       {isAdmin&&selected.status==='OPEN'&&<section className="hs-panel">
         <h3>自愿同伴互评 · 安全抽样</h3>
         <p>仅允许已批准的同班学生，并要求学生本人及其有效监护人分别完成知情同意。
@@ -348,6 +352,28 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             ' 组非自评关系。任何测评作答仍需正式发布的测评批次及科学政策。')
         })}>按同意记录随机生成非自评配对</button>
       </section>}
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-content" aria-label="阅读、练习与打卡" hidden={compact&&panel!=='content'}>
+        {selected.status==='DRAFT'&&<>        <h3>添加活动内容</h3>
+        <label className="hs-field"><span>任务类型</span>
+          <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
+            <option value="READING">阅读材料</option><option value="ASSIGNMENT">练习任务</option>
+            <option value="CHECKIN">活动记录</option>
+          </select></label>
+        <label className="hs-field"><span>任务名称</span>
+          <input value={taskTitle} onChange={event=>setTaskTitle(event.target.value)}/></label>
+        <label className="hs-field"><span>内容</span>
+          <textarea rows={4} value={taskContent} onChange={event=>setTaskContent(event.target.value)}/></label>
+        <button disabled={busy||!taskTitle.trim()} onClick={addTask}>{compact?'加入当前活动草稿':'加入草稿'}</button>
+</>}
+        {compact&&selected.status!=='DRAFT'&&<p>活动已离开准备阶段，当前不能在这里添加阅读、练习或记录。</p>}
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-assessments" aria-label="正式测评批次" hidden={compact&&panel!=='assessments'}>
+        {selected.status==='DRAFT'&&<>        <h3>准备测评批次</h3>
+        <label className="hs-field"><span>{compact?'测评批次名称':'测评活动名称'}</span>
+          <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
+        <button disabled={busy||!runTitle.trim()} onClick={newRun}>{compact?'创建测评批次草稿':'创建测评草稿'}</button>
+      </>}
       <h3>2. 发布 · 测评批次</h3>
       <p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p>
       {!canInspectRuns&&<p>当前活动状态不支持读取测评批次详情；以下仅展示活动关联状态。</p>}
@@ -451,11 +477,15 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           <button className="hs-primary" disabled={busy||!preview} onClick={publishRun}>
             {selected.capabilities?.ownPsychologyPublisher?'正式发布本人测评':'学校管理员正式发布测评'}</button>}
       </div>}
+      </section>
+      <section className="hs-activity-config-panel" id="hs-activity-panel-results" aria-label="活动进度与结果" hidden={compact&&panel!=='results'}>
+        {compact&&lifecycleControls}
       <section aria-label="进度与结果说明">
         <h3>3. 进度 · 核对参与与作答</h3>
         <p>当前授权学生人数和批次发布状态不是完成率。本页不展示个体心理作答或报告。</p>
         <h3>4. 结果 · 按权限查看报告</h3>
         <p>请通过工作空间中已授权的报告入口查看。活动和测评批次的收尾、等待时间及隐私阈值分别校验，结束活动不会自动生成或公开报告。</p>
+      </section>
       </section>
     </div>}
   </section>
