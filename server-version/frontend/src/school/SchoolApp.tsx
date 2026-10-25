@@ -530,7 +530,7 @@ export default function SchoolApp(){
             </details>}
           {page==='activities'&&schoolId&&access&&canManageSchoolActivities(access)&&<SchoolActivityManager
             key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
-            compact={ordinaryTeacher} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
+            compact={ordinaryTeacher||professionalWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
             &&<SchoolGroupReports key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}

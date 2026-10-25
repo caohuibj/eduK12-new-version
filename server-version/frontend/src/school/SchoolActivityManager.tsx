@@ -1,8 +1,11 @@
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
 import { useEffect, useRef, useState } from 'react'
+import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
+
+const resourceFamilyText:Record<string,string>={FORM:'表单',SCALE:'量表',BUNDLE:'组合测评',SITUATIONAL:'情境测评',COGNITIVE:'认知测评'}
 
 type ActivityInputs={taskTitle:string;taskContent:string;taskKind:'ASSIGNMENT'|'READING'|'CHECKIN';runTitle:string}
 const emptyActivityInputs:ActivityInputs={taskTitle:'',taskContent:'',taskKind:'READING',runTitle:''}
@@ -288,7 +291,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   return <section className={"hs-panel hs-activity-manager"+(compact?" hs-activity-manager--compact":"")}>
 
     <h2>校园心理健康活动</h2>
-    <p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>
+    {compact?<SchoolTaskHelp label="活动与发布说明" buttonText="活动说明"><p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p></SchoolTaskHelp>:<p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
     <div className={"hs-grid hs-activity-entry-grid"+(compact?" hs-activity-entry-grid--compact":"")}>
@@ -400,11 +403,11 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       </div>:null)}
       {activeRun&&<div className="hs-task-detail">
         <h3>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
-        <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p></details>
-        <SelectedToolOutline className="hs-selected-tool-outline" items={activeRun.tracks?.map(track=>({
-          id:track.id,kind:track.resourceFamily,version:track.resourceVersion,
+        <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p>{compact&&<ul className="hs-activity-track-identifiers">{activeRun.tracks?.map(track=><li key={track.id}>{track.resourceFamily} · {track.resourceKey} · 固定版本：{track.resourceVersion}</li>)}</ul>}</details>
+        <SelectedToolOutline className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
+          id:track.id,kind:compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,version:track.resourceVersion,
           title:resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
-            &&resource.version===track.resourceVersion)?.title??track.resourceKey,
+            &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker

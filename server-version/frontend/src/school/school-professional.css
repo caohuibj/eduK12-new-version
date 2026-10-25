@@ -69,3 +69,40 @@
  .hs-app.hs-workspace.hs-professional .hs-header nav.hs-professional-groups{grid-row:3}
  .hs-app.hs-workspace.hs-professional .hs-header nav.hs-professional-pages{grid-row:4}
 }
+
+/* Activity setup reuses the compact School editor; unrelated professional pages stay scoped. */
+.hs-app.hs-professional .hs-activity-manager--compact{padding:24px;margin:0}
+.hs-app.hs-professional .hs-activity-manager--compact>.hs-teacher-task-help{position:relative;display:flex;justify-content:flex-end;margin:0 0 14px;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-manager--compact>.hs-teacher-task-help>button{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:6px 0;border:0;background:transparent;color:var(--hs-muted);font-size:13px}
+.hs-professional .hs-activity-manager--compact>.hs-teacher-task-help>.hs-teacher-task-help-content{position:absolute;z-index:30;right:0;top:100%;width:min(420px,100%);padding:16px 18px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);box-shadow:0 10px 28px #10251b20}
+.hs-app.hs-professional .hs-activity-manager--compact>.hs-teacher-task-help .hs-teacher-task-help-content p{font-size:13px;line-height:1.85;margin:0;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-entry-grid--compact>.hs-activity-select>.hs-field>span{font-size:13px;font-weight:500}
+.hs-app.hs-professional .hs-activity-entry-grid--compact>.hs-activity-select>button{font-size:13px;min-height:44px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-config-panel>p{color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-config-panel :is([aria-label="活动下一步"],[aria-label="进度与结果说明"]) p{font-size:14px;font-weight:400;line-height:1.85}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-create-fields .hs-field{margin:0 0 18px}
+.hs-professional .hs-activity-manager--compact .hs-activity-create-fields input{width:100%;min-width:0}
+.hs-professional .hs-activity-manager--compact .hs-activity-create-fields>button{width:100%;min-height:44px}
+@media(max-width:700px){
+ .hs-app.hs-professional .hs-activity-manager--compact{padding:20px 16px}
+ .hs-app.hs-professional .hs-activity-entry-grid--compact>.hs-activity-select{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px}
+ .hs-professional .hs-activity-entry-grid--compact>.hs-activity-select>.hs-field{grid-column:1/-1}
+ .hs-app.hs-professional .hs-activity-entry-grid--compact>.hs-activity-select>button{grid-column:1;justify-self:start}
+ .hs-professional .hs-activity-entry-grid--compact>details.hs-activity-create{width:100%}
+ .hs-professional .hs-activity-entry-grid--compact>.hs-activity-create>summary{min-height:44px}
+ .hs-professional .hs-activity-manager--compact>.hs-teacher-task-help>.hs-teacher-task-help-content{position:relative;margin-top:8px;box-shadow:none}
+ .hs-app.hs-professional .hs-activity-manager--compact>.hs-teacher-task-help{display:block}
+ .hs-professional .hs-activity-entry-grid--compact :is(input,select){font-size:16px}
+ .hs-professional .hs-activity-config-tabs>button{min-width:0;overflow-wrap:anywhere}
+}
+
+.hs-app.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline{padding:18px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline h4{font-family:inherit;font-size:16px;font-weight:600;color:var(--hs-ink)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline p{font-size:13px;line-height:1.8}
+.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline ul{grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));list-style:none;padding:0;gap:12px}
+.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline li{padding:4px 0 4px 12px;border-left:2px solid var(--hs-border);font-size:14px;line-height:1.8}
+.hs-professional .hs-activity-manager--compact .hs-selected-tool-outline li span{font-size:12px;color:var(--hs-muted)}
+.hs-professional .hs-activity-track-identifiers{padding-inline-start:20px;margin:12px 0 0}
+.hs-professional .hs-activity-track-identifiers li{font-size:12px;line-height:1.9;overflow-wrap:anywhere}
+
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-config-panel>.hs-actions{margin:12px 0;gap:10px;align-items:center}

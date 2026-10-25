@@ -252,3 +252,27 @@ it('separates compact configuration and preserves unsaved inputs per activity wi
  expect(screen.getByLabelText('测评批次名称')).toHaveValue('活动A未保存批次')
  expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
 })
+
+
+it.each([true,false])('keeps compact psychologist lifecycle controls in the results panel and honors backend canOpen=%s',async canOpen=>{
+ const detail={...activity,status:'SUBMITTED',runs:[],capabilities:{canOpen,canSubmit:false,canClose:false,canPause:false,canResume:false,canPublishRun:false,ownPsychologyPublisher:true}}
+ const api=vi.fn(async(path:string)=>path.endsWith('pageSize=50')?{list:[detail]}:detail)
+ render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
+ const help=screen.getByRole('button',{name:'活动与发布说明'})
+ expect(help).toHaveAttribute('aria-expanded','false')
+ expect(screen.queryByText(/教师准备活动；学校管理员/)).not.toBeInTheDocument()
+ fireEvent.click(help)
+ expect(screen.getByText(/只有已批准班级中的授权学生/)).toBeInTheDocument()
+ fireEvent.keyDown(help,{key:'Escape'})
+ expect(help).toHaveAttribute('aria-expanded','false')
+ fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
+ await screen.findByRole('heading',{name:'同伴支持'})
+ expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
+ expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'进度与结果说明'}))
+ expect(screen.getByRole('region',{name:'活动进度与结果'})).toBeVisible()
+ expect(screen.queryByRole('region',{name:'阅读、练习与打卡'})).not.toBeInTheDocument()
+ if(canOpen)expect(screen.getByRole('button',{name:'开放本人活动'})).toBeEnabled()
+ else expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()
+ expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+})

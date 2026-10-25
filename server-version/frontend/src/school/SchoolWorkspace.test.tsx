@@ -96,7 +96,8 @@ it('mounts the counselor grouped home without legacy navigation or requesting re
  window.history.replaceState(null,'','/workspace?organizationId=psych-school')
  vi.stubGlobal('scrollTo',vi.fn())
  const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
- const fetcher=vi.fn(async(url:string)=>{
+ const fetcher=vi.fn(async(url:string,options?:RequestInit)=>{
+  if(options?.method&&options.method!=='GET')throw Error('Unexpected write during counselor navigation')
   if(url.endsWith('/auth/me'))return reply({id:'psych',username:'示例心理教师',role:'TEACHER',accountDomain:'SCHOOL'})
   if(url.endsWith('/organizations'))return reply({list:[{id:'psych-school',name:'示例学校',orgRole:'MEMBER'}]})
   if(url.endsWith('/context'))return reply({access:{orgRole:'MEMBER',canGovern:false,personas:['COUNSELOR'],capabilities:['PSYCHOLOGY_STAFF'],explicitDenies:[]}})
@@ -122,5 +123,11 @@ it('mounts the counselor grouped home without legacy navigation or requesting re
   const context=screen.getByLabelText('当前学校和班级')
   expect(context.compareDocumentPosition(screen.getByRole('heading',{level:1,name:'学校与班级'}))&Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy()
   expect(context.compareDocumentPosition(screen.getByRole('heading',{level:2,name:'学校与班级'}))&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  fireEvent.click(within(screen.getByRole('navigation',{name:'校园功能分组'})).getByRole('link',{name:'校园活动'}))
+  await screen.findByRole('button',{name:'活动与发布说明'})
+  expect(screen.getByLabelText('新建活动名称').closest('details')).not.toHaveAttribute('open')
+  expect(screen.getByLabelText('新建活动名称').closest('section')).toHaveClass('hs-activity-manager--compact')
+  expect(fetcher.mock.calls.every(call=>!call[1]||call[1].method==='GET')).toBe(true)
+
  }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
