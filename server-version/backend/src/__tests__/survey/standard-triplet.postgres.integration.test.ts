@@ -1,7 +1,7 @@
 import {randomUUID} from 'node:crypto'
 import {createServer,type Server} from 'node:http'
 import express from 'express'
-import {describe,it,expect,beforeAll,afterAll} from 'vitest'
+import {describe,it,expect,beforeAll,afterAll,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
@@ -29,6 +29,8 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
  function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only',allowedProducts:['SURVEY']}}
  beforeAll(async()=>{
   const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!(u.pathname.startsWith('/survey_triplet_test_')||/^\/eduk12_ci355_license_entrytriplet_test_[a-f0-9]{10}$/.test(u.pathname)))throw new Error('Schema-only Survey test database required')
+  vi.stubEnv('SURVEY_WORKSPACE_ENABLED','true');vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
+  vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))
   const create=(name:string,platformRole:'STANDARD'|'SYSTEM_ADMIN')=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole,role:'STUDENT'}})
   system=await create('system','SYSTEM_ADMIN');manager=await create('survey','STANDARD');training=await create('training','STANDARD')
   await db.adminEntryGrant.createMany({data:[{id:randomUUID(),userId:manager.id,entry:'SURVEY',grantedBy:system.id},{id:randomUUID(),userId:training.id,entry:'TRAINING',grantedBy:system.id}]})
@@ -38,7 +40,7 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/platform',platformSurveyOriginGuard);app.use('/api/platform/survey-standard',surveyStandardTripletRouter);app.use(errorHandler)
   server=createServer(app);await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+(server.address() as {port:number}).port
  },60000)
- afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
+ afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);vi.unstubAllEnvs();await db.$disconnect()})
  async function call(user:any,path:string,body?:unknown,extra:object={},csrf=true,origin='http://localhost:5174'){
   const token=generateToken({userId:user.id,username:user.username,role:user.role,accountDomain:user.accountDomain,tokenVersion:user.tokenVersion,...proof,...extra})
   const response=await fetch(base+'/api/platform/survey-standard'+path,{method:body===undefined?'GET':'POST',headers:{Cookie:'ptool_session='+token+'; ptool_csrf=synthetic-csrf','X-CSRF-Token':csrf?'synthetic-csrf':'wrong',Origin:origin,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,body:await response.json() as any}

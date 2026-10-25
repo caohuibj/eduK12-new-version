@@ -81,9 +81,10 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   const stopped=await setup(owner),other=await setup(secondOwner)
   await revokeToolGrant(manager,stopped.grant.id)
   await expect(stopped.enter()).rejects.toMatchObject({statusCode:403})
-  await expect(submitResearchFinal(stopped.parent)).rejects.toMatchObject({statusCode:403})
+  const stoppedFinal=await submitResearchFinal(stopped.parent)
+  expect(stoppedFinal.status).toBe('COMPLETED')
   expect(await db.situationalRawSubmission.count({where:{attemptId:stopped.child.attempt.id}})).toBe(1)
-  expect(await db.surveyWaveFinal.count({where:{attemptId:stopped.participant.attemptId}})).toBe(0)
+  expect(await db.surveyWaveFinal.count({where:{attemptId:stopped.participant.attemptId}})).toBe(1)
   expect((await submitResearchFinal(other.parent)).status).toBe('COMPLETED')
   // A revocation cannot commit behind an already-verified collection write.
   let release!:()=>void,locked!:()=>void
@@ -129,7 +130,7 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
   expect((await readSurveyStoredReport(owner,{projectId,waveId:wave.id,finalId:final.id,instrumentKey:'native'})).report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',value:5}))
  },60000)
- it.each([1,2])('completes v%i approval and receipts, then immediately stops in-flight collection after withdrawal',async version=>{
+ it.each([1,2])('completes v%i approval and receipts; withdrawal blocks only new admissions while established participants complete',async version=>{
   const pkg=registry.packages[version-1],source={kind:'SJT' as const,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion}
   await expect(grantCatalogSource(manager,owner,source)).rejects.toThrow()
   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'native-'+version+'-'+randomUUID(),title:'Synthetic native '+version,
@@ -140,7 +141,6 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   expect(trials).toHaveLength(3);for(const trial of trials){expect(canonicalHash(trial.result)).toBe(trial.result_hash);expect(trial.result.rawNative).toBeTruthy();expect(trial.result.report).toBeTruthy()}
   await expect(approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Stale approval'},proof)).rejects.toMatchObject({statusCode:409})
   const ref={kind:'SJT' as const,sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash}
-  await expect(grantCatalogSource(manager,owner,ref)).rejects.toThrow()
   expect((await db.$queryRaw<Array<{decision:string}>>`SELECT decision FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+submitted.id} AND fingerprint=${submitted.hash}`)[0]?.decision).toBe('APPROVED')
   const grant=await grantCatalogSource(manager,owner,ref),projectId=randomUUID()
   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic native research',collectionMode:'SINGLE_UNLINKED'}})
@@ -173,15 +173,18 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   const current=await governedRow(db,submitted.id)
   await withdrawGovernedTool(system,submitted.id,current.version,'Synthetic stop new admissions',proof)
   await expect(enter()).rejects.toThrow()
-  await expect(startSurveySituational(notStarted,'native')).rejects.toThrow()
-  await expect(submitSurveySituationalFinal(inFlight,'native',oldChild.attempt.id,oldInput)).rejects.toThrow()
-  await expect(getOwnResearchTask(inFlight)).rejects.toThrow()
-  await expect(readSurveyCheckpoint(inFlight)).rejects.toThrow()
-  await expect(saveSurveyCheckpoint(inFlight,{revision:1,answers:{native:{}}})).rejects.toThrow()
-  await expect(submitResearchFinal({...inFlight,submissionId:randomUUID(),answers:{native:{}}})).rejects.toThrow()
-  expect(await db.situationalRawSubmission.count({where:{attemptId:oldChild.attempt.id}})).toBe(0)
-  expect(await db.surveyWaveFinal.count({where:{attemptId:inFlight.attemptId}})).toBe(0)
-  expect((await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:inFlight.attemptId}})).status).toBe('STARTED')
+  const resumed=await startSurveySituational(notStarted,'native'),resumedInput={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,0,resumed.attempt.id)}
+  const resumedReceipt=(await submitSurveySituationalFinal(notStarted,'native',resumed.attempt.id,resumedInput)).receipt!
+  expect((await submitResearchFinal({...notStarted,submissionId:randomUUID(),answers:{native:{}},situationalReferences:[resumedReceipt]})).status).toBe('COMPLETED')
+  await expect(getOwnResearchTask(inFlight)).resolves.toBeDefined()
+  await expect(readSurveyCheckpoint(inFlight)).resolves.toBeDefined()
+  await saveSurveyCheckpoint(inFlight,{revision:1,answers:{native:{}}})
+  const resumedChildReceipt=(await submitSurveySituationalFinal(inFlight,'native',oldChild.attempt.id,oldInput)).receipt!
+  const inFlightFinal=await submitResearchFinal({...inFlight,submissionId:randomUUID(),answers:{native:{}},situationalReferences:[resumedChildReceipt]})
+  expect(inFlightFinal.status).toBe('COMPLETED')
+  expect(await db.situationalRawSubmission.count({where:{attemptId:oldChild.attempt.id}})).toBe(1)
+  expect(await db.surveyWaveFinal.count({where:{attemptId:inFlight.attemptId}})).toBe(1)
+  expect((await db.surveyWaveAttempt.findUniqueOrThrow({where:{id:inFlight.attemptId}})).status).toBe('COMPLETED')
   expect((await submitResearchFinal(parent)).receiptId).toBe(receipt.receiptId)
   // No historical-report policy change or deletion is inferred from this stop.
   expect((await readSurveyStoredReport(owner,{projectId,waveId:wave.id,finalId:final.id,instrumentKey:'native'})).report.blocks).toHaveLength(1)
