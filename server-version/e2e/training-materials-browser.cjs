@@ -60,6 +60,8 @@ async function createPublication(teacher, experimentKey, title) {
   await teacher.getByText('当前草稿自检通过', { exact: true }).waitFor()
   const published = teacher.waitForResponse(r => new URL(r.url()).pathname === `/api/questionnaire-products/${product.id}/publish` && r.request().method() === 'POST')
   await teacher.getByRole('button', { name: '发布组合测评', exact: true }).click()
+  await teacher.getByRole('dialog', { name: '确认发布组合测评', exact: true })
+    .getByRole('button', { name: '确认发布', exact: true }).click()
   assert.equal((await published).status(), 200)
   product = ok(await api(teacher, '/questionnaire-products/' + product.id))
   assert.equal(product.status, 'PUBLISHED'); assert.equal(product.maxAttempts, 2)
