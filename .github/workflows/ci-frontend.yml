@@ -51,6 +51,11 @@ jobs:
           python3 -B .github/scripts/survey-wave-selection-reuse.py frontend
       - name: npm ci
         run: npm ci
+      - name: prepare locked backend dependencies for shared contract types and tests
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npx prisma generate
       - name: lint
         if: inputs.survey_selection != true
         run: npm run lint

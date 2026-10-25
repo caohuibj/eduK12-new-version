@@ -355,7 +355,7 @@ const startAuthenticatedParent = async (page) => {
   await card.getByRole('button', { name: '开始测评', exact: true }).click()
   const body = await (await responsePromise).json()
   assert.equal(body.code, 0, body.message || 'authenticated Bundle start failed')
-  await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+  await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
   return body.data.attempt.id
 }
 
@@ -367,7 +367,7 @@ const enterEmbedded = async (page, parentId, publicMode = false, recoveryToken =
   const prefix = publicMode ? '/public' : '/student'
   await Promise.all([
     page.waitForURL(new RegExp(`${prefix}/composite/situational/${childId}(?:\\?|$)`), { timeout: 30000 }),
-    page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).click(),
+    page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).click(),
   ])
   await waitScene(page, fixture.branching.scenes.entry)
   return childId
@@ -476,7 +476,7 @@ const runPublicBundle = async (browser) => {
     const recoveryToken = body.data.recoveryToken
     assert.ok(parentId && recoveryToken)
     await page.waitForFunction((key) => Boolean(window.sessionStorage.getItem(key)), `composite:recovery:attempt:${parentId}`, { timeout: 30000 })
-    await page.getByRole('button', { name: '开始/继续文字情境测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
+    await page.getByRole('button', { name: '开始/继续情境判断测评', exact: true }).waitFor({ state: 'visible', timeout: 30000 })
     const childId = await enterEmbedded(page, parentId, true, recoveryToken)
     record('public-anonymous-bundle-entry')
 

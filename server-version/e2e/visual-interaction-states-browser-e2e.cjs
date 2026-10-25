@@ -109,12 +109,12 @@ async function main() {
         await scenario(width, kind === 'courses' ? 'ADMIN' : 'TEACHER', async page => {
           const record = { id: 'modal-record', title: '弹窗回归示例', content: '', description: '', courseId: sampleCourse.id, course: sampleCourse, questions: [], videos: [], images: [], documents: [], tags: [], createdAt: '2026-09-01', endTime: '2026-12-31', _count: { submissions: 1 } }
           const submission = { id: 'submission-1', status: 'SUBMITTED', content: '学习反思', answers: [], images: [], createdAt: '2026-09-01', student: { id: 'student-1', username: 'student', nickname: '示例学生' } }
-          await page.route(`**/api/${kind}`, route => fulfill(route, { list: kind === 'courses' ? [{ ...sampleCourse, creatorId: 'admin-visual-user' }] : [record], total: 1 }))
-          await page.route(`**/api/${kind}/modal-record/submissions`, route => fulfill(route, { list: [submission] }))
+          await page.route(new RegExp(`/api/${kind}(?:\\?.*)?$`), route => fulfill(route, { list: kind === 'courses' ? [{ ...sampleCourse, creatorId: 'admin-visual-user' }] : [record], total: 1 }))
+          await page.route(`**/api/${kind}/modal-record/submissions`, route => fulfill(route, { list: [submission],total:1,gradedCount:0,ungradedCount:1,nextCursor:null }))
           await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
           await page.route('**/api/checkins/tags', route => fulfill(route, { tags: [] }))
           await page.goto(base + '/' + kind)
-          const createName = kind === 'assignments' ? '布置作业' : kind === 'checkins' ? '创建打卡' : '创建课程'
+          const createName = kind === 'assignments' ? '布置练习' : kind === 'checkins' ? '创建打卡' : '创建课程'
           const trigger = page.getByRole('button', { name: createName, exact: true }).first()
           await trigger.click()
           const editor = page.getByRole('dialog')
@@ -224,7 +224,7 @@ async function main() {
           const deepLink = ['populated', 'filtered-empty'].includes(state)
           const assignmentRequests = new Set()
           await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
-          await page.route('**/api/assignments', async route => {
+          await page.route(/\/api\/assignments(?:\?.*)?$/, async route => {
             assignmentRequests.add('/assignments')
             assert.equal(route.request().method(), 'GET')
             if (state === 'loading') await wait
@@ -337,7 +337,7 @@ async function main() {
         await page.route('**/api/videos?*', route => fulfill(route, { list: [{ id: 'v1', title: longTitle, fileSize: 1024, fileName: 'clip.mp4', url: 'https://example.com/clip.mp4' }] }, failed ? 503 : 200))
         await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
         await page.goto(base + '/assignments')
-        await page.getByRole('button', { name: '布置作业', exact: true }).click()
+        await page.getByRole('button', { name: '布置练习', exact: true }).click()
         const trigger = page.getByRole('button', { name: '添加视频', exact: true })
         await trigger.click()
         const dialog = page.getByRole('dialog', { name: '选择视频' })
@@ -377,7 +377,7 @@ async function main() {
         await scenario(width, 'TEACHER', async page => {
           await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
           await page.goto(base + '/assignments')
-          await page.getByRole('button', { name: '布置作业', exact: true }).click()
+          await page.getByRole('button', { name: '布置练习', exact: true }).click()
           const trigger = page.getByRole('button', { name: '添加视频', exact: true })
           await trigger.click()
           const dialog = page.getByRole('dialog', { name: '选择视频' })

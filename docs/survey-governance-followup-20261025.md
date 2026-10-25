@@ -666,7 +666,7 @@ Training 分配、以及未显式发布测量版本不能冻结，不能通过�
 - SJT public-projection 单元用例受本 PR 新增 fresh 采集边界影响。仅在该测试显式
   模拟事务/采集边界，断言调用一次并增加 authority 拒绝时不得返回投影的负例。
   整文件 12/12 通过；生产 guard、真实 PG/锁负例不改，不借其他请求/数据库授权。
-- streaming ZIP 背压时限用例：CI 点值超过原 300ms，main 与候选各自定向本地执行
+- streaming ZIP 背压行数用例：CI 生成行数超过原 300 行，main 与候选各自定向本地执行
   通过。该生产文件/测试原样，阈值未放宽；两个局部点不能当容量、普遍提速或已完成
   CI 资格，也不能单凭此确定 CI 失败的全部环境原因。
 
@@ -720,3 +720,28 @@ CI 最小配置：9 个显式 opt-in 指向现有 job PG（14 个 suite 使用�
 
 
 `b59e6af5` 的 GitHub workflow validation 在创建应用作业前拒绝：job-level env 不支持 runner.environment。原失败 runs 40166657738/40166660581 保留，不能称回归已执行。已将该值移入两个实际消费 step env，增加 job/step 层级合同；官方 actionlint 1.7.12 经官方 checksum 核验，两个 workflow 的 expression/semantic 检查退出0，18项控制仍全过。无应用输入变化，不重复本地应用测试；下一次正常 synchronize 执行缺失正式检查。
+
+
+### 9065 正式失败后的冻结检查点（等待父 dot 第二轮复查）
+
+当前优先级仅为收敛 #355；不混入 #356 的 Training 范围绑定、共享版本引用或按需报告迁移。用户已要求双重复查：修复和局部自检后冻结精确 HEAD/tree/diff，父 dot 独立确认该候选才可启动下一轮 CI。9065 的运行创建于该要求之前；之后仅使用 `[skip ci]` 备份，未手动 dispatch/re-run。
+
+[正式 run 40166806895](https://github.com/caohuibj/eduK12-new-version/actions/runs/40166806895) **整体失败**，精确 head `9065bb0ee73916d5e35f913b389f2ea55a9f0818`，测试 merge `af94aaadccdd52a1d7c7b33c2ff0aca5845c19f8`。后端原始报告8399通过、3断言失败、227跳过，另1套件setup错误；不可继续称旧203为当前失败数。CodeQL、生产镜像扫描、前端/UI-lab产物、后端迁移/构建/200完成门、短k6、维护/恢复门、seeded security均已真实success。完整选中作业身份见 `official-ci-9065-outcomes.json`，成功子项不能把整体或未来head变成成功。
+
+| 正式失败组 | 修订与现有合同 | 定向证据/边界 |
+| --- | --- | --- |
+| Mini功能清单 | 原生成器145→159条，来源是真实路由；不改native能力或业务权限 | `feature-inventory.cjs --check`通过；无删除路由 |
+| 前端typecheck | 独立前端job补后端锁文件 `npm ci --ignore-scripts` 和显式 `prisma generate` | 干净后端依赖目录 app+cognitive两份tsc退出0，共享表单4项通过；不启动后端/迁移/seed/服务，不编译canvas |
+| Mixed native setup / report conflict两例 | 固定gonogo版本和全局FIFO必须使用各自空合成库；新库完整执行现有229迁移，真实Prisma绑定/恢复。Cognitive显式走原发布函数 | 2文件4项实际通过，保版本/FAILED/attempts=2/budget=0/拒绝重试原断言；原共享库的DRAFT、队列及数据不修改 |
+| ZIP背压 | 用户已明确批准 `fd531f11` 将Archiver中间队列1MiB默认收紧到64KiB | 原10项及backend tsc通过；300是行数上限，非300ms；不改断言、权限、保存格式，不声称普遍提速或峰值内存上限 |
+| QA Round3 | 按真实折叠区、article状态badge、报告方案视图修订流程，保作者不能自审及独立审核/发布 | 原脚本完整6个检查通过，无page errors |
+| 三引擎共用视觉脚本 | 练习新术语、分页query fixture与完整提交计数 | Chromium有界局部：提交页3视口；编辑/媒体选择360/1440，原焦点/键盘/取消/溢出断言保留。三引擎完整选择未本地重跑 |
+| SJT父入口/导航共因 | 用当前正式「情境判断测评」「已作答/未作答」，同步剩余直接消费者及FinalCompositeShell合同 | 真实API foundation、video原脚本ALL PASS；FinalCompositeShell2项通过。其他同词消费者只语法/同源合同核对，待正常CI |
+| MEDIA2 | 旧PUBLIC字段不足，复用既有真实测量发布和精确PUBLIC分发许可夹具 | 独立量表/登录包/匿名包3条真实API浏览器路径ALL PASS |
+| Bundle发布 | 截图明确是CONTENT_STATIC_SJT_MAPPING_MISSING；原status selector有效。夹具补真实Scale/Cognitive/static-SJT发布前置及Training课程 | 专用原有fixture server有界验证创建/发布和通用PATCH409通过；没有声称完整参与/报告浏览器流程通过 |
+
+`RUNNER_ENVIRONMENT` 的多余覆盖已全部删除，读取Actions原生值。官方 actionlint1.7.12检查三个受影响workflow退出0，18项控制通过；生成清单和CJS语法通过。根因映射、原始失败/局部失败与最终结果摘要见 `ci-9065-repair-candidate.json`；原JSON/日志仅保留私有，公开证据只含身份、hash和断言状态。
+
+浏览器复用本轮官方前端/UI-lab及backend产物，核ZIP摘要和原manifest的source/run/kind/lock/content；不重复构建。测试只用新建合成库与loopback端口，未改数据库时区、生产角色或数据。专用Bundle fixture server按既有测试路线运行源代码provider，和普通编译产物探针分清。旧失败、错配本地fixture profile、未运行/过滤项目均保留，不将有界probe标成完整CI。
+
+本检查点之后仍需父 dot 对精确候选独立复查并明确同意，再运行最终head全部适用门禁；不得借用9065成功子项伪造新head门禁成功，不force merge、不绕过保护、不部署。
