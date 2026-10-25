@@ -16,6 +16,7 @@ import { SchoolActivityManager } from './SchoolActivityManager'
 import { schoolClassApprovalReasons } from './school-activity-workflow'
 import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
+import {SchoolLearnerHome,SchoolLearnerMenu} from './SchoolLearnerHome'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolTeacherTasks } from './SchoolTeacherTasks'
 import { SchoolRelationships } from './SchoolRelationships'
@@ -349,13 +350,14 @@ export default function SchoolApp(){
   const publicHome=!user&&screen==='home'
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
-  return <div className={`hs-app${user?' hs-workspace':''}`} data-theme={appearance.theme}>
+  return <div className={`hs-app${user?' hs-workspace':''}${user?.role==='STUDENT'?' hs-learner':''}`} data-theme={appearance.theme}>
     <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
       onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome} appearance={appearance}/>:<header className="hs-header">
       <a href="/workspace" className="hs-workspace-brand" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('overview')}}><SchoolMark/></a>
       <nav className="hs-account-actions" aria-label="校园导航">
         <span className="hs-account">{user.username}</span>
+        {user.role==='STUDENT'&&<SchoolLearnerMenu items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
         <a className="hs-profile-entry" href={workspaceHref('account')} aria-label="个人信息编辑" title="个人信息编辑"
           aria-current={page==='account'?'page':undefined}
           onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>
@@ -432,8 +434,9 @@ export default function SchoolApp(){
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
-        {page==='overview'&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
+      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
+        {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
+        {page==='overview'&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
         {page==='account'&&<section className="hs-panel"><h2>校园账号</h2><p>用户名：{user.username}</p>
           <p>你使用的是独立校园账号。可用功能由学校授权决定。</p>
           <h3>修改密码</h3>
@@ -453,7 +456,7 @@ export default function SchoolApp(){
         </section>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
-            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api}/>}
+            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api} activityId={new URLSearchParams(window.location.search).get('activityId')??undefined}/>}
             {page==='feedback'&&<SchoolStudentFeedback api={api}/>}
             {page==='family'&&<SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>}
             {page==='sharing'&&campusParentReportEnabled&&<SchoolStudentReportConsent api={api}/>}

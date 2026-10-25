@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { BookOpen, CalendarCheck2, ClipboardList, FileText, RefreshCw } from 'lucide-react'
 import { EducationScalePersonalReport, type EducationScalePersonalReportData } from '../components/education-tools/EducationScalePersonalReport'
+import {SchoolCollectionControls,type SchoolCollectionView} from './SchoolCollectionControls'
+import {schoolSearchText,schoolDeadline} from './school-collection'
+import {workspaceHref} from './school-navigation'
 import type { SchoolApi } from './SchoolRecovery'
 import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
 
-type SchoolTask={
+export type SchoolTask={
   id:string;activityId:string;activityTitle:string
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
@@ -11,7 +15,7 @@ type SchoolTask={
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
-type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
+export type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
 type StudentFinalFeedback=EducationScalePersonalReportData
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
@@ -21,11 +25,13 @@ const captions:Record<SchoolTask['status'],string>={
   PENDING:'待完成',COMPLETED:'已完成',EXPIRED:'已截止',
   IN_PROGRESS:'进行中',UNAVAILABLE:'当前不可使用',
 }
+const taskIcons={ASSIGNMENT:ClipboardList,READING:BookOpen,CHECKIN:CalendarCheck2,MEASUREMENT:FileText}
 const kinds:Record<SchoolTask['kind'],string>={
   ASSIGNMENT:'活动练习',READING:'阅读材料',CHECKIN:'活动记录',MEASUREMENT:'正式测评',
 }
 
-export function SchoolStudentTasks({api}: {api:SchoolApi}) {
+export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:string}) {
+  const [query,setQuery]=useState(''),[sort,setSort]=useState('recommended'),[view,setView]=useState<SchoolCollectionView>('list')
   const [page,setPage]=useState(1)
   const [items,setItems]=useState<TaskPage|null>(null)
   const [selected,setSelected]=useState<SchoolTask|null>(null)
@@ -41,7 +47,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const [loading,setLoading]=useState(false)
   const [listError,setListError]=useState('')
   const [retryPage,setRetryPage]=useState(1)
-  const scope=useMemo(()=>({pending:false}),[api])
+  const scope=useMemo(()=>({pending:false}),[api,activityId])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
   const detailRef=useRef<HTMLDivElement>(null)
@@ -52,7 +58,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     if(currentScope.current!==scope||scope.pending)return
     scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
     try{
-      const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25')
+      const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25'+(activityId?'&activityId='+encodeURIComponent(activityId):''))
       if(currentScope.current===scope){setItems(result);setPage(targetPage)}
     }catch(err){
       if(currentScope.current===scope)setListError(err instanceof Error?err.message:'活动待办暂不可用')
@@ -60,11 +66,11 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       scope.pending=false
       if(currentScope.current===scope)setLoading(false)
     }
-  },[api,scope])
+  },[api,scope,activityId])
   useEffect(()=>{
     currentScope.current=scope
     feedbackEpoch.current+=1;setFeedback(null);setItems(null);setPage(1)
-    setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('')
+    setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('');setQuery('');setSort('recommended')
     setStudentReference(null);setBusy(false)
     void load(1)
     return ()=>{currentScope.current=null;feedbackEpoch.current+=1}
@@ -110,26 +116,31 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     }catch(err){setError(err instanceof Error?err.message:'提交失败，请核实活动是否仍开放')}
     finally{setBusy(false)}
   }
-  return <section className="hs-panel hs-task-view">
+  const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
+  const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
+  return <section className="hs-panel hs-task-view hs-student-tasks">
     <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
     <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
-    <h2>我的校园活动</h2>
-    <p>这里只显示学校已开放、并且当前允许你参加的活动。
-      心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
-    {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}
+    {activityId&&<p className="hs-student-task-filter">当前活动任务 <a href={workspaceHref('tasks')}>查看全部任务</a></p>}
+    <header className="hs-student-task-heading"><div><h2>我的校园活动</h2><p>查看学校安排的任务，继续尚未完成的内容。</p></div>
+    {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
+    <details className="hs-student-task-help"><summary>任务与隐私说明{studentReference?' · 校园观察编号':''}</summary><p>这里只显示学校已开放、并且当前允许你参加的活动。心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
+    {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}</details>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
     {listError&&<p className="hs-alert" role="alert">{listError}</p>}
-    <button disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)}>{loading?'正在读取…':listError?'重试读取待办':'刷新待办'}</button>
+    {items&&<>
+    <p className="hs-collection-summary" role="status">{query?`检索到 ${visibleTasks.length} 项 · “${query}”`:`${items.total} 项任务`}{partial?' · 检索和排序仅作用于本页已加载的任务':''}</p></>}
     {loading&&<p role="status">正在读取校园活动…</p>}
     {!items?null:
       items.list.length===0?!loading&&!listError&&<p>目前没有开放给你的活动。你不需要采取任何操作。</p>:
-      <div className="hs-task-list">
-        {items.list.map(task=><article className="hs-task-card" data-task-id={task.id} key={task.kind+task.id}>
-          <small>{task.activityTitle} · {kinds[task.kind]}</small>
-          <h3>{task.title}</h3>
-          <p>状态：{captions[task.status]}{task.deadline?
-            ' · 截止 '+new Date(task.deadline).toLocaleDateString('zh-CN'):''}</p>
+      <div className={"hs-task-list"+(view==='cards'?' hs-task-list--cards':'')}>
+        {visibleTasks.map(task=>{const Icon=taskIcons[task.kind];return <article className="hs-task-card" data-task-id={task.id} key={task.kind+task.id}>
+          <span className="hs-student-task-icon" aria-hidden="true"><Icon size={21}/></span>
+          <div className="hs-student-task-copy"><small>{task.activityTitle}</small><h3>{task.title}</h3>
+          <div className="hs-student-task-meta"><span>{kinds[task.kind]}</span><span className="hs-student-task-state" data-status={task.status} aria-label={'状态：'+captions[task.status]}>{captions[task.status]}</span>
+          {task.deadline&&<span>截止 {new Date(task.deadline).toLocaleDateString('zh-CN')}</span>}</div></div>
+          <div className="hs-student-task-action">
           {task.kind==='MEASUREMENT'?
               task.href&&['PENDING','IN_PROGRESS'].includes(task.status)?
                 <button disabled={busy} onClick={()=>{
@@ -147,9 +158,11 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
                 <p>测评目前不可作答。符合授权与科学规则的反馈才可查看。</p>:
             task.href&&task.status!=='EXPIRED'&&<button disabled={busy}
               onClick={()=>void showTask(task)}>查看{task.kind==='READING'?'阅读材料':'活动任务'}</button>}
-        </article>)}
+          </div>
+        </article>})}
       </div>}
-    {items&&<div className="hs-actions">
+    {items&&items.list.length>0&&visibleTasks.length===0&&<p className="hs-collection-empty">{partial?'本页没有匹配的任务。可清空检索或切换其他页面。':'没有匹配的任务，请尝试其他关键词。'}</p>}
+    {items&&<div className="hs-actions hs-student-task-pagination">
       <button disabled={page<=1||busy||loading} onClick={()=>void load(page-1)}>上一页</button>
       <span>第 {page} 页 · 共 {items.total} 个任务</span>
       <button disabled={!items.hasMore||busy||loading} onClick={()=>void load(page+1)}>下一页</button>

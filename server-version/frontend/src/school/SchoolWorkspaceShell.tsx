@@ -3,14 +3,14 @@ import { ArrowLeft, ArrowRight, Clock3, Menu, X } from 'lucide-react'
 import './school-overview-refresh.css'
 import { workspaceHref, type SchoolNavigationItem } from './school-navigation'
 
-export function SchoolWorkspaceShell({items,page,onNavigate,context,children}:{items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void;context?:ReactNode;children:ReactNode}){
+export function SchoolWorkspaceShell({items,page,onNavigate,context,children,learner=false}:{learner?:boolean;items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void;context?:ReactNode;children:ReactNode}){
  const [open,setOpen]=useState(false)
  const toggle=useRef<HTMLButtonElement>(null)
  const content=useRef<HTMLDivElement>(null)
  const previous=useRef(page)
  const active=items.find(i=>i.id===page)
  const groups=[...new Set(items.map(i=>i.group))]
- const hasWorkspaceNavigation=items.some(item=>item.id!=='overview'&&item.id!=='account')
+ const hasWorkspaceNavigation=!learner&&items.some(item=>item.id!=='overview'&&item.id!=='account')
  useEffect(()=>{
   if(previous.current!==page){setOpen(false);content.current?.focus();previous.current=page}
   document.title=`${active?.label??'校园功能'} · Huischool`

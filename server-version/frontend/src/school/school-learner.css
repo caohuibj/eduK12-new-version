@@ -1,0 +1,164 @@
+/* School learner surfaces follow Training's content hierarchy with School tokens. */
+.hs-app.hs-workspace.hs-learner{background:var(--hs-bg)}
+.hs-learner-home{display:grid;gap:28px;min-width:0}
+.hs-learner-home-header{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,640px);align-items:center;gap:28px}
+.hs-app .hs-learner-home-header h1{font-family:var(--hs-serif);font-size:30px;font-weight:600;line-height:1.35;margin:0 0 10px;color:var(--hs-ink)}
+.hs-learner-home-header>div>p{font-size:14px;line-height:1.7;margin:0;color:var(--hs-muted)}
+.hs-learner-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.hs-learner-shortcut{display:flex;align-items:center;gap:12px;min-width:0;padding:18px;border:1px solid var(--hs-border);border-radius:14px;background:var(--hs-surface);color:var(--hs-ink);text-decoration:none}
+.hs-learner-shortcut--tasks{background:color-mix(in srgb,var(--hs-primary) 7%,var(--hs-surface))}
+.hs-learner-shortcut:hover,.hs-learner-activity:hover{border-color:var(--hs-primary);box-shadow:0 4px 18px #183b2b08}
+.hs-learner-shortcut-icon{display:flex;align-items:center;justify-content:center;flex:none;width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--hs-primary) 9%,var(--hs-surface));color:var(--hs-primary)}
+.hs-learner-shortcut-copy{flex:1;min-width:0;display:grid;gap:5px}
+.hs-learner-shortcut-copy strong{font-size:16px;font-weight:600}
+.hs-learner-shortcut-copy small{font-size:12px;line-height:1.6;color:var(--hs-muted)}
+.hs-learner-shortcut-count{flex:none;font-family:var(--hs-serif);font-size:25px;white-space:nowrap}
+.hs-learner-shortcut-count small{font-family:inherit;font-size:11px;margin-left:3px;color:var(--hs-muted)}
+.hs-learner-shortcut>svg{flex:none;color:var(--hs-muted)}
+.hs-learner-section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.hs-app .hs-learner-section-heading h2{font-family:inherit;font-size:16px;font-weight:600;line-height:1.5;margin:0;color:var(--hs-muted)}
+.hs-app .hs-learner-section-heading button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;padding:0;background:transparent;border-color:transparent;color:var(--hs-muted)}
+.hs-learner-activities{display:grid;gap:18px}
+.hs-learner-activity{display:grid;grid-template-columns:minmax(200px,32%) minmax(0,1fr);min-height:210px;overflow:hidden;border:1px solid var(--hs-border);border-radius:18px;background:var(--hs-surface);text-decoration:none;color:var(--hs-ink)}
+.hs-learner-activity-art{position:relative;min-height:210px;background:linear-gradient(0deg,#193d1c20,#fff4ce08),url('./huischool-campus-sunlight.webp') 57% center/cover}
+.hs-learner-activity-art--1{background-position:70% center}
+.hs-learner-activity-art--2{background-position:35% center}
+.hs-learner-activity-art>span{position:absolute;bottom:20px;left:20px;display:flex;align-items:center;gap:7px;padding:6px 10px;background:#fffff5e8;color:#294f3b;border-radius:6px;font-size:12px}
+.hs-learner-activity-copy{display:flex;flex-direction:column;align-items:flex-start;padding:28px 30px;min-width:0}
+.hs-learner-open{display:inline-flex;padding:3px 8px;border-radius:5px;background:color-mix(in srgb,var(--hs-primary) 8%,var(--hs-surface));color:var(--hs-primary);font-size:12px}
+.hs-app .hs-learner-activity-copy h3{font-family:inherit;font-size:21px;font-weight:600;line-height:1.5;margin:12px 0 10px;overflow-wrap:anywhere}
+.hs-learner-activity-copy>p{font-size:14px;line-height:1.7;color:var(--hs-muted);margin:0 0 24px}
+.hs-learner-activity-bottom{align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--hs-border);margin-top:auto;color:var(--hs-primary);font-size:14px;font-weight:600}
+.hs-learner-state{padding:32px;border:1px solid var(--hs-border);border-radius:16px;background:var(--hs-surface);color:var(--hs-muted);line-height:1.8}
+.hs-learner-state h3{color:var(--hs-ink)}
+.hs-learner-partial{font-size:13px;line-height:1.8;color:var(--hs-muted)}
+.hs-learner-partial a{margin-left:8px;color:var(--hs-primary)}
+/* The banner replaces the learner sidebar without removing authorized destinations. */
+.hs-app.hs-workspace.hs-learner .hs-header nav.hs-account-actions details.hs-learner-menu{position:relative;display:block;border:0;padding:0;margin:0;background:transparent;color:var(--hs-ink)}
+.hs-learner-menu>summary{display:flex;align-items:center;justify-content:center;list-style:none;width:44px;height:44px;padding:0;border:1px solid var(--hs-border);border-radius:50%;cursor:pointer}
+.hs-learner-menu>summary::-webkit-details-marker{display:none}
+.hs-learner-menu[open]>summary,.hs-learner-menu>summary:hover{background:var(--hs-surface-soft,#eaf0e7);border-color:var(--hs-primary)}
+.hs-learner-menu-links{position:absolute;z-index:50;right:0;top:calc(100% + 12px);display:grid;min-width:210px;padding:8px;border:1px solid var(--hs-border);border-radius:14px;background:var(--hs-surface);box-shadow:0 12px 32px #10251b20}
+.hs-learner-menu-links>a{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 12px;border-radius:8px;font-size:14px;text-decoration:none;color:var(--hs-ink)}
+.hs-learner-menu-links>a:hover{background:var(--hs-surface-soft,#edf3e8)}
+/* Student tasks use compact rows instead of a wall of equal-weight cards. */
+.hs-student-task-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:18px}
+.hs-app .hs-student-task-heading h2{font-family:inherit;font-size:20px;line-height:1.5;margin:0 0 5px}
+.hs-student-task-heading p{font-size:14px;margin:0}
+.hs-student-task-heading>button{flex:none}
+.hs-student-task-help{margin:0 0 10px;font-size:13px;color:var(--hs-muted)}
+.hs-student-task-help>summary{padding:10px 0;cursor:pointer;font-size:13px}
+.hs-student-task-help p{font-size:13px}
+.hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0}
+.hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list .hs-task-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:18px;align-items:center;padding:22px 0;border:0;border-bottom:1px solid var(--hs-border);border-radius:0;background:transparent;color:var(--hs-ink)}
+.hs-student-task-icon{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:color-mix(in srgb,var(--hs-primary) 8%,var(--hs-surface));color:var(--hs-primary)}
+.hs-student-task-copy{min-width:0}
+.hs-app.hs-workspace.hs-learner .hs-student-tasks .hs-task-card h3{font-family:inherit;font-size:17px;line-height:1.5;margin:5px 0 8px}
+.hs-app.hs-workspace.hs-learner .hs-student-tasks .hs-task-card small{font-size:12px;color:var(--hs-muted);overflow-wrap:anywhere}
+.hs-student-task-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;color:var(--hs-muted);font-size:12px;line-height:1.6}
+.hs-student-task-state{padding:2px 8px;border-radius:5px;background:color-mix(in srgb,var(--hs-primary) 7%,var(--hs-surface));color:var(--hs-primary)}
+.hs-student-task-state[data-status=IN_PROGRESS]{background:color-mix(in srgb,var(--hs-primary) 17%,var(--hs-surface));font-weight:650}
+.hs-student-task-action{max-width:290px;min-width:0}
+.hs-app .hs-student-task-action>button{min-height:44px;margin:0;white-space:normal}
+.hs-app .hs-student-task-action>p{font-size:12px;margin:0;line-height:1.75}
+.hs-app .hs-student-task-pagination{display:flex;align-items:center;justify-content:flex-end;flex-direction:row;gap:12px;padding-top:20px;margin:0;font-size:13px;color:var(--hs-muted)}
+.hs-student-task-filter{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 20px;font-size:13px;color:var(--hs-muted)}
+.hs-student-task-filter a{color:var(--hs-primary)}
+@media(max-width:1000px){.hs-learner-home-header{grid-template-columns:minmax(0,1fr);gap:20px}.hs-learner-shortcuts{max-width:760px}}
+@media(max-width:600px){
+ .hs-learner-home{gap:22px}
+ .hs-app .hs-learner-home-header h1{font-size:27px}
+ .hs-learner-shortcuts{grid-template-columns:minmax(0,1fr);gap:10px}
+ .hs-learner-shortcut{padding:16px}
+ .hs-learner-activity{grid-template-columns:minmax(0,1fr)}
+ .hs-learner-activity-art{min-height:145px;background-position:center 57%}
+ .hs-learner-activity-copy{padding:22px}
+ .hs-app .hs-learner-activity-copy h3{font-size:19px}
+ .hs-app.hs-workspace.hs-learner .hs-header{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:12px 16px}
+ .hs-app.hs-workspace.hs-learner .hs-header nav.hs-account-actions{width:100%;justify-content:flex-end;gap:8px}
+ .hs-learner-menu-links{right:auto;left:0;max-width:calc(100vw - 32px)}
+ .hs-student-task-heading{align-items:flex-start;flex-wrap:wrap;gap:12px}
+ .hs-student-task-heading>div{flex:1;min-width:150px}
+ .hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list .hs-task-card{grid-template-columns:36px minmax(0,1fr);gap:10px 12px;padding:20px 0}
+ .hs-student-task-icon{width:36px;height:36px;border-radius:10px}
+ .hs-student-task-action{grid-column:2;max-width:none}
+ .hs-app .hs-student-task-action>button{width:100%}
+ .hs-app .hs-student-task-pagination{justify-content:space-between;flex-wrap:wrap}
+ .hs-app .hs-student-task-pagination>*{width:auto}
+ .hs-learner-state{padding:24px}
+}
+/* The same collection controls serve School activities and student tasks. */
+.hs-collection-controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin:0 0 12px}
+.hs-app.hs-workspace.hs-learner form.hs-collection-search{display:flex;flex-direction:row;align-items:center;gap:10px;flex:1;min-width:min(100%,260px);max-width:650px;margin:0;padding:4px 5px 4px 14px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);color:var(--hs-muted)}
+.hs-collection-search>svg{flex:none}
+.hs-collection-search>input{width:100%;min-width:0;border:0;background:transparent;color:var(--hs-ink);font:inherit;font-size:14px;min-height:36px;padding:6px 0;outline-offset:1px}
+.hs-app .hs-collection-search>button{display:flex;align-items:center;justify-content:center;flex:none;min-height:36px;padding:7px 12px;font-size:13px;border-color:transparent;background:transparent;color:var(--hs-primary)}
+.hs-app .hs-collection-search>button[type=submit]{background:color-mix(in srgb,var(--hs-primary) 8%,var(--hs-surface));border-radius:7px}
+.hs-collection-options{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.hs-collection-options>label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--hs-muted)}
+.hs-collection-options select{min-height:44px;max-width:220px;border:1px solid var(--hs-border);border-radius:9px;padding:8px 30px 8px 12px;background:var(--hs-surface);color:var(--hs-ink);font:inherit;font-size:13px}
+.hs-collection-views{display:flex;padding:3px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-app .hs-collection-views>button{display:flex;align-items:center;justify-content:center;min-width:38px;min-height:36px;width:38px;height:36px;padding:0;border:0;border-radius:6px;background:transparent;color:var(--hs-muted)}
+.hs-app .hs-collection-views>button[aria-pressed=true]{background:color-mix(in srgb,var(--hs-primary) 12%,var(--hs-surface));color:var(--hs-primary)}
+.hs-app .hs-collection-summary{font-size:12px;line-height:1.7;margin:0 0 16px;color:var(--hs-muted)}
+.hs-collection-empty{padding:28px 16px;border:1px dashed var(--hs-border);border-radius:12px;text-align:center;line-height:1.8;color:var(--hs-muted)}
+.hs-learner-activities.hs-learner-activities--cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+.hs-learner-activities--cards .hs-learner-activity{grid-template-columns:minmax(0,1fr)}
+.hs-learner-activities--cards .hs-learner-activity-art{min-height:180px}
+.hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list.hs-task-list--cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list.hs-task-list--cards .hs-task-card{display:flex;flex-direction:column;align-items:stretch;gap:14px;padding:20px;border:1px solid var(--hs-border);border-radius:14px;background:var(--hs-surface)}
+.hs-task-list--cards .hs-student-task-action{margin-top:auto;max-width:none;grid-column:auto}
+.hs-app .hs-task-list--cards .hs-student-task-action>button{width:100%}
+@media(max-width:1000px){.hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list.hs-task-list--cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .hs-collection-controls{align-items:stretch;gap:10px}
+ .hs-app.hs-workspace.hs-learner form.hs-collection-search{flex-basis:100%;max-width:none}
+ .hs-collection-options{justify-content:space-between;width:100%;gap:8px}
+ .hs-collection-options select{max-width:195px;padding-right:20px}
+ .hs-learner-activities.hs-learner-activities--cards{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-workspace.hs-learner .hs-task-view.hs-student-tasks .hs-task-list.hs-task-list--cards{grid-template-columns:minmax(0,1fr)}
+}
+
+@media(max-width:600px){.hs-collection-search>input,.hs-collection-options select{font-size:16px}.hs-app .hs-collection-views>button{width:44px;height:44px;min-width:44px;min-height:44px}}
+/* Compact activity cards: campus art is a quiet background, not a cover area. */
+.hs-learner-activity{position:relative;isolation:isolate;display:block;min-height:132px}
+.hs-learner-activity-art,.hs-learner-activities--cards .hs-learner-activity-art{position:absolute;z-index:-1;inset:0;min-height:0;opacity:.13;background-position:right 56%;mask-image:linear-gradient(90deg,transparent 5%,#000 100%)}
+.hs-learner-activity-art>span{display:none}
+.hs-learner-activity-copy{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 24px;padding:20px 24px;align-items:start}
+.hs-learner-open{justify-self:start}
+.hs-app .hs-learner-activity-copy h3{grid-column:1;margin:3px 0;font-size:19px;line-height:1.5}
+.hs-learner-activity-copy>p{grid-column:1;margin:0;font-size:13px}
+.hs-learner-activity-bottom{grid-column:2;grid-row:1 / span 3;align-self:center;gap:20px;padding:0;border:0;margin:0;white-space:nowrap}
+.hs-learner-activities.hs-learner-activities--cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.hs-learner-activities--cards .hs-learner-activity-copy{display:flex;gap:8px;padding:20px;height:100%;min-height:188px}
+.hs-app .hs-learner-activities--cards .hs-learner-activity-copy h3{font-size:18px;margin:0}
+.hs-learner-activities--cards .hs-learner-activity-copy>p{margin:0 0 8px}
+.hs-learner-activities--cards .hs-learner-activity-bottom{align-self:stretch;margin-top:auto;border-top:1px solid var(--hs-border);padding-top:12px;gap:12px}
+.hs-app[data-theme=dark] .hs-learner-activity-art{opacity:.075}
+@media(max-width:1000px){.hs-learner-activities.hs-learner-activities--cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){
+ .hs-learner-activity{min-height:0}
+ .hs-learner-activity-copy{display:flex;gap:7px;padding:18px}
+ .hs-app .hs-learner-activity-copy h3{font-size:18px;margin:0}
+ .hs-learner-activity-bottom{align-self:stretch;margin-top:8px;padding-top:12px;border-top:1px solid var(--hs-border);gap:12px}
+ .hs-learner-activities.hs-learner-activities--cards{grid-template-columns:minmax(0,1fr)}
+ .hs-learner-activities--cards .hs-learner-activity-copy{min-height:0;padding:18px}
+}
+/* Search stays behind the magnifier beside refresh; expanding it takes one row. */
+.hs-learner-section-heading,.hs-student-task-heading{flex-wrap:wrap}
+.hs-collection-options{margin-left:auto;gap:12px}
+.hs-collection-actions{display:flex;align-items:center;gap:4px}
+.hs-app .hs-collection-actions>button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;min-height:44px;min-width:44px;border-color:transparent;padding:0;background:transparent;color:var(--hs-muted)}
+.hs-app .hs-collection-search-toggle[aria-expanded=true],.hs-app .hs-collection-search-toggle[data-filtered=true]{color:var(--hs-primary);background:color-mix(in srgb,var(--hs-primary) 9%,var(--hs-surface))}
+.hs-app.hs-workspace.hs-learner form.hs-collection-search{order:3;flex:1 0 100%;max-width:none;margin-top:2px}
+.hs-app .hs-collection-search>button{width:auto;min-width:36px}
+.hs-student-task-heading>.hs-collection-options{flex:none;min-width:0}
+@media(max-width:600px){
+ .hs-collection-options{gap:8px;justify-content:flex-end;width:auto;flex-wrap:wrap}
+ .hs-collection-options>label{gap:5px}
+ .hs-collection-options>label>span{display:none}
+ .hs-collection-options select{max-width:165px}
+ .hs-learner-section-heading>h2{flex:1;min-width:90px}
+ .hs-student-task-heading>div:first-child{flex-basis:100%}
+ .hs-student-task-heading>.hs-collection-options{flex-basis:100%;justify-content:space-between}
+}

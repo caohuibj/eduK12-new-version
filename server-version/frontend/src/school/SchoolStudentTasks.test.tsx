@@ -40,7 +40,7 @@ describe('Huischool student tasks remain inside the campus account realm',()=>{
       throw Error('FORM receipt must not request a report: '+path)
     })
     render(<SchoolStudentTasks api={api as unknown as SchoolApi}/>)
-    expect(await screen.findByText('状态：已完成')).toBeInTheDocument()
+    expect(await screen.findByLabelText('状态：已完成')).toBeInTheDocument()
     expect(screen.getByText('本次表单已正式提交。表单只记录作答，不计算量表分数，也不新增个人报告读取权。')).toBeInTheDocument()
     expect(screen.queryByRole('button',{name:'查看我的测评反馈'})).not.toBeInTheDocument()
     expect(screen.queryByRole('region',{name:'获准的个人测评反馈'})).not.toBeInTheDocument()
