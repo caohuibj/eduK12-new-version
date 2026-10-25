@@ -116,8 +116,25 @@ async function restoreThird(){
 }
 export function changedLanguages(files){const js=files.some(p=>/\.[cm]?[jt]sx?$/.test(p)),py=files.some(p=>p.endsWith('.py'));assert(js||py,'No actual new SAST inputs');return [js?'javascript-typescript':null,py?'python':null].filter(Boolean).join(',');}
 
+export function verifyBuiltFiles(manifest,read,files){assert.deepEqual(files.slice().sort(),Object.keys(manifest.files).sort(),'Emitted artifact file set changed');for(const[p,x]of Object.entries(manifest.files)){const bytes=read(p);assert.equal(bytes.length,x.bytes);assert.equal(sha(bytes),x.sha256,'Emitted bytes changed: '+p);}const html=read('index.html').toString();assert([...html.matchAll(/<script[^>]+src=["']([^"']+)["']/g)].some(m=>manifest.files[m[1].replace(/^\//,'')]),'HTML must reference retained runtime');}
+function emittedPaths(root){const files=[];function walk(p){for(const n of readdirSync(p)){const f=p+'/'+n,s=lstatSync(f);if(s.isDirectory())walk(f);else{assert(s.isFile(),'No artifact links');files.push(f.slice(root.length+1));}}}walk(root);return files;}
+async function restoreFourth(){
+ const b=binding.resume4;const [run,scope,job,artifact]=await Promise.all([official('actions/runs/'+b.run),official('actions/jobs/'+b.scopeJob),official('actions/jobs/'+b.job),official('actions/artifacts/'+b.artifact)]);originalRun(run,b);qualifiedJob(scope,b,b.scopeJob,'classify changed content','success');qualifiedJob(job,b,b.job,'Survey governance / bounded qualification','failure');
+ for(const name of ['restore verified successful official stages and retain failed history','actual HTTP authority export trial package and persistence flows','prepare fresh synthetic encrypted report rows only for restoration','restore exact synthetic rows including completed reports','one production frontend compilation','Run actions/upload-artifact@v4'])assert(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'),'Original actual success missing: '+name);
+ assert(job.steps.some(s=>s.name==='compiled system management light dark desktop and mobile without writes'&&s.conclusion==='failure'));
+ for(const c of ['frontend','backend'])assert.equal(git('rev-parse',b.source+':server-version/'+c),binding.components[c],'App changed since actual build/restore');
+ assert.equal(artifact.id,b.artifact);assert.equal(artifact.expired,false);assert.equal(artifact.digest,'sha256:'+b.zipSHA256);assert.equal(artifact.workflow_run.id,b.run);assert.equal(artifact.workflow_run.head_sha,b.source);assert.equal(artifact.size_in_bytes,22375108);
+ const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+b.artifact+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN}});assert.equal(response.status,200);const zip=Buffer.from(await response.arrayBuffer());assert.equal(zip.length,22375108);assert.equal(sha(zip),b.zipSHA256);const z=process.env.RUNNER_TEMP+'/pr354-once-built-'+b.artifact+'.zip';writeFileSync(z,zip);const dir=out+'/original-'+b.run;mkdirSync(dir,{recursive:true});
+ const py="import zipfile,pathlib,stat,sys\nz=zipfile.ZipFile(sys.argv[1]);out=pathlib.Path(sys.argv[2]);root=pathlib.Path('.').resolve();items=z.infolist();assert len(items)<6000;assert sum(i.file_size for i in items)<256*1024*1024\nfor i in items:\n p=pathlib.PurePosixPath(i.filename);assert not p.is_absolute() and '..' not in p.parts and not stat.S_ISLNK(i.external_attr>>16);assert i.filename.startswith(('survey-governance-evidence/','server-version/frontend/dist/'))\n if i.is_dir():continue\n if i.filename.startswith('server-version/frontend/dist/'):\n  f=root/pathlib.Path(*p.parts);f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(z.read(i))\n elif len(p.parts)==2:\n  assert p.suffix in ['.json','.log'];(out/p.name).write_bytes(z.read(i))\n";execFileSync('python3',['-c',py,z,dir],{stdio:'inherit'});
+ const rec=JSON.parse(readFileSync(dir+'/frontend-build-execution.json'));assert.equal(rec.source,b.checkout);assert.equal(rec.sourceHead,b.source);assert.equal(String(rec.run),String(b.run));assert.equal(rec.exitCode,0);assert.equal(rec.signal,null);assert.equal(sha(readFileSync(dir+'/frontend-build.log')),rec.logSHA256);
+ const manifest=JSON.parse(readFileSync(dir+'/frontend-build-manifest.json'));assert.equal(manifest.source,b.checkout);assert.equal(manifest.sourceHead,b.source);assert.equal(String(manifest.run),String(b.run));assert.equal(manifest.componentTree,binding.components.frontend);verifyBuiltFiles(manifest,p=>readFileSync('server-version/frontend/dist/'+p),emittedPaths('server-version/frontend/dist'));
+ const restore=JSON.parse(readFileSync(dir+'/restore-qualified.json')),fixture=JSON.parse(readFileSync(dir+'/restore-fixture.json'));assert.equal(restore.allRowsEqual,true);assert.equal(restore.syntheticOnly,true);assert(restore.tables>200);assert.equal(fixture.syntheticOnly,true);assert(fixture.packageReportRows>0);
+ for(const name of ['frontend-build-manifest.json','restore-qualified.json'])writeFileSync(out+'/'+name,readFileSync(dir+'/'+name));
+ save('official-resume4',{kind:'official-once-built-artifact-and-restore-reuse',run:b.run,job:b.job,source:b.source,artifact:b.artifact,zipSHA256:b.zipSHA256,originalConclusion:'failure',applicationBuildRepeated:false,restoreRepeated:false,remaining:'compiled browser fixture contract only'});
+}
+
 async function main(stage){
- if(stage==='resume'){await restorePrior();await restoreSecond();await restoreThird();}
+ if(stage==='resume'){await restorePrior();await restoreSecond();await restoreThird();await restoreFourth();}
  else if(stage==='codeql-config'){await priorSastConfig();}
  else if(stage==='admission'){assert.equal(sha(readFileSync('.github/scripts/survey-governance-evidence.json')),binding.evidenceSHA256);save('local-admission',verifyEvidence(loadEvidence()));}
  else if(stage==='types'&&binding.resume2){assert(existsSync(out+'/official-resume2.json'));save('type-admission',{backend:'original first official type receipt',frontend:'original second official type receipt'});}
@@ -142,6 +159,7 @@ async function main(stage){
   assert.deepEqual(failures,[],'Every selected business flow must pass');
  }
  else if(stage==='finish'){selectedOutcomes(process.env.BUSINESS_OUTCOME,process.env.BROWSER_OUTCOME);assert(existsSync(out+'/restore-qualified.json'));assert(existsSync(out+'/frontend-build-manifest.json'));assert(existsSync(out+'/compiled-browser.json'));save('all-selected-qualified',{business:'success',compiledBrowser:'success',originalFailuresPreserved:true});}
+ else if(stage==='build'&&binding.resume4){assert(existsSync(out+'/official-resume4.json'));save('build-admission',{actualOriginalArtifact:binding.resume4.artifact,source:binding.resume4.source,buildRepeated:false});}
  else if(stage==='build'){runRecorded('frontend-build','frontend',['node_modules/vite/bin/vite.js','build']);manifest();}
  else throw Error('Unknown exact qualification stage '+stage);
 }

@@ -1032,5 +1032,15 @@
     "checkout": "006be0a361f2bdbe17bf393f746d772dcd6cc467",
     "artifact": 12580995796,
     "zipSHA256": "4bfdfe83077fa320bfb606b4205eb5fa05333ac4cc6d013e3d844650f397a090"
+  },
+  "resume4": {
+    "run": 40146021953,
+    "scopeJob": 121027413396,
+    "job": 121027458690,
+    "sastJob": 121027458817,
+    "source": "fc3e99eac60c4628d19ca22e06b35c5a3737aaa2",
+    "checkout": "2580cdbd24dbd41df306c81b9a00a53ad0f963a7",
+    "artifact": 12580477362,
+    "zipSHA256": "aa1b2ba5da15276c4dca3ba93c287816d55df9ae1893ef48aea9c83dc8e45adf"
   }
 }

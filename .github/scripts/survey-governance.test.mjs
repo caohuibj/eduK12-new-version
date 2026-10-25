@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
 import {binding,branch,surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
-import {verifyEvidence,loadEvidence,verifyReport,verifyTestRepairs,selectedOutcomes,changedLanguages} from './survey-governance-checks.mjs';import {requiredChecks,failedChecks} from './merge-gate.mjs';
+import {verifyEvidence,loadEvidence,verifyReport,verifyTestRepairs,selectedOutcomes,changedLanguages,verifyBuiltFiles,sha} from './survey-governance-checks.mjs';import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const entries=()=>[...Object.entries(binding.source).map(([file,s])=>({file,status:s.status,oldMode:s.oldMode,newMode:s.newMode})),...binding.controls.map(file=>({file,status:binding.controlBefore[file]?'M':'A',oldMode:binding.controlBefore[file]?'100644':'000000',newMode:'100644'}))];
 const head='1'.repeat(40),source='2'.repeat(40),env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:source,CI_PR_NUMBER:'354',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version'};
 function read(_,...args){const x=args.join('');if(x.endsWith('^{tree}'))return '3'.repeat(40);const colon=x.indexOf(':'),ref=x.slice(0,colon),p=x.slice(colon+1);if(p.startsWith('server-version/')&&['frontend','backend'].includes(p.slice(15)))return binding.components[p.slice(15)];const s=binding.source[p];if(s)return ref===binding.base?s.before:s.after;if(binding.controlBefore[p])return binding.controlBefore[p];if(binding.protectedInputs[p])return binding.protectedInputs[p];throw Error('Unbound fixture read '+x);}
@@ -30,3 +30,8 @@ test("exact reviewed repair cannot change passed setup",()=>{verifyTestRepairs(p
 for(const status of ["failure","skipped","cancelled",undefined])test("explicit continuation outcome blocks "+status,()=>{assert.throws(()=>selectedOutcomes(status,"success"));assert.throws(()=>selectedOutcomes("success",status));});
 
 test("only changed SAST languages run; previous Python success is not replayed",()=>{assert.equal(changedLanguages(["checks.mjs"]),"javascript-typescript");assert.equal(changedLanguages(["database.py"]),"python");assert.equal(changedLanguages(["checks.mjs","database.py"]),"javascript-typescript,python");assert.throws(()=>changedLanguages([]));});
+
+const files={'index.html':Buffer.from('<script src="/assets/a.js"></script>'),'assets/a.js':Buffer.from('compiled')};
+const buildManifest=()=>({files:Object.fromEntries(Object.entries(files).map(([p,b])=>[p,{bytes:b.length,sha256:sha(b)}]))});
+test('same complete original compiled artifact is admitted without rebuild',()=>verifyBuiltFiles(buildManifest(),p=>files[p],Object.keys(files)));
+test('changed or missing emitted bytes cannot retain original qualification',()=>{assert.throws(()=>verifyBuiltFiles(buildManifest(),p=>p==='assets/a.js'?Buffer.from('modified'):files[p],Object.keys(files)));assert.throws(()=>verifyBuiltFiles(buildManifest(),p=>files[p],['index.html']));});

@@ -1825,3 +1825,18 @@ SAST chains the completed full application analysis with the completed prior
 control analysis, then scans only genuinely changed controls and languages;
 unchanged Python inputs are not reanalysed. Action versions/options, original
 success metadata and source trees remain mandatory; no pending result qualifies.
+
+
+Run `40146021953` completed actual fresh encrypted combined-report preparation,
+native all-row dump/restore and the one production frontend compilation. The
+browser fixture omitted the required response-envelope message field, causing
+session discovery to reject its synthetic response before any scenario passed.
+Only the fixture envelope is corrected; actual client validation is preserved.
+Official artifact `12580477362` and its exact ZIP/source/run/job, original build
+command/exit/log, complete emitted paths/bytes/hashes, compiled HTML entry and
+restore report are verified directly on the GitHub runner. The original failed
+job remains failed. Retained dist bytes feed the missing browser scenarios;
+there is no second application build, DB restore, schema preparation or business
+test execution. Current browser reports keep new consumer execution identity
+separate from the original immutable build identity. Unknown requests and all
+mutations remain rejected; the stable selected-outcome check remains fail-closed.
