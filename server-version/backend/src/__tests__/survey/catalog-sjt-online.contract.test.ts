@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach,describe, expect, it, vi } from 'vitest'
 import fixture from '../../modules/situational/authoring/examples/online-hand-calculated.json'
 import { compileSjtOnlineDocument, normalizeSjtOnlineResponses } from '../../modules/situational/authoring/online'
 import { normalizeSituationalResponses } from '../../modules/situational/situational-final-submit.service'
@@ -11,7 +11,12 @@ import { computeSurveyFinal } from '../../modules/survey/final.compute'
 import type { ResearchFrozenPublication } from '../../modules/survey/publication.service'
 import { validateSituationPackage, type SituationPackage } from '../../modules/situational/situation-package'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
-const h = vi.hoisted(() => ({ own: vi.fn(), authority: vi.fn() }))
+const h = vi.hoisted(() => ({ own: vi.fn(), authority: vi.fn(),collection:vi.fn(),tx:{scope:'public-projection-unit-fixture'} }))
+// This file tests public projection and source adaptation. Current collection
+// authority has its own real PG/lock contracts; model that explicit boundary
+// here, including refusal, rather than silently borrowing a database grant.
+vi.mock('../../config/database',()=>({prisma:{$transaction:async(work:(tx:unknown)=>unknown)=>work(h.tx)}}))
+vi.mock('../../modules/survey/scale-collection-guard',()=>({assertSurveyScaleCollectionAllowed:h.collection}))
 vi.mock('../../modules/situational/entry-authority', async original => ({...await original<object>(),assertSjtEntryDistributionAuthority:h.authority}))
 import {SjtEntryAuthorityError} from '../../modules/situational/entry-authority'
 vi.mock('../../modules/survey/admission.service', () => ({ verifiedSurveyAttempt: h.own }))
@@ -24,6 +29,7 @@ function publication(pkg: SituationPackage) {
   return { imported, snapshot }
 }
 const answersFor = (responses: Array<{ channelKey: string; status: string; responseValue?: unknown }>) => Object.fromEntries(responses.map(r => [r.channelKey, r.status === 'REFUSED' ? { _surveyRefusal: true } : r.status === 'ANSWERED' ? r.responseValue : null]))
+beforeEach(()=>{h.collection.mockReset();h.own.mockReset()})
 
 describe('authorized online SJT uses the shared Training protocol core', () => {
   it('retains exact definition, online display, model and source digests without flattening', () => {
@@ -59,10 +65,18 @@ describe('authorized online SJT uses the shared Training protocol core', () => {
     const { snapshot } = publication(published())
     h.own.mockResolvedValue({ status: 'STARTED', attemptId: 'attempt', waveId: 'wave', compiledSnapshot: snapshot, definitionDigest: canonicalHash(snapshot) })
     const task = await getOwnResearchTask({ publicId: 'public', attemptId: 'attempt', accessCredential: 'synthetic' })
+    expect(h.collection).toHaveBeenCalledExactlyOnceWith(h.tx,snapshot)
     const serialized = JSON.stringify(task)
     expect(task.units[0]).toMatchObject({ kind: 'SJT', schemaVersion: 2, orderPolicy: 'FIXED' })
     expect(serialized).toContain('MULTIPLE'); expect(serialized).toContain('"allowRefusal":true')
     for (const key of ['contributions', 'expertKey', 'scoring', 'compiledDefinition']) expect(serialized).not.toContain('"' + key + '"')
+  })
+  it('keeps the public projection closed when the current collection gate refuses',async()=>{
+    const {snapshot}=publication(published())
+    h.own.mockResolvedValue({status:'STARTED',attemptId:'attempt',waveId:'wave',compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)})
+    h.collection.mockRejectedValueOnce(Object.assign(new Error('CURRENT_EXACT_GRANT_REVOKED'),{statusCode:403}))
+    await expect(getOwnResearchTask({publicId:'public',attemptId:'attempt',accessCredential:'synthetic'})).rejects.toMatchObject({statusCode:403,message:'CURRENT_EXACT_GRANT_REVOKED'})
+    expect(h.collection).toHaveBeenCalledExactlyOnceWith(h.tx,snapshot)
   })
   it('rejects forged display, forged scoring, missing required answer and illegal selection', () => {
     const pkg = published(), broken = structuredClone(pkg)

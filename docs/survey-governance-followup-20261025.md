@@ -644,3 +644,40 @@ review threads、实际检查和仓库 merge gate，绝不强制跳过。
 走原必需门禁，当前文档不签发本地/跨提交自动接纳，不改 workflow/required checks。
 最终合并和后续 main 检查以 PR355 的实时检查及合并结果为准，不将本段首轮记录
 伪装成最终成功。
+
+### 首轮结束后的实际阻断与定向归因
+
+官方 backend regression artifact `12586341016`（ZIP SHA-256
+`6d14a9a01bce7ee188ec05075df300568cdf918bb56fb8fe8d5b628a8ebfdb1f`）已逐字节核验。
+该 job 实际 930 文件/8060 断言通过，84 文件/203 断言失败，33 文件/236 断言跳过；
+全量命令排除了另一个 job 承担的 aggregate burst。不能把这次结果称为通过，也不能
+把所有失败归因于 PR355。
+
+在同一云端增加只读 detached main checkout（不是替代环境/任务），固定 25215dcc，
+复用相同锁定依赖与 Prisma schema，只选官方已失败的用例进行因果对照：两批纯用例
+49+36 项，以及全新 schema-only 合成库的三个 PG 用例，共 88 项；main 同样失败
+86 项，2 项通过。没有跑第二套本地全量，没有修改 main 的源文件、时区、权限或
+真实/现有授权。三个 PG 对照分别实际重现入口管理员身份缺失、系统管理员不能代替
+Training 分配、以及未显式发布测量版本不能冻结，不能通过放宽这些规则修测试。
+另 115 个正式失败断言及所有 suite setup 错误尚未完成逐项归因，不伪称都是基线问题。
+
+两项 main 能通过的样本分别为：
+
+- SJT public-projection 单元用例受本 PR 新增 fresh 采集边界影响。仅在该测试显式
+  模拟事务/采集边界，断言调用一次并增加 authority 拒绝时不得返回投影的负例。
+  整文件 12/12 通过；生产 guard、真实 PG/锁负例不改，不借其他请求/数据库授权。
+- streaming ZIP 背压时限用例：CI 点值超过原 300ms，main 与候选各自定向本地执行
+  通过。该生产文件/测试原样，阈值未放宽；两个局部点不能当容量、普遍提速或已完成
+  CI 资格，也不能单凭此确定 CI 失败的全部环境原因。
+
+CodeQL job 121067458499 在既有 20 分钟上限被取消；日志记录到 87/89 query evaluation，
+没有完整分析/上传结果，不能标成功或将部分查询当 SAST 资格。另有 14 个缺必需数据库
+变量的 suite setup（含本 PR 的 SURVEY_FOLLOWUP_TEST_DATABASE_URL）；隔离保护保持
+fail-closed，没有改 skip、退回任意 DATABASE_URL、借共享/真实库或伪造 Actions 身份。
+
+详见[首轮官方诊断与定向 main 对照](evidence/survey-governance-followup-20261025/merge-ci-first-diagnostic.json)。
+其中只含 reporter digest、静态 case/status、失败文件和配置名，没有原始日志/凭据/正文。
+源码/夹具修正先 push 备份并保留 skip 指令，避免已知外部阻断未处理时重复启动全平台。
+继续合并需要明确允许的验证维护范围：CI 独立库接线与 SAST 时间预算，以及已确认
+主干旧夹具/契约的维护。现有“工作流不变”边界仍保留，未擅自修改工作流或压低门禁；
+在实际最终 head 必需检查真实通过前，PR355 不合并。
