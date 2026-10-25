@@ -1,0 +1,12 @@
+{
+  "sourceSha256": "63439dd01cca879821f0c4b6929f15547f4ab9dff8dc00adcb8dbe4defa2b143",
+  "validatedAt": "2026-10-25T15:19:00Z",
+  "node": "v24.22.1",
+  "toolTests": 14,
+  "combinedTests": 22,
+  "finalAffectedTests": 14,
+  "testExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorExitCode": 0,
+  "scope": "Strict local source/package; synthetic mean scorer/report only. Official source-file hashes independently matched. No DB writes."
+}

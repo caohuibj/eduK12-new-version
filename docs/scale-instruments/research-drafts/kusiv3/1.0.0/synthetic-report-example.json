@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "kusiv3_zh_cn_research",
+    "name": "人际信任简表（3题）（中文研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "c3ff75082ebeef348e1bcd1a29db87c84ee7d022d944d0062d5966b2881f38c8",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "KUSIV3_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "KUSIV3_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "KUSIV3_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "interpersonal_trust",
+      "type": "total",
+      "label": "对他人的信任预期",
+      "description": "对他人的信任预期的回答均值；不是诚信、能力或风险等级。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 3,
+      "range": {
+        "min": 1,
+        "max": 5
+      },
+      "expectedItems": [
+        "KUSIV3_01",
+        "KUSIV3_02",
+        "KUSIV3_03"
+      ],
+      "answeredItems": [
+        "KUSIV3_01",
+        "KUSIV3_02",
+        "KUSIV3_03"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "interpersonal_trust",
+      "headline": "你通常怎样看待别人的善意？",
+      "label": null,
+      "interpretation": "这三道题像一张小小的合影：记录你此刻对“别人一般能不能信任”的看法，不是给你贴上天真或多疑的标签。更愿意相信别人，可能让合作更容易开始；多留一点心，也可能是在保护自己的边界。合适的做法往往取决于眼前的人和事，而不是把信任越多当成越好。例如，和新同事分工时，可以先约定一件小任务，看看对方是否按时完成，再决定下一步合作。信任不必一次全给，也不必永远关门。分数越高，表示这次回答越倾向于认为他人通常可信，并不说明某个具体的人一定安全可靠。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想一次别人兑现承诺的经历，再想一次让你失望的经历：这两件事有哪些不同？"
+        },
+        {
+          "category": "strategy",
+          "text": "下一次合作先说清楚任务、时间和边界，用实际表现慢慢积累信任。 遇到借钱、隐私或安全问题，核实信息和保留拒绝权始终重要。"
+        }
+      ],
+      "limitations": [
+        "这是独立中文工作译稿，仍待人工审校和本地验证，仅供成人研究与自我了解。",
+        "英国和德国成人研究中的平均值仅作出处记录，不能当作中国人的标准答案；本报告不作高低分级、排名或风险判断。",
+        "三题都需完整回答才提供结果。漏答不补零、不猜测。",
+        "不能用于诊断、重要选拔、对个人诚信作结论或自动剔除研究参与者。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这是独立中文工作译稿，仍待人工审校和本地验证，仅供成人研究与自我了解。",
+    "英国和德国成人研究中的平均值仅作出处记录，不能当作中国人的标准答案；本报告不作高低分级、排名或风险判断。",
+    "三题都需完整回答才提供结果。漏答不补零、不猜测。",
+    "不能用于诊断、重要选拔、对个人诚信作结论或自动剔除研究参与者。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。 https://creativecommons.org/licenses/by/4.0/ 。仅供成人研究与自我了解，不用于心理诊断或诚信评价。"
+}

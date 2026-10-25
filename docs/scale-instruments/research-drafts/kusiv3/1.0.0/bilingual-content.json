@@ -1,0 +1,64 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": "1",
+      "en": "I am convinced that most people have good intentions.",
+      "zh": "我相信大多数人都怀有善意。",
+      "reverse": false
+    },
+    {
+      "id": "2",
+      "en": "You can’t rely on anyone these days.",
+      "zh": "如今谁都靠不住。",
+      "reverse": true
+    },
+    {
+      "id": "3",
+      "en": "In general, people can be trusted.",
+      "zh": "总的来说，人们是可以信任的。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 1,
+      "en": "do not agree at all",
+      "zh": "完全不同意"
+    },
+    {
+      "value": 2,
+      "en": "hardly agree",
+      "zh": "不太同意"
+    },
+    {
+      "value": 3,
+      "en": "somewhat agree",
+      "zh": "有些同意"
+    },
+    {
+      "value": 4,
+      "en": "mostly agree",
+      "zh": "大体同意"
+    },
+    {
+      "value": 5,
+      "en": "completely agree",
+      "zh": "完全同意"
+    }
+  ],
+  "instructions": {
+    "en": "In the following we are interested in your attitude towards other people. Please indicate the extent to which you agree or disagree with each of the statements below.",
+    "zh": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。"
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "copyTranslationDigitalRedistribution": "Permitted with attribution, license link and modification notice.",
+    "basis": "Author-developed English adaptation reproduced in an explicitly named author-supplied English Answer Sheet; full form inspected for exceptions. Published article licenses material under CC BY 4.0. No separate restrictive credit found in the named form. Not inferred from an unrelated open-access paper.",
+    "changesNotice": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "caution": "Do not relabel CC BY as public domain or noncommercial-only. Do not imply original authors endorse translation or report."
+  },
+  "attribution": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。"
+}

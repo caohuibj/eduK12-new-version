@@ -1,0 +1,249 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "defaultAudience": "ADULT_SELF_18_69_REFERENCE_ONLY",
+  "k12Validated": false,
+  "thresholds": [],
+  "thresholdPolicy": "No validated diagnostic cutoff. No invented low/medium/high, percentile, risk, ability, honesty or suitability classifications. Reference means are not thresholds.",
+  "missingPolicy": {
+    "rule": "all items required; no imputation",
+    "source": "Author recommends aggregation only with no missing values"
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "copyTranslationDigitalRedistribution": "Permitted with attribution, license link and modification notice.",
+    "basis": "Author-developed English adaptation reproduced in an explicitly named author-supplied English Answer Sheet; full form inspected for exceptions. Published article licenses material under CC BY 4.0. No separate restrictive credit found in the named form. Not inferred from an unrelated open-access paper.",
+    "changesNotice": "本项目据作者英文题本独立翻译为中文工作稿，并编写通俗反馈；尚非经验证的中文版本。",
+    "caution": "Do not relabel CC BY as public domain or noncommercial-only. Do not imply original authors endorse translation or report."
+  },
+  "reportPolicy": {
+    "purpose": "自主了解与研究用途，非诊断",
+    "prohibited": [
+      "诊断",
+      "筛选/录取/能力排名",
+      "自动剔除研究参与者",
+      "测谎或诚信评价",
+      "中国人群百分位",
+      "儿童常模推断"
+    ],
+    "thresholdTrigger": "none; all response patterns receive the same neutral construct introduction and reflection actions",
+    "display": "面向普通人不显示标准分、信度、常模百分位；可在展开的技术说明显示原始均分及范围。"
+  },
+  "sampleContext": {
+    "fielding": "January 2018",
+    "mode": "self-administered online survey (CASI)",
+    "sampling": "heterogeneous quota samples by age, gender, education; respective-language native speakers; not Chinese norms",
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ]
+  },
+  "dedup": {
+    "mainRegistry": "eduk12-main-review-20261025/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "exactAliasMatch": false,
+    "excluded": "Not IE4 (historical PR328 draft deferred); not existing GSE/ASKU or nine recent additions."
+  },
+  "id": "KUSIV3",
+  "title": "人际信任简表（3题）",
+  "family": "interpersonal-trust",
+  "tags": [
+    "人际关系",
+    "人际信任",
+    "自我了解",
+    "成人",
+    "研究用途",
+    "中文工作译稿",
+    "CC BY 4.0"
+  ],
+  "references": [
+    {
+      "authors": [
+        "Nießen, D.",
+        "Beierlein, C.",
+        "Rammstedt, B.",
+        "Lechner, C. M."
+      ],
+      "year": 2020,
+      "title": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3)",
+      "journal": "Measurement Instruments for the Social Sciences",
+      "volume": 2,
+      "article": 10,
+      "doi": "10.1186/s42409-020-00016-1",
+      "url": "https://link.springer.com/article/10.1186/s42409-020-00016-1"
+    },
+    {
+      "type": "GESIS documentation",
+      "doi": "10.6102/zis292_exz",
+      "url": "https://zis.gesis.org/s//skala/Nießen-Beierlein-Rammstedt-Lechner-Interpersonal-Trust-Short-Scale-(KUSIV3)"
+    }
+  ],
+  "instructions": {
+    "en": "In the following we are interested in your attitude towards other people. Please indicate the extent to which you agree or disagree with each of the statements below.",
+    "zh": "下面我们想了解你对其他人的看法。请指出你对以下每句话的同意或不同意程度。"
+  },
+  "options": [
+    {
+      "value": 1,
+      "en": "do not agree at all",
+      "zh": "完全不同意"
+    },
+    {
+      "value": 2,
+      "en": "hardly agree",
+      "zh": "不太同意"
+    },
+    {
+      "value": 3,
+      "en": "somewhat agree",
+      "zh": "有些同意"
+    },
+    {
+      "value": 4,
+      "en": "mostly agree",
+      "zh": "大体同意"
+    },
+    {
+      "value": 5,
+      "en": "completely agree",
+      "zh": "完全同意"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "en": "I am convinced that most people have good intentions.",
+      "zh": "我相信大多数人都怀有善意。",
+      "reverse": false
+    },
+    {
+      "id": "2",
+      "en": "You can’t rely on anyone these days.",
+      "zh": "如今谁都靠不住。",
+      "reverse": true
+    },
+    {
+      "id": "3",
+      "en": "In general, people can be trusted.",
+      "zh": "总的来说，人们是可以信任的。",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "type": "mean",
+    "itemIds": [
+      "1",
+      "2",
+      "3"
+    ],
+    "reverseItemIds": [
+      "2"
+    ],
+    "reverseFormula": "6 - raw",
+    "formula": "(q1 + (6-q2) + q3) / 3",
+    "range": [
+      1,
+      5
+    ],
+    "higherMeans": "More positive expectations of others in general, not evidence that any particular person is safe or trustworthy."
+  },
+  "referenceParameters": [
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "mean": 3.2,
+      "sd": 0.81
+    },
+    {
+      "population": "German adult quota sample",
+      "n": 474,
+      "mean": 3.07,
+      "sd": 0.79
+    }
+  ],
+  "referenceUse": "Archive as research context only; do not calculate Chinese individual percentile or threshold bands. Metric invariance does not establish scalar equivalence.",
+  "report": {
+    "title": "你通常怎样看待别人的善意？",
+    "intro": "这三道题像一张小小的合影：记录你此刻对“别人一般能不能信任”的看法，不是给你贴上天真或多疑的标签。",
+    "explanation": "更愿意相信别人，可能让合作更容易开始；多留一点心，也可能是在保护自己的边界。合适的做法往往取决于眼前的人和事，而不是把信任越多当成越好。",
+    "lifeExample": "例如，和新同事分工时，可以先约定一件小任务，看看对方是否按时完成，再决定下一步合作。信任不必一次全给，也不必永远关门。",
+    "actions": [
+      "回想一次别人兑现承诺的经历，再想一次让你失望的经历：这两件事有哪些不同？",
+      "下一次合作先说清楚任务、时间和边界，用实际表现慢慢积累信任。",
+      "遇到借钱、隐私或安全问题，核实信息和保留拒绝权始终重要。"
+    ],
+    "caveat": "这不是心理诊断，也不判断谁值得相信。中文内容是工作译稿；英国和德国成人的研究结果不能当作中国儿童或成人的标准答案。"
+  },
+  "tests": [
+    {
+      "responses": [
+        1,
+        5,
+        1
+      ],
+      "expectedMean": 1
+    },
+    {
+      "responses": [
+        5,
+        1,
+        5
+      ],
+      "expectedMean": 5
+    },
+    {
+      "responses": [
+        3,
+        3,
+        3
+      ],
+      "expectedMean": 3
+    },
+    {
+      "responses": [
+        1,
+        null,
+        5
+      ],
+      "expected": "NO_SCORE"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "id": "KUSIV3",
+      "kind": "article",
+      "url": "https://link.springer.com/article/10.1186/s42409-020-00016-1",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_article.html",
+      "sha256": "1a42019ae22822e12c699e6a3f3e27892bf6b061befe816de14c98df5ddfdd50",
+      "bytes": 537595
+    },
+    {
+      "id": "KUSIV3",
+      "kind": "form",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-020-00016-1/MediaObjects/42409_2020_16_MOESM1_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_form.pdf",
+      "sha256": "14aae58589ad28ec89972b12e7f466b5e5a70ca779910fae50094ba59828be7e",
+      "bytes": 264172
+    },
+    {
+      "id": "KUSIV3",
+      "kind": "reference",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-020-00016-1/MediaObjects/42409_2020_16_MOESM5_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_reference.pdf",
+      "sha256": "0fab0f41e5a8643c592181678433adf257b885d9f50eee428383b395b15d0d70",
+      "bytes": 267424
+    }
+  ],
+  "attribution": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3) — Nießen, D., Beierlein, C., Rammstedt, B., Lechner, C. M. (2020). CC BY 4.0. 中文工作翻译与反馈由本项目另行编写，原作者未背书。"
+}

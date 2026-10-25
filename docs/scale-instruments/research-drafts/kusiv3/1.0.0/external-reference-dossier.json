@@ -1,0 +1,104 @@
+{
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "sourceSample": {
+    "fielding": "January 2018",
+    "mode": "self-administered online survey (CASI)",
+    "sampling": "heterogeneous quota samples by age, gender, education; respective-language native speakers; not Chinese norms",
+    "UK": {
+      "n": 468,
+      "retestN": 111
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117
+    },
+    "ageRange": [
+      18,
+      69
+    ]
+  },
+  "parameters": [
+    {
+      "population": "UK adult quota sample",
+      "n": 468,
+      "mean": 3.2,
+      "sd": 0.81
+    },
+    {
+      "population": "German adult quota sample",
+      "n": 474,
+      "mean": 3.07,
+      "sd": 0.79
+    }
+  ],
+  "parameterUse": "Archive as research context only; do not calculate Chinese individual percentile or threshold bands. Metric invariance does not establish scalar equivalence.",
+  "scoring": {
+    "type": "mean",
+    "itemIds": [
+      "1",
+      "2",
+      "3"
+    ],
+    "reverseItemIds": [
+      "2"
+    ],
+    "reverseFormula": "6 - raw",
+    "formula": "(q1 + (6-q2) + q3) / 3",
+    "range": [
+      1,
+      5
+    ],
+    "higherMeans": "More positive expectations of others in general, not evidence that any particular person is safe or trustworthy."
+  },
+  "thresholds": [],
+  "currentTranslationValidated": false,
+  "references": [
+    {
+      "authors": [
+        "Nießen, D.",
+        "Beierlein, C.",
+        "Rammstedt, B.",
+        "Lechner, C. M."
+      ],
+      "year": 2020,
+      "title": "An English-language adaptation of the Interpersonal Trust Short Scale (KUSIV3)",
+      "journal": "Measurement Instruments for the Social Sciences",
+      "volume": 2,
+      "article": 10,
+      "doi": "10.1186/s42409-020-00016-1",
+      "url": "https://link.springer.com/article/10.1186/s42409-020-00016-1"
+    },
+    {
+      "type": "GESIS documentation",
+      "doi": "10.6102/zis292_exz",
+      "url": "https://zis.gesis.org/s//skala/Nießen-Beierlein-Rammstedt-Lechner-Interpersonal-Trust-Short-Scale-(KUSIV3)"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "id": "KUSIV3",
+      "kind": "article",
+      "url": "https://link.springer.com/article/10.1186/s42409-020-00016-1",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_article.html",
+      "sha256": "1a42019ae22822e12c699e6a3f3e27892bf6b061befe816de14c98df5ddfdd50",
+      "bytes": 537595
+    },
+    {
+      "id": "KUSIV3",
+      "kind": "form",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-020-00016-1/MediaObjects/42409_2020_16_MOESM1_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_form.pdf",
+      "sha256": "14aae58589ad28ec89972b12e7f466b5e5a70ca779910fae50094ba59828be7e",
+      "bytes": 264172
+    },
+    {
+      "id": "KUSIV3",
+      "kind": "reference",
+      "url": "https://media.springernature.com/original/springer-static/esm/art:10.1186%2Fs42409-020-00016-1/MediaObjects/42409_2020_16_MOESM5_ESM.pdf",
+      "path": "scale-source-packs-gesis-next-20261025/sources/KUSIV3_reference.pdf",
+      "sha256": "0fab0f41e5a8643c592181678433adf257b885d9f50eee428383b395b15d0d70",
+      "bytes": 267424
+    }
+  ]
+}
