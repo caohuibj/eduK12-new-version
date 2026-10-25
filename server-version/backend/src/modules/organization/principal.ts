@@ -60,7 +60,7 @@ export async function loadCurrentPrincipal(userId: string, db: Pick<Prisma.Trans
   // Legacy ADMIN is only a historical business label. Project the compatibility
   // ADMIN role exclusively inside Training, from a current explicit grant.
   const training = ['LEGACY','TRAINING'].includes(row.accountDomain)
-  const role = training ? row.entryGrants?.some(g => g.entry === 'TRAINING') ? UserRole.ADMIN
+  const role = training ? row.platformRole==='STANDARD'&&row.entryGrants?.some(g => g.entry === 'TRAINING') ? UserRole.ADMIN
     : row.role === UserRole.ADMIN ? UserRole.STUDENT : row.role : row.role
   return { ...row, userId: resolvedUserId, businessRole: row.role, role }
 }

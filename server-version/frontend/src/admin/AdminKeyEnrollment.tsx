@@ -1,3 +1,5 @@
+import SystemAdminEntryShell from './SystemAdminEntryShell'
+import {SYSTEM_HOME,isSystemLoginTarget} from './systemWorkspace'
 import {isTrainingAdminPath} from './trainingPages'
 import {useState} from 'react'
 import {Link,useLocation} from 'react-router-dom'
@@ -24,13 +26,14 @@ function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
   const {mode}=useSurveyAppearance()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const systemEntry=isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
   const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
   const educationProduct=educationEntry(location.search)
-  const Shell=educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
-  const loginPath=educationProduct?`/admin/login?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
+  const Shell=systemEntry?SystemAdminEntryShell:educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
+  const loginPath=systemEntry?'/admin/login?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/login?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')
@@ -51,7 +54,7 @@ function AdminKeyEnrollment(){
     catch(error){setUri('');setMessage(errorMessage(error,'验证未完成')+'；请重新填写登记信息开始绑定。')}
     finally{setCode('');setBusy(false)}
   }
-  return <Shell tone="admin" title={trainingEntry?'Training 管理员首次绑定':'绑定管理员验证方式'} description={trainingEntry?'用手机验证器，为培训管理账号完成首次安全设置。':'使用账号、密码与一次性绑定码，绑定你的验证方式'}
+  return <Shell tone="admin" title={systemEntry?'系统管理员验证器绑定':trainingEntry?'Training 管理员首次绑定':'绑定管理员验证方式'} description={trainingEntry?'用手机验证器，为培训管理账号完成首次安全设置。':'使用账号、密码与一次性绑定码，绑定你的验证方式'}
     {...(trainingEntry?{
       brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
       className:'training-admin-auth training-admin-enrollment',backTo:trainingHome,backLabel:'返回 Training 首页',

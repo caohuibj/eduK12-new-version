@@ -1,3 +1,4 @@
+import {assertSurveyManager} from '../survey/admin-role'
 import {Prisma} from '@prisma/client'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
@@ -14,6 +15,10 @@ export async function libraryActor(tx:Prisma.TransactionClient,actorId:string){
 export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId:string,releaseId:string,capability:'catalog.manage'|'material.distribute',product:LibraryProduct,grantId?:string){
   const user=await libraryActor(tx,actorId)
   if(!['TRAINING','LEGACY'].includes(user.account_domain))fail('平台内容管理需使用平台账号',403)
+  if(product==='SURVEY'&&capability==='material.distribute'){await assertSurveyManager(tx,actorId);return {grantId:null,version:0}}
+  // Entry-only distribution never inherits system authority; retain exact content grants below.
+  if(capability==='material.distribute'&&(product==='TRAINING'||product==='SURVEY')&&user.systemAdmin)fail('系统管理员不能代替入口管理员分配使用权',403)
+  if(capability==='catalog.manage'&&!user.systemAdmin)fail('全局工具版本审批仅限系统管理员',403)
   if(user.systemAdmin)return {grantId:null,version:0}
   if(!grantId)fail('缺少精确版本的平台授权',403)
   if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])

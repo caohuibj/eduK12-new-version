@@ -65,25 +65,22 @@ const templateInclude = {
  * unrelated activity. C13 reporting grants are never consulted as raw access. */
 async function authority(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string,
   lockMode?: 'SHARE' | 'UPDATE', expectedTokenVersion?: number) {
-  if (![UserRole.TEACHER, UserRole.ADMIN].includes(actor.role as any)) unavailable()
+  if (actor.role !== UserRole.TEACHER) unavailable() // Management/old export identities do not imply raw-data access.
   // Grant mutations lock the same user row and increment token_version. A
   // single statement both projects the current entry role and locks the full
   // authority context; the caller cannot supply an already-verified shortcut.
-  const effectiveRole = actor.role===UserRole.TEACHER?Prisma.sql`u.role::text`
-    :Prisma.sql`CASE WHEN g.user_id IS NOT NULL THEN 'ADMIN'
-      WHEN u.role::text='ADMIN' THEN 'STUDENT' ELSE u.role::text END`
+  const effectiveRole = Prisma.sql`u.role::text`
   const rows = await tx.$queryRaw<Array<{id:string;role:UserRole;businessRole:UserRole;isActive:boolean;isFrozen:boolean;
     expiresAt:Date|null;teacherApproved:boolean;accountDomain:string;mustChangePassword:boolean;tokenVersion:number;
     trainingGrantVersion:number|null;courseId:string;creatorId:string;courseType:string;isLibrary:boolean}>>`
       SELECT u.id,${effectiveRole} AS role,u.role AS "businessRole",u.is_active AS "isActive",u.is_frozen AS "isFrozen",u.expires_at AS "expiresAt",
         u.teacher_approved AS "teacherApproved",u.account_domain AS "accountDomain",
         u.must_change_password AS "mustChangePassword",u.token_version AS "tokenVersion",
-        g.version AS "trainingGrantVersion",
+        NULL::integer AS "trainingGrantVersion",
         c.id AS "courseId",c.creator_id AS "creatorId",c.course_type AS "courseType",c.is_library AS "isLibrary"
       FROM courses c JOIN users u ON u.id=${actor.userId}
-      LEFT JOIN admin_entry_grants g ON g.user_id=u.id AND g.entry='TRAINING' AND g.revoked_at IS NULL
       WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library
-        AND (${actor.role}='ADMIN' OR c.creator_id=u.id)
+        AND c.creator_id=u.id
         AND ${effectiveRole}=${actor.role}
         AND u.account_domain IN ('LEGACY','TRAINING') AND u.is_active AND NOT u.is_frozen
         AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())

@@ -2,55 +2,51 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ScaleLibraryGovernance from './ScaleLibraryGovernance'
+const scoped=vi.hoisted(()=>({request:vi.fn()}))
+vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'manager',platformRole:'STANDARD'}})}))
+vi.mock('../../api/surveyManagement',()=>({surveyManagementRequest:scoped.request}))
 const api = vi.hoisted(() => ({ catalog: vi.fn(), catalogDetail: vi.fn(), capabilities: vi.fn(), submissionDetail: vi.fn(), submissions: vi.fn(), entries: vi.fn(), review: vi.fn(), setStatus: vi.fn(), recipients: vi.fn(), grants: vi.fn(), grant: vi.fn(), revoke: vi.fn() }))
 vi.mock('../../api/scaleLibraryGovernance', () => ({ governanceApi: () => api, submissionStatusLabel: { SUBMITTED: '待审核' } }))
 const metadata = { title: '范围内量表', author: '作者', copyright: '自有', applicability: '研究', scoringDescription: '求和', reportDescription: '描述性' }
 const application = { id: 'application', releaseId: 'release', metadata, version: 3, status: 'SUBMITTED', product: 'TRAINING', supportedEntrypoints: ['TRAINING', 'SURVEY'] }
 const entry = { ...application, id: 'entry', status: 'ACTIVE' }
 beforeEach(() => {
-  vi.resetAllMocks(); api.submissions.mockResolvedValue({ list: [application] }); api.entries.mockResolvedValue({ list: [entry] }); api.setStatus.mockResolvedValue(entry)
+  vi.resetAllMocks(); scoped.request.mockImplementation(async(_scope,path)=>path.startsWith('/catalog')?{list:[{catalogId:'entry',origin:'AUTHORED',title:metadata.title,exactVersion:{releaseId:'release'},authored:{...entry,submissionId:'application'},policyIdentity:{resourceKey:'release:release',fingerprint:'a'.repeat(64)},policy:{decision:'APPROVED',paused:false,version:1,reason:'Reviewed'},states:{content:{ready:true,reasons:[]},assignment:{ready:true,reasons:[]},deployment:{ready:false,reasons:['Runtime check required']}}}],hasMore:false}:path==='/entries/entry/recipients'?{list:[{id:'researcher',username:'verified-researcher'}]}:path==='/submissions/application'?{snapshot:'FROZEN_REVIEW_FIXTURE'}:{list:[],hasMore:false}); api.submissions.mockResolvedValue({ list: [application] }); api.entries.mockResolvedValue({ list: [entry] }); api.setStatus.mockResolvedValue(entry)
   api.catalog.mockImplementation(async (page = 1) => ({ schemaVersion: 1, page, pageSize: 25, hasMore: false, list: (await api.entries()).list.map((row: typeof entry) => ({ catalogId: row.id, origin: 'AUTHORED', title: row.metadata.title, exactVersion: { origin: 'AUTHORED', entryId: row.id, releaseId: row.releaseId }, availability: { status: 'RESTRICTED', reasons: [] }, authored: row })) }))
   api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: false, reviewGrants: [], distributionGrants: [{ grantId: 'distribute', product: 'TRAINING', releaseIds: ['release'] }] })
 })
 describe('Scale library system review versus entrance distribution', () => {
-  it('filters only the current Survey catalog page and keeps approval controls in their own view', async () => {
-    api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: true, reviewGrants: [{grantId:'review',releaseIds:['release']}], distributionGrants: [] })
-    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance /></MemoryRouter>)
+  it('filters only the current Survey catalog page and keeps approval controls in their own view',async()=>{
+    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance/></MemoryRouter>)
     expect(await screen.findByRole('heading',{name:'范围内量表'})).toBeVisible()
-    expect(screen.queryByRole('button',{name:'批准精确版本入库'})).not.toBeInTheDocument()
-    fireEvent.change(screen.getByRole('searchbox',{name:'搜索本页量表'}),{target:{value:'不存在的名称'}})
-    expect(screen.getByText('本页没有匹配的量表')).toBeVisible()
-    expect(api.catalog).toHaveBeenCalledTimes(1)
-    fireEvent.click(screen.getByRole('button',{name:'清除本页筛选'}))
-    expect(screen.getByRole('heading',{name:'范围内量表'})).toBeVisible()
+    fireEvent.change(screen.getByLabelText('筛选当前页'),{target:{value:'不存在'}})
+    expect(screen.queryByRole('heading',{name:'范围内量表'})).not.toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('筛选当前页'),{target:{value:''}})
     fireEvent.change(screen.getByRole('combobox',{name:'来源'}),{target:{value:'STANDARD_REGISTRY'}})
     expect(screen.queryByRole('heading',{name:'范围内量表'})).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:/入库审批/}))
-    expect(screen.getByRole('button',{name:'批准精确版本入库'})).toBeDisabled()
-    expect(screen.getByLabelText('审核、下架或撤权说明')).toBeVisible()
+    expect(scoped.request.mock.calls.filter(c=>String(c[1]).startsWith('/catalog'))).toHaveLength(1)
+    fireEvent.click(screen.getByRole('tab',{name:'Survey 入库审批'}))
+    await waitFor(()=>expect(scoped.request).toHaveBeenCalledWith('survey-library','/submissions?page=1',undefined))
+    expect(screen.getByLabelText('审批或暂停原因')).toBeVisible()
   })
-  it('shows readable Survey version details while keeping the complete record available on demand', async () => {
-    const record={catalogId:'custom',origin:'AUTHORED',title:metadata.title,exactVersion:{origin:'AUTHORED',releaseId:entry.releaseId},authored:entry}
-    api.catalogDetail.mockResolvedValue({entry:record})
-    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance /></MemoryRouter>)
-    fireEvent.click(await screen.findByRole('button',{name:'查看自编精确版本详情'}))
-    expect(await screen.findByRole('region',{name:'公共量表精确版本详情'})).toHaveTextContent('作者 / 来源')
-    expect(screen.getByText('完整版本记录').closest('details')).not.toHaveAttribute('open')
-    fireEvent.click(screen.getByRole('button',{name:'收起详情'}))
-    expect(screen.queryByRole('region',{name:'公共量表精确版本详情'})).not.toBeInTheDocument()
-  })
-
-  it('keeps Survey management recipients in Survey even when the source supports both entrances',async()=>{
-    api.capabilities.mockResolvedValue({systemAdmin:false,canReview:false,reviewGrants:[],distributionGrants:[{grantId:'survey-distribution',product:'SURVEY',releaseIds:['release']}]})
-    api.grants.mockResolvedValue({list:[]});api.recipients.mockResolvedValue({list:[{id:'researcher',username:'verified-researcher'}],page:1,hasMore:false})
+  it('keeps Survey frozen version details behind explicit expansion and detail reads',async()=>{
     render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance/></MemoryRouter>)
-    fireEvent.click(await screen.findByRole('button',{name:'查看 / 分配只读使用权限'}))
-    await waitFor(()=>expect(screen.getByRole('button',{name:'读取可见授权对象'})).toBeEnabled())
-    expect(screen.getByRole('combobox',{name:'目标入口'})).toHaveValue('SURVEY')
+    await screen.findByRole('heading',{name:'范围内量表'})
+    const disclosure=screen.getByText('状态、详情与操作').closest('details')!
+    expect(disclosure).not.toHaveAttribute('open');disclosure.setAttribute('open','')
+    fireEvent.click(screen.getByRole('button',{name:'读取冻结内容、计分与报告'}))
+    await waitFor(()=>expect(scoped.request).toHaveBeenCalledWith('survey-library','/submissions/application',undefined))
+    expect(await screen.findByText(/FROZEN_REVIEW_FIXTURE/)).toBeVisible()
+  })
+  it('keeps Survey management recipients in Survey even when the source supports both entrances',async()=>{
+    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance/></MemoryRouter>)
+    await screen.findByRole('heading',{name:'范围内量表'})
+    screen.getByText('状态、详情与操作').closest('details')!.setAttribute('open','')
+    fireEvent.click(screen.getByRole('button',{name:'分配 Survey 精确版本'}))
+    expect(await screen.findByRole('option',{name:'verified-researcher'})).toBeInTheDocument()
+    expect(scoped.request).toHaveBeenCalledWith('survey-library','/entries/entry/recipients',undefined)
     expect(screen.queryByRole('option',{name:'Training'})).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'读取可见授权对象'}))
-    await screen.findByRole('option',{name:/verified-researcher/})
-    expect(api.recipients).toHaveBeenCalledExactlyOnceWith('entry','SURVEY',1,'','survey-distribution')
+    expect(api.recipients).not.toHaveBeenCalled()
   })
 
   it('does not mistake entrance distribution authority for review authority', async () => {
@@ -125,4 +121,14 @@ describe('Scale library system review versus entrance distribution', () => {
     await waitFor(() => expect(api.setStatus).toHaveBeenCalledWith(entry, 'EMERGENCY_DISABLED', '内容风险', undefined))
     confirm.mockRestore()
   })
+})
+
+it('system administrators cannot distribute Survey versions from the shared governance page',async()=>{
+  api.capabilities.mockResolvedValue({systemAdmin:true,canReview:true,reviewGrants:[],distributionGrants:[]})
+  api.entries.mockResolvedValue({list:[{...entry,supportedEntrypoints:['SURVEY']}]});api.grants.mockResolvedValue({list:[]})
+  render(<MemoryRouter><ScaleLibraryGovernance/></MemoryRouter>)
+  fireEvent.click(await screen.findByRole('button',{name:'查看 / 分配只读使用权限'}))
+  await screen.findByText('当前账号没有此版本在该入口的分配权限，或该入口尚未开放。')
+  expect(screen.queryByRole('button',{name:'读取可见授权对象'})).not.toBeInTheDocument()
+  expect(api.recipients).not.toHaveBeenCalled();expect(api.grant).not.toHaveBeenCalled()
 })

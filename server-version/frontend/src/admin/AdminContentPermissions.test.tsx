@@ -4,14 +4,16 @@ import AdminContentPermissions from './AdminContentPermissions'
 const mocks=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}))
 vi.mock('../api/client',()=>({default:mocks}))
 const id=(n:number)=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
+function openComposer(){const summary=screen.getByText('编制精确内容授权');if(!summary.closest('details')?.open)fireEvent.click(summary)}
 function fill(){
+ openComposer()
  for(const [label,value] of [['目标研究者 UUID',id(1)],['项目 UUID',id(2)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','Approved research']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
 }
 beforeEach(()=>{vi.clearAllMocks();sessionStorage.clear();vi.spyOn(window,'confirm').mockReturnValue(true);mocks.post.mockReset().mockImplementation(async(url,body)=>({data:{grantId:url.endsWith('/revoke')?url.split('/')[url.split('/').length-2]:body.requestId,version:url.endsWith('/revoke')?body.expectedVersion+1:1}}))})
 describe('explicit system content capability form',()=>{
  it('does not fetch any data automatically and validates before issuing',async()=>{
   render(<AdminContentPermissions actorId={id(9)}/>);expect(mocks.get).not.toHaveBeenCalled()
-  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));expect(await screen.findByRole('alert')).toHaveTextContent('有效 UUID');expect(mocks.post).not.toHaveBeenCalled()
+  openComposer();fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));expect(await screen.findByRole('alert')).toHaveTextContent('有效 UUID');expect(mocks.post).not.toHaveBeenCalled()
  })
  it('issues only selected exact reference capabilities after confirmation and prevents accidental duplicates',async()=>{
   render(<AdminContentPermissions actorId={id(9)}/>);fill();fireEvent.click(screen.getByLabelText('reference.review'))

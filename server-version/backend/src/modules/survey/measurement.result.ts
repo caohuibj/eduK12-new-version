@@ -26,6 +26,7 @@ const feedbackLabels={hitRate:'Go 命中率',goMedianRtMs:'Go 正确反应中位
 export function cognitiveParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,
   collectionClosed:boolean){
   const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
+  if(unit.sourceProvenance?.reportConfigured===false)return null
   if(frozen.feedback.mode!=='DESCRIPTIVE'||result.notExecuted)return null
   if(frozen.feedback.release==='AFTER_COLLECTION'&&!collectionClosed)return {pending:true as const}
   if(!result.measurement||result.measurement.measurementDigest!==frozen.measurementDigest)

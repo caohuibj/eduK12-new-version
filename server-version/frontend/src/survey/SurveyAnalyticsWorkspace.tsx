@@ -1,3 +1,4 @@
+import {StoredPackageReports} from './StoredPackageReports'
 import './survey-workspace-polish.css'
 import {CheckCircle2,ClipboardCheck,Filter,UserMinus} from 'lucide-react'
 import {readableAnswerCsv} from './readable-answer-export'
@@ -723,6 +724,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
         <summary>参考版本与历史报告 · 高级工具</summary>
         <p>需要编制项目样本参考或查看已保存报告时，再展开以下工具。</p>
         <SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
+        <StoredPackageReports key={'package:'+projectId+':'+waveId} projectId={projectId} waveId={waveId}/>
         <SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
       </details>}
     </>}

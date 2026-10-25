@@ -50,9 +50,9 @@ export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;
   },[load])
   return <section id="survey-authorized-catalog" tabIndex={-1} className="survey-catalog border rounded-xl p-4 space-y-3" aria-label="授权原版工具目录">
     <h3 className="font-semibold">导入已授权的原版工具</h3>
-    <p className="text-sm text-slate-600">仅列出系统管理员授予您的明确版本；导入后不能编辑原版内容或计分。撤销授权后不能再次导入或冻结发布，既有已发布研究不受影响。</p>
+    <p className="text-sm text-slate-600">仅列出Survey 管理员授予您的明确版本；导入后不能编辑原版内容或计分。撤销授权后不能再次导入或冻结发布，既有已发布研究不受影响。</p>
     {error&&<p role="alert">{error}</p>}
-    {!loading&&!error&&!list.length&&<p className="text-sm">暂无可导入的授权工具。请联系系统管理员确认具体工具与版本。</p>}
+    {!loading&&!error&&!list.length&&<p className="text-sm">暂无可导入的授权工具。请联系 Survey 管理员确认具体工具与版本。</p>}
     {loading&&<p role="status">正在加载授权目录…</p>}
     <label className="block text-sm">筛选当前页授权工具<input type="search" className="input block w-full" value={query} onChange={event=>setQuery(event.target.value)} placeholder="输入当前页的工具名称"/></label>
     {!loading&&!error&&list.length>0&&<p role="status" className="text-sm">当前页显示 {filtered.length} / {list.length} 项；仅筛选已加载的本页，不搜索其他页。</p>}

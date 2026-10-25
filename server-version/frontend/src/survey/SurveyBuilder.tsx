@@ -1,3 +1,5 @@
+import {ResearchPackageCatalog} from './ResearchPackageCatalog'
+import {SubmitSurveyToolToLibrary} from './SubmitSurveyToolToLibrary'
 import {toolLibraryApi} from './tool-library-api'
 import { SurveySectionHeader } from './SurveySectionHeader'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
@@ -435,6 +437,8 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         </div></details>
       </aside>
     </div>
+    {!legacyOnly&&active&&!licensedReadOnly&&<SubmitSurveyToolToLibrary projectId={projectId} draft={active} dirty={dirty} busy={busy}/>}
+    {!legacyOnly&&<ResearchPackageCatalog projectId={projectId} busy={busy} onImported={async()=>{await refreshList()}}/>}
     {!legacyOnly&&<ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>}
     </fieldset>
   </section>

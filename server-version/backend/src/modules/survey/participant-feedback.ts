@@ -44,6 +44,7 @@ const recordedScores=z.object({
 /** Project saved authoritative scores only. No scorer, reference resolver,
  * template rendering, population inference, or private result spreading. */
 export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnitResult,collectionClosed:boolean){
+  if(unit.sourceProvenance?.reportConfigured===false)return null
   if(!['SCALE','SJT'].includes(unit.kind)||!unit.participantFeedback||result.notExecuted)return null
   const policy=surveyRawFeedbackSchema.parse(unit.participantFeedback)
   if(policy.mode!=='DESCRIPTIVE')return null

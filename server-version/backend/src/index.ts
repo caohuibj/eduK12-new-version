@@ -1,3 +1,4 @@
+import {surveyGovernedToolsRouter,surveyGovernedUseRouter,surveyGovernedResearcherRouter} from './modules/survey/governed-tool.routes'
 import huiteacherPrivateFormRuntimeRoutes from './modules/huiteacher/privateFormRuntime.routes'
 import { educationSchoolScaleReportRouter, educationTeacherScaleReportRouter } from './modules/reporting/education-scale-report.routes'
 import {trainingScaleLibraryGovernanceRouter,surveyScaleLibraryGovernanceRouter} from './modules/scale-library-governance/routes'
@@ -27,6 +28,9 @@ import { surveyWavesRouter } from './modules/survey/waves.routes'
 import { surveyAnalyticsRouter } from './modules/survey/analytics.routes'
 import { surveyExportsRouter } from './modules/survey/analytics.export.routes'
 import { publicSurveyRouter } from './modules/survey/public.routes'
+import {surveySystemDataRouter} from './modules/survey/system-data.routes'
+import {surveyStandardTripletRouter} from './modules/survey/standard-triplet.routes'
+import {surveyLibraryAdminRouter} from './modules/survey/library-admin.routes'
 import { surveyPlatformRouter } from './modules/survey/platform.routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
@@ -322,6 +326,12 @@ const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 }
 app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
+app.use('/api/platform/survey-system',surveyFeatureGuard,platformSurveyOriginGuard,surveySystemDataRouter)
+app.use('/api/platform/survey-tools',surveyFeatureGuard,platformSurveyOriginGuard,surveyGovernedToolsRouter)
+app.use('/api/platform/survey-tool-use',surveyFeatureGuard,platformSurveyOriginGuard,surveyGovernedUseRouter)
+app.use('/api/survey/governed-projects',surveyFeatureGuard,surveyGovernedResearcherRouter)
+app.use('/api/platform/survey-standard',surveyFeatureGuard,platformSurveyOriginGuard,surveyStandardTripletRouter)
+app.use('/api/platform/survey-library',surveyFeatureGuard,platformSurveyOriginGuard,surveyLibraryAdminRouter)
 app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
 const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
   if(process.env.HUITEACHER_WORKSPACE_ENABLED!=='true')

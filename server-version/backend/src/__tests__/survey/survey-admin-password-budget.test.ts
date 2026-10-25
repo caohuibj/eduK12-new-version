@@ -14,7 +14,7 @@ describe('Survey current admin password failure budget',()=>{
  beforeEach(()=>{
   vi.stubEnv('NODE_ENV','production');vi.clearAllMocks()
   mock.find.mockResolvedValue({isActive:true,isFrozen:false,accountDomain:'TRAINING',platformRole:'STANDARD',passwordHash:'synthetic-hash'})
-  mock.authority.mockResolvedValue([{id:actor}])
+  mock.authority.mockResolvedValue([{id:actor,role:'STANDARD'}])
   mock.compare.mockResolvedValue(true);mock.state.mockResolvedValue({count:0,retryAfterSeconds:0})
   mock.consume.mockResolvedValue({allowed:true,remaining:14,retryAfterSeconds:900})
   mock.gate.mockImplementation(async(operation:()=>Promise<unknown>)=>operation())

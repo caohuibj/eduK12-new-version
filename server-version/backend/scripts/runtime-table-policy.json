@@ -188,6 +188,9 @@
     "submission_histories": "RUNTIME_RW",
     "submission_idempotency_receipts": "RUNTIME_RW",
     "submissions": "RUNTIME_RW",
+    "survey_admin_data_audits": "RUNTIME_RW",
+    "survey_system_export_grants": "RUNTIME_RW",
+    "survey_tool_policies": "RUNTIME_RW",
     "survey_accounts": "RUNTIME_RW",
     "survey_attempt_checkpoints": "RUNTIME_RW",
     "survey_cognitive_results": "RUNTIME_RW",
@@ -246,6 +249,15 @@
     "scale_library_media": "RUNTIME_RW",
     "survey_tool_templates": "RUNTIME_RW",
     "survey_tool_selections": "RUNTIME_RW",
-    "survey_participant_codes": "RUNTIME_RW"
+    "survey_participant_codes": "RUNTIME_RW",
+    "survey_standard_versions": "RUNTIME_RW",
+    "survey_standard_releases": "RUNTIME_RW",
+    "survey_standard_trials": "RUNTIME_RW",
+    "survey_governed_tools": "RUNTIME_RW",
+    "survey_governed_trials": "RUNTIME_RW",
+    "survey_package_grants": "RUNTIME_RW",
+    "survey_package_imports": "RUNTIME_RW",
+    "survey_package_members": "RUNTIME_RW",
+    "survey_package_report_artifacts": "RUNTIME_RW"
   }
 }

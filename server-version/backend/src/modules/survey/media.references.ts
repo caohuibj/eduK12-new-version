@@ -1,4 +1,5 @@
 import {authorizedCatalogSjtMedia} from './catalog-sjt-media.authorization'
+import {authorizedGovernedUnitMedia} from './governed-tool.media'
 import {ownedScope} from './material-scope'
 import {materialListSchema,materialLimits,stimulusMaterials,type AssessmentMaterial} from '../assessment-media/material'
 import {authorizedLibraryUnitMedia,type LibraryBoundMediaUnit} from '../scale-library-governance/media.authorization'
@@ -40,8 +41,9 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const nativeUnits:UnitDef[]=[]
   const libraryRefs:Array<{assetId:string;contentHash:string;mimeType:string}>=[]
   for(const unit of units){
-    const sjt=await authorizedCatalogSjtMedia(tx,userId,unit)
-    const authorized=sjt??await authorizedLibraryUnitMedia(tx,userId,unit)
+    const governed=await authorizedGovernedUnitMedia(tx,userId,unit)
+    const sjt=governed===null?await authorizedCatalogSjtMedia(tx,userId,unit):null
+    const authorized=governed??sjt??await authorizedLibraryUnitMedia(tx,userId,unit)
     if(authorized===null)nativeUnits.push(unit)
     else libraryRefs.push(...authorized)
   }

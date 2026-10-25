@@ -2,6 +2,9 @@ import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthori
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
+import {isGovernedSource} from './governed-tool.model'
+import {readGovernedSource} from './governed-tool.service'
+import {isSurveyStandardSource,readOnlineStandardSnapshot} from './standard-triplet.catalog'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -98,7 +101,7 @@ export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:Ca
     return adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
       String(current.provenance.definitionHash))
   }
-  if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION)return current
+  if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION||isGovernedSource(stored.ref.sourceId))return current
   const legacy=adaptLegacyCatalogScale(current.ref,current.title,current.compiledDefinition as ScaleDefinitionV2)
   return {...current,...legacy,provenance:{...current.provenance,...legacy.provenance}}
 }
@@ -228,13 +231,13 @@ async function formScope(actorUserId:string,organizationId:string|undefined,db:D
 /** Caller owns Survey grant/owner authority; this function independently enforces source scope and freshness. */
 export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef},db:Database=prisma):Promise<CatalogSourceSnapshot>{
   if(db===prisma)return prisma.$transaction(tx=>getCatalogSourceSnapshot(input,tx))
-  if(input.ref.kind==='FORM'&&!input.ref.sourceId.startsWith('questionnaire:'))await formScope(input.actorUserId,input.ref.organizationId,db)
+  if(input.ref.kind==='FORM'&&!input.ref.sourceId.startsWith('questionnaire:')&&!isGovernedSource(input.ref.sourceId))await formScope(input.actorUserId,input.ref.organizationId,db)
   await lockCatalogSourceRows([input.ref],db)
   return readCatalogSourceSnapshot(input,db,true)
 }
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
-  const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
+  const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
   // Source advisory locks must precede Scale row locks. A queued license writer
   // would otherwise invert the explicit converter's source -> Scale order.
   const scaleIds=ids('SCALE')
@@ -260,7 +263,9 @@ async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promis
 }
 async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef;pinnedSjtAuthority?:unknown},db:Database,verifiedFormScope:boolean,scaleAuthorityDb:Database=db,scaleReleases?:ReadonlyMap<string,StoredRelease>):Promise<CatalogSourceSnapshot>{
   const {ref}=input
+  if(isGovernedSource(ref.sourceId))return readGovernedSource(scaleAuthorityDb,ref.sourceId,ref.sourceVersion)
   if(ref.kind==='SCALE'){
+    if(isSurveyStandardSource(ref.sourceId))return readOnlineStandardSnapshot(scaleAuthorityDb,ref.sourceId,ref.sourceVersion)
     const row=await db.scale.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
     if(!row)fail('SOURCE_NOT_PUBLISHED')
     if(isAssessmentOperationallyPaused({family:'SCALE',key:row!.code,version:ref.sourceVersion}))fail('SOURCE_OPERATIONALLY_PAUSED')
@@ -324,31 +329,39 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   if(kind==='SJT'&&db===prisma)return prisma.$transaction(tx=>listCatalogSources(input,tx))
   const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.max(1,Math.floor(input.page||1))
   if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
-  const offset=(page-1)*limit,take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
+  let offset=(page-1)*limit
+  const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
+  if(kind!=='SCALE'){
+    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string}>>`SELECT id,title,snapshot_hash FROM survey_governed_tools WHERE family=${kind} AND state='ONLINE' ORDER BY submitted_at,id`
+    for(const row of governed.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},title:row.title})
+    offset=Math.max(0,offset-governed.length)
+  }
   if(kind==='SCALE'){
-    const rows=await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD'},orderBy:{id:'asc'},skip:offset,take})
+    const online=await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string}}>>`SELECT id,combination_hash,snapshot FROM survey_standard_releases WHERE state='ONLINE' ORDER BY tool_key,created_at,id`
+    for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
+    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
     const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED').sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
-    for(const pkg of builtins.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
+    for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
     const rows=refs.length<take?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.instrumentKey})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
-    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take})
+    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.configVersion},title:row.name})
     cached={cognitiveTestConfig:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.configVersion===where.configVersion)??null}} as unknown as Database
   }else if(kind==='FORM'&&!input.organizationId){
-    const rows=await db.questionnaireFormSection.findMany({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take})
+    const rows=await db.questionnaireFormSection.findMany({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:'questionnaire:'+row.id,sourceVersion:questionnaireFormSourceVersion(row)},title:row.title})
     cached={questionnaireFormSection:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.questionnaire.creatorId===where.questionnaire.creatorId)??null}} as unknown as Database
   }else if(kind==='FORM'){
     await formScope(input.actorUserId,input.organizationId,db)
-    const rows=await db.huiteacherFormInstrument.findMany({where:{organizationId:input.organizationId,status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take})
+    const rows=await db.huiteacherFormInstrument.findMany({where:{organizationId:input.organizationId,status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:String(row.revision),organizationId:input.organizationId},title:row.title})
     cached={huiteacherFormInstrument:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.organizationId===where.organizationId&&r.revision===where.revision)??null}} as unknown as Database
   }else fail('SOURCE_KIND_UNSUPPORTED')
@@ -373,8 +386,8 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   if(entries.length>30)fail('SOURCE_PUBLICATION_LIMIT')
   const refs=entries.map(e=>e.snapshot.ref)
   await lockCatalogSourceRows(refs,db)
-  const scales=refs.filter(r=>r.kind==='SCALE'),sjts=refs.filter(r=>r.kind==='SJT'&&!r.sourceId.startsWith('registry:')),
-    cognitive=refs.filter(r=>r.kind==='COGNITIVE'),forms=refs.filter(r=>r.kind==='FORM'&&!r.sourceId.startsWith('questionnaire:')),questionnaireForms=refs.filter(r=>r.kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))
+  const scales=refs.filter(r=>r.kind==='SCALE'&&!isGovernedSource(r.sourceId)),sjts=refs.filter(r=>r.kind==='SJT'&&!isGovernedSource(r.sourceId)&&!r.sourceId.startsWith('registry:')),
+    cognitive=refs.filter(r=>r.kind==='COGNITIVE'&&!isGovernedSource(r.sourceId)),forms=refs.filter(r=>r.kind==='FORM'&&!isGovernedSource(r.sourceId)&&!r.sourceId.startsWith('questionnaire:')),questionnaireForms=refs.filter(r=>r.kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))
   const [scaleRows,sjtRows,cognitiveRows,formRows,questionnaireRows]=await Promise.all([
     scales.length?db.scale.findMany({where:{status:'PUBLISHED',OR:scales.map(r=>({id:r.sourceId,instrumentVersion:r.sourceVersion}))},take:30}):[],
     sjts.length?db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED',OR:sjts.map(r=>({id:r.sourceId,instrumentVersion:r.sourceVersion}))},take:30}):[],
@@ -384,7 +397,7 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   ])
   const scaleReleases=await getContentReleaseBatch(db,scaleRows.flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]),true)
   const verifiedScopes=new Set<string>()
-  for(const entry of entries)if(entry.snapshot.ref.kind==='FORM'&&!entry.snapshot.ref.sourceId.startsWith('questionnaire:')){
+  for(const entry of entries)if(entry.snapshot.ref.kind==='FORM'&&!entry.snapshot.ref.sourceId.startsWith('questionnaire:')&&!isGovernedSource(entry.snapshot.ref.sourceId)){
     const key=JSON.stringify([entry.actorUserId,entry.snapshot.ref.organizationId])
     if(!verifiedScopes.has(key)){await formScope(entry.actorUserId,entry.snapshot.ref.organizationId,db);verifiedScopes.add(key)}
   }
@@ -410,7 +423,7 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
  * Only elapsed time can change now. Reuse the verified snapshot after later
  * publication/asset waits instead of rereading/compiling entire packages. */
 export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
-  const managed=[...snapshots].filter(snapshot=>snapshot.ref.kind==='SCALE'&&snapshot.provenance.instrumentClass==='STANDARD')
+  const managed=[...snapshots].filter(snapshot=>snapshot.ref.kind==='SCALE'&&snapshot.provenance.instrumentClass==='STANDARD'&&!snapshot.provenance.surveyStandardReleaseId)
   if(!managed.length)return
   const [clock]=await db.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
   if(!clock)fail('SOURCE_SCALE_CLOCK_UNAVAILABLE')

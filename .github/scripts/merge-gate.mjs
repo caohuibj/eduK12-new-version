@@ -1,3 +1,4 @@
+import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
 import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
@@ -60,6 +61,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='survey-governance')return ['scope','survey-governance','codeql'];
   if(scope.application_route==='training-polish')return ['scope','training-polish','codeql'];
   if(scope.application_route==='sjt-native')return ['scope','sjt-native','codeql'];
   if(scope.application_route==='training-entry')return ['scope','training-entry','codeql'];
@@ -138,6 +140,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='survey-governance'){
+    try{const p=JSON.parse(scope.survey_governance_plan);if(draft||p.postMerge!==false||p.route!=='survey-governance'||Object.entries(surveyGovernanceOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='training-polish'){
     try{const p=JSON.parse(scope.training_polish_plan);if(draft||p.postMerge!==false||p.route!=='training-polish'||Object.entries(trainingPolishOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -432,6 +438,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='survey-governance'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_governance_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(surveyGovernancePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-governance-plan');}catch{failed.push('recomputed-survey-governance-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='training-polish'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_polish_plan);if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(trainingPolishPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-training-polish-plan');}catch{failed.push('recomputed-training-polish-plan');}
   }

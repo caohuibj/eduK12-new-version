@@ -1,0 +1,1047 @@
+{
+  "schema": 1,
+  "base": "31d9e4cb933395acda3e2123f100a0a1a66a869b",
+  "product": "6fadf6de2a27394fd6b75de6b5389f11364142ce",
+  "source": {
+    "docs/survey-unified-tool-management.md": {
+      "before": null,
+      "after": "e878572479f4205a05832cd8921fc6c27a6a5647",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/prisma/migrations/20261024110000_survey_admin_separation/migration.sql": {
+      "before": null,
+      "after": "afe3a8e52ff57a1b5eb054a163dd0ae4a48c7a61",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/prisma/migrations/20261024133000_survey_standard_triplets/migration.sql": {
+      "before": null,
+      "after": "42e431afccd68584bde6d1e547e16009a8355859",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/prisma/migrations/20261024153000_survey_all_tool_governance/migration.sql": {
+      "before": null,
+      "after": "5122a8fc745c58df621845492672ab8dbe9ff3f2",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "b75acf10b51f520b1e0c2ac3f68d720ad2fe15ef",
+      "after": "a30f925de8f8415a296439927dee6b2cec1e0fe3",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/scripts/runtime-table-policy.json": {
+      "before": "ea7d59004aacc51c31799e9c0a79e1a80d400b45",
+      "after": "e840557408a5e2a647fe8349ca032add95835faa",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/local-entry-boundary.postgres.integration.test.ts": {
+      "before": null,
+      "after": "91ec31ab6a37bba919bb0aa87785e68e9e1d1e87",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/measurement-content/survey-report-results.test.ts": {
+      "before": "3956b8f812cb39991fcd983271208d2d93b736cd",
+      "after": "71ca4e745ba4e70f13016651c0accb3ee5e7a939",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/admin-separation.postgres.integration.test.ts": {
+      "before": null,
+      "after": "38063fe74b60ff2a704c0d278c93dfa4f97a3de1",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/deidentified-export.test.ts": {
+      "before": null,
+      "after": "4e69675b98e8853991a642f2472cab55a8fad478",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/governed-tool.fixtures.ts": {
+      "before": null,
+      "after": "365d55f7db65577ec4bae85bb1c56529e282a899",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/governed-tools.postgres.integration.test.ts": {
+      "before": null,
+      "after": "a9117072e5679567f800ee9e0d3625418cc96711",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/governed-tools.test.ts": {
+      "before": null,
+      "after": "b9b2cefae046dc1ba3ce44090eb38a7508b77eb1",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts": {
+      "before": null,
+      "after": "e7e4f1f0bd7e59bb1694209a0a0f284f3e7cef05",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/standard-triplet.test.ts": {
+      "before": null,
+      "after": "d1cc38e45422ce7b2da3565355f84e1c5eef8d67",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/survey-admin-password-budget.test.ts": {
+      "before": "9c02c47bf9c6f91835d1b988f3ecf7064c95161f",
+      "after": "4922bdf5e9b3d334f315668286423da11a886477",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/survey/tool-management-policy.test.ts": {
+      "before": null,
+      "after": "1591cf6c38221db6366e7e07fd4cc9e3a9be7760",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/index.ts": {
+      "before": "84c4f9f89dba0a47577fc11e64679a277448bf7b",
+      "after": "9b8b0f9bc78282ce68b6df1d37ef9c76f2fca3d8",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/middleware/auth.ts": {
+      "before": "77bcfc977c6824b72fc4c736ee9cc0bc3b530a63",
+      "after": "c5a09cd75ef7df0abf38052255413af66aebff66",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/admin-permissions/guards.ts": {
+      "before": "5acb0b36c9ed7b4dd8e667abb4a9ac68c38993ea",
+      "after": "1820c115cd3d7c66c89c5c7c8cc73960d78a03a1",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/admin-permissions/service.ts": {
+      "before": "ddefa4ff1431601f5cec7311af4dd3703d18197c",
+      "after": "b1064ebe48f1032499a2f42ae49b579ad26ee4e9",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/organization/principal.ts": {
+      "before": "3dcc96edf9a3acb42cab949291157ad44ca0c270",
+      "after": "900c77f0f4455f70ceb1320fcb89a28d5e12996c",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/scale-library-governance/authority.ts": {
+      "before": "3999dbc74e2df4c9afdcc17d4b1fee66c5040d26",
+      "after": "56094a615f4e3c61c523009116ff6a21b580150a",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/scale-library-governance/distribution.ts": {
+      "before": "37c809a9715d13a4b782a5d14b4e4a6debeca2cb",
+      "after": "ac2fb7f9841fe45aff5dccf7d01462e3f0337460",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/scale-library-governance/service.ts": {
+      "before": "1a593f4909889ab99da0d1e70f3ad806f6c13f96",
+      "after": "af6c41074ee63801c8904f0057740e992f46662a",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/admin-role.ts": {
+      "before": null,
+      "after": "41e98bf0efc53cac217c8eb1417bacd366198ce0",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/analytics.source.ts": {
+      "before": "f1822df61c3d6ec53639921d88a2ed9c8525f13e",
+      "after": "3b427ef48516acd3bd754b565889660414896a9e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/builder.service.ts": {
+      "before": "8f674749ca9fa78191ee3dc7b14e59699de67bac",
+      "after": "a2d22eb2241a43e66dba22e00bb99213d0f9d9b6",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/catalog.service.ts": {
+      "before": "05520969cf07b247fad04dbf2b6dbb7851b6525c",
+      "after": "1db13ed6be411058b898698c0d67906c4322151c",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/catalog.sources.ts": {
+      "before": "925a4a5c0c367fe881b20baa5f670b00c05cb80b",
+      "after": "261f368f21ebe64a5425ca5ec4367274bd4b1fa4",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/content-binding.service.ts": {
+      "before": "d3f8685cd6fed395fe4c3a1e54db57d461336529",
+      "after": "6e1a2c999542cce5739cfca0754ec16112ec164c",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/deidentified-export.ts": {
+      "before": null,
+      "after": "731a9ed270034606a02e4d3ab3f437d51a9bc941",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/final.service.ts": {
+      "before": "32f0f2e441bfc07daa8912d9de9da337fd4a8523",
+      "after": "3a80408b58f3d61f5456c7a3c9ef8cf6144c3e8f",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governance.service.ts": {
+      "before": "4cf44aed01e1a2ade5f872e745dd4b16821e2ad7",
+      "after": "b2c8c72c4506c3c03e55bebad4c278c1e7660c90",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-package.reports.ts": {
+      "before": null,
+      "after": "ff60739ab21d140f444fe7c79b525fa400cc2214",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-package.service.ts": {
+      "before": null,
+      "after": "32ae7a2ad1f67d7d4ccd17970dfcdb211d2a68ad",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.content.ts": {
+      "before": null,
+      "after": "5a101e804cbd684da41faf003f98f7a9f19e2041",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.media.ts": {
+      "before": null,
+      "after": "f82134656a8b44e53e85e3b62e2bdfd667f912b6",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.model.ts": {
+      "before": null,
+      "after": "24b3510f871143b84c3b74a335291bd1b9d7b209",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.reports.ts": {
+      "before": null,
+      "after": "cff4964c30ae8c15415ec3ef86401d4df0ab00a4",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": {
+      "before": null,
+      "after": "1015227466456017afdcff37e9d3e4ecd30f7651",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": {
+      "before": null,
+      "after": "5b788f9e5c858cd32a8d5d9fc2fe1dec669b0c11",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.trial.ts": {
+      "before": null,
+      "after": "a36820e41e8aa9a05bd139ba6576bb39e628d75e",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/library-admin.routes.ts": {
+      "before": null,
+      "after": "819d50eebd8b7d6428eb0f227d85911cec2cd51d",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/library-admin.service.ts": {
+      "before": null,
+      "after": "9240cd2c10a1bb67981f0b6a2c660abe7ac39e5b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/measurement.result.ts": {
+      "before": "7280d30a8a4851d79235cba05e7586eb7a0bfdc1",
+      "after": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/media.references.ts": {
+      "before": "74e08c3e6bd5f16302b2a5aba2ce23078b629cb9",
+      "after": "f4a4bfc73842442a454bc101b94a7892fbf59b29",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "before": "fb910f9a196dab3e59ce264b4c13222dd8dee17e",
+      "after": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/platform.routes.ts": {
+      "before": "5c110054fc597538f8da7596f279368d728fef62",
+      "after": "af531d33b898e1066cf1d7c77ffa7a52f803c413",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/publication.service.ts": {
+      "before": "2dcec4c3887bc7d3297d9f50da4e8e17b60ca56e",
+      "after": "022904856e08258d05dcdaf3b2073c1bbf51339b",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/report-results.service.ts": {
+      "before": "25ab26c12235876f5817de12de08b4320a322e79",
+      "after": "406db30d50adbe087f95adcffc0cbc2dc3f54d0e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.catalog.ts": {
+      "before": null,
+      "after": "19d640bd2170669a3f8eaec19c9c7fb2c19a1182",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.content.ts": {
+      "before": null,
+      "after": "360d795d37caac503a6b3004db250d5dfb3ba933",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
+      "before": null,
+      "after": "bf2365f871cf6dd728a66261c33f00b18b8258e7",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.routes.ts": {
+      "before": null,
+      "after": "1e031a186d217bcbbf7a9f8d11c37b5d1b858eee",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": {
+      "before": null,
+      "after": "541bc1ca74efe3923172c5e9496da51c5141809b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/system-data-authority.ts": {
+      "before": null,
+      "after": "77067230372217160bb94375adb8ed84475b3109",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/system-data.routes.ts": {
+      "before": null,
+      "after": "7c774899cf3be958d4bf4ac208b3ebf751e736b1",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/system-data.service.ts": {
+      "before": null,
+      "after": "eb78620cff1076b693d3c40336da09964d78c04b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/tool-management-policy.ts": {
+      "before": null,
+      "after": "c9fbe7a46a342c7a76935ae24a0e01cd8f9548d2",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/tool-policy.ts": {
+      "before": null,
+      "after": "4d38f28df56b0e21a6a815f35ffd3719d0a5bd7f",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/tool-reference.ts": {
+      "before": null,
+      "after": "ababf95407f273ddf9ea22c6ac04b8afb4804b56",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/training-analysis/source.ts": {
+      "before": "c1e0e321e2a76bd5fb6d6a8873d439f4c765fbe0",
+      "after": "c3dcd864b1052319056005f61e19c75e1d1fc9e2",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/public/system-admin.svg": {
+      "before": null,
+      "after": "e76a486e1a801af7f6323512e23b537c0d9fbafd",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "before": "71faaf9422104084705d15e1c63465373c922fba",
+      "after": "f47dc912986d19146df86ff6601abc0ef9178bba",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminAccess.tsx": {
+      "before": "7d5420bdb5bee86d77719b8521891a03f55f5f92",
+      "after": "42dcf7867bf782f8da4973df2056f94a2fdbd7e2",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": {
+      "before": "a3b5141eb5372439d10f1abc4ab1ee5c9b3e6220",
+      "after": "760ce5fdbb19f5d404a61fe54c5caa5d06d3d287",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminContentPermissions.tsx": {
+      "before": "9218335198e5c3e7888c20725cfdde09ab55a740",
+      "after": "700b5ecd7a6a83baf6c97c1851130b0b0cecd4c6",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminEntrances.tsx": {
+      "before": "bfc17e3dd76f7548ae7cb4af890cbb2bbe4ec930",
+      "after": "7cf2e79aac61c8c01690da978dead7f3ecbc73c6",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminKeyEnrollment.tsx": {
+      "before": "169ffa1e1c212db2cb876557732cc185355ddb85",
+      "after": "bb557543a9fce69a4bbed82dd94bbf6c43d85d6e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminPermissions.test.tsx": {
+      "before": null,
+      "after": "88791f9367c2236108d1c257b637db4823f5bd82",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminPermissions.tsx": {
+      "before": "8a5ccbb3943a7ddc9863e21209057920696ae2ac",
+      "after": "712ad6bb55e565350de1c4ac2d3302780f7decc4",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/AdminStaticSjtPublication.test.tsx": {
+      "before": "24be3cce5c3f20613ed5d6e939fa58049fe168f5",
+      "after": "d2de7d2ab6b05ba7cb248e993e6bb9cd28322a0a",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SurveyAdminEnrollmentContext.test.tsx": {
+      "before": "c77123677c7f6f25d4e6cbb617e491244d470077",
+      "after": "53286e7399b6af811338cafbce848af1f7dce2ae",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SystemAdminEntryShell.tsx": {
+      "before": null,
+      "after": "2d923ff66aaf2c8042f3e34908896b9346d65985",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SystemAdminHome.test.tsx": {
+      "before": null,
+      "after": "e4a69c50cd649dd043ce5c46f1575f3119fc22da",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SystemAdminHome.tsx": {
+      "before": null,
+      "after": "f3587b4768d9614c09b740c1faddcbb21e3f3a46",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SystemAdminShell.tsx": {
+      "before": null,
+      "after": "503857525c3ee662e99ddf42a00d1d2880690d80",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/authority.ts": {
+      "before": "cd726c05ce75271ae9a773cb75cbafb1a81f9a75",
+      "after": "468f4a37cbd5606b69bf6c4c93ead291b7015c91",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/navigation.ts": {
+      "before": "7aedd50f53a258c57e24075c7830cc3fa021a3f3",
+      "after": "72e4bb5c61dffe7149e4558cadff8014001f2459",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/system-admin.css": {
+      "before": null,
+      "after": "36f5b7b6cbed6c6344938b61b762b53ba1157c6b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/systemWorkspace.ts": {
+      "before": null,
+      "after": "167788ad7d1dfc37414d954c17d92178e6ef6ba8",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/api/surveyGovernance.ts": {
+      "before": null,
+      "after": "e5a3887371254248c741dcdcdd69604b2310e3cd",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/api/surveyManagement.ts": {
+      "before": null,
+      "after": "1784843b01fea0639c097f9dc6302dfe3844a506",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/api/surveyStandard.ts": {
+      "before": null,
+      "after": "7435594899bdc2be9144e977d3b7a0d67e9abe48",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "7dcb2945f8775ad9cab7378c472fa3863d97ee33",
+      "after": "0f5f349943e8ee065642315863c36dc50de17b9e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "a81d98d28cb0a0d110ccc63b0c282b1b98ad7d16",
+      "after": "d43dfa6e349c6b68dd957d5a8f4e09f721b92931",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": {
+      "before": "94720f68743bb92fb12a4a5528046428ee3e960a",
+      "after": "67e09ac4ef2e3d335cbba94a046ed874bb4a82e4",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/AdminLogin.tsx": {
+      "before": "1dbc0166a90415b162ee8b016882b715d58f7659",
+      "after": "d10d9ebdb4b2e02080aa086a4771370f0feaf51e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolLibrary.tsx": {
+      "before": null,
+      "after": "0236431bab3731c060b05fa8a5a6e9df1e508185",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.test.tsx": {
+      "before": null,
+      "after": "4e088df3114f51057e894c5ee0b9f6264651c0d3",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.tsx": {
+      "before": null,
+      "after": "5e28506a1dd92b5ed561ec248fc93b013d77958e",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/OriginalSjtSubmission.tsx": {
+      "before": null,
+      "after": "c5165b9c8693e56915ddb8cd07b0f50fafe0dab8",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/ReportingContent.tsx": {
+      "before": "343ad4a49d2a98539470c6044bc7f8f91b6ebbe9",
+      "after": "8fb251862fea85cdf8c5232ea95a367364252d85",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx": {
+      "before": "9a6ed21a50f487da33b7e1998a0d65c0209f1ff8",
+      "after": "14e9717d9331655dd0dfa6d0eb3b641fe9542cd7",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
+      "before": "76e02953e2b5dc5b1cf6cffd6bc601da72ed94b2",
+      "after": "d9049fd8bf8d2563eccd3858cd4f9642d442715f",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": {
+      "before": null,
+      "after": "1fcaa1b53445c6d639500e48ecbd51012d2be956",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": {
+      "before": null,
+      "after": "9914cce9882ede869065e265415690da7b87b555",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+      "before": "c465957ab8515eed3ca62cc5e2bd2e749f73f9fb",
+      "after": "ff96c7e659d477fea3459261602b0890df66c0fd",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx": {
+      "before": null,
+      "after": "fc9d811d0a135dc6d6599871fb9555e7d01107fa",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.tsx": {
+      "before": null,
+      "after": "1f6d8028f731ff50f0e03426ef80c1d97c980022",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveyPackageGrantAdmin.tsx": {
+      "before": null,
+      "after": "cf0672230c5a38e32d4ad2c1ce3b41a03111a0ac",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "before": "74b736f02c2256974b2df39a850d5a4fbd098a55",
+      "after": "47cd197d6f419923491025769f833ad134d0bf21",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/SurveySystemAdmin.tsx": {
+      "before": null,
+      "after": "7cf325293ca90045d6006a5d18f4582a5c766596",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/ToolManagementDesign.tsx": {
+      "before": null,
+      "after": "a3c5b02778f0d13a3a5a6d7ed9504dd19799a682",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/__tests__/ReportingContent.test.tsx": {
+      "before": "5faf3c96c5602ce82e31929a55a73563a0cea8cf",
+      "after": "38c730306a150f1e36e621b9226b3f22c69668e3",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/survey-admin.css": {
+      "before": "9f42406b325c491a28fff4eae5c89f327ac04d10",
+      "after": "34bf87abd6a34d06381d06c7643540c49fdac9e8",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/survey-library.css": {
+      "before": "82601a2af10608fc2da64ef50c1baa79ab5be3fd",
+      "after": "e74472ee9bd3d8829bc06f9a74d44570435115c9",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/ResearchCatalog.tsx": {
+      "before": "b2697ca8b210da5b179a24c0f6b7488ab9896797",
+      "after": "4435877e0e5d5751ddbc7ff5442a7ecf3e6b6c48",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/ResearchPackageCatalog.tsx": {
+      "before": null,
+      "after": "0910d995e2f73ae3b106dd70f25a2e46f80bbd6b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/StoredPackageReports.tsx": {
+      "before": null,
+      "after": "ec0f65b44fc28517a577cda5936e6a523b25beb8",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/SubmitSurveyToolToLibrary.tsx": {
+      "before": null,
+      "after": "d1997a3ef29bd6bc3c8cd01f1938d7ee13476d69",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyAdminShell.tsx": {
+      "before": "e4041e9d7d9441a1f964bab9b28178dd3212a500",
+      "after": "61cfa49ecde252c9f1bb1f1d8633f0ca13fa79be",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "before": "a4416e96afb6b285de0f076f6f69be4e7922ca26",
+      "after": "23062aab4ee05d3c37d29f9e5fa1fc81fc22d7c8",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "before": "d428f5423f0c9de84a40a3e09b43a3526e85a42e",
+      "after": "56c9048930ff2d930cb29036c4c61b403ceffb4d",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "before": "d8f544d068f3c66f2689131b745598066a56023f",
+      "after": "e4f6f1af1c6d619e5d58a3e7d0e8c825b8ce6187",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/WavePackagePicker.tsx": {
+      "before": null,
+      "after": "c7e3317f3e2e1545c2970d12619fd614447efdd8",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/survey-admin-shell.css": {
+      "before": "e6167d9cb0ffdb390161af5bb7701809def536b9",
+      "after": "dc3c9643289030b28b9107cdc36b1c1bcb1f7b27",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    }
+  },
+  "controls": [
+    ".github/scripts/survey-governance-bindings.json",
+    ".github/scripts/survey-governance-scope.mjs",
+    ".github/scripts/survey-governance-checks.mjs",
+    ".github/scripts/survey-governance.test.mjs",
+    ".github/scripts/survey-governance-evidence.json",
+    ".github/scripts/survey-governance-db.py",
+    ".github/scripts/survey-governance-browser.mjs",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md",
+    ".github/scripts/survey-governance-restore-fixture.cjs"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "678fdfffd145fa01b3f4afedb8562a630c2154b2",
+    ".github/scripts/merge-gate.mjs": "413ca195a60d5e06a384040a4ade0a0bb3e36c36",
+    ".github/workflows/ci.yml": "cb760ba8b86982d1e03fa3f9832de2077223b483",
+    "docs/release/README.md": "4cc7f730ce9f1f6105e246f988fe6de015c98fc9"
+  },
+  "components": {
+    "frontend": "91cda22b8013a0f375f4ed0f6868a157d49dd523",
+    "backend": "daaf5007aad5a23b7e8ee97fd74616d0c0133c66"
+  },
+  "protectedInputs": {
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+  },
+  "evidenceSHA256": "092d03295c6d6a7ea20ad8517b3c807fb9e0f051e33d4fde81dfe1582d6ace7d",
+  "admittedCases": 20,
+  "checks": {
+    "backendUnit": [
+      "src/__tests__/measurement-content/survey-report-results.test.ts",
+      "src/__tests__/survey/deidentified-export.test.ts",
+      "src/__tests__/survey/governed-tools.test.ts",
+      "src/__tests__/survey/standard-triplet.test.ts",
+      "src/__tests__/survey/survey-admin-password-budget.test.ts",
+      "src/__tests__/middleware/auth.test.ts"
+    ],
+    "frontendTests": [
+      "src/admin/AdminContentPermissions.test.tsx",
+      "src/admin/AdminPermissions.test.tsx",
+      "src/admin/AdminStaticSjtPublication.test.tsx",
+      "src/admin/SurveyAdminEnrollmentContext.test.tsx",
+      "src/admin/SystemAdminHome.test.tsx",
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/pages/AdminLogin.test.tsx",
+      "src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "src/pages/admin/__tests__/ReportingContent.test.tsx"
+    ],
+    "lint": [
+      "src/App.tsx",
+      "src/admin/AdminAccess.tsx",
+      "src/admin/AdminContentPermissions.test.tsx",
+      "src/admin/AdminContentPermissions.tsx",
+      "src/admin/AdminEntrances.tsx",
+      "src/admin/AdminKeyEnrollment.tsx",
+      "src/admin/AdminPermissions.test.tsx",
+      "src/admin/AdminPermissions.tsx",
+      "src/admin/AdminStaticSjtPublication.test.tsx",
+      "src/admin/SurveyAdminEnrollmentContext.test.tsx",
+      "src/admin/SystemAdminEntryShell.tsx",
+      "src/admin/SystemAdminHome.test.tsx",
+      "src/admin/SystemAdminHome.tsx",
+      "src/admin/SystemAdminShell.tsx",
+      "src/admin/authority.ts",
+      "src/admin/navigation.ts",
+      "src/admin/systemWorkspace.ts",
+      "src/api/surveyGovernance.ts",
+      "src/api/surveyManagement.ts",
+      "src/api/surveyStandard.ts",
+      "src/components/app-shell/AppShell.tsx",
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/pages/AdminLogin.test.tsx",
+      "src/pages/AdminLogin.tsx",
+      "src/pages/admin/GovernedToolLibrary.tsx",
+      "src/pages/admin/GovernedToolsWorkspace.test.tsx",
+      "src/pages/admin/GovernedToolsWorkspace.tsx",
+      "src/pages/admin/OriginalSjtSubmission.tsx",
+      "src/pages/admin/ReportingContent.tsx",
+      "src/pages/admin/ScaleLibraryGovernance.test.tsx",
+      "src/pages/admin/ScaleLibraryGovernance.tsx",
+      "src/pages/admin/StandardTripletWorkspace.test.tsx",
+      "src/pages/admin/StandardTripletWorkspace.tsx",
+      "src/pages/admin/SurveyCatalogGrants.tsx",
+      "src/pages/admin/SurveyLibraryAdmin.test.tsx",
+      "src/pages/admin/SurveyLibraryAdmin.tsx",
+      "src/pages/admin/SurveyPackageGrantAdmin.tsx",
+      "src/pages/admin/SurveyResearchersAdmin.tsx",
+      "src/pages/admin/SurveySystemAdmin.tsx",
+      "src/pages/admin/ToolManagementDesign.tsx",
+      "src/pages/admin/__tests__/ReportingContent.test.tsx",
+      "src/survey/ResearchCatalog.tsx",
+      "src/survey/ResearchPackageCatalog.tsx",
+      "src/survey/StoredPackageReports.tsx",
+      "src/survey/SubmitSurveyToolToLibrary.tsx",
+      "src/survey/SurveyAdminShell.tsx",
+      "src/survey/SurveyAnalyticsWorkspace.tsx",
+      "src/survey/SurveyBuilder.tsx",
+      "src/survey/SurveyWaveStudio.tsx",
+      "src/survey/WavePackagePicker.tsx"
+    ],
+    "postgres": [
+      [
+        "governed-postgres",
+        "src/__tests__/survey/governed-tools.postgres.integration.test.ts",
+        "survey_alltools_test_governance",
+        "SURVEY_ALL_TOOLS_ISOLATED"
+      ],
+      [
+        "training-boundary-postgres",
+        "src/__tests__/local-entry-boundary.postgres.integration.test.ts",
+        "survey_alltools_test_training",
+        "SURVEY_ALL_TOOLS_ISOLATED"
+      ],
+      [
+        "admin-isolation-postgres",
+        "src/__tests__/survey/admin-separation.postgres.integration.test.ts",
+        "survey_permissions_test_governance",
+        "SURVEY_ADMIN_ISOLATED_TEST"
+      ],
+      [
+        "standard-triplet-postgres",
+        "src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "survey_triplet_test_governance",
+        "SURVEY_TRIPLET_ISOLATED"
+      ]
+    ]
+  },
+  "resume": {
+    "run": 40143699913,
+    "scopeJob": 121020524898,
+    "job": 121020585047,
+    "source": "470ece4b17e6d452fae72943c8dd7f5208ff9fb3",
+    "checkout": "cd0b4a9a0bfd98b0ac12b6b1d3bafebb29dc93bf",
+    "artifact": 12579502917,
+    "zipSHA256": "92a2f530c48d09d9646698db50d12f03d21b9abfd43d1373d5c25f707c098807",
+    "testRepairs": {
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": [
+        {
+          "before": "auth.user={id:'loading-admin',username:'manager',role:'STUDENT',",
+          "after": "auth.user={id:'loading-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "auth.user={id,username:'theme-admin',role:'STUDENT',",
+          "after": "auth.user={id,username:'theme-admin',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',",
+          "after": "auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "it('keeps the administrator banner and account location on the dedicated profile page',async()=>{\n    auth.user={id:'manager',username:'manager',role:'STUDENT',",
+          "after": "it('keeps the administrator banner and account location on the dedicated profile page',async()=>{\n    auth.user={id:'manager',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        }
+      ],
+      "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": [
+        {
+          "before": "expect(await screen.findByRole('heading',{name:'\u4e09\u7c7b\u7ba1\u7406\u5458\u7684\u6743\u9650\u8fb9\u754c'})).toBeVisible();",
+          "after": "expect(await screen.findByRole('heading',{name:'\u7cfb\u7edf\u4e0e\u56db\u4e2a\u5165\u53e3\u7ba1\u7406\u5458\u7684\u6743\u9650\u8fb9\u754c'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'School \u7ba1\u7406\u5458'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'Teacher \u7ba1\u7406\u5458'})).toBeVisible();"
+        }
+      ]
+    },
+    "failedFrontendCases": [
+      "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+      "Training management appearance on the admin origin keeps Training startup colors and loading copy while the administrator session is loading",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on accounts",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on courses",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on resources",
+      "Training management appearance on the admin origin loads the saved Training preference when entering from another admin-origin page",
+      "Training management section context keeps the administrator banner and account location on the dedicated profile page"
+    ]
+  },
+  "resume2": {
+    "run": 40144378159,
+    "scopeJob": 121022486566,
+    "job": 121022538783,
+    "sastJob": 121022538431,
+    "source": "130409e741a5570067ffe32f297b0b379cb8127c",
+    "checkout": "eee1db1e6b07f27d1fa8c7862e4523c4ed26e73a",
+    "artifact": 12579484251,
+    "zipSHA256": "8e9892294acea21cb1ff06c1cf8c04fea8f379a180f6e0a8671e5aa909f9c321",
+    "adminRetry": "independent Survey admin with real HTTP, current DB and deidentified export denies Survey managers platform authorization and denies self/coexisting Survey role grants"
+  },
+  "resume3": {
+    "run": 40145624195,
+    "scopeJob": 121026220278,
+    "job": 121026295810,
+    "sastJob": 121026295674,
+    "source": "c1ca42f6d7cbfa1cd8d92f3a51ef7e12ac5eb8f1",
+    "checkout": "006be0a361f2bdbe17bf393f746d772dcd6cc467",
+    "artifact": 12580995796,
+    "zipSHA256": "4bfdfe83077fa320bfb606b4205eb5fa05333ac4cc6d013e3d844650f397a090"
+  },
+  "resume4": {
+    "run": 40146021953,
+    "scopeJob": 121027413396,
+    "job": 121027458690,
+    "sastJob": 121027458817,
+    "source": "fc3e99eac60c4628d19ca22e06b35c5a3737aaa2",
+    "checkout": "2580cdbd24dbd41df306c81b9a00a53ad0f963a7",
+    "artifact": 12580477362,
+    "zipSHA256": "aa1b2ba5da15276c4dca3ba93c287816d55df9ae1893ef48aea9c83dc8e45adf"
+  },
+  "browserOrigin": "https://training.eduk12.top"
+}

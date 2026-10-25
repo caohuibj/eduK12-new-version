@@ -15,7 +15,7 @@ export async function assertEntryAdmin(db: Prisma.TransactionClient, userId: str
     WITH locked AS MATERIALIZED (
       SELECT u."id", u."expires_at" FROM "users" u JOIN "admin_entry_grants" g ON g."user_id"=u."id"
       WHERE u."id"=${userId} AND g."entry"=${entry} AND g."revoked_at" IS NULL
-        AND u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password"
+        AND u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password" AND u."platform_role"='STANDARD'
         AND u."account_domain" IN ('LEGACY','TRAINING') LIMIT 1 FOR SHARE OF u,g
     )
     SELECT "id" FROM locked WHERE "expires_at" IS NULL OR "expires_at">clock_timestamp()
@@ -46,6 +46,8 @@ export async function changeEntryGrant(input: {
     const target = locked.find(row=>row.id===input.targetUserId)
     if (!target || !['LEGACY', 'TRAINING'].includes(target.accountDomain))
       throw new AdminPermissionError(404, '管理账号不存在或不属于管理身份域')
+    if(input.active && (target.platformRole==='SYSTEM_ADMIN'||input.actorUserId===input.targetUserId))
+      throw new AdminPermissionError(403,'入口管理角色必须由独立账号承接，禁止自授或与系统角色叠加')
     const current = await tx.adminEntryGrant.findUnique({ where: { userId_entry: { userId: input.targetUserId, entry: input.entry } } })
     const version = current?.version ?? 0
     const active = Boolean(current && !current.revokedAt)

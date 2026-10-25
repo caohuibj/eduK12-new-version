@@ -1,3 +1,5 @@
+import SystemAdminEntryShell from '../admin/SystemAdminEntryShell'
+import {SYSTEM_HOME,isSystemLoginTarget} from '../admin/systemWorkspace'
 import {isTrainingAdminPath} from '../admin/trainingPages'
 import SurveyAdminOrigin from '../components/app-shell/SurveyAdminOrigin'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../products/origins'
@@ -28,12 +30,13 @@ const AdminLogin: React.FC = () => {
   const { mode } = useSurveyAppearance()
   const origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const systemEntry=isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
   const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
   const educationProduct=educationEntry(location.search)
-  const Shell = trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
+  const Shell = systemEntry ? SystemAdminEntryShell : trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
   const trainingRecovery = trainingEntry && readReauthReturn()?.target === new URLSearchParams(location.search).get('returnTo')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -61,7 +64,7 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <Shell tone="admin" title={educationProduct?`${educationProduct} 管理员登录`:trainingEntry?'培训管理员登录':'管理员登录'} description={educationProduct?'使用已获本产品管理授权的账号登录，管理学校开通与授权。':trainingEntry?'使用管理员账号与手机验证器动态码登录。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+    <Shell tone="admin" title={systemEntry?'系统管理员登录':educationProduct?`${educationProduct} 管理员登录`:trainingEntry?'培训管理员登录':'管理员登录'} description={systemEntry?'使用独立系统管理员账号与验证器，进入平台治理工作台。':educationProduct?'使用已获本产品管理授权的账号登录，管理学校开通与授权。':trainingEntry?'使用管理员账号与手机验证器动态码登录。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
       {...(trainingEntry?{
         brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
         className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
@@ -157,7 +160,7 @@ const AdminLogin: React.FC = () => {
             <p>已绑定实体安全密钥时，可在「验证方式」中切换为硬件安全密钥，再按提示连接密钥并验证。尚未绑定时，请使用 Authenticator。</p>
           </div>
         </details>
-      </>:<p className="mt-4"><Link to={educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
+      </>:<p className="mt-4"><Link to={systemEntry?'/admin/security/enroll?returnTo='+encodeURIComponent(SYSTEM_HOME):educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

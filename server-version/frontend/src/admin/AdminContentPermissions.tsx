@@ -52,7 +52,8 @@ function ContentPermissions({actorId}:{actorId:string}){
   const [pending,setPending]=useState<Request|null>(restored.request),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[issued,setIssued]=useState(false)
   const [lookup,setLookup]=useState(restoredRevocation.pending?.grantId??restored.request?.requestId??''),[row,setRow]=useState<Metadata|null>(null),[revokeReason,setRevokeReason]=useState(restoredRevocation.pending?.request.reason??'')
   const [sjtGrant,setSjtGrant]=useState<{mappingId:string;grantId:string}|null>(null)
-  const inFlight=useRef(false)
+  const inFlight=useRef(false),composer=useRef<HTMLDetailsElement>(null)
+  const [sjtExpanded]=useState(()=>{try{return Boolean(sessionStorage.getItem('admin-static-sjt:'+actorId))}catch{return true}})
   const library=purpose==='library-review'||purpose==='library-distribute'
   const sjtDistribution=product==='SURVEY'&&purpose==='sjt-distribute'
   const platform=library||sjtDistribution||product==='TRAINING'&&(purpose==='reference-governance'||purpose==='static-sjt')
@@ -107,6 +108,7 @@ function ContentPermissions({actorId}:{actorId:string}){
   }
   function prepareSjtGrant(mappingId:string){
     if(busy||pending||issued||recoveryBlocked||revocation)return
+    if(composer.current)composer.current.open=true
     setProduct('TRAINING');setPurpose('static-sjt');setSubject(actorId);setProject('');setResources(mappingId);setCaps([]);setDelegate(false);setFrom('');setUntil('');setReason('');setError('');setNotice('已填入精确 SJT 映射。请补充期限和原因，明确确认签发；准备来源本身不授予能力。')
   }
   async function read(){setRow(null);setError('');if(!uuid.test(lookup.trim())){setError('请填写有效授权 UUID');return}setBusy(true)
@@ -149,9 +151,9 @@ function ContentPermissions({actorId}:{actorId:string}){
   }
   return <section aria-labelledby="content-permissions-title" style={{overflowWrap:'anywhere'}}><h2 id="content-permissions-title">精确内容授权</h2>
     <p>Survey 支持项目参考、指定 FINAL 重新解释与独立 SJT 入口分发；Training 支持课程报告、参考、指定已完成作答重新解释，以及独立平台参考治理与已安装 SJT 发布。后台复核当前身份、资格、真实所有权和资源归属；管理身份不自动授予科学能力或其他入口身份。</p>
-    <p>签发、读取和撤销前，请在上方完成管理员双因素验证。资源栏只接受实际 UUID，不提供样本或报告浏览。</p>
-    <AdminStaticSjtPublication actorId={actorId} onPrepareGrant={prepareSjtGrant} grantReceipt={sjtGrant} grantLocked={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}/>
-    <fieldset disabled={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}><legend>新根授权</legend>
+    <p>签发、读取和撤销前，请在“操作验证”中完成管理员双因素验证。资源栏只接受实际 UUID，不提供样本或报告浏览。</p>
+    <details className="sys-content-disclosure" open={sjtExpanded?true:undefined}><summary>已安装 SJT 发布准备</summary><AdminStaticSjtPublication actorId={actorId} onPrepareGrant={prepareSjtGrant} grantReceipt={sjtGrant} grantLocked={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}/></details>
+    <details ref={composer} className="sys-content-disclosure" open={pending?true:undefined}><summary>编制精确内容授权</summary><fieldset disabled={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}><legend>新根授权</legend>
       <label>产品授权范围<select value={product} onChange={e=>{setProduct(e.target.value as 'SURVEY'|'TRAINING');setProject('');setResources('');setCaps([]);setDelegate(false);setPurpose('report')}}><option value="SURVEY">Survey 项目与共用库分发</option><option value="TRAINING">Training 课程与平台内容</option></select></label>
       {product==='TRAINING'&&<label>Training 授权用途<select value={purpose} onChange={e=>{setPurpose(e.target.value as TrainingPurpose);setProject('');setResources('');setCaps([]);setDelegate(false)}}><option value="report">课程报告编辑/发布</option><option value="reference">课程参考分析/复核/发布</option><option value="data">课程指定作答重新解释</option><option value="reference-governance">平台正式参考独立复核/发布</option><option value="static-sjt">已安装 SJT 测量发布</option><option value="library-review">共用量表系统级审核委托</option><option value="library-distribute">共用量表入口分发委托</option></select></label>}
       {product==='SURVEY'&&<label>Survey 授权用途<select value={sjtDistribution?'sjt-distribute':library?'library-distribute':'report'} onChange={e=>{setPurpose(e.target.value as TrainingPurpose);setProject('');setResources('');setCaps([]);setDelegate(false)}}><option value="report">项目内容授权</option><option value="library-distribute">共用量表入口分发委托</option><option value="sjt-distribute">SJT 精确版本入口分发</option></select></label>}
@@ -168,7 +170,7 @@ function ContentPermissions({actorId}:{actorId:string}){
     {pending&&<p>待核对请求编号：{pending.requestId}。内容已锁定；请先重试或读取该编号核对，不要重复签发。{storageError?'当前保存状态异常，请勿离页。':'请求按当前管理员保存在本标签页，重进后可继续核对。'}</p>}
     <button className="btn-primary" disabled={busy||issued||Boolean(revocation)||recoveryBlocked} onClick={()=>void issue()}>{pending?'重试同一签发请求':'确认签发内容授权'}</button>
     {issued&&<button className="btn-secondary" disabled={busy} onClick={()=>{setIssued(false);setHadUnknown(false);setSubject('');setProject('');setResources('');setCaps([]);setDelegate(false);setFrom('');setUntil('');setReason('')}}>编制另一份授权</button>}
-    <h3>读取与撤销</h3><label>授权 UUID<input value={lookup} disabled={busy||Boolean(revocation)} onChange={e=>{setLookup(e.target.value);setRow(null)}}/></label><button className="btn-secondary" disabled={busy} onClick={()=>void read()}>读取授权元数据</button>
+    </details><h3>读取与撤销</h3><label>授权 UUID<input value={lookup} disabled={busy||Boolean(revocation)} onChange={e=>{setLookup(e.target.value);setRow(null)}}/></label><button className="btn-secondary" disabled={busy} onClick={()=>void read()}>读取授权元数据</button>
     {row&&<div><p>授权 {row.grantId} · 版本 {row.version} · {row.revokedAt?'已撤销':'未撤销（实际使用仍检查期限与祖先）'}</p><p>目标 {row.subjectId} · {scopeLabel(row.scope.scopeKind)} {row.scope.scopeId} · {row.scope.resourceKind}</p><p>能力：{row.capabilities.join('、')}；可委派：{row.delegableCapabilities.join('、')||'无'}</p><p>期限：{row.validFrom} 至 {row.expiresAt}</p><p>父授权：{row.parentGrantId||'根授权'}；资源：{row.scope.resourceKeys.join('、')}</p>
       {pending&&row.grantId===pending.requestId&&row.issuerId===actorId&&row.parentGrantId===null&&sameContentGrant(row,pending.grant)&&<button className="btn-secondary" disabled={busy} onClick={finishVerified}>按已读记录结束待核对请求</button>}
       <label>撤销原因<input disabled={Boolean(revocation)} value={revokeReason} maxLength={500} onChange={e=>setRevokeReason(e.target.value)}/></label><button className="btn-secondary" disabled={busy||Boolean(row.revokedAt)||Boolean(revocation)||recoveryBlocked||!revokeReason.trim()} onClick={()=>void revoke()}>确认撤销已读授权</button></div>}

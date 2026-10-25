@@ -3,10 +3,11 @@ import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticate } from '../../middleware/auth'
-import { requireEntryAdmin, requireRecentAdminKey } from '../admin-permissions/guards'
+import { requireRecentAdminKey } from '../admin-permissions/guards'
 import { success, error } from '../../utils/response'
 import * as governance from './governance.service'
 
+import {requireSurveyManager} from './admin-role'
 export const surveyPlatformRouter=Router()
 const password=z.object({currentPassword:z.string().min(1).max(128)}).strict()
 const inviteId=z.string().guid()
@@ -25,7 +26,7 @@ async function administrator(req:Request) {
   const parsed=password.parse(req.body)
   await governance.authorizeAdmin(req.user!.userId,parsed.currentPassword)
 }
-surveyPlatformRouter.use(authenticate, requireEntryAdmin('SURVEY'))
+surveyPlatformRouter.use(authenticate, requireSurveyManager)
 surveyPlatformRouter.use((req,res,next)=>['GET','HEAD','OPTIONS'].includes(req.method)?next():requireRecentAdminKey(req,res,next))
 surveyPlatformRouter.get('/researchers',handler(req=>governance.researcherList(req.user!.userId,Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
 surveyPlatformRouter.get('/researcher-invitations',handler(req=>

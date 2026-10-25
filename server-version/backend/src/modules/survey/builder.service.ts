@@ -1,4 +1,5 @@
 import {recheckCatalogSjtSourceAuthority} from './catalog.sources'
+import {assertNotTechnicalPackageGrant} from './governed-package.service'
 import { previewScaleRawScoreFeedback } from '../scale/raw-score-feedback-preview'
 import { compileResearchScale } from './builder.compiler'
 import {catalogSnapshotsForDrafts,compileCatalogUnit,researcherCatalog} from './catalog.service'
@@ -127,6 +128,7 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const from=await findDraft(tx,projectId,id)
+    if(from.catalogGrantId)await assertNotTechnicalPackageGrant(tx,from.catalogGrantId)
     if(!from.catalogGrantId&&!['FORM','SCALE'].includes(from.kind))fail(403,'SJT 与认知测验暂不开放复制自建')
     const sources=await catalogSnapshotsForDrafts(tx,userId,from.catalogGrantId?[from.catalogGrantId]:[])
     const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})
@@ -285,6 +287,7 @@ export async function listResearcherCatalog(userId:string,projectId:string,page:
 export async function importCatalogDraft(userId:string,projectId:string,grantId:string,input:{requestId:string;instrumentKey:string;title:string}){
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
+    await assertNotTechnicalPackageGrant(tx,grantId)
     const sources=await catalogSnapshotsForDrafts(tx,userId,[grantId])
     const source=sources.get(grantId)!
     const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})

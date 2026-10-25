@@ -1,3 +1,4 @@
+import {assertSystemSurveyDataAudit,type SystemDataAccess} from './system-data-authority'
 import {surveyAttemptCode} from './analytics.export-format'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -11,16 +12,17 @@ const fail=(status:number,message:string):never=>{throw new SurveyAnalyticsError
 /** Researcher-only materialization of a selected template against saved FINAL
  * facts/interpretation. No scorer, population selector, or new interpretation.
  */
-export async function readSurveyStoredReport(actorId:string,input:{projectId:string;waveId:string;finalId:string;instrumentKey:string}){
+export async function readSurveyStoredReport(actorId:string,input:{projectId:string;waveId:string;finalId:string;instrumentKey:string;systemAccess?:SystemDataAccess}){
   const source=await loadSurveySource({actorUserId:actorId,projectId:input.projectId,waveIds:[input.waveId],
-    finalId:input.finalId,maxFinals:1,selectRaw:false,includeInterpretation:true,includeAttendance:false})
+    systemAccess:input.systemAccess,finalId:input.finalId,maxFinals:1,selectRaw:false,includeInterpretation:true,includeAttendance:false})
   const saved=source.interpretations?.[0]
   if(source.completeAttempts!==1||!saved?.interpretation||!saved.binding)fail(404,'此 FINAL 没有已保存的版本解释')
   const bound=saved!.binding!.units.find(unit=>unit.instrumentKey===input.instrumentKey)
   const interpreted=saved!.interpretation!.units.find(unit=>unit.instrumentKey===input.instrumentKey)
   if(!bound?.report||!interpreted||interpreted.report.status!=='READY')fail(409,'此 FINAL 没有可读取的已选报告模板')
   return prisma.$transaction(async tx=>{
-    try{await authorizedProject(tx,actorId,input.projectId,false)}catch(error){
+    let contentOwner=actorId
+    try{if(input.systemAccess)contentOwner=await assertSystemSurveyDataAudit(tx,actorId,input.projectId,input.systemAccess);else await authorizedProject(tx,actorId,input.projectId,false)}catch(error){
       if(error instanceof SurveyBuilderError)fail(error.statusCode,error.message);throw error
     }
     // Existing withdrawal/quality governance locks this project and increments
@@ -34,7 +36,7 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
       let release=cache.get(pointer.releaseId)
       if(!release){release=(await getContentRelease(tx,pointer.releaseId,true))??undefined;if(release)cache.set(pointer.releaseId,release)}
       if(!release||release.contentHash!==pointer.contentHash||release.scope.kind!=='PRIVATE'||release.scope.product!=='SURVEY'
-        ||release.scope.resourceId!==input.projectId||release.scope.ownerId!==actorId)fail(409,'报告内容版本来源不匹配')
+        ||release.scope.resourceId!==input.projectId||release.scope.ownerId!==contentOwner)fail(409,'报告内容版本来源不匹配')
       return release!
     }
     const measurement=await read(bound!.measurement),report=await read(bound!.report!)

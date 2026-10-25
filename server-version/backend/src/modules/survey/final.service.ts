@@ -1,5 +1,6 @@
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
+import {persistGovernedPackageReports} from './governed-package.reports'
 import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {rawParticipantFeedback} from './participant-feedback'
 import {interpretSurveyFinal} from './final-interpretation.service'
@@ -182,6 +183,7 @@ export async function submitResearchFinal(input:FinalInput){
       definitionDigest:publication.definitionDigest,payloadHash:canonical.hash,
       resultsCipher,resultsHash,
     },select:{id:true,completedAt:true}})
+    await persistGovernedPackageReports(tx,{projectId:known.projectId,waveId:wave.id,finalId:receipt.id,sourceFinalHash:resultsHash,snapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
     const updated=await tx.surveyWaveAttempt.updateMany({
       where:{id:attempt.id,projectId:known.projectId,status:'STARTED'},
       data:{status:'COMPLETED',completedAt:receipt.completedAt},

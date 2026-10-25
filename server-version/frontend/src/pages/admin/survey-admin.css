@@ -123,3 +123,189 @@
 .survey-admin-verification-explanation [role=note] { padding:10px 12px; border-left:3px solid var(--survey-brand-accent-strong); background:var(--survey-brand-soft); color:var(--survey-brand-ink); }
 @media (max-width:1000px) { .survey-admin-header-actions { position:relative; } .survey-admin-security-anchor { position:static; } .survey-admin-security-anchor:has(details[open]) { flex-basis:100%; } .survey-admin-security-help { left:0; right:auto; width:350px; max-width:100%; } }
 @media (max-width:640px) { .survey-admin-security > summary > span { display:inline; } .survey-admin-security-help { left:0; right:auto; } }
+
+/* Researcher management: primary work and a quiet, in-flow utility rail. */
+.survey-admin { max-width:none; }
+.survey-admin .survey-admin-header { padding:0 0 24px; border-bottom:1px solid var(--survey-brand-line); align-items:center; }
+.survey-admin-header h1 { font-size:clamp(27px,2.7vw,34px); margin:5px 0 8px; }
+.survey-admin-header .survey-admin-kicker { font-size:10px; font-weight:650; letter-spacing:.16em; color:var(--survey-brand-muted); }
+.survey-admin-header .survey-admin-refresh { display:inline-flex; align-items:center; gap:8px; background:transparent; }
+.survey-admin-workbench { display:grid; grid-template-columns:minmax(0,1fr) 280px; grid-template-areas:'content sidebar'; gap:28px; align-items:start; }
+.survey-admin-sidebar { grid-area:sidebar; min-width:0; display:grid; gap:16px; }
+.survey-admin-content { grid-area:content; min-width:0; }
+.survey-admin-content > * + * { margin-top:18px; }
+.survey-admin-sidecard { padding:20px; border:1px solid var(--survey-brand-line); border-radius:16px; background:var(--survey-brand-canvas); }
+.survey-admin-sidecard h2 { font-size:14px; font-weight:650; }
+.survey-admin-sidecard-title { display:flex; align-items:center; gap:9px; color:var(--survey-brand-accent-strong); }
+.survey-admin-sidecard > p { font-size:12px; line-height:1.8; color:var(--survey-brand-muted); margin:10px 0 16px; }
+.survey-admin-sidecard .survey-admin-security { background:var(--survey-brand-subtle); border-radius:10px; }
+.survey-admin-sidecard .survey-admin-security > summary { justify-content:space-between; gap:6px; padding:10px 12px; }
+.survey-admin-sidecard .survey-admin-security > summary::before { display:none; }
+.survey-admin-sidecard .survey-admin-security > summary > strong { font-size:12px; }
+.survey-admin-sidecard .survey-admin-security > summary > span { display:inline; font-size:10px; }
+.survey-admin-sidecard .survey-admin-security-content { position:static; display:grid; grid-template-columns:minmax(0,1fr); width:auto; max-width:none; gap:16px; padding:16px 12px; border:0; border-top:1px solid var(--survey-brand-line); border-radius:0 0 10px 10px; box-shadow:none; background:transparent; }
+.survey-admin-sidecard .survey-admin-stepup form { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+.survey-admin-sidecard .survey-admin-stepup h2 { font-size:13px; }
+.survey-admin-sidecard .survey-admin-verification-explanation { font-size:11px; line-height:1.7; }
+.survey-admin-sidecard .survey-admin-verification-explanation p + p { margin-top:8px; }
+.survey-admin-sidecard :is(label,.input) { font-size:12px; }
+.survey-admin-sidecard .survey-admin-security-help { right:0; top:calc(100% + 8px); width:320px; max-width:calc(100vw - 48px); }
+.survey-admin-overview dl { display:grid; margin-top:18px; gap:16px; }
+.survey-admin-overview dl > div { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.survey-admin-overview dt { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--survey-brand-muted); }
+.survey-admin-overview dd { font-size:23px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; }
+.survey-admin-overview dd > span { font-size:11px; font-weight:400; color:var(--survey-brand-muted); }
+.survey-admin-overview > p { margin:20px 0 0; font-size:10px; }
+.survey-admin .survey-admin-tabs { gap:8px; padding:5px; border:1px solid var(--survey-brand-line); border-radius:12px; background:var(--survey-brand-canvas); }
+.survey-admin .survey-admin-tabs button { flex:1; min-height:44px; padding:9px 14px; border:0; border-radius:8px; font-size:13px; }
+.survey-admin .survey-admin-tabs [aria-selected=true] { color:var(--survey-brand-accent-strong); background:var(--survey-brand-soft); }
+.survey-admin-content .survey-admin-panel { padding:22px; border-radius:16px; }
+.survey-admin-section-heading h2 { font-size:16px; }
+.survey-admin-section-heading .survey-admin-muted { font-size:11px; }
+.survey-admin-people { display:grid; gap:12px; }
+.survey-admin .survey-admin-person { display:block; padding:0; border-radius:12px; border-color:var(--survey-brand-line); background:var(--survey-brand-subtle); overflow:hidden; }
+.survey-admin-person-disclosure > summary { display:flex; align-items:center; gap:14px; list-style:none; padding:20px; min-height:96px; }
+.survey-admin-person-disclosure > summary::-webkit-details-marker { display:none; }
+.survey-admin-person-disclosure > summary:hover { background:var(--survey-brand-soft); }
+.survey-admin-avatar { display:grid; place-items:center; width:46px; height:46px; flex-shrink:0; border:1px solid var(--survey-brand-line); border-radius:14px; background:var(--survey-brand-canvas); color:var(--survey-brand-accent-strong); }
+.survey-admin-person-name { min-width:0; flex:1; }
+.survey-admin-person-name h3 { color:var(--survey-brand-ink); font-size:15px; font-weight:650; line-height:1.5; }
+.survey-admin-person-name > span { display:block; margin-top:4px; color:var(--survey-brand-muted); font-size:11px; }
+.survey-admin-person .survey-admin-badge { flex-shrink:0; padding:3px 9px; border:1px solid var(--survey-brand-line); font-size:10px; font-weight:500; color:var(--survey-brand-accent-strong); }
+.survey-admin-person .survey-admin-badge[data-status=ACTIVE]::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; margin-right:5px; background:currentColor; vertical-align:2px; }
+.survey-admin-disclosure-chevron { flex-shrink:0; transition:transform .18s ease; }
+.survey-admin-person-disclosure[open] > summary > .survey-admin-disclosure-chevron { transform:rotate(180deg); }
+.survey-admin-person-body { padding:0 20px 20px; border-top:1px solid var(--survey-brand-line); }
+.survey-admin-person-body > details { margin:8px 0 12px; }
+.survey-admin-person-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.survey-admin-person-actions > .btn-secondary { text-align:center; min-height:44px; font-size:12px; }
+.survey-admin-person-actions > button[aria-label^='永久撤销'] { color:var(--survey-ui-danger,#9f2635); }
+.survey-admin-pagination { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:16px; border-top:1px solid var(--survey-brand-line); font-size:11px; color:var(--survey-brand-muted); }
+.survey-admin-pagination > .btn-secondary { padding:6px 10px; font-size:11px; }
+.survey-admin-card-actions { margin-top:12px; border-top:1px solid var(--survey-brand-line); }
+.survey-admin-card-actions > summary { display:flex; align-items:center; justify-content:space-between; list-style:none; color:var(--survey-brand-accent-strong); font-size:12px; }
+.survey-admin-card-actions > summary::-webkit-details-marker { display:none; }
+.survey-admin-card-actions[open] > summary > svg { transform:rotate(180deg); }
+.survey-admin-card-actions > div > * + * { margin-top:12px; }
+.survey-admin-card-actions > div { padding:8px 0; }
+.survey-admin-sidebar .survey-admin-scope { padding:0 12px; font-size:11px; line-height:1.8; }
+@media (max-width:1000px) {
+  .survey-admin-workbench { grid-template-columns:minmax(0,1fr) 248px; gap:20px; }
+  .survey-admin-sidecard { padding:16px; }
+  .survey-admin-content .survey-admin-panel { padding:18px; }
+}
+@media (max-width:760px) {
+  .survey-admin .survey-admin-header { padding-bottom:20px; gap:12px; }
+  .survey-admin-header > div { flex:1; min-width:0; }
+  .survey-admin-header h1 { font-size:27px; }
+  .survey-admin-header p:not(.survey-admin-kicker) { font-size:12px; }
+  .survey-admin-header .survey-admin-refresh { font-size:0; width:44px; padding:0; justify-content:center; }
+  .survey-admin-header .survey-admin-refresh svg { width:18px; height:18px; }
+  .survey-admin-workbench { grid-template-columns:minmax(0,1fr); grid-template-areas:'sidebar' 'content'; gap:20px; }
+  .survey-admin-sidebar { gap:0; }
+  .survey-admin-overview { display:none; }
+  .survey-admin-security-card { padding:14px 16px; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px 12px; border-radius:12px; }
+  .survey-admin-security-card > .survey-admin-sidecard-title { grid-column:1; grid-row:1; gap:7px; }
+  .survey-admin-security-card h2 { font-size:12px; }
+  .survey-admin-security-card > p { grid-column:1/-1; grid-row:2; margin:0; font-size:11px; }
+  .survey-admin-security-card > .survey-admin-security-anchor { grid-column:2; grid-row:1; position:static; }
+  .survey-admin-security-card:has(details[open]) { display:block; }
+  .survey-admin-security-card:has(details[open]) > p { margin:8px 0 12px; }
+  .survey-admin-security-card .survey-admin-security-help { left:0; right:auto; max-width:100%; }
+  .survey-admin-security-card { position:relative; }
+  .survey-admin-person-disclosure > summary { gap:10px; padding:16px; min-height:88px; }
+  .survey-admin-avatar { width:38px; height:38px; border-radius:12px; }
+  .survey-admin-person-name h3 { font-size:14px; }
+  .survey-admin-person .survey-admin-badge { font-size:10px; padding:2px 7px; }
+  .survey-admin-person-body { padding:0 16px 16px; }
+  .survey-admin-content .survey-admin-panel { padding:16px; }
+  .survey-admin-pagination { gap:6px; font-size:10px; }
+  .survey-admin-pagination > .btn-secondary { padding:6px 8px; font-size:10px; }
+}
+@media (max-width:380px) {
+  .survey-admin-person-disclosure > summary { flex-wrap:wrap; }
+  .survey-admin-person-name { flex-basis:calc(100% - 55px); }
+  .survey-admin-person .survey-admin-badge { margin-left:48px; }
+  .survey-admin-person-disclosure > summary > .survey-admin-disclosure-chevron { margin-left:auto; }
+  .survey-admin-person-actions { grid-template-columns:minmax(0,1fr); }
+}
+@media (prefers-reduced-motion:reduce) { .survey-admin-disclosure-chevron { transition:none; } }
+
+.survey-admin-person-disclosure > summary:focus-visible { outline-offset:-4px; }
+
+/* Invitation and version-grant tabs share the compact researcher-card language. */
+.survey-admin-panel-heading { display:flex; align-items:center; gap:13px; min-width:0; }
+.survey-admin-panel-heading > div { min-width:0; }
+.survey-admin-panel-heading h2 { font-size:16px; }
+.survey-admin-panel-heading p { margin-top:5px; color:var(--survey-brand-muted); font-size:12px; line-height:1.8; }
+.survey-admin-invitations .survey-admin-section-heading > .survey-admin-panel-heading { flex:1 1 260px; }
+.survey-admin-invitations .survey-admin-section-heading > button,.survey-admin-grant-form > button { display:inline-flex; align-items:center; justify-content:center; gap:8px; font-size:12px; }
+.survey-admin-inline-note { display:flex; align-items:flex-start; gap:8px; padding:12px 14px; border:1px solid var(--survey-brand-line); border-radius:10px; color:var(--survey-brand-muted); background:var(--survey-brand-subtle); font-size:11px; line-height:1.8; }
+.survey-admin-inline-note > svg { flex-shrink:0; margin-top:2px; }
+.survey-admin-invitation-list { display:grid; gap:12px; }
+.survey-admin .survey-admin-invitation-card,.survey-admin .survey-admin-tool-card { padding:0; border-radius:12px; overflow:hidden; background:var(--survey-brand-subtle); }
+.survey-admin-invitation-disclosure > summary,.survey-admin-tool-disclosure > summary { display:flex; align-items:center; gap:14px; min-height:96px; padding:18px; list-style:none; }
+:is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary::-webkit-details-marker { display:none; }
+:is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary:hover { background:var(--survey-brand-soft); }
+:is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary:focus-visible { outline-offset:-4px; }
+:is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure)[open] > summary > .survey-admin-disclosure-chevron { transform:rotate(180deg); }
+.survey-admin-card-name { flex:1; min-width:0; }
+.survey-admin-card-name :is(h3,h4) { margin:0; color:var(--survey-brand-ink); font-size:15px; font-weight:650; line-height:1.6; }
+.survey-admin-card-name > span { display:block; margin-top:4px; color:var(--survey-brand-muted); font-size:11px; overflow-wrap:anywhere; }
+:is(.survey-admin-invitation-card,.survey-admin-tool-card) .survey-admin-badge { flex-shrink:0; padding:3px 8px; border:1px solid var(--survey-brand-line); color:var(--survey-brand-accent-strong); font-size:10px; font-weight:500; }
+.survey-admin-invitation-card .survey-admin-badge[data-status=EXPIRED] { color:var(--survey-brand-muted); background:transparent; }
+.survey-admin-invitation-body,.survey-admin-tool-body { padding:16px 18px; border-top:1px solid var(--survey-brand-line); font-size:12px; color:var(--survey-brand-muted); }
+.survey-admin-invitation-body > * + *,.survey-admin-tool-body > * + * { margin-top:12px; }
+.survey-admin-invitation-body > p { font-size:12px; line-height:1.8; }
+.survey-admin-invitation-actions { padding-top:10px; border-top:1px solid var(--survey-brand-line); }
+.survey-admin-empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; min-height:220px; padding:30px 20px; border:1px dashed var(--survey-brand-border); border-radius:12px; background:var(--survey-brand-subtle); text-align:center; }
+.survey-admin-empty-icon { display:grid; place-items:center; width:64px; height:64px; margin-bottom:4px; border:1px solid var(--survey-brand-line); border-radius:20px; color:var(--survey-brand-accent-strong); background:var(--survey-brand-canvas); }
+.survey-admin-empty-state > p { font-size:13px; font-weight:550; color:var(--survey-brand-ink); }
+.survey-admin-empty-state > span:last-child { font-size:11px; color:var(--survey-brand-muted); line-height:1.8; }
+.survey-admin-grant-boundary { color:var(--survey-brand-muted); font-size:11px; }
+.survey-admin-grant-boundary > p { padding:4px 0 12px; line-height:1.8; }
+.survey-admin-grant-form { min-width:0; }
+.survey-admin-grant-form > * + * { margin-top:16px; }
+.survey-admin-grant-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; padding:18px; border:1px solid var(--survey-brand-line); border-radius:12px; background:var(--survey-brand-subtle); }
+.survey-admin-grant-field { min-width:0; }
+.survey-admin-grant-field label { display:block; font-size:12px; font-weight:600; }
+.survey-admin-grant-field .input { display:block; width:100%; min-width:0; margin-top:8px; padding:10px; border:1px solid var(--survey-brand-border-strong); border-radius:8px; color:var(--survey-brand-ink); background:var(--survey-brand-canvas); font-size:12px; }
+.survey-admin-field-hint { margin-top:8px; font-size:10px; line-height:1.8; color:var(--survey-brand-muted); }
+.survey-admin-grant-target { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:8px; background:var(--survey-brand-soft); color:var(--survey-brand-muted); font-size:11px; }
+.survey-admin-grant-target > svg { flex-shrink:0; }
+.survey-admin-grant-target strong { color:var(--survey-brand-ink); font-weight:600; overflow-wrap:anywhere; }
+.survey-admin-source-empty { min-height:190px; }
+.survey-admin-tool-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; align-items:start; }
+.survey-admin-tool-grid:empty { display:none; }
+.survey-admin-tool-card .survey-admin-avatar { width:40px; height:40px; border-radius:12px; }
+.survey-admin-tool-body .survey-admin-object { margin:0; font-size:11px; color:var(--survey-brand-muted); }
+.survey-admin-tool-body > button { width:100%; }
+.survey-admin-existing-grants { padding-top:20px; border-top:1px solid var(--survey-brand-line); }
+.survey-admin-existing-grants > * + * { margin-top:16px; }
+.survey-admin-existing-grants > .survey-admin-section-heading h3 { font-size:14px; font-weight:600; }
+.survey-admin-grant-empty { padding:16px; border-radius:10px; background:var(--survey-brand-subtle); font-size:12px; color:var(--survey-brand-muted); }
+@media (min-width:1200px) { .survey-admin-tool-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .survey-admin-tool-disclosure > summary { gap:10px; padding:16px; } .survey-admin-tool-card .survey-admin-card-name :is(h3,h4) { font-size:14px; } }
+@media (max-width:1000px) { .survey-admin-grant-controls { grid-template-columns:minmax(0,1fr); padding:16px; } }
+@media (max-width:760px) {
+  .survey-admin-panel-heading { gap:10px; }
+  .survey-admin-panel-heading h2 { font-size:15px; }
+  .survey-admin-panel-heading p { font-size:11px; }
+  .survey-admin-invitations .survey-admin-section-heading > button { width:100%; }
+  .survey-admin-inline-note { padding:10px 12px; }
+  .survey-admin-empty-state { min-height:200px; padding:24px 16px; }
+  .survey-admin-empty-state > p { font-size:12px; }
+  .survey-admin-empty-state > span:last-child { font-size:10px; }
+  :is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary { padding:14px; gap:10px; }
+  .survey-admin-card-name :is(h3,h4) { font-size:14px; }
+  :is(.survey-admin-invitation-card,.survey-admin-tool-card) .survey-admin-avatar { width:34px; height:34px; border-radius:11px; }
+  .survey-admin-card-name > span { font-size:10px; }
+  .survey-admin-invitation-body,.survey-admin-tool-body { padding:14px; }
+  .survey-admin-grant-controls { gap:14px; padding:14px; }
+  .survey-admin-grant-form > button { width:100%; }
+}
+@media (max-width:380px) {
+  :is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary { flex-wrap:wrap; }
+  .survey-admin-card-name { flex-basis:calc(100% - 44px); }
+  :is(.survey-admin-invitation-card,.survey-admin-tool-card) .survey-admin-badge { margin-left:44px; }
+  :is(.survey-admin-invitation-disclosure,.survey-admin-tool-disclosure) > summary > .survey-admin-disclosure-chevron { margin-left:auto; }
+}

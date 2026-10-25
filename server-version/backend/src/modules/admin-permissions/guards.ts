@@ -6,7 +6,7 @@ import { ADMIN_STEP_UP_SECONDS } from './security'
 // No database lookup here: authenticate loaded this immutable request snapshot
 // and validated its signed tokenVersion. Transactional writers recheck state.
 export const requireEntryAdmin = (entry: AdminEntry): RequestHandler => (req, res, next) => {
-  if (!req.user?.entryGrants?.some(g => g.entry === entry)) return forbidden(res, '缺少当前入口管理授权')
+  if (req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g => g.entry === entry)) return forbidden(res, '缺少当前入口管理授权')
   next()
 }
 export const requireSystemAdmin: RequestHandler = (req, res, next) => {
