@@ -1,4 +1,3 @@
-import { selfAuthoredSourceProof } from './self-authored'
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
 import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
 import { compileScalePolicy } from '../policy/compile'
@@ -18,10 +17,10 @@ export const previewScaleInstrument = (input: {
   source?: unknown
   instrumentKey?: string
   instrumentVersion?: string
-  authorizations: InstrumentAuthorizationRecordV1[]
+  authorizations?: InstrumentAuthorizationRecordV1[]
   locale: string
   territory: string
-  commercialNature: 'NON_COMMERCIAL' | 'COMMERCIAL'
+  commercialNature?: 'NON_COMMERCIAL' | 'COMMERCIAL'
   deploymentModes: ScaleDeploymentModeV1[]
   authorizationRefs?: string[]
   nowIso?: string
@@ -46,20 +45,12 @@ export const previewScaleInstrument = (input: {
   if (source.executable) {
     const runtime = compileScalePolicy(source)
     runtimePolicyHash = runtime.runtimePolicyHash
-    const refs = input.authorizationRefs?.length
-      ? input.authorizationRefs
-      : [...new Set(input.authorizations.map(record => record.authorizationId))]
-    const authoredHash = selfAuthoredSourceProof(source)
     const policy = {
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       revision: 1,
       locale: input.locale,
       territory: input.territory,
       deploymentModes: modes,
-      commercialNature: input.commercialNature,
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
-      authorizationRefs: authoredHash ? [] : (refs.length ? refs : ['__MISSING_AUTHORIZATION__']),
-      ...(authoredHash ? { selfAuthoredSourceHash: authoredHash } : {}),
       runtimePolicyHash: runtime.runtimePolicyHash,
       ...(localization?.localizationVersion ? { localizationVersion: localization.localizationVersion } : {}),
       inFlightCompletion: 'FROZEN_DEADLINE' as const,
@@ -67,12 +58,11 @@ export const previewScaleInstrument = (input: {
     blockers.push(...scaleLocalizationReasons(source, policy))
     for (const requestedMode of modes) {
       const decision = evaluateScaleDeployment({
-        policy: { ...policy, requiredRightsActions: [...policy.requiredRightsActions] },
+        policy,
         requestedMode,
         instrumentKey: source.identity.instrumentKey,
         instrumentVersion: source.identity.instrumentVersion,
         compiledRuntimePolicyHash: runtime.runtimePolicyHash,
-        authorizations: input.authorizations,
         usageRequirements: runtime.usageRequirements,
         nowIso: input.nowIso,
       })

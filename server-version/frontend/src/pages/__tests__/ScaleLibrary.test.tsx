@@ -174,11 +174,11 @@ describe('ScaleLibrary page', () => {
     await waitFor(() => expect(screen.getByText('没有符合条件的量表')).toBeInTheDocument())
   })
 
-  it('shows confirmed authored provenance without claiming an external license or direct use grant', async () => {
-    mockDetail.mockResolvedValue({ code: 0, data: { entry: entry({ rights: { status: 'SELF_AUTHORED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] } }) } })
+  it('shows licensing as not evaluated without implying permission or direct use grant', async () => {
+    mockDetail.mockResolvedValue({ code: 0, data: { entry: entry({ rights: { status: 'NOT_EVALUATED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] } }) } })
     render(<MemoryRouter initialEntries={['/scale-library/who5/1.0.0']}><Routes><Route path="/scale-library/:instrumentKey/:instrumentVersion" element={<ScaleLibrary />} /></Routes></MemoryRouter>)
-    expect(await screen.findByText(/自编来源已确认/)).toBeInTheDocument()
-    expect(screen.getByText(/不要求外部许可证；入口及用户使用权限另行核验/)).toBeInTheDocument()
+    expect(await screen.findByText(/版权许可不作为系统门禁（未评估）/)).toBeInTheDocument()
+    expect(screen.getByText(/入口及用户使用权限另行核验/)).toBeInTheDocument()
     expect(screen.queryByText(/暂无可用授权范围/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /开始测评/ })).not.toBeInTheDocument()
   })

@@ -3,8 +3,6 @@ import {scaleEntryClassificationTags,matchesCatalogDiscovery} from './catalog-di
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
-  evaluateAuthorizationOverlayStatus,
-  resolveEffectiveAuthorization,
   type InstrumentAuthorizationRecordV1,
 } from '../../assessment-authorization'
 import { hashScaleDefinition } from '../scale-definition'
@@ -98,7 +96,7 @@ export interface ScaleLibraryLocalizationSummary {
 }
 
 export interface ScaleLibraryRightsSummary {
-  status: 'SELF_AUTHORED' | 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
+  status: 'NOT_EVALUATED' | 'SELF_AUTHORED' | 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
   commercialNature: InstrumentAuthorizationRecordV1['scope']['commercialNature']
   locales: string[]
   territories: string[]
@@ -195,40 +193,10 @@ const deploymentForKey = (
   deployment.code === pkg.key && deployment.instrumentVersion === pkg.instrumentVersion
 ))
 
-const summarizeRights = (input: {
-  pkg: ScalePackageV2
-  authorizations: readonly InstrumentAuthorizationRecordV1[]
-  locale: string
-  territory: string
-  nowIso: string
-}): ScaleLibraryRightsSummary => {
-  if (registeredSelfAuthoredSourceProof(input.pkg.key, input.pkg.instrumentVersion))
-    return { status: 'SELF_AUTHORED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] }
-  const effective = resolveEffectiveAuthorization({
-    authorizations: [...input.authorizations],
-    instrumentKey: input.pkg.key,
-    instrumentVersion: input.pkg.instrumentVersion,
-    nowIso: input.nowIso,
-  })
-  if (!effective) {
-    return { status: 'NOT_GRANTED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] }
-  }
-  const overlay = evaluateAuthorizationOverlayStatus(effective, input.nowIso)
-  const scopeMatches = effective.scope.locales.includes(input.locale) && effective.scope.territories.includes(input.territory)
-  const eligibleStatus = effective.status === 'APPROVED' || effective.status === 'EVIDENCE_PENDING'
-  const status: ScaleLibraryRightsSummary['status'] = !eligibleStatus || overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT'
-    ? 'INELIGIBLE'
-    : (scopeMatches
-      ? (effective.status === 'APPROVED' ? 'APPROVED' : 'EVIDENCE_PENDING')
-      : 'SCOPE_MISMATCH')
-  return {
-    status,
-    commercialNature: effective.scope.commercialNature,
-    locales: [...effective.scope.locales],
-    territories: [...effective.scope.territories],
-    validTo: effective.validTo,
-  }
-}
+/** Copyright permissions are not evaluated or represented as approved. */
+const summarizeRights = (): ScaleLibraryEntry['rights'] => ({
+  status: 'NOT_EVALUATED', commercialNature: 'UNSPECIFIED', locales: [], territories: [],
+})
 
 const summarizeGateReason = (input: {
   pkg: ScalePackageV2
@@ -256,14 +224,12 @@ const summarizeGateReason = (input: {
   if (!input.deployment) reasons.push('当前环境尚无已发布的可启动量表部署。')
   else if (!deploymentPublished) reasons.push('当前量表部署尚未发布。')
   if (input.pkg.releaseStatus !== 'PUBLISHED') reasons.push('量表包尚未发布，当前仅可浏览目录信息。')
-  const operationalErrors = input.gate.decision.warnings.filter(warning => /rights\/governance|localization\/deployment/.test(warning))
+  const operationalErrors = input.gate.decision.warnings.filter(warning => /localization\/deployment/.test(warning))
   if (input.gate.decision.errors.length > 0 || operationalErrors.length > 0) {
     const allErrors = [...input.gate.decision.errors, ...operationalErrors]
-    const rightsFailure = allErrors.some((error) => /authorization|rights|commercialNature|electronicAdministration|scoring required|translation required|display required|locale\/territory/i.test(error))
     const localizationFailure = allErrors.some((error) => /localization|contentLocale|targetLocale|translation pending/i.test(error))
-    if (rightsFailure) reasons.push('当前 locale/territory 的电子施测、计分或显示授权未满足。')
     if (localizationFailure && targetLocaleMatches) reasons.push('当前语言的本地化治理条件尚未满足。')
-    if (!rightsFailure && !localizationFailure) reasons.push('当前发布门未通过，暂不可启动。')
+    if (!localizationFailure) reasons.push('当前发布门未通过，暂不可启动。')
   }
 
   const dedupedReasons = unique(reasons)
@@ -317,14 +283,12 @@ const buildEntry = (input: {
   const pkg = catalogEntry.pkg!
   const manifest = catalogEntry.manifest
   const respondent = context.respondent ?? manifest.population.respondentTypes[0]
-  const authorizations = context.authorizations ?? []
   const deployments = context.deployments ?? []
   const deployment = deploymentForKey(deployments, pkg)
   const gate = evaluatePilotFirstPublicationGate({
     pkg,
     manifest,
     localizationManifest: localization,
-    authorizations: [...authorizations],
     locale: context.locale,
     territory: context.territory,
     requestedRespondent: respondent,
@@ -339,13 +303,7 @@ const buildEntry = (input: {
     respondent,
     gate,
   })
-  const rights = summarizeRights({
-    pkg,
-    authorizations,
-    locale: context.locale,
-    territory: context.territory,
-    nowIso: context.nowIso,
-  })
+  const rights = summarizeRights()
   const report = buildReportSummary(pkg, gate.reportEligibility)
 
   const entry: ScaleLibraryEntry = {
@@ -383,12 +341,6 @@ const buildEntry = (input: {
   }
 
   if (context.viewerRole === 'ADMIN') {
-    const effective = resolveEffectiveAuthorization({
-      authorizations: [...authorizations],
-      instrumentKey: pkg.key,
-      instrumentVersion: pkg.instrumentVersion,
-      nowIso: context.nowIso,
-    })
     entry.governance = {
       catalogManifestVersion: manifest.catalogManifestVersion,
       catalogStatus: manifest.catalogStatus,
@@ -404,9 +356,6 @@ const buildEntry = (input: {
         warnings: unique([...gate.decision.warnings]),
         reportEligibility: gate.reportEligibility,
       },
-      ...(effective
-        ? { authorization: { authorizationId: effective.authorizationId, status: effective.status, basis: effective.basis } }
-        : {}),
     }
   }
 

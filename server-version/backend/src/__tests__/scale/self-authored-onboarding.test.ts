@@ -6,15 +6,14 @@ import { planStandardScalePublication } from '../../modules/scale/onboarding/pub
 import { resolveScaleStartDeployment } from '../../modules/scale/deployment/service'
 import { readManagedScaleSourceRights } from '../../modules/scale/measurement-source'
 import { recheckCatalogScaleSourceExpiry } from '../../modules/survey/catalog.sources'
-import { hashScaleDeploymentPolicy, type ScaleDeploymentPolicyV1 } from '../../modules/scale/policy/deployment'
+import { hashScaleDeploymentPolicy, type ScaleDeploymentPolicyV2 } from '../../modules/scale/policy/deployment'
 import { hashScaleDefinition } from '../../modules/scale/scale-definition'
 
 const key = 'academic_self_concept_chinese_zh_cn', version = '1.0.0'
 const source = getScaleInstrumentSource(key, version)!, runtime = getScaleInstrumentRuntimePolicy(key, version)!
-const policy: ScaleDeploymentPolicyV1 = { schemaVersion: 1, revision: 1, locale: 'zh-CN', territory: 'ZZ',
-  deploymentModes: ['STANDALONE', 'QUESTIONNAIRE'], commercialNature: 'UNSPECIFIED',
-  requiredRightsActions: ['electronicAdministration', 'scoring', 'display'], authorizationRefs: [],
-  selfAuthoredSourceHash: registeredSelfAuthoredSourceProof(key, version)!, runtimePolicyHash: runtime.runtimePolicyHash,
+const policy: ScaleDeploymentPolicyV2 = { schemaVersion: 2, revision: 1, locale: 'zh-CN', territory: 'ZZ',
+  deploymentModes: ['STANDALONE', 'QUESTIONNAIRE'],
+  runtimePolicyHash: runtime.runtimePolicyHash,
   localizationVersion: '1.0.0', inFlightCompletion: 'FROZEN_DEADLINE' }
 const scale = { id: 'authored-scale', code: key, instrumentVersion: version, instrumentClass: 'STANDARD' as const,
   status: 'PUBLISHED', visibility: 'HIDDEN', creatorId: 'system', definition: source.executable!.definition, definitionHash: hashScaleDefinition(source.executable!.definition) }
@@ -37,7 +36,7 @@ describe('self-authored formal install, publication and consumption', () => {
     const reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
     const db = database()
     const reviewedInput = { ...input, instrumentKey: reviewedKey, deploymentPolicy: { ...policy,
-      selfAuthoredSourceHash: registeredSelfAuthoredSourceProof(reviewedKey, version)!, runtimePolicyHash: reviewedRuntime.runtimePolicyHash } }
+      runtimePolicyHash: reviewedRuntime.runtimePolicyHash } }
     const wrong = await planScaleInstrumentInstall(db as any, reviewedInput)
     expect(wrong.allowActivation).toBe(false)
     expect(wrong.blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
@@ -67,7 +66,7 @@ describe('self-authored formal install, publication and consumption', () => {
   it('retains scientific scope rejection and accepts a new reviewed CN deployment revision without external licenses', async () => {
     const reviewedKey = 'academic_self_concept_mathematics_zh_cn'
     const reviewed = getScaleInstrumentSource(reviewedKey, version)!, reviewedRuntime = getScaleInstrumentRuntimePolicy(reviewedKey, version)!
-    const oldPolicy = { ...policy, selfAuthoredSourceHash: registeredSelfAuthoredSourceProof(reviewedKey, version)!, runtimePolicyHash: reviewedRuntime.runtimePolicyHash }
+    const oldPolicy = { ...policy, runtimePolicyHash: reviewedRuntime.runtimePolicyHash }
     const db = database(true)
     const reviewedScale = { ...scale, code: reviewedKey, definition: reviewed.executable!.definition, definitionHash: hashScaleDefinition(reviewed.executable!.definition) }
     db.scale.findUnique.mockResolvedValue(reviewedScale)
@@ -78,7 +77,7 @@ describe('self-authored formal install, publication and consumption', () => {
     const revised = { ...oldPolicy, revision: 2, territory: registeredSelfAuthoredDeploymentTerritory(reviewedKey, version)! }
     db.$queryRaw.mockResolvedValue([{ ...deployment, revision: 2, policyJson: revised, policyHash: hashScaleDeploymentPolicy(revised) }])
     expect(await planStandardScalePublication(db as any, publication)).toMatchObject({ allowPublish: true, blockers: [] })
-    expect(revised.authorizationRefs).toEqual([])
+    expect(revised).not.toHaveProperty('authorizationRefs')
     expect(reviewed.catalog.scientificMaturity).toBe('RESEARCH_READY')
   })
   it('reaches managed starts but still rejects unpublished scales and missing active deployments', async () => {
@@ -88,16 +87,19 @@ describe('self-authored formal install, publication and consumption', () => {
     db.$queryRaw.mockResolvedValue([])
     expect(await resolveScaleStartDeployment({ db: db as any, scale })).toMatchObject({ allowNewStarts: false, reasons: ['DEPLOYMENT_BINDING_MISSING'] })
   })
-  it('carries exact authored provenance through Training/legacy Survey source receipts, not fictitious license dates', async () => {
+  it('carries deployment identity through Training/Survey without fictitious authorship or license proof', async () => {
     const db = database(true)
     const receipt = await readManagedScaleSourceRights(db as any, scale as any, new Date())
-    expect(receipt).toMatchObject({ basis: 'SELF_AUTHORED_SOURCE', sourceHash: policy.selfAuthoredSourceHash, authorization: null, validFrom: null, validTo: null })
-    const expiryDb = { $queryRaw: vi.fn(async () => [{ now: new Date() }]) }
-    const snapshot: any = { ref: { kind: 'SCALE', sourceVersion: version }, provenance: { instrumentClass: 'STANDARD', code: key, sourceRights: receipt } }
+    expect(receipt).toMatchObject({ basis: 'DEPLOYMENT_IDENTITY', deploymentPolicyHash: deployment.policyHash })
+    expect(receipt).not.toHaveProperty('authorization');expect(receipt).not.toHaveProperty('sourceHash');expect(receipt).not.toHaveProperty('validTo')
+    const query=db.$queryRaw.getMockImplementation()!
+    db.$queryRaw.mockImplementation(async(q:any)=>q.strings?.join(' ').includes('clock_timestamp')?[{now:new Date()}] as any:query(q))
+    const expiryDb = {...db,scale:{findFirst:vi.fn(async()=>scale)}}
+    const snapshot: any = { ref: { kind: 'SCALE', sourceId:scale.id,sourceVersion: version }, provenance: { instrumentClass: 'STANDARD', code: key, sourceDeploymentIdentity: receipt } }
     await expect(recheckCatalogScaleSourceExpiry(expiryDb as any, [snapshot])).resolves.toBeUndefined()
-    snapshot.provenance.sourceRights = { ...receipt, sourceHash: '0'.repeat(64) }
-    await expect(recheckCatalogScaleSourceExpiry(expiryDb as any, [snapshot])).rejects.toThrow('SOURCE_SCALE_AUTHORSHIP_CHANGED')
-    snapshot.provenance.sourceRights = { validFrom: '2020-01-01', validTo: '2021-01-01' }
-    await expect(recheckCatalogScaleSourceExpiry(expiryDb as any, [snapshot])).rejects.toThrow('SOURCE_SCALE_LICENSE_EXPIRED')
+    snapshot.provenance.sourceDeploymentIdentity = { ...receipt, runtimePolicyHash: '0'.repeat(64) }
+    await expect(recheckCatalogScaleSourceExpiry(expiryDb as any, [snapshot])).resolves.toBeUndefined()
+    expect(expiryDb.scale.findFirst).not.toHaveBeenCalled()
+    expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
   })
 })

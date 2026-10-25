@@ -10,7 +10,7 @@ import { hashScaleDefinition } from '../scale-definition'
 import { validateScaleProductDefinition } from '../product-definition-readiness'
 import { assertScaleCopyPublishSource, scaleCopySourceSchema } from '../scale-copy.service'
 import { publishedScaleMediaOwner, retainScaleAssessmentImages } from '../scale-image.adapter'
-import { readManagedScaleSourceRights as standardRights } from '../measurement-source'
+import { readManagedScaleSourceIdentity as standardIdentity } from '../measurement-source'
 import { getScaleInstrumentSource } from './instrument-registry'
 import { planStandardScalePublication } from './publish'
 
@@ -86,7 +86,7 @@ async function buildPlan(tx: Tx, input: Input, scale: Scale) {
   const definition = checked.definition, computedDefinitionHash = hashScaleDefinition(definition)
   if (scale.definitionHash !== null && scale.definitionHash !== computedDefinitionHash) fail('DEFINITION_HASH_MISMATCH')
   let standard: Awaited<ReturnType<typeof planStandardScalePublication>> | null = null
-  let rights: Awaited<ReturnType<typeof standardRights>> | null = null
+  let deploymentIdentity: Awaited<ReturnType<typeof standardIdentity>> | null = null
   if (scale.instrumentClass === 'STANDARD') {
     const source = getScaleInstrumentSource(scale.code, scale.instrumentVersion)
     if (!source?.executable || source.executable.releaseStatus !== 'PUBLISHED') fail('REGISTRY_SOURCE_NOT_PUBLISHED')
@@ -97,9 +97,8 @@ async function buildPlan(tx: Tx, input: Input, scale: Scale) {
     standard = await planStandardScalePublication(tx, { instrumentKey: scale.code, instrumentVersion: scale.instrumentVersion,
       actorUserId: input.actorUserId, visibility: scale.visibility })
     if (!standard.allowPublish) fail('STANDARD_PUBLICATION_BLOCKED:' + standard.blockers.join(','))
-    rights = await standardRights(tx, scale, await now(tx))
+    deploymentIdentity = await standardIdentity(tx, scale, await now(tx))
   } else {
-    if (definition.license.status !== 'self_authored' || definition.license.redistribution !== 'allowed') fail('CUSTOM_SOURCE_RIGHTS_UNPROVEN')
     await assertScaleCopyPublishSource(tx, scale)
   }
   const source = { scaleId: scale.id, code: scale.code, instrumentClass: scale.instrumentClass, instrumentVersion: scale.instrumentVersion,
@@ -119,7 +118,7 @@ async function buildPlan(tx: Tx, input: Input, scale: Scale) {
   if (target.layer !== 'MEASUREMENT') fail('LAYER_MISMATCH')
   const proof = { operation, actorUserId: input.actorUserId, recoveryPoint: input.recoveryPoint, source, target: {
     key: target.key, version: target.version, contentHash: target.contentHash, measurementHash: target.content.measurementHash },
-    standardPublicationProofHash: standard?.proofHash ?? null, sourceRights: rights,
+    standardPublicationProofHash: standard?.proofHash ?? null, sourceDeploymentIdentity: deploymentIdentity,
     objectCount: 1, historicalRecordWrites: 0, originalDefinitionWrites: 0 }
   return { proof, proofHash: canonicalHash(proof), releaseInput, definition }
 }
@@ -165,8 +164,8 @@ export async function convertLegacyScaleMeasurement(db: PrismaClient, raw: unkno
     const at = await now(tx)
     checkActor(actor, scale, input.actorUserId, at)
     if (scale.instrumentClass === 'STANDARD') {
-      const liveRights = await standardRights(tx, scale, at)
-      if (canonicalHash(liveRights) !== canonicalHash(plan.proof.sourceRights)) fail('SOURCE_RIGHTS_CHANGED')
+      const liveIdentity = await standardIdentity(tx, scale, at)
+      if (canonicalHash(liveIdentity) !== canonicalHash(plan.proof.sourceDeploymentIdentity)) fail('SOURCE_DEPLOYMENT_CHANGED')
     }
     const changed = await tx.$executeRaw(Prisma.sql`UPDATE scales SET measurement_release_id=${release.releaseId}
       WHERE id=${scale.id} AND measurement_release_id IS NULL AND status='PUBLISHED' AND updated_at=${scale.updatedAt}`)

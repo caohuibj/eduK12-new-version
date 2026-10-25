@@ -61,8 +61,8 @@ export function isSjtMapping(value: unknown): value is StaticSjtMapping {
 }
 export function isSjtPublishRequest(value: unknown): value is StaticSjtPublishRequest {
   return record(value) && uuid(value.mappingId) && uuid(value.grantId) && record(value.deployment)
-    && text(value.deployment.locale) && text(value.deployment.territory) && text(value.deployment.grantee)
-    && ['NON_COMMERCIAL', 'COMMERCIAL'].includes(String(value.deployment.commercialNature))
+    && text(value.deployment.locale) && text(value.deployment.territory)
+    && Object.keys(value.deployment).every(key => key === 'locale' || key === 'territory')
 }
 export function isSjtPublishResult(value: unknown): value is StaticSjtPublishResult {
   return record(value) && uuid(value.mappingId) && uuid(value.measurementReleaseId) && text(value.contentHash) && value.status === 'PUBLISHED'

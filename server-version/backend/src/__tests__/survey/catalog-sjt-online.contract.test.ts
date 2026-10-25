@@ -97,6 +97,20 @@ describe('authorized online SJT uses the shared Training protocol core', () => {
     expect((publication(published(image)).imported.displayDefinition as any).scenes[0].image).toEqual(image.display.scenes[0].image)
     expect(() => adaptCatalogSjt({ ...ref, sourceId: 'registry:unbound' }, 'SJT', published(image))).toThrow('SOURCE_SJT_ONLINE_MEDIA_REQUIRES_AUTHORIZED_DELIVERY')
   })
+  it('preserves unknown copyright for new raw-channel imports and keeps historical bytes/hash unchanged', () => {
+    const document: any = structuredClone(fixture)
+    document.display.licenseStatus='unknown';document.display.redistribution='unknown'
+    document.display.scenes = [{ ...document.display.scenes[0], sceneKey: 'sjt_q_first', questions: [{ ...document.display.scenes[0].questions[0], required: true, allowRefusal: false }] }]
+    document.goldenCases = [{ name: 'first option', responses: [{ sceneKey: 'sjt_q_first', channelKey: 'first', status: 'ANSWERED', responseValue: ['a'] }], expected: { cooperation: 1 } }]
+    const pkg=published(document),current=adaptCatalogSjt(ref,'unknown source',{...pkg,online:undefined})
+    expect((current.displayDefinition as any).licenseStatus).toBe('unknown')
+    expect((current.compiledDefinition as any).license.status).toBe('unknown')
+    const historical=structuredClone(current);(historical.displayDefinition as any).licenseStatus='authorized'
+    const original=JSON.stringify(historical),hash=canonicalHash(historical)
+    expect(catalogAdapterForRecheck(current,historical)).toEqual(historical)
+    expect(JSON.stringify(historical)).toBe(original);expect(canonicalHash(historical)).toBe(hash)
+    expect((current.displayDefinition as any).licenseStatus).toBe('unknown')
+  })
   it('rechecks an existing raw-channel grant with its original adapter identity', () => {
     const document: any = structuredClone(fixture)
     document.display.scenes = [{ ...document.display.scenes[0], sceneKey: 'sjt_q_first', questions: [{ ...document.display.scenes[0].questions[0], required: true, allowRefusal: false }] }]

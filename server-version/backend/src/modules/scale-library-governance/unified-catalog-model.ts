@@ -19,7 +19,7 @@ export interface StandardCatalogRecord {
   exactVersion: Extract<CatalogExactVersion, { origin: 'STANDARD_REGISTRY' }>
   availability: CatalogAvailability
   authorization: {
-    mechanism: 'INSTRUMENT_AUTHORIZATION' | 'SELF_AUTHORED_SOURCE'
+    mechanism: 'DEPLOYMENT_AND_USE_GRANT'
     rights: UnifiedScaleLibraryEntry['rights']
     requiresRuntimeCheck: true
     useGrantStatus: 'NOT_EVALUATED'
@@ -44,9 +44,9 @@ export interface AuthoredCatalogRecord {
 export type PlatformCatalogRecord = StandardCatalogRecord | AuthoredCatalogRecord
 
 export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: LibraryProduct): StandardCatalogRecord {
-  // STANDARD remains bound to its existing rights/scientific/deployment resolver.
+  // STANDARD remains bound to its existing scientific/deployment resolver.
   // No launch links in this management projection: directory visibility and even
-  // rights approval do not establish this user's exact entrypoint use permission.
+  // catalog readiness does not establish this user's exact entrypoint use permission.
   const { launch: _launch, ...availability } = entry.availability
   const standard = { ...entry, availability }
   return {
@@ -58,7 +58,7 @@ export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: 
       status: availability.status === 'NOT_AVAILABLE' ? 'NOT_AVAILABLE' : 'RESTRICTED',
       reasons: [...new Set([...availability.reasons, `${product}_EXACT_USER_AUTHORIZATION_NOT_EVALUATED`])],
     },
-    authorization: { mechanism: entry.rights.status === 'SELF_AUTHORED' ? 'SELF_AUTHORED_SOURCE' : 'INSTRUMENT_AUTHORIZATION', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
+    authorization: { mechanism: 'DEPLOYMENT_AND_USE_GRANT', rights: entry.rights, requiresRuntimeCheck: true, useGrantStatus: 'NOT_EVALUATED' },
     standard,
   }
 }

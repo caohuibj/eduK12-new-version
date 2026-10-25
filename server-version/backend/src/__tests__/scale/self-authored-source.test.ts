@@ -29,10 +29,9 @@ describe('registered self-authored source boundary', () => {
     expect(evaluate({ ...policy(), territory: 'US', commercialNature: 'COMMERCIAL' }).allowNewStarts).toBe(true)
     expect(evaluateDurableInstrumentRights({ instrumentKey: key, instrumentVersion: version, authorizations: [], locale: 'zh-CN', territory: 'ZZ' }).ok).toBe(true)
   })
-  it('does not let a copied hash authorize external, nonexistent or mismatched source identities', () => {
-    for (const other of ['who5', 'nonexistent_authored']) expect(evaluate(policy(), other)).toMatchObject({ allowNewStarts: false, reasons: ['SELF_AUTHORED_SOURCE_MISMATCH'] })
-    expect(evaluate({ ...policy(), selfAuthoredSourceHash: '0'.repeat(64) }).allowNewStarts).toBe(false)
-    expect(evaluateDurableInstrumentRights({ instrumentKey: 'who5', instrumentVersion: version, authorizations: [], locale: 'zh-CN', territory: 'CN' }).ok).toBe(false)
+  it('treats historic authored proofs as metadata, not a copyright permission gate', () => {
+    expect(evaluate({ ...policy(), selfAuthoredSourceHash: '0'.repeat(64) }).allowNewStarts).toBe(true)
+    expect(evaluateDurableInstrumentRights({ instrumentKey: 'who5', instrumentVersion: version, authorizations: [], locale: 'zh-CN', territory: 'CN' }).ok).toBe(true)
   })
   it('supports other reviewed registry identities without a key whitelist', () => {
     const independent = structuredClone(source)
@@ -65,10 +64,10 @@ describe('registered self-authored source boundary', () => {
     const args = { authorizations: [], locale: 'zh-CN', territory: 'ZZ', commercialNature: 'NON_COMMERCIAL' as const, deploymentModes: ['STANDALONE' as const] }
     expect(previewScaleInstrument({ ...args, instrumentKey: key, instrumentVersion: version }).allowActivation).toBe(true)
     const fake = structuredClone(getScaleInstrumentSource('who5', version)!); fake.executable!.definition.license.status = 'self_authored'; fake.executable!.definition.license.redistribution = 'allowed'
-    expect(previewScaleInstrument({ ...args, source: fake }).blockers).toContain('SELF_AUTHORED_SOURCE_MISMATCH')
+    expect(previewScaleInstrument({ ...args, source: fake }).blockers).not.toContain('SELF_AUTHORED_SOURCE_MISMATCH')
     const modified = structuredClone(source); modified.executable!.definition.items[0].content += 'changed'
     expect(selfAuthoredSourceProof(modified)).not.toBe(registeredSelfAuthoredSourceProof(key, version))
-    expect(previewScaleInstrument({ ...args, source: modified }).blockers).toContain('SELF_AUTHORED_SOURCE_MISMATCH')
+    expect(previewScaleInstrument({ ...args, source: modified }).blockers).not.toContain('SELF_AUTHORED_SOURCE_MISMATCH')
     expect(previewScaleInstrument({ ...args, instrumentKey: key, instrumentVersion: version, locale: 'en-US' }).allowActivation).toBe(false)
     const retired = structuredClone(source); retired.executable!.releaseStatus = 'RETIRED'
     expect(previewScaleInstrument({ ...args, source: retired }).blockers).toContain('EXECUTABLE_NOT_PUBLISHED')
@@ -76,13 +75,13 @@ describe('registered self-authored source boundary', () => {
   it('projects authored provenance without inventing approval, public access or user grants', () => {
     const model = buildScaleLibraryReadModel({ viewerRole: 'ADMIN', authorizations: [], deployments: [{ scaleId: 'source', code: key, instrumentVersion: version, status: 'PUBLISHED', visibility: 'HIDDEN' }] })
     const entry = model.entries.find(e => e.identity.instrumentKey === key)!
-    expect(entry.rights.status).toBe('SELF_AUTHORED')
+    expect(entry.rights.status).toBe('NOT_EVALUATED')
     expect(entry.governance).toMatchObject({ catalogStatus: 'REVIEWED', scientificMaturity: 'PILOT' })
     expect(entry.availability.status).toBe('RESTRICTED')
     expect(entry.availability.launch).toBeUndefined()
     expect(entry.availability.reasons).not.toContain('目录记录尚未完成治理审核。')
     expect(entry.availability.reasons.some(r => r.includes('已正式发布'))).toBe(true)
-    expect(standardCatalogRecord(entry, 'TRAINING').authorization).toMatchObject({ mechanism: 'SELF_AUTHORED_SOURCE', useGrantStatus: 'NOT_EVALUATED', requiresRuntimeCheck: true })
+    expect(standardCatalogRecord(entry, 'TRAINING').authorization).toMatchObject({ mechanism: 'DEPLOYMENT_AND_USE_GRANT', useGrantStatus: 'NOT_EVALUATED', requiresRuntimeCheck: true })
     const uninstalled = buildScaleLibraryReadModel({ authorizations: [] }).entries.find(e => e.identity.instrumentKey === key)!
     expect(uninstalled.availability.reasons).toContain('目录记录尚未完成治理审核。')
   })

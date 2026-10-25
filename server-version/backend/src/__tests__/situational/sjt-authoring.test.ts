@@ -31,6 +31,13 @@ import {
 
 const compiled = compileSjtTemplate(example)
 describe('SJT upload compiler and independent author oracles', () => {
+  it('preserves unknown copyright metadata without bypassing author golden validation', () => {
+    const unknown={...structuredClone(example),licenseStatus:'unknown',redistribution:'unknown'}
+    const current=compileSjtTemplate(unknown)
+    expect(current.template.licenseStatus).toBe('unknown')
+    expect(()=>assertSjtReleaseReady(current)).not.toThrow()
+    expect(()=>assertSjtReleaseReady(compileSjtTemplate({...unknown,goldenCases:[]}))).toThrow()
+  })
   it('preserves all 128 author paths and six U cases with six logical nodes and two mothers', () => {
     expect(compiled.package.goldenCases).toHaveLength(134)
     expect(

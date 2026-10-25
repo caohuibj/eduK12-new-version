@@ -13,7 +13,7 @@ describe('shared Training catalog discovery before pagination',()=>{
   const result=await readUnifiedCatalog('system','TRAINING',{page:1,pageSize:25,keyword:'学生 数学',tags:['value_cost','language:zh-CN']})
   expect(result.list).toHaveLength(1)
   expect(result.list[0].exactVersion).toMatchObject({instrumentKey:'value_cost_mathematics_zh_cn',instrumentVersion:'1.0.0'})
-  expect(result.list[0].authorization).toMatchObject({mechanism:'SELF_AUTHORED_SOURCE',useGrantStatus:'NOT_EVALUATED',requiresRuntimeCheck:true})
+  expect(result.list[0].authorization).toMatchObject({mechanism:'DEPLOYMENT_AND_USE_GRANT',useGrantStatus:'NOT_EVALUATED',requiresRuntimeCheck:true})
   expect(mocks.entries).not.toHaveBeenCalled()
   expect(result.hasMore).toBe(false)
  })

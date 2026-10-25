@@ -38,7 +38,7 @@ describe('one platform catalog preserving source-owned exact identities', () => 
       expect(record.standard.availability).not.toHaveProperty('launch')
       expect(record.standard.rights).toEqual(source.rights)
       expect(record.standard.governance).toEqual(source.governance)
-      expect(record.authorization.mechanism).toBe(source.rights.status === 'SELF_AUTHORED' ? 'SELF_AUTHORED_SOURCE' : 'INSTRUMENT_AUTHORIZATION')
+      expect(record.authorization.mechanism).toBe('DEPLOYMENT_AND_USE_GRANT')
       expect(record.authorization.requiresRuntimeCheck).toBe(true)
       expect(record.authorization.useGrantStatus).toBe('NOT_EVALUATED')
     }

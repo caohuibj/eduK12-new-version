@@ -1,5 +1,4 @@
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import {recheckCatalogScaleSourceExpiry} from './catalog.sources'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {authorizedProject,SurveyBuilderError} from './builder.service'
@@ -23,7 +22,6 @@ export async function publishSurveyMeasurementDraft(actorId:string,projectId:str
     if(release.status!=='PUBLISHED')throw new SurveyBuilderError(409,'该草稿版本已停止用于新施测，请编辑后发布新版本')
     await retainAssessmentAssetReferences({owner:{entityType:'MeasurementContentRelease',entityId:release.releaseId,field:'media'},references:assets,db:tx})
     await authorizedProject(tx,actorId,projectId,true)
-    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     if(draft.kind==='SCALE'&&!draft.catalogGrantId) await tx.surveyInstrumentDraft.update({where:{id:draftId},data:{
       status:'PUBLISHED',measurementReleaseId:release.releaseId}})
     // The release's immutable publisher/time is the idempotent publication audit.

@@ -440,7 +440,7 @@ export const validateScaleDefinition = (
 
   if (options.forPublish) {
     if (!hasText(definition.source.title) && !hasText(definition.source.citation)) issues.push({ path: 'source', message: '发布前必须填写来源', severity: 'error' })
-    if (definition.license.status === 'unknown' || definition.license.redistribution === 'unknown') issues.push({ path: 'license', message: '发布前必须明确内容授权状态', severity: 'error' })
+    // Copyright declarations remain truthful metadata, not a publication gate.
     if (!hasText(definition.report.disclaimer)) issues.push({ path: 'report.disclaimer', message: '发布前必须填写免责声明', severity: 'error' })
     if (options.requireGoldenFixture && !options.hasGoldenFixture) issues.push({ path: 'goldenFixture', message: '标准量表缺少 golden scoring fixture', severity: 'error' })
   }

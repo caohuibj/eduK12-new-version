@@ -339,7 +339,7 @@ export const createScaleAdmissionForRuntime = async (input: {
     scale: input.scale,
     requestedMode: input.requestedMode,
   })
-  if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts || !deployment.decision.authorization) {
+  if (deployment.kind !== 'MANAGED_V2' || !deployment.allowNewStarts) {
     throw new InstrumentFinalSubmitError(
       'STALE_ATTEMPT',
       `量表当前不可启动：${deployment.reasons.join(',') || 'DEPLOYMENT_DENIED'}`,
@@ -427,8 +427,7 @@ export const createScaleAdmissionForRuntime = async (input: {
       deployment: {
         revision: deployment.deployment.revision,
         policyHash: deployment.deployment.policyHash,
-        authorizationId: deployment.decision.authorization.authorizationId,
-        authorizationVersion: deployment.decision.authorization.version,
+        basis: 'DEPLOYMENT_IDENTITY',
         evaluatedAt,
         completionDeadline: new Date(Date.parse(evaluatedAt) + (deployment.deployment.policy.completionWindowMs ?? 7 * 24 * 60 * 60 * 1000)).toISOString(),
       },

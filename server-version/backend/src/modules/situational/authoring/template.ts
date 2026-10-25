@@ -568,12 +568,6 @@ export function compileSjtTemplate(input: unknown): {
 export function assertSjtReleaseReady(compiled: ReturnType<typeof compileSjtTemplate>): void {
   const { package: pkg, template: t } = compiled,
     issues: SjtAuthorIssue[] = []
-  if (t.licenseStatus === 'unknown' || t.redistribution === 'unknown')
-    issues.push({
-      path: 'licenseStatus',
-      code: 'SOURCE',
-      message: '发布前需明确内容来源与使用授权',
-    })
   for (const [index, node] of t.nodes.entries())
     if (node.image && (node.image.rightsStatus === 'unknown' || !node.image.rightsNote.trim()))
       issues.push({

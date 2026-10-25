@@ -8,7 +8,7 @@ import ScaleLibraryGovernance from './ScaleLibraryGovernance'
 import {EMPTY_CATALOG_FACETS} from '../../api/catalogDiscovery'
 it('uses shared server filtering across pages instead of hiding returned rows with a local title search',async()=>{
  api.capabilities.mockResolvedValue({systemAdmin:false,reviewGrants:[],distributionGrants:[]});api.submissions.mockResolvedValue({list:[]})
- const row={catalogId:'exact',origin:'STANDARD_REGISTRY',title:'远端命中',exactVersion:{instrumentKey:'registered',instrumentVersion:'1.0.0'},availability:{status:'RESTRICTED',reasons:[]},authorization:{mechanism:'INSTRUMENT_AUTHORIZATION',requiresRuntimeCheck:true,useGrantStatus:'NOT_EVALUATED'},classificationTags:[{id:'MOTIVATION',label:'学习动机',facet:'domain'}]}
+ const row={catalogId:'exact',origin:'STANDARD_REGISTRY',title:'远端命中',exactVersion:{instrumentKey:'registered',instrumentVersion:'1.0.0'},availability:{status:'RESTRICTED',reasons:[]},authorization:{mechanism:'DEPLOYMENT_AND_USE_GRANT',requiresRuntimeCheck:true,useGrantStatus:'NOT_EVALUATED'},classificationTags:[{id:'MOTIVATION',label:'学习动机',facet:'domain'}]}
  api.catalog.mockImplementation(async(page=1)=>({list:[row],page,hasMore:page===1,tagFacets:{...EMPTY_CATALOG_FACETS,domain:[{id:'MOTIVATION',label:'学习动机'}]}}))
  render(<MemoryRouter><ScaleLibraryGovernance/></MemoryRouter>);await screen.findByText('远端命中 · 标准量表（只读）')
  fireEvent.click(screen.getByRole('button',{name:'目录下一页'}));await waitFor(()=>expect(api.catalog).toHaveBeenCalledWith(2))
