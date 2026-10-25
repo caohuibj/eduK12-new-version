@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormPlayer } from '../FormPlayer'
+import {useState} from 'react'
 
 const navigationProps = {
   position: 1,
@@ -211,4 +212,68 @@ describe('C06 policy controls',()=>{
   const other=vi.fn();render(<FormPlayer item={item} options={q.options.map(o=>({value:o.optionKey,label:o.label}))} value={['other']} onChange={vi.fn()} otherText="先前文本" onOtherTextChange={other} {...navigationProps}/>)
   fireEvent.change(screen.getByLabelText('其他填写：q_v3'),{target:{value:'补充'}});expect(other).toHaveBeenCalledWith('补充')
  })
+})
+
+
+it('saves before advancing a School single choice once and keeps the last question manual',async()=>{
+ let finish!:(saved:boolean)=>void
+ const save=vi.fn().mockImplementationOnce(()=>new Promise<boolean>(resolve=>{finish=resolve})).mockResolvedValue(true),submit=vi.fn()
+ function Journey(){
+  const [index,setIndex]=useState(0),[answers,setAnswers]=useState<Record<number,string>>({})
+  return <FormPlayer autoAdvance scopeKey="page-a" item={{id:'q'+index,type:'single_choice',label:'问题 '+(index+1),required:true}} options={[{value:'a',label:'选项 A'}]} value={answers[index]} position={index+1} total={2}
+   onChange={async value=>{const saved=await save(value);if(saved)setAnswers(old=>({...old,[index]:String(value)}));return saved}}
+   onPrevious={()=>setIndex(old=>old-1)} onNext={index===0?()=>setIndex(1):undefined} onSubmit={index===1?submit:undefined}/>
+ }
+ render(<Journey/>)
+ const radio=screen.getByRole('radio',{name:'选项 A'})
+ fireEvent.click(radio,{detail:1});fireEvent.click(radio,{detail:1})
+ expect(save).toHaveBeenCalledTimes(1)
+ expect(screen.getByRole('region',{name:'表单题目 1 / 2'})).toBeInTheDocument()
+ await act(async()=>finish(true))
+ expect(await screen.findByRole('region',{name:'表单题目 2 / 2'})).toHaveFocus()
+ await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
+ await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled())
+ expect(submit).not.toHaveBeenCalled()
+ await userEvent.click(screen.getByRole('button',{name:'上一题'}))
+ expect(screen.getByRole('radio',{name:'选项 A'})).toBeChecked()
+ await act(async()=>{await new Promise(resolve=>setTimeout(resolve,260))})
+ expect(screen.getByRole('region',{name:'表单题目 1 / 2'})).toBeInTheDocument()
+ expect(save).toHaveBeenCalledTimes(2)
+})
+
+it.each([false,'reject'] as const)('does not advance a form after an unsuccessful save: %s',async(outcome)=>{
+ const next=vi.fn(),save=outcome==='reject'?vi.fn().mockRejectedValue(new Error('本机保存失败')):vi.fn().mockResolvedValue(false)
+ render(<FormPlayer autoAdvance item={{id:'choice',type:'single_choice',label:'单选题',required:true}} options={[{value:'a',label:'选项 A'}]} value={undefined} position={1} total={2} onChange={save} onPrevious={vi.fn()} onNext={next}/>)
+ await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
+ await waitFor(()=>expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled())
+ expect(next).not.toHaveBeenCalled()
+})
+
+it('keeps multiple choice, Other text and native arrow selection manual',async()=>{
+ const next=vi.fn(),save=vi.fn()
+ const props={autoAdvance:true,position:1,total:2,onChange:save,onPrevious:vi.fn(),onNext:next}
+ const options=[{value:'a',label:'选项 A'},{value:'other',label:'其他'}]
+ const view=render(<FormPlayer {...props} item={{id:'multiple',type:'multiple_choice',label:'多选题',required:true}} options={options} value={[]}/>)
+ await userEvent.click(screen.getByRole('checkbox',{name:'选项 A'}))
+ expect(save).toHaveBeenCalledWith(['a'])
+ view.rerender(<FormPlayer {...props} item={{id:'typed',type:'SINGLE',label:'单选题',required:true,formDefinition:{itemKey:'typed',type:'SINGLE',prompt:'单选题',required:true,options:[{optionKey:'a',label:'选项 A'},{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other'}}} options={options} value={undefined}/>)
+ await userEvent.click(screen.getByRole('radio',{name:'其他'}))
+ expect(save).toHaveBeenLastCalledWith('other')
+ view.rerender(<FormPlayer {...props} item={{id:'arrows',type:'single_choice',label:'方向键选择',required:true}} options={options} value="a"/>)
+ screen.getByRole('radio',{name:'选项 A'}).focus()
+ await userEvent.keyboard('{ArrowRight}')
+ await act(async()=>{await new Promise(resolve=>setTimeout(resolve,260))})
+ expect(next).not.toHaveBeenCalled()
+})
+
+
+it.each([true,false])('uses the latest page boundary after saving conditional answers (initial next=%s)',async(initial)=>{
+ let finish!:(saved:boolean)=>void
+ const save=vi.fn(()=>new Promise<boolean>(resolve=>{finish=resolve})),next=vi.fn()
+ const props={autoAdvance:true,item:{id:'conditional',type:'single_choice',label:'条件单选题',required:true},options:[{value:'a',label:'选项 A'}],value:undefined,position:1,onChange:save,onPrevious:vi.fn()}
+ const view=render(<FormPlayer {...props} total={initial?2:1} onNext={initial?next:undefined}/>)
+ await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
+ view.rerender(<FormPlayer {...props} total={initial?1:2} onNext={initial?undefined:next}/>)
+ await act(async()=>{finish(true);await new Promise(resolve=>setTimeout(resolve,260))})
+ expect(next).toHaveBeenCalledTimes(initial?0:1)
 })

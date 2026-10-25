@@ -398,9 +398,9 @@ describe('C06 visibility and durable answer cleanup',()=>{
   const submit=vi.fn().mockResolvedValue({code:0,data:{}})
   render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[first,second]})} submitFormSection={submit} submitScale={vi.fn()}/>)
   const user=userEvent.setup();await waitFor(()=>expect(screen.getByRole('radio',{name:'显示'})).toBeEnabled())
-  await user.click(screen.getByRole('radio',{name:'显示'}));await user.click(screen.getByRole('button',{name:'下一字段'}));await user.type(screen.getByLabelText('条件内容'),'应被清除')
+  await user.click(screen.getByRole('radio',{name:'显示'}));await user.click(screen.getByRole('button',{name:'下一题'}));await user.type(screen.getByLabelText('条件内容'),'应被清除')
   const prune = vi.spyOn(finalDraftStore, 'deleteAnswers')
-  await user.click(screen.getByRole('button',{name:'上一字段'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
+  await user.click(screen.getByRole('button',{name:'上一题'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
   await waitFor(async()=>expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(a=>a.itemKey==='conditional')).toBe(false))
   expect(prune.mock.calls).toEqual([['composite-form-section:composite-attempt-1:composite-form-section-1', ['conditional']]])
   await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
@@ -436,7 +436,7 @@ it('clears hidden selected Other and late same-frame text when a source changes'
  const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
  const source={...formItem.formAnswers![0],formItemId:'source-frame',type:'single_choice',label:'同帧来源',required:true,value:'yes',options:[{value:'yes',label:'显示'},{value:'no',label:'隐藏'}],formPolicy:policy,formDefinition:{itemKey:'q_source_frame',type:'SINGLE' as const,prompt:'同帧来源',required:true,options:[{optionKey:'yes',label:'显示'},{optionKey:'no',label:'隐藏'}],rows:[]}}
  const other={...formItem.formAnswers![0],formItemId:'other-frame',type:'multiple_choice',label:'同帧其他',required:true,options:[{value:'other',label:'其他'}],formPolicy:policy,formDefinition:{itemKey:'q_other_frame',type:'MULTIPLE' as const,prompt:'同帧其他',required:true,options:[{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other',displayIf:{itemKey:'q_source_frame',operator:'EQUALS' as const,optionKey:'yes'}}}
- const submit=vi.fn().mockResolvedValue({code:0});render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[source,other]})} submitFormSection={submit} submitScale={vi.fn()}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'下一字段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'下一字段'}));await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
+ const submit=vi.fn().mockResolvedValue({code:0});render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[source,other]})} submitFormSection={submit} submitScale={vi.fn()}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'下一题'}));await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
  await act(async()=>{void frameHandlers.get('source-frame').onChange('no');void frameHandlers.get('other-frame').onOtherTextChange('晚到文本')})
  await waitFor(async()=>{const rows=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(rows.some(r=>r.itemKey==='other-frame'||r.itemKey==='other-frame:other')).toBe(false);expect(rows.find(r=>r.itemKey==='source-frame')?.value).toBe('no')})
  await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
@@ -493,5 +493,41 @@ it('keeps the campus privacy appendix in one folded instruction entry without su
  await userEvent.click(summary)
  expect(screen.getByText('校园作答隐私补充说明')).toBeVisible()
  expect(screen.getByText(/未提交的答案保存在当前浏览器/)).toBeVisible()
+ expect(submit).not.toHaveBeenCalled()
+})
+
+
+it('advances a campus form only after durable save and never submits the page automatically',async()=>{
+ const submit=vi.fn()
+ const fields=['第一题','第二题'].map((label,index)=>({formItemId:'auto-'+index,type:'single_choice',label,required:true,options:[{value:'a',label:'选项 A'}],placeholder:null,contextKey:null,value:null}))
+ render(<FinalCompositeAssessment campusMode state={makeState({...formItem,formAnswers:fields})} submitFormSection={submit} submitScale={vi.fn()} {...sharedProps}/>)
+ await userEvent.click(await screen.findByRole('radio',{name:'选项 A'}))
+ await screen.findByText('第二题')
+ expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(row=>row.itemKey==='auto-0'&&row.value==='a')).toBe(true)
+ await userEvent.click(screen.getByRole('radio',{name:'选项 A'}))
+ await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled())
+ expect(submit).not.toHaveBeenCalled()
+})
+
+it('enables campus single-question scale advance while keeping its FINAL manual',async()=>{
+ const submit=vi.fn()
+ const first=scaleItem.scale!.definition!.items[0]
+ const item={...scaleItem,scale:{...scaleItem.scale!,definition:{...scaleItem.scale!.definition!,items:[first,{...first,itemCode:'item-2',content:'综合量表第二题'}]}}}
+ render(<FinalCompositeAssessment campusMode state={makeState(item)} submitFormSection={vi.fn()} submitScale={submit} {...sharedProps}/>)
+ await userEvent.click(await screen.findByRole('button',{name:'经常'}))
+ await screen.findByRole('heading',{name:/综合量表第二题/})
+ await userEvent.click(screen.getByRole('button',{name:'经常'}))
+ await waitFor(()=>expect(screen.getByRole('button',{name:/提交整份量表/})).toBeEnabled())
+ expect(submit).not.toHaveBeenCalled()
+})
+
+
+it('advances to a newly revealed campus form question after the source choice is saved',async()=>{
+ const submit=vi.fn()
+ const source={formItemId:'source',type:'SINGLE',label:'是否显示后续问题',required:true,options:[{value:'show',label:'显示'}],placeholder:null,contextKey:null,value:null,formDefinition:{itemKey:'source',type:'SINGLE' as const,prompt:'是否显示后续问题',required:true,options:[{optionKey:'show',label:'显示'}],rows:[]}}
+ const detail={formItemId:'detail',type:'LONG_TEXT',label:'后续问题',required:false,options:[],placeholder:null,contextKey:null,value:null,formDefinition:{itemKey:'detail',type:'LONG_TEXT' as const,prompt:'后续问题',required:false,options:[],rows:[],displayIf:{itemKey:'source',operator:'EQUALS' as const,optionKey:'show'}}}
+ render(<FinalCompositeAssessment campusMode state={makeState({...formItem,formAnswers:[source,detail]})} submitFormSection={submit} submitScale={vi.fn()} {...sharedProps}/>)
+ await userEvent.click(await screen.findByRole('radio',{name:'显示'}))
+ await screen.findByRole('textbox',{name:'后续问题'})
  expect(submit).not.toHaveBeenCalled()
 })

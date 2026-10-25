@@ -284,14 +284,14 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }, [state.status, onCompleted])
 
   const saveForm = async (itemId: string, value: FormValue) => {
-    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return
+    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return false
     const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
     const pendingValues = {...formValuesRef.current,[itemId]:value}
     const nextValues = sanitizeTrainingFormValues(fields,pendingValues)
     formValuesRef.current = nextValues
     setFormValues(nextValues)
     setSectionIndex(index=>Math.min(index,Math.max(0,trainingVisibleFields(fields,nextValues).length-1)))
-    await scheduleLocalSave(`form:${itemId}`, async () => {
+    return scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
       const staleKeys = Object.keys(pendingValues).filter(key => !(key in nextValues))
       if (staleKeys.length > 0) await finalDraftStore.deleteAnswers(draftKey, staleKeys)
@@ -649,6 +649,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                   loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}
                 >
                   <FormPlayer
+                    autoAdvance={campusMode}
+                    scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={{
                       id: field.formItemId,
                       type: field.type,
@@ -705,7 +707,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
-                    autoAdvance={!allScaleItems && isTrainingHost() && !campusMode && !publicMode}
+                    autoAdvance={!allScaleItems && (campusMode || (isTrainingHost() && !publicMode))}
                     hideNavigation={allScaleItems}
                     scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={question}
