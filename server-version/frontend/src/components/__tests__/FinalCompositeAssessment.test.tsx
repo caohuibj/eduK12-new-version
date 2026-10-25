@@ -481,3 +481,17 @@ it('uses a compact Training header and Chinese SJT labels without changing the c
   expect(submitFormSection).not.toHaveBeenCalled()
   expect(submitScale).not.toHaveBeenCalled()
 })
+
+
+it('keeps the campus privacy appendix in one folded instruction entry without submitting',async()=>{
+ const submit=vi.fn()
+ render(<FinalCompositeAssessment campusMode state={makeState(formItem)} instructionsSummary="作答说明" instructionsAppendix={<p>校园作答隐私补充说明</p>} submitFormSection={submit} submitScale={vi.fn()} {...sharedProps}/>)
+ await screen.findByRole('button',{name:'保存并退出'})
+ const summary=screen.getByText('作答说明',{selector:'summary'})
+ expect(screen.getAllByText('作答说明',{selector:'summary'})).toHaveLength(1)
+ expect(screen.getByText('校园作答隐私补充说明')).not.toBeVisible()
+ await userEvent.click(summary)
+ expect(screen.getByText('校园作答隐私补充说明')).toBeVisible()
+ expect(screen.getByText(/未提交的答案保存在当前浏览器/)).toBeVisible()
+ expect(submit).not.toHaveBeenCalled()
+})

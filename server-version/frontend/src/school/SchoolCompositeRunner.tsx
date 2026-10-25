@@ -127,15 +127,20 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
-  const studentAnswer=Boolean(title&&state&&!done&&!child&&['FORM_SECTION','SCALE'].includes(state.currentItem?.type??''))
-  const compactNotes=studentAnswer||Boolean(title&&child)
+  const ordinaryAnswer=Boolean((title||observer)&&state&&!done&&!child&&['FORM_SECTION','SCALE'].includes(state.currentItem?.type??''))
+  const compactNotes=ordinaryAnswer||Boolean(title&&child)
   const observerReady=observer&&!state&&!done
-  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(title&&child?' hs-school-task-runner--child':'')+(studentAnswer?' hs-school-task-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
-    {observerReady?<>
-      <div className="hs-observer-ready-toolbar"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回任务</button>
-        <SchoolTaskHelp label="作答与隐私说明" buttonText="作答说明"><p><strong>离开与提交</strong><br/>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p><strong>结果可见性</strong><br/>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></SchoolTaskHelp>
+  const observerAnswer=observer&&ordinaryAnswer
+  return <section data-school-child={title?child?.type:undefined} className={"hs-panel hs-runner"+(observerReady?' hs-observer-runner--ready':'')+(title&&child?' hs-school-task-runner--child':'')+(ordinaryAnswer?' hs-school-task-runner--answer':'')+(observerAnswer?' hs-observer-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答"
+    onMouseOut={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
+    onPointerDownCapture={observerAnswer?event=>{const details=panelRef.current?.querySelector<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.target as Node))details.open=false}:undefined}
+    onBlurCapture={observerAnswer?event=>{const details=(event.target as Element).closest<HTMLDetailsElement>('details.assessment-instructions');if(details&&!details.contains(event.relatedTarget as Node|null))details.open=false}:undefined}
+    onKeyDown={observerAnswer?event=>{const details=panelRef.current?.querySelector<HTMLDetailsElement>('details.assessment-instructions');if(event.key==='Escape'&&details?.open){details.open=false;details.querySelector<HTMLElement>('summary')?.focus()}}:undefined}>
+    {observerReady||observerAnswer?<>
+      <div className={'hs-observer-ready-toolbar'+(observerAnswer?' hs-observer-answer-toolbar':'')}><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回任务</button>
+        {!observerAnswer&&<SchoolTaskHelp label="作答与隐私说明" buttonText="作答说明"><p><strong>离开与提交</strong><br/>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p><strong>结果可见性</strong><br/>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></SchoolTaskHelp>}
       </div>
-      <header className="hs-observer-ready-heading"><p>教师观察测评</p><h2>{observerTaskTitle||'校园正式测评'}</h2></header>
+      {observerReady&&<header className="hs-observer-ready-heading"><p>教师观察测评</p><h2>{observerTaskTitle||'校园正式测评'}</h2></header>}
     </>:<>
     <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
     {!compactNotes&&<p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>}
@@ -170,7 +175,8 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
     state?<FinalCompositeAssessment
       state={state}
       campusMode
-      instructionsSummary={studentAnswer?'作答说明':undefined}
+      instructionsSummary={ordinaryAnswer?'作答说明':undefined}
+      instructionsAppendix={observerAnswer?<><p>返回任务不会提交当前作答。已提交的结果保留；尚未提交的内容可能无法保留。</p><p>完成测评不会自动向家长或普通教师开放学生个人心理报告。</p></>:undefined}
       campusVideoLoader={videoLoader}
       submitFormSection={async(_id,sectionId,input)=>{
         return wrapped(await api(runApi('/form-sections/'+encodeURIComponent(sectionId)+'/submit'),

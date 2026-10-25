@@ -60,6 +60,7 @@ export interface FinalCompositeAssessmentProps {
   campusMode?: boolean
   /** Optional product presentation; answer and submission controllers stay unchanged. */
   instructionsSummary?: string
+  instructionsAppendix?: React.ReactNode
   campusVideoLoader?: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
 }
 
@@ -87,7 +88,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport, instructionsSummary }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport, instructionsSummary, instructionsAppendix }) => {
   const item = state.currentItem
   const expiredCognitive = item?.type === 'COGNITIVE' && cognitiveRecovery?.reason === 'LOCAL_DRAFT_EXPIRED'
   const [sectionIndex, setSectionIndex] = useState(0)
@@ -532,6 +533,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           {!(isTrainingHost() && !campusMode) ? <p>当前单元：{currentUnit ? compositeItemLabel(currentUnit) : item ? compositeItemLabel(item) : '—'}</p> : null}
           {expiredCognitive ? <p>请先处理本机认知试次过期状态，已接受的单元记录不受影响。</p>
             : <p>{contextText} {publicMode?'仅可恢复此浏览器中仍有效的本机草稿；换设备需要已启用并成功保存的临时进度。参与链接本身不包含未提交答案。':'浏览器重开后可以继续恢复。'}</p>}
+          {instructionsAppendix}
         </div>
       )}
       progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}

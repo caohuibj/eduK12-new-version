@@ -126,3 +126,17 @@ it('keeps observer preparation concise without hiding required consent or starti
  expect(onExit).toHaveBeenCalledOnce()
  expect(api).not.toHaveBeenCalled()
 })
+
+
+it.each(['FORM_SECTION','SCALE','COGNITIVE'])('scopes observer %s answer presentation without changing transport',async(type)=>{
+ const api=vi.fn(async(path:string)=>path.endsWith('/start')?{state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:{id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'unit-1',type}})
+ render(<SchoolCompositeRunner observer observerTaskTitle="教师观察任务" api={api as unknown as SchoolApi} execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>)
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+ await screen.findByRole('button',{name:'进入冻结认知子测评'})
+ const ordinary=type!=='COGNITIVE'
+ expect(screen.getByLabelText('校园任务作答').classList.contains('hs-observer-runner--answer')).toBe(ordinary)
+ expect(screen.getByLabelText('校园任务作答').classList.contains('hs-school-task-runner--answer')).toBe(ordinary)
+ expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({campusMode:true,instructionsSummary:ordinary?'作答说明':undefined}))
+ expect(Boolean(m.presentation.mock.lastCall?.[0].instructionsAppendix)).toBe(ordinary)
+ expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
+})
