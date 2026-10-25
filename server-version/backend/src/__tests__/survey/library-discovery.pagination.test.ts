@@ -28,6 +28,14 @@ beforeEach(() => {
 })
 
 describe('server-wide discovery before public-catalog pagination', () => {
+  it('keeps the #355 SDQ function fingerprint fix on unfiltered second pages after tag integration', async () => {
+    const standard = await standardTripletCatalog('system', 2)
+    const survey = await surveyLibraryCatalog('manager', 2)
+    expect(standard.list.length).toBeGreaterThan(0)
+    expect(survey.list.length).toBeGreaterThan(0)
+    expect([...standard.list.map(row => row.toolKey), ...survey.list.map(row => row.exactVersion.origin === 'STANDARD_REGISTRY' ? row.exactVersion.instrumentKey : '')].some(key => key.includes('sdq'))).toBe(true)
+    expect(survey.list.every(row => Array.isArray(row.classificationTags))).toBe(true)
+  })
   it('finds a standard version outside the original first page with an old tag ID and Chinese aliases', async () => {
     const all = listScaleInstrumentSources().slice().sort((a, b) => `${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
     const index = all.findIndex(source => source.identity.instrumentKey === 'value_cost_mathematics_zh_cn')

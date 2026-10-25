@@ -1,4 +1,4 @@
-export const CATALOG_FACETS = ['population', 'construct', 'subject', 'domain'] as const
+export const CATALOG_FACETS = ['population', 'construct', 'subject', 'domain', 'language'] as const
 export type CatalogFacet = typeof CATALOG_FACETS[number]
 export type CatalogTagOption = { id: string; label: string }
 export type CatalogClassificationTag = CatalogTagOption & { facet: CatalogFacet | 'other' }
@@ -7,10 +7,10 @@ export type CatalogOrigin = 'ALL' | 'STANDARD_REGISTRY' | 'AUTHORED'
 export type CatalogFilters = Record<CatalogFacet, string> & { keyword: string; origin: CatalogOrigin }
 export type CatalogDiscoveryPage<T> = { list: T[]; page?: number; hasMore: boolean; tagFacets?: CatalogTagFacets }
 
-export const EMPTY_CATALOG_FACETS: CatalogTagFacets = { population: [], construct: [], subject: [], domain: [] }
-export const EMPTY_CATALOG_FILTERS: CatalogFilters = { keyword: '', population: '', construct: '', subject: '', domain: '', origin: 'ALL' }
+export const EMPTY_CATALOG_FACETS: CatalogTagFacets = { population: [], construct: [], subject: [], domain: [], language: [] }
+export const EMPTY_CATALOG_FILTERS: CatalogFilters = { keyword: '', population: '', construct: '', subject: '', domain: '', language: '', origin: 'ALL' }
 export const CATALOG_FACET_LABELS: Record<CatalogFacet | 'other', string> = {
-  population: '人群', construct: '测量内容', subject: '学科', domain: '领域', other: '其他',
+  population: '人群', construct: '测量内容', subject: '学科', domain: '领域', language: '语言', other: '其他',
 }
 
 // Stable source IDs remain unchanged in requests, even when the display label is localized.

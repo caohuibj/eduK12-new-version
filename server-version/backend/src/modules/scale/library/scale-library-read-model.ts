@@ -1,5 +1,5 @@
 import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
-import {catalogClassificationTags,matchesCatalogDiscovery} from './catalog-discovery'
+import {scaleEntryClassificationTags,matchesCatalogDiscovery} from './catalog-discovery'
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
@@ -457,7 +457,7 @@ export const filterScaleLibraryEntries = (
         entry.construct.constructDefinition,
         entry.source.title ?? '',
         entry.identity.instrumentKey,
-      ], catalogClassificationTags(entry.construct), filters)
+      ], scaleEntryClassificationTags(entry), filters)
       if (!matches) return false
     }
     if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false

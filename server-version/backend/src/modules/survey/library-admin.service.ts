@@ -1,4 +1,4 @@
-import {catalogClassificationTags,catalogTagFacets,catalogKeywordTerms,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {scaleEntryClassificationTags,catalogTagFacets,catalogKeywordTerms,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {assertGovernedOnline} from './governed-tool.service'
 import type {StandardRelease} from './standard-triplet.service'
 import {randomUUID} from 'node:crypto'
@@ -56,8 +56,8 @@ async function decorate(tx:Prisma.TransactionClient,row:PlatformCatalogRecord){
 export async function surveyLibraryCatalog(actorId:string,page:number,filters:CatalogDiscoveryFilters&{origin?:'ALL'|'STANDARD_REGISTRY'|'AUTHORED'}={}){
  await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,actorId))
  const standard=await readStandardScaleLibraryForActor({userId:actorId,role:UserRole.ADMIN})
- const tagFacets=catalogTagFacets(standard.entries.map(row=>catalogClassificationTags(row.construct)))
- const sorted=(filters.origin==='AUTHORED'?[]:standard.entries).filter(row=>matchesCatalogDiscovery([row.identity.canonicalName,row.identity.instrumentKey,row.identity.instrumentVersion,row.identity.instrumentFamily??'',row.construct.constructDefinition],catalogClassificationTags(row.construct),filters)).sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
+ const tagFacets=catalogTagFacets(standard.entries.map(row=>scaleEntryClassificationTags(row)))
+ const sorted=(filters.origin==='AUTHORED'?[]:standard.entries).filter(row=>matchesCatalogDiscovery([row.identity.canonicalName,row.identity.instrumentKey,row.identity.instrumentVersion,row.identity.instrumentFamily??'',row.construct.constructDefinition],scaleEntryClassificationTags(row),filters)).sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
  const offset=(page-1)*25,selected=sorted.slice(offset,offset+25)
  return prisma.$transaction(async tx=>{
   await assertSurveyLibraryManager(tx,actorId)
@@ -73,7 +73,7 @@ export async function surveyLibraryCatalog(actorId:string,page:number,filters:Ca
    more=entries.length>25-selected.length
   }
   const decorated=[]
-  for(const row of list)decorated.push({...await decorate(tx,row),classificationTags:row.origin==='STANDARD_REGISTRY'?catalogClassificationTags(row.standard.construct):[]})
+  for(const row of list)decorated.push({...await decorate(tx,row),classificationTags:row.origin==='STANDARD_REGISTRY'?scaleEntryClassificationTags(row.standard):[]})
   return {schemaVersion:1,list:decorated,page,pageSize:25,hasMore:more,tagFacets,generatedAt:new Date().toISOString()}
  },{timeout:20000})
 }

@@ -12,19 +12,20 @@ type Props = {
   onApply: (filters: CatalogFilters) => void
   includeOrigin?: boolean
   disabled?: boolean
+  label?: string
 }
 
-export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, includeOrigin = false, disabled = false }: Props) {
-  return <form className="catalog-discovery" role="search" aria-label="量表目录检索" onSubmit={event => { event.preventDefault(); onApply(filters) }}>
+export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, includeOrigin = false, disabled = false, label = '量表目录检索' }: Props) {
+  return <form className="catalog-discovery" role="search" aria-label={label} onSubmit={event => { event.preventDefault(); onApply(filters) }}>
     <fieldset disabled={disabled}>
-      <legend className="sr-only">量表分类与关键词</legend>
+      <legend className="sr-only">工具分类与关键词</legend>
       <label className="catalog-discovery-keyword">关键词
         <input type="search" maxLength={100} value={filters.keyword} onChange={event => onChange({ ...filters, keyword: event.target.value })} placeholder="搜索名称、编号或标签" />
       </label>
       {CATALOG_FACETS.map(facet => <label key={facet}>{CATALOG_FACET_LABELS[facet]}
         <select value={filters[facet]} onChange={event => onChange({ ...filters, [facet]: event.target.value })}>
           <option value="">全部{CATALOG_FACET_LABELS[facet]}</option>
-          {facets[facet].map(tag => <option key={tag.id} value={tag.id}>{catalogTagLabel(tag)}</option>)}
+          {(facets[facet] ?? []).map(tag => <option key={tag.id} value={tag.id}>{catalogTagLabel(tag)}</option>)}
         </select>
       </label>)}
       {includeOrigin && <label>入库来源
@@ -37,6 +38,6 @@ export default function CatalogDiscoveryFilters({ filters, facets, onChange, onA
         <button type="button" onClick={() => { onChange({ ...EMPTY_CATALOG_FILTERS }); onApply({ ...EMPTY_CATALOG_FILTERS }) }}>清除筛选</button>
       </div>
     </fieldset>
-    <p className="catalog-discovery-hint">在全部可见目录中检索，分类与关键词同时生效。修改条件后点击“检索”。</p>
+    <p className="catalog-discovery-hint">在全部可见目录中检索，分类与关键词同时生效。修改条件后点击“检索”。分类资料不代表使用许可、科学成熟度或版本批准。</p>
   </form>
 }

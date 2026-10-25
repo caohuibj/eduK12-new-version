@@ -1,3 +1,6 @@
+import CatalogDiscoveryFilters from '../../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../../components/scale-governance/CatalogClassificationTags'
+import {EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters,type CatalogTagFacets} from '../../api/catalogDiscovery'
 import { scaleRightsStatusLabel } from '../../modules/scale/rightsPresentation'
 import { EducationLibraryDistributionPicker, educationDistributionReason } from '../../components/scale-governance/EducationLibraryDistributionPicker'
 import {EducationApplicabilitySummary} from '../../components/scale-governance/EducationApplicabilityFields'
@@ -5,7 +8,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './survey-admin.css'
 import './survey-library.css'
-import { ChevronDown, BookOpen, ClipboardList, FileSearch, RefreshCw, Search, ShieldCheck } from 'lucide-react'
+import { ChevronDown, BookOpen, ClipboardList, FileSearch, RefreshCw, ShieldCheck } from 'lucide-react'
 import { governanceApi, submissionStatusLabel, type GovernanceCatalogRecord, type GovernanceCapabilities, type GovernanceEntry, type GovernanceTargetProduct, type EducationDistributionProduct, type GovernanceSubmission, type GovernanceUseGrant } from '../../api/scaleLibraryGovernance'
 import { ScaleLibraryMediaPreview } from '../../components/scale-governance/ScaleLibraryMediaPreview'
 import { ProductPage, PageHeader } from '../../components/product-ui'
@@ -36,7 +39,7 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
   const {user}=useAuth()
   const systemContext=user?.platformRole==='SYSTEM_ADMIN'
   const [view, setView] = useState<'catalog' | 'submissions'>(authoredOnly?'submissions':'catalog')
-  const [catalogQuery, setCatalogQuery] = useState(''), [originFilter, setOriginFilter] = useState(authoredOnly?'AUTHORED':'ALL')
+  const [filters,setFilters]=useState<CatalogFilters>({...EMPTY_CATALOG_FILTERS,origin:authoredOnly?'AUTHORED':'ALL'}),[appliedFilters,setAppliedFilters]=useState<CatalogFilters>({...EMPTY_CATALOG_FILTERS,origin:authoredOnly?'AUTHORED':'ALL'}),[tagFacets,setTagFacets]=useState<CatalogTagFacets>(EMPTY_CATALOG_FACETS)
   const location=useLocation()
   const surveyContext=new URLSearchParams(location.search).get('workspace')==='survey'
   const modernContext=surveyContext||systemContext
@@ -60,18 +63,18 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
   const mounted = useRef(true), locked = useRef(false), lookupGeneration = useRef(0)
   const refresh = useCallback(async () => {
     const current = ++catalogReadGeneration.current
-    setLoading(true); setError('')
+    setLoading(true); setError('');setCatalog([]);setCatalogHasMore(false)
     try {
       const authority = await api.capabilities()
       if (!mounted.current || current !== catalogReadGeneration.current) return
       setCapabilities(authority)
-      const [applications, library] = await Promise.all([api.submissions(), api.catalog(catalogPage)])
+      const [applications, library] = await Promise.all([api.submissions(), Object.values(appliedFilters).some(value=>value&&value!=='ALL')?api.catalog(catalogPage,25,appliedFilters):api.catalog(catalogPage)])
       if (!mounted.current || current !== catalogReadGeneration.current) return
-      setSubmissions(applications.list); setCatalog(library.list); setCatalogHasMore(library.hasMore); const authored = library.list.flatMap(row => row.authored ? [row.authored] : []); setEntries(authored)
+      setSubmissions(applications.list); setCatalog(library.list); setCatalogHasMore(library.hasMore);setTagFacets(library.tagFacets??EMPTY_CATALOG_FACETS); const authored = library.list.flatMap(row => row.authored ? [row.authored] : []); setEntries(authored)
       setSelected(current => current ? authored.find(row => row.id === current.id) || null : null)
-    } catch (failure) { if (mounted.current && current === catalogReadGeneration.current) { setCapabilities(null); setError(failure instanceof Error ? failure.message : '治理状态加载失败') } }
+    } catch (failure) { if (mounted.current && current === catalogReadGeneration.current) { setCapabilities(null);setCatalog([]);setCatalogHasMore(false);setSelected(null);setCatalogDetail(null); setError(failure instanceof Error ? failure.message : '治理状态加载失败') } }
     finally { if (mounted.current && current === catalogReadGeneration.current) setLoading(false) }
-  }, [catalogPage])
+  }, [catalogPage,appliedFilters])
   useEffect(() => { mounted.current = true; void refresh(); return () => { mounted.current = false; lookupGeneration.current++; catalogReadGeneration.current++; catalogDetailGeneration.current++ } }, [refresh])
   const run = async (work: () => Promise<unknown>, message: string) => {
     if (locked.current) return
@@ -126,8 +129,10 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
       {submissions.map(row => <article key={row.id} className="border rounded p-4 mt-3"><h3>{row.metadata.title} · {submissionStatusLabel[row.status]}</h3><SurveyLibraryDisclosure enabled={modernContext} label="申请详情与审核"><p className="break-all">{row.product} · 精确版本 {row.releaseId}</p><dl>{Object.entries(row.metadata).map(([key, value]) => <div key={key}><dt>{metadataLabels[key] || key}</dt><dd>{value}</dd></div>)}</dl>{row.reason && <p>处理说明：{row.reason}</p>}{canReview(row.releaseId) && <div className="my-3"><button type="button" className="hui-button hui-button--secondary" disabled={busy || !!detailLoading} onClick={() => void inspect(row)}>读取精确版本审核内容</button>{details[row.id] && <details open><summary>冻结内容、计分、报告与依赖版本</summary><pre tabIndex={0} role="region" aria-label={`审核冻结内容：${row.metadata.title} · ${row.releaseId}`} className="whitespace-pre-wrap break-all text-xs max-h-96 overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current">{JSON.stringify(details[row.id], null, 2)}</pre></details>}{details[row.id]?.version===row.version && details[row.id]?.releaseId===row.releaseId && <EducationApplicabilitySummary value={details[row.id].educationApplicability} hash={details[row.id].educationApplicabilityHash}/>}{details[row.id]?.mediaManifest && <section aria-label="固定附件审核清单"><h4>同批媒体审核</h4><p>批准后将固定附件纳入受控平台媒体库；不是匿名公开 URL。退回不发布媒体。</p>{details[row.id].mediaManifest.items.map(item => <article key={item.assetId + item.assetVersion}><p className="break-all">{item.assetId} · {item.mimeType} · {item.sizeBytes} 字节 · v{item.assetVersion} · {item.contentHash}</p><p>用途：{item.usages.join('、')}；权限：仅随此批准量表供获授权使用者 / 对应任务使用，不允许脱离量表独立复用。</p><ScaleLibraryMediaPreview product="TRAINING" context={{ kind: 'submissions', id: row.id }} item={item}/></article>)}{details[row.id].mediaManifest.items.length > 0 && <label><input type="checkbox" checked={mediaReviewed[row.id] === details[row.id].mediaManifest.manifestHash} onChange={event => setMediaReviewed(current => ({ ...current, [row.id]: event.target.checked ? details[row.id].mediaManifest.manifestHash : '' }))}/>已核对固定附件内容及随量表共享权限</label>}</section>}<p>批准前请核对实际冻结题目、计分、报告及依赖；仅有申请说明不足以批准。</p></div>}{row.status === 'SUBMITTED' && canReview(row.releaseId) && <div className="flex gap-2 mt-3"><button type="button" className="hui-button hui-button--primary" disabled={busy || loading || !reason.trim() || details[row.id]?.version !== row.version || details[row.id]?.releaseId !== row.releaseId || !details[row.id]?.mediaManifest || (details[row.id].mediaManifest.items.length > 0 && mediaReviewed[row.id] !== details[row.id].mediaManifest.manifestHash)} onClick={() => void run(() => api.review(row, 'APPROVE', reason.trim(), reviewGrant(row.releaseId)), '已批准收录，尚未自动分配使用权限。')}>批准精确版本入库</button><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || !reason.trim()} onClick={() => void run(() => api.review(row, 'RETURN', reason.trim(), reviewGrant(row.releaseId)), '申请已退回，作者可查看原因。')}>退回并说明原因</button></div>}</SurveyLibraryDisclosure></article>)}
       {!submissions.length && !loading && <p>当前范围没有入库申请。</p>}
     </section>
-  const legacyCatalog = !surveyContext && <section className="staff-panel staff-panel--padded p-5 mt-4"><h2>公共量表总汇</h2><p>标准量表与获批自编量表在同一目录分页呈现。目录可见或版权获批，不代表当前用户已获入口使用权限；来源入口仅表示出处，不决定使用授权。</p><p>普通下架或撤权停止新增使用，保留历史与既有绑定；紧急停用会阻止该版本继续用于运行，可能影响正在进行的任务或波次。历史答卷与报告不删除。</p>
-      {catalog.filter(row => row.origin === 'STANDARD_REGISTRY').map(row => <article key={row.catalogId} className="border rounded p-4 mt-3"><h3>{row.title} · 标准量表（只读）</h3><p>{row.exactVersion.instrumentKey} · v{row.exactVersion.instrumentVersion}</p><p>{row.standard?.construct.constructDefinition}</p><p>版权状态：{scaleRightsStatusLabel(row.standard?.rights.status || '待核对')}；科学证据：{row.standard?.evidence.coverageText || '查看精确详情'}。</p><p>目录状态：{row.availability.status === 'NOT_AVAILABLE' ? '暂不可用' : '使用前需核验入口授权'}；不会自动转为自编量表或绕过原标准授权。</p><button type="button" className="hui-button hui-button--secondary" disabled={catalogDetailLoading} onClick={() => void inspectCatalog(row)}>查看标准精确版本详情</button>{!surveyContext&&row.authorization.mechanism!=='SELF_AUTHORED_SOURCE'&&<Link className="ml-3" to="/admin/instrument-authorizations">原标准版权与使用授权管理</Link>}</article>)}
+  const applyCatalogFilters=(next:CatalogFilters)=>{catalogReadGeneration.current++;catalogDetailGeneration.current++;setCatalogDetail(null);setSelected(null);setCatalogPage(1);setAppliedFilters({...next,origin:authoredOnly?'AUTHORED':next.origin,keyword:next.keyword.trim()})}
+  const catalogDiscoveryControls=<CatalogDiscoveryFilters label="公共量表总汇检索" filters={filters} facets={tagFacets} onChange={setFilters} onApply={applyCatalogFilters} includeOrigin={!authoredOnly} disabled={busy}/>
+  const legacyCatalog = !surveyContext && <section className="staff-panel staff-panel--padded p-5 mt-4"><h2>公共量表总汇</h2>{catalogDiscoveryControls}<p>标准量表与获批自编量表在同一目录分页呈现。目录可见或版权获批，不代表当前用户已获入口使用权限；来源入口仅表示出处，不决定使用授权。</p><p>普通下架或撤权停止新增使用，保留历史与既有绑定；紧急停用会阻止该版本继续用于运行，可能影响正在进行的任务或波次。历史答卷与报告不删除。</p>
+      {catalog.filter(row => row.origin === 'STANDARD_REGISTRY').map(row => <article key={row.catalogId} className="border rounded p-4 mt-3"><h3>{row.title} · 标准量表（只读）</h3><CatalogClassificationTags tags={row.classificationTags}/><p>{row.exactVersion.instrumentKey} · v{row.exactVersion.instrumentVersion}</p><p>{row.standard?.construct.constructDefinition}</p><p>版权状态：{scaleRightsStatusLabel(row.standard?.rights.status || '待核对')}；科学证据：{row.standard?.evidence.coverageText || '查看精确详情'}。</p><p>目录状态：{row.availability.status === 'NOT_AVAILABLE' ? '暂不可用' : '使用前需核验入口授权'}；不会自动转为自编量表或绕过原标准授权。</p><button type="button" className="hui-button hui-button--secondary" disabled={catalogDetailLoading} onClick={() => void inspectCatalog(row)}>查看标准精确版本详情</button>{!surveyContext&&row.authorization.mechanism!=='SELF_AUTHORED_SOURCE'&&<Link className="ml-3" to="/admin/instrument-authorizations">原标准版权与使用授权管理</Link>}</article>)}
       {entries.map(row => <article key={row.id} className="border rounded p-4 mt-3"><h3>{row.metadata.title} · 自编描述性量表 · {entryLabels[row.status]}</h3><p className="break-all">精确版本 {row.releaseId}</p><p>兼容入口：{row.supportedEntrypoints?.join('、') || '暂无可分配入口'}</p><div className="flex flex-wrap gap-2"><button type="button" className="hui-button hui-button--secondary" disabled={catalogDetailLoading} onClick={() => { const record = catalog.find(item => item.authored?.id === row.id); if (record) void inspectCatalog(record) }}>查看自编精确版本详情</button><button type="button" className="hui-button hui-button--secondary" disabled={busy} onClick={() => void loadGrants(row)}>查看 / 分配只读使用权限</button>{row.status !== 'EMERGENCY_DISABLED' && canReview(row.releaseId) && <><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || row.status !== 'ACTIVE' || !reason.trim()} onClick={() => void run(() => api.setStatus(row, 'WITHDRAWN', reason.trim(), reviewGrant(row.releaseId)), '已普通下架；历史记录保留。')}>普通下架</button><button type="button" className="hui-button hui-button--secondary text-red-700" disabled={busy || loading || !reason.trim()} onClick={() => { if (window.confirm('紧急停用将阻止此精确版本继续用于运行，可能影响正在进行的任务或波次；历史数据不会删除。确认紧急停用？\n原因：' + reason.trim())) void run(() => api.setStatus(row, 'EMERGENCY_DISABLED', reason.trim(), reviewGrant(row.releaseId)), '已紧急停用；历史数据保留。') }}>紧急停用（影响运行）</button></>}</div></article>)}
       {!catalog.length && !loading && <p>本页没有可见量表。</p>}<div className="flex gap-3 items-center mt-4" aria-label="公共量表目录分页"><button type="button" className="hui-button hui-button--secondary" disabled={loading || busy || catalogPage <= 1} onClick={() => { catalogDetailGeneration.current++; setCatalogDetailLoading(false); setCatalogDetail(null); setCatalogPage(page => page - 1) }}>目录上一页</button><span>目录第 {catalogPage} 页</span><button type="button" className="hui-button hui-button--secondary" disabled={loading || busy || !catalogHasMore} onClick={() => { catalogDetailGeneration.current++; setCatalogDetailLoading(false); setCatalogDetail(null); setCatalogPage(page => page + 1) }}>目录下一页</button></div>
       {catalogDetailLoading && <p role="status">正在读取精确目录详情…</p>}{catalogDetail && <section aria-label="公共量表精确版本详情" className="border rounded p-4 mt-3"><h3>{catalogDetail.title} · {catalogDetail.origin === 'STANDARD_REGISTRY' ? '标准科学身份保留 · 只读' : '自编描述性量表 · 精确获批版本'}</h3><p>目录与许可状态不替代目标入口的实际使用授权。以下是服务器按精确版本返回的详情。</p><pre tabIndex={0} role="region" aria-label={`目录版本内容：${catalogDetail.title}`} className="whitespace-pre-wrap break-all text-xs max-h-96 overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current">{JSON.stringify(catalogDetail, null, 2)}</pre></section>}
@@ -167,8 +172,7 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
       </article>)}
     </section>
   const pendingCount = submissions.filter(row => row.status === 'SUBMITTED').length
-  const visibleCatalog = catalog.filter(row => (!authoredOnly||row.origin==='AUTHORED') && (originFilter === 'ALL' || row.origin === originFilter)
-    && [row.title, row.exactVersion.instrumentKey, row.exactVersion.releaseId, row.authored?.metadata.author].filter(Boolean).join(' ').toLowerCase().includes(catalogQuery.trim().toLowerCase()))
+  const visibleCatalog = catalog.filter(row=>!authoredOnly||row.origin==='AUTHORED')
   const pagination = <nav className="slg-pagination" aria-label="公共量表目录分页">
     <span>目录第 {catalogPage} 页 · 当前页 {catalog.length} 项</span><div>
       <button type="button" className="hui-button hui-button--secondary" disabled={loading || busy || catalogPage <= 1} onClick={() => { catalogDetailGeneration.current++; setCatalogDetailLoading(false); setCatalogDetail(null); setCatalogPage(page => page - 1) }}>目录上一页</button>
@@ -189,15 +193,15 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
       </nav>
         {view === 'catalog' ? <section className="slg-catalog" aria-label="公共量表总汇">
           <div className="slg-section-heading"><div><h2>公共量表总汇</h2><p>标准量表与已获批自编量表，保留各自的科学身份和版本。</p></div><span className="slg-page-label">第 {catalogPage} 页</span></div>
-          <div className="slg-toolbar"><label className="slg-search"><Search size={17} aria-hidden="true"/><span className="sr-only">搜索本页量表</span><input type="search" placeholder="搜索本页名称、来源或版本" value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)}/></label><label className="slg-filter"><span>来源</span><select value={originFilter} onChange={event => setOriginFilter(event.target.value)}><option value="ALL">全部来源</option><option value="STANDARD_REGISTRY">标准量表</option><option value="AUTHORED">自编量表</option></select></label></div>
-          <p className="slg-result-count">本页显示 {visibleCatalog.length} / {catalog.length} 项。搜索和筛选仅作用于当前页。</p>
+          {catalogDiscoveryControls}
+          <p className="slg-result-count">第 {catalogPage} 页显示 {visibleCatalog.length} 个匹配版本。</p>
           <div className="slg-records">{visibleCatalog.map(row => {
             const entry = row.authored, standard = row.origin === 'STANDARD_REGISTRY'
             return <article key={row.catalogId} className="slg-record">
               <details className="slg-record-disclosure">
                 <summary aria-label={'查看量表：'+row.title}>
                   <span className="slg-record-icon">{standard?<ShieldCheck size={21} aria-hidden="true"/>:<BookOpen size={21} aria-hidden="true"/>}</span>
-                  <span className="slg-record-heading"><span className="slg-kind" data-kind={standard?'standard':'authored'}>{standard?'标准量表 · 只读':'自编描述性量表'}</span><h3>{row.title}</h3><span className="slg-record-hint">{standard?'v'+row.exactVersion.instrumentVersion:'精确获批版本'} · 详情与操作</span></span>
+                  <span className="slg-record-heading"><span className="slg-kind" data-kind={standard?'standard':'authored'}>{standard?'标准量表 · 只读':'自编描述性量表'}</span><h3>{row.title}</h3><CatalogClassificationTags tags={row.classificationTags}/><span className="slg-record-hint">{standard?'v'+row.exactVersion.instrumentVersion:'精确获批版本'} · 详情与操作</span></span>
                   <span className="slg-record-state"><span className="slg-availability">{entry?entryLabels[entry.status]:row.availability?.status==='NOT_AVAILABLE'?'暂不可用':'需核验授权'}</span><ChevronDown size={17} aria-hidden="true"/></span>
                 </summary>
                 <div className="slg-record-body">
@@ -214,7 +218,7 @@ function LegacyScaleLibraryGovernance({authoredOnly=false}:{authoredOnly?:boolea
               </details>
             </article>
           })}</div>
-          {!visibleCatalog.length && !loading && <div className="slg-empty"><BookOpen size={28} aria-hidden="true"/><h3>{catalog.length ? '本页没有匹配的量表' : '本页暂无可见量表'}</h3><p>{catalog.length ? '试试其他关键词或来源，也可以翻页继续查找。' : '获批收录后，量表将显示在这里。'}</p>{(catalogQuery || originFilter !== 'ALL') && <button type="button" className="hui-button hui-button--secondary" onClick={() => { setCatalogQuery(''); setOriginFilter('ALL') }}>清除本页筛选</button>}</div>}
+          {!visibleCatalog.length && !loading && !error && <div className="slg-empty"><BookOpen size={28} aria-hidden="true"/><h3>没有匹配的可见量表</h3><p>调整分类或关键词后重新检索；获批收录的版本仍须单独授权。</p></div>}
           {pagination}
           {catalogDetailLoading && <p role="status">正在读取精确目录详情…</p>}
           {catalogDetail && <section ref={detailRegion} tabIndex={-1} className="slg-detail" aria-label="公共量表精确版本详情"><div className="slg-section-heading"><div><p className="slg-eyebrow">精确版本详情</p><h2>{catalogDetail.title}</h2></div><button type="button" className="hui-button hui-button--secondary" onClick={() => { catalogDetailGeneration.current++; setCatalogDetail(null) }}>收起详情</button></div>

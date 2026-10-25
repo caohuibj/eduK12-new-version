@@ -28,3 +28,7 @@
   .catalog-discovery-actions { width: 100%; }
   .catalog-discovery-actions button { flex: 1; }
 }
+.library-preflight { margin: 1rem 0; padding: 1rem; border: 1px solid currentColor; border-radius: .75rem; }
+.library-preflight-stages { display: grid; gap: .8rem; padding-left: 1.5rem; }
+.library-preflight-stages p { margin: .35rem 0; }
+.survey-admin-selection { margin: 1rem 0; padding: 1rem; border: 1px solid var(--survey-border, currentColor); border-radius: .75rem; }

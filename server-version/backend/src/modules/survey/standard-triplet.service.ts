@@ -1,4 +1,4 @@
-import {catalogClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {scaleSourceClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {toolReference} from './tool-reference'
 import {copyTripletContent} from './standard-triplet.content'
 import {randomUUID} from 'node:crypto'
@@ -54,8 +54,8 @@ export async function previewStandardTriplet(db:Db,actor:string,selection:Select
 export async function standardTripletCatalog(actor:string,page=1,filters:CatalogDiscoveryFilters={}){
  await assertStandardSystem(prisma,actor)
  const all=listScaleInstrumentSources().slice().sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
- const tagFacets=catalogTagFacets(all.map(source=>catalogClassificationTags(source.catalog.construct)))
- const sources=all.filter(source=>matchesCatalogDiscovery([source.catalog.identity.canonicalName,source.identity.instrumentKey,source.identity.instrumentVersion,source.catalog.identity.instrumentFamily??'',source.catalog.construct.constructDefinition],catalogClassificationTags(source.catalog.construct),filters))
+ const tagFacets=catalogTagFacets(all.map(source=>scaleSourceClassificationTags(source)))
+ const sources=all.filter(source=>matchesCatalogDiscovery([source.catalog.identity.canonicalName,source.identity.instrumentKey,source.identity.instrumentVersion,source.catalog.identity.instrumentFamily??'',source.catalog.construct.constructDefinition],scaleSourceClassificationTags(source),filters))
  const selected=sources.slice((page-1)*25,page*25)
  const keys=selected.map(s=>s.identity.instrumentKey)
  const states=keys.length?await prisma.$queryRaw<StandardRelease[]>(Prisma.sql`SELECT * FROM survey_standard_releases WHERE tool_key IN (${Prisma.join(keys)}) ORDER BY created_at DESC`):[]
@@ -63,7 +63,7 @@ export async function standardTripletCatalog(actor:string,page=1,filters:Catalog
   const parts=sourceParts(s.identity.instrumentKey,s.identity.instrumentVersion),p=Object.fromEntries(parts.map(p=>[p.axis,p])) as Record<Axis,Part>
   let candidate:Triplet|undefined,blockers:string[]=[]
   try{if(parts.length===3)candidate=composeTriplet(s.identity.instrumentKey,p);else blockers=['尚缺完整的内容、参数与报告版本，当前只有目录资料']}catch(e){blockers=[e instanceof Error?e.message:'版本结构不完整']}
-  return {toolKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,title:s.catalog.identity.canonicalName,versions:parts.map(p=>({axis:p.axis,version:p.version,hash:p.hash})),combinationHash:candidate?.combinationHash??null,blockers:[...blockers,...(candidate?.blockers??[])],releases:states.filter(r=>r.tool_key===s.identity.instrumentKey).map(stateView),tags:s.catalog.construct.constructOverlapTags,classificationTags:catalogClassificationTags(s.catalog.construct)}
+  return {toolKey:s.identity.instrumentKey,instrumentVersion:s.identity.instrumentVersion,title:s.catalog.identity.canonicalName,versions:parts.map(p=>({axis:p.axis,version:p.version,hash:p.hash})),combinationHash:candidate?.combinationHash??null,blockers:[...blockers,...(candidate?.blockers??[])],releases:states.filter(r=>r.tool_key===s.identity.instrumentKey).map(stateView),tags:s.catalog.construct.constructOverlapTags,classificationTags:scaleSourceClassificationTags(s)}
  })}
 }
 export async function standardTripletDetail(actor:string,key:string,version:string){
