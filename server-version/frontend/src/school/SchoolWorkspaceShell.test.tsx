@@ -60,11 +60,13 @@ describe('campus overview shortcuts',()=>{
    expect(link).toHaveAttribute('href',item.id==='overview'?'/workspace':`/workspace/${item.id}`)
   }
  })
- it('keeps pending students limited to their actual account entry and preserves the pending explanation',()=>{
-  render(<SchoolWorkspaceOverview username="Student" items={schoolNavigation('STUDENT','PENDING_CLASS_APPROVAL',null,true)} onNavigate={vi.fn()} pending={<p>等待学校审批</p>}/>)
+ it('keeps pending students out of protected functions without duplicating banner navigation',()=>{
+  render(<SchoolWorkspaceShell items={schoolNavigation('STUDENT','PENDING_CLASS_APPROVAL',null,true)} page="overview" onNavigate={vi.fn()}><SchoolWorkspaceOverview username="Student" items={schoolNavigation('STUDENT','PENDING_CLASS_APPROVAL',null,true)} onNavigate={vi.fn()} pending={<p>等待学校审批</p>}/></SchoolWorkspaceShell>)
   expect(screen.getByText('等待学校审批')).toBeInTheDocument()
-  expect(screen.getAllByRole('link')).toHaveLength(1)
-  expect(screen.getByRole('link')).toHaveAttribute('href','/workspace/account')
+  expect(screen.queryByRole('navigation',{name:'工作台功能导航'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'功能导航'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('region',{name:'可用功能'})).not.toBeInTheDocument()
+  expect(screen.queryAllByRole('link')).toHaveLength(0)
   expect(screen.queryByRole('heading',{name:'我的校园任务'})).not.toBeInTheDocument()
  })
  it('does not invent an account entry when none is supplied',()=>{
