@@ -1,0 +1,107 @@
+{
+  "status": "UNVALIDATED_WORKING_TRANSLATION",
+  "items": [
+    {
+      "id": 1,
+      "en": "I was bothered by things that don't usually bother me.",
+      "zh_draft": "一些平时不会让我烦恼的事，也让我感到烦恼。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "I had trouble keeping my mind on what I was doing.",
+      "zh_draft": "我很难集中注意力做正在做的事。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I felt depressed.",
+      "zh_draft": "我感到情绪低落。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I felt that everything I did was an effort.",
+      "zh_draft": "我觉得做什么事都很费力。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I felt hopeful about the future.",
+      "zh_draft": "我对未来抱有希望。",
+      "reverse": true
+    },
+    {
+      "id": 6,
+      "en": "I felt fearful.",
+      "zh_draft": "我感到害怕。",
+      "reverse": false
+    },
+    {
+      "id": 7,
+      "en": "My sleep was restless.",
+      "zh_draft": "我睡得不安稳。",
+      "reverse": false
+    },
+    {
+      "id": 8,
+      "en": "I was happy.",
+      "zh_draft": "我感到快乐。",
+      "reverse": true
+    },
+    {
+      "id": 9,
+      "en": "I felt lonely.",
+      "zh_draft": "我感到孤独。",
+      "reverse": false
+    },
+    {
+      "id": 10,
+      "en": "I could not get \"going\".",
+      "zh_draft": "我提不起劲开始做事。",
+      "reverse": false
+    }
+  ],
+  "anchors": [
+    {
+      "value": 0,
+      "zh": "很少或没有（少于1天）"
+    },
+    {
+      "value": 1,
+      "zh": "有些时候（1–2天）"
+    },
+    {
+      "value": 2,
+      "zh": "较多时候（3–4天）"
+    },
+    {
+      "value": 3,
+      "zh": "大部分时候（5–7天）"
+    }
+  ],
+  "sourceEnglishAnchors": [
+    "Rarely or none of the time (less than 1 day)",
+    "Some of the time (1–2 days)",
+    "Occasionally (3–4 days)",
+    "Most of the time (5–7 days)"
+  ],
+  "instructions": "请回想过去一周，选择以下情况出现的频率。没有标准答案。",
+  "adaptations": [
+    "Interviewer prompts omitted for self-administration",
+    "Response display normalized to 0–3",
+    "Chinese items newly translated; not claimed to reproduce validated Chinese CESD10",
+    "Item5 hopeful translated 抱有希望 rather than stronger 充满希望."
+  ],
+  "sourceOptionsNotScored": [
+    "Don’t Know",
+    "Refused"
+  ],
+  "license": {
+    "kind": "public-domain",
+    "authority": "Carnegie Mellon University Common Cold Project",
+    "url": "https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/depressive-symptoms.html",
+    "evidence": "Official page labels copyright status Available in the public domain",
+    "copy_translate_online_redistribute": "Public-domain status supports reuse and derivative translation; this is not evidence that a new translation or online administration is psychometrically equivalent."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "dossierVersion": "1.0.0",
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "sourceInstrument": "Andresen1994 CES-D10, CMU PMBC form",
+  "sourceLocale": "en",
+  "scoreRange": [
+    0,
+    30
+  ],
+  "thresholds": [
+    {
+      "value": 10,
+      "operator": ">=",
+      "enabled_for_this_zh_draft": false,
+      "population": "Well older adults in a large health maintenance organization; exact N/age not verified from primary abstract",
+      "purpose": "Agreement against full 20-item CES-D cutoff >=16, not standalone diagnostic confirmation",
+      "reference": "Andresen EM, Malmgren JA, Carter WB, Patrick DL. Screening for depression in well older adults: evaluation of a short form of the CES-D. Am J Prev Med. 1994;10(2):77–84.",
+      "doi": "10.1016/S0749-3797(18)30622-6",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/8037935/",
+      "caution": "Do not apply adult/older-adult thresholds to Chinese adolescents or assume teacher-specific validity."
+    },
+    {
+      "value": 12,
+      "operator": ">=",
+      "enabled_for_this_zh_draft": false,
+      "population": "398 Chinese adults aged 60+ referred for psychiatric assessment",
+      "reference": "Cheng ST, Chan ACM. The Center for Epidemiologic Studies Depression Scale in older Chinese: thresholds for long and short forms. Int J Geriatr Psychiatry. 2005.",
+      "doi": "10.1002/gps.1314",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1002/gps.1314",
+      "verified_level": "Primary abstract only; full translated item wording and sample selection require further review",
+      "sensitivity": 0.76,
+      "specificity": 0.55,
+      "caution": "Do not confuse dichotomized CESD10 cutoff4 with 0–30 scoring. This does not validate our new translation."
+    }
+  ],
+  "currentTranslationApplicability": "NOT_ESTABLISHED",
+  "missingPrerequisites": [
+    "Exact translated form/administration equivalence",
+    "Target population validity and threshold purpose",
+    "Supported adult reference governance; do not invent school stage or measurementHash"
+  ],
+  "sourcePsychometrics": {
+    "cmuPMBC": {
+      "n": 193,
+      "alpha": 0.68
+    },
+    "caution": "Source sample only, not Chinese reliability or threshold"
+  },
+  "noAutomaticRiskOrDiagnosis": true
+}

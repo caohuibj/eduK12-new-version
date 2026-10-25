@@ -1,0 +1,719 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cesd10_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "CES-D10 过去一周情绪体验（中文研究译稿）",
+      "abbreviation": "CES-D10",
+      "instrumentFamily": "CES-D 10-item short form (Andresen 1994 / CMU PMBC)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "过去一周抑郁相关情绪、睡眠、精力和人际感受的自报频率；非临床诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "cesd10",
+        "depressive_symptoms",
+        "past_week",
+        "adult_self_report",
+        "research",
+        "working_translation",
+        "public_domain",
+        "non_diagnostic",
+        "descriptive_report"
+      ]
+    },
+    "population": {
+      "populationNotes": "成人本人自陈研究与自我了解；ADULT_SELF / student 中 student 为现有报告技术受众角色，不表示未成年人。中文工作译稿尚无目标人群效度证据，不据此推定青少年适用性。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 10,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "过去一周",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留CMU PMBC10题顺序；第5、8题反向。",
+        "频率选项采用实际0–3编码，不将原访谈表列号1–4当得分。",
+        "原访谈者指示改成自填说明，未声称施测方式与原研究等价；不知道/拒答不能计零。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "当前中文译稿的心理测量属性未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "基于CMU PMBC公开题本的独立中文工作译稿，非既有验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "待人工译审/认知访谈/适用人群验证。第5题由充满希望微调为抱有希望以避免增加强度；原访谈施测转换为自填。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "cesd10-zh-cn-research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "cesd10-zh-cn-research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "teacher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "cesd10-zh-cn-research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "CMU Common Cold Project明确该CES-D短表为public domain；不将版权许可等同新译稿/施测方式验证。",
+      "https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/depressive-symptoms.html"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Center for Epidemiological Studies Depression Scale Short Form — CMU PMBC10",
+        "citation": "Andresen EM, Malmgren JA, Carter WB, Patrick DL. Screening for depression in well older adults: evaluation of a short form of the CES-D. Am J Prev Med. 1994;10(2):77–84.",
+        "url": "https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/pmbc_ces-d.pdf",
+        "publicationYear": 1994
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "CMU official public-domain statement: https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/depressive-symptoms.html"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "cesd10_week_frequency_0_3",
+          "options": [
+            {
+              "value": "0",
+              "label": "很少或没有（少于1天）",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有些时候（1–2天）",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "较多时候（3–4天）",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "大部分时候（5–7天）",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CESD10_01",
+          "content": "一些平时不会让我烦恼的事，也让我感到烦恼。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_02",
+          "content": "我很难集中注意力做正在做的事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_03",
+          "content": "我感到情绪低落。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_04",
+          "content": "我觉得做什么事都很费力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_05",
+          "content": "我对未来抱有希望。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_06",
+          "content": "我感到害怕。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_07",
+          "content": "我睡得不安稳。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_08",
+          "content": "我感到快乐。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_09",
+          "content": "我感到孤独。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CESD10_10",
+          "content": "我提不起劲开始做事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "cesd10_week_frequency_0_3",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CESD10_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_05",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CESD10_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CESD10_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CESD10_10",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "depressive_symptoms",
+            "type": "total",
+            "label": "过去一周的相关体验",
+            "description": "过去一周抑郁相关体验的自报频率汇总；不是诊断或风险等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CESD10_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CESD10_10",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "depressive_symptoms"
+        ],
+        "scoreOrder": [
+          "depressive_symptoms"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "depressive_symptoms",
+            "headline": "最近一周，你过得怎么样？",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些回答记录了过去一周的心情、睡眠、精力和孤独感。分数越高，表示这次回答呈现的相关困扰更多；它不是给一周生活打好坏分，也不能判断你是否患有抑郁症。比如，连续几晚没睡好、遇到烦心事，可能让平常的小任务也显得费力。请把结果与真实处境、身体状态和日常生活受到的影响放在一起看，分数较低也不意味着难受不值得关注。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想过去一周，哪种体验最常出现、最影响生活？有没有相对轻松的一天，当时有什么不同？"
+              },
+              {
+                "category": "support",
+                "text": "可以简单记录心情、睡眠和日常活动的变化，和信任的人聊聊。若困扰持续、加重或影响生活，可把记录带给有资质的心理健康专业人员讨论，不必等分数达到某条线。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份中文研究译稿仍待人工审校和适用人群验证，目前仅供成人研究和自我了解。",
+          "原版研究有参考分界，出处和适用条件另有记录；本报告不自动把它套用于这份中文译稿，也不对学生或教师作临床分级。",
+          "10题都需完整回答才计算结果；不知道、拒答或漏答不能当作零分，也不能当作没有困扰。",
+          "问卷没有直接询问自伤，低分不能证明安全；如有迫切的人身安全顾虑，应寻求身边的即时帮助，而不是依赖分数。",
+          "不用于诊断、重要选拔、学生筛选或教师考核。"
+        ],
+        "disclaimer": "仅供成人研究与自我了解，不用于心理诊断。本中文为独立工作译稿，尚未验证；公开版权不代表原作者认可此翻译或自填适配。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted local editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T15:08:00Z",
+            "basis": "AI editorial check: ordinary-reader weekly experience language, no automatic old-adult threshold transfer, no diagnostic/safety claim; not expert translation validation."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "cesd10",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "keyed-minimum",
+        "answers": [
+          {
+            "itemCode": "CESD10_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depressive_symptoms": 0
+          },
+          "totalScoreKeys": [
+            "depressive_symptoms"
+          ]
+        }
+      },
+      {
+        "name": "keyed-maximum",
+        "answers": [
+          {
+            "itemCode": "CESD10_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CESD10_10",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depressive_symptoms": 30
+          },
+          "totalScoreKeys": [
+            "depressive_symptoms"
+          ]
+        }
+      },
+      {
+        "name": "all-one",
+        "answers": [
+          {
+            "itemCode": "CESD10_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CESD10_10",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depressive_symptoms": 12
+          },
+          "totalScoreKeys": [
+            "depressive_symptoms"
+          ]
+        }
+      },
+      {
+        "name": "all-zero",
+        "answers": [
+          {
+            "itemCode": "CESD10_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CESD10_10",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "depressive_symptoms": 6
+          },
+          "totalScoreKeys": [
+            "depressive_symptoms"
+          ]
+        }
+      }
+    ]
+  }
+}

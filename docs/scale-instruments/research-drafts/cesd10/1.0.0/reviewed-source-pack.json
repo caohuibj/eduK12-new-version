@@ -1,0 +1,173 @@
+{
+  "candidate": "CES-D10",
+  "version": "Andresen 1994 ten-item; CMU PMBC interviewer form 11/01/2000",
+  "status": "Source verified; independent Chinese translation requires language review; no Chinese youth/teacher clinical threshold enabled",
+  "license": {
+    "kind": "public-domain",
+    "authority": "Carnegie Mellon University Common Cold Project",
+    "url": "https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/depressive-symptoms.html",
+    "evidence": "Official page labels copyright status Available in the public domain",
+    "copy_translate_online_redistribute": "Public-domain status supports reuse and derivative translation; this is not evidence that a new translation or online administration is psychometrically equivalent."
+  },
+  "source_pdf": "https://www.cmu.edu/common-cold-project/measures-by-study/psychological-and-social-constructs/other-psychological-measures/pmbc_ces-d.pdf",
+  "tags": [
+    "情绪困扰",
+    "抑郁相关症状",
+    "过去一周",
+    "自评",
+    "公共领域",
+    "独立中译待验证",
+    "非诊断",
+    "成人研究"
+  ],
+  "instructions_zh": "请回想过去一周，选择以下情况出现的频率。没有标准答案。",
+  "response_options": [
+    {
+      "value": 0,
+      "zh": "很少或没有（少于1天）"
+    },
+    {
+      "value": 1,
+      "zh": "有些时候（1–2天）"
+    },
+    {
+      "value": 2,
+      "zh": "较多时候（3–4天）"
+    },
+    {
+      "value": 3,
+      "zh": "大部分时候（5–7天）"
+    }
+  ],
+  "items": [
+    {
+      "id": 1,
+      "en": "I was bothered by things that don't usually bother me.",
+      "zh_draft": "一些平时不会让我烦恼的事，也让我感到烦恼。",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "I had trouble keeping my mind on what I was doing.",
+      "zh_draft": "我很难集中注意力做正在做的事。",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "I felt depressed.",
+      "zh_draft": "我感到情绪低落。",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "I felt that everything I did was an effort.",
+      "zh_draft": "我觉得做什么事都很费力。",
+      "reverse": false
+    },
+    {
+      "id": 5,
+      "en": "I felt hopeful about the future.",
+      "zh_draft": "我对未来充满希望。",
+      "reverse": true
+    },
+    {
+      "id": 6,
+      "en": "I felt fearful.",
+      "zh_draft": "我感到害怕。",
+      "reverse": false
+    },
+    {
+      "id": 7,
+      "en": "My sleep was restless.",
+      "zh_draft": "我睡得不安稳。",
+      "reverse": false
+    },
+    {
+      "id": 8,
+      "en": "I was happy.",
+      "zh_draft": "我感到快乐。",
+      "reverse": true
+    },
+    {
+      "id": 9,
+      "en": "I felt lonely.",
+      "zh_draft": "我感到孤独。",
+      "reverse": false
+    },
+    {
+      "id": 10,
+      "en": "I could not get \"going\".",
+      "zh_draft": "我提不起劲开始做事。",
+      "reverse": false
+    }
+  ],
+  "scoring": {
+    "reverse_keys": [
+      5,
+      8
+    ],
+    "reverse_formula": "3 - response",
+    "total": "sum all 10 keyed responses",
+    "range": [
+      0,
+      30
+    ],
+    "direction": "More frequent depressive symptoms during past week; not a diagnosis",
+    "critical_mapping": "CMU interview PDF displays categories 1–4; official scoring page defines 0–3. Subtract 1 from display codes BEFORE reverse scoring. Never sum 1–4 directly.",
+    "missing": "Require 10 valid responses for total; incomplete otherwise. This complete-case rule is an implementation safeguard, not a source-validated imputation rule. Do not score Don’t Know/Refused as zero."
+  },
+  "threshold_evidence": [
+    {
+      "value": 10,
+      "operator": ">=",
+      "enabled_for_this_zh_draft": false,
+      "population": "Well older adults in a large health maintenance organization; exact N/age not verified from primary abstract",
+      "purpose": "Agreement against full 20-item CES-D cutoff >=16, not standalone diagnostic confirmation",
+      "reference": "Andresen EM, Malmgren JA, Carter WB, Patrick DL. Screening for depression in well older adults: evaluation of a short form of the CES-D. Am J Prev Med. 1994;10(2):77–84.",
+      "doi": "10.1016/S0749-3797(18)30622-6",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/8037935/",
+      "caution": "Do not apply adult/older-adult thresholds to Chinese adolescents or assume teacher-specific validity."
+    },
+    {
+      "value": 12,
+      "operator": ">=",
+      "enabled_for_this_zh_draft": false,
+      "population": "398 Chinese adults aged 60+ referred for psychiatric assessment",
+      "reference": "Cheng ST, Chan ACM. The Center for Epidemiologic Studies Depression Scale in older Chinese: thresholds for long and short forms. Int J Geriatr Psychiatry. 2005.",
+      "doi": "10.1002/gps.1314",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1002/gps.1314",
+      "verified_level": "Primary abstract only; full translated item wording and sample selection require further review",
+      "sensitivity": 0.76,
+      "specificity": 0.55,
+      "caution": "Do not confuse dichotomized CESD10 cutoff4 with 0–30 scoring. This does not validate our new translation."
+    }
+  ],
+  "report": {
+    "heading": "最近一周，你过得怎么样？",
+    "body": "你的回答记录了过去一周情绪、睡眠、精力和孤独感方面的体验。这些体验可能随生活事件和身体状态变化，不能仅凭这份问卷判断你是否患有抑郁症。",
+    "next_steps": "可以先留意最常出现、最影响生活的困扰，找信任的人聊聊，尽量保持规律的作息。如果困扰持续、加重，或影响学习、工作和日常生活，可以寻求专业支持。",
+    "interpretation_policy": "Default ordinary-reader feedback uses answered experiences, not unvalidated severity bands or technical scores. Technical raw score optional in details. No percentile/low-medium-high classification.",
+    "safety": "This questionnaire does not ask about self-harm and cannot rule out urgent risk. If immediate safety concerns exist, seek nearby emergency assistance rather than relying on the score."
+  },
+  "translation": {
+    "kind": "independent simplified-Chinese draft",
+    "validated": false,
+    "changes": [
+      "Interviewer prompts omitted for self-administration",
+      "Response display normalized to 0–3",
+      "Chinese items newly translated; not claimed to reproduce validated Chinese CESD10"
+    ]
+  },
+  "references": [
+    {
+      "author": "Radloff LS",
+      "year": 1977,
+      "title": "The CES-D Scale: A Self-Report Depression Scale for Research in the General Population",
+      "journal": "Applied Psychological Measurement",
+      "volume": "1",
+      "pages": "385–401",
+      "doi": "10.1177/014662167700100306"
+    }
+  ],
+  "images": "No borrowed illustration needed; optional original neutral weekly-reflection illustration. Do not depict score as a diagnosis."
+}
