@@ -1,0 +1,212 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "thresholds": [],
+  "missingPolicy": {
+    "rule": "all items required; no imputation",
+    "status": "PROJECT_POLICY_NOT_ORIGINAL_PSYCHOMETRIC_RULE"
+  },
+  "defaultAudience": "ADULT_SELF; school/minor use requires population-specific review",
+  "reportPolicy": "Descriptive feedback only. No diagnosis, percentile, low/medium/high bands, selection or ranking.",
+  "id": "RSES10",
+  "title": "Rosenberg自尊量表（中文研究译稿）",
+  "family": "Rosenberg Self-Esteem Scale",
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": [
+      "full-item-reproduction",
+      "translation-and-adaptation",
+      "online-administration",
+      "project-authored-feedback"
+    ],
+    "source": "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale",
+    "verification": "Official indexed source explicitly public domain and translation/adaptation permitted; direct page retrieval returned 502/503. PhenX official full protocol independently accessible."
+  },
+  "instructionZh": "下面是一些关于你对自己总体感受的陈述。请根据你的实际感受，选择你对每句话的同意程度。",
+  "timeframe": "general feelings about self; no 2-week window",
+  "responseOptions": [
+    {
+      "value": 0,
+      "en": "Strongly Disagree",
+      "zh": "很不同意"
+    },
+    {
+      "value": 1,
+      "en": "Disagree",
+      "zh": "不同意"
+    },
+    {
+      "value": 2,
+      "en": "Agree",
+      "zh": "同意"
+    },
+    {
+      "value": 3,
+      "en": "Strongly Agree",
+      "zh": "很同意"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "I feel that I'm a person of worth, at least on an equal plane with others.",
+      "zh": "我觉得自己是一个有价值的人，至少与其他人同样有价值。",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "I feel that I have a number of good qualities.",
+      "zh": "我觉得自己有不少好的品质。",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "All in all, I am inclined to feel that I am a failure.",
+      "zh": "总的来说，我倾向于觉得自己是个失败者。",
+      "reverse": true
+    },
+    {
+      "number": 4,
+      "en": "I am able to do things as well as most other people.",
+      "zh": "我做事情能和大多数其他人做得一样好。",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "I feel I do not have much to be proud of.",
+      "zh": "我觉得自己没有多少值得自豪的地方。",
+      "reverse": true
+    },
+    {
+      "number": 6,
+      "en": "I take a positive attitude toward myself.",
+      "zh": "我对自己持积极的态度。",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "en": "On the whole, I am satisfied with myself.",
+      "zh": "总体而言，我对自己感到满意。",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "en": "I wish I could have more respect for myself.",
+      "zh": "我希望自己能更尊重自己一些。",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "en": "I certainly feel useless at times.",
+      "zh": "有时候，我确实觉得自己没有用。",
+      "reverse": true
+    },
+    {
+      "number": 10,
+      "en": "At times I think I am no good at all.",
+      "zh": "有时候，我觉得自己一无是处。",
+      "reverse": true
+    }
+  ],
+  "scoring": {
+    "type": "sum",
+    "positiveItems": [
+      1,
+      2,
+      4,
+      6,
+      7
+    ],
+    "reverseItems": [
+      3,
+      5,
+      8,
+      9,
+      10
+    ],
+    "reverseFormula": "3 - response",
+    "range": [
+      0,
+      30
+    ],
+    "higherMeans": "总体自我价值感更高",
+    "implementationNote": "Response values explicitly code SD=0,D=1,A=2,SA=3. This reverses displayed option order vs PhenX but preserves exact scores. PhenX column numbers 1–4 are not score weights. Do not mix with alternate item order starting On the whole."
+  },
+  "thresholdEvidence": {
+    "status": "NO_UNIVERSAL_CUTOFF",
+    "source": "https://socy.umd.edu/about-us/rosenberg-scale-faq",
+    "note": "Official FAQ says no discrete high/low cutoffs. Do not activate <15 or 15–25 bands."
+  },
+  "populationEvidence": {
+    "originalSample": "5,024 high-school juniors/seniors from 10 New York State schools; original Guttman scoring",
+    "source": "https://socy.umd.edu/about-us/using-rosenberg-self-esteem-scale?device=m",
+    "phenx": "Self-report adolescent/adult; working group recommends down to age10. This does not validate this project Chinese translation at those ages."
+  },
+  "translationNotes": [
+    "Independent project translation, not copied from an unlicensed Chinese validated form.",
+    "Item8 retains negative valence as official; do not change to positive scoring because of reports about cultural wording.",
+    "PhenX offers Chinese worksheets but they have not been retrieved or adopted in this package.",
+    "No original English or Chinese local norm activated."
+  ],
+  "references": [
+    {
+      "id": "ROSENBERG_1965",
+      "citation": "Rosenberg, M. (1965). Society and the Adolescent Self-Image. Princeton University Press.",
+      "role": "Original scale/book cited by custodian"
+    },
+    {
+      "id": "ROSENBERG_1989",
+      "citation": "Rosenberg, M. (1989). Society and the Adolescent Self-Image (Rev. ed.). Wesleyan University Press.",
+      "role": "Source edition listed by PhenX"
+    },
+    {
+      "id": "UMD_RIGHTS",
+      "title": "Rosenberg Self Esteem Scale",
+      "url": "https://socy.umd.edu/about-us/rosenberg-self-esteem-scale",
+      "role": "Public-domain and translation permission"
+    },
+    {
+      "id": "UMD_SCORING",
+      "title": "Using the Rosenberg Self-Esteem Scale",
+      "url": "https://socy.umd.edu/about-us/using-rosenberg-self-esteem-scale?device=m",
+      "role": "Keys, anchors, 0–30 scoring, sample background"
+    },
+    {
+      "id": "UMD_FAQ",
+      "title": "Rosenberg Scale FAQ",
+      "url": "https://socy.umd.edu/about-us/rosenberg-scale-faq",
+      "role": "No universal cutoff"
+    },
+    {
+      "id": "PHENX_180901",
+      "citation": "PhenX Toolkit. (2010). Self-esteem. Protocol 180901.",
+      "doi": "10.82568/phenx_toolkit/180901",
+      "url": "https://www.phenxtoolkit.org/protocols/view/180901",
+      "role": "Directly inspected authoritative full English items, order, scoring and protocol"
+    }
+  ],
+  "tags": [
+    "自我概念",
+    "自尊",
+    "总体自我价值",
+    "自我报告",
+    "研究译稿",
+    "非诊断"
+  ],
+  "reportDraft": {
+    "heading": "你的总体自我评价",
+    "summary": "本次结果反映你对自身价值的总体感受，不是在评定你这个人有多好，也不是心理诊断。",
+    "scoreExplanation": "总分范围0–30，得分越高表示本次自报的总体自我价值感越高。本研究译稿没有已验证的中国人群常模，因此不提供高低等级、百分位或风险判定。",
+    "reflection": [
+      "哪些经历最容易影响你对自己的看法？",
+      "除了成绩、工作表现或他人评价，你还看重自己的哪些品质？"
+    ],
+    "actions": [
+      "记录一件你认真投入或关心他人的具体小事，不用把它与别人比较。",
+      "把一次不顺利描述为具体情境和可改进的行为，而不是对整个人下结论。"
+    ],
+    "limits": "该报告为项目原创描述性反馈；未做中文版等值验证，不用于诊断、选拔或贴标签。"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "validatedAt": "2026-10-25T14:44:45Z",
+  "sourceSha256": "bbfa4464fa2d0fc385a73a1d934123c21e1b208106aaca5c9d616f81818a3c63",
+  "node": "v24.22.1",
+  "toolTests": 13,
+  "combinedBatchTests": 31,
+  "testsExitCode": 0,
+  "typecheckExitCode": 0,
+  "generatorCheckExitCode": 0,
+  "scope": "Source/scoring/result runtime tests only; no DB or production writes. AI review not human expert approval.",
+  "log": "rses-c1-tests-final.log"
+}
