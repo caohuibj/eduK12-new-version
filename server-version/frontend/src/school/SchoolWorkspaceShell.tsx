@@ -37,15 +37,15 @@ export function SchoolWorkspaceShell({items,page,onNavigate,context,children,lea
  </div>
 }
 
-export function SchoolWorkspaceOverview({username,items,onNavigate,pending,compact=false}:{compact?:boolean;username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void;pending?:ReactNode}){
+export function SchoolWorkspaceOverview({username,items,onNavigate,pending,compact=false,parent=false}:{parent?:boolean;compact?:boolean;username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void;pending?:ReactNode}){
  // Use actual authorized entries; a group label must never disguise a different destination.
- const priority=['tasks','activities','feedback','family','classes','group-reports','private-tools']
+ const priority=parent?['tasks','family','peer','parent-reports']:['tasks','activities','feedback','family','classes','group-reports','private-tools']
  const primary=priority.flatMap(id=>items.filter(item=>item.id===id)).slice(0,4)
  const shortcuts=primary
  return <div className="hs-overview">
-  {compact?<header className="hs-educator-home-heading"><h1>校园工作台</h1><p>你好，{username}。选择校园任务与活动，开始今天的工作。</p></header>:<div className="hs-workspace-welcome"><div><p className="hs-eyebrow">School · 校园空间</p><h1>欢迎回来，<span>{username}</span></h1><p>从今天的校园活动开始，<br className="hs-overview-copy-break"/>让每一次参与与陪伴都有温度。</p></div></div>}
+  {compact?<header className="hs-educator-home-heading"><h1>{parent?'家校陪伴':'校园工作台'}</h1><p>你好，{username}。{parent?'查看观察任务，管理亲子关系与参与授权。':'选择校园任务与活动，开始今天的工作。'}</p></header>:<div className="hs-workspace-welcome"><div><p className="hs-eyebrow">School · 校园空间</p><h1>欢迎回来，<span>{username}</span></h1><p>从今天的校园活动开始，<br className="hs-overview-copy-break"/>让每一次参与与陪伴都有温度。</p></div></div>}
   {pending&&<div className="hs-overview-status"><span className="hs-overview-status-icon" aria-hidden="true"><Clock3 size={24}/></span>{pending}</div>}
-  {shortcuts.length>0&&<section className="hs-overview-section" aria-label="可用功能"><h2>从这里开始</h2><div className="hs-workspace-shortcuts">{shortcuts.map(item=>{
+  {shortcuts.length>0&&<section className="hs-overview-section" aria-label="可用功能"><h2>{parent?'我的校园功能':'从这里开始'}</h2><div className="hs-workspace-shortcuts">{shortcuts.map(item=>{
    return <a href={workspaceHref(item.id)} key={item.id} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onNavigate(item.id)}}><item.icon size={24} aria-hidden="true"/><h3>{item.label}</h3><p>{item.description}</p><span>{compact?'打开':`进入${item.label}`} <ArrowRight size={16}/></span></a>
   })}</div></section>}
  </div>

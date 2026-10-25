@@ -1,5 +1,5 @@
 import {it,expect,vi} from 'vitest'
-import {render,screen,waitFor,fireEvent} from '@testing-library/react'
+import {render,screen,waitFor,fireEvent,within} from '@testing-library/react'
 import SchoolApp from './SchoolApp'
 
 it('keeps teacher task panels unique when organization context loads',async()=>{
@@ -54,5 +54,39 @@ it('does not mount activity configuration or request activity data for an ordina
   expect(screen.queryByRole('link',{name:/活动管理/})).not.toBeInTheDocument()
   expect(screen.queryByText('新建活动',{exact:true})).not.toBeInTheDocument()
   expect(fetcher.mock.calls.some(([url])=>url.includes('/activities'))).toBe(false)
+ }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
+})
+
+
+it.each([false,true])('shows direct parent tabs and only available report entries (reports=%s)',async reports=>{
+ window.history.replaceState(null,'','/workspace?organizationId=parent-school')
+ vi.stubGlobal('scrollTo',vi.fn())
+ const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
+ const fetcher=vi.fn(async(url:string)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'parent',username:'示例家长',role:'PARENT',accountDomain:'SCHOOL'})
+  if(url.endsWith('/organizations'))return reply({list:[{id:'parent-school',name:'示例学校',orgRole:'MEMBER'}]})
+  if(url.endsWith('/reports/availability'))return reply({parentReportsEnabled:reports})
+  return reply({list:[]})
+ })
+ vi.stubGlobal('fetch',fetcher)
+ try{
+  const view=render(<SchoolApp/> )
+  await screen.findByRole('heading',{level:1,name:'家校陪伴'})
+  const tabs=within(screen.getByRole('navigation',{name:'校园功能入口'}))
+  for(const [label,id] of [['我的观察任务','tasks'],['亲子关联','family'],['参与授权','peer']]){
+   expect(tabs.getByRole('link',{name:label})).toHaveAttribute('href',`/workspace/${id}?organizationId=parent-school`)
+   expect(screen.getByRole('region',{name:'可用功能'})).toContainElement(screen.getByRole('heading',{name:label}))
+  }
+  if(reports){await waitFor(()=>expect(tabs.getByRole('link',{name:'家长报告'})).toBeInTheDocument())}
+  else expect(tabs.queryByRole('link',{name:'家长报告'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'功能导航'})).not.toBeInTheDocument()
+  expect(view.container.querySelector('.hs-workspace-welcome')).toBeNull()
+  expect(tabs.queryByRole('link',{name:'活动管理'})).not.toBeInTheDocument()
+  fireEvent.click(tabs.getByRole('link',{name:'亲子关联'}))
+  await screen.findByRole('heading',{name:'我的家校关系'})
+  expect(tabs.getByRole('link',{name:'亲子关联'})).toHaveAttribute('aria-current','page')
+  expect(window.location.search).toBe('?organizationId=parent-school')
+  fireEvent.click(screen.getByRole('link',{name:'返回概览'}))
+  await screen.findByRole('heading',{level:1,name:'家校陪伴'})
  }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
