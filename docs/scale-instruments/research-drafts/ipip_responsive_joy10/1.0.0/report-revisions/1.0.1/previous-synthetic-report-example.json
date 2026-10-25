@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_responsive_joy10_zh_cn_research",
+    "name": "IPIP共感愉悦10题（研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "43f89eedfe82ca1cf7627cf739a95b499239f11830f87842b0b510b6199ab42b",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_RESPONSIVE_JOY10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "ipip_responsive_joy10",
+      "type": "total",
+      "label": "共感愉悦",
+      "description": "分数概括你在他人开心或庆祝时受到积极情绪感染的自述倾向。它不代表整体共情能力，也不用于判断是否关心别人。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_RESPONSIVE_JOY10_01",
+        "IPIP_RESPONSIVE_JOY10_02",
+        "IPIP_RESPONSIVE_JOY10_03",
+        "IPIP_RESPONSIVE_JOY10_04",
+        "IPIP_RESPONSIVE_JOY10_05",
+        "IPIP_RESPONSIVE_JOY10_06",
+        "IPIP_RESPONSIVE_JOY10_07",
+        "IPIP_RESPONSIVE_JOY10_08",
+        "IPIP_RESPONSIVE_JOY10_09",
+        "IPIP_RESPONSIVE_JOY10_10"
+      ],
+      "answeredItems": [
+        "IPIP_RESPONSIVE_JOY10_01",
+        "IPIP_RESPONSIVE_JOY10_02",
+        "IPIP_RESPONSIVE_JOY10_03",
+        "IPIP_RESPONSIVE_JOY10_04",
+        "IPIP_RESPONSIVE_JOY10_05",
+        "IPIP_RESPONSIVE_JOY10_06",
+        "IPIP_RESPONSIVE_JOY10_07",
+        "IPIP_RESPONSIVE_JOY10_08",
+        "IPIP_RESPONSIVE_JOY10_09",
+        "IPIP_RESPONSIVE_JOY10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_responsive_joy10",
+      "headline": "共感愉悦：描述性反馈",
+      "label": null,
+      "interpretation": "分数概括你在他人开心或庆祝时受到积极情绪感染的自述倾向。它不代表整体共情能力，也不用于判断是否关心别人。 题目含儿童礼物、生日聚会等情境，生活经历与文化背景会影响回答；不可据此评价教师、亲职或照顾能力。无中国常模或经验分界值。 当前工作译稿尚未经过中文目标人群验证。理论分数范围为10–50，数值不能转换为人群排名或高／中／低等级；30只是理论中点，不是人群平均值。应结合具体情境和生活经历理解回答，不给自己贴固定标签。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想一次他人分享好消息时，你内心有什么反应？你用什么方式表达回应？"
+        },
+        {
+          "category": "strategy",
+          "text": "如果愿意，可以问一句具体的问题，让对方多讲讲令其开心的事情；不需要强迫自己表现出同样强烈的情绪。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未经专家译审、认知访谈和目标人群验证。",
+        "没有适用的中国成人或青少年常模及经验阈值；30仅为理论中点。",
+        "题目含儿童礼物、生日聚会等情境，生活经历与文化背景会影响回答；不可据此评价教师、亲职或照顾能力。无中国常模或经验分界值。",
+        "原英文女性432人、男性317人的alpha是来源样本统计，不是当前中文信度或个人准确性。",
+        "全10题有效才求和；不插补、不将漏答当零。缺失时结果invalid。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "中文工作译稿未经专家译审、认知访谈和目标人群验证。",
+    "没有适用的中国成人或青少年常模及经验阈值；30仅为理论中点。",
+    "题目含儿童礼物、生日聚会等情境，生活经历与文化背景会影响回答；不可据此评价教师、亲职或照顾能力。无中国常模或经验分界值。",
+    "原英文女性432人、男性317人的alpha是来源样本统计，不是当前中文信度或个人准确性。",
+    "全10题有效才求和；不插补、不将漏答当零。缺失时结果invalid。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供成人研究和描述性自我了解，不用于心理诊断、能力鉴定或高风险决策。共感愉悦不是整体共情、善良程度或教师/亲职能力。"
+}
