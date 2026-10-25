@@ -194,7 +194,7 @@ describe('situation definition schema', () => {
     expect(JSON.stringify(result.issues)).toContain('sampling.strategy')
   })
 
-  it('requires provenance, license, disclaimer and a golden fixture for publish', () => {
+  it('requires provenance, disclaimer and golden fixtures but not a copyright-license declaration', () => {
     const result = validateSituationDefinition(baseDefinition, { forPublish: true, requireGoldenFixture: true, hasGoldenFixture: false })
     expect(errorPaths(result.issues)).toContain('goldenFixture')
 
@@ -205,7 +205,7 @@ describe('situation definition schema', () => {
     const publishResult = validateSituationDefinition(anonymous, { forPublish: true })
     const paths = errorPaths(publishResult.issues)
     expect(paths).toContain('source')
-    expect(paths).toContain('license')
+    expect(paths).not.toContain('license')
     expect(paths).toContain('report.disclaimer')
   })
 })

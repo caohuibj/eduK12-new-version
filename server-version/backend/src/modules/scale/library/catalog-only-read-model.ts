@@ -1,9 +1,4 @@
 import {
-  evaluateAuthorizationOverlayStatus,
-  resolveEffectiveAuthorization,
-  type InstrumentAuthorizationRecordV1,
-} from '../../assessment-authorization'
-import {
   getScaleInstrumentLocalization,
   listScaleInstrumentSources,
 } from '../onboarding/instrument-registry'
@@ -49,33 +44,10 @@ export interface UnifiedScaleLibraryReadModel {
   diagnostics: Array<{ severity: 'error' | 'warning'; code: string; message: string }>
 }
 
-const summarizeRights = (input: {
-  instrumentKey: string
-  instrumentVersion: string
-  authorizations: readonly InstrumentAuthorizationRecordV1[]
-  locale: string
-  territory: string
-  nowIso: string
-}): ScaleLibraryEntry['rights'] => {
-  const effective = resolveEffectiveAuthorization({
-    authorizations: [...input.authorizations],
-    instrumentKey: input.instrumentKey,
-    instrumentVersion: input.instrumentVersion,
-    nowIso: input.nowIso,
-  })
-  if (!effective) return { status: 'NOT_GRANTED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] }
-  const overlay = evaluateAuthorizationOverlayStatus(effective, input.nowIso)
-  const scopeMatches = effective.scope.locales.includes(input.locale) && effective.scope.territories.includes(input.territory)
-  const eligible = (effective.status === 'APPROVED' || effective.status === 'EVIDENCE_PENDING')
-    && overlay !== 'EXPIRED' && overlay !== 'REVOKED' && overlay !== 'DRAFT'
-  return {
-    status: !eligible ? 'INELIGIBLE' : scopeMatches ? (effective.status === 'APPROVED' ? 'APPROVED' : 'EVIDENCE_PENDING') : 'SCOPE_MISMATCH',
-    commercialNature: effective.scope.commercialNature,
-    locales: [...effective.scope.locales],
-    territories: [...effective.scope.territories],
-    validTo: effective.validTo,
-  }
-}
+/** Copyright permissions are not evaluated or represented as approved. */
+const summarizeRights = (): ScaleLibraryEntry['rights'] => ({
+  status: 'NOT_EVALUATED', commercialNature: 'UNSPECIFIED', locales: [], territories: [],
+})
 
 const buildCandidate = (source: ReturnType<typeof listScaleInstrumentSources>[number], context: ScaleLibraryReadModelContext, generatedAt: string): CatalogOnlyScaleLibraryEntry => {
   const manifest = materializeCatalogManifest(source)
@@ -83,15 +55,7 @@ const buildCandidate = (source: ReturnType<typeof listScaleInstrumentSources>[nu
   const locale = context.locale ?? localization?.targetLocale ?? 'und'
   const territory = context.territory ?? 'CN'
   const respondent = context.respondent ?? manifest.population.respondentTypes[0]
-  const authorizations = context.authorizations ?? []
-  const rights = summarizeRights({
-    instrumentKey: source.identity.instrumentKey,
-    instrumentVersion: source.identity.instrumentVersion,
-    authorizations,
-    locale,
-    territory,
-    nowIso: generatedAt,
-  })
+  const rights = summarizeRights()
   const preview = source.candidatePreview
   const plan = preview?.reportPlan
   const respondentMatches = manifest.population.respondentTypes.includes(respondent)
@@ -99,7 +63,6 @@ const buildCandidate = (source: ReturnType<typeof listScaleInstrumentSources>[nu
   const reasons = [
     ...(preview?.blockers ?? ['EXECUTABLE_NOT_REGISTERED']),
     ...(!localization ? ['LOCALIZATION_MISSING'] : localization.reviewStatus !== 'APPROVED' ? ['LOCALIZATION_REVIEW_PENDING'] : []),
-    ...(rights.status !== 'APPROVED' ? ['AUTHORIZATION_NOT_READY'] : []),
     ...(!respondentMatches ? ['RESPONDENT_NOT_APPLICABLE'] : []),
     ...(!localeMatches ? ['LOCALE_NOT_AVAILABLE'] : []),
   ]
@@ -146,12 +109,6 @@ const buildCandidate = (source: ReturnType<typeof listScaleInstrumentSources>[nu
     availability: { status: 'NOT_AVAILABLE', locale, territory, respondent, reasons: [...new Set(reasons)] },
   }
   if (context.viewerRole === 'ADMIN') {
-    const effective = resolveEffectiveAuthorization({
-      authorizations: [...authorizations],
-      instrumentKey: source.identity.instrumentKey,
-      instrumentVersion: source.identity.instrumentVersion,
-      nowIso: generatedAt,
-    })
     entry.governance = {
       catalogManifestVersion: manifest.catalogManifestVersion,
       catalogStatus: manifest.catalogStatus,
@@ -167,7 +124,6 @@ const buildCandidate = (source: ReturnType<typeof listScaleInstrumentSources>[nu
         warnings: [],
         reportEligibility: { maxEligibleLevel: null, pilotWordingRequired: false, requiredReferenceWording: [], forbiddenClaims: ['全国常模', '诊断结论'] },
       },
-      ...(effective ? { authorization: { authorizationId: effective.authorizationId, status: effective.status, basis: effective.basis } } : {}),
     }
   }
   return entry

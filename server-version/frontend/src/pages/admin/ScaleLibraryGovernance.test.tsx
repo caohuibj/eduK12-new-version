@@ -74,11 +74,14 @@ describe('Scale library system review versus entrance distribution', () => {
     await waitFor(() => expect(api.grant).toHaveBeenCalledWith('entry', 'researcher', 'SURVEY', expect.any(String), 'survey-distribution'))
   })
   it('shows registry and authored records together, preserves standard identity and pages using hasMore', async () => {
-    const standard = { catalogId: 'standard:key:1', origin: 'STANDARD_REGISTRY', title: '标准原版', instrumentClass: 'STANDARD', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '1' }, availability: { status: 'RESTRICTED', reasons: [] }, authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION', useGrantStatus: 'NOT_EVALUATED', requiresRuntimeCheck: true }, standard: { construct: { constructDefinition: '原版构念' }, rights: { status: 'APPROVED' }, evidence: { coverageText: '原科学记录' } } }
+    const standard = { catalogId: 'standard:key:1', origin: 'STANDARD_REGISTRY', title: '标准原版', instrumentClass: 'STANDARD', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '1' }, availability: { status: 'RESTRICTED', reasons: [] }, authorization: { mechanism: 'DEPLOYMENT_AND_USE_GRANT', useGrantStatus: 'NOT_EVALUATED', requiresRuntimeCheck: true }, standard: { construct: { constructDefinition: '原版构念' }, rights: { status: 'NOT_EVALUATED' }, evidence: { coverageText: '原科学记录' } } }
     api.catalog.mockImplementation(async (page: number) => ({ schemaVersion: 1, page, pageSize: 25, hasMore: page === 1, list: page === 1 ? [standard, { catalogId: 'custom', origin: 'AUTHORED', title: entry.metadata.title, exactVersion: { origin: 'AUTHORED', entryId: 'entry', releaseId: 'release' }, authored: entry }] : [{ ...standard, catalogId: 'standard:key:2', title: '后续目录记录', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '2' } }] }))
     api.catalogDetail.mockResolvedValue({ entry: standard })
     render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
     await screen.findByText('标准原版 · 标准量表（只读）')
+    expect(screen.getByText(/版权许可不作为系统门禁（未评估）/)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '原标准版权与使用授权管理' })).not.toBeInTheDocument()
+    expect(screen.queryByText(/版权状态：已批准/)).not.toBeInTheDocument()
     expect(screen.getByText('范围内量表 · 自编描述性量表 · 已收录')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /开始测评|施测/ })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '查看标准精确版本详情' }))

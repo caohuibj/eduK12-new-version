@@ -23,7 +23,7 @@ export type StaticSjtMapping = StaticSjtSource & {mappingId: string; contentDige
 export type StaticSjtPublishRequest = {
   mappingId: string
   grantId: string
-  deployment: {locale: string; territory: string; commercialNature: 'NON_COMMERCIAL' | 'COMMERCIAL'; grantee: string}
+  deployment: {locale: string; territory: string}
 }
 export type StaticSjtPublishResult = {mappingId: string; measurementReleaseId: string; contentHash: string; status: string}
 export const adminContentApi = {

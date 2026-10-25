@@ -34,17 +34,22 @@ const main = async () => {
       const source = getScaleInstrumentSource(key, '1.0.0')!
       assert.ok(source)
       const authId = randomUUID()
+      // Historical optional metadata only; the retired write API is never called.
       await db.instrumentAuthorization.create({ data: { authorizationKey: authId, version: 1, instrumentKey: key, instrumentVersion: '1.0.0', grantor: 'test', grantee: 'test', electronicAdministration: true, scoring: true, display: true, translation: true, territories: ['CN'], locales: ['zh-CN'], commercialNature: 'NON_COMMERCIAL', validFrom: new Date('2020-01-01'), validTo: new Date('2099-01-01'), basis: 'synthetic only', status: 'APPROVED', approvedByUserId: admin.id, approvedAt: new Date(), createdByUserId: admin.id, recordHash: 'a'.repeat(64) } })
-      const input = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: admin.id, deploymentPolicy: { schemaVersion: 1 as const, revision: 1, locale: 'zh-CN', territory: 'CN', commercialNature: 'NON_COMMERCIAL' as const, deploymentModes: ['STANDALONE' as const], requiredRightsActions: ['electronicAdministration' as const, 'scoring' as const, 'display' as const], authorizationRefs: [authId], runtimePolicyHash: getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash, localizationVersion: source.localization!.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE' as const } }
+      const input = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: admin.id, deploymentPolicy: { schemaVersion: 2 as const, revision: 1, locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE' as const], runtimePolicyHash: getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash, localizationVersion: source.localization!.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE' as const } }
       assert.equal((await planScaleInstrumentInstall(db, input)).allowActivation, true)
       await installScaleInstrument(db, input)
       const scale = await db.scale.findUniqueOrThrow({ where: { code: key } }); ids.push(scale.id)
       assert.equal(scale.status, 'DRAFT'); assert.equal(scale.visibility, 'HIDDEN')
+      const [deployment] = await db.$queryRaw<Array<{policy_json: {schemaVersion: number}; authorization_refs: unknown}>>`SELECT policy_json, authorization_refs FROM scale_deployment_policies WHERE scale_id=${scale.id}`
+      assert.equal(deployment.policy_json.schemaVersion, 2)
+      assert.deepEqual(deployment.authorization_refs, [])
+      assert.equal(JSON.stringify(deployment.policy_json).includes(authId), false)
       assert.notEqual((await request(`/scales/${scale.id}/assessments`, {})).status, 200)
       const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: admin.id, visibility: 'PUBLIC' as const }
       assert.ok((await planStandardScalePublication(db, { ...publication, actorUserId: student.id })).blockers.includes('SYSTEM_ADMIN_REQUIRED'))
       await db.instrumentAuthorization.updateMany({ where: { authorizationKey: authId }, data: { status: 'REVOKED' } })
-      assert.equal((await planStandardScalePublication(db, publication)).allowPublish, false)
+      assert.equal((await planStandardScalePublication(db, publication)).allowPublish, true)
       await db.instrumentAuthorization.updateMany({ where: { authorizationKey: authId }, data: { status: 'APPROVED' } })
       const cli = realpathSync('node_modules/.bin/tsx')
       const path = `publish-${index}.json`
@@ -53,7 +58,9 @@ const main = async () => {
       assert.equal(dryRun.status, 0, dryRun.stderr + dryRun.stdout)
       let preview = JSON.parse(dryRun.stdout); assert.equal(preview.allowPublish, true)
       await db.instrumentAuthorization.updateMany({ where: { authorizationKey: authId }, data: { basis: 'reviewed synthetic evidence' } })
-      await assert.rejects(publishStandardScale(db, { ...publication, expectedProofHash: preview.proofHash }), /PUBLICATION_PREVIEW_STALE/)
+      const afterReferenceChange = await planStandardScalePublication(db, publication)
+      assert.equal(afterReferenceChange.proofHash, preview.proofHash, 'optional historic copyright metadata must not change publication identity')
+      assert.equal(JSON.stringify(afterReferenceChange.proof).includes(authId), false)
       assert.equal((await db.scale.findUniqueOrThrow({ where: { id: scale.id } })).status, 'DRAFT')
       const refreshed = spawnSync(process.execPath, [cli, 'src/scripts/publish-scale-instrument.ts', '--input', path], { encoding: 'utf8', timeout: 20000 })
       assert.equal(refreshed.status, 0, refreshed.stderr + refreshed.stdout)

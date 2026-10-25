@@ -1,0 +1,284 @@
+{
+  "schemaVersion": 1,
+  "status": "LOCAL_TARGETED_CHECKPOINT_NOT_CI_OR_MERGE_READY",
+  "baseHead": "aa12202f6f0a55afe167e8a9d5a0a9b553675987",
+  "upstreamPatchBase": "149441f908b57e67d53b55532206cc36b4b55580",
+  "handoff": {
+    "libraryFileId": "libfile_242b310dae788191abe2e4c9ced8854e",
+    "version": 0,
+    "zipBytes": 84855,
+    "zipSha256": "2a08464b9743f3b61330efe7357d56986abceb986c89ed9f720959505368fba2",
+    "patchSha256": "465d5cf4b3f01fc2ff259fb134eb77a974d996533f61326a0b28c47109abee93",
+    "baseApplyCheck": "passed against separate unchanged 149441f9 worktree",
+    "integration": "git apply --3way; zero conflicts; existing admission lifecycle removals retained",
+    "inputFiles": 89,
+    "initialManifestExactMatches": 88,
+    "initialCombinedFile": "server-version/backend/src/modules/scale/scale-admission.service.ts"
+  },
+  "checks": [
+    {
+      "command": "vitest run <24 changed backend test files selected from target manifest> --no-file-parallelism",
+      "log": "license-355-backend-tests1.log",
+      "result": "282 passed, 2 failed; later tool withdrawal expectations conflict with newly approved admission lifecycle"
+    },
+    {
+      "command": "vitest run src/__tests__/survey/catalog-sjt-online.contract.test.ts --no-file-parallelism",
+      "log": "license-355-catalog-contract2.log",
+      "result": "14 passed; two old expectations repaired and one current-participant credential refusal added"
+    },
+    {
+      "command": "vitest run <8 changed frontend test files selected from target manifest> --no-file-parallelism",
+      "log": "license-355-frontend-tests1.log",
+      "result": "106 passed"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/{pr3-authorization-binding,pr3-context-preflight,pr3-eligibility-admission-contract,legacy-policy-compatibility}.test.ts --no-file-parallelism",
+      "log": "license-355-legacy-direct1.log",
+      "result": "12 passed; strict V1 decode remains historical read behavior"
+    },
+    {
+      "command": "vitest run src/__tests__/assessment-authorization/source-identity-lock.test.ts --no-file-parallelism",
+      "log": "license-355-identity-direct-red1.log",
+      "result": "2 passed; retired copyright writer expectation failed"
+    },
+    {
+      "command": "vitest run src/__tests__/assessment-authorization/source-identity-lock.test.ts --no-file-parallelism --testNamePattern=\"rejects a new copyright lineage\"",
+      "log": "license-355-identity-direct-green2.log",
+      "result": "1 passed,2 name-filtered; no transaction/lock/write allowed"
+    },
+    {
+      "command": "vitest run src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts --no-file-parallelism",
+      "log": "license-355-source-races1.log",
+      "result": "8 failed; seven fixture identities exhausted in preseeded clone, one obsolete static deployment shape; retained, not claimed as product acceptance"
+    },
+    {
+      "command": "vitest run src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts --no-file-parallelism",
+      "log": "license-355-source-races2.log",
+      "result": "7 passed,1 failed; actual Composite publication succeeded, newly added publish replay expectation incorrect because published objects retain draft-only conflict"
+    },
+    {
+      "command": "vitest run src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts --no-file-parallelism --testNamePattern=\"static SJT Composite publication\"",
+      "log": "license-355-source-static-pg3.log",
+      "result": "1 passed,7 name-filtered; original status409 and snapshot identity retained on repeated publish"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/{pr3-managed,unknown-scale}.postgres.integration.test.ts src/__tests__/scale/instruments/learning-motivation-wave1.postgres.integration.test.ts --no-file-parallelism",
+      "log": "license-355-install-pg1.log",
+      "result": "3 passed,11 failed; unknown two-new-instrument real HTTP/CLI path and real36-source install/publication passed; PR3 student installer rejected by retained system-admin boundary"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/pr3-managed.postgres.integration.test.ts --no-file-parallelism",
+      "log": "license-355-install-pr3-pg2.log",
+      "result": "setup timed out at10seconds under parallel imports; no assertions executed; hook budget explicitly matched30second lifecycle budget"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/pr3-managed.postgres.integration.test.ts --no-file-parallelism",
+      "log": "license-355-install-pr3-pg3.log",
+      "result": "10 passed,1 failed; obsolete denied-new-start expectation after copyright removal"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/pr3-managed.postgres.integration.test.ts --no-file-parallelism --testNamePattern=\"dry-runs|freezes eligible facts\"",
+      "log": "license-355-install-pr3-pg4.log",
+      "result": "1 passed,1 failed,9 name-filtered; added deployment proof assertion used wrong property depth"
+    },
+    {
+      "command": "vitest run src/__tests__/scale/pr3-managed.postgres.integration.test.ts --no-file-parallelism --testNamePattern=\"dry-runs|freezes eligible facts\"",
+      "log": "license-355-install-pr3-pg5.log",
+      "result": "2 passed,9 name-filtered; new no-ledger admission and frozen scalePolicy.deployment identity verified"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit",
+      "log": "license-355-backend-tsc-actual1.log",
+      "exitCode": 0
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "cwd": "server-version/frontend",
+      "log": "license-355-frontend-app-tsc-actual2.log",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run inventory:product-ui:check",
+      "log": "license-355-ui-inventory1.log",
+      "exitCode": 0,
+      "result": "158 routes match"
+    },
+    {
+      "command": "eslint <changed frontend JS/TS files>",
+      "log": "license-355-frontend-lint1.log",
+      "exitCode": 0,
+      "result": "0 errors,3 existing cleanup-ref warnings"
+    }
+  ],
+  "notCountedAsChecks": [
+    {
+      "logs": [
+        "license-355-backend-types1.log",
+        "license-355-backend-types2.log"
+      ],
+      "reason": "npm run typecheck --if-present was a no-op; backend has no typecheck script; superseded by explicit TypeScript invocation"
+    }
+  ],
+  "uniquePassingAssertions": {
+    "backendPureContractFiles": 29,
+    "backendPureContractCases": 300,
+    "frontendFiles": 8,
+    "frontendCases": 106,
+    "postgresFiles": 4,
+    "postgresCases": 22,
+    "postgresWholeSuiteLastInvocationPassed": false,
+    "explanation": "Union of actually passed cases plus affected-case rechecks; duplicates excluded, name filters not treated as executed. No full suite or CI acceptance claim."
+  },
+  "isolatedDatabase": {
+    "freshSchemaMigrations": 229,
+    "sourceRaceRuntime": "NOSUPERUSER,NOBYPASSRLS,not schema owner; unchanged runtime-table-policy reconciled",
+    "oldDedicatedPortGuard": "replaced by explicit opt-in integration URL, same-DATABASE_URL loopback-test guard and actual PostgreSQL role restrictions; no developer/production fallback",
+    "historicalLicenseRows": "Synthetic optional metadata only; no retired approval API used and no new permission forged",
+    "retention": "All new synthetic DBs and original failed logs retained; no external or pre-existing DB removed"
+  },
+  "preserved": [
+    "MaterialGrant and exact delegated tool authority",
+    "product entry and current actor roles",
+    "scientific applicability,locale,territory and scoring/disclosure identity",
+    "media ownership and current data ACL",
+    "strict historical hashes and frozen admission receipts",
+    "actual inserted release/deployment retirement rollback and exact retry",
+    "admitted-attempt original deadline and consent/credential checks"
+  ],
+  "notExecuted": [
+    "new full GitHub CI",
+    "browser product acceptance for this integrated tree",
+    "fresh full application production build",
+    "full backend/frontend regression matrix",
+    "SQL/resource probe for licensed source or this integrated tree",
+    "PR356 shared body/combination migration",
+    "deployment,push,merge"
+  ],
+  "remaining": [
+    "entry-specific intake approval and21B distribution simplification",
+    "pure bibliographic metadata removal from approval/runtime identity",
+    "C/P/R integration after parent chooses minimal PR356 dependency closure",
+    "project data read/export contract finalization",
+    "prior Training HTTPS browser environment blocker"
+  ],
+  "changedFileSha256": {
+    "server-version/backend/src/__tests__/assessment-authorization/repository.test.ts": "658bdccdcd3796689dc33db6266ea1978808b5b9ead67400815ce7973bf41af3",
+    "server-version/backend/src/__tests__/assessment-authorization/source-identity-lock.test.ts": "0219f165e2ddb54e2ac9793fa776cd27adf1ef5f78616ba027876abb57d9c77a",
+    "server-version/backend/src/__tests__/fixtures/published-measurement.ts": "601b4563ec298b75645af87563c1f65ea10c190db0e928aca6794986693867e0",
+    "server-version/backend/src/__tests__/measurement-content/legacy-scale-conversion.test.ts": "9fa692604016355863a8fceee92ce4723909bcf1f94477f26379c406de7eb708",
+    "server-version/backend/src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts": "b538a94d64f3359a93dea68a75f32120ae68dd446dc73e77402c722952a90476",
+    "server-version/backend/src/__tests__/measurement-content/source-license-retirement.test.ts": "6bd42027e7b857dfbdcdd264667eabbdeacb26f5ad7aeab3616880f45e4a1996",
+    "server-version/backend/src/__tests__/measurement-content/static-sjt-admin.test.ts": "f401692dcdcc2e984bfa997c3530eec3e9d854107fa5899f45968adf67e3cc68",
+    "server-version/backend/src/__tests__/measurement-content/static-sjt-license-retirement.test.ts": "c7f60be2a7411e695852496e4d76d5774a436f8459ccd0674ba9cbb2235ff12f",
+    "server-version/backend/src/__tests__/measurement-content/static-sjt-measurement.test.ts": "e11c1b17beed294972a3a6ee9c80ed4dc96aadf0ff8067844182b01873e6fec9",
+    "server-version/backend/src/__tests__/scale-library-governance/unified-catalog.test.ts": "c64357dad9a327709bcec90b6c222dd725de5678d08a27a8db29244b558f0f22",
+    "server-version/backend/src/__tests__/scale/fixtures/unknown-scale-runner.ts": "aec3f260474a96d4c6ff6c062724c7c3b7872e7fd9c3d48ce43823cffd8de88a",
+    "server-version/backend/src/__tests__/scale/instruments/learning-motivation-wave1.postgres.integration.test.ts": "a590dd8c0a4898bc2a65ca5e6695521fae756f4a5983c6d87bbb2adeb88ea97b",
+    "server-version/backend/src/__tests__/scale/license-retirement-admission.test.ts": "70a48bf39d5aa2b412494641f26b8c738e3a7d5e92df8460e75c126eadb31fde",
+    "server-version/backend/src/__tests__/scale/license-retirement-install.test.ts": "a928c6deb7a8917214f5d248972b8b1c1106821cc7a14a822e4badffcd8c223e",
+    "server-version/backend/src/__tests__/scale/pr3-managed.postgres.integration.test.ts": "5995a612212935e4de87662b73804b16f1c17d476f8dc83b97bc7cdefca6c8b8",
+    "server-version/backend/src/__tests__/scale/pr4-governance-review.test.ts": "69e54d55c52e5474397018638c8b42c83acdd87055bdb489978431b2cad442ed",
+    "server-version/backend/src/__tests__/scale/scale-deployment-policy.test.ts": "077860620dcda0f6d5c826e01d92380604fdc65b18aef534f2e9ed00e633e751",
+    "server-version/backend/src/__tests__/scale/scale-library-pilot-boundary-matrix.test.ts": "d35850bcaa2909c23aeb1bb506ab7ebaed0cea52eed440ef62355fc35983a211",
+    "server-version/backend/src/__tests__/scale/scale-library-pilot-publication-gate.test.ts": "c9191ada7748d3b5309bad5bae5bd9c1280f2ea2ee87924a66a9d70c88b07daa",
+    "server-version/backend/src/__tests__/scale/scale-library-pilot-publication-policy.test.ts": "7453d84edd34ed8d21559f64dba44706a4424af83c66c612328a9d7f27dd64a6",
+    "server-version/backend/src/__tests__/scale/scale-library-wave0-read-model.test.ts": "39781db73dae2106f610657e41003ee19eee800c6e9b89dc1d8d343123597e10",
+    "server-version/backend/src/__tests__/scale/scale-library-wave1-p1.test.ts": "f4336f3c5a7962f5cff7599d3b53a2af84c7bf9473d315edb5fa663f38c2de0e",
+    "server-version/backend/src/__tests__/scale/who5-sdq-texi-gates.test.ts": "16041434c7b8da4f95ad7c8147ab05bc7e139fe1f4a4463de3d7a249a19c7e4f",
+    "server-version/backend/src/__tests__/situational/situation-definition.test.ts": "c4b68b65472a522948c3e348d2e3e0e7846d9ffa69c649749d9f52487d4935d2",
+    "server-version/backend/src/__tests__/situational/sjt-authoring.test.ts": "b04c082da74b6269ba3903b54cf3cf45d792ab88c0c292179b7cd0fda43d8353",
+    "server-version/backend/src/__tests__/situational/sjt-entry-authority.test.ts": "ce4d1308695f143c9a6bf165501d9da0136af87c3465cbf23ef183a6ed3fe9d9",
+    "server-version/backend/src/__tests__/situational/sjt-online-authoring.contract.test.ts": "91d21253fe2100d6c0984c84ee533b84d978a53c05fe476e1003c3c2a9faf9ad",
+    "server-version/backend/src/__tests__/survey/catalog-sjt-online.contract.test.ts": "5c0b4c90301db993fce1a797dc1e1473114fe645294a6095322e97859c704de3",
+    "server-version/backend/src/__tests__/survey/catalog.sources.contract.test.ts": "656209717875b13cae96d7bd6969f4c3f717a035ed72fd82538b8ea577375410",
+    "server-version/backend/src/__tests__/survey/research-builder.contract.test.ts": "15d9d1aa7cd860f6b40a538b4646607f9e882b40f48ae12b4856f6cc878e5ae7",
+    "server-version/backend/src/controllers/instrumentAuthorizationController.ts": "255387e67c2d0662d9b1eb1bcf47e68490104a382da0fda51275942510dc1036",
+    "server-version/backend/src/modules/assessment-authorization/repository.ts": "263b9ed05f027b5921fef379ee98de19c329832f9dd58868518e31735943f7aa",
+    "server-version/backend/src/modules/assessment-core/sjt/validation.ts": "54ac44ac605abe1198d832b19fb254a14358cebd1abf15ef29ba3d9ad4cf1933",
+    "server-version/backend/src/modules/assessment-runtime/admission-snapshot-v2.ts": "a3dc64c0b0aef464acda50b2139f007d9b1bf6c603ddf6ee5cf3ac102626875b",
+    "server-version/backend/src/modules/scale-library-governance/unified-catalog-model.ts": "6fc402866da3eb3240026860d6d8b108c3c8f2d7151cf6b76d23d98bc13b8a2a",
+    "server-version/backend/src/modules/scale/deployment/repository.ts": "0cfdfc2ee4f30c30c45342c7ae345ce249b956b23a8086ec904875d5fbe86f08",
+    "server-version/backend/src/modules/scale/deployment/rights.ts": "71f45b5ad8e92d826ad045531335ad20ceef59dbddc651f0aa643d85445418ef",
+    "server-version/backend/src/modules/scale/deployment/service.ts": "0f768686052026ebd74ea70573b1d55748a6c752d15321d718f7f687380a3b61",
+    "server-version/backend/src/modules/scale/library/catalog-only-read-model.ts": "dba28afb4003d012a8831cfb22d1bfd6ea951d36386c43b7b87b17864cbcb2ca",
+    "server-version/backend/src/modules/scale/library/pilot-publication-gate.ts": "7693031e69351955c4d7724823065b63f798ed253aef923e07a80059c5805093",
+    "server-version/backend/src/modules/scale/library/pilot-publication-policy.ts": "9665de3a5e838b3a03da4b4c71787d86e5f9b4bc17ead258eb51a884433470fb",
+    "server-version/backend/src/modules/scale/library/scale-library-read-model.ts": "af28b9f983abad0c76ac5ffffeefd013a972159c33433ff805edd42a3c747a7f",
+    "server-version/backend/src/modules/scale/library/standard-catalog-reader.ts": "9c7cc81de4eff7c21ede50e87793444d9700d64b92c4655effc6473e9ff5f857",
+    "server-version/backend/src/modules/scale/measurement-source.ts": "462396dea306c63446508085a4938a1cd5c28c1ed3e6105721a5436646501914",
+    "server-version/backend/src/modules/scale/onboarding/backfill.ts": "e5bd53937b1853659f41bfb7fb4e8cfc6b06f7b4f39567c485fa2b5707adbf65",
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "e8f61363035b1461a4117a2913cd5268ba163c304bb8a6cd8be9e71083026de2",
+    "server-version/backend/src/modules/scale/onboarding/measurement-conversion.ts": "c275a0ff343a653af73d1a8bb9e5c236be82ea48fd9256dffab75f6a0d72732e",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "6c77ec5f89aa9f594767e034de94e0fd96ac385122e7d767af054e04658ee2c3",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "fe85148c5fc1cfbf5bc42f6c951228243fa54c0a7359c6ffcd3d021a311fc15f",
+    "server-version/backend/src/modules/scale/policy/deployment.ts": "8f9eb7d6b80487d3a694d3694462a086df1dbe6a802d25c5576e5ce822a0316a",
+    "server-version/backend/src/modules/scale/policy/localization.ts": "d0c922deb3e8b1cb324abdef7fe4694117d94347ec9c86f27c55bbece44fab0c",
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": "f0fa61356887f7ef36519bc56e92d6e24701b4b0e86ad852c8bfac808e045104",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "b726066731c3a94ee165bc6fab2af8f5e03225febfad32add9a91e6fca727cf0",
+    "server-version/backend/src/modules/situational/authoring/online.ts": "ed6ca911b50948f7a261adcdb6d400295d00b6b9b677ab1fa8558da4d74792dd",
+    "server-version/backend/src/modules/situational/authoring/template.ts": "0778a9c6f9cee20e0ca4e953b3b93811dbcacc900d240e5e74643f673dad41c3",
+    "server-version/backend/src/modules/situational/entry-authority.ts": "8cd3db0ed9182368efcd844b45d75cf41425275a842b7c86b896390c919ebe56",
+    "server-version/backend/src/modules/situational/onboarding/scientific-qualification.ts": "357addc943aa2cd8a3860593840cda85022aa5da58aad9953fe501ccc9f5bf42",
+    "server-version/backend/src/modules/situational/situation-definition.ts": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9",
+    "server-version/backend/src/modules/situational/static-measurement-release.ts": "67a53b2401ede65ed402e2ca02c0827552dda06632dde4415bd27702a32f3dbd",
+    "server-version/backend/src/modules/survey/builder.definition.ts": "5bae73521fbf9851c56257edfcd99447bbe5717e51bd1d922514b6f880dc109b",
+    "server-version/backend/src/modules/survey/catalog.service.ts": "8767b2f7224bed693429fed57dd19015714ae2c619a4ceea6e71df9625401432",
+    "server-version/backend/src/modules/survey/catalog.sources.ts": "d62c9f85f0c4d068b7a49f2ac035d744ffb179773cae92c5078d225af8872b4d",
+    "server-version/backend/src/modules/survey/content-options.service.ts": "ae9aa8e87908d373ba25568702f22965aa2c815e1f5197ec3a9de0b629d4b51f",
+    "server-version/backend/src/modules/survey/measurement-publication.service.ts": "65d67a1b8d1c6ea7c4ad207cd81a7fbae5b04bc4808a5627b571be3b3fdd5434",
+    "server-version/backend/src/modules/survey/publication.service.ts": "888460261651624e4a3700fd0fcca2da330608b54cdecad0d66dacc81129aa75",
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": "2638731f9522a7ad43b32581c24fdddccd1601f67e083f9ab298d709b9497aed",
+    "server-version/backend/src/routes/instrumentAuthorizations.ts": "9bfc4bca6660fdfa2a2715ccb103ce459196660785040885e40f21dc186481ea",
+    "server-version/backend/src/scripts/install-scale-instrument.ts": "14d6dafbe504a4990640c9baead261648e614b1f98610294aad4677ff14d6f21",
+    "server-version/docs/frontend-convergence/routes.md": "561518ca90fd8066c41089cc1fa5e0f6c6c36153a5edc5f453bb4dec96a43c8f",
+    "server-version/frontend/src/App.tsx": "77ae2e48927ff93623a9d59ab4bb94449e4ea0e51554602e2555c108b3624a7d",
+    "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": "2f16b636bcc70572fd211e67ab42a80694cad5d7f245a2c28738018dbc657c7f",
+    "server-version/frontend/src/admin/AdminContentPermissions.tsx": "7f17ec29f5d27fffe944ce12c40dec889da75438ec9575a265f89b5ef3baa9d1",
+    "server-version/frontend/src/admin/AdminStaticSjtPublication.test.tsx": "9b8f549ee9f92df7906115578efa08894112ab50825189753558b973950cb4f5",
+    "server-version/frontend/src/admin/AdminStaticSjtPublication.tsx": "534523fed13f58d42342066c07dc9ba20cdbf8bed695a919aa1d50fec6e133d7",
+    "server-version/frontend/src/admin/SystemAdminShell.tsx": "f8183a3304385633d337710af579d28a81e109b3c88028f564f183cfe64fba63",
+    "server-version/frontend/src/admin/contentRequestRecovery.ts": "57e9ae41d0c00295f925b22dafeb126f999abd86dcac2924c70fdf59234b6bdb",
+    "server-version/frontend/src/admin/systemWorkspace.ts": "7ef1644a979e6eeb00de2d28c2930c7ee83182017c116d0ec314e95b9bd3b3ab",
+    "server-version/frontend/src/api/adminContent.ts": "24e518d0cdb0508c6d6fd5cf91b35f19e49546b237e6c37e6f1c1bc2c6a702e8",
+    "server-version/frontend/src/api/instrumentAuthorizations.ts": "154b0bda33b64330f2ce7f03cfb3ee9cec32ae1de231145c30aa04d8291b4824",
+    "server-version/frontend/src/api/scaleLibraryGovernance.ts": "ac44ff9645f22e59b84f1ec68f851b16da43b74fc8ba2fdbbe82b2aa62cf54cb",
+    "server-version/frontend/src/components/app-shell/__tests__/access.test.ts": "b4c91ad3a628e4f284e7d615535aaf5243927af7987528e4e3cf3410fb4f4102",
+    "server-version/frontend/src/components/app-shell/access.ts": "64c1b95842e56352580db3b692a10d54fb24015755f58f3d4921ce233aadd56a",
+    "server-version/frontend/src/components/app-shell/navigation.ts": "0d2a17913ba361fb02d880fd714f7a15a3ce3d68b9a8f61a37721bd6250cee21",
+    "server-version/frontend/src/modules/scale/rightsPresentation.ts": "9ebdba472f6153d0a86d105ecace86b1fe15cc42dfb8daf2c549c397c2aafd6c",
+    "server-version/frontend/src/pages/ScaleLibrary.tsx": "5e6d222af449ff7c0d84d01a49aa988e651a9de9493e80c113622f6bae99d0e4",
+    "server-version/frontend/src/pages/__tests__/ScaleLibrary.test.tsx": "97aa3444c6e3ff2c2000c747aff395e03e8463746f04e1660bb1373e8de70685",
+    "server-version/frontend/src/pages/admin/InstrumentAuthorization.training.test.tsx": "7ad7ee23043141b84c068e7c8f13feeeaff98f94bc31068db526d4c352607845",
+    "server-version/frontend/src/pages/admin/InstrumentAuthorization.tsx": "286bec0b325c2036fd79626e1a70e945fa4a50ea42e118ccef66e820c33d4c73",
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx": "c8c6b3b1172e1c61a8cd5ac884e04061854c5a73caa6358a20ac95707554a631",
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": "301637b8ba6071937a0928e1632534ddaaf291bee1d2fc346aa0f10a9caaa4d3",
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx": "2cdc2819d49ea0eb0d97285e191b497378e4e1c601f1ae831dd023580da8aebd",
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.tsx": "e1cf85a5a673cee58028363a6c33a03106428e0c963958ee47089d1ae521d2c0",
+    "server-version/frontend/src/training/TrainingAdminResources.test.tsx": "ab71787740cdd3b160651d01a267b9f13181b55cc1bc64e7de9d6cd694f9f789",
+    "server-version/frontend/src/training/TrainingAdminResources.tsx": "eb7caefdfb48686192f7ba6e86c36d7fc0e8be727a06055e5039fdb9ccb07563"
+  },
+  "rawPrivateLogSha256": {
+    "license-355-backend-tests1.log": "c1780eb8485e30936ba6048df4e396ab179c9434ac509e24a26f83da260e491d",
+    "license-355-catalog-contract2.log": "34c78b475285053cd3e3f6dc71152bea3185d2264fd6cb394d012982085d66e3",
+    "license-355-frontend-tests1.log": "4e6a9c99f1b285985ebdf1540e933faf1732763ec258d176ae2504562e623481",
+    "license-355-legacy-direct1.log": "576b1fed044978f4726fbe12f6aaba4add4e90840b3c4fc1ace44f721dc58815",
+    "license-355-identity-direct-red1.log": "b186fc15af18a26878ad25c4b5abc370e79b2c1ef335184c9ff2d736956141a7",
+    "license-355-identity-direct-green2.log": "3c01d2ee38bc6ec51a4808ba8b2d95d664e1e05462418e9193b14e9e60f4ccbd",
+    "license-355-source-races1.log": "bb5e42fc98441c2c74200810977b2988ce60f00a495bcd5fbce7eb541d22ffb2",
+    "license-355-source-races2.log": "48aa7e98d9b15654c105147299f440aaf68847ce06a7bd9eebe6848970ac4fec",
+    "license-355-source-static-pg3.log": "d57584b50c994e1d77ef39843cd8ab7247e1193d56e3df8ee6f00586bd7d28bb",
+    "license-355-install-pg1.log": "f8f541e6822c561c6b2f468f180c5248fd6ad4fc64728879e0f606eefbe13aca",
+    "license-355-install-pr3-pg2.log": "7a8b0d38e9378bd46e562ddae185cfdc37558eeaf88eee63a2fcf3d037859a3d",
+    "license-355-install-pr3-pg3.log": "97a480c55c68732777b2b4bbb0e5c4cf39075e8090b07f8c787345d547dcd5bc",
+    "license-355-install-pr3-pg4.log": "4bd5bbf320bdcc5142a516a630977ac572ff35db481ace422d73c7d523499ad2",
+    "license-355-install-pr3-pg5.log": "0a49bbaf0c1e63c8388b4ac7709327210cfb57013957c6437af3cc7013acca9d",
+    "license-355-backend-types1.log": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec",
+    "license-355-backend-types2.log": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec",
+    "license-355-backend-tsc-actual1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license-355-frontend-app-tsc-actual2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "license-355-ui-inventory1.log": "25599df1c56b2ae7354b01e121941f8622bc6972ff2ba2fe18d9c85c87816dab",
+    "license-355-frontend-lint1.log": "2dc4652c56a6fdc26a2141bea810f48c9e97eca1525c33e9f1d50f9c0245617e",
+    "license-355-fresh-migrations1.log": "cf325ed96c61bad04ab3a8999881e72c483ec48d0c5b8856c8d056feb16bf00c",
+    "license-355-threeway-apply.log": "a1d3ac131a418a0bd0df16f661c200711d415c1d59a3243021644430a4662694"
+  }
+}

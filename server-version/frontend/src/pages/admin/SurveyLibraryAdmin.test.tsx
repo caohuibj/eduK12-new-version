@@ -28,6 +28,18 @@ describe('scoped Survey library UI',()=>{
   await waitFor(()=>expect(mock.request).toHaveBeenCalledWith('survey-library','/policies',expect.objectContaining({resourceKey:item.policyIdentity.resourceKey,expectedVersion:0,decision:'APPROVED',paused:false,reason:'核对完整内容'})))
   expect(mock.request.mock.calls.some(c=>String(c[1]).includes('/grants'))).toBe(false)
  })
+ it('keeps Survey approval and attachment access checks without a copyright gate',async()=>{
+  mock.request.mockImplementation(async(_scope,path)=>path.startsWith('/submissions')?{list:[{id:'submission',metadata:{title:'申请工具',copyright:'unknown'},product:'TRAINING',status:'SUBMITTED',policy:item.policy,policyIdentity:item.policyIdentity}],hasMore:false}:{list:[],hasMore:false})
+  render(<MemoryRouter><SurveyLibraryAdmin/></MemoryRouter>)
+  await waitFor(()=>expect(screen.getByRole('tab',{name:'Survey 入库审批'})).toBeEnabled())
+  fireEvent.click(screen.getByRole('tab',{name:'Survey 入库审批'}))
+  await screen.findByRole('heading',{name:'申请工具'})
+  screen.getByText('申请详情与 Survey 审批').closest('details')!.setAttribute('open','')
+  expect(screen.getByText(/共享库全局收录与附件访问权限继续独立核对；版权许可仅作参考，不作为系统门禁/)).toBeVisible()
+  expect(screen.getByText('unknown')).toBeVisible()
+  expect(screen.getByRole('button',{name:'批准 Survey 使用范围'})).toBeDisabled()
+  expect(mock.request.mock.calls.every(call=>call[2]===undefined)).toBe(true)
+ })
  it('shows system navigation separately from researcher administration',async()=>{
   mock.user={id:'system',platformRole:'SYSTEM_ADMIN'}
   render(<MemoryRouter><SurveyLibraryAdmin/></MemoryRouter>);await screen.findByText('完整内容工具')

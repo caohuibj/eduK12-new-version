@@ -9,7 +9,6 @@ import {
 } from '../policy/deployment'
 import type { CompiledScalePolicyV1 } from '../policy/compile'
 import {
-  listScaleInstrumentAuthorizations,
   readActiveScaleDeployment,
   type StoredScaleDeploymentPolicyV1,
 } from './repository'
@@ -131,11 +130,6 @@ export const resolveScaleStartDeployment = async (input: {
     && deployment.policy.localizationVersion !== localizationVersion
   ) reasons.push('DEPLOYMENT_LOCALIZATION_VERSION_MISMATCH')
 
-  const authorizations = await listScaleInstrumentAuthorizations(
-    input.db,
-    input.scale.code,
-    input.scale.instrumentVersion,
-  )
   const modes = input.requestedMode ? [input.requestedMode] : deployment.policy.deploymentModes
   let decision: ScaleDeploymentDecisionV1 | null = null
   for (const requestedMode of modes) {
@@ -145,7 +139,6 @@ export const resolveScaleStartDeployment = async (input: {
       instrumentKey: input.scale.code,
       instrumentVersion: input.scale.instrumentVersion,
       compiledRuntimePolicyHash: runtimePolicy.runtimePolicyHash,
-      authorizations,
       usageRequirements: runtimePolicy.usageRequirements,
       nowIso: (input.now ?? new Date()).toISOString(),
     })
@@ -159,7 +152,6 @@ export const resolveScaleStartDeployment = async (input: {
     instrumentKey: input.scale.code,
     instrumentVersion: input.scale.instrumentVersion,
     compiledRuntimePolicyHash: runtimePolicy.runtimePolicyHash,
-    authorizations,
     usageRequirements: runtimePolicy.usageRequirements,
     nowIso: (input.now ?? new Date()).toISOString(),
   })

@@ -51,9 +51,11 @@ describe('immutable system catalog source adapters',()=>{
       expect(scoreScale(imported.compiledDefinition as typeof definition,originalAnswers)).toEqual(scoreScale(original,originalAnswers))
     }
   })
-  it('refuses restricted rights and presentation changes rather than rewriting official source',()=>{
+  it('preserves reference-only rights metadata while still rejecting unsupported presentation changes',()=>{
     const definition=scale();definition.license.redistribution='restricted'
-    expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('SOURCE_RIGHTS')
+    const original=structuredClone(definition)
+    expect(adaptCatalogScale(scaleRef,'Source',definition).compiledDefinition).toEqual(original)
+    expect(definition).toEqual(original)
     definition.license.redistribution='allowed';definition.items[0].randomizeOptions=true
     expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('RANDOMIZATION_RUNTIME_UNSUPPORTED')
   })
@@ -73,9 +75,11 @@ describe('immutable system catalog source adapters',()=>{
     pkg.definition.researchAssignment={assignmentVersion:'source-assignment-v1',groups:[{groupKey:'control',nodeKey:node.nodeKey,variants:[{variantKey:'control',weight:1,omittedChannelKeys:[],probeTiming:'DEFINED'}]}]}
     expect(()=>adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:pkg.instrumentVersion},'Source',pkg)).toThrow('SOURCE_SJT_RESEARCH_CAPTURE_UNSUPPORTED')
   })
-  it('does not claim restricted SJT sources or branch flattening is supported',()=>{
+  it('does not reinterpret restricted SJT metadata as an authorization gate or grant',()=>{
     const pkg=sjt();pkg.definition.license.redistribution='restricted'
-    expect(()=>adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:'1'},'Source',pkg)).toThrow('SOURCE_RIGHTS')
+    const original=structuredClone(pkg)
+    expect(adaptCatalogSjt({kind:'SJT',sourceId:'source',sourceVersion:'1'},'Source',pkg).compiledDefinition).toEqual(original.definition)
+    expect(pkg).toEqual(original)
   })
   it('accepts only the actual controlled published Cognitive config, never substitutes a template for another task',()=>{
     const ref={kind:'COGNITIVE' as const,sourceId:'config-id',sourceVersion:'1.1.0'}

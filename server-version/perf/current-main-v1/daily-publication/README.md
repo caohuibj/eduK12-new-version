@@ -2,6 +2,8 @@
 
 这是一个有界合成探针，不是容量测试或 CI 接纳通道。原执行在同一云端、同一 PG16/Redis 实例上进行，固定基线 `149441f9` 和候选 `db225657`。两者使用同一数据库模板的克隆，冻结发布、参与者身份和答案相同，按 baseline / candidate / candidate / baseline 顺序执行。
 
+实际冻结发布含两单元：一题单选 FORM，以及自编描述性 SCALE（两题五级选项，含一题反向题、两个维度）；不是公库注册量表、native/认知或整包。已对照原fixture、结果definitionDigest及模板库冻结publication核实，并非只依据整理后的fixture源码推断。
+
 每个进程依次执行三名参与者：首次请求单列 `process-first`，其余两名为 `process-reused`。PG/OS 缓存未清空，不能称为数据库冷缓存。共84个真实 HTTP 请求全部成功；FINAL 还检查 COMPLETED、精确重放和落库结果。没有浏览器/UI 通过声明。
 
 ## 进程复用组，每个阶段各4个观察值

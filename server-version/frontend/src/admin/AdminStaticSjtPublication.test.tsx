@@ -12,15 +12,14 @@ const click = (name: string) => {openSjt();fireEvent.click(screen.getByRole('but
 function source() { openSjt(); change('来源 instrumentKey', 'installed-sjt'); change('来源 instrumentVersion', '1.2.0') }
 async function prepare() { source(); click('准备精确 SJT 来源'); await screen.findByRole('button', {name: '确认发布 SJT 测量版本'}) }
 function deployment() {
-  change('SJT 发布授权 UUID', id(4)); change('许可语言 locale', 'zh-CN'); change('许可地域 territory', 'CN')
-  change('商业性质', 'NON_COMMERCIAL'); change('许可被许可主体 grantee', 'Authorized institution')
+  change('SJT 发布授权 UUID', id(4)); change('部署语言 locale', 'zh-CN'); change('科学适用地域 territory', 'CN')
 }
 beforeEach(() => {
   vi.restoreAllMocks(); sessionStorage.clear(); mocks.get.mockReset(); mocks.post.mockReset()
   vi.spyOn(window, 'confirm').mockReturnValue(true)
   mocks.post.mockImplementation(async (url, body) => ({data: url.endsWith('/prepare') ? mapping : url.endsWith('/publish') ? published : {grantId: body.requestId, version: 1}}))
 })
-it('prepares an exact source, requires a separate explicit grant, and publishes the exact license fields', async () => {
+it('prepares an exact source, requires a separate explicit grant, and publishes only the exact deployment locale and territory', async () => {
   render(<AdminContentPermissions actorId={id(9)}/>); expect(mocks.post).not.toHaveBeenCalled(); expect(mocks.get).not.toHaveBeenCalled()
   await prepare()
   expect(mocks.post).toHaveBeenCalledWith('/admin/permissions/static-sjt/prepare', {instrumentKey: 'installed-sjt', instrumentVersion: '1.2.0'})
@@ -33,12 +32,12 @@ it('prepares an exact source, requires a separate explicit grant, and publishes 
   const grant = mocks.post.mock.calls[1][1]
   expect(grant.grant).toMatchObject({subjectId: id(9), scope: {product: 'TRAINING', scopeKind: 'PLATFORM', scopeId: 'situational-registry', resourceKind: 'measurement', resourceKeys: [id(2)]}, capabilities: ['measurement.publish'], delegableCapabilities: []})
   deployment(); click('使用刚签发的 SJT 授权'); click('确认发布 SJT 测量版本'); await screen.findByText(/发布已确认：测量 release/)
-  expect(mocks.post.mock.calls[2]).toEqual(['/admin/permissions/static-sjt/publish', {mappingId: id(2), grantId: grant.requestId, deployment: {locale: 'zh-CN', territory: 'CN', commercialNature: 'NON_COMMERCIAL', grantee: 'Authorized institution'}}])
+  expect(mocks.post.mock.calls[2]).toEqual(['/admin/permissions/static-sjt/publish', {mappingId: id(2), grantId: grant.requestId, deployment: {locale: 'zh-CN', territory: 'CN'}}])
   expect(screen.queryByRole('button', {name: '确认发布 SJT 测量版本'})).not.toBeInTheDocument(); expect(window.confirm).toHaveBeenCalledTimes(3)
 })
 it('cancellation or missing deployment choice does not publish', async () => {
-  render(<AdminContentPermissions actorId={id(9)}/>); await prepare(); deployment(); change('商业性质', ''); click('确认发布 SJT 测量版本')
-  expect(mocks.post).toHaveBeenCalledTimes(1); change('商业性质', 'COMMERCIAL'); vi.mocked(window.confirm).mockReturnValue(false); click('确认发布 SJT 测量版本'); expect(mocks.post).toHaveBeenCalledTimes(1)
+  render(<AdminContentPermissions actorId={id(9)}/>); await prepare(); deployment(); change('部署语言 locale', ''); click('确认发布 SJT 测量版本')
+  expect(mocks.post).toHaveBeenCalledTimes(1); change('部署语言 locale', 'zh-CN'); vi.mocked(window.confirm).mockReturnValue(false); click('确认发布 SJT 测量版本'); expect(mocks.post).toHaveBeenCalledTimes(1)
 })
 it('retains an unknown prepare body across remount, later denial, and actor switches', async () => {
   mocks.post.mockRejectedValueOnce(new Error('response lost')).mockRejectedValueOnce({status: 403, message: 'Forbidden'})
@@ -54,19 +53,19 @@ it('locks and restores unknown publication through a later denial and key step-u
   const view = render(<AdminContentPermissions actorId={id(9)}/>); await prepare(); deployment()
   mocks.post.mockRejectedValueOnce(new Error('response lost')); click('确认发布 SJT 测量版本'); await screen.findByText(/发布结果尚未确认/)
   const request = mocks.post.mock.calls[1]
-  expect(screen.getByLabelText('许可被许可主体 grantee')).toBeDisabled(); expect(screen.queryByRole('button', {name: '准备另一精确来源'})).not.toBeInTheDocument()
-  view.unmount(); render(<AdminContentPermissions actorId={id(9)}/>); expect(screen.getByLabelText('SJT 发布授权 UUID')).toHaveValue(id(4)); expect(screen.getByLabelText('商业性质')).toHaveValue('NON_COMMERCIAL')
+  expect(screen.getByLabelText('科学适用地域 territory')).toBeDisabled(); expect(screen.queryByRole('button', {name: '准备另一精确来源'})).not.toBeInTheDocument()
+  view.unmount(); render(<AdminContentPermissions actorId={id(9)}/>); expect(screen.getByLabelText('SJT 发布授权 UUID')).toHaveValue(id(4)); expect(screen.getByLabelText('科学适用地域 territory')).toHaveValue('CN')
   mocks.post.mockRejectedValueOnce({status: 403, message: '内容授权范围或当前身份无效'}); click('重试同一 SJT 发布请求'); await screen.findByText(/发布结果尚未确认/)
-  expect(screen.getByLabelText('许可语言 locale')).toBeDisabled(); expect(mocks.post.mock.calls[2]).toEqual(request)
+  expect(screen.getByLabelText('部署语言 locale')).toBeDisabled(); expect(mocks.post.mock.calls[2]).toEqual(request)
   mocks.post.mockRejectedValueOnce({status: 403, message: '需要最近的安全密钥验证'}); click('重试同一 SJT 发布请求'); await screen.findByText(/需要最近的安全密钥验证/); expect(mocks.post.mock.calls[3]).toEqual(request)
   click('重试同一 SJT 发布请求'); await screen.findByText(/发布已确认：测量 release/); expect(mocks.post.mock.calls[4]).toEqual(request)
   expect(JSON.parse(sessionStorage.getItem('admin-static-sjt:' + id(9))!).state.publish).toBeNull()
 })
-it('retains step-up requests but unlocks after a first definite license rejection without unknown history', async () => {
+it('retains step-up requests but unlocks after a first definite deployment rejection without unknown history', async () => {
   render(<AdminContentPermissions actorId={id(9)}/>); await prepare(); deployment()
   mocks.post.mockRejectedValueOnce({status: 403, message: '需要最近的安全密钥验证'}); click('确认发布 SJT 测量版本'); await screen.findByText(/发布结果尚未确认/)
-  mocks.post.mockRejectedValueOnce({status: 409, message: 'CONTENT_STATIC_SJT_SOURCE_LICENSE_DENIED'}); click('重试同一 SJT 发布请求'); await screen.findByText(/本次发布明确未执行/)
-  expect(screen.getByLabelText('许可被许可主体 grantee')).not.toBeDisabled(); expect(mocks.post.mock.calls[2]).toEqual(mocks.post.mock.calls[1])
+  mocks.post.mockRejectedValueOnce({status: 409, message: 'CONTENT_STATIC_SJT_DEPLOYMENT_MISMATCH'}); click('重试同一 SJT 发布请求'); await screen.findByText(/本次发布明确未执行/)
+  expect(screen.getByLabelText('科学适用地域 territory')).not.toBeDisabled(); expect(mocks.post.mock.calls[2]).toEqual(mocks.post.mock.calls[1])
 })
 it('never confirms an inconsistent mapping or malformed publication response', async () => {
   render(<AdminContentPermissions actorId={id(9)}/>); source(); mocks.post.mockResolvedValueOnce({data: {...mapping, instrumentVersion: 'different'}})
@@ -86,7 +85,7 @@ it('blocks mutations if saved state cannot safely restore', () => {
 it('does not treat an existing source release as confirmation of a new deployment', async () => {
   mocks.post.mockResolvedValueOnce({data: {...mapping, measurementReleaseId: id(3)}})
   render(<AdminContentPermissions actorId={id(9)}/>); await prepare()
-  expect(screen.getByText(/这不代表本次部署或许可已核验/)).toBeInTheDocument()
+  expect(screen.getByText(/这不代表本次部署已核验/)).toBeInTheDocument()
   expect(screen.queryByText(/发布已确认：测量 release/)).not.toBeInTheDocument()
   click('确认发布 SJT 测量版本'); expect(mocks.post).toHaveBeenCalledTimes(1)
 })
@@ -98,4 +97,16 @@ it('prevents duplicate clicks while a preparation request is in flight', async (
   fireEvent.click(button); fireEvent.click(button)
   expect(mocks.post).toHaveBeenCalledTimes(1)
   complete({data: mapping}); await screen.findByRole('button', {name: '确认发布 SJT 测量版本'})
+})
+it('does not rewrite or replay an uncertain legacy license-bearing request', () => {
+  const legacy = {actorId: id(9), state: {source: {instrumentKey: 'installed-sjt', instrumentVersion: '1.2.0'}, mapping,
+    preparePending: false, prepareUnknown: false, publishUnknown: true, result: null,
+    publish: {mappingId: id(2), grantId: id(4), deployment: {locale: 'zh-CN', territory: 'CN', commercialNature: 'NON_COMMERCIAL', grantee: 'legacy'}}}}
+  const original = JSON.stringify(legacy)
+  sessionStorage.setItem('admin-static-sjt:' + id(9), original)
+  render(<AdminContentPermissions actorId={id(9)}/>); openSjt()
+  expect(screen.getByRole('button', {name: '准备精确 SJT 来源'})).toBeDisabled()
+  expect(screen.getByText(/无法恢复当前管理员的 SJT 请求/)).toBeInTheDocument()
+  expect(sessionStorage.getItem('admin-static-sjt:' + id(9))).toBe(original)
+  expect(mocks.post).not.toHaveBeenCalled()
 })

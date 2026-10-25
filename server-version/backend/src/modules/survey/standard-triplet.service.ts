@@ -46,8 +46,7 @@ export async function previewStandardTriplet(db:Db,actor:string,selection:Select
  const scale=await db.scale.findUnique({where:{code:selection.toolKey},select:{id:true,creatorId:true,name:true,description:true,tags:true,createdAt:true}})
  const applications=scale?await db.$queryRaw<unknown[]>`SELECT to_jsonb(s) AS record FROM scale_library_submissions s WHERE source_id=${scale.id} ORDER BY created_at`:[]
  const publications=scale?await db.$queryRaw<unknown[]>`SELECT to_jsonb(a) AS record FROM scale_publication_audits a WHERE scale_id=${scale.id}`:[]
- const rights=await db.instrumentAuthorization.findMany({where:{instrumentKey:selection.toolKey},orderBy:{version:'asc'}})
- triplet.reference=toolReference('SCALE',selection.toolKey,{...triplet.reference.metadata,originalScaleRecord:scale,rightsRecords:rights},applications,publications)
+ triplet.reference=toolReference('SCALE',selection.toolKey,{...triplet.reference.metadata,originalScaleRecord:scale},applications,publications)
  return triplet
 }
 export async function standardTripletCatalog(actor:string,page=1){

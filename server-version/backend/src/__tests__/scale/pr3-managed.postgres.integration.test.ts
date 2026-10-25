@@ -2,13 +2,12 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import express from 'express'
 import type { Server } from 'node:http'
-import type { PrismaClient } from '@prisma/client'
+import type { PrismaClient, Prisma } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 
 const DB_URL = integrationDatabaseUrl('SCALE_PR3_INTEGRATION_DATABASE_URL', 'INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL')
 const suite = DB_URL ? describe : describe.skip
 const key = 'synthetic_pr3_eligibility'
-const authId = randomUUID()
 vi.mock('../../modules/scale/onboarding/instrument-registry', async importOriginal => {
   const actual = await importOriginal<typeof import('../../modules/scale/onboarding/instrument-registry')>()
   const { compileScalePolicy } = await import('../../modules/scale/policy/compile')
@@ -63,26 +62,20 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
     const registry = await import('../../modules/scale/onboarding/instrument-registry')
     source = registry.getScaleInstrumentSource(key, '1.0.0')!
     actor = (await db.user.create({ data: { username: `pr3-${randomUUID()}`, passwordHash: 'test-only', role: 'STUDENT' } })).id
-    await db.instrumentAuthorization.create({ data: {
-      authorizationKey: authId, version: 1, instrumentKey: key, instrumentVersion: '1.0.0', grantor: 'test', grantee: 'test',
-      electronicAdministration: true, scoring: true, display: true, translation: true, territories: ['CN'], locales: ['zh-CN'], commercialNature: 'NON_COMMERCIAL',
-      validFrom: new Date('2020-01-01'), validTo: new Date('2099-01-01'), basis: 'test-only', status: 'APPROVED',
-      approvedByUserId: actor, approvedAt: new Date(), createdByUserId: actor, recordHash: 'a'.repeat(64),
-    } })
-    input = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: actor, deploymentPolicy: {
-      schemaVersion: 1, revision: 1, locale: 'zh-CN', territory: 'CN', commercialNature: 'NON_COMMERCIAL',
-      deploymentModes: ['STANDALONE', 'QUESTIONNAIRE', 'PUBLIC_QUESTIONNAIRE', 'COMPOSITE'], requiredRightsActions: ['electronicAdministration', 'scoring', 'display'],
-      authorizationRefs: [authId], runtimePolicyHash: registry.getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash,
+    publisher = (await db.user.create({ data: { username: `pr3-publisher-${randomUUID()}`, passwordHash: 'test-only', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' } })).id
+    input = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, deploymentPolicy: {
+      schemaVersion: 2, revision: 1, locale: 'zh-CN', territory: 'CN',
+      deploymentModes: ['STANDALONE', 'QUESTIONNAIRE', 'PUBLIC_QUESTIONNAIRE', 'COMPOSITE'],
+      runtimePolicyHash: registry.getScaleInstrumentRuntimePolicy(key, '1.0.0')!.runtimePolicyHash,
       localizationVersion: source.localization.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE', completionWindowMs: 86400000,
     } }
-    publisher = (await db.user.create({ data: { username: `pr3-publisher-${randomUUID()}`, passwordHash: 'test-only', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN' } })).id
     const app = express(); app.use(express.json())
     app.use((req, _res, next) => { req.user = { userId: actor, role: 'STUDENT' } as any; next() })
     app.post('/scales/:scaleId/assessments', (await import('../../modules/scale/scale-start.controller')).startStandaloneScaleAssessment)
     server = app.listen(0, '127.0.0.1')
     await new Promise<void>(resolve => server.once('listening', resolve))
     base = `http://127.0.0.1:${(server.address() as any).port}`
-  })
+  }, 30_000)
 
   afterAll(async () => {
     if (server) await new Promise<void>((resolve, reject) => server.close(err => err ? reject(err) : resolve()))
@@ -93,7 +86,6 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
       await db.$executeRaw`DELETE FROM "scale_deployment_policies" WHERE "scale_id" = ${scaleId}`
       await db.scale.delete({ where: { id: scaleId } })
     }
-    await db.instrumentAuthorization.deleteMany({ where: { instrumentKey: key } })
     if (publisher) await db.user.delete({ where: { id: publisher } })
     if (actor) await db.user.delete({ where: { id: actor } })
     await db.$disconnect()
@@ -103,13 +95,13 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
     expect((await install.planScaleInstrumentInstall(db, input)).createScale).toBe(true)
     await install.installScaleInstrument(db, input)
     const row = await db.scale.findUniqueOrThrow({ where: { code: key } }); scaleId = row.id
-    expect(row).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: actor })
+    expect(row).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: publisher })
     const { planStandardScalePublication, publishStandardScale } = await import('../../modules/scale/onboarding/publish')
     const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const }
     const preview = await planStandardScalePublication(db, publication)
     await publishStandardScale(db, { ...publication, expectedProofHash: preview.proofHash })
     expect((await install.installScaleInstrument(db, input)).deploymentAlreadyActive).toBe(true)
-    expect(await db.scale.findUnique({ where: { id: scaleId } })).toMatchObject({ status: 'PUBLISHED', visibility: 'PUBLIC', creatorId: actor })
+    expect(await db.scale.findUnique({ where: { id: scaleId } })).toMatchObject({ status: 'PUBLISHED', visibility: 'PUBLIC', creatorId: publisher })
   })
 
   it('returns context preflight without questions or a persisted attempt', async () => {
@@ -133,7 +125,7 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
     await db.assessment.delete({ where: { id: child.id } })
   })
 
-  it('freezes eligible facts once and preserves them on concurrent resume and grant revocation', async () => {
+  it('freezes eligible facts once and preserves them on concurrent resume without a copyright grant', async () => {
     const simultaneous = await Promise.all([request({ context: { birthYearMonth: '2000-01', gradeLevel: '12' } }), request({ context: { birthYearMonth: '2000-01' } })])
     expect(simultaneous.map(item => item.status)).toEqual([200, 200])
     expect(new Set(simultaneous.map(item => item.body.data.assessment.id)).size).toBe(1)
@@ -146,13 +138,16 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
     expect(frozen.contextValues?.birthYearMonth).toBe('2000-01')
     expect(frozen.contextValues?.gradeLevel).toBeUndefined()
     expect(JSON.stringify(response.body)).not.toContain('birthYearMonth')
-    await db.instrumentAuthorization.updateMany({ where: { instrumentKey: key }, data: { status: 'REVOKED' } })
+    expect(await db.instrumentAuthorization.count({ where: { instrumentKey: key } })).toBe(0)
     const resumed = await Promise.all([request(), request({ context: { birthYearMonth: '2025-01' } })])
     expect(resumed.map(result => result.body.data.assessment.id)).toEqual([id, id])
     expect((await db.assessment.findUniqueOrThrow({ where: { id } })).frozenAdmissionSnapshotHash).toBe(row.frozenAdmissionSnapshotHash)
     await db.assessment.update({ where: { id }, data: { status: 'ABANDONED' } })
-    expect((await request({ context: { birthYearMonth: '2000-01' } })).status).toBe(409)
-    await db.instrumentAuthorization.updateMany({ where: { instrumentKey: key }, data: { status: 'APPROVED' } })
+    const fresh = await request({ context: { birthYearMonth: '2000-01' } })
+    expect(fresh.status).toBe(200)
+    expect(fresh.body.data.assessment.id).not.toBe(id)
+    expect(admissionModule.readStoredScaleAdmission(await db.assessment.findUniqueOrThrow({ where: { id: fresh.body.data.assessment.id } }))?.scalePolicy?.deployment)
+      .toMatchObject({ basis: 'DEPLOYMENT_IDENTITY' })
   })
 
 
@@ -182,7 +177,7 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
       answers: source.executable.goldenCases[0].answers }
     const { submitUnifiedScaleAssessmentFinal } = await import('../../modules/scale/unified-final-submit.service')
     const child = await db.assessment.findUniqueOrThrow({ where: { id: assessment.id }, include: { scale: true } })
-    await db.instrumentAuthorization.updateMany({ where: { instrumentKey: key }, data: { status: 'REVOKED' } })
+    expect(await db.instrumentAuthorization.count({ where: { instrumentKey: key } })).toBe(0)
     const completed = await submitUnifiedScaleAssessmentFinal(payload, child as any)
     expect(completed.replayed).toBe(false)
     expect(JSON.stringify(completed.assessment)).not.toContain('"scores"')
@@ -196,7 +191,6 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
       expect(replay.replayed).toBe(true)
       expect(JSON.stringify(replay.assessment)).not.toContain('"scores"')
     } finally { clock.mockRestore() }
-    await db.instrumentAuthorization.updateMany({ where: { instrumentKey: key }, data: { status: 'APPROVED' } })
   })
 
   it('evaluates subject facts, never respondent age, consistently across all four modes', async () => {
@@ -278,8 +272,28 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
 
 
   it('rolls back retirement when a replacement deployment cannot be written', async () => {
-    await expect(install.installScaleInstrument(db, { ...input, actorUserId: randomUUID(), deploymentPolicy: { ...input.deploymentPolicy, revision: 2 } })).rejects.toThrow()
     const { readActiveScaleDeployment, readScaleDeploymentRevision } = await import('../../modules/scale/deployment/repository')
+    let retiredInsideTransaction = false
+    const failing = new Proxy(db, { get(target, property) {
+      if (property === '$transaction') return (work: (tx: Prisma.TransactionClient) => Promise<unknown>, options: unknown) =>
+        target.$transaction(async tx => work(new Proxy(tx, { get(transaction, key) {
+          const value = Reflect.get(transaction, key)
+          if (key === '$executeRaw') return async (...args: unknown[]) => {
+            const sql = args[0] as {sql?: string; strings?: readonly string[]}
+            if ((sql.sql ?? sql.strings?.join('?') ?? '').includes('INSERT INTO "scale_deployment_policies"')) {
+              retiredInsideTransaction = await readActiveScaleDeployment(tx, scaleId) === null
+              throw new Error('synthetic replacement write failed after real retirement')
+            }
+            return value.apply(transaction, args)
+          }
+          return typeof value === 'function' ? value.bind(transaction) : value
+        } })), options as Parameters<PrismaClient['$transaction']>[1])
+      const value = Reflect.get(target, property)
+      return typeof value === 'function' ? value.bind(target) : value
+    } })
+    await expect(install.installScaleInstrument(failing, { ...input, deploymentPolicy: { ...input.deploymentPolicy, revision: 2 } }))
+      .rejects.toThrow('synthetic replacement write failed after real retirement')
+    expect(retiredInsideTransaction).toBe(true)
     expect((await readActiveScaleDeployment(db, scaleId))?.revision).toBe(1)
     expect(await readScaleDeploymentRevision(db, scaleId, 2)).toBeNull()
   })
@@ -293,7 +307,7 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
   it('verifies backfill resume and rollback against live deployment and immutable revision history', async () => {
     const { applyScaleOnboardingBackfill, rollbackScaleOnboardingBackfill } = await import('../../modules/scale/onboarding/backfill')
     const { readActiveScaleDeployment } = await import('../../modules/scale/deployment/repository')
-    const plan = { schemaVersion: 1, actorUserId: actor, entries: [{ instrumentKey: key, instrumentVersion: '1.0.0', deploymentPolicy: { ...input.deploymentPolicy, revision: 2 } }] }
+    const plan = { schemaVersion: 1, actorUserId: publisher, entries: [{ instrumentKey: key, instrumentVersion: '1.0.0', deploymentPolicy: { ...input.deploymentPolicy, revision: 2 } }] }
     let journal: unknown
     await expect(applyScaleOnboardingBackfill({ db, plan, onCheckpoint: next => {
       if (next.entries[0].status === 'APPLIED') throw new Error('simulated checkpoint write failure after commit')

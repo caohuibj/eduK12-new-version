@@ -14,7 +14,7 @@ import { publishContentRelease,requirePublishedContentRelease } from '../measure
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import {recheckCatalogSjtSourceAuthority,recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
+import {recheckCatalogSjtSourceAuthority,type SourceAnswerMapping} from './catalog.sources'
 import { freezeSurveyMeasurementNotice,type SurveyMeasurementNotice } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -374,7 +374,6 @@ export async function freezeResearchWaveDraft(input:{
       metadata:{waveId:input.waveId,publicationId,definitionDigest:digest,
         runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
-    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     await recheckCatalogSjtSourceAuthority(tx,sources.values())
     return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })

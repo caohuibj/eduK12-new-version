@@ -7,7 +7,7 @@ import { qualificationAllowsScientificMaturity } from '../../assessment-governan
 import { evaluateScaleProductReadiness } from '../library/product-readiness'
 import { projectScalePackage } from './define-instrument'
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
-import { listScaleInstrumentAuthorizations, readActiveScaleDeployment } from '../deployment/repository'
+import { readActiveScaleDeployment } from '../deployment/repository'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
 import { getScaleInstrumentSource } from './instrument-registry'
 import { planScaleInstrumentInstall } from './install'
@@ -47,12 +47,9 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
     blockers.push(...install.blockers)
     if (install.referenceCreates.length) blockers.push('REFERENCES_NOT_INSTALLED')
   }
-  const authorizations = active ? (await listScaleInstrumentAuthorizations(db, input.instrumentKey, input.instrumentVersion))
-    .filter(row => active.authorizationRefs.includes(row.authorizationId)) : []
   const proof = {
-    schemaVersion: 1, identity: source.identity, actorUserId: input.actorUserId, scaleId: scale?.id ?? null,
+    schemaVersion: 2, identity: source.identity, actorUserId: input.actorUserId, scaleId: scale?.id ?? null,
     definitionHash: hashScaleDefinition(source.executable.definition), sourceHash: canonicalHash({ ...source, executable: { ...source.executable, scorerPlugins: source.executable.scorerPlugins?.map(({ key, version }) => ({ key, version })) ?? [] } }),
-    authorizationStateHash: canonicalHash(authorizations),
     deploymentPolicyHash: active?.policyHash ?? null, deploymentRevision: active?.revision ?? null,
     scientificMaturity: source.catalog.scientificMaturity, qualification,
     visibility: input.visibility, previousStatus: scale?.status ?? null, previousVisibility: scale?.visibility ?? null,

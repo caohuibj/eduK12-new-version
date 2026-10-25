@@ -84,7 +84,7 @@ function harness(standard = false) {
   return { db, state, auth, rehash, registered, preview, apply }
 }
 beforeEach(() => vi.clearAllMocks())
-describe('controlled legacy Scale conversion through real validators/compiler/license/release repository', () => {
+describe('controlled legacy Scale conversion through real validators/compiler/deployment/release repository', () => {
   it('previews one named source without changing publication, pointer, facts or assets', async () => {
     const h = harness(), before = structuredClone(h.state); const plan = await h.preview()
     expect(plan.proof).toMatchObject({ objectCount: 1, historicalRecordWrites: 0, originalDefinitionWrites: 0, source: { recordedHashScheme: 'LEGACY_UNRECORDED' } })
@@ -112,12 +112,12 @@ describe('controlled legacy Scale conversion through real validators/compiler/li
     const h = harness(); h.state.scale.status = status
     await expect(h.apply()).rejects.toThrow('SOURCE_NOT_PUBLISHED'); expect(h.state.releases.size).toBe(0)
   })
-  it('refuses other owner, projected admin, expired account and unproven custom license', async () => {
+  it('refuses other owner, projected admin and expired account without using license descriptions as permission', async () => {
     const h = harness(); h.state.scale.creatorId = 'other'; await expect(h.preview()).rejects.toThrow('AUTHOR_REQUIRED')
     h.state.scale.creatorId = 'author'; h.state.actor.role = 'ADMIN'; await expect(h.preview()).rejects.toThrow('AUTHOR_REQUIRED')
     h.state.actor.role = 'TEACHER'; h.state.actor.expires_at = at; await expect(h.preview()).rejects.toThrow('ACTOR_UNAVAILABLE')
     h.state.actor.expires_at = null; h.state.scale.definition.license.redistribution = 'unknown'; h.state.scale.definitionHash = null
-    await expect(h.preview()).rejects.toThrow('CUSTOM_SOURCE_RIGHTS_UNPROVEN')
+    await expect(h.preview()).resolves.toHaveProperty('proof')
   })
   it('rejects changed source, mismatched hash, missing scorer and existing mapping', async () => {
     const h = harness(), plan = await h.preview(); h.state.scale.updatedAt = new Date(at.getTime() + 1000)
@@ -126,27 +126,28 @@ describe('controlled legacy Scale conversion through real validators/compiler/li
     h.state.scale.definitionHash = null; h.state.scale.definition.scoring.scorerKey = 'missing-plugin'; await expect(h.preview()).rejects.toThrow('DEFINITION_INVALID')
     h.state.scale.measurementReleaseId = 'other'; await expect(h.preview()).rejects.toThrow('ALREADY_MAPPED')
   })
-  it('publishes STANDARD through real compiler, hashed current rights and existing publication identity', async () => {
+  it('publishes STANDARD through real compiler, hashed deployment identity and existing publication identity', async () => {
     const h = harness(true), plan = await h.preview()
-    expect(plan.proof.sourceRights?.authorization?.authorizationId).toBe(h.auth.authorizationKey)
+    expect(plan.proof.sourceDeploymentIdentity?.basis).toBe('DEPLOYMENT_IDENTITY')
+    expect(plan.proof).not.toHaveProperty('sourceRights');expect(h.db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
     expect(plan.proof.standardPublicationProofHash).toMatch(/^[a-f0-9]{64}$/)
     const result = await h.apply(), release = h.state.releases.get(result.measurementReleaseId)
     expect(release.provenance).toEqual({ sourceIdentity: h.registered.identity }); expect(release.scope).toEqual({ kind: 'PLATFORM', ownerId: 'author' })
     expect(h.state.calls.findIndex(s => s.includes('pg_advisory_xact_lock_shared'))).toBeLessThan(h.state.calls.findIndex(s => s.includes('FROM users')))
   })
-  it('denies absent managed deployment or revoked/tampered license', async () => {
+  it('denies absent managed deployment without reading revoked or tampered historical licenses', async () => {
     const h = harness(true); h.state.active = false; await expect(h.preview()).rejects.toThrow('STANDARD_PUBLICATION_BLOCKED')
-    h.state.active = true; h.auth.status = 'REVOKED'; h.rehash(); await expect(h.preview()).rejects.toThrow('STANDARD_PUBLICATION_BLOCKED')
-    h.auth.status = 'APPROVED'; h.auth.recordHash = 'b'.repeat(64); await expect(h.preview()).rejects.toThrow('LICENSE_HASH_MISMATCH')
+    h.state.active = true; h.auth.status = 'REVOKED'; h.rehash(); await expect(h.preview()).resolves.toHaveProperty('proof')
+    h.auth.status = 'APPROVED'; h.auth.recordHash = 'b'.repeat(64); await expect(h.preview()).resolves.toHaveProperty('proof');expect(h.db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
   })
   it('rejects package substitution when measurement-only hash ignores a report change', async () => {
     const h = harness(true); h.state.scale.definition.report.disclaimer += ' changed'
     expect(hashScaleDefinition(h.state.scale.definition)).toBe(h.state.scale.definitionHash)
     await expect(h.preview()).rejects.toThrow('REGISTRY_DEFINITION_MISMATCH')
   })
-  it('rechecks elapsed expiry after release waits and aborts', async () => {
-    const h = harness(true); h.state.expireOnRelease = true; await expect(h.apply()).rejects.toThrow('MANAGED_SOURCE_LICENSE_REQUIRED')
-    expect(h.state.releases.size).toBe(0); expect(h.state.scale.measurementReleaseId).toBeNull()
+  it('ignores license expiry after waits while retaining account expiry', async () => {
+    const h = harness(true); h.state.expireOnRelease = true; await expect(h.apply()).resolves.toHaveProperty('converted',true)
+    expect(h.db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
     const custom = harness(); custom.state.actor.expires_at = new Date('2099-01-01'); custom.state.expireOnRelease = true
     await expect(custom.apply()).rejects.toThrow('ACTOR_UNAVAILABLE')
   })
@@ -172,13 +173,14 @@ describe('controlled legacy Scale conversion through real validators/compiler/li
     const missing={...unit,sourceProvenance:{source:{sourceVersion:'2.0.0'}}}
     expect(()=>surveyMeasurementReleaseInput(missing,'researcher','project')).toThrow('显式版本转换')
   })
-  it('Survey rejects withdrawn source release, current revoked managed license and expiry after later waits',async()=>{
+  it('Survey rejects withdrawn releases but ignores revoked licenses and their elapsed expiry',async()=>{
     const h=harness(true),conversion=await h.apply(),ref={kind:'SCALE' as const,sourceId:'scale',sourceVersion:'1.0.0'}
     const snapshot=await getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},h.db)
     await recheckCatalogScaleSourceExpiry(h.db,[snapshot])
-    h.state.clock=new Date('2100-01-01');await expect(recheckCatalogScaleSourceExpiry(h.db,[snapshot])).rejects.toThrow('LICENSE_EXPIRED')
+    h.state.clock=new Date('2100-01-01');await expect(recheckCatalogScaleSourceExpiry(h.db,[snapshot])).resolves.toBeUndefined()
     h.state.clock=at;h.auth.status='REVOKED';h.rehash()
-    await expect(getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},h.db)).rejects.toThrow('MANAGED_SOURCE_LICENSE_REQUIRED')
+    await expect(getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},h.db)).resolves.toHaveProperty('provenance.sourceDeploymentIdentity.basis','DEPLOYMENT_IDENTITY')
+    expect(h.db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
     h.auth.status='APPROVED';h.rehash();h.state.releases.get(conversion.measurementReleaseId).status='REVOKED'
     await expect(getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},h.db)).rejects.toThrow('RELEASE_NOT_PUBLISHED')
   })

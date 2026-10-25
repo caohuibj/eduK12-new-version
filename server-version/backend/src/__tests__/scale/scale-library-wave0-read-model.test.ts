@@ -144,7 +144,7 @@ describe('Wave 0 Scale Library read model', () => {
     expect(directEnglish.availability.reasons).not.toContain('当前内容语言为 en，不提供 zh-CN 版本。')
   })
 
-  it('keeps deployment and authorization gates fail-closed for PUBLISHED packages', () => {
+  it('allows published deployments without license records but keeps missing deployments closed', () => {
     const model = buildWave0ReadModel({
       locale: 'zh-CN',
       territory: 'CN',
@@ -152,18 +152,18 @@ describe('Wave 0 Scale Library read model', () => {
       deployments: [{ scaleId: 'scale-who5', code: 'who5', instrumentVersion: '1.0.0', status: 'PUBLISHED' }],
     })
     const who5 = model.entries.find((entry) => entry.identity.instrumentKey === 'who5')!
-    expect(who5.availability.status).toBe('RESTRICTED')
-    expect(who5.availability.launch).toBeUndefined()
-    expect(who5.availability.reasons.join(' ')).toContain('授权未满足')
+    expect(who5.availability.status).toBe('AVAILABLE')
+    expect(who5.availability.launch).toEqual({ scaleId: 'scale-who5', route: '/student/scales/scale-who5' })
+    expect(who5.availability.reasons.join(' ')).not.toContain('授权未满足')
     expect(who5.availability.reasons.join(' ')).not.toContain('量表包尚未发布')
-    expect(who5.rights.status).toBe('NOT_GRANTED')
+    expect(who5.rights.status).toBe('NOT_EVALUATED')
 
     const missingDeployment = model.entries.find((entry) => entry.identity.instrumentKey === 'adexi_v1')!
     expect(missingDeployment.availability.status).toBe('NOT_AVAILABLE')
     expect(missingDeployment.availability.reasons.join(' ')).toContain('尚无已发布')
   })
 
-  it('launches only after existing package, deployment, locale, and rights gates pass', () => {
+  it('launches only after existing package, deployment, and locale gates pass', () => {
     const pkg = getScalePackage('adexi_v1', '2.0.0')!
     const originalReleaseStatus = pkg.releaseStatus
     pkg.releaseStatus = 'PUBLISHED'
@@ -179,7 +179,7 @@ describe('Wave 0 Scale Library read model', () => {
       const adexi = model.entries.find((entry) => entry.identity.instrumentKey === 'adexi_v1')!
       expect(adexi.availability.status).toBe('AVAILABLE')
       expect(adexi.availability.launch).toEqual({ scaleId: 'scale-adexi', route: '/student/scales/scale-adexi' })
-      expect(adexi.rights.status).toBe('EVIDENCE_PENDING')
+      expect(adexi.rights.status).toBe('NOT_EVALUATED')
     } finally {
       pkg.releaseStatus = originalReleaseStatus
     }
@@ -201,5 +201,15 @@ describe('Wave 0 Scale Library read model', () => {
     expect(sdqParent.source.citation).toContain('Goodman R.')
     expect(sdqParent.governance?.evidence).toHaveLength(1)
     expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toHaveLength(3)
+  })
+})
+
+describe('retired license projection', () => {
+  it('does not inspect supplied legacy records and never claims approval', () => {
+    const authorizations = new Proxy([], { get() { throw Error('Unexpected license inspection') } })
+    const model = buildScaleLibraryReadModel({ authorizations, viewerRole: 'ADMIN', nowIso: NOW })
+    expect(model.entries.every(entry => entry.rights.status === 'NOT_EVALUATED')).toBe(true)
+    expect(model.entries.every(entry => entry.governance?.authorization === undefined)).toBe(true)
+    expect(model.entries.flatMap(entry => entry.availability.reasons).join(' ')).not.toMatch(/授权未满足|AUTHORIZATION_NOT_READY/)
   })
 })

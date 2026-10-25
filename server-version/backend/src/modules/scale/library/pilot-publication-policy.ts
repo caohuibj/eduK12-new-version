@@ -2,7 +2,7 @@
  * Scale Product Publication Policy.
  *
  * Product release answers one question only: can this exact Scale package run
- * the declared Huisurvey workflow? Rights, locale/deployment fit, respondent
+ * the declared Huisurvey workflow? Locale/deployment fit, respondent
  * applicability and scientific evidence remain valuable governance facts, but
  * they do not turn an otherwise executable product back into DRAFT.
  *
@@ -93,7 +93,8 @@ export interface HardLayerResult {
 export interface PilotPublicationPolicyInput {
   executableCorrectness: HardLayerResult
   /** Governance/deployment diagnostics only; not Product Release blockers. */
-  rights: HardLayerResult
+  /** Legacy input accepted but not evaluated. */
+  rights?: HardLayerResult
   localization: HardLayerResult
   respondentMatch: HardLayerResult
   scientific: ScientificCompletenessSummary
@@ -128,7 +129,6 @@ const collectResearchGaps = (summary: ScientificCompletenessSummary): ResearchGa
 )
 
 const governanceWarnings = (input: PilotPublicationPolicyInput): string[] => [
-  ...input.rights.errors.map((message) => `[rights/governance] ${message}`),
   ...input.localization.errors.map((message) => `[localization/deployment] ${message}`),
   ...input.respondentMatch.errors.map((message) => `[respondent/deployment] ${message}`),
 ]

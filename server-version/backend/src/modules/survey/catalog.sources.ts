@@ -42,10 +42,6 @@ export class CatalogSourceError extends Error {
 }
 const fail=(code:string):never=>{throw new CatalogSourceError(code)}
 const copy=<T>(value:T):T=>JSON.parse(JSON.stringify(value))
-function rights(value:{status:string;redistribution:string}|undefined){
-  if(!value||!['verified','authorized','self_authored'].includes(value.status)||value.redistribution!=='allowed')
-    fail('SOURCE_RIGHTS_DO_NOT_ALLOW_SURVEY_REDISTRIBUTION')
-}
 function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unknown,compiled:unknown,
   scoringDigest:string|null,provenance:Record<string,unknown>,answerMapping?:SourceAnswerMapping):CatalogSourceSnapshot {
   return copy({ref,title,displayDefinition:assertSurveyDraft(ref.kind,display,true),compiledDefinition:compiled,
@@ -55,7 +51,6 @@ function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unk
 /** Only presentation identifiers are translated. The canonical score definition is copied byte-for-byte. */
 export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2,
   options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'}={}):CatalogSourceSnapshot {
-  rights(definition.license)
   const valid=validateScaleDefinition(definition,{instrumentClass:options.instrumentClass??'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
   // The canonical Training publisher also rejects randomization: never silently flatten it.
@@ -72,7 +67,6 @@ export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:S
  * ALL_AT_ONCE. This adapter is only used to verify an existing immutable grant;
  * new grants always receive the canonical consumption protocol above. */
 function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2):CatalogSourceSnapshot {
-  rights(definition.license)
   const valid=validateScaleDefinition(definition,{instrumentClass:'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
   if(definition.display?.randomizeItems||definition.items.some(i=>i.type!=='single'||!i.required||i.images?.length||i.video||i.randomizeOptions))
@@ -94,13 +88,31 @@ function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:Sc
   return snapshot(ref,title,definition,display,definition,canonicalHash(definition.scoring),
     {source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true},answerMapping)
 }
+/** Read-only compatibility for the historical raw-channel adapter that mislabeled
+ * unknown copyright metadata. Never use this projection for a new grant/write. */
+function preserveHistoricalSjtLicenseProjection(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  const now=current.displayDefinition as {licenseStatus?:string},old=stored.displayDefinition as {licenseStatus?:string}
+  const definition=stored.compiledDefinition as {license?:{status?:string}}
+  if(stored.ref.kind==='SJT'&&stored.adapterVersion===CATALOG_ADAPTER_VERSION&&current.adapterVersion===CATALOG_ADAPTER_VERSION
+    &&definition.license?.status==='unknown'&&now.licenseStatus==='unknown'&&old.licenseStatus==='authorized')
+    return {...current,displayDefinition:{...now,licenseStatus:'authorized'}}
+  return current
+}
 export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  if(Object.prototype.hasOwnProperty.call(stored.provenance,'sourceRights')&&!Object.prototype.hasOwnProperty.call(stored.provenance,'sourceDeploymentIdentity')){
+    const legacy=stored.provenance.sourceRights as Record<string,unknown>|null
+    const identity=current.provenance.sourceDeploymentIdentity as Record<string,unknown>|null
+    if(legacy&&identity&&['runtimePolicyHash','deploymentPolicyHash','deploymentRevision'].some(key=>legacy[key]!==identity[key]))fail('SOURCE_SNAPSHOT_CHANGED')
+    const {sourceDeploymentIdentity: _identity,...provenance}=current.provenance
+    current={...current,provenance:{...provenance,sourceRights:stored.provenance.sourceRights}}
+  }
   if(stored.ref.kind==='SJT'&&stored.adapterVersion===CATALOG_ADAPTER_VERSION&&current.adapterVersion===ONLINE_SJT_ADAPTER_VERSION){
     // A previously admitted raw-channel projection keeps its original digest.
     // New online grants must not rewrite that immutable presentation on recheck.
-    return adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
-      String(current.provenance.definitionHash))
+    return preserveHistoricalSjtLicenseProjection(adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
+      String(current.provenance.definitionHash)),stored)
   }
+  current=preserveHistoricalSjtLicenseProjection(current,stored)
   if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION||isGovernedSource(stored.ref.sourceId))return current
   const legacy=adaptLegacyCatalogScale(current.ref,current.title,current.compiledDefinition as ScaleDefinitionV2)
   return {...current,...legacy,provenance:{...current.provenance,...legacy.provenance}}
@@ -108,7 +120,6 @@ export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:Ca
 /** Exact authorized scoring plane. Online sources retain their validated shared
  * presentation; legacy sources keep the original narrow raw-channel adapter. */
 export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationPackage):CatalogSourceSnapshot {
-  rights(pkg.definition.license)
   if(pkg.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
   const validation=validateSituationPackage(pkg)
   if(!validation.valid)fail('SOURCE_SJT_INVALID')
@@ -166,7 +177,7 @@ function adaptLegacyCatalogSjt(ref:CatalogSourceRef,title:string,d:SituationDefi
   if(visited.size!==nodes.size||scenes.length!==d.scenes.length||new Set(scenes.map(s=>s.sceneKey)).size!==scenes.length)fail('SOURCE_SJT_FLOW_UNSUPPORTED')
   const seen=new Set<string>()
   const display={schemaVersion:2,respondentType:d.respondentType,title,author:d.source.citation||d.source.title||title,
-    sourceNote:d.source.citation||d.source.title||title,licenseStatus:d.license.status==='self_authored'?'self_authored':'authorized',
+    sourceNote:d.source.citation||d.source.title||title,licenseStatus:d.license.status==='unknown'?'unknown':d.license.status==='self_authored'?'self_authored':'authorized',
     redistribution:d.license.redistribution,orderPolicy:'FIXED',metrics:d.scoring.publishedMetrics.map(m=>({metricKey:m.key,label:m.label,direction:'descriptive'})),
     scoring:{modelKey:model.modelKey,modelVersion:'1',sourceNote:d.source.citation||title},
     scenes:scenes.map(s=>({sceneKey:s.sceneKey,title:s.title,stimulus:s.stimulus.text,questions:s.channels.map(c=>{
@@ -238,8 +249,8 @@ export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:Cat
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
   const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
-  // Source advisory locks must precede Scale row locks. A queued license writer
-  // would otherwise invert the explicit converter's source -> Scale order.
+  // Source advisory locks must precede Scale row locks, preserving the explicit
+  // converter's source -> Scale order while identities are verified.
   const scaleIds=ids('SCALE')
   const before=scaleIds.length?await db.$queryRaw<Array<{id:string;code:string;instrument_version:string;instrument_class:string}>>(Prisma.sql`SELECT id,code,instrument_version,instrument_class::text FROM scales WHERE id IN (${Prisma.join(scaleIds)}) ORDER BY id`):[]
   for(const row of [...before].filter(row=>row.instrument_class==='STANDARD').sort((a,b)=>a.code.localeCompare(b.code)||a.instrument_version.localeCompare(b.instrument_version)))
@@ -278,7 +289,7 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     catch(error){if(error instanceof ContentReleaseError)fail(error.code.replace('CONTENT_SCALE_SOURCE_','SOURCE_SCALE_'));throw error}
     const result=adaptCatalogScale(ref,row!.name,definition)
     return {...result,provenance:{...result.provenance,code:row!.code,instrumentClass:row!.instrumentClass,
-      sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceRights:admitted.rights}}
+      sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceDeploymentIdentity:admitted.deploymentIdentity}}
   }
   if(ref.kind==='SJT'){
     let pkg:SituationPackage|undefined
@@ -420,20 +431,11 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   }
 }
 
-/** Current grants/sources were already verified and SHARE-locked by this caller.
- * Only elapsed time can change now. Reuse the verified snapshot after later
- * publication/asset waits instead of rereading/compiling entire packages. */
-export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
-  const managed=[...snapshots].filter(snapshot=>snapshot.ref.kind==='SCALE'&&snapshot.provenance.instrumentClass==='STANDARD'&&!snapshot.provenance.surveyStandardReleaseId)
-  if(!managed.length)return
-  const [clock]=await db.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
-  if(!clock)fail('SOURCE_SCALE_CLOCK_UNAVAILABLE')
-  for(const snapshot of managed){
-    const rights=snapshot.provenance.sourceRights as {validFrom?:string;validTo?:string}|undefined
-    const from=Date.parse(rights?.validFrom??''),to=Date.parse(rights?.validTo??'')
-    if(!Number.isFinite(from)||!Number.isFinite(to)||clock.now.getTime()<from||clock.now.getTime()>=to)fail('SOURCE_SCALE_LICENSE_EXPIRED')
-  }
-}
+/** @deprecated Copyright expiry is no longer a gate. Kept only for old callers.
+ * First source verification already holds transaction-scoped source identity,
+ * Scale/deployment and measurement-release SHARE locks. No mutable license
+ * clock condition remains, so do not repeat identity SQL after later waits. */
+export async function recheckCatalogScaleSourceExpiry(_db:Prisma.TransactionClient,_snapshots:Iterable<CatalogSourceSnapshot>):Promise<void> {}
 
 /** Same-transaction final fence after asset/publication waits. The pinned grant
  * never changes to another grant; frozen participant reads do not call this. */

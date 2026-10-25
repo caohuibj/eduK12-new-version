@@ -12,9 +12,8 @@ import type { ResearchFrozenPublication } from '../../modules/survey/publication
 import { validateSituationPackage, type SituationPackage } from '../../modules/situational/situation-package'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 const h = vi.hoisted(() => ({ own: vi.fn(), authority: vi.fn(),collection:vi.fn(),tx:{scope:'public-projection-unit-fixture'} }))
-// This file tests public projection and source adaptation. Current collection
-// authority has its own real PG/lock contracts; model that explicit boundary
-// here, including refusal, rather than silently borrowing a database grant.
+// This file tests public projection after server admission. Current participant
+// credentials still gate access; later tool withdrawal only stops new admission.
 vi.mock('../../config/database',()=>({prisma:{$transaction:async(work:(tx:unknown)=>unknown)=>work(h.tx)}}))
 vi.mock('../../modules/survey/scale-collection-guard',()=>({assertSurveyScaleCollectionAllowed:h.collection}))
 vi.mock('../../modules/situational/entry-authority', async original => ({...await original<object>(),assertSjtEntryDistributionAuthority:h.authority}))
@@ -65,18 +64,24 @@ describe('authorized online SJT uses the shared Training protocol core', () => {
     const { snapshot } = publication(published())
     h.own.mockResolvedValue({ status: 'STARTED', attemptId: 'attempt', waveId: 'wave', compiledSnapshot: snapshot, definitionDigest: canonicalHash(snapshot) })
     const task = await getOwnResearchTask({ publicId: 'public', attemptId: 'attempt', accessCredential: 'synthetic' })
-    expect(h.collection).toHaveBeenCalledExactlyOnceWith(h.tx,snapshot)
+    expect(h.collection).not.toHaveBeenCalled()
     const serialized = JSON.stringify(task)
     expect(task.units[0]).toMatchObject({ kind: 'SJT', schemaVersion: 2, orderPolicy: 'FIXED' })
     expect(serialized).toContain('MULTIPLE'); expect(serialized).toContain('"allowRefusal":true')
     for (const key of ['contributions', 'expertKey', 'scoring', 'compiledDefinition']) expect(serialized).not.toContain('"' + key + '"')
   })
-  it('keeps the public projection closed when the current collection gate refuses',async()=>{
+  it('keeps the admitted frozen task available after later tool withdrawal',async()=>{
     const {snapshot}=publication(published())
     h.own.mockResolvedValue({status:'STARTED',attemptId:'attempt',waveId:'wave',compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)})
     h.collection.mockRejectedValueOnce(Object.assign(new Error('CURRENT_EXACT_GRANT_REVOKED'),{statusCode:403}))
-    await expect(getOwnResearchTask({publicId:'public',attemptId:'attempt',accessCredential:'synthetic'})).rejects.toMatchObject({statusCode:403,message:'CURRENT_EXACT_GRANT_REVOKED'})
-    expect(h.collection).toHaveBeenCalledExactlyOnceWith(h.tx,snapshot)
+    const task=await getOwnResearchTask({publicId:'public',attemptId:'attempt',accessCredential:'synthetic'})
+    expect(task.units[0]).toMatchObject({kind:'SJT',schemaVersion:2})
+    expect(h.collection).not.toHaveBeenCalled()
+  })
+  it('still rejects an invalid current participant credential before projecting frozen content',async()=>{
+    h.own.mockRejectedValueOnce(Object.assign(new Error('ATTEMPT_CREDENTIAL_INVALID'),{statusCode:403}))
+    await expect(getOwnResearchTask({publicId:'public',attemptId:'attempt',accessCredential:'invalid'})).rejects.toMatchObject({statusCode:403,message:'ATTEMPT_CREDENTIAL_INVALID'})
+    expect(h.collection).not.toHaveBeenCalled()
   })
   it('rejects forged display, forged scoring, missing required answer and illegal selection', () => {
     const pkg = published(), broken = structuredClone(pkg)
@@ -96,6 +101,20 @@ describe('authorized online SJT uses the shared Training protocol core', () => {
     image.display.scenes[0].image = { asset: { assetId: 'image', contentHash: 'a'.repeat(64), mimeType: 'image/png' }, altText: '情境图', rightsStatus: 'self_authored', rightsNote: 'synthetic' }
     expect((publication(published(image)).imported.displayDefinition as any).scenes[0].image).toEqual(image.display.scenes[0].image)
     expect(() => adaptCatalogSjt({ ...ref, sourceId: 'registry:unbound' }, 'SJT', published(image))).toThrow('SOURCE_SJT_ONLINE_MEDIA_REQUIRES_AUTHORIZED_DELIVERY')
+  })
+  it('preserves unknown copyright for new raw-channel imports and keeps historical bytes/hash unchanged', () => {
+    const document: any = structuredClone(fixture)
+    document.display.licenseStatus='unknown';document.display.redistribution='unknown'
+    document.display.scenes = [{ ...document.display.scenes[0], sceneKey: 'sjt_q_first', questions: [{ ...document.display.scenes[0].questions[0], required: true, allowRefusal: false }] }]
+    document.goldenCases = [{ name: 'first option', responses: [{ sceneKey: 'sjt_q_first', channelKey: 'first', status: 'ANSWERED', responseValue: ['a'] }], expected: { cooperation: 1 } }]
+    const pkg=published(document),current=adaptCatalogSjt(ref,'unknown source',{...pkg,online:undefined})
+    expect((current.displayDefinition as any).licenseStatus).toBe('unknown')
+    expect((current.compiledDefinition as any).license.status).toBe('unknown')
+    const historical=structuredClone(current);(historical.displayDefinition as any).licenseStatus='authorized'
+    const original=JSON.stringify(historical),hash=canonicalHash(historical)
+    expect(catalogAdapterForRecheck(current,historical)).toEqual(historical)
+    expect(JSON.stringify(historical)).toBe(original);expect(canonicalHash(historical)).toBe(hash)
+    expect((current.displayDefinition as any).licenseStatus).toBe('unknown')
   })
   it('rechecks an existing raw-channel grant with its original adapter identity', () => {
     const document: any = structuredClone(fixture)
