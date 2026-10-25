@@ -18,6 +18,10 @@ import type {ResearchFrozenPublication} from '../../modules/survey/publication.s
 import {compileSjtNativeV1Fixture,createSjtNativeV1ScientificDeclaration} from '../fixtures/sjt-native-v1.fixture'
 import {createSjtNativeStagedPackage} from '../fixtures/sjt-native-staged.fixture'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integration/integration-env'
+import {compileSjtTemplate} from '../../modules/situational/authoring/template'
+import {createSjtDraft,requestSjtReview,reviewSjtDraft} from '../../modules/situational/authoring/service'
+import {sjtNativeStagedTemplate} from '../fixtures/sjt-native-staged.fixture'
+import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
 
 const registry=vi.hoisted(()=>({packages:[] as import('../../modules/situational/situation-package').SituationPackage[]}))
 vi.mock('../../modules/situational/situation-package.registry',async original=>{
@@ -49,6 +53,33 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   registry.packages=[compileSjtNativeV1Fixture().package,createSjtNativeStagedPackage()].map(p=>({...p,releaseStatus:'PUBLISHED'}))
  })
  afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect();vi.unstubAllEnvs()})
+ it('qualifies a real synthetic V2 author release and preserves concurrent child replay plus the configured report',async()=>{
+  const template={...structuredClone(sjtNativeStagedTemplate),instrumentKey:'synthetic-author-governed-'+randomUUID()},compiled=compileSjtTemplate(template)
+  const draft=await createSjtDraft({userId:manager,admin:false},template,{authorizationPolicy:null})
+  await requestSjtReview({userId:manager,admin:false},draft.id,draft.revision,draft.contentDigest)
+  await reviewSjtDraft({userId:system,admin:true},draft.id,draft.revision,draft.contentDigest,true,'Synthetic independently approved source')
+  const release=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:template.instrumentKey}}),source={kind:'SJT' as const,sourceId:release.id,sourceVersion:release.instrumentVersion}
+  const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'1',title:'Synthetic actual author release',report:{version:'r1',template:{blocks:[{type:'METRIC',metricKey:'coordination',display:'RAW'}],limitations:[]}},reference:{}},proof)
+  expect((await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic governing approval'},proof)).state).toBe('ONLINE')
+  await changeSurveyToolPolicy(manager,{...governedPolicyIdentity(await governedRow(db,submitted.id)),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic exact source grant'})
+  const grant=await grantCatalogSource(manager,owner,{kind:'SJT',sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash}),projectId=randomUUID()
+  await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic actual source',collectionMode:'SINGLE_UNLINKED'}})
+  const imported=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Synthetic native'})
+  const wave=await createWave(owner,projectId,{requestId:randomUUID(),title:'Synthetic author wave',consentText:'Synthetic isolated consent with no actual participant.',generalText:'Synthetic',instrumentIds:[imported.id],allowNewParticipants:true})
+  await prepareWave(owner,projectId,wave.id,wave.revision);const prepared=await getWave(owner,projectId,wave.id),opened=await openWave(owner,projectId,wave.id,prepared.revision)
+  const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:opened.publicationId!}}),unit=(publication.compiledSnapshot as unknown as ResearchFrozenPublication).units[0]
+  expect(unit.nativeSituational!.definitionHash).toBe(compiled.definitionHash)
+  const attempt=await startSingleUnlinkedWave({publicId:opened.publicId,waveId:wave.id,entryToken:opened.entrySecret,consentVersion:1,consent:true}),p={publicId:opened.publicId,attemptId:attempt.attemptId,accessCredential:attempt.accessCredential}
+  const child=await startSurveySituational(p,'native'),input={submissionId:randomUUID(),attemptEpoch:1,definitionHash:unit.nativeSituational!.definitionHash,...syntheticNativeSituationalSubmission(unit,0,child.attempt.id)}
+  const receipts=await Promise.all([submitSurveySituationalFinal(p,'native',child.attempt.id,input),submitSurveySituationalFinal(p,'native',child.attempt.id,input)])
+  expect(receipts[0].receipt).toEqual(receipts[1].receipt)
+  expect((await readSurveySituational(p,'native',child.attempt.id)).receipt).toEqual(receipts[0].receipt)
+  const command={...p,submissionId:randomUUID(),answers:{native:{}},situationalReferences:[receipts[0].receipt!]}
+  await submitResearchFinal(command);await submitResearchFinal(command)
+  const final=await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:attempt.attemptId}})
+  expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
+  expect((await readSurveyStoredReport(owner,{projectId,waveId:wave.id,finalId:final.id,instrumentKey:'native'})).report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',value:5}))
+ },60000)
  it.each([1,2])('completes v%i approval/trials, exact grant, frozen child/parent receipts and old-attempt recovery',async version=>{
   const pkg=registry.packages[version-1],source={kind:'SJT' as const,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion}
   await expect(grantCatalogSource(manager,owner,source)).rejects.toThrow()

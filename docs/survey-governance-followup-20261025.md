@@ -61,9 +61,20 @@ request-local `verifySurveyFinalPublication`、selectedSnapshot、collection sto
 
 ## 政策边界
 
-21–24 待讨论：不扩 material.distribute 权限，不改撤权效力，不迁移三轴/文献模型，
-不统一物化/异步报告或改变反馈时机。25 已决定本期不新增双人审批，保留单人系统
-管理员的 MFA、原因、范围、时效、审计及撤销校验。School/Teacher 不扩展治理。
+最新用户决定覆盖先前“21–24 均待讨论”的历史状态：
+
+- 21 已选 B：正式入口管理员分配所有**本入口已准入**的精确版本；受委托人员仍需
+  精确能力许可。先证明 Training 入口准入判定，不以全球 ONLINE 代替；不批量改生产授权。
+- 22 已决定立即停止：受影响授权/版本撤销须阻止新准入及后续采集/提交，保留数据。
+  现有代码/旧测试的“已开始默认可继续”是待修改差异，不再是新设计目标。历史报告
+  是否停止展示仍待澄清，不扩大为删除。
+- 23 三轴/Reference 模型仍讨论，需列效率与代价方案；不自动做大迁移。
+- 24 已选 B 按需生成；三层在开始时锁定，共享不可变参数/模板引用方向确定。
+  最小事实、旧整包物化迁移/历史重建仍待设计，不删除 artifact 或最终事实，不默认异步。
+- 25 本期单人系统管理员授权，保留 MFA、原因、范围、时效、审计及撤销校验，不新增双人规则。
+
+School/Teacher 不扩展治理。21/22 的新政策修订需单列完整受影响消费者与验证，不能
+把当前行为的回归通过标成新政策完成。
 
 ## 01 实际施测顺序
 
@@ -130,3 +141,34 @@ native 合成数据留在同一测试库失败。随后新建 schema-only 合成
 追加发布预算案例 1/1 通过。原始证据：`03-budget-unit.json`、
 `03-budget-read.json`、`03-governed-postgres.json`、
 `03-governed-postgres-empty-scope.json`、`03-budget-publication-postgres.json`。
+
+## 并发会话归属与证据修订
+
+00:54–00:56 UTC 同 checkout 的另一个恢复会话提交了 `cac178f7`、`e2f81200`。
+已保留，未 reset 或覆盖。其 `docs/pr354-followup.md` 是历史执行记录；本文件为
+融合路线/当前状态的唯一入口。native helper 被等价提取为可复用的合成输入生成器，
+PG 测试文件也被替换成 registry/scientific seam 版本。因此上节本会话原始 PG JSON
+保留为当时源码执行，不伪称当前测试文件完整复现那份旧报告。
+
+当前另外新增一个不覆盖原 cases 的 V2 实际 author-release 案例，验证来源审批、
+治理 trial、真正新授权/冻结、并发 native child 提交/回执恢复、parent 重放、单份
+raw 与配置报告值 5；`02-native-author-current.json` 1/1 通过。另一个会话的两项
+registry PG 结果按其独立 `/tmp/eduk12-*` 原件/来源保留，不声称由本会话重跑。
+
+## D：08–11 同事务减工与 13 渲染索引
+
+严格 governed APPROVED 校验后仍逐次检查 sourceGrant ACTIVE，再跳过同事务较弱
+policy 重读；其他来源/暂停检查不变。Survey 管理员复用 assertEntryAdmin 的
+STANDARD/user/grant 锁与有效性证明，系统管理员 library 例外不变。
+
+packageBoundCatalogSnapshots 在一次调用中按 exact tool ID/hash 复用已锁定父包；
+每个成员仍验绑定身份、定义和 hash，下一请求重新验证。冻结准入只读一次项目
+owner，逐项 live grant 保留；FINAL 复用已选择 snapshot。报告每次渲染建立字段/
+missing/metric 索引。没有跨请求权限缓存。
+
+证据：72 个既有受影响 FINAL/策略合同通过，5 个新事务复用断言（不同请求重验、
+成员/身份篡改、不同 hash、历史读、逐 grant 检查）通过；当前新鲜 schema-only
+合成库中 21 个治理 PG 案例全部通过，包括权限、整包、原子失败/重试、报告预算。
+输入变化使这组 DB 消费者需要复验，不是重复无关检查。证据为
+`08-11-contracts.json`、`08-11-reuse.json`、`08-11-postgres.json`。
+这些是冗余减少与正确性证据，尚无 CPU/时延普遍提速结论。

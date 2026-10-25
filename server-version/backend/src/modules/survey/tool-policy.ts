@@ -32,6 +32,12 @@ export async function readToolPolicy(tx:Prisma.TransactionClient,identity:Policy
   WHERE resource_key=${identity.resourceKey} AND fingerprint=${identity.fingerprint} ${lock?Prisma.sql`FOR SHARE`:Prisma.empty}`)
  return rows[0]??{decision:'PENDING',paused:false,version:0,reason:'尚未进行 Survey 范围审批'}
 }
+/** Current list hints only, never an authority cache or an action proof. */
+export async function readToolPolicies(tx:Prisma.TransactionClient,identities:readonly PolicyIdentity[]){
+ if(!identities.length)return new Map<string,ToolPolicy>()
+ const rows=await tx.$queryRaw<Array<ToolPolicy&{resource_key:string;fingerprint:string}>>(Prisma.sql`SELECT resource_key,fingerprint,decision,paused,version,reason FROM survey_tool_policies WHERE (resource_key,fingerprint) IN (${Prisma.join(identities.map(i=>Prisma.sql`(${i.resourceKey},${i.fingerprint})`))})`)
+ return new Map(identities.map(i=>[i.resourceKey+':'+i.fingerprint,rows.find(r=>r.resource_key===i.resourceKey&&r.fingerprint===i.fingerprint)??{decision:'PENDING' as const,paused:false,version:0,reason:'尚未进行 Survey 范围审批'}]))
+}
 export async function assertSurveyToolPolicy(tx:Prisma.TransactionClient,identity:PolicyIdentity,requireApproval:boolean){
  const policy=await readToolPolicy(tx,identity,true)
  if(policy.paused)throw new AdminPermissionError(409,'该精确版本已暂停 Survey 的新增分配与投放：'+policy.reason)
@@ -46,6 +52,9 @@ export async function assertSurveyPublicationNotPaused(tx:Prisma.TransactionClie
   if(typeof p.surveyToolReleaseId==='string'&&!p.surveyPackage){
    await assertGovernedEntryAllowed(tx,p.surveyToolReleaseId,ref.sourceVersion)
    if(typeof p.sourceGrantId==='string'){const rows=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM survey_tool_grants WHERE id=${p.sourceGrantId} AND status='ACTIVE' FOR SHARE`;if(!rows.length)throw new AdminPermissionError(403,'研究者此精确版本授权已撤销')}
+   // The strict governed check already locked the identical policy/hash and
+   // required APPROVED. Keep the source grant check above in this transaction.
+   continue
   }
   const identity=await snapshotPolicyIdentity(tx,{ref,provenance:p,definitionDigest:unit.sourceDigest} as CatalogSourceSnapshot)
   await assertSurveyToolPolicy(tx,identity,false)

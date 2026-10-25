@@ -38,10 +38,11 @@ export async function revokeSurveyPackage(actor:string,id:string,version:number,
 })}
 export async function packageGrantsForManager(actor:string,userId:string,page:number){await prisma.$transaction(tx=>assertSurveyManager(tx,actor));const rows=await prisma.$queryRaw<Array<PackageGrantRow&{title:string;family:string}>>`SELECT g.*,t.title,t.family FROM survey_package_grants g JOIN survey_governed_tools t ON t.id=g.tool_id WHERE g.user_id=${userId} ORDER BY g.created_at DESC,g.id LIMIT 25 OFFSET ${(page-1)*25}`;return {list:rows.map(r=>view(r,r.title,r.family)),page}}
 export async function packageGrantsForResearcher(actor:string,projectId:string,page:number){return prisma.$transaction(async tx=>{await authorizedProject(tx,actor,projectId,false);const rows=await tx.$queryRaw<Array<PackageGrantRow&{title:string;family:string}>>`SELECT g.*,t.title,t.family FROM survey_package_grants g JOIN survey_governed_tools t ON t.id=g.tool_id WHERE g.user_id=${actor} AND g.status='ACTIVE' AND g.valid_from<=clock_timestamp() AND (g.expires_at IS NULL OR g.expires_at>clock_timestamp()) ORDER BY g.created_at DESC,g.id LIMIT 25 OFFSET ${(page-1)*25}`;return {list:rows.map(r=>view(r,r.title,r.family)),page}})}
-async function currentPackageGrant(tx:Prisma.TransactionClient,id:string,actor:string,active=true){
+const exactToolKey=(id:string,hash:string)=>id+':'+hash
+async function currentPackageGrant(tx:Prisma.TransactionClient,id:string,actor:string,active=true,verifiedTools?:Map<string,GovernedRow>){
  const [g]=await tx.$queryRaw<PackageGrantRow[]>`SELECT * FROM survey_package_grants WHERE id=${id} AND user_id=${actor} FOR SHARE`
  if(!g)governedFail(403,'整包授权不属于当前研究者')
- if(active){const [clock]=await tx.$queryRaw<Array<{now:Date}>>`SELECT clock_timestamp() AS now`;if(g.status!=='ACTIVE'||g.valid_from>clock.now||g.expires_at&&g.expires_at<=clock.now)governedFail(403,'整包授权已撤销、尚未生效或已到期');await assertGovernedEntryAllowed(tx,g.tool_id,g.snapshot_hash)}
+ if(active){const [clock]=await tx.$queryRaw<Array<{now:Date}>>`SELECT clock_timestamp() AS now`;if(g.status!=='ACTIVE'||g.valid_from>clock.now||g.expires_at&&g.expires_at<=clock.now)governedFail(403,'整包授权已撤销、尚未生效或已到期');const key=exactToolKey(g.tool_id,g.snapshot_hash);if(!verifiedTools?.has(key)){const tool=await assertGovernedEntryAllowed(tx,g.tool_id,g.snapshot_hash);verifiedTools?.set(key,tool)}}
  return g
 }
 export async function importSurveyPackage(actor:string,projectId:string,grantId:string,requestId:string){return prisma.$transaction(async tx=>{
@@ -69,12 +70,17 @@ export async function importSurveyPackage(actor:string,projectId:string,grantId:
 export async function packageBoundCatalogSnapshots(tx:Prisma.TransactionClient,actor:string,map:Map<string,CatalogSourceSnapshot>,active:boolean){
  if(!map.size)return map
  const rows=await tx.$queryRaw<Array<{technical_grant_id:string;draft_id:string;import_id:string;slot_key:string;grant_id:string;project_id:string;tool_id:string;snapshot_hash:string}>>(Prisma.sql`SELECT m.*,i.grant_id,i.project_id,i.tool_id,i.snapshot_hash FROM survey_package_members m JOIN survey_package_imports i ON i.id=m.import_id WHERE m.technical_grant_id IN (${Prisma.join([...map.keys()])}) ORDER BY i.grant_id,m.draft_id`)
- const checked=new Set<string>(),bound=new Set<string>()
+ const checked=new Map<string,PackageGrantRow>(),bound=new Set<string>(),verifiedTools=new Map<string,GovernedRow>()
  for(const b of rows){
-  if(!checked.has(b.grant_id)){await currentPackageGrant(tx,b.grant_id,actor,active);checked.add(b.grant_id)}
+  if(!checked.has(b.grant_id))checked.set(b.grant_id,await currentPackageGrant(tx,b.grant_id,actor,active,verifiedTools))
+  const grant=checked.get(b.grant_id)!
+  if(grant.tool_id!==b.tool_id||grant.snapshot_hash!==b.snapshot_hash)governedFail(409,'整包导入与当前精确授权不一致')
   const snapshot=map.get(b.technical_grant_id)!,{packageBindingIdentity,...provenance}=snapshot.provenance,identity=packageBindingIdentity as {importId?:string;draftId?:string;slotKey?:string}|undefined
   if(!identity||identity.importId!==b.import_id||identity.draftId!==b.draft_id||identity.slotKey!==b.slot_key)governedFail(409,'整包内部绑定身份不一致')
-  const tool=await governedRow(tx,b.tool_id),component=tool.snapshot.components.find(c=>c.slotKey===b.slot_key)
+  const key=exactToolKey(b.tool_id,b.snapshot_hash)
+  let tool=verifiedTools.get(key)
+  if(!tool){tool=await governedRow(tx,b.tool_id);if(tool.snapshot_hash!==b.snapshot_hash)governedFail(409,'整包冻结版本摘要不一致');verifiedTools.set(key,tool)}
+  const component=tool.snapshot.components.find(c=>c.slotKey===b.slot_key)
   if(!component||canonicalHash({...snapshot,provenance})!==canonicalHash(component.unit))governedFail(409,'整包内部绑定与批准组件不一致')
   bound.add(b.technical_grant_id)
   map.set(b.technical_grant_id,{...snapshot,provenance:{...provenance,surveyPackage:{importId:b.import_id,slotKey:b.slot_key,draftId:b.draft_id,projectId:b.project_id,parentGrantId:b.grant_id,toolId:b.tool_id,hash:b.snapshot_hash}}})
@@ -114,10 +120,12 @@ export async function freezeGovernedPackages(tx:Prisma.TransactionClient,actor:s
 }
 /** New admissions only; existing Attempts and stored reports retain their frozen package. */
 export async function assertFrozenPackageAdmissions(tx:Prisma.TransactionClient,snapshot:ResearchFrozenPublication){
+ if(!snapshot.governedPackages?.length)return
+ const [project]=await tx.$queryRaw<Array<{owner_user_id:string}>>`SELECT owner_user_id FROM survey_projects WHERE id=${snapshot.projectId} FOR SHARE`
+ if(!project)governedFail(403,'研究项目不可用')
+ const verifiedTools=new Map<string,GovernedRow>()
  for(const p of snapshot.governedPackages??[]){
-  const [project]=await tx.$queryRaw<Array<{owner_user_id:string}>>`SELECT owner_user_id FROM survey_projects WHERE id=${snapshot.projectId} FOR SHARE`
-  if(!project)governedFail(403,'研究项目不可用')
-  const grant=await currentPackageGrant(tx,p.parentGrantId,project.owner_user_id)
+  const grant=await currentPackageGrant(tx,p.parentGrantId,project.owner_user_id,true,verifiedTools)
   if(grant.tool_id!==p.toolId||grant.snapshot_hash!==p.hash)governedFail(409,'冻结组合与当前授权不一致')
  }
 }

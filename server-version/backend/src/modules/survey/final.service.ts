@@ -183,7 +183,7 @@ export async function submitResearchFinal(input:FinalInput){
       definitionDigest:publication.definitionDigest,payloadHash:canonical.hash,
       resultsCipher,resultsHash,
     },select:{id:true,completedAt:true}})
-    await persistGovernedPackageReports(tx,{projectId:known.projectId,waveId:wave.id,finalId:receipt.id,sourceFinalHash:resultsHash,snapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
+    await persistGovernedPackageReports(tx,{projectId:known.projectId,waveId:wave.id,finalId:receipt.id,sourceFinalHash:resultsHash,snapshot:selectedSnapshot,calculated})
     const updated=await tx.surveyWaveAttempt.updateMany({
       where:{id:attempt.id,projectId:known.projectId,status:'STARTED'},
       data:{status:'COMPLETED',completedAt:receipt.completedAt},
