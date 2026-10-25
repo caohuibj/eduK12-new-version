@@ -349,6 +349,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
 
     return (
       <AssessmentShell
+        className="cognitive-preparation"
         title={title}
         instructions={instructions}
         progress={{ kind: 'phase', phase: '准备开始', detail: '请先阅读任务说明并完成练习；正式测验开始后请保持专注。' }}

@@ -80,3 +80,59 @@
  .hs-app.hs-learner .hs-school-task-runner--answer>.hs-school-runner-help{display:block;margin:0}
 }
 .hs-app.hs-learner[data-theme] .hs-school-task-runner--answer [data-assessment-shell-content]>div>div:first-child:not(:has(.form-player)){background:transparent}
+
+/* Keep product navigation outside the shared neutral cognitive surface. The
+ * cognitive trial container's width, padding, stimuli and controls are untouched. */
+.hs-app.hs-learner .hs-school-task-runner--child>.hs-school-runner-help{margin-bottom:16px}
+.hs-app.hs-workspace.hs-learner[data-theme] section.hs-task-view:has(>.hs-school-task-runner--child[data-school-child=COGNITIVE]){background:#fff;border-color:#dfe3e7;color:#252a30}
+.hs-app.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=COGNITIVE]{color-scheme:light;color:#252a30}
+.hs-app.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=COGNITIVE]>.hs-school-runner-help{color:#626b74;background:transparent}
+.hs-app.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=COGNITIVE]>.hs-school-runner-help p{color:#626b74;border-color:#dfe3e7}
+.hs-app.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=COGNITIVE]>.hs-actions>.hs-runner-back{color:#626b74;background:transparent}
+/* School situational layout uses the existing frozen scene/response components. */
+.hs-app.hs-workspace.hs-learner[data-theme]:has(.hs-school-task-runner--child[data-school-child=SITUATIONAL]) .hs-main.hs-main-workspace{width:min(1120px,calc(100% - 64px))}
+.hs-app.hs-workspace.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL]{max-width:none}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:20px 28px;max-width:none;padding:0;background:transparent;color:var(--hs-ink)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment>*{grid-column:1/-1;min-width:0}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-header]{margin:0;border-bottom:1px solid var(--hs-border);padding-bottom:16px}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-header] h1{font:600 clamp(23px,2.3vw,28px)/1.5 var(--hs-serif);color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] .assessment-instructions{margin:0;padding:0;border:0;background:transparent;font-size:13px;color:var(--hs-muted)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] .assessment-instructions>summary{min-height:36px;cursor:pointer}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-statuses]:empty{display:none}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-content]{grid-column:1;grid-row:4}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-navigation]{grid-column:2;grid-row:4;margin:0;align-self:start}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-actions]{margin:0;padding-top:18px;border-top:1px solid var(--hs-border)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-content]>section{padding:22px;border:1px solid var(--hs-border);border-radius:14px;background:var(--hs-surface);box-shadow:none;--tw-ring-shadow:0 0 #0000}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-navigation]>nav{border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);box-shadow:none;--tw-ring-shadow:0 0 #0000}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-sjt-question]{padding-top:18px;border-top:1px solid var(--hs-border)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-sjt-question] legend{font-size:16px;line-height:1.8;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] :is(label,button){line-height:1.75;overflow-wrap:anywhere}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] label:has(input:checked){background:var(--hs-surface-soft,#edf3e7);border-color:var(--hs-primary);--tw-ring-color:var(--hs-primary)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] input{accent-color:var(--hs-primary)}
+.hs-app.hs-learner .hs-school-task-runner--child[data-school-child=SITUATIONAL] :is(.bg-indigo-600,.bg-emerald-600){background:var(--hs-primary);color:var(--hs-on-primary,#fff)}
+@media(max-width:900px){
+ .hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment{grid-template-columns:minmax(0,1fr)}
+ .hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-content]{grid-column:1;grid-row:auto}
+ .hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-navigation]{grid-column:1;grid-row:auto}
+}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-learner[data-theme]:has(.hs-school-task-runner--child[data-school-child=SITUATIONAL]) .hs-main.hs-main-workspace{width:calc(100% - 32px)}
+ .hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-content]>section{padding:18px 16px}
+}
+.hs-app.hs-workspace.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment{padding:0;grid-template-areas:"heading heading" "progress progress" "statuses statuses" "content navigation" "actions actions"}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-header]{grid-area:heading}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment>section[aria-label]{grid-area:progress;margin:0}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-statuses]{grid-area:statuses}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-content]{grid-area:content}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-navigation]{grid-area:navigation}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-actions]{grid-area:actions}
+.hs-app.hs-workspace.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment:has(>[data-assessment-shell-statuses]:empty){grid-template-areas:"heading heading" "progress progress" "content navigation" "actions actions"}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-header] p{font-size:12px;margin:0 0 6px;color:var(--hs-muted)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-header] h1{margin:0}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [role=progressbar]{background:var(--hs-border)}
+.hs-school-task-runner--child[data-school-child=SITUATIONAL] [role=progressbar]>div{background:var(--hs-primary)}
+@media(max-width:900px){
+ .hs-app.hs-workspace.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment{grid-template-areas:"heading" "progress" "statuses" "content" "actions" "navigation"}
+ .hs-app.hs-workspace.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL]>.hui-page--assessment:has(>[data-assessment-shell-statuses]:empty){grid-template-areas:"heading" "progress" "content" "actions" "navigation"}
+}
+.hs-app.hs-learner[data-theme] .hs-school-task-runner--child[data-school-child=SITUATIONAL] [data-assessment-shell-navigation] button[aria-current=step]{background:var(--hs-primary);color:var(--hs-on-primary,#fff)}

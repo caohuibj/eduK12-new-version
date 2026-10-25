@@ -49,10 +49,12 @@ describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoi
       throw Error('unexpected campus call: '+path+' '+method)
     })
     render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution}
-      onExit={vi.fn()} onFinished={vi.fn()}/>)
+      title="学生认知任务" onExit={vi.fn()} onFinished={vi.fn()}/>)
     fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
     fireEvent.click(await screen.findByRole('button',{name:'进入冻结认知子测评'}))
     expect(await screen.findByText('校园认知子测评已进入')).toBeInTheDocument()
+    expect(screen.getByLabelText('校园任务作答')).toHaveAttribute('data-school-child','COGNITIVE')
+    expect(screen.getByLabelText('校园任务作答')).not.toHaveClass('hs-school-task-runner--answer')
     fireEvent.click(screen.getByRole('button',{name:'读取认知子测评'}))
     fireEvent.click(screen.getByRole('button',{name:'提交认知 FINAL'}))
     await waitFor(()=>expect(submitted).toHaveBeenCalledTimes(1))

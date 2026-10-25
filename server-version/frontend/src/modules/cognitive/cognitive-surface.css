@@ -47,3 +47,22 @@
 /* Product shells may also theme the non-timed progress card. */
 .cognitive-surface section[aria-label="测评进度"] { background:#fff!important; border-color:#dfe3e7!important; }
 .cognitive-surface section[aria-label="测评进度"] .text-slate-500 { color:#626b74!important; }
+
+/* One shared non-timed preparation layout across Survey, Training and School.
+ * Active trial pages never receive cognitive-preparation. */
+.cognitive-surface .hui-page.cognitive-preparation{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px 28px;align-items:start}
+.cognitive-preparation>*{grid-column:1/-1;min-width:0}
+.cognitive-surface .cognitive-preparation>[data-assessment-shell-header]{grid-column:1;grid-row:1;margin:0!important;padding:0!important;border:0!important}
+.cognitive-surface .cognitive-preparation>section[aria-label="测评进度"]{grid-column:2;grid-row:1;margin:0;border:1px solid #dfe3e7;border-radius:10px;padding:16px}
+.cognitive-preparation>[data-assessment-shell-statuses]:empty,.cognitive-preparation>[data-assessment-shell-content]:empty{display:none}
+.cognitive-preparation>[data-assessment-shell-actions]{margin:0;padding-top:18px;border-top:1px solid #e5e7eb}
+.cognitive-preparation>[data-assessment-shell-actions]>div{text-align:right}
+@media(max-width:700px){
+ .cognitive-surface .hui-page.cognitive-preparation{grid-template-columns:minmax(0,1fr);gap:18px}
+ .cognitive-surface .cognitive-preparation>section[aria-label="测评进度"]{grid-column:1;grid-row:auto}
+ .cognitive-preparation>[data-assessment-shell-actions] button{width:100%}
+}
+/* Progress chrome stays legible and neutral under every product appearance.
+ * These selectors cannot enter the timed task boundary. */
+.cognitive-surface .hui-page>section[aria-label] :is(.text-slate-500,.text-slate-600,.text-slate-900){color:#626b74!important}
+.cognitive-surface .cognitive-preparation :is(.hui-status--pending,.hui-status--info){background:#f8f9fa;border-color:#dfe3e7;color:#454f59}

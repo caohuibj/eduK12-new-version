@@ -102,6 +102,7 @@ export interface SchoolEmbeddedSituationalProps {
   parentAttemptId:string
   compositeItemId:string
   client:SituationalRunnerClient
+  instructionsSummary?:string
   onCompleted:()=>void
 }
 const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:SchoolEmbeddedSituationalProps}> = ({campus:campusProp,host}) => {
@@ -767,7 +768,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
     <AssessmentShell
       title={currentScene.title}
       eyebrow={embedded ? '综合测评 · 情境判断' : '情境判断'}
-      instructionsSummary={isTrainingHost() && !campus ? '作答说明' : undefined}
+      instructionsSummary={campus?.instructionsSummary ?? (isTrainingHost() && !campus ? '作答说明' : undefined)}
       instructions={trainingSequential ? '单选后自动定位下一题，多选完成后请自行确认。选填题可留空；切换情境前请检查答案，确认后不能返回修改。' : `版本 ${data.attempt.instrumentVersion}。请根据当前情境作答；情境分支变化后，后续内容将随当前选择调整。`}
       progress={shellProgress}
       saveStatus={saveStatus}
