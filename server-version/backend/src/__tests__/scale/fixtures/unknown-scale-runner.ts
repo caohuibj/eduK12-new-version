@@ -46,7 +46,7 @@ const main = async () => {
       assert.deepEqual(deployment.authorization_refs, [])
       assert.equal(JSON.stringify(deployment.policy_json).includes(authId), false)
       assert.notEqual((await request(`/scales/${scale.id}/assessments`, {})).status, 200)
-      const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: admin.id, visibility: 'PUBLIC' as const }
+      const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: admin.id, visibility: 'PUBLIC' as const,allowedProducts:['TRAINING' as const] }
       assert.ok((await planStandardScalePublication(db, { ...publication, actorUserId: student.id })).blockers.includes('SYSTEM_ADMIN_REQUIRED'))
       await db.instrumentAuthorization.updateMany({ where: { authorizationKey: authId }, data: { status: 'REVOKED' } })
       assert.equal((await planStandardScalePublication(db, publication)).allowPublish, true)

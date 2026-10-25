@@ -10,8 +10,8 @@ export const educationLibraryProduct=z.enum(['SCHOOL','TEACHER'])
 export type EducationLibraryProduct=z.infer<typeof educationLibraryProduct>
 export type LibraryProduct=z.infer<typeof libraryProduct>
 export const libraryMetadata=z.object({
-  title:z.string().trim().min(1).max(200),author:z.string().trim().min(1).max(500),
-  copyright:z.string().trim().min(1).max(2000),applicability:z.string().trim().min(1).max(2000),
+  title:z.string().trim().min(1).max(200),author:z.string().trim().max(500).default(''),
+  copyright:z.string().trim().max(2000).default(''),applicability:z.string().trim().min(1).max(2000),
   scoringDescription:z.string().trim().min(1).max(4000),reportDescription:z.string().trim().min(1).max(4000),
 }).strict()
 export const submissionInput=z.object({requestId:z.string().guid(),releaseId:z.string().guid(),metadata:libraryMetadata,
@@ -20,7 +20,7 @@ export const submissionInput=z.object({requestId:z.string().guid(),releaseId:z.s
   dependencyReleaseIds:z.array(z.string().guid()).max(20).refine(v=>new Set(v).size===v.length).default([])}).strict()
 const reason=z.string().trim().min(1).max(1000)
 export const transitionInput=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
-export const reviewInput=transitionInput.extend({decision:z.enum(['APPROVE','RETURN']),grantId:z.string().guid().optional()}).strict()
+export const reviewInput=transitionInput.extend({decision:z.enum(['APPROVE','RETURN']),allowedProducts:z.array(legacyLibraryProduct).min(1).max(2).refine(v=>new Set(v).size===v.length).optional(),grantId:z.string().guid().optional()}).strict()
 export const entryStatusInput=transitionInput.extend({status:z.enum(['WITHDRAWN','EMERGENCY_DISABLED']),grantId:z.string().guid().optional()}).strict()
 const distributionBase={requestId:z.string().guid(),grantId:z.string().guid().optional(),expectedGrantVersion:z.number().int().positive().optional()}
 export const legacyDistributionInput=z.object({...distributionBase,userId:z.string().guid(),product:legacyLibraryProduct,

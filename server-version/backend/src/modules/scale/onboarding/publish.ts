@@ -1,3 +1,5 @@
+import {approveToolEntryPolicies,exactToolEntryProducts} from '../../assessment-governance/tool-entry-policy'
+import {scaleSourcePolicyIdentity} from './source-snapshot'
 import { publishScaleMeasurement } from '../../measurement-content/scale'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
@@ -18,6 +20,7 @@ import { publishedScaleMediaOwner, retainScaleAssessmentImages } from '../scale-
 export const standardScalePublishInputSchema = z.object({
   instrumentKey: z.string().min(1), instrumentVersion: z.string().min(1), actorUserId: z.string().min(1),
   visibility: z.enum(['HIDDEN', 'COURSE', 'PUBLIC']),
+  allowedProducts:z.array(z.enum(['TRAINING','SURVEY'])).min(1).max(2).optional(),
   expectedProofHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
 }).strict()
 type Input = z.infer<typeof standardScalePublishInputSchema>
@@ -52,7 +55,7 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
     definitionHash: hashScaleDefinition(source.executable.definition), sourceHash: canonicalHash({ ...source, executable: { ...source.executable, scorerPlugins: source.executable.scorerPlugins?.map(({ key, version }) => ({ key, version })) ?? [] } }),
     deploymentPolicyHash: active?.policyHash ?? null, deploymentRevision: active?.revision ?? null,
     scientificMaturity: source.catalog.scientificMaturity, qualification,
-    visibility: input.visibility, previousStatus: scale?.status ?? null, previousVisibility: scale?.visibility ?? null,
+    ...(input.allowedProducts?{allowedProducts:exactToolEntryProducts(input.allowedProducts)}:{}),visibility: input.visibility, previousStatus: scale?.status ?? null, previousVisibility: scale?.visibility ?? null,
   }
   const proofHash = canonicalHash(proof)
   if (input.expectedProofHash && input.expectedProofHash !== proofHash) blockers.push('PUBLICATION_PREVIEW_STALE')
@@ -61,7 +64,7 @@ export const planStandardScalePublication = async (db: Db, value: Input) => {
 
 /** Explicit human publication, distinct from installation. Retains media and audit atomically. */
 export const publishStandardScale = async (db: PrismaClient, value: Input & { expectedProofHash: string }) => {
-  const input = standardScalePublishInputSchema.extend({ expectedProofHash: z.string().regex(/^[0-9a-f]{64}$/) }).parse(value)
+  const input = standardScalePublishInputSchema.extend({ expectedProofHash: z.string().regex(/^[0-9a-f]{64}$/),allowedProducts:z.array(z.enum(['TRAINING','SURVEY'])).min(1).max(2) }).parse(value)
   return withSerializableScaleTransaction(db, async tx => {
     const plan = await planStandardScalePublication(tx, input)
     if (!plan.allowPublish || !plan.proof.scaleId) throw new Error(`Scale publication blocked: ${plan.blockers.join(',')}`)
@@ -75,6 +78,7 @@ export const publishStandardScale = async (db: PrismaClient, value: Input & { ex
       scope: { kind: 'PLATFORM', ownerId: scale.creatorId },
     }, input.actorUserId)
     await tx.$executeRaw(Prisma.sql`UPDATE scales SET measurement_release_id=${release.releaseId} WHERE id=${scale.id}`)
+    await approveToolEntryPolicies(tx,scaleSourcePolicyIdentity(source),input.allowedProducts,input.actorUserId,'系统入库批准：'+input.visibility)
     await tx.$executeRaw(Prisma.sql`INSERT INTO "scale_publication_audits" ("id", "scale_id", "actor_user_id", "proof_hash", "proof") VALUES (${randomUUID()}::uuid, ${scale.id}, ${input.actorUserId}, ${plan.proofHash}, CAST(${JSON.stringify(plan.proof)} AS jsonb))`)
     return { scaleId: scale.id, status: scale.status, visibility: scale.visibility, proofHash: plan.proofHash, measurementReleaseId: release.releaseId }
   })

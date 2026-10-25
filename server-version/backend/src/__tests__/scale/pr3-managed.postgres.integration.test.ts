@@ -97,7 +97,7 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
     const row = await db.scale.findUniqueOrThrow({ where: { code: key } }); scaleId = row.id
     expect(row).toMatchObject({ status: 'DRAFT', visibility: 'HIDDEN', creatorId: publisher })
     const { planStandardScalePublication, publishStandardScale } = await import('../../modules/scale/onboarding/publish')
-    const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const }
+    const publication = { instrumentKey: key, instrumentVersion: '1.0.0', actorUserId: publisher, visibility: 'PUBLIC' as const,allowedProducts:['TRAINING' as const] }
     const preview = await planStandardScalePublication(db, publication)
     await publishStandardScale(db, { ...publication, expectedProofHash: preview.proofHash })
     expect((await install.installScaleInstrument(db, input)).deploymentAlreadyActive).toBe(true)

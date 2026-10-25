@@ -1,8 +1,7 @@
-import {assertSurveyManager} from '../survey/admin-role'
 import {Prisma} from '@prisma/client'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
-import {assertEntryAdmin} from '../admin-permissions/service'
+import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
 import {fail,LIBRARY_SCOPE,libraryAdminEntry,type LibraryProduct} from './contracts'
 export async function libraryActor(tx:Prisma.TransactionClient,actorId:string){
   const [u]=await tx.$queryRaw<Array<{id:string;platform_role:string;account_domain:string;role:string;teacher_approved:boolean;expires_at:Date|null}>>(Prisma.sql`
@@ -15,19 +14,28 @@ export async function libraryActor(tx:Prisma.TransactionClient,actorId:string){
 export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId:string,releaseId:string,capability:'catalog.manage'|'material.distribute',product:LibraryProduct,grantId?:string){
   const user=await libraryActor(tx,actorId)
   if(!['TRAINING','LEGACY'].includes(user.account_domain))fail('平台内容管理需使用平台账号',403)
-  if(product==='SURVEY'&&capability==='material.distribute'){await assertSurveyManager(tx,actorId);return {grantId:null,version:0}}
-  // Entry-only distribution never inherits system authority; retain exact content grants below.
+  // Formal entry administration and exact delegation are separate issuance bases.
+  // Global system authority never implies entry distribution.
   if(capability==='material.distribute'&&(product==='TRAINING'||product==='SURVEY')&&user.systemAdmin)fail('系统管理员不能代替入口管理员分配使用权',403)
   if(capability==='catalog.manage'&&!user.systemAdmin)fail('全局工具版本审批仅限系统管理员',403)
   if(user.systemAdmin)return {grantId:null,version:0}
-  if(!grantId)fail('缺少精确版本的平台授权',403)
-  if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])
+  if(capability==='material.distribute'&&(product==='TRAINING'||product==='SURVEY')){
+    try{
+      const entry=await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])
+      return {grantId:null,version:entry.grantVersion,entryAuthority:{entry:product,grantId:entry.grantId,version:entry.grantVersion}}
+    }catch(e){if(!(e instanceof AdminPermissionError)||e.statusCode!==403)throw e}
+    // An ordinary delegate can issue only the exact explicitly delegated scope.
+    // No formal entry role is inferred from their content capability.
+  }else if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])
+  if(!grantId)fail('缺少当前入口管理资格或精确版本委托',403)
   const result=await assertContentAuthority(tx,{actorId,grantId:grantId!,capability,
     scope:{product,scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:capability==='catalog.manage'?'catalog':'material',resourceKeys:[releaseId]}})
   return result
 }
 export async function libraryCapabilities(tx:Prisma.TransactionClient,actorId:string){
   const actor=await libraryActor(tx,actorId)
+  const entryGrants=actor.platform_role==='STANDARD'&&['TRAINING','LEGACY'].includes(actor.account_domain)?await tx.$queryRaw<Array<{entry:'TRAINING'|'SURVEY'}>>`SELECT entry FROM admin_entry_grants WHERE user_id=${actorId} AND entry IN ('TRAINING','SURVEY') AND revoked_at IS NULL`:[]
+  const entryAdminProducts=entryGrants.map(row=>row.entry)
   const rows=await tx.$queryRaw<Array<{id:string;product:LibraryProduct;resource_keys:string[];capabilities:string[]}>>(Prisma.sql`
     SELECT id,product,resource_keys,capabilities FROM content_capability_grants WHERE subject_id=${actorId}
       AND scope_kind='PLATFORM' AND scope_id=${LIBRARY_SCOPE} AND revoked_at IS NULL
@@ -41,5 +49,5 @@ export async function libraryCapabilities(tx:Prisma.TransactionClient,actorId:st
       else distributionGrants.push({grantId:row.id,product:row.product,releaseIds:row.resource_keys})
     }catch(e){if(!(e instanceof ContentAuthorityError)&&!(e instanceof Error&&('statusCode'in e)&&e.statusCode===403))throw e}
   }
-  return {systemAdmin:actor.systemAdmin,reviewGrants,distributionGrants,canReview:actor.systemAdmin||reviewGrants.length>0}
+  return {systemAdmin:actor.systemAdmin,entryAdminProducts,reviewGrants,distributionGrants,canReview:actor.systemAdmin||reviewGrants.length>0}
 }

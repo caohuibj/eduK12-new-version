@@ -54,14 +54,14 @@ suite('library media atomic publication / isolated PostgreSQL',()=>{
   expect(await db.$queryRaw(Prisma.sql`SELECT id FROM scale_library_entries WHERE id=${entryId}`)).toEqual([])
   expect(await db.$queryRaw(Prisma.sql`SELECT id FROM scale_library_media WHERE entry_id=${entryId}`)).toEqual([])
   expect(await db.assetReference.count({where:{entityType:'ScaleLibraryMedia',entityId:entryId}})).toBe(0)
-  const result=await review(admin,f.submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic approval'})
+  const result=await review(admin,f.submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic approval'})
   const rows=await db.$queryRaw<Array<{asset_id:string;state:string}>>(Prisma.sql`SELECT asset_id,state FROM scale_library_media WHERE entry_id=${result.entryId}`)
   expect(rows).toEqual([{asset_id:f.asset.id,state:'READY'}])
   expect((await db.storedAsset.findUniqueOrThrow({where:{id:f.asset.id}})).accessScope).toBe('PRIVATE')
   await expect(db.storedAsset.delete({where:{id:f.asset.id}})).rejects.toThrow()
  })
  it('bridges exact authorized cross-owner report media and preserves the frozen original ID',async()=>{
-  const f=await application(),approved=await review(admin,f.submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic approval'})
+  const f=await application(),approved=await review(admin,f.submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic approval'})
   await grantLibraryUseFixture(db,admin,approved.entryId!,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
   const [grant]=await db.$queryRaw<Array<{snapshot:{displayDefinition:unknown;compiledDefinition:unknown;provenance:Record<string,unknown>}}>>(Prisma.sql`SELECT t.snapshot FROM survey_tool_grants t JOIN scale_library_use_grants g ON g.survey_tool_grant_id=t.id WHERE g.entry_id=${approved.entryId} AND g.user_id=${reader}`)
   const unit={kind:'SCALE' as const,definition:grant.snapshot.displayDefinition,compiledDefinition:grant.snapshot.compiledDefinition,sourceProvenance:grant.snapshot.provenance}

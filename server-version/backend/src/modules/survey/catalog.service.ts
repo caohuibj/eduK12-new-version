@@ -53,7 +53,8 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
       if(source?.instrument_class==='CUSTOM_DESCRIPTIVE')fail(403,'自编量表新分配必须通过已批准的共用库精确版本；旧授权不能扩大')
     }
     const snapshot=await getCatalogSourceSnapshot({actorUserId,ref},tx)
-    await assertSurveyToolPolicy(tx,await snapshotPolicyIdentity(tx,snapshot),ref.kind==='SCALE'&&!snapshot.provenance.surveyStandardReleaseId)
+    // Intake approval includes entry scope; ONLINE alone is not entry admission.
+    if(!isGovernedSource(ref.sourceId))await assertSurveyToolPolicy(tx,await snapshotPolicyIdentity(tx,snapshot),true)
     const snapshotDigest=canonicalHash(snapshot)
     const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants
       (id,user_id,status,snapshot,snapshot_digest,created_by)

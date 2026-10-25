@@ -26,9 +26,9 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
  let system:any,manager:any,training:any,owner:string,server:Server,base:string,onlineId:string,pid:string,wid:string,finalId:string,instrumentKey:string
  const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
  const sources=listScaleInstrumentSources().filter(s=>s.executable)
- function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only'}}
+ function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only',allowedProducts:['SURVEY']}}
  beforeAll(async()=>{
-  const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!u.pathname.startsWith('/survey_triplet_test_'))throw new Error('Schema-only Survey test database required')
+  const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!(u.pathname.startsWith('/survey_triplet_test_')||/^\/eduk12_ci355_license_entrytriplet_test_[a-f0-9]{10}$/.test(u.pathname)))throw new Error('Schema-only Survey test database required')
   const create=(name:string,platformRole:'STANDARD'|'SYSTEM_ADMIN')=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole,role:'STUDENT'}})
   system=await create('system','SYSTEM_ADMIN');manager=await create('survey','STANDARD');training=await create('training','STANDARD')
   await db.adminEntryGrant.createMany({data:[{id:randomUUID(),userId:manager.id,entry:'SURVEY',grantedBy:system.id},{id:randomUUID(),userId:training.id,entry:'TRAINING',grantedBy:system.id}]})

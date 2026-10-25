@@ -2935,7 +2935,7 @@ const createAttempt = async (
   // Include conditional/unselected slots before admitting the parent; otherwise
   // a stop could first be discovered halfway through an accepted attempt.
   await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,
-    composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
+    composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId),composite.createdBy)
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({

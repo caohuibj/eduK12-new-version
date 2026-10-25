@@ -59,7 +59,6 @@ export async function submissionSource(tx:Prisma.TransactionClient,actorId:strin
   }else fail('SCALE_LIBRARY_SOURCE_ADAPTER_NOT_READY',409)
   snapshot.snapshotOrigin=stored?'PUBLISHED_PROVENANCE':'APPLICATION_CAPTURE'
   snapshot.definitionHash=canonicalHash(snapshot.definition)
-  if(snapshot.compiledDefinition.license.status!=='self_authored'||snapshot.compiledDefinition.license.redistribution!=='allowed')fail('SCALE_LIBRARY_REDISTRIBUTION_RIGHTS_REQUIRED',400)
   if(release.provenance.sourceMeasurementRelease||release.provenance.presentationOnly)fail('共用库授权仅可使用，不允许改编后重新入库',403)
   // Media are confirmed as an exact manifest by the submission service.
   return {release,sourceId,snapshot}

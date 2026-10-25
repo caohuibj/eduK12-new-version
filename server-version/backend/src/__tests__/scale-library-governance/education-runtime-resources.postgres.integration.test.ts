@@ -47,7 +47,7 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
     authoringSnapshot:{title:metadata.title,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}}),owner))
   const application=await submit(owner,'SURVEY',{requestId:randomUUID(),releaseId:release.releaseId,metadata,
    educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'},{population:'TEACHER',responseMode:'SELF'}]}})
-  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic version approval'})
+  const approved=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic version approval'})
   const entryId=approved.entryId!,organizationId=randomUUID()
   await db.organization.create({data:{id:organizationId,name:'Synthetic exact resource school',productDomain:'SCHOOL',createdByUserId:admin}})
   for(const product of ['HUISCHOOL','HUITEACHER'] as const)await db.educationProductEntitlement.create({data:{organizationId,product,grantedByUserId:admin}})

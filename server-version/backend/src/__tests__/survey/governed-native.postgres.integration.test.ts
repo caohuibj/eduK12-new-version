@@ -58,8 +58,8 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
  afterAll(async()=>{await (await import('../../config/queue')).closeQueues(true);await db.$disconnect();vi.unstubAllEnvs()})
  it('stops only the revoked exact researcher grant, retaining a completed native child and serializing stop with collection',async()=>{
   const pkg=registry.packages[1],submitted=await submitGovernedSource(system,{requestId:randomUUID(),source:{kind:'SJT',sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},version:'scope-'+randomUUID(),title:'Synthetic scoped stop',report:null,reference:{}},proof)
-  await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic scope approval'},proof)
-  await changeSurveyToolPolicy(manager,{...governedPolicyIdentity(await governedRow(db,submitted.id)),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic exact scope'})
+  await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic scope approval'},proof)
+  expect((await db.$queryRaw<Array<{decision:string}>>`SELECT decision FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+submitted.id} AND fingerprint=${submitted.hash}`)[0]?.decision).toBe('APPROVED')
   const secondOwner=(await db.user.create({data:{username:'native-other-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'SURVEY'}})).id
   const login='r'+randomUUID().replace(/-/g,'').slice(0,18)
   await db.surveyAccount.create({data:{userId:secondOwner,loginName:login,normalizedLogin:login}})
@@ -109,8 +109,8 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await reviewSjtDraft({userId:system,admin:true},draft.id,draft.revision,draft.contentDigest,true,'Synthetic independently approved source')
   const release=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:template.instrumentKey}}),source={kind:'SJT' as const,sourceId:release.id,sourceVersion:release.instrumentVersion}
   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'1',title:'Synthetic actual author release',report:{version:'r1',template:{blocks:[{type:'METRIC',metricKey:'coordination',display:'RAW'}],limitations:[]}},reference:{}},proof)
-  expect((await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic governing approval'},proof)).state).toBe('ONLINE')
-  await changeSurveyToolPolicy(manager,{...governedPolicyIdentity(await governedRow(db,submitted.id)),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic exact source grant'})
+  expect((await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic governing approval'},proof)).state).toBe('ONLINE')
+  expect((await db.$queryRaw<Array<{decision:string}>>`SELECT decision FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+submitted.id} AND fingerprint=${submitted.hash}`)[0]?.decision).toBe('APPROVED')
   const grant=await grantCatalogSource(manager,owner,{kind:'SJT',sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash}),projectId=randomUUID()
   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic actual source',collectionMode:'SINGLE_UNLINKED'}})
   const imported=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Synthetic native'})
@@ -134,14 +134,14 @@ suite('new native governance grants on isolated synthetic PostgreSQL',()=>{
   await expect(grantCatalogSource(manager,owner,source)).rejects.toThrow()
   const submitted=await submitGovernedSource(system,{requestId:randomUUID(),source,version:'native-'+version+'-'+randomUUID(),title:'Synthetic native '+version,
    report:{version:'r1',template:{title:'Synthetic report',blocks:[{type:'METRIC',metricKey:'coordination',display:'RAW'}],limitations:[]}},reference:{}},proof)
-  const approved=await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Synthetic native approval'},proof)
+  const approved=await approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Synthetic native approval'},proof)
   expect(approved.state,approved.blockers.join(';')).toBe('ONLINE')
   const trials=await db.$queryRaw<Array<{result:Record<string,unknown>;result_hash:string}>>`SELECT result,result_hash FROM survey_governed_trials WHERE tool_id=${submitted.id}`
   expect(trials).toHaveLength(3);for(const trial of trials){expect(canonicalHash(trial.result)).toBe(trial.result_hash);expect(trial.result.rawNative).toBeTruthy();expect(trial.result.report).toBeTruthy()}
-  await expect(approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',reason:'Stale approval'},proof)).rejects.toMatchObject({statusCode:409})
+  await expect(approveGovernedTool(system,submitted.id,{expectedVersion:submitted.version,hash:submitted.hash,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Stale approval'},proof)).rejects.toMatchObject({statusCode:409})
   const ref={kind:'SJT' as const,sourceId:'survey-tool:'+submitted.id,sourceVersion:submitted.hash}
   await expect(grantCatalogSource(manager,owner,ref)).rejects.toThrow()
-  await changeSurveyToolPolicy(manager,{...governedPolicyIdentity(await governedRow(db,submitted.id)),expectedVersion:0,decision:'APPROVED',paused:false,reason:'Synthetic entry approval'})
+  expect((await db.$queryRaw<Array<{decision:string}>>`SELECT decision FROM survey_tool_policies WHERE product='SURVEY' AND resource_key=${'governed-release:'+submitted.id} AND fingerprint=${submitted.hash}`)[0]?.decision).toBe('APPROVED')
   const grant=await grantCatalogSource(manager,owner,ref),projectId=randomUUID()
   await db.surveyProject.create({data:{id:projectId,ownerUserId:owner,title:'Synthetic native research',collectionMode:'SINGLE_UNLINKED'}})
   const draft=await importCatalogDraft(owner,projectId,grant.id,{requestId:randomUUID(),instrumentKey:'native',title:'Frozen native'})

@@ -15,7 +15,7 @@ suite('Wave1 registered content install and publication (isolated PostgreSQL)',{
    const input={instrumentKey:key,instrumentVersion:'1.0.0',actorUserId:actor.id,deploymentPolicy:{schemaVersion:2 as const,revision:1,locale:'zh-CN',territory:'CN',deploymentModes:['STANDALONE','COMPOSITE'] as ('STANDALONE'|'COMPOSITE')[],runtimePolicyHash:getScaleInstrumentRuntimePolicy(key,'1.0.0')!.runtimePolicyHash,localizationVersion:'1.0.0',inFlightCompletion:'FROZEN_DEADLINE' as const,completionWindowMs:86400000}}
    expect((await planScaleInstrumentInstall(db,input)).blockers,key).toEqual([])
    await installScaleInstrument(db,input)
-   const publication={instrumentKey:key,instrumentVersion:'1.0.0',actorUserId:actor.id,visibility:'COURSE' as const},preview=await planStandardScalePublication(db,publication)
+   const publication={instrumentKey:key,instrumentVersion:'1.0.0',actorUserId:actor.id,visibility:'COURSE' as const,allowedProducts:['TRAINING' as const]},preview=await planStandardScalePublication(db,publication)
    expect(preview.blockers,key).toEqual([]);await publishStandardScale(db,{...publication,expectedProofHash:preview.proofHash})
    const row=await db.scale.findUniqueOrThrow({where:{code:key}});expect(row.status).toBe('PUBLISHED');expect(row.instrumentClass).toBe('STANDARD')
    const snapshots=await db.$queryRaw<Array<{source_hash:string}>>`SELECT source_hash FROM scale_axis_snapshots WHERE scale_id=${row.id}`;expect(snapshots).toHaveLength(1);expect(snapshots[0].source_hash).toMatch(/^[a-f0-9]{64}$/)

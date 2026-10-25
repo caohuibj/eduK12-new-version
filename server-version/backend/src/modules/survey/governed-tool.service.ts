@@ -1,3 +1,4 @@
+import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
 import {Prisma,type PrismaClient} from '@prisma/client'
@@ -134,16 +135,19 @@ export async function governedComponentOptions(actor:string,page=1,query=''){
  }
  return {list,page,hasMore:selected.length>25}
 }
-export async function approveGovernedTool(actor:string,id:string,input:{expectedVersion:number;hash:string;reason:string;decision:'APPROVE'|'RETURN'},proof:AdminSessionProof){
+export async function approveGovernedTool(actor:string,id:string,input:{expectedVersion:number;hash:string;reason:string;decision:'APPROVE'|'RETURN';allowedProducts?:unknown},proof:AdminSessionProof){
  const row=await prisma.$transaction(async tx=>{
   await assertStandardSystem(tx,actor,proof);const r=await governedRow(tx,id,true)
   if(r.version!==input.expectedVersion||r.snapshot_hash!==input.hash||r.state!=='SUBMITTED')governedFail(409,'审批内容或状态已变化，请刷新')
   if(input.decision==='APPROVE'){
+   const products=exactToolEntryProducts(input.allowedProducts)
+   if(products.some(product=>product!=='SURVEY'))governedFail(409,'此治理版本当前仅有 Survey 执行适配，不能将全局上线视为 Training 准入')
    const blockers=artifactBlockers(r.snapshot);if(blockers.length)governedFail(409,blockers.join('；'))
    await assertGovernedDependencies(tx,r.snapshot)
+   await approveToolEntryPolicies(tx,governedPolicyIdentity(r),products,actor,input.reason)
   }
   await tx.$executeRaw`UPDATE survey_governed_tools SET state=${input.decision==='APPROVE'?'APPROVED':'RETURNED'},version=version+1,approved_by=${input.decision==='APPROVE'?actor:null},approved_at=${input.decision==='APPROVE'?new Date():null},approval_reason=${input.decision==='APPROVE'?input.reason:null},reason=${input.reason} WHERE id=${id}`
-  await audit(tx,actor,'GOVERNED_TOOL_'+input.decision,{id,hash:r.snapshot_hash,reason:input.reason,researcherGrantsCreated:0})
+  await audit(tx,actor,'GOVERNED_TOOL_'+input.decision,{id,hash:r.snapshot_hash,reason:input.reason,allowedProducts:input.allowedProducts??[],researcherGrantsCreated:0})
   return governedRow(tx,id)
  },{timeout:20000})
  return row.state==='APPROVED'?runGovernedTrial(actor,id,row.version,proof):governedView(row)
@@ -200,7 +204,6 @@ export type OriginalSjtSubmission={requestId:string;toolKey:string;version:strin
 /** New authored material only. Never rewrites registry examples or their source rights. */
 export function originalSjtArtifact(actor:string,input:OriginalSjtSubmission):GovernedArtifact{
  const definition=input.definition as {licenseStatus?:string;redistribution?:string;author?:string;sourceNote?:string}
- if(definition.licenseStatus!=='self_authored'||definition.redistribution!=='allowed')governedFail(409,'原创入口仅接收明确声明原创且允许 Survey 展示的新内容；不得重新标注受限示例')
  const compiled=compileFrozenResearchUnit({id:input.requestId,instrumentKey:input.toolKey,kind:'SJT',title:input.title,revision:1,definition})
  const unit={ref:{kind:'SJT' as const,sourceId:'original-sjt:'+input.toolKey,sourceVersion:input.version},title:input.title,displayDefinition:compiled.displayDefinition,compiledDefinition:compiled.compiledDefinition,definitionDigest:compiled.sourceDigest,scoringDigest:compiled.scoringDigest,adapterVersion:'survey-catalog-v1' as const,provenance:{instrumentKey:input.toolKey,originalAuthor:definition.author,originalSourceNote:definition.sourceNote,submittedBy:actor,licenseStatus:definition.licenseStatus,redistribution:definition.redistribution}}
  return {schemaVersion:1,family:'SJT',toolKey:'SJT:original:'+input.toolKey,version:input.version,title:input.title,unit,parameters:null,report:input.report,components:[],packageReport:null,reference:artifactReference('SJT',input.toolKey,{annotations:clone(input.reference),author:definition.author,sourceNote:definition.sourceNote,licenseStatus:definition.licenseStatus,redistribution:definition.redistribution,submissionStatement:input.statement,originalContent:true})}
