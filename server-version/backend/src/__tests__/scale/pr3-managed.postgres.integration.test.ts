@@ -86,7 +86,10 @@ suite('PR3 managed installation and HTTP admission (isolated PostgreSQL)', { tim
       await db.$executeRaw`DELETE FROM "scale_deployment_policies" WHERE "scale_id" = ${scaleId}`
       await db.scale.delete({ where: { id: scaleId } })
     }
-    if (publisher) await db.user.delete({ where: { id: publisher } })
+    if (publisher) {
+      await db.surveyToolPolicy.deleteMany({ where: { reviewedBy: publisher } })
+      await db.user.delete({ where: { id: publisher } })
+    }
     if (actor) await db.user.delete({ where: { id: actor } })
     await db.$disconnect()
   })
