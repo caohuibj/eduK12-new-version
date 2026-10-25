@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-local-only",
+    "code": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+    "name": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-local-only",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0",
+    "definitionHash": "99c88b01aa596875b10b95a65aa43dc10c4c3ad73bdffdf0546e21d327b7ff2c",
+    "referenceVersions": [],
+    "assessmentContext": null
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_01",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_02",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_04",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_05",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_06",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_07",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "IPIP_NEO_C1_SELF_EFFICACY10_10",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    }
+  ],
+  "scores": [
+    {
+      "key": "ipip_neo_c1_self_efficacy10",
+      "type": "total",
+      "label": "一般任务自我效能感",
+      "description": "一般任务自我效能感的自述；较高分表示相关信心更强，不代表客观能力或道德价值更高。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 30,
+      "range": {
+        "min": 10,
+        "max": 50
+      },
+      "expectedItems": [
+        "IPIP_NEO_C1_SELF_EFFICACY10_01",
+        "IPIP_NEO_C1_SELF_EFFICACY10_02",
+        "IPIP_NEO_C1_SELF_EFFICACY10_03",
+        "IPIP_NEO_C1_SELF_EFFICACY10_04",
+        "IPIP_NEO_C1_SELF_EFFICACY10_05",
+        "IPIP_NEO_C1_SELF_EFFICACY10_06",
+        "IPIP_NEO_C1_SELF_EFFICACY10_07",
+        "IPIP_NEO_C1_SELF_EFFICACY10_08",
+        "IPIP_NEO_C1_SELF_EFFICACY10_09",
+        "IPIP_NEO_C1_SELF_EFFICACY10_10"
+      ],
+      "answeredItems": [
+        "IPIP_NEO_C1_SELF_EFFICACY10_01",
+        "IPIP_NEO_C1_SELF_EFFICACY10_02",
+        "IPIP_NEO_C1_SELF_EFFICACY10_03",
+        "IPIP_NEO_C1_SELF_EFFICACY10_04",
+        "IPIP_NEO_C1_SELF_EFFICACY10_05",
+        "IPIP_NEO_C1_SELF_EFFICACY10_06",
+        "IPIP_NEO_C1_SELF_EFFICACY10_07",
+        "IPIP_NEO_C1_SELF_EFFICACY10_08",
+        "IPIP_NEO_C1_SELF_EFFICACY10_09",
+        "IPIP_NEO_C1_SELF_EFFICACY10_10"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "ipip_neo_c1_self_efficacy10",
+      "headline": "一般任务自我效能感：描述性反馈",
+      "label": null,
+      "interpretation": "总分描述你对完成一般任务、判断情况和寻找解决办法的信心，理论范围为10–50。分数较高表示本次作答呈现更强的任务自我效能感，不等于客观能力、实际绩效或个人价值更高。本工具是IPIP对NEO C1的公共领域表征，不是专有NEO-PI-R题目，也不等同GSE或具体学科的自我效能。中文工作译稿未验证，不提供人群排名和高低等级。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想最近一次完成任务的经历：你的信心来自经验、信息、准备还是他人的支持？"
+        },
+        {
+          "category": "strategy",
+          "text": "选择一个可完成的小步骤，记录用了什么方法和资源；把需要帮助看作任务信息，而不是能力不足的标签。"
+        }
+      ],
+      "limitations": [
+        "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+        "没有可运行的目标人群常模或经验分档；30仅为理论中点，不是人群均值。",
+        "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+        "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+        "官方英文alpha=.78仅为来源统计，样本细节未重新建立，不冒称中文信度或个人准确性。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "中文工作译稿未完成专家译审、认知访谈和目标人群验证。",
+    "没有可运行的目标人群常模或经验分档；30仅为理论中点，不是人群均值。",
+    "完整10项有效作答才求和；不插补，该缺失规则是项目实现选择。",
+    "不用于诊断、选拔、能力排名、学生筛选或教师考核。",
+    "官方英文alpha=.78仅为来源统计，样本细节未重新建立，不冒称中文信度或个人准确性。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "仅供成人研究与描述性自我了解，不用于心理诊断、高风险选拔或个人价值判定。本工具是独立IPIP-NEO C1表征，非完整NEO人格评估。"
+}

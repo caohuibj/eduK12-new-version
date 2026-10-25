@@ -1,0 +1,214 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "translationStatus": "PROJECT_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "thresholds": [],
+  "missingPolicy": {
+    "rule": "all items required; no imputation",
+    "status": "PROJECT_POLICY_NOT_ORIGINAL_PSYCHOMETRIC_RULE"
+  },
+  "defaultAudience": "ADULT_SELF; school/minor use requires population-specific review",
+  "reportPolicy": "Descriptive feedback only. No diagnosis, percentile, low/medium/high bands, selection or ranking.",
+  "id": "IPIP_NEO_C1_SELF_EFFICACY10",
+  "title": "一般任务自我效能感",
+  "family": "IPIP-NEO facet representation",
+  "facet": "C1",
+  "identityWarning": "Public-domain IPIP representation, not proprietary NEO-PI-R items; standalone facet, not full NEO profile. Not equivalent to GSE or domain-specific academic self-efficacy.",
+  "rights": {
+    "status": "PUBLIC_DOMAIN",
+    "scope": [
+      "full-item-reproduction",
+      "translation",
+      "online-administration",
+      "commercial-and-noncommercial",
+      "project-authored-feedback"
+    ],
+    "sources": [
+      "https://ipip.ori.org/newPermission.htm",
+      "https://www.ipip.ori.org/"
+    ]
+  },
+  "instructionZh": "请根据你目前通常的情况，而不是希望将来成为的样子，判断下面各句话与你的实际情况有多符合。",
+  "timeframe": "general current self-description; no fixed retrospective window",
+  "responseOptions": [
+    {
+      "value": 1,
+      "en": "Very Inaccurate",
+      "zh": "很不符合"
+    },
+    {
+      "value": 2,
+      "en": "Moderately Inaccurate",
+      "zh": "比较不符合"
+    },
+    {
+      "value": 3,
+      "en": "Neither Inaccurate nor Accurate",
+      "zh": "介于不符合与符合之间"
+    },
+    {
+      "value": 4,
+      "en": "Moderately Accurate",
+      "zh": "比较符合"
+    },
+    {
+      "value": 5,
+      "en": "Very Accurate",
+      "zh": "很符合"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "en": "Complete tasks successfully.",
+      "zh": "我能成功完成任务。",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "en": "Excel in what I do.",
+      "zh": "我在所做的事情上表现出色。",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "en": "Handle tasks smoothly.",
+      "zh": "我能顺利处理任务。",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "en": "Am sure of my ground.",
+      "zh": "我对自己的判断有把握。",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "en": "Come up with good solutions.",
+      "zh": "我能想出好的解决办法。",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "en": "Know how to get things done.",
+      "zh": "我知道怎样把事情办好。",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "en": "Misjudge situations.",
+      "zh": "我会误判情况。",
+      "reverse": true
+    },
+    {
+      "number": 8,
+      "en": "Don't understand things.",
+      "zh": "我弄不明白事情。",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "en": "Have little to contribute.",
+      "zh": "我能作出的贡献很少。",
+      "reverse": true
+    },
+    {
+      "number": 10,
+      "en": "Don't see the consequences of things.",
+      "zh": "我看不出事情会带来什么后果。",
+      "reverse": true
+    }
+  ],
+  "scoring": {
+    "type": "sum",
+    "positiveItems": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reverseItems": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "reverseFormula": "6 - response",
+    "range": [
+      10,
+      50
+    ],
+    "higherMeans": "一般任务自我效能感自报倾向更强；不代表客观能力更高或更有道德价值"
+  },
+  "evidence": [
+    {
+      "kind": "internal-consistency-alpha",
+      "value": 0.78,
+      "source": "IPIP_NEO_KEYS",
+      "limitation": "Official key page reports English source alpha; sample details not re-established here. Not a Chinese coefficient, norm or cutoff."
+    }
+  ],
+  "references": [
+    {
+      "id": "IPIP_PERMISSION",
+      "title": "Obtaining Permission",
+      "url": "https://ipip.ori.org/newPermission.htm",
+      "role": "Public-domain commercial/non-commercial use"
+    },
+    {
+      "id": "IPIP_HOME",
+      "title": "International Personality Item Pool",
+      "url": "https://www.ipip.ori.org/",
+      "role": "Explicit copy/edit/translate/use-any-purpose statement"
+    },
+    {
+      "id": "IPIP_NEO_KEYS",
+      "title": "Items in the Preliminary IPIP Scales Measuring Constructs Similar to Those in the NEO-PI-R",
+      "url": "https://ipip.ori.org/newNEOKey.htm",
+      "role": "Exact English items and positive/negative keys"
+    },
+    {
+      "id": "IPIP_SCORING",
+      "title": "Converting IPIP Item Responses to Scale Scores",
+      "url": "https://ipip.ori.org/newScoringInstructions.htm",
+      "role": "1–5 anchors; reverse keys; sum"
+    },
+    {
+      "id": "GOLDBERG_1999",
+      "citation": "Goldberg, L. R. (1999). A broad-bandwidth, public domain, personality inventory measuring the lower-level facets of several five-factor models. In I. Mervielde, I. Deary, F. De Fruyt, & F. Ostendorf (Eds.), Personality Psychology in Europe, Vol. 7 (pp. 7–28). Tilburg University Press.",
+      "url": "https://www.ipip.ori.org/A%20broad-bandwidth%20inventory.pdf",
+      "role": "IPIP project/facet construction background; not Chinese validation"
+    },
+    {
+      "id": "GOLDBERG_2006",
+      "citation": "Goldberg, L. R., Johnson, J. A., Eber, H. W., Hogan, R., Ashton, M. C., Cloninger, C. R., & Gough, H. C. (2006). The International Personality Item Pool and the future of public-domain personality measures. Journal of Research in Personality, 40, 84–96.",
+      "doi": "10.1016/j.jrp.2005.08.007",
+      "url": "https://projects.ori.org/lrg/PDFs_papers/Goldberg_etal_2006_IPIP_JRP.pdf",
+      "role": "Project background, not standalone C1/C5 Chinese validation"
+    }
+  ],
+  "tags": [
+    "人格倾向",
+    "自我报告",
+    "成人",
+    "研究译稿",
+    "一般任务自我效能感"
+  ],
+  "reportDraft": {
+    "heading": "你对处理一般任务的信心",
+    "summary": "本次结果反映你如何评价自己处理任务、判断情况和寻找办法的能力，不是对真实能力、智力或某一学科水平的测试。",
+    "scoreExplanation": "反向计分后总分10–50，得分越高表示本次自报的一般任务自我效能倾向越强。没有适用于本中文研究译稿的常模或经验分界，不划分等级。",
+    "reflection": [
+      "在哪些任务里你更有把握，哪些任务仍需要支持？",
+      "你的信心来自哪些已经完成的具体经验？"
+    ],
+    "actions": [
+      "选择一件难度适中的任务，拆出一个今天能完成的小步骤。",
+      "完成后记录有效的策略与所获帮助，用具体经验校准信心。"
+    ],
+    "limits": "IPIP公共领域人格分量表，不是GSE量表或NEO-PI-R原版；中文版尚未验证。"
+  }
+}
