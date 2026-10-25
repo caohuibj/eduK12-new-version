@@ -251,8 +251,8 @@ export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:Cat
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
   const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
-  // Source advisory locks must precede Scale row locks. A queued license writer
-  // would otherwise invert the explicit converter's source -> Scale order.
+  // Source advisory locks must precede Scale row locks, preserving the explicit
+  // converter's source -> Scale order while identities are verified.
   const scaleIds=ids('SCALE')
   const before=scaleIds.length?await db.$queryRaw<Array<{id:string;code:string;instrument_version:string;instrument_class:string}>>(Prisma.sql`SELECT id,code,instrument_version,instrument_class::text FROM scales WHERE id IN (${Prisma.join(scaleIds)}) ORDER BY id`):[]
   for(const row of [...before].filter(row=>row.instrument_class==='STANDARD').sort((a,b)=>a.code.localeCompare(b.code)||a.instrument_version.localeCompare(b.instrument_version)))

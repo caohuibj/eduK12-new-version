@@ -355,7 +355,7 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     const children=await tx.assessment.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
       compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{scaleId:true,compositeItemId:true}})
     if(children.length!==prepared.length)throw failure('整卷工具来源已变化')
-    await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),parent.id,children.map(child=>child.compositeItemId!))
+    await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),{compositeAttemptId:parent.id,compositeItemIds:children.map(child=>child.compositeItemId!)})
   }:undefined)
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)

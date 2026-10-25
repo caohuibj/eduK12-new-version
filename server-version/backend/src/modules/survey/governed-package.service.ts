@@ -46,7 +46,7 @@ async function listedPackageGrants(tx:Prisma.TransactionClient,userId:string,pag
  const pattern='%'+query.trim().replace(/[\\%_]/g,'\\$&')+'%'
  const rows=await tx.$queryRaw<ListedPackageGrant[]>(Prisma.sql`SELECT g.*,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused FROM survey_package_grants g
   JOIN LATERAL(SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE t.id=g.tool_id) tool ON true
-  LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
+  LEFT JOIN survey_tool_policies p ON p.product='SURVEY' AND p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
   WHERE g.user_id=${userId} ${activeOnly?Prisma.sql`AND g.status='ACTIVE'`:Prisma.empty} AND (${query}='' OR tool.title ILIKE ${pattern} OR g.snapshot_hash ILIKE ${pattern})
   ORDER BY g.created_at DESC,g.id LIMIT 26 OFFSET ${(page-1)*25}`)
  return {list:rows.slice(0,25).map(r=>({...view(r,r.tool.title,r.tool.family),toolVersion:r.tool.tool_version,versions:r.tool.versions,components:r.tool.components,availability:packageAvailability(r)})),page,hasMore:rows.length>25}
@@ -150,7 +150,7 @@ async function packageImportSummaries(tx:Prisma.TransactionClient,projectId:stri
   SELECT g.*,i.id AS import_id,i.bindings,to_jsonb(tool) AS tool,clock_timestamp() AS now,p.decision,p.paused
   FROM survey_package_imports i JOIN survey_package_grants g ON g.id=i.grant_id
   JOIN LATERAL(SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE t.id=i.tool_id AND t.snapshot_hash=i.snapshot_hash) tool ON true
-  LEFT JOIN survey_tool_policies p ON p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
+  LEFT JOIN survey_tool_policies p ON p.product='SURVEY' AND p.resource_key='governed-release:'||g.tool_id::text AND p.fingerprint=g.snapshot_hash
   WHERE i.project_id=${projectId} ${'draftIds'in input?Prisma.sql`AND EXISTS(SELECT 1 FROM survey_package_members member WHERE member.import_id=i.id AND member.draft_id=ANY(${input.draftIds}::text[]))`:Prisma.empty}
   ORDER BY i.created_at DESC,i.id ${'page'in input?Prisma.sql`LIMIT 26 OFFSET ${(input.page-1)*25}`:Prisma.sql`LIMIT 31`}`)
  if('draftIds'in input&&rows.length>30)governedFail(409,'选用整包身份数量超限，不能截断编排身份')

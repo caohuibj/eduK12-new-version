@@ -78,7 +78,7 @@ it('keeps Survey management isolated even when the exact version is ready for bo
  expect(api.grants).not.toHaveBeenCalled()
 })
 it('preserves all admin targets and exact education readiness outside Survey management',async()=>{
- api.catalog.mockResolvedValue(catalog({...entry,supportedEntrypoints:['TRAINING','SURVEY','SCHOOL','TEACHER'],educationDistribution:{...ready,products:{SCHOOL:ready,TEACHER:closed}}}))
+ api.catalog.mockResolvedValue(catalog({...entry,supportedEntrypoints:['TRAINING','SURVEY','SCHOOL','TEACHER'],admittedEntrypoints:['TRAINING','SURVEY'],educationDistribution:{...ready,products:{SCHOOL:ready,TEACHER:closed}}}))
  api.educationRecipients.mockResolvedValue({product:'SCHOOL',scopeKind:'ORGANIZATION',list:[],nextCursor:null})
  await inspect()
  expect(screen.getByRole('option',{name:'Training'})).toBeEnabled();expect(screen.getByRole('option',{name:'Survey'})).toBeEnabled()

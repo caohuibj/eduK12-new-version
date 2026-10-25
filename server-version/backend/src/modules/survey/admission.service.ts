@@ -44,17 +44,9 @@ async function openWaveLocked(tx:Tx,projectId:string,waveId:string,linked:boolea
   const now=new Date()
   if((wave.opensAt&&wave.opensAt>now)||(wave.closesAt&&wave.closesAt<=now)||wave.hardStopAt)
     blocked('本波次未在允许的采集时间内')
-  const owners=await tx.$queryRaw<Array<{id:string}>>`
-    SELECT u.id FROM "users" u
-      JOIN "survey_researcher_grants" g ON g.user_id=u.id
-      JOIN "survey_mfa_credentials" m ON m.user_id=u.id
-    WHERE u.id=${project.ownerUserId} AND u.account_domain='SURVEY'
-      AND u.is_active AND NOT u.is_frozen
-      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
-      AND g.status='ACTIVE' AND m.enabled
-    FOR SHARE OF u,g,m
-  `
-  if(!owners.length)blocked('研究发布者暂不可用')
+  // Account/project authoring eligibility was checked when this publication was
+  // frozen. Public admission follows its current recruitment state, not a fresh
+  // approval of the author's account. Participant authentication stays separate.
   if((linked&&project.collectionMode!=='LINKED_WAVES')||
     (!linked&&project.collectionMode!=='SINGLE_UNLINKED'))
     blocked('此研究不是对应的匿名参与模式')

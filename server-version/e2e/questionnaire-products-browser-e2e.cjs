@@ -9,12 +9,13 @@ const output = process.env.QUESTIONNAIRE_PRODUCT_EVIDENCE || '/tmp/huisurvey-q1-
 fs.mkdirSync(output,{recursive:true})
 function ok(response) { assert.equal(response.status,200,JSON.stringify(response.body)); assert.equal(response.body.code,0); return response.body.data }
 async function completeFour(page, label) {
-  await page.locator('textarea').fill('学习与合作')
+  const answer=page.getByRole('textbox',{name:/^本次学习目标\s*必填$/})
+  await answer.fill('学习与合作')
   await page.waitForTimeout(300)
   const route=page.url()
   await page.reload()
-  await page.locator('textarea').waitFor()
-  assert.equal(await page.locator('textarea').inputValue(),'学习与合作')
+  await answer.waitFor()
+  assert.equal(await answer.inputValue(),'学习与合作')
   assert.equal(page.url(),route)
   await page.getByRole('button',{name:'提交整个区段',exact:true}).click()
   await page.getByRole('button',{name:'是',exact:true}).click()
@@ -66,12 +67,17 @@ async function main() {
   const publicMode=process.env.QUESTIONNAIRE_PRODUCT_PUBLIC==='1'
   try {
     if (publicMode) {
-      // Public-delivery business coverage starts after strong authentication.
-      // The separate administrator gate retains real virtual CTAP2 ceremonies.
-      await restoreSyntheticAdminSession(page, { baseUrl, username: fixture.admin.username })
-    } else {
-      await loginWithSession(page,{baseUrl,route:'/teacher/account-login',...fixture.teacher,timeout:60000})
+      // An entry administrator does not acquire the content owner's business
+      // identity. Keep that rejection, then use the real owner's teacher login.
+      const adminContext=await browser.newContext(),adminPage=await adminContext.newPage()
+      try {
+        await restoreSyntheticAdminSession(adminPage,{baseUrl,username:fixture.admin.username})
+        for(const endpoint of ['/questionnaire-products','/questionnaire-products/resources']) {
+          assert.equal((await sessionJsonFetch(adminPage,endpoint)).status,403,'entry administration alone must not read private business content')
+        }
+      } finally { await adminContext.close() }
     }
+    await loginWithSession(page,{baseUrl,route:'/teacher/account-login',...fixture.teacher,timeout:60000})
     if(process.env.QUESTIONNAIRE_PRODUCT_REPORT_ONLY==='1') {
       const previous=JSON.parse(fs.readFileSync(output+'/result.json','utf8'))
       const payload=ok(await sessionJsonFetch(page,'/questionnaire-products/'+previous.id+'/reports'))

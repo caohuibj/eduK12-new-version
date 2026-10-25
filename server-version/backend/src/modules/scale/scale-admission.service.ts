@@ -1,5 +1,4 @@
 import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
@@ -8,6 +7,7 @@ import { type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import {
   createFrozenUnitAdmission,
   frozenAdmissionPersistence,
@@ -726,7 +726,7 @@ export const activateScaleAdmission = async (
   assertFinalOnly(row.deliveryMode)
   const runtime = (await loadScaleAdmissionRuntime(row))
   if (runtime.schemaVersion === 1) return prisma.$transaction(async tx=>{
-    await assertTrainingScaleCollectionAllowed(tx,[row.scaleId],row.compositeAttemptId,row.compositeItemId?[row.compositeItemId]:[])
+    await assertTrainingScaleCollectionAllowed(tx,[row.scaleId],{compositeAttemptId:row.compositeAttemptId,compositeItemIds:row.compositeItemId?[row.compositeItemId]:[]})
     return activateUnstoredScaleAdmission(tx,row,runtime,parent)
   })
 
@@ -737,7 +737,7 @@ export const activateScaleAdmission = async (
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = await loadStoredScaleAdmission(current,tx)
       if (winner) return (await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
-      await assertTrainingScaleCollectionAllowed(tx,[current.scaleId],current.compositeAttemptId,current.compositeItemId?[current.compositeItemId]:[])
+      await assertTrainingScaleCollectionAllowed(tx,[current.scaleId],{compositeAttemptId:current.compositeAttemptId,compositeItemIds:current.compositeItemId?[current.compositeItemId]:[]})
       // Load the parent inside this transaction, never use a pre-transaction context.
       return activateUnstoredScaleAdmission(tx, current, (await loadScaleAdmissionRuntime(current, tx)))
     },

@@ -14,7 +14,7 @@ import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from '../integrat
 import {publishContentRelease} from '../../modules/measurement-content/repository'
 import {scaleMeasurementRelease} from '../../modules/measurement-content/scale'
 import {compileResearchScale} from '../../modules/survey/builder.compiler'
-import {submit,review,withdraw,changeEntryStatus,stopCollection,readSubmission,listEntries} from '../../modules/scale-library-governance/service'
+import {submit,review,withdraw,changeEntryStatus,changeEntryProducts,stopCollection,readSubmission,listEntries} from '../../modules/scale-library-governance/service'
 import {grantUse,revokeUse} from '../../modules/scale-library-governance/distribution'
 import {assertLibraryUseGrantCurrent} from '../../modules/scale-library-governance/usage'
 import {assertScaleLibraryCollectionAllowed} from '../../modules/scale-library-governance/collection-guard'
@@ -29,7 +29,7 @@ async function source(sourceReleaseId:string|null=null,relationship='ORIGINAL'){
   provenance:{authoringRelationship:relationship,authoringSnapshot:{title:metadata.title,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}}),owner))
 }
 async function application(){const release=await source();const submission=await submit(owner,'SURVEY',{requestId:randomUUID(),releaseId:release.releaseId,metadata});return {release,submission}}
-async function approved(){const state=await application();const result=await review(admin,state.submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic approval'});return {...state,entryId:result.entryId!}}
+async function approved(){const state=await application();const result=await review(admin,state.submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic approval'});return {...state,entryId:result.entryId!}}
 suite('Scale library governance / real isolated PostgreSQL',()=>{
  beforeAll(async()=>{
   process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);process.env.DATA_PSEUDONYM_KEY='b'.repeat(64)
@@ -45,22 +45,24 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
  afterAll(async()=>{await db?.$disconnect()})
  it('freezes application metadata, denies foreign review and keeps exact source release',async()=>{
   const {release,submission}=await application()
-  await expect(review(reader,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Not authorized'})).rejects.toThrow()
+  await expect(review(reader,submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Not authorized'})).rejects.toThrow()
   await expect(db.$executeRaw(Prisma.sql`UPDATE scale_library_submissions SET metadata='{}'::jsonb WHERE id=${submission.id}`)).rejects.toThrow()
   await expect(readSubmission(reader,submission.id)).rejects.toThrow()
   const detail=await readSubmission(owner,submission.id)
   expect(detail.release.releaseId).toBe(release.releaseId)
   expect(detail.snapshot.compiledDefinition.scoring).toEqual(compileResearchScale(metadata.title,definition).scoring)
-  const result=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Exact snapshot approved'})
+  const result=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Exact snapshot approved'})
   const [entry]=await db.$queryRaw<Array<{release_id:string}>>(Prisma.sql`SELECT release_id FROM scale_library_entries WHERE id=${result.entryId}`)
   expect(entry.release_id).toBe(release.releaseId)
   const catalog=await listEntries(reader)
-  expect(catalog.list.some(e=>e.id===result.entryId)).toBe(true)
+  expect(catalog.list.some(e=>e.id===result.entryId)).toBe(false)
+  await grantLibraryUseFixture(db,admin,result.entryId!,{requestId:randomUUID(),userId:reader,product:'SURVEY'})
+  expect((await listEntries(reader)).list.some(e=>e.id===result.entryId)).toBe(true)
   expect(JSON.stringify(catalog)).not.toContain('compiledDefinition')
  })
  it('serializes author withdrawal against approval without a half-approved entry',async()=>{
   const {submission}=await application()
-  const results=await Promise.allSettled([review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Race approval'}),withdraw(owner,submission.id,{expectedVersion:1,reason:'Race withdraw'})])
+  const results=await Promise.allSettled([review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Race approval'}),withdraw(owner,submission.id,{expectedVersion:1,reason:'Race withdraw'})])
   expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1)
   const [row]=await db.$queryRaw<Array<{status:string;entries:bigint}>>(Prisma.sql`SELECT s.status,(SELECT count(*) FROM scale_library_entries e WHERE e.submission_id=s.id) AS entries FROM scale_library_submissions s WHERE s.id=${submission.id}`)
   expect(Number(row.entries)).toBe(row.status==='APPROVED'?1:0)
@@ -105,7 +107,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const release=await db.$transaction(tx=>publishContentRelease(tx,scaleMeasurementRelease({localId:id,version:'v1',instrumentVersion:'1',definition:compiled,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:{kind:'PRIVATE',ownerId:author,product:'TRAINING',resourceId:id},provenance:{authoringRelationship:'ORIGINAL',authoringSnapshot:{title:metadata.title,definition:compiled,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'TRAINING'}}}),author))
   await db.scale.create({data:{id,code:'original:'+id,name:metadata.title,creatorId:author,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'1',definition:compiled as unknown as Prisma.InputJsonValue,definitionHash:hashScaleDefinition(compiled),measurementReleaseId:release.releaseId}})
   const application=await submit(author,'TRAINING',{requestId:randomUUID(),releaseId:release.releaseId,metadata})
-  const approval=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic source independence'})
+  const approval=await review(admin,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic source independence'})
   const entryId=approval.entryId!
   await db.scale.update({where:{id},data:{status:'ARCHIVED'}})
   await db.user.update({where:{id:author},data:{isFrozen:true}})
@@ -149,21 +151,53 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
     if(oldAsync===undefined)delete process.env.ASSESSMENT_REPORT_ASYNC_ENABLED;else process.env.ASSESSMENT_REPORT_ASYNC_ENABLED=oldAsync
   }
  })
- it('entry admin is a distributor only within the exact explicit parent grant; revocation stops new use',async()=>{
-  const {entryId,release}=await approved()
-  const teacher=(await db.user.create({data:{username:'distrib-recipient-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
-  const delegate=(await db.user.create({data:{username:'libdelegate'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id
-  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:delegate,entry:'TRAINING',grantedBy:admin}})
-  await expect(grantUse(delegate,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})).rejects.toThrow()
+ it('formal entry administration covers admitted exact versions; ordinary delegation stays exact and revocation stops new use',async()=>{
+  const first=await approved(),second=await approved()
+  const teacher=await db.user.create({data:{username:'formal-recipient-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})
+  const delegatedTeacher=await db.user.create({data:{username:'delegated-recipient-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})
+  const manager=(await db.user.create({data:{username:'libmanager-'+randomUUID(),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id
+  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:manager,entry:'TRAINING',grantedBy:admin}})
+  await grantUse(manager,first.entryId,{requestId:randomUUID(),userId:teacher.id,product:'TRAINING'})
+  await grantUse(manager,second.entryId,{requestId:randomUUID(),userId:teacher.id,product:'TRAINING'})
+  await expect(grantUse(manager,first.entryId,{requestId:randomUUID(),userId:reader,product:'SURVEY'})).rejects.toThrow()
+  const delegate=(await db.user.create({data:{username:'libdelegate-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
+  await expect(grantUse(delegate,first.entryId,{requestId:randomUUID(),userId:delegatedTeacher.id,product:'TRAINING'})).rejects.toThrow()
   const parentId=randomUUID()
-  await db.contentCapabilityGrant.create({data:{id:parentId,subjectId:delegate,issuerId:admin,product:'TRAINING',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'material',resourceKeys:[release.releaseId],capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000),expiresAt:new Date(Date.now()+60000),ancestry:[parentId]}})
-  await grantUse(delegate,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING',grantId:parentId})
-  await expect(review(delegate,(await application()).submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Distribution is not review',grantId:parentId})).rejects.toThrow()
-  await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:teacher,product:'TRAINING'}))
+  await db.contentCapabilityGrant.create({data:{id:parentId,subjectId:delegate,issuerId:admin,product:'TRAINING',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'material',resourceKeys:[first.release.releaseId],capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:new Date(Date.now()-60000),expiresAt:new Date(Date.now()+60000),ancestry:[parentId]}})
+  await expect(grantUse(delegate,second.entryId,{requestId:randomUUID(),userId:delegatedTeacher.id,product:'TRAINING',grantId:parentId})).rejects.toThrow()
+  await grantUse(delegate,first.entryId,{requestId:randomUUID(),userId:delegatedTeacher.id,product:'TRAINING',grantId:parentId})
+  await expect(review(delegate,(await application()).submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING'],reason:'Distribution is not review',grantId:parentId})).rejects.toThrow()
+  await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId:first.entryId,userId:delegatedTeacher.id,product:'TRAINING'}))
   await db.contentCapabilityGrant.update({where:{id:parentId},data:{revokedAt:new Date(),revokedBy:admin,revokeReason:'Synthetic parent withdrawal',version:{increment:1}}})
-  await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:teacher,product:'TRAINING'}))).rejects.toThrow()
-  await db.$transaction(tx=>assertScaleLibraryCollectionAllowed(tx,[release.releaseId]))
+  await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId:first.entryId,userId:delegatedTeacher.id,product:'TRAINING'}))).rejects.toThrow()
+  await db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId:first.entryId,userId:teacher.id,product:'TRAINING'}))
+  await db.$transaction(tx=>assertScaleLibraryCollectionAllowed(tx,[first.release.releaseId]))
  })
+ it('global approval without Training admission cannot distribute there; an explicit system scope change is required',async()=>{
+  const state=await application(),result=await review(admin,state.submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Survey only'})
+  const manager=(await db.user.create({data:{username:'training-entry-'+randomUUID(),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id
+  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:manager,entry:'TRAINING',grantedBy:admin}})
+  const teacher=(await db.user.create({data:{username:'training-target-'+randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
+  await expect(grantUse(manager,result.entryId!,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})).rejects.toThrow(/入口准入/)
+  expect(await db.$queryRaw`SELECT id FROM scale_library_use_grants WHERE entry_id=${result.entryId} AND product='TRAINING'`).toEqual([])
+  await expect(changeEntryProducts(manager,result.entryId!,{expectedVersion:1,allowedProducts:['TRAINING'],reason:'Cannot grant myself entry approval'})).rejects.toThrow()
+  await changeEntryProducts(admin,result.entryId!,{expectedVersion:1,allowedProducts:['SURVEY','TRAINING'],reason:'Explicit Training admission'})
+  await expect(grantUse(manager,result.entryId!,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})).resolves.toMatchObject({product:'TRAINING',userId:teacher})
+ })
+ it('filters authorization before pagination when the only usable entry is behind26 catalog rows',async()=>{
+  const target=(await db.user.create({data:{username:'catalog-recipient-'+randomUUID(),passwordHash:'synthetic',accountDomain:'SURVEY'}})).id
+  const login='r'+randomUUID().replaceAll('-','').slice(0,20)
+  await db.surveyAccount.create({data:{userId:target,loginName:login,normalizedLogin:login}})
+  await db.surveyResearcherGrant.create({data:{userId:target,status:'PENDING_MFA',grantedBy:admin}})
+  const oldest=await approved()
+  for(let n=0;n<26;n++)await approved()
+  await grantLibraryUseFixture(db,admin,oldest.entryId,{requestId:randomUUID(),userId:target,product:'SURVEY'})
+  const page=await listEntries(target,undefined,{offset:0,limit:25},'SURVEY')
+  expect(page.list.map(row=>row.id)).toEqual([oldest.entryId]);expect(page.hasMore).toBe(false)
+  await revokeUse((await db.$queryRaw<Array<{issuer_id:string}>>`SELECT issuer_id FROM scale_library_use_grants WHERE entry_id=${oldest.entryId} AND user_id=${target}`)[0].issuer_id,
+    (await db.$queryRaw<Array<{id:string}>>`SELECT id FROM scale_library_use_grants WHERE entry_id=${oldest.entryId} AND user_id=${target}`)[0].id,{expectedVersion:1,reason:'Synthetic withdrawal'})
+  expect((await listEntries(target,undefined,{offset:0,limit:25},'SURVEY')).list).toEqual([])
+ },15000)
  it('exact emergency stops reject collection but do not cascade across independent native revisions',async()=>{
   const v1=await source(),v2=await source(v1.releaseId,'REVISION'),dependent=await source(v1.releaseId,'LICENSED_USE')
   await db.$transaction(tx=>stopCollection(tx,admin,'RELEASE',v1.releaseId,'Synthetic exact stop'))
@@ -202,7 +236,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   expect(response.statusCode).toBe(403)
   expect(await db.assessment.count({where:{scaleId:wrapper.id,userId:student}})).toBe(1)
  })
- it('real FINAL waiting on an uncommitted emergency fence cannot collect after the stop commits',async()=>{
+ it('finishes an admitted frozen FINAL while a new-start stop transaction is held',async()=>{
   const {submitScaleAssessmentFinal}=await import('../../modules/scale/scale-final-submit.service')
   const {entryId,release}=await approved()
   const teacher=(await db.user.create({data:{username:'raceteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
@@ -215,18 +249,14 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const stopping=db.$transaction(async tx=>{await stopCollection(tx,admin,'RELEASE',release.releaseId,'Synthetic FINAL race');locked();await commitStop},{timeout:15000})
   await lockReady
   const final=submitScaleAssessmentFinal(input).then(value=>({ok:true,value}),error=>({ok:false,error}))
-  let waiting=false
+  let timer:ReturnType<typeof setTimeout>|undefined,result:Awaited<typeof final>|undefined
   try{
-    for(let n=0;n<100&&!waiting;n++){
-      const [row]=await db.$queryRaw<Array<{waiting:boolean}>>(Prisma.sql`SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE datname=current_database() AND pid<>pg_backend_pid() AND cardinality(pg_blocking_pids(pid))>0 AND query ILIKE '%measurement_content_releases%') AS waiting`)
-      waiting=row.waiting;if(!waiting)await new Promise(resolve=>setTimeout(resolve,25))
-    }
-  }finally{commit()}
+    result=await Promise.race([final,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error('Admitted FINAL waited for a new-start stop')),3000)})])
+  }finally{if(timer)clearTimeout(timer);commit()}
   await stopping
-  expect(waiting).toBe(true)
-  expect((await final).ok).toBe(false)
+  expect(result?.ok).toBe(true)
   const retained=await db.assessment.findUniqueOrThrow({where:{id:assessment.id}})
-  expect(retained.status).toBe('IN_PROGRESS');expect(retained.submissionId).toBeNull();expect(retained.result).toBeNull()
+  expect(retained.status).toBe('COMPLETED');expect(retained.submissionId).toBe(input.submissionId);expect(retained.result).not.toBeNull()
  })
  it('old Serializable snapshots cannot miss a committed stop after the existing-identity fence',async()=>{
   const release=await source();let ready!:()=>void,resume!:()=>void
@@ -336,7 +366,7 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const repeated=await submit(owner,'SURVEY',{...request,educationApplicability:{...educationApplicability,administrations:[...educationApplicability.administrations].reverse()}})
   expect(repeated.id).toBe(submission.id)
   await expect(submit(owner,'SURVEY',{...request,educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'PARENT_REPORT'}]}})).rejects.toThrow('请求编号已用于其他申请')
-  const approvedVersion=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Explicit applicability approved with this version'})
+  const approvedVersion=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Explicit applicability approved with this version'})
   const detail=await readSubmission(owner,submission.id)
   expect(detail.educationApplicability).toEqual(educationApplicability)
   expect(detail.educationApplicabilityHash).toBe(submission.educationApplicabilityHash)

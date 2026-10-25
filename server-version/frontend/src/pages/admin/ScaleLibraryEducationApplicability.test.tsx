@@ -9,7 +9,7 @@ const api=vi.hoisted(()=>({capabilities:vi.fn(),submissions:vi.fn(),catalog:vi.f
 vi.mock('../../api/scaleLibraryGovernance',()=>({governanceApi:()=>api,submissionStatusLabel:{SUBMITTED:'待审核'}}))
 const metadata={title:'待审量表',author:'作者',copyright:'自有',applicability:'描述性用途',scoringDescription:'求和',reportDescription:'报告'}
 const declared={schemaVersion:1,administrations:[{population:'TEACHER',responseMode:'STUDENT_REPORT'}]}
-const row={id:'application',releaseId:'r1',version:2,metadata,status:'SUBMITTED',product:'TRAINING',educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'}]}}
+const row={id:'application',releaseId:'r1',version:2,metadata,status:'SUBMITTED',product:'TRAINING',supportedEntrypoints:['TRAINING','SURVEY'],educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'}]}}
 const detail=(overrides:Record<string,unknown>={})=>({...row,educationApplicability:declared,educationApplicabilityHash:'snapshot-hash',snapshot:{definition:{}},mediaManifest:{schemaVersion:1,manifestHash:'empty',releaseIds:['r1'],items:[]},release:{releaseId:'r1',version:'1'},dependencies:[],...overrides})
 beforeEach(()=>{vi.resetAllMocks();session.me.mockResolvedValue({code:0,data:{id:'entry-manager',username:'entry-manager',role:'TEACHER',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}});api.capabilities.mockResolvedValue({systemAdmin:false,reviewGrants:[{grantId:'review-r1',releaseIds:['r1']}],distributionGrants:[]});api.submissions.mockResolvedValue({list:[row]});api.catalog.mockResolvedValue({list:[],page:1,pageSize:25,hasMore:false})})
 afterEach(()=>{cleanup();vi.restoreAllMocks()})

@@ -8,6 +8,7 @@ import {authenticate,authenticateSurvey} from '../../middleware/auth'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 import {success,error} from '../../utils/response'
 import {platformSurveyOriginGuard} from '../survey/originGuard'
+import {requireRecentAdminKey} from '../admin-permissions/guards'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -45,6 +46,7 @@ function router(product:'TRAINING'|'SURVEY'){
  result.get('/entries',handle(req=>service.listEntries(req.user!.userId)))
  if(product==='TRAINING'){
   result.post('/submissions/:id/review',handle(req=>service.review(req.user!.userId,uuid.parse(req.params.id),req.body)))
+  result.post('/entries/:id/entrypoints',requireRecentAdminKey,handle(req=>service.changeEntryProducts(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.post('/entries/:id/status',handle(req=>service.changeEntryStatus(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.get('/entries/:id/recipients',handle(req=>recipients(req.user!.userId,uuid.parse(req.params.id),req.query)))
   result.get('/entries/:id/grants',handle(req=>listUses(req.user!.userId,uuid.parse(req.params.id))))

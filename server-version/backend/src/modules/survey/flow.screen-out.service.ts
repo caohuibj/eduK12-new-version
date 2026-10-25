@@ -72,7 +72,7 @@ export async function screenOutResearchAttempt(input:FinalInput){
       throw new SurveyFinalError(409,'冻结版本已经变化')
     const now=new Date()
     const deadline=wave.finishUntil??wave.closesAt
-    if(wave.hardStopAt||!deadline||deadline<=now)
+    if(!deadline||deadline<=now)
       throw new SurveyFinalError(403,'研究窗口已关闭')
     const consent=await tx.surveyConsent.findFirst({where:{
       projectId:own.projectId,waveId:own.waveId,attemptId:own.attemptId,

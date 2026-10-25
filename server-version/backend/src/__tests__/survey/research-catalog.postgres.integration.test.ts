@@ -38,7 +38,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
   const release=await db.$transaction(tx=>publishContentRelease(tx,scaleMeasurementRelease({localId:scale.id,version:sourceVersion,instrumentVersion:sourceVersion,definition,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:author,resourceId:scale.id},provenance:{authoringRelationship:'ORIGINAL',authoringSnapshot:{title:'Source',definition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'TRAINING'}}}),author))
   await db.scale.update({where:{id:scale.id},data:{measurementReleaseId:release.releaseId}})
   const application=await submit(author,'TRAINING',{requestId:randomUUID(),releaseId:release.releaseId,metadata:{title:'Source',author:'Synthetic author',copyright:'Self authored; redistribution permitted',applicability:'Synthetic only',scoringDescription:'Sum',reportDescription:'Descriptive only'}})
-  entryId=(await review(system,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Independent synthetic catalog approval'})).entryId!
+  entryId=(await review(system,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['SURVEY'],reason:'Independent synthetic catalog approval'})).entryId!
   sourceId='library:'+entryId
 
  })

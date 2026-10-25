@@ -1,5 +1,5 @@
 import {assertSurveyManager} from '../survey/admin-role'
-import {assertSurveyToolPolicy} from '../survey/tool-policy'
+import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {z} from 'zod'
 import {assertEducationPublicDistributionReady} from './education-distribution-readiness'
 import {grantEducationPublicUseInTransaction,educationRecipientsInTransaction} from './education-distribution-public'
@@ -41,7 +41,7 @@ export async function grantUse(actorId:string,entryId:string,raw:unknown){
     await target(tx,input.userId,input.product)
     await assertScaleLibraryCollectionAllowed(tx,[header.release_id])
     const {entry,submission}=await loadEntry(tx,entryId)
-    if(input.product==='SURVEY')await assertSurveyToolPolicy(tx,{resourceKey:'release:'+entry.release_id,fingerprint:entry.content_hash??''},true)
+    await assertToolEntryPolicy(tx,{resourceKey:'release:'+entry.release_id,fingerprint:entry.content_hash??''},input.product)
     if(entry.status!=='ACTIVE')fail('该版本不再接受新使用')
     if(!submission.snapshot.mediaManifest)fail('申请缺少固定附件清单')
     await assertLibraryMediaReady(tx,entryId,submission.snapshot.mediaManifest)
@@ -79,7 +79,7 @@ export async function grantUse(actorId:string,entryId:string,raw:unknown){
     const [row]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`INSERT INTO scale_library_use_grants
       (id,entry_id,user_id,product,issuer_id,authority_grant_id,material_grant_id,survey_tool_grant_id)
       VALUES(${input.requestId},${entryId},${input.userId},${input.product},${actorId},${authority.grantId},${materialId},${surveyId}) RETURNING *`)
-    await event(tx,actorId,'USE_GRANTED','分配精确版本，仅使用，不含编辑、改编或再授权',submission.id,entryId,{grantId:row.id,userId:input.userId,product:input.product,authorityGrantId:authority.grantId})
+    await event(tx,actorId,'USE_GRANTED','分配精确版本，仅使用，不含编辑、改编或再授权',submission.id,entryId,{grantId:row.id,userId:input.userId,product:input.product,authorityGrantId:authority.grantId,...('entryAuthority' in authority?{entryAuthority:authority.entryAuthority}:{})})
     return useView(row)
   })
 }
@@ -87,7 +87,7 @@ export async function listUses(actorId:string,entryId:string){
   return prisma.$transaction(async tx=>{
     const caps=await libraryCapabilities(tx,actorId)
     const {entry}=await loadEntry(tx,entryId)
-    const products=caps.distributionGrants.filter(g=>g.releaseIds.includes(entry.release_id)).map(g=>g.product)
+    const products=[...caps.entryAdminProducts,...caps.distributionGrants.filter(g=>g.releaseIds.includes(entry.release_id)).map(g=>g.product)]
     const rows=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`SELECT * FROM scale_library_use_grants WHERE entry_id=${entryId}
       AND (${caps.systemAdmin} OR product=ANY(${products}::text[]) OR user_id=${actorId}) ORDER BY created_at DESC,id LIMIT 100`)
     return {list:rows.map(useView)}
@@ -106,7 +106,7 @@ export async function revokeUse(actorId:string,id:string,raw:unknown){
     if(!row)fail('授权已撤销或版本已变化')
     if(row.material_grant_id)await tx.materialGrant.deleteMany({where:{id:row.material_grant_id,grantedBy:row.issuer_id}})
     if(row.survey_tool_grant_id)await tx.$executeRaw(Prisma.sql`UPDATE survey_tool_grants SET status='REVOKED',revoked_at=clock_timestamp() WHERE id=${row.survey_tool_grant_id} AND status='ACTIVE'`)
-    await event(tx,actorId,'USE_REVOKED',input.reason,null,row.entry_id,{grantId:id,policy:'FUTURE_IMPORT_AND_PUBLICATION_ONLY'})
+    await event(tx,actorId,'USE_REVOKED',input.reason,null,row.entry_id,{grantId:id,policy:'FUTURE_IMPORT_PUBLICATION_AND_ADMISSION_ONLY'})
     return useView(row)
   })
 }
@@ -125,7 +125,8 @@ export async function recipients(actorId:string,entryId:string,raw:unknown){
   const caps=await libraryCapabilities(tx,actorId)
   const grant=input.grantId??caps.distributionGrants.find(g=>g.product===input.product&&g.releaseIds.includes(entry.release_id))?.grantId
   await assertLibraryAuthority(tx,actorId,entry.release_id,'material.distribute',input.product,grant)
-  const {submission}=await loadEntry(tx,entryId)
+  const {entry:current,submission}=await loadEntry(tx,entryId)
+  await assertToolEntryPolicy(tx,{resourceKey:'release:'+current.release_id,fingerprint:current.content_hash!},input.product)
   if(!libraryCompatibility(submission.snapshot).supportedEntrypoints.includes(input.product))fail('SCALE_LIBRARY_ENTRYPOINT_NOT_SUPPORTED',400)
   const pattern='%'+input.keyword.replace(/[\\%_]/g,'\\$&')+'%'
   const list=await tx.$queryRaw<Array<{id:string;username:string;name:string|null}>>(Prisma.sql`SELECT u.id,u.username,u.nickname AS name FROM users u

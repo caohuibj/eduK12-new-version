@@ -42,20 +42,14 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
     FROM "survey_waves" w
     JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
     JOIN "survey_projects" p ON p.id=w.project_id
-    JOIN "users" u ON u.id=p.owner_user_id
-    JOIN "survey_researcher_grants" g ON g.user_id=u.id
-    JOIN "survey_mfa_credentials" m ON m.user_id=u.id
     WHERE w.id=${waveId} AND w.project_id=${projectId}
       AND p.status='ACTIVE' AND w.status='OPEN'
       AND w.publication_id IS NOT NULL AND w.hard_stop_at IS NULL
       AND (w.opens_at IS NULL OR w.opens_at<=statement_timestamp())
       AND (w.closes_at IS NULL OR w.closes_at>statement_timestamp())
-      AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
-      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
-      AND g.status='ACTIVE' AND m.enabled=TRUE
       AND t.token_hash=${sha256(rawEntry)} AND t.revoked_at IS NULL
       AND t.expires_at>statement_timestamp()
-    FOR UPDATE OF w FOR SHARE OF t,u,g,m
+    FOR UPDATE OF w FOR SHARE OF t
   `
   const wave=rows[0]
   if(!wave)return fail('研究目前未开放参加')

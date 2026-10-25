@@ -58,8 +58,7 @@ const resolvePlan = async (
 
   const deploymentPolicy = scaleDeploymentPolicySchema.parse(input.deploymentPolicy)
   const blockers: string[] = scaleLocalizationReasons(source, deploymentPolicy)
-  // Same scientific applicability fence as preview/publication, caught before
-  // installation rather than after creating a deployment that cannot publish.
+  // Retain scientific scope and caller authority independently of retired licenses.
   if (source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== deploymentPolicy.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
   const actor = await db.user.findUnique({ where: { id: input.actorUserId } })
   if (!actor || actor.platformRole !== 'SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen

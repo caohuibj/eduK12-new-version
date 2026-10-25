@@ -11,7 +11,6 @@ import { prisma } from '../../config/database'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { buildSurveyFlowPublicProjection } from './flow.runtime'
 import { SurveyWaveError } from './waves.service'
-import {assertSurveyScaleCollectionAllowed} from './scale-collection-guard'
 type SurveyFrozenImage=Pick<NonNullable<FormDraft['pages'][number]['questions'][number]['image']>,'asset'|'altText'|'caption'>
 export function projectPublicSurveyImage(image:SurveyFrozenImage|undefined){
   if(!image)return undefined
@@ -44,7 +43,6 @@ export async function getOwnResearchTask(input:{
       accessCredential:input.accessCredential,snapshot:own.compiledSnapshot,
     })):null
   const selected=assignedSurveySnapshot(own.compiledSnapshot,assignment)
-  if(own.status==='STARTED')await prisma.$transaction(tx=>assertSurveyScaleCollectionAllowed(tx,selected))
   const units=selected.units.map(unit=>{
     if(unit.kind==='SJT'||unit.executionProtocol!==undefined)surveySituationalExecutionProtocol(unit)
     // Validate the same list once per selected unit; the public allowlist still

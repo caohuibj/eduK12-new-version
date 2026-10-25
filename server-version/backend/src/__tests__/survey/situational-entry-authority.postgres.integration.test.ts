@@ -194,9 +194,12 @@ suite('Survey SJT explicit entry authority with real published source and frozen
     expect(replacement.id).not.toBe(tool.id)
     expect(replacement.sourceProvenance.sjtEntryAuthority).toEqual({ ...authority, grantId: alternative.id })
 
-    await expect(getOwnResearchTask(pendingParticipant)).rejects.toMatchObject({statusCode:403})
-    await expect(startSurveySituational(pendingParticipant,'staged')).rejects.toMatchObject({statusCode:403})
-    expect(await db.situationalAttempt.count({where:{surveyAttemptId:pendingParticipant.attemptId}})).toBe(0)
+    // The withdrawal blocks only new admission; this server-bound participant
+    // still reads its task and starts the frozen situational unit, matching the
+    // native lifecycle contract for established attempts.
+    await expect(getOwnResearchTask(pendingParticipant)).resolves.toBeDefined()
+    await startSurveySituational(pendingParticipant,'staged')
+    expect(await db.situationalAttempt.count({where:{surveyAttemptId:pendingParticipant.attemptId}})).toBe(1)
     expect(await readGeneralForOwnAttempt(participant)).toMatchObject({kind:'DESCRIPTIVE'})
     // All identities and permissions pre-existing to the explicit Survey root
     // remain byte-for-byte unchanged; these are isolated synthetic rows only.

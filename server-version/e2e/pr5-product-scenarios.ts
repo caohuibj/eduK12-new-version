@@ -120,7 +120,12 @@ async function complete(name, r) {
     // Inject only projection loss after authoritative FINAL; GET must repair it.
     await prisma.$executeRaw`UPDATE assessment_run_executions SET status='STARTED', completed_at=NULL WHERE id=${task.executionId}`
     const rereadBody = page.waitForResponse(
-      response => response.request().method() === 'GET' && response.url().endsWith(`/composite-assessments/attempts/${attemptId}`),
+      response => {
+        const url = new URL(response.url())
+        return response.request().method() === 'GET'
+          && url.pathname === `/api/composite-assessments/attempts/${attemptId}`
+          && url.searchParams.get('view') === 'current-unit'
+      },
     )
     await page.goto(`${base}/relational/attempts/${attemptId}`)
     const response = await rereadBody

@@ -31,7 +31,7 @@ async function scenario(browser, engine, width) {
     }
   }
   async function newPage() {
-    const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' })
+    const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce', acceptDownloads: true })
     contexts.push(context)
     const page = await context.newPage()
     page.setDefaultTimeout(15000)
@@ -147,7 +147,20 @@ async function scenario(browser, engine, width) {
     const join = research.getByRole('button', { name: '创建研究内身份码' })
     assert.equal(await join.isEnabled(), false)
     await research.getByRole('checkbox').check(); await join.click()
+    await research.getByRole('heading', { name: '保存专属链接或二维码', exact: true }).waitFor()
+    assert.equal(await research.getByText(identity, { exact: true }).isVisible(), false, 'raw recovery credential starts collapsed')
+    await research.getByText('查看完整恢复凭据', { exact: true }).click()
     await research.getByText(identity, { exact: true }).waitFor()
+    const saving = research.waitForEvent('download')
+    await research.getByRole('button', { name: '保存链接文件', exact: true }).click()
+    const download = await saving, downloadPath = await download.path()
+    assert.ok(downloadPath)
+    assert.equal(download.suggestedFilename(), '我的培训参与链接.txt')
+    const link = new URL(fs.readFileSync(downloadPath, 'utf8').split('\n').find(line => /^https?:\/\//.test(line)))
+    assert.equal(link.origin, new URL(base).origin)
+    assert.equal(link.pathname, `/public/studies/${sid}`)
+    assert.equal(link.search, '')
+    assert.equal(link.hash, `#resume=training-study&key=${identity}`)
     await research.getByRole('button', { name: '进入我的研究测评' }).click()
     await research.getByText('第 2 波：合成第 2 波', { exact: true }).waitFor()
 

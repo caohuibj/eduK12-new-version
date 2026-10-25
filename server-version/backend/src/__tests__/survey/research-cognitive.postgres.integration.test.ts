@@ -79,7 +79,7 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
   }
   const start=(f:Fixture)=>startSurveyCognitive(f.proof,'go',{priorAnswers,administrationProvenance:provenance})
   const submit=(f:Fixture,s:Session,input=finalInput(s))=>submitSurveyCognitiveFinal(f.proof,'go',s.sessionId,input)
-  async function blockedMutation(f:Fixture,operation:()=>Promise<unknown>,mutation:(tx:any)=>Promise<unknown>){
+  async function blockedMutation(f:Fixture,operation:()=>Promise<unknown>,mutation:(tx:any)=>Promise<unknown>,opts?:{succeeds?:boolean}){
     let started!:()=>void,release!:()=>void
     const ready=new Promise<void>(resolve=>{started=resolve}),resume=new Promise<void>(resolve=>{release=resolve})
     const hold=db.$transaction(async tx=>{
@@ -102,8 +102,15 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
     }finally{release()}
     await hold
     const outcome=await pending
-    expect(outcome.ok).toBe(false)
-    expect(await db.surveyCognitiveResult.count({where:{attemptId:f.proof.attemptId}})).toBe(0)
+    if(opts?.succeeds){
+      // Hard stop no longer suspends an already-admitted child FINAL; the frozen
+      // execution completes and persists its result.
+      expect(outcome.ok).toBe(true)
+      expect(await db.surveyCognitiveResult.count({where:{attemptId:f.proof.attemptId}})).toBeGreaterThan(0)
+    }else{
+      expect(outcome.ok).toBe(false)
+      expect(await db.surveyCognitiveResult.count({where:{attemptId:f.proof.attemptId}})).toBe(0)
+    }
   }
   it('admits once with stable encrypted seed and returns safe recovery without private score/trials',async()=>{
     const f=await fixture(),[a,b]=await Promise.all([start(f),start(f)])
@@ -224,9 +231,9 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
       attemptId:invalid.proof.attemptId,publicationId:invalid.publicationId}})
     await expect(submitSurveyCognitiveFinal(invalid.proof,'go',id,finalInput(s))).rejects.toThrow('知情同意')
   })
-  it('rechecks HARD_STOP while child FINAL is waiting for the authority lock',async()=>{
+  it('lets an admitted child FINAL complete when HARD_STOP commits while it waits for the authority lock',async()=>{
     const f=await fixture(),s=await start(f)
-    await blockedMutation(f,()=>submit(f,s),tx=>tx.surveyWave.update({where:{id:f.waveId},data:{hardStopAt:new Date()}}))
+    await blockedMutation(f,()=>submit(f,s),tx=>tx.surveyWave.update({where:{id:f.waveId},data:{hardStopAt:new Date()}}),{succeeds:true})
   })
   it('rechecks current completion window and closed parent under authority locks',async()=>{
     const f=await fixture(),s=await start(f)
@@ -269,7 +276,7 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
       await expect(loadSurveyCognitiveResultGroups(tx,[{...inputs[0],references:inputs[1].references}])).rejects.toThrow('无法匹配')
     })
   })
-  it('reused task locators still reject a subsequently revoked credential and hard stop',async()=>{
+  it('reused task locators still reject a subsequently revoked credential; hard stop keeps the attempt readable',async()=>{
     const linked=await fixture({linked:true});await start(linked)
     const locator=await verifiedSurveyAttempt(linked.proof)
     await revokeLinkedResearchAccess({projectId:linked.projectId,researchCode:linked.proof.researchCode!,accessCredential:linked.proof.accessCredential})
@@ -277,6 +284,6 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
     const single=await fixture();await start(single)
     const beforeStop=await verifiedSurveyAttempt(single.proof)
     await db.surveyWave.update({where:{id:single.waveId},data:{hardStopAt:new Date()}})
-    await expect(readSurveyCognitiveProgressFromVerifiedAttempt(single.proof,beforeStop)).rejects.toThrow('窗口')
+    await expect(readSurveyCognitiveProgressFromVerifiedAttempt(single.proof,beforeStop)).resolves.toBeDefined()
   })
 })

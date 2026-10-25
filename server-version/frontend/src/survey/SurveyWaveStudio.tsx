@@ -323,9 +323,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
     const wave=editing
     if(operation==='open'&&!productOrigins()){setError('当前地址不支持生成招募链接');return}
     if(['close','hard-stop'].includes(operation)&&
-      !window.confirm(operation==='hard-stop'
-        ?'确认紧急停止此波次？已经开始但尚未提交的作答也将禁止 FINAL。'
-        :'确认关闭本波次？新的被试将无法开始。'))return
+      !window.confirm('确认停止本波次的新参与？所有招募入口将关闭；已开始的作答仍可在原完成期限内提交。'))return
     void act(async()=>{
       const epoch=projectEpoch.current,selection=selectionEpoch.current
       if(operation==='open')setShareLink('')
@@ -465,7 +463,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const showDraft=wavesLoaded&&!showOverview&&(!editing||editing.status==='DRAFT'&&!editing.publicationId)
   const waveStatus=(wave:Wave)=>wave.hardStopAt?'已终止':wave.status==='OPEN'?'采集中':wave.status==='PAUSED'?'已暂停':wave.status==='CLOSED'?'已结束':wave.publicationId?'待开放':'编制中'
   const identityLabel=project?.collectionMode==='SINGLE_UNLINKED'?'单次独立匿名':project?.participantIdentityMode==='SELF_CODE'?'随机研究编码':project?.participantIdentityMode==='MEMORABLE_CODE'?'研究者编号＋私人后缀':'专属链接与二维码'
-  const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.hardStopAt?'已紧急终止':editing.status==='CLOSED'?'已结束招募':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
+  const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.status==='CLOSED'?'已停止新参与':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
   const nextStep=activePending?'请先核对原冻结请求，不要重复创建或重新选择版本。':busy?'正在等待本次操作结果；请勿据此重复提交或开始下一步。':!editing?'填写本轮内容并保存草稿，再检查研究定义。':editing.hardStopAt?'已停止本轮作答，请到研究数据查看既有记录。':editing.status==='CLOSED'?'不再招募；在途作答仍以服务端完成窗口为准。':editing.status==='PAUSED'?'需要继续招募时可恢复开放；在途作答遵循原完成窗口。':editing.status==='OPEN'?'核对招募链接后再分享；是否允许新参与仍受项目状态、时间窗口和配额约束。':editing.publicationId?'确认冻结内容后，可显式正式开放本轮。':'先保存内容，再检查知情同意与所有工具，通过后冻结研究定义。'
   return <section className="survey-studio-surface survey-publish-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <SurveySectionHeader compact section="publish" title="发布与采集" goal="安排每次问卷，查看采集进度与参与入口。" showNavigation={false} policyLabel="采集与版本说明">
@@ -682,17 +680,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               <button type="button" className="btn-primary" disabled={busy} onClick={()=>lifecycle('open')}>正式开放本轮</button>}
             {editing.status==='OPEN'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('pause')}>暂停新参与</button>}
             {editing.status==='PAUSED'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('resume')}>恢复开放</button>}
-            {editing.status==='CLOSED'&&!editing.hardStopAt&&editing.finishUntil
-              &&new Date(editing.finishUntil).getTime()>Date.now()&&
-              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
-                onClick={()=>lifecycle('hard-stop')}>紧急终止剩余在途作答</button>}
             {['OPEN','PAUSED'].includes(editing.status)&&<>
               <button type="button" className="btn-secondary" disabled={busy}
                 onClick={()=>entryToken('rotate')}>轮换招募链接</button>
               <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
                 onClick={()=>entryToken('revoke')}>撤销全部招募链接</button>
               <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('close')}>结束招募</button>
-              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
             </>}
           </div>
           {editing.publicationId&&<section className="survey-publish-frozen-summary" aria-label="本波次问卷概要">

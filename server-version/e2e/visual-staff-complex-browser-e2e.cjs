@@ -121,17 +121,17 @@ async function main() {
       try {
         const response = await page.goto(baseUrl + '/assignments', { waitUntil: 'domcontentloaded' })
         assert.equal(response?.status(), 200, `${viewport.name}: assignment management document failed`)
-        await page.getByRole('heading', { name: '作业管理', exact: true }).waitFor()
-        await page.getByRole('button', { name: '布置作业', exact: true }).click()
+        await page.getByRole('heading', { name: '练习管理', exact: true }).waitFor()
+        await page.getByRole('button', { name: '布置练习', exact: true }).click()
         const dialog = page.getByRole('dialog')
-        await dialog.getByRole('heading', { name: '布置作业', exact: true }).waitFor()
+        await dialog.getByRole('heading', { name: '布置练习', exact: true }).waitFor()
 
         const metrics = await metricsFor(page)
         assert.ok(metrics.scrollWidth <= viewport.width + 1, `${viewport.name}: page-level horizontal overflow`)
         assert.deepEqual(pageErrors, [], `${viewport.name}: uncaught browser error`)
         assert.equal(requests.some((request) => request.method !== 'GET'), false, `${viewport.name}: visual capture attempted a write API`)
 
-        for (const name of ['取消', '创建作业']) {
+        for (const name of ['取消', '创建练习']) {
           const box = await dialog.getByRole('button', { name, exact: true }).boundingBox()
           assert.ok(box && box.height >= 44, `${viewport.name}: ${name} touch target is below 44px`)
           assert.ok(box.y >= 0 && box.y + box.height <= viewport.height + 1, `${viewport.name}: ${name} action is outside the visible dialog viewport`)

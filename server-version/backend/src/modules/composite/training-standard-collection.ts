@@ -5,6 +5,7 @@ import {trainingBoundContent} from './training-reference-binding'
 import {verifyStoredTrainingStandardItem} from './training-standard-combination'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
+import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type {WholeReceiptExecution} from './whole-questionnaire.service'
 
@@ -51,6 +52,9 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
   }else{
    const current=await verifyStoredTrainingStandardItem(tx,parent.compositeAssessment,item,'COLLECTION')
    if(canonicalHash(current.reference.measurement)!==canonicalHash(unit.measurement))throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
+   // New admission also requires the approved combination to have admitted
+   // Training explicitly; already-admitted executions skip this re-check.
+   await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+current.reference.combination.releaseId,fingerprint:current.reference.combination.combinationHash},'TRAINING')
   }
   exactScaleIds.add(item.scaleId!)
  }

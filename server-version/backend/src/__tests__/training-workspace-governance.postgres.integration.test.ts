@@ -35,7 +35,7 @@ async function approved(version:string,product:'TRAINING'|'SURVEY'='TRAINING'){
  const release=await db.$transaction(tx=>publishContentRelease(tx,scaleMeasurementRelease({localId,version:'v'+version,instrumentVersion:version,definition:compiled,instrumentClass:'CUSTOM_DESCRIPTIVE',presentationMode:product==='SURVEY'?'ALL_AT_ONCE':'RUNNER_DEFAULT',scope:{kind:'PRIVATE',ownerId:owner,product,resourceId:product==='SURVEY'?project:localId},provenance:{authoringRelationship:'ORIGINAL',authoringSnapshot:{title:prefix,definition:product==='SURVEY'?definition:compiled,instrumentClass:'CUSTOM_DESCRIPTIVE',product}}}),owner))
  if(product==='TRAINING')await db.scale.create({data:{id:localId,code:randomUUID(),name:prefix,creatorId:owner,status:'PUBLISHED',visibility:'HIDDEN',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:version,definition:compiled as unknown as Prisma.InputJsonValue,definitionHash:hashScaleDefinition(compiled),measurementReleaseId:release.releaseId}})
  const submission=await submit(owner,product,{requestId:randomUUID(),releaseId:release.releaseId,metadata})
- const result=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Synthetic catalog regression'})
+ const result=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Synthetic catalog regression'})
  return {entryId:result.entryId!,sourceId:localId}
 }
 suite('Training workspace uses authoritative exact-version library permissions',()=>{
@@ -70,14 +70,14 @@ suite('Training workspace uses authoritative exact-version library permissions',
   await expect(copyScaleToDraft(wrapper.id,recipient)).rejects.toMatchObject({status:403})
   expect(await db.scale.findUniqueOrThrow({where:{id:wrapper.id}})).toEqual(before)
  },30000)
- it('excludes revoked and withdrawn grants, even when the material grant or author provenance remains',async()=>{
+ it('excludes revoked and withdrawn grants without re-auditing issuer eligibility per use',async()=>{
   const state=await approved('3')
   const use=await grantLibraryUseFixture(db,admin,state.entryId,{requestId:randomUUID(),userId:recipient,product:'TRAINING'})
   const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:state.entryId}})
   expect((await catalog(recipient)).list.map((row:any)=>row.id)).toContain(wrapper.id)
   const issuer=await libraryDistributorFixture(db,admin)
   await db.user.update({where:{id:issuer},data:{isFrozen:true}})
-  try{expect((await catalog(recipient)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)}
+  try{expect((await catalog(recipient)).list.map((row:any)=>row.id)).toContain(wrapper.id)}
   finally{await db.user.update({where:{id:issuer},data:{isFrozen:false}})}
   await revokeUse(admin,use.id,{expectedVersion:1,reason:'Synthetic revocation'})
   expect((await catalog(recipient)).list.map((row:any)=>row.id)).not.toContain(wrapper.id)

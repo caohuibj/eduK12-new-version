@@ -124,6 +124,8 @@ suite('Bundle V3 real FINAL lifecycle', () => {
     await db.cognitiveAssignment.deleteMany({where:{createdBy:{in:[actor.userId,other.userId]}}})
     await db.scale.deleteMany({where:{creatorId:actor.userId}})
     await db.course.deleteMany({where:{creatorId:actor.userId}})
+    // Policies retain reviewer FKs; remove only policies reviewed by this suite's synthetic users.
+    await db.surveyToolPolicy.deleteMany({where:{reviewedBy:{in:[actor.userId,other.userId,student,student2]}}})
     await db.user.deleteMany({where:{id:{in:[actor.userId,other.userId,student,student2]}}})
     await db.$disconnect()
   },60000)

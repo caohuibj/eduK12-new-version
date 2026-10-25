@@ -498,7 +498,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       projectId,researchCode:identity.researchCode,
     }})).toBe(1)
   })
-  it('serializes project PAUSE before linked recruitment and rejects expired publisher access',async()=>{
+  it('serializes project PAUSE before recruitment without reapproving the frozen publisher account',async()=>{
     const fresh=await wave('T5 项目状态并发验证',[toolIds.scale],true)
     let racing:Promise<boolean>|undefined
     await db.$transaction(async tx=>{
@@ -525,7 +525,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     await expect(joinLinkedStudy({
       publicId:fresh.publicId,waveId:fresh.id,entryToken:fresh.entrySecret,
       consentVersion:1,consent:true,
-    })).rejects.toThrow()
+    })).resolves.toHaveProperty('attemptId')
     await db.user.update({where:{id:ownerId},data:{expiresAt:null}})
   })
   it('serializes simultaneous Wave creation without upgrading two shared project locks',async()=>{
@@ -540,7 +540,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(ordinals[2]).toBe(ordinals[1]+1)
     expect(await db.surveyWave.count({where:{id:{in:result.map(w=>w.id)}}})).toBe(3)
   })
-  it('serializes an in-flight FINAL behind a committed Wave HARD_STOP',async()=>{
+  it('lets a previously admitted FINAL finish after a committed Wave stop but rejects new START',async()=>{
     const w=await wave('紧急终止与提交并发',[toolIds.scale],true)
     const person=await joinLinkedStudy({
       publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
@@ -552,8 +552,8 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })
     let finalized:Promise<boolean>|undefined
     await db.$transaction(async tx=>{
-      // A second connection holds the Wave write lock. FINAL must not read a
-      // pre-stop Wave while completing its separate Attempt transaction.
+      // New admission serializes behind this stop. An existing Attempt keeps
+      // its originally published completion window after the same lock wait.
       await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${w.id} FOR UPDATE`
       finalized=submitResearchFinal({
         publicId:w.publicId,attemptId:person.attemptId,
@@ -564,19 +564,21 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       await new Promise(resolve=>setTimeout(resolve,100))
       const stopped=new Date()
       await tx.surveyWave.update({where:{id:w.id},data:{
-        status:'CLOSED',hardStopAt:stopped,finishUntil:stopped,
+        status:'CLOSED',hardStopAt:stopped,
         revision:{increment:1},
       }})
     })
     expect(finalized).toBeDefined()
-    expect(await finalized).toBe(false)
-    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(0)
+    expect(await finalized).toBe(true)
+    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
     expect((await db.surveyWaveAttempt.findUniqueOrThrow({
       where:{id:person.attemptId},
-    })).status).toBe('STARTED')
+    })).status).toBe('COMPLETED')
+    await expect(joinLinkedStudy({publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1})).rejects.toThrow()
   })
-  it('can HARD_STOP after ordinary CLOSE while in-flight FINAL remains possible',async()=>{
-    const w=await wave('关闭后再紧急终止',[toolIds.scale],true)
+  it('keeps the original deadline and accepted FINAL through CLOSE followed by HARD_STOP',async()=>{
+    const w=await wave('关闭后再紧急终止',[toolIds.scale],true,true)
     const participant=await joinLinkedStudy({
       publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
       consent:true,consentVersion:1,
@@ -586,14 +588,23 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       researchCode:participant.researchCode,accessCredential:participant.accessCredential,
     })
     const current=await getWave(ownerId,projectId,w.id)
+    const originalFinish=current.finishUntil
+    const proof={publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential}
+    const partial={[task.units[0].instrumentKey]:{itemone:'o4'}}
+    await saveSurveyCheckpoint(proof,{revision:0,answers:partial})
     const closed=await transitionWave(ownerId,projectId,w.id,current.revision,'CLOSE')
     expect(closed.status).toBe('CLOSED')
     const withinGrace=await getWave(ownerId,projectId,w.id)
     expect(withinGrace.finishUntil!.getTime()).toBeGreaterThan(Date.now())
+    expect(withinGrace.finishUntil).toEqual(originalFinish)
     const stopped=await transitionWave(ownerId,projectId,w.id,withinGrace.revision,'HARD_STOP')
     expect(stopped.status).toBe('CLOSED')
     const latest=await getWave(ownerId,projectId,w.id)
     expect(latest.hardStopAt).not.toBeNull()
+    expect(latest.finishUntil).toEqual(originalFinish)
+    expect((await readSurveyCheckpoint(proof)).checkpoint?.answers).toEqual(partial)
+    await expect(saveSurveyCheckpoint(proof,{revision:1,answers:partial})).resolves.toMatchObject({revision:2})
     await expect(transitionWave(ownerId,projectId,w.id,latest.revision,'HARD_STOP'))
       .rejects.toThrow()
     await expect(submitResearchFinal({
@@ -601,8 +612,23 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       researchCode:participant.researchCode,accessCredential:participant.accessCredential,
       submissionId:randomUUID(),
       answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
-    })).rejects.toThrow()
-    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
+    })).resolves.toMatchObject({status:'COMPLETED'})
+    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(1)
+  })
+  it('rejects a stale recruitment START waiting behind a Wave stop without allocating identity or quota',async()=>{
+    const w=await wave('先停用再入场',[toolIds.scale],true)
+    let pending:Promise<boolean>|undefined
+    await db.$transaction(async tx=>{
+      await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${w.id} FOR UPDATE`
+      pending=joinLinkedStudy({publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+        consent:true,consentVersion:1}).then(()=>true,()=>false)
+      await new Promise(resolve=>setTimeout(resolve,75))
+      await tx.surveyWave.update({where:{id:w.id},data:{status:'CLOSED',hardStopAt:new Date(),revision:{increment:1}}})
+    })
+    expect(pending).toBeDefined();expect(await pending).toBe(false)
+    expect(await db.surveyWaveAttempt.count({where:{waveId:w.id}})).toBe(0)
+    expect(await db.surveyConsent.count({where:{waveId:w.id}})).toBe(0)
+    expect((await db.surveyWave.findUniqueOrThrow({where:{id:w.id}})).startsCount).toBe(0)
   })
   it('derives raw and score Wide variables from a frozen Wave with zero FINALs',async()=>{
     const w=await wave('冻结变量但没有完成答卷',[toolIds.scale],true)

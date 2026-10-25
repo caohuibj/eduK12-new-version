@@ -817,3 +817,47 @@ cognitive两份tsc）、两文件eslint与diff检查均退出0。
 本次按直接影响范围验证32项，未重复跑全量矩阵。此补丁尚未启动CI，需父dot
 对最终HEAD/tree独立复查后决定；
 之前正式run的失败、未执行门禁仍不能算通过，不合并、不部署。
+
+### fedc 正式浏览器失败后的定向修订（等待父 dot 复查）
+
+父 dot 批准上述精确cf08/tree后，仅以同tree空提交
+`fedc8629bdc0748bfec0cfe5cbc041c20a9e16bc`触发
+[run40177411402](https://github.com/caohuibj/eduK12-new-version/actions/runs/40177411402)。
+正式checkout为`03a4318563c66caf4a42d0b06bc362dede9c7664`，整体仍**failure**。
+这轮frontend完整548文件通过，3688项通过/3跳过；backend主组8401及独立export3
+通过，225跳过，0失败。分类、Mini、两份前端产物、maintenance、CodeQL、镜像扫描、
+backend迁移/构建/200完成门、短k6、恢复、QA UI、images-video及security均success。
+独立Situational run40177411250也success。正式job身份见
+`official-ci-fedc-outcomes.json`，不把这些结果改称修订后head的成功。
+
+剩余六个浏览器子阶段按四组根因收敛，生产代码、权限、工作流和门禁均未修改：
+
+| 失败阶段 | 修订合同 | 实际定向验证 |
+| --- | --- | --- |
+| 三引擎visual | Staff、状态、legacy弹窗旧“作业”选择器对齐正式“练习”术语；用户输入的示例标题保留。精确详情深链不显示列表筛选，筛选case改走真实列表的展开及显式查询；保留populated深链焦点/唯一详情GET、所有空/错/重试/键盘/溢出/无业务写断言 | Chromium完整Staff脚本3视口、完整legacy脚本41场景通过；原有`VISUAL_QA_SCOPE=assignment-list-states`仅跑5状态×4宽度，20张实际截图通过，不称全脚本/三引擎通过 |
+| situational_branching | 当前V2显示“已查看”位置，不将其当作已提交/已作答数；第四情境刷新后仍为位置4。导航使用“已作答/未作答”，禁止可变分母覆盖旧/新两种前缀 | 未过滤原脚本29条PASS及ALL PASS。所有必答阻断、裁剪、选答、刷新、丢响应单次FINAL、登录/匿名整包、strict receipt/canonical/资产保留断言不变 |
+| products anonymous identity | 原脚本等待折叠诊断中的原始凭据；改走真实保存链接文件，验证下载的origin、精确study路径、空query及namespace/key fragment，再确认进入 | 原完整脚本3视口通过；consent、Bearer/恢复header、继续/返回及撤权拒绝仍验证 |
+| foundation PR5 | 恢复GET已使用`?view=current-unit`，旧endsWith错过真实响应；谓词改为GET+精确API/attempt路径+该view | 原完整脚本PASSED，5条综合check、27次真实runtime FINAL；COMPLETED投影恢复及单一snapshot/canonical原断言保留。全新专用合成库实际229迁移，原数据库安全guard不变 |
+
+本地复用本轮官方UI-lab artifact12592982304，ZIP SHA256
+`8ee8b799cd8ae3badd3d4e17a74f6bbe6686355db8608da7fabeeeba438d870c`；
+source/run/kind/lock及完整内容digest在诊断前后均核对，不重新编译前端。
+SJT使用锁定依赖的source backend，PR5使用原CI规定的专用source场景server；
+这属于本地真实Chromium/HTTP/IndexedDB/PostgreSQL证据，不替代正式编译产物门禁。
+5个CJS语法、PR5 TypeScript语法转换诊断、session/auth控制及diff检查通过。
+
+原失败、最初本地筛选case误用深链失败、PR5因专用测试库命名guard拒绝的尝试
+均保留。未修改guard；另建符合其原规则的空合成库后迁移/seed并完成PR5。
+本地Firefox在只读uid_map/软件framebuffer处启动失败；WebKit官方install-deps
+因su认证失败停止，并非自动审批拒绝。没有关闭沙箱、提供凭据或绕道提权。
+因此本地不声称Firefox/WebKit成功，下一轮正式三引擎仍必须全部真实通过。
+
+详细根因/源文件hash、实际命令边界及原日志/报告hash见`ci-fedc-repair-candidate.json`。
+临时诊断应用与preview按本任务进程身份停止；合成库和原证据保留。
+当前仅以`[skip ci]`备份修订，等待父dot对精确最终HEAD/tree复查后决定必要CI；
+新head正式门禁仍未具备合并资格，不强制合并、不部署、不开始356。
+
+
+## 最新授权：日常发布生命周期与工具库简化（仅本地）
+
+最新有效合同、分片状态、PR356最小来源映射、SQL资源审计边界见 [日常发布路线](daily-publication-lifecycle-355.md)。此合同覆盖本文历史记录中的“撤权立即终止在途采集”目标；历史红绿与原CI结果不改写。本节点当前不push、不激活CI、不merge。

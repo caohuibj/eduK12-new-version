@@ -1,4 +1,5 @@
 import {scaleSourceClassificationTags,catalogTagFacets,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
+import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {toolReference} from './tool-reference'
 import {copyTripletContent} from './standard-triplet.content'
 import {randomUUID} from 'node:crypto'
@@ -76,7 +77,8 @@ export async function standardTripletDetail(actor:string,key:string,version:stri
  return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),versionMappings,trials,reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
 }
 async function audit(db:Prisma.TransactionClient,actor:string,action:string,metadata:object){await db.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action,metadata:metadata as Prisma.InputJsonValue}})}
-export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string},proof?:AdminSessionProof){
+export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
+ const products=exactToolEntryProducts(input.allowedProducts)
  const triplet=await previewStandardTriplet(prisma,actor,input)
  if(triplet.combinationHash!==input.expectedCombinationHash)fail(409,'审核预览已变化，请重新核对三份版本')
  if(triplet.blockers.length)fail(409,triplet.blockers.join('；'))
@@ -93,7 +95,8 @@ export async function approveStandardTriplet(actor:string,input:Selection&{reque
   }
   triplet.reference.approvals.push({actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash})
   await tx.$executeRaw`INSERT INTO survey_standard_releases(id,tool_key,combination_hash,snapshot,reference,state,approved_by) VALUES(${input.requestId},${triplet.toolKey},${triplet.combinationHash},${JSON.stringify(triplet)}::jsonb,${JSON.stringify(triplet.reference)}::jsonb,'APPROVED',${actor})`
-  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,scope:'SURVEY_ONLY',researcherGrantsCreated:0})
+  await approveToolEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
+  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'SURVEY_ONLY',researcherGrantsCreated:0})
   return input.requestId
  },{timeout:15000})
  const row=await standardReleaseRow(prisma,id)

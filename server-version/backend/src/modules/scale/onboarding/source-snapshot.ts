@@ -1,3 +1,4 @@
+import {canonicalHash} from '../../assessment-runtime/canonical'
 import type {ScaleInstrumentSourceV1} from './types'
 /** The existing axis-snapshot contract binds plugin key/version, rather than
  * JavaScript function identity. All other source fields remain in the strict
@@ -11,4 +12,9 @@ export function snapshotScaleInstrumentSource(source:ScaleInstrumentSourceV1){
   const {scorer:_,...identity}=plugin
   return identity
  })}}
+}
+
+/** Exact server-derived key reused by entry admission, never a client visibility claim. */
+export function scaleSourcePolicyIdentity(source:ScaleInstrumentSourceV1){
+ return {resourceKey:`standard:${source.identity.instrumentKey}:${source.identity.instrumentVersion}`,fingerprint:canonicalHash(snapshotScaleInstrumentSource(source))}
 }

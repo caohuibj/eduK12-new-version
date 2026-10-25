@@ -70,6 +70,8 @@ describe('role navigation', () => {
   it('keeps admin and disabled capability items out of other menus', () => {
     expect(navigationFor('TEACHER', false).some((item) => item.path === '/users' || item.path === '/cognitive-assignments')).toBe(false)
     expect(navigationFor('ADMIN', true).some((item) => item.path === '/admin/instrument-authorizations')).toBe(false)
+    expect(returnAfterLogin('/admin/instrument-authorizations', 'ADMIN')).toBe('/dashboard')
+    expect(returnAfterLogin('/admin/material-grants', 'ADMIN')).toBe('/admin/material-grants')
   })
   it('groups staff navigation by task without changing route destinations', () => {
     const teacher = navigationFor('TEACHER', true)

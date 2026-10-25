@@ -27,7 +27,7 @@ const policy = (key: string, locale: string, commercialNature: 'NON_COMMERCIAL' 
 }
 
 describe('migrated WHO-5 / SDQ / TEXI source restrictions', () => {
-  it('preserves WHO-5 items/scoring and expresses non-commercial use in generic source policy', () => {
+  it('preserves WHO-5 items/scoring and non-commercial metadata without making it a license gate', () => {
     const pkg = getScalePackage('who5', '1.0.0')!
     expect(validateScalePackage(pkg).valid).toBe(true)
     expect(pkg.definition.items).toHaveLength(5)
@@ -38,15 +38,15 @@ describe('migrated WHO-5 / SDQ / TEXI source restrictions', () => {
     const auth = { ...authorization('who5', 'zh-CN'), authorizationId: 'auth' }
     const runtime = getScaleInstrumentRuntimePolicy('who5', '1.0.0')!
     expect(evaluateScaleDeployment({ policy: policy('who5', 'zh-CN'), requestedMode: 'STANDALONE', instrumentKey: 'who5', instrumentVersion: '1.0.0', compiledRuntimePolicyHash: runtime.runtimePolicyHash, authorizations: [auth], usageRequirements: runtime.usageRequirements }).allowNewStarts).toBe(true)
-    expect(evaluateScaleDeployment({ policy: policy('who5', 'zh-CN', 'COMMERCIAL'), requestedMode: 'STANDALONE', instrumentKey: 'who5', instrumentVersion: '1.0.0', compiledRuntimePolicyHash: runtime.runtimePolicyHash, authorizations: [auth], usageRequirements: runtime.usageRequirements }).reasons).toContain('COMMERCIAL_NATURE_NOT_ALLOWED')
+    expect(evaluateScaleDeployment({ policy: policy('who5', 'zh-CN', 'COMMERCIAL'), requestedMode: 'STANDALONE', instrumentKey: 'who5', instrumentVersion: '1.0.0', compiledRuntimePolicyHash: runtime.runtimePolicyHash, authorizations: [auth], usageRequirements: runtime.usageRequirements }).allowNewStarts).toBe(true)
   })
 
-  it('preserves SDQ executable content while generic source policy requires rights and exact locale', () => {
+  it('preserves SDQ executable content and exact locale independently of license records', () => {
     const parent = getScalePackage('sdq_parent_zh_cn', '1.0.0')!
     expect(validateScalePackage(parent).valid).toBe(true)
     expect(parent.definition.items).toHaveLength(25)
     const parentRuntime = getScaleInstrumentRuntimePolicy('sdq_parent_zh_cn', '1.0.0')!
-    expect(evaluateScaleDeployment({ policy: policy('sdq_parent_zh_cn', 'zh-CN'), requestedMode: 'STANDALONE', instrumentKey: 'sdq_parent_zh_cn', instrumentVersion: '1.0.0', compiledRuntimePolicyHash: parentRuntime.runtimePolicyHash, authorizations: [], usageRequirements: parentRuntime.usageRequirements }).allowNewStarts).toBe(false)
+    expect(evaluateScaleDeployment({ policy: policy('sdq_parent_zh_cn', 'zh-CN'), requestedMode: 'STANDALONE', instrumentKey: 'sdq_parent_zh_cn', instrumentVersion: '1.0.0', compiledRuntimePolicyHash: parentRuntime.runtimePolicyHash, authorizations: [], usageRequirements: parentRuntime.usageRequirements }).allowNewStarts).toBe(true)
     const teacherSource = getScaleInstrumentSource('sdq_teacher_zh_cn', '1.0.0')!
     expect(teacherSource.executable?.contentLocale).toBe('en')
     expect(scaleLocalizationReasons(teacherSource, policy('sdq_teacher_zh_cn', 'zh-CN'))).toContain('DEPLOYMENT_CONTENT_LOCALE_MISMATCH')
