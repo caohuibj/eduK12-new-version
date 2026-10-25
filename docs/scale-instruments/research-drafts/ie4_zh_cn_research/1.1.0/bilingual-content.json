@@ -1,0 +1,65 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "en": "I’m my own boss.",
+      "zh": "我自己做主。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "If I work hard, I will succeed.",
+      "zh": "如果我努力，就会成功。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "Whether at work or in my private life: What I do is mainly determined by others.",
+      "zh": "无论是在工作中还是在私人生活中，我做什么主要由别人决定。",
+      "subscale": "external",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "Fate often gets in the way of my plans.",
+      "zh": "命运常常阻碍我的计划。",
+      "subscale": "external",
+      "reverse": false
+    }
+  ],
+  "instructions": {
+    "en": "The following statements may apply more or less to you. To what extent do you think each statement applies to you personally?",
+    "zh": "以下陈述可能在不同程度上符合您的情况。您觉得每条陈述在多大程度上符合您本人？"
+  },
+  "responses": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "translationNotice": "本项目依据2022年作者英文版独立制作中文研究工作译稿，并新增通俗反馈；未经独立语言审校或中文心理测量验证，不是作者认可的官方中文版。保留原题顺序、两组均分与各题原方向。",
+  "presentationChanges": "原指导语工作译文置于首题之前；非原版布局验证。"
+}

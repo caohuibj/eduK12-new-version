@@ -1,0 +1,9 @@
+{
+  "sourceSha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3",
+  "canonicalSourceHash": "e0d797f74b5718b88a6abc7c7a04e06b01ed3f379981e5d57a239b7b6ae07a39",
+  "measurementHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+  "checkedAt": "2026-10-25T17:50:18.192Z",
+  "validation": "strict source/package + actual synthetic reports",
+  "goldenCases": 6,
+  "dbWrites": false
+}

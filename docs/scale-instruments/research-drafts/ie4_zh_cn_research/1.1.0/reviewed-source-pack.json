@@ -1,0 +1,332 @@
+{
+  "checkedAt": "2026-10-25",
+  "contentStatus": "RESEARCH_CANDIDATE",
+  "id": "IE4",
+  "title": "内外控制点简表（4题）",
+  "family": "locus-of-control",
+  "authors": [
+    "Désirée Nießen",
+    "Isabelle Schmidt",
+    "Katharina Groskurth",
+    "Beatrice Rammstedt",
+    "Clemens M. Lechner"
+  ],
+  "versionIntent": {
+    "instrumentKey": "ie4_zh_cn_research",
+    "instrumentVersion": "1.1.0",
+    "localizationVersion": "1.1.0",
+    "scoringVersion": "1.1.0",
+    "reportVersion": "1.1.0",
+    "releaseStatus": "DRAFT"
+  },
+  "dedup": {
+    "headChecked": "68061f416e3f40a00d0c642b21bd770da1dbf524",
+    "currentInstrumentPathMatch": false,
+    "historicalHead": "fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf",
+    "historicalPath": "docs/scale-instruments/research-drafts/ie4/1.0.0/content-draft.json",
+    "historicalIdentity": "ie4_zh_cn_research/1.0.0",
+    "historicalRegistration": false,
+    "policy": "Do not overwrite/replay old PR. New 1.1.0 keeps same family/key, newly verified original, independent translation and report. Prior draft presence is not evidence of prior DB deployment."
+  },
+  "rights": {
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+    "noncommercialOnly": false,
+    "copyright": "© 2022 Nießen et al.",
+    "basis": "Specific official English instrument PDF https://access.gesis.org/zis/1259 page2 expressly identifies this instrument excerpt as CC BY4; page3 contains full form. Technical document1278 page2 repeats license. Not inferred from generic ZIS landing Standardlizenz and not an old German ND license.",
+    "translationRedistribution": "Copy/share/adapt, including translation with attribution, license link and change notice; no author endorsement. Copyright retained, not public domain."
+  },
+  "changesNotice": "本项目依据2022年作者英文版独立制作中文研究工作译稿，并新增通俗反馈；未经独立语言审校或中文心理测量验证，不是作者认可的官方中文版。保留原题顺序、两组均分与各题原方向。",
+  "references": [
+    {
+      "url": "https://access.gesis.org/zis/1259",
+      "doi": "10.6102/zis323_exz",
+      "citation": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS.",
+      "role": "Official complete English form; PDF p2 CC BY4; p3 instruction/items/all five anchors."
+    },
+    {
+      "url": "https://access.gesis.org/zis/1278",
+      "doi": "10.6102/zis323_exz",
+      "citation": "Nießen et al. (2022). Internal–External Locus of Control Short Scale–4 (IE-4), technical documentation. ZIS.",
+      "role": "PDF p4 scoring; p5 scientific use restriction; Table2 population; Table4 reliability; Table6 external references."
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289",
+      "doi": "10.1371/journal.pone.0271289",
+      "citation": "Nießen D, Schmidt I, Groskurth K, Rammstedt B, Lechner CM (2022). The Internal–External Locus of Control Short Scale–4 (IE-4): A comprehensive validation of the English-language adaptation. PLoS ONE 17(7):e0271289.",
+      "role": "Primary English validation; CC BY4; paper Tables4/5 correspond to documentation Tables6/4."
+    },
+    {
+      "url": "https://zis.gesis.org/s/skala/openScale/400?lang=de",
+      "role": "Current official registry; general licensing text not used to override instrument-specific CC BY4."
+    },
+    {
+      "url": "https://link.springer.com/article/10.1186/s40359-026-05101-4",
+      "doi": "10.1186/s40359-026-05101-4",
+      "citation": "Petrowski K, Duhm J, Renner V, Schmalbach B, Strauß B, Brähler E (2026). Psychometricre-evaluation of the locus of control short scale (IE-4) in the German general population: evidence of acquiescence bias. BMC Psychology 14:975.",
+      "role": "New German evidence: N2522 favors one content factor with uncorrelated acquiescence method factor. Does not justify simple four-item total or silently reversing externality in this 2022 English contract."
+    }
+  ],
+  "instructions": {
+    "en": "The following statements may apply more or less to you. To what extent do you think each statement applies to you personally?",
+    "zh": "以下陈述可能在不同程度上符合您的情况。您觉得每条陈述在多大程度上符合您本人？"
+  },
+  "administration": {
+    "mode": "Adult self-report, online or paper",
+    "timeFrame": "General beliefs; no fixed recall period",
+    "completionTimeSecondsEstimate": 30,
+    "estimateBasis": "Authors estimated about30 seconds for original language; not Chinese timing validation."
+  },
+  "items": [
+    {
+      "id": 1,
+      "en": "I’m my own boss.",
+      "zh": "我自己做主。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "If I work hard, I will succeed.",
+      "zh": "如果我努力，就会成功。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "Whether at work or in my private life: What I do is mainly determined by others.",
+      "zh": "无论是在工作中还是在私人生活中，我做什么主要由别人决定。",
+      "subscale": "external",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "Fate often gets in the way of my plans.",
+      "zh": "命运常常阻碍我的计划。",
+      "subscale": "external",
+      "reverse": false
+    }
+  ],
+  "responses": [
+    {
+      "value": 1,
+      "en": "does not apply at all",
+      "zh": "完全不符合"
+    },
+    {
+      "value": 2,
+      "en": "applies a bit",
+      "zh": "有一点符合"
+    },
+    {
+      "value": 3,
+      "en": "applies somewhat",
+      "zh": "有些符合"
+    },
+    {
+      "value": 4,
+      "en": "applies mostly",
+      "zh": "大体符合"
+    },
+    {
+      "value": 5,
+      "en": "applies completely",
+      "zh": "完全符合"
+    }
+  ],
+  "scoring": {
+    "totalScore": null,
+    "totalScoreProhibited": true,
+    "reverseItems": [],
+    "subscales": [
+      {
+        "id": "internal",
+        "label": "自己的行动与结果",
+        "items": [
+          1,
+          2
+        ],
+        "formula": "(Q1+Q2)/2",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "id": "external",
+        "label": "外部力量与结果",
+        "items": [
+          3,
+          4
+        ],
+        "formula": "(Q3+Q4)/2",
+        "range": [
+          1,
+          5
+        ]
+      }
+    ],
+    "higherMeaning": "Greater agreement with respective source-of-control beliefs, not better/worse ability or responsibility. Both dimensions may be endorsed at once.",
+    "precision": "Retain half-point means; never round prior to reporting."
+  },
+  "missingPolicy": {
+    "rule": "Each two-item subscale requires both valid1–5 integer answers. Any missing item means that subscale has no score. Platform complete report may require all4; never impute, substitute0, prorate or copy opposite score.",
+    "source": "Official documentation PDF p4. Authors population-analysis MI/FIML advice is not an individual-report imputation rule."
+  },
+  "defaultAudience": "ADULT_RESEARCH_SELF_REPORT",
+  "k12Validated": false,
+  "translationStatus": "PROJECT_AI_WORKING_TRANSLATION_NOT_VALIDATED",
+  "expertReview": "PENDING",
+  "thresholds": [],
+  "thresholdPolicy": "No validated diagnostic or low/medium/high cutoff supplied. No invented Chinese norms, risk strata, percentiles or success prediction. External sample descriptive parameters are inactive reference dossier only.",
+  "sampleContext": {
+    "UK": {
+      "n": 468,
+      "retestN": 111,
+      "ageRange": [
+        18,
+        69
+      ]
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117,
+      "ageRange": [
+        18,
+        69
+      ]
+    },
+    "sampling": "Native-language adult online quota samples; not all adults nor Chinese/youth norms",
+    "invariance": "Metric supported, scalar not supported across UK/DE. Does not establish comparable national means or English–Chinese equivalence."
+  },
+  "externalReferenceValues": [
+    {
+      "subscale": "internal",
+      "mean": 3.4,
+      "sd": 1.08,
+      "population": "UK adult native-language online quota age18–69",
+      "n": 468,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "external",
+      "mean": 2.46,
+      "sd": 0.98,
+      "population": "UK adult native-language online quota age18–69",
+      "n": 468,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "internal",
+      "mean": 4.02,
+      "sd": 0.71,
+      "population": "Germany adult native-language online quota age18–69",
+      "n": 474,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "external",
+      "mean": 2.52,
+      "sd": 0.88,
+      "population": "Germany adult native-language online quota age18–69",
+      "n": 474,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    }
+  ],
+  "reliability": {
+    "source": "Official documentation Table4 / paper Table5",
+    "UK": {
+      "internalOmega": 0.59,
+      "externalOmega": 0.63,
+      "internalRetest": 0.71,
+      "externalRetest": 0.64,
+      "medianRetestDays": 28
+    },
+    "Germany": {
+      "internalOmega": 0.67,
+      "externalOmega": 0.59,
+      "internalRetest": 0.67,
+      "externalRetest": 0.61,
+      "medianRetestDays": 20
+    },
+    "limits": "Only2 items per dimension, modest precision, self-report online adult validation. Research survey only; not individual diagnosis. Retest≥.64 summary is not universally correct: German external retest is.61. 2026 method-factor findings caution against asserting two uncontested independent traits."
+  },
+  "scientificUseLimit": "Authors recommend self-report research surveys with severe time constraints, not individual diagnostics. Reflective feedback is project-authored explanatory support, not a validated personal assessment or intervention.",
+  "tags": {
+    "domain:": [
+      "人格与自我认知"
+    ],
+    "construct:": [
+      "控制点",
+      "内控信念",
+      "外控信念"
+    ],
+    "orientation:": [],
+    "population:": [
+      "成人"
+    ],
+    "response:": [
+      "自评",
+      "双维度"
+    ],
+    "use:": [
+      "研究",
+      "非诊断"
+    ],
+    "license:": [
+      "CC BY 4.0"
+    ],
+    "language_validation:": [
+      "中文工作译本",
+      "待专家审校",
+      "未验证中文常模"
+    ]
+  },
+  "reportPolicy": {
+    "trigger": "Same neutral explanatory report for all complete valid patterns; no score-based strata or unsupported individual inference.",
+    "technicalDetails": "Explain plain-language meaning first. Put formulas/references in detail area. No claim this pack has hidden platform score UI.",
+    "noTreatmentClaim": true
+  },
+  "report": {
+    "heading": "看看您怎样理解“事情由谁推动”",
+    "summary": "这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。",
+    "perspectives": [
+      {
+        "id": "internal",
+        "label": "自己的行动与结果",
+        "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。"
+      },
+      {
+        "id": "external",
+        "label": "外部力量与结果",
+        "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。"
+      }
+    ],
+    "everydayExample": "比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+    "reflection": [
+      "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？",
+      "有没有把本来不属于自己的责任，也一并背在身上？"
+    ],
+    "action": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。",
+    "limits": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+    "illustrationSuggestion": "可选原创三栏简图：能着手／可求助／暂不可决定；不画红绿风险区，不把外部限制画成缺陷。"
+  },
+  "sourceFiles": [
+    {
+      "filename": "ie4_official_english_instrument.pdf",
+      "sha256": "a3a3f0fcaefe208d5a032c5c2b835782ce8d3138962cc1cae78fb911b803a2e7",
+      "bytes": 213105,
+      "url": "https://access.gesis.org/zis/1259"
+    },
+    {
+      "filename": "ie4_official_documentation.pdf",
+      "sha256": "2f4ed60a36900bf071a923165e8455766c7c4cdae06e4cedbed0bde04d9525a9",
+      "bytes": 592426,
+      "url": "https://access.gesis.org/zis/1278"
+    }
+  ]
+}

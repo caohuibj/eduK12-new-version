@@ -1,0 +1,1079 @@
+{
+  "generatedBy": "actual buildScaleResult + parseScaleResultV2, synthetic answers only",
+  "reports": [
+    {
+      "fixture": "minimum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    },
+    {
+      "fixture": "maximum",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    },
+    {
+      "fixture": "midpoint",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    },
+    {
+      "fixture": "half-point",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1.5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4.5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    },
+    {
+      "fixture": "both-endorsed",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4.5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4.5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    },
+    {
+      "fixture": "opposite",
+      "synthetic": true,
+      "answers": [
+        {
+          "itemCode": "IE4_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "IE4_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "IE4_04",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-local-only",
+          "code": "ie4_zh_cn_research",
+          "name": "内外控制点简表（4题）（中文研究工作稿）",
+          "instrumentVersion": "1.1.0"
+        },
+        "method": {
+          "scaleId": "synthetic-local-only",
+          "instrumentVersion": "1.1.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "452efbd878443b944921ada1bcb4852f694618f23d71c2ff365012749169bfff",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.1.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "IE4_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "IE4_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "IE4_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "internal",
+            "type": "dimension",
+            "label": "自己的行动与结果",
+            "description": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "answeredItems": [
+              "IE4_01",
+              "IE4_02"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "external",
+            "type": "dimension",
+            "label": "外部力量与结果",
+            "description": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "answeredItems": [
+              "IE4_03",
+              "IE4_04"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "internal",
+            "headline": "自己的行动与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得自己的决定和努力能影响结果。它不测量实际能力，也不保证只要努力就一定成功。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "想到一件最近的事：哪些部分可以由自己行动，哪些需要别人协助，哪些暂时无法改变？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "external",
+            "headline": "外部力量与结果",
+            "label": null,
+            "interpretation": "这一组关注您是否觉得他人的决定、命运或机遇影响结果。承认限制不等于懒惰、推卸责任或失败；有些障碍确实需要支持和制度层面的改变。这4道题分别询问您怎么看自己的行动，以及他人、环境和机遇对结果的影响。它们不是一道非此即彼的选择题：一个人可以既愿意努力，也清楚很多条件不由自己决定。比如准备一次重要申请：整理材料是自己能着手的部分；名额、规则或他人的决定不完全由自己掌握。这只是帮助理解题意的例子，不是在推断您的经历。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有把本来不属于自己的责任，也一并背在身上？"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，可把一件小事写成三栏：“我能做的”“可以求助的”“暂时无法决定的”。只从第一栏选一个轻量步骤，也允许自己暂停或寻求帮助；这不是必须完成的训练。"
+              }
+            ],
+            "limitations": [
+              "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+              "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+              "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+              "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。",
+          "每组只有2题，英语原样本内部一致性有限；中文工作稿尚未验证。2026德语研究提示同意式作答影响，不能把两组均分当作两个无争议独立特质。",
+          "UK与德国均值和标准差只作外部来源记录；跨国未支持标量不变性，不能将均值差异直接解释为人群差异，更不能当中文常模。",
+          "两题任一缺失就不计算该维度，未答不代填为0；项目完整报告要求4题全答。研究群体分析的插补建议不适用于个人报告。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "中文目前是未经验证的研究工作译稿，仅供成人研究中的解释和反思，不提供诊断、能力判定、人格优劣或升学就业建议。两组内容分开描述，不合并排名，也不能用来认定成功或困境是谁的责任。 下面的例子和可选行动用于理解，不是在推断您的经历，也不保证改善。"
+      }
+    }
+  ]
+}

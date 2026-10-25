@@ -1,0 +1,12 @@
+{
+  "status": "PASS_LOCAL_CONTENT_CHECKS",
+  "uniqueTests": 26,
+  "instrumentTests": 18,
+  "registryTests": 8,
+  "exhaustiveCompletePatterns": 625,
+  "missingItemCases": 4,
+  "actualEngineReportExamples": 6,
+  "typecheckExitCode": 0,
+  "generatorCheckExitCode": 0,
+  "limits": "Not browser, DB, production publication, translation validation, or personal diagnostics approval."
+}

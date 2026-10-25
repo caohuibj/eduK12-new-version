@@ -1,0 +1,110 @@
+{
+  "activationStatus": "EXTERNAL_ONLY_NOT_RUNTIME",
+  "sampleContext": {
+    "UK": {
+      "n": 468,
+      "retestN": 111,
+      "ageRange": [
+        18,
+        69
+      ]
+    },
+    "Germany": {
+      "n": 474,
+      "retestN": 117,
+      "ageRange": [
+        18,
+        69
+      ]
+    },
+    "sampling": "Native-language adult online quota samples; not all adults nor Chinese/youth norms",
+    "invariance": "Metric supported, scalar not supported across UK/DE. Does not establish comparable national means or English–Chinese equivalence."
+  },
+  "parameters": [
+    {
+      "subscale": "internal",
+      "mean": 3.4,
+      "sd": 1.08,
+      "population": "UK adult native-language online quota age18–69",
+      "n": 468,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "external",
+      "mean": 2.46,
+      "sd": 0.98,
+      "population": "UK adult native-language online quota age18–69",
+      "n": 468,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "internal",
+      "mean": 4.02,
+      "sd": 0.71,
+      "population": "Germany adult native-language online quota age18–69",
+      "n": 474,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    },
+    {
+      "subscale": "external",
+      "mean": 2.52,
+      "sd": 0.88,
+      "population": "Germany adult native-language online quota age18–69",
+      "n": 474,
+      "source": "GESIS documentation Table6 (PDF p18; printed16), original paper Table4",
+      "runtimeSelected": false
+    }
+  ],
+  "reliability": {
+    "source": "Official documentation Table4 / paper Table5",
+    "UK": {
+      "internalOmega": 0.59,
+      "externalOmega": 0.63,
+      "internalRetest": 0.71,
+      "externalRetest": 0.64,
+      "medianRetestDays": 28
+    },
+    "Germany": {
+      "internalOmega": 0.67,
+      "externalOmega": 0.59,
+      "internalRetest": 0.67,
+      "externalRetest": 0.61,
+      "medianRetestDays": 20
+    },
+    "limits": "Only2 items per dimension, modest precision, self-report online adult validation. Research survey only; not individual diagnosis. Retest≥.64 summary is not universally correct: German external retest is.61. 2026 method-factor findings caution against asserting two uncontested independent traits."
+  },
+  "thresholds": [],
+  "sources": [
+    {
+      "url": "https://access.gesis.org/zis/1259",
+      "doi": "10.6102/zis323_exz",
+      "citation": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). ZIS.",
+      "role": "Official complete English form; PDF p2 CC BY4; p3 instruction/items/all five anchors."
+    },
+    {
+      "url": "https://access.gesis.org/zis/1278",
+      "doi": "10.6102/zis323_exz",
+      "citation": "Nießen et al. (2022). Internal–External Locus of Control Short Scale–4 (IE-4), technical documentation. ZIS.",
+      "role": "PDF p4 scoring; p5 scientific use restriction; Table2 population; Table4 reliability; Table6 external references."
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289",
+      "doi": "10.1371/journal.pone.0271289",
+      "citation": "Nießen D, Schmidt I, Groskurth K, Rammstedt B, Lechner CM (2022). The Internal–External Locus of Control Short Scale–4 (IE-4): A comprehensive validation of the English-language adaptation. PLoS ONE 17(7):e0271289.",
+      "role": "Primary English validation; CC BY4; paper Tables4/5 correspond to documentation Tables6/4."
+    },
+    {
+      "url": "https://zis.gesis.org/s/skala/openScale/400?lang=de",
+      "role": "Current official registry; general licensing text not used to override instrument-specific CC BY4."
+    },
+    {
+      "url": "https://link.springer.com/article/10.1186/s40359-026-05101-4",
+      "doi": "10.1186/s40359-026-05101-4",
+      "citation": "Petrowski K, Duhm J, Renner V, Schmalbach B, Strauß B, Brähler E (2026). Psychometricre-evaluation of the locus of control short scale (IE-4) in the German general population: evidence of acquiescence bias. BMC Psychology 14:975.",
+      "role": "New German evidence: N2522 favors one content factor with uncorrelated acquiescence method factor. Does not justify simple four-item total or silently reversing externality in this 2022 English contract."
+    }
+  ]
+}
