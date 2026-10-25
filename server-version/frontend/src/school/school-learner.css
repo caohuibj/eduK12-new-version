@@ -162,3 +162,24 @@
  .hs-student-task-heading>div:first-child{flex-basis:100%}
  .hs-student-task-heading>.hs-collection-options{flex-basis:100%;justify-content:space-between}
 }
+/* One heading and one toolbar for the student task index. */
+.hs-app.hs-workspace.hs-learner section.hs-panel.hs-task-view.hs-student-task-index{margin:0;padding:24px}
+.hs-student-task-trail{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;font-size:13px}
+.hs-student-task-trail>a{display:inline-flex;align-items:center;gap:7px;text-decoration:none;color:var(--hs-muted)}
+.hs-student-task-trail>a:hover{color:var(--hs-primary);text-decoration:underline}
+.hs-app.hs-workspace.hs-learner .hs-student-task-heading{align-items:center;gap:16px;margin-bottom:14px}
+.hs-student-task-heading>div:first-child{flex:1;min-width:0}
+.hs-app.hs-workspace.hs-learner .hs-student-task-heading h1{font-family:var(--hs-serif);font-size:28px;font-weight:600;line-height:1.35;margin:0 0 7px;outline-offset:4px}
+.hs-app.hs-workspace.hs-learner .hs-student-task-heading p{font-size:13px;line-height:1.7;margin:0;color:var(--hs-muted);overflow-wrap:anywhere}
+.hs-student-task-info{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;flex-wrap:wrap;margin:0 0 6px}
+.hs-app.hs-learner .hs-student-task-info>.hs-collection-summary{margin:0;font-size:12px}
+.hs-app.hs-workspace.hs-learner .hs-student-tasks .hs-student-task-info>details.hs-student-task-help{margin:0;padding:0;border:0;border-radius:0;box-shadow:none;background:transparent;color:var(--hs-muted)}
+.hs-student-task-info>.hs-student-task-help>summary{padding:7px 0;font-size:12px}
+.hs-student-task-info>.hs-student-task-help[open]{flex-basis:100%}
+@media(max-width:600px){
+ .hs-app.hs-workspace.hs-learner section.hs-panel.hs-task-view.hs-student-task-index{padding:18px 16px}
+ .hs-student-task-trail{margin-bottom:16px}
+ .hs-app.hs-workspace.hs-learner .hs-student-task-heading h1{font-size:25px}
+ .hs-student-task-heading>div:first-child{flex-basis:100%}
+ .hs-student-task-info{align-items:flex-start;gap:6px 16px}
+}

@@ -29,7 +29,7 @@ export function SchoolWorkspaceShell({items,page,onNavigate,context,children,lea
    {groups.map(group=><div className="hs-nav-group" key={group}><p>{group}</p>{items.filter(i=>i.group===group).map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={e=>navigate(e,item.id)}><item.icon size={18} aria-hidden="true"/><span>{item.label}</span></a>)}</div>)}
   </nav>}
   <div ref={content} tabIndex={-1} className="hs-workspace-content">
-   {page!=='overview'&&<div className="hs-workspace-page-heading"><div className="hs-workspace-trail"><a href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a><p className="hs-section-kicker">{active?.group??'校园空间'}</p></div><h1>{active?.label??'暂不可用的校园功能'}</h1><p>{active?.description??'该入口当前不在你的授权范围内，请返回概览选择可用功能。'}</p></div>}
+   {page!=='overview'&&!(learner&&page==='tasks'&&active)&&<div className="hs-workspace-page-heading"><div className="hs-workspace-trail"><a href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a><p className="hs-section-kicker">{active?.group??'校园空间'}</p></div><h1>{active?.label??'暂不可用的校园功能'}</h1><p>{active?.description??'该入口当前不在你的授权范围内，请返回概览选择可用功能。'}</p></div>}
    {context}
    {active?children:<section className="hs-panel"><h2>当前无法进入此功能</h2><p>学校授权或账号状态变化后，可用功能也会相应更新。</p><a className="hs-workspace-inline-link" href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}>查看可用功能 <ArrowRight size={16}/></a></section>}
   </div>

@@ -121,26 +121,29 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   }
   const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
   const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
-  return <section className="hs-panel hs-task-view hs-student-tasks">
+  return <section className={'hs-panel hs-task-view hs-student-tasks'+(!selected&&!execution&&!feedback?' hs-student-task-index':'')}>
     <details className="hs-task-inbox" open={!(selected||execution||feedback)}>
     <summary hidden={!(selected||execution||feedback)}>查看任务列表</summary>
-    {activityId&&<p className="hs-student-task-filter">当前活动任务 <a href={workspaceHref('tasks')}>查看全部任务</a></p>}
-    <header className="hs-student-task-heading"><div><h2 ref={inboxTitle} tabIndex={-1}>我的校园活动</h2><p>查看学校安排的任务，继续尚未完成的内容。</p></div>
+    <div className="hs-student-task-trail"><a href={workspaceHref('overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a>{activityId&&<a href={workspaceHref('tasks')}>查看全部任务</a>}</div>
+    <header className="hs-student-task-heading"><div><h1 ref={inboxTitle} tabIndex={-1}>我的校园任务</h1><p>{activityId&&items?.list[0]?.activityTitle?items.list[0].activityTitle:'学校已开放的活动任务'}</p></div>
     {items?<SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={partial?'检索本页任务':'检索任务'} placeholder="搜索任务名称或活动名称" sorts={[{value:'recommended',label:'默认顺序'},{value:'deadline',label:'截止时间优先'},{value:'title',label:'任务名称 A–Z'}]} actions={<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}/>:<button type="button" disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)} aria-label={loading?'正在读取…':listError?'重试读取待办':'刷新待办'} title="刷新待办"><RefreshCw size={18} aria-hidden="true"/></button>}</header>
-    <details className="hs-student-task-help"><summary>任务与隐私说明{studentReference?' · 校园观察编号':''}</summary><p>这里只显示学校已开放、并且当前允许你参加的活动。心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
-    {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}</details>
+
     {!selected&&error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
     {listError&&<p className="hs-alert" role="alert">{listError}</p>}
-    {items&&<>
-    <p className="hs-collection-summary" role="status">{query?`检索到 ${visibleTasks.length} 项 · “${query}”`:`${items.total} 项任务`}{partial?' · 检索和排序仅作用于本页已加载的任务':''}</p></>}
+    <div className="hs-student-task-info">
+    {items&&
+    <p className="hs-collection-summary" role="status">{query?`检索到 ${visibleTasks.length} 项 · “${query}”`:`${items.total} 项任务`}{partial?' · 检索和排序仅作用于本页已加载的任务':''}</p>}
+    <details className="hs-student-task-help"><summary>任务与隐私说明{studentReference?' · 校园观察编号':''}</summary><p>这里只显示学校已开放、并且当前允许你参加的活动。心理测评结果需经过独立授权与审核，完成任务不会自动向教师或家长公开个人心理报告。</p>
+    {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}</details>
+    </div>
     {loading&&<p role="status">正在读取校园活动…</p>}
     {!items?null:
       items.list.length===0?!loading&&!listError&&<p>目前没有开放给你的活动。你不需要采取任何操作。</p>:
       <div className={"hs-task-list"+(view==='cards'?' hs-task-list--cards':'')}>
         {visibleTasks.map(task=>{const Icon=taskIcons[task.kind];return <article className="hs-task-card" data-task-id={task.id} key={task.kind+task.id}>
           <span className="hs-student-task-icon" aria-hidden="true"><Icon size={21}/></span>
-          <div className="hs-student-task-copy"><small>{task.activityTitle}</small><h3>{task.title}</h3>
+          <div className="hs-student-task-copy">{!activityId&&<small>{task.activityTitle}</small>}<h3>{task.title}</h3>
           <div className="hs-student-task-meta"><span>{kinds[task.kind]}</span><span className="hs-student-task-state" data-status={task.status} aria-label={'状态：'+captions[task.status]}>{captions[task.status]}</span>
           {task.deadline&&<span>截止 {new Date(task.deadline).toLocaleDateString('zh-CN')}</span>}</div></div>
           <div className="hs-student-task-action">

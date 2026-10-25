@@ -135,6 +135,6 @@ it('keeps typed answers on submission failure and returns focus to the inbox wit
  expect(await screen.findByRole('alert')).toHaveTextContent('本次提交暂未成功，请重试')
  expect(field).toHaveValue('保留这份活动记录')
  fireEvent.click(screen.getByRole('button',{name:'返回活动'}))
- expect(screen.getByRole('heading',{name:'我的校园活动'})).toHaveFocus()
+ expect(screen.getByRole('heading',{name:'我的校园任务'})).toHaveFocus()
  expect(api.mock.calls.filter(call=>call[1]==='POST')).toHaveLength(1)
 })
