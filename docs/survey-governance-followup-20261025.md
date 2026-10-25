@@ -610,3 +610,37 @@ N 项通过”；未做密码学执行认证，不等于完整输入闭包、正
 原始失败、夹具修订与绿色输入文件 hash 分开记录；不是正式 CI、整应用构建、真实
 浏览器或非 UTC 风险修复。此次提交保 `[skip ci]`，只更新既有 draft PR355，并在
 push 后检查没有新 Actions/check；不改 workflow/required checks、不合并、不部署。
+
+## PR355 正常合并资格推进（后续明确授权）
+
+用户后续明确要求完成必要 CI 后合并，并澄清此前“不扩展压力测试”限制的是本地
+版本验收/性能分析，不禁止仓库正常门禁的 GitHub-hosted 隔离 200 完成检查与短 k6
+smoke。不部署，不改生产/现有部署负载，不追加容量实验；不扩展到下一阶段开发。
+
+PR355 已转 ready；main 仍为 25215dcc，产品审查 head bab8e3de。新增无产品 diff 的
+`896bf9276eafedadbb4d301fb69cac2b114778fa` 正常 synchronize，去掉 HEAD 的 skip 指令，
+没有重写历史或手工 dispatch 代替 PR 检查。实际采用原 legacy/platform/C 全部门禁。
+GitHub integration 读取 main 分支保护返回 403，未换身份/路线重试；仍可核对 PR、
+review threads、实际检查和仓库 merge gate，绝不强制跳过。
+
+首轮[主 CI 40159337918](https://github.com/caohuibj/eduK12-new-version/actions/runs/40159337918)
+与[独立 Situational 40159337789](https://github.com/caohuibj/eduK12-new-version/actions/runs/40159337789)
+均对应 896bf927。独立 publication 已成功，主 CI 暴露两个此前在精确路线中未执行的
+主干验证消费者缺口：
+
+- scope 的 136 项中 135 通过，content-workflows 的 test-only 路由断言失败；backend
+  的 content routing 子集也因同一项失败，不能把两次当两个新根因。断言硬编码 scenario
+  必须在 if 文本开头，但 PR354 在前面加了更强的 exact-route 排除。工作流条件未改；
+  测试现在执行完整的既有布尔条件，遍历 event/draft/force/frontend 组合，确认 test-only
+  始终拒绝、普通 platform 至少有真实可达上下文，不再把前缀位置当准入证明。
+- 前端 typecheck 在 pretypecheck 的生成清单检查退出，尚未执行该 job 的 tsc。
+  App.tsx/OrganizationProductRoutes.tsx 与 main 相同，确定性清单漏掉的是主干已有的
+  3 条系统管理员路由。仅按原生成器从 156 刷新到 159 条；没有改路由、权限或生成器。
+
+两处局部修订的主要验证：仅原失败 Node case 1/1，159 路由 inventory --check、
+6 session/2 syntax gate 验证及其 3 项 Node 断言通过；未重复本地全矩阵。
+首轮官方生产前端构建、UI-lab 构建、两生产镜像构建/扫描已成功；其余结果由该原 run
+保留。失败仍是失败，不能将这些成功子项拼成完整资格。后续修订必须在实际最终 head
+走原必需门禁，当前文档不签发本地/跨提交自动接纳，不改 workflow/required checks。
+最终合并和后续 main 检查以 PR355 的实时检查及合并结果为准，不将本段首轮记录
+伪装成最终成功。

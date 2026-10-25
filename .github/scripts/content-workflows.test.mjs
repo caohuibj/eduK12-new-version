@@ -383,8 +383,23 @@ test('light test-only route never starts unrelated builds, scans or platform smo
   for(const name of ['pr-light-backend','pr-light-frontend','post-merge-smoke',
     'backend','backend-regression','docker','miniprogram']) {
     const block=job(ci,name);
-    assert.match(block,/if: \$\{\{ needs\.scope\.outputs\.scenario != 'frontend-test' &&/,
-      name+' would otherwise run a redundant platform check');
+    const expression=block.match(/^    if: \$\{\{ (.+) \}\}$/m)?.[1];
+    assert.ok(expression,name+' must retain an explicit job condition');
+    // These existing job predicates use JavaScript-compatible boolean syntax.
+    // Check the complete condition, including leading exact-route exclusions;
+    // a textual prefix cannot establish that a later OR does not bypass it.
+    const allowed=new Function('needs','github','vars','cancelled',`return (${expression});`);
+    let platformReachable=false;
+    for(const event of ['pull_request','push','workflow_dispatch']) for(const draft of [false,true])
+      for(const force of ['false','true']) for(const frontend of ['false','true']) {
+        const outputs={application_route:'legacy',scenario:'frontend-test',documentation:'false',
+          maintenance:'false',content:'false',frontend,presentation:'false'};
+        const github={event_name:event,event:{pull_request:{draft}}},vars={CI_FORCE_FULL:force};
+        assert.equal(allowed({scope:{outputs}},github,vars,()=>false),false,
+          name+' must exclude frontend-test for every event/draft/force/frontend context');
+        platformReachable||=allowed({scope:{outputs:{...outputs,scenario:'platform'}}},github,vars,()=>false);
+      }
+    assert.equal(platformReachable,true,name+' must still admit its ordinary platform work');
   }
   assert.match(job(ci,'frontend'),/scenario == 'frontend-test'/);
   assert.match(job(ci,'merge-gate'),/needs: .*frontend.*browser.*docker/);
