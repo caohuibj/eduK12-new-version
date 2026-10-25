@@ -8,7 +8,30 @@
 已读根 AGENTS.md、docs/release/README.md 的执行/验证/PR354 规则；仓库及
 `/workspace/.agents` 无额外 SKILL.md。未访问 Mac、生产服务器或真实用户数据。
 
-## 执行清单
+## 融合执行路线与状态
+
+已直接读取 [Notion 路线图](https://app.notion.com/p/403d27635a388157aa34c83821491347)
+和[证据报告](https://app.notion.com/p/402d27635a388106a8dbeafc7a2f6306)，原页面
+编辑时间分别为 2026-10-24 18:48:19 / 18:48:32 UTC；这是历史来源，不修改它们。
+核心目标为被试作答 → durable commit → 反馈/报告，减少等待与每份 CPU、内存、
+DB 实工量/字节及存储；不以 SQL 数量代替净收益。
+
+| 阶段 | 任务、依赖与边界 | 当前实际状态/证据 |
+| --- | --- | --- |
+| A 基准及正确性 | 01–07；先复现顺序/native/报告预算/拒答，冻结角色、版本与生命周期合同 | 基准已核实；01 已提交 4c54fafe，9 断言通过；02–07 进行中 |
+| B 兼容整合 | 依赖 A；逐提交盘点 e0dd4300 的 receipt-only、请求内 runtime、窄状态、outbox、报告单读、认知 metadata、overview | 已核远端与历史证据；尚未整合，不以无冲突代替兼容证明 |
+| C 新基线 | 依赖实际整合 source/config；普通、native mixed、整包报告，进程冷/热分别记录 | 新系列待冻结；历史 d01、31d9 及各候选原件不覆盖 |
+| D 核心减工 | 08–13，以及 14–19 中已证明语义/成本的部分；发布编译复用、参与精确绑定、提交 fresh authority 与同请求事实复用 | 在 A 后按实际合同推进；不建平行 ordinary 协议/每 unit job/authority 缓存 |
+| E 推进与报告 | 依赖 B–D 的合同证据；分离纯 next-plan 与准入/推进写，保逐单元保存、GET 恢复及两入口报告开放差异 | 本 PR 仅纳入已证明兼容片；显式 advance、正文迁移等先列方案 |
+
+完成 A/局部 D 不等于路线图整体完成。旧 M1 ordinary schema 不是当前强前置；
+“#354 未合并”和“冷暖从未测过”已过期。31d9 冷5/预热10/暖5 六组历史基线
+确已执行；本次带新治理/整包报告的工作量没有新时间均值或容量结论。
+raw SQL 父图实验虽省部分 Node CPU，DB 下行增加约 24–41%，本轮继续不接入；
+第五片 callback/双披露方案已被 receipt-only 替代，不恢复。test-mode 跳过普通
+Redis/IP 限流，不能当生产总成本。报告状态、生成与当前读取权限分开。
+
+## 首批执行预算
 
 | 修改组件 | 已确认问题与必需检查 | 主要位置及预算 |
 | --- | --- | --- |
@@ -54,3 +77,23 @@ request-local `verifySurveyFinalPublication`、selectedSnapshot、collection sto
 原始 JSON 保存在云端 `/workspace/survey-followup-evidence/01-order-{red,green}.json`。
 首次收集被环境预装 Zod 3 与 main 锁定 Zod 4 不一致阻断，未计入断言；按 main
 原锁文件从官方 npm ci 后生成 Prisma client，依赖和锁文件均未改动。
+
+## 02 native SJT 治理闭环
+
+`snapshotUnit` 保留原 executionProtocol/header；合成试运行生成 native 输入/阶段
+事件，调用同一 `prepareSituationalFinalSubmission` → `deriveSituationalFinalFacts`
+→ `decodeSurveySituationalResult` → parent FINAL 事实消费。没有静态伪装、第二评分器、
+人类 Attempt、Training 记录或逐 unit job。试运行证据明确 synthetic，原生 raw、
+canonical/receipt 与报告进入既有治理 trial JSON 提交/回读，未作为参与者正式回执。
+
+10 项局部断言通过（2 native V1/V2 + 8 原治理消费者），backend tsc 执行退出 0
+（当时尚未加入后续 PG 测试文件；最终类型检查另记）。真实隔离 PostgreSQL 16
+新建合成库运行 229 项现有迁移，没有生产迁移或复制已有数据。两种协议完整验证
+新审批/3 case 试运行/回读、入口批准、新授权、导入/冻结、子提交竞态/重放、丢响应
+read 恢复、parent FINAL 幂等与已配置报告值；撤销普通授权拒绝新参与，已准入
+Attempt 可完成且 child raw 只有一份。V1 registry 仅注入原创测试身份，V2 经实际
+author release 链；都不宣称真实目录已授权。原生 V1 无阶段 capture，V2 保留 capture。
+
+首轮 PG：V1 通过；V2 夹具让作者审核自己，正确被既有保护拒绝。改用独立夹具
+作者后只运行 V2，该项通过。原失败不改写，两个通过取不相交证据。文件：
+`02-native-unit.json`、`02-native-postgres.json`、`02-native-postgres-v2.json`。
