@@ -27,7 +27,7 @@ vi.mock('../../modules/situational/situation-package.registry',async original=>{
 })
 vi.mock('../../modules/situational/onboarding/scientific-registry',async original=>{
  const actual=await original<typeof import('../../modules/situational/onboarding/scientific-registry')>()
- return {...actual,getSituationalScientificDeclaration:(key:string,version:string)=>registry.packages[0]?.key===key?createSjtNativeV1ScientificDeclaration():actual.getSituationalScientificDeclaration(key,version)}
+ return {...actual,getSituationalScientificDeclaration:(key:string,version:string)=>registry.packages.some(p=>p.key===key&&p.instrumentVersion===version)?createSjtNativeV1ScientificDeclaration():actual.getSituationalScientificDeclaration(key,version)}
 })
 const url=integrationDatabaseUrl('SURVEY_FOLLOWUP_TEST_DATABASE_URL')
 const suite=url?describe:describe.skip
