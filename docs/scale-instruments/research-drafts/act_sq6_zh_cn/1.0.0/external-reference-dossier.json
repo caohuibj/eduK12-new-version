@@ -1,0 +1,38 @@
+{
+  "instrumentKey": "act_sq6_zh_cn",
+  "activationStatus": "SOURCE_EVIDENCE_ONLY_NOT_RUNTIME_NORMS",
+  "runtimeReferenceSets": [],
+  "thresholds": [],
+  "severityBands": [],
+  "percentiles": null,
+  "reliableChangeIndex": null,
+  "minimalImportantDifference": null,
+  "sourceStudies": [
+    {
+      "study": "Study 1 ACT",
+      "n": 87,
+      "alpha": 0.81,
+      "language": "de",
+      "factorCount": 1
+    },
+    {
+      "study": "Study 2 CBT, 15th session",
+      "n": 115,
+      "alpha": 0.84,
+      "language": "de",
+      "factorCount": 1
+    },
+    {
+      "study": "Study 2 CBT, post-treatment",
+      "n": 156,
+      "alpha": 0.88,
+      "language": "de",
+      "factorCount": 1
+    }
+  ],
+  "overlapNote": "Study 2两个样本有17人重叠，合计254人；不汇总为271名独立参与者。",
+  "usedForIndividualComparison": false,
+  "localChineseEvidence": [],
+  "sourceEvidenceLimit": "初步探索性单因子和内部一致性证据；不证明中文、一般成人、K12或治疗成效。",
+  "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115"
+}

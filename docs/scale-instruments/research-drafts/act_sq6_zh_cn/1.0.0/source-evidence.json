@@ -1,0 +1,65 @@
+{
+  "status": "SOURCE_LICENSE_VERIFIED_TRANSLATION_REVIEW_PENDING",
+  "checkedOn": "2026-10-25",
+  "checkMethod": "AI-assisted source comparison plus independent research confirmation; not human scientific approval",
+  "originalArticle": {
+    "doi": "https://doi.org/10.32872/cpe.v2i3.3115",
+    "url": "https://cpe.psychopen.eu/index.php/cpe/article/download/3115/3115.html?inline=1",
+    "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115",
+    "license": "CC-BY-4.0"
+  },
+  "supplement": {
+    "doi": "https://doi.org/10.23668/psycharchives.3462",
+    "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Supplementary materials to the ACT-SQ development and initial validation article [Questionnaire; English and German version]. PsychOpen / PsychArchives. https://doi.org/10.23668/psycharchives.3462",
+    "repositoryRecord": "https://www.psycharchives.org/handle/20.500.12034/3077",
+    "metadataUrl": "https://api.datacite.org/dois/10.23668/psycharchives.3462",
+    "rightsList": [
+      {
+        "rights": "CC-BY 4.0"
+      },
+      {
+        "rights": "openAccess"
+      },
+      {
+        "rights": "Creative Commons Attribution 4.0 International",
+        "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+        "schemeUri": "https://spdx.org/licenses/",
+        "rightsIdentifier": "cc-by-4.0",
+        "rightsIdentifierScheme": "SPDX"
+      }
+    ],
+    "scope": "The independent supplementary-material DOI explicitly identifies the English and German ACT-SQ questionnaires and separately assigns CC BY4; not merely inferred from article license.",
+    "pdfSha256": "ce3b8ba37d2579694a9caa3f60141dcc83ae64fac8bc73442fe91db69ef8ab96"
+  },
+  "archivedResearchInputs": [
+    {
+      "filename": "act_sq6_en.handoff.json",
+      "sha256": "6fb67a0e731e2e9a2e789a77b4ef5da979129a55bad4b72725929c8a61fc1291"
+    },
+    {
+      "filename": "act_sq-primary.xml",
+      "sha256": "c9552f27ce543501d6d48f3952aabfca9e8f4a9834ab87d18373c3eeb37c1b6a"
+    },
+    {
+      "filename": "act_sq-cpe-02-3115-s1.pdf",
+      "sha256": "ce3b8ba37d2579694a9caa3f60141dcc83ae64fac8bc73442fe91db69ef8ab96"
+    },
+    {
+      "filename": "act_sq-supplement-datacite.json",
+      "sha256": "8d106736881880e88bc4259437dd4da7d051db7aa33a45c967537f164658a92a"
+    }
+  ],
+  "modifications": [
+    "AI-assisted Chinese working translation of all six items, full instructions and all five response labels",
+    "Digital source/scoring metadata and platform-owned conservative complete-response/adult/post-session policies",
+    "Plain-language report and synthetic examples"
+  ],
+  "notEstablished": [
+    "Chinese expert translation review",
+    "Chinese cognitive debriefing",
+    "Chinese local psychometric validation",
+    "Full runtime instruction / XY scope capture integration",
+    "Publication or deployment authorization"
+  ],
+  "thirdPartyExclusionCheck": "No restrictive third-party credit line found for the author-developed ACT-SQ items/Appendix A+B. This does not license other instruments cited by the article."
+}

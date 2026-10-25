@@ -1,0 +1,53 @@
+{
+  "status": "SYNTHETIC_CONTENT_EXAMPLE_NOT_RUNTIME_OUTPUT",
+  "instrumentKey": "act_sq6_zh_cn",
+  "assessmentContext": "ACT_PSYCHOTHERAPY_POST_SESSION",
+  "sessionScopeExample": {
+    "xy": 1,
+    "scope": "本次已结束的ACT心理治疗会谈（合成示例）"
+  },
+  "answers": [
+    {
+      "itemCode": "ACTSQ_01",
+      "responseValue": "0"
+    },
+    {
+      "itemCode": "ACTSQ_02",
+      "responseValue": "1"
+    },
+    {
+      "itemCode": "ACTSQ_03",
+      "responseValue": "2"
+    },
+    {
+      "itemCode": "ACTSQ_04",
+      "responseValue": "3"
+    },
+    {
+      "itemCode": "ACTSQ_05",
+      "responseValue": "4"
+    },
+    {
+      "itemCode": "ACTSQ_06",
+      "responseValue": "1"
+    }
+  ],
+  "expectedRawScore": 1.8333333333333333,
+  "displayScore": "1.83",
+  "scoreRange": [
+    0,
+    4
+  ],
+  "scoreLabel": "指定会谈的帮助感（六题均分）",
+  "percentile": null,
+  "referenceVersion": null,
+  "severityBand": null,
+  "reportText": "六题均分为1.83（范围0–4）。这只是这次指定会谈在六项描述上的帮助感汇总，没有高低等级或排名。可以回想哪段谈话或练习有帮助、哪里仍然困惑，并按自己的意愿与治疗师讨论；它不证明治疗成败，也不评价你或治疗师。",
+  "missingExample": {
+    "answeredItems": 5,
+    "quality": "invalid",
+    "score": null,
+    "meaning": "尚不足以汇总本次会谈经历，不将漏答当作没有帮助。"
+  },
+  "notRealPatientData": true
+}

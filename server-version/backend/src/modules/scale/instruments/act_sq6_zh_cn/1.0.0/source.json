@@ -1,0 +1,705 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "act_sq6_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "接纳承诺疗法会谈过程问卷（ACT-SQ，6题）— 中文工作译稿",
+      "abbreviation": "ACT-SQ-6-CN",
+      "instrumentFamily": "Acceptance and Commitment Therapy Session Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "来访者对最近明确指定的ACT心理治疗会谈中六个核心过程之帮助感的自评：接纳、认知解离、接触当下、以己为景、价值与承诺行动。源证据支持一个因子；不是一般人格、日常心理灵活性水平、治疗成效或治疗师绩效。SELF_REGULATION仅为现有目录的宽领域归类。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "act_sq6_zh_cn",
+        "domain:self_regulation",
+        "construct:act_in_session_process_realization",
+        "construct:patient_perceived_session_help",
+        "orientation:ACT",
+        "orientation:post_session_only",
+        "population:adult",
+        "population:psychotherapy_clients",
+        "population:german_clinical_source_evidence",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:digital_supervised",
+        "response:paper",
+        "response:six_items",
+        "response:five_point_applicability",
+        "use:research",
+        "use:reflection",
+        "use:psychotherapy_post_session_only",
+        "use:not_general_screening",
+        "use:not_diagnostic",
+        "use:not_therapist_performance",
+        "use:no_validated_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:adaptation_permitted",
+        "language_validation:content_zh-CN",
+        "language_validation:source_en",
+        "language_validation:source_evidence_de",
+        "language_validation:working_translation",
+        "language_validation:translation_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:maturity_pilot"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限成人来访者在明确指定的ACT心理治疗会谈后本人自评，18岁为本包保守边界；源研究德国临床样本不能证明全部成人或未成年人适用。源证据是德语，英语为作者公开形式，中文工作译稿未验证。ADULT_SELF / student中的student只是现有报告技术受众角色，不表示中小学生或学校用途。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "最近明确指定的（XY）次ACT心理治疗会谈；须记录XY及具体会谈范围，不得改成最近两周、通常人格或一般生活状态",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留英语Appendix A六题题序、0–4全部五个原锚点的工作翻译；不随机题序或选项，不用同意度替换符合度。",
+        "独立指导语为“最近的（XY）次心理治疗会谈帮助我……”；必须和六题片段一起呈现，不能将指导语拼入首题或改写成独立人格断言。",
+        "独立指导语及XY会谈范围记录见docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/administration.md；现有引擎缺口未补，不声明完整施测页可用。",
+        "仅会谈后工作流；ACT_PSYCHOTHERAPY_POST_SESSION是保守适用情境标记，不证明前端已接入该情境或记录XY。缺失情境或年龄不得推定符合。",
+        "需要熟悉ACT会谈的专业人员说明施测范围；这是平台保守流程要求，不是作者规定的认证门槛。2分钟是平台负担估计，非论文实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅成人ACT心理治疗会谈后过程研究候选；中文译稿与数字呈现未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅帮助回顾指定会谈经历，不是日常人格自测、疗效判断或治疗师考核。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "actsq-probst2020-act87",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "德国临床ACT来访者；9名ACT治疗师",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 87,
+        "studyDesign": "ACT会谈后自评；最大似然探索性因素分析按Kaiser准则保留一个因子，六题Cronbach alpha=0.81",
+        "rating": "MIXED",
+        "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115",
+        "doi": "10.32872/cpe.v2i3.3115",
+        "url": "https://cpe.psychopen.eu/index.php/cpe/article/download/3115/3115.html?inline=1",
+        "notes": "平均年龄42.48岁（SD14.79）；平均在第21.25次会谈后作答，非短程治疗或一般成人样本。Study 1未研究治疗成效关联。 初步探索性证据，尚需更大样本确认性分析；不是中文本地证据或常模。"
+      },
+      {
+        "evidenceId": "actsq-probst2020-cbt115",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "德国临床CBT门诊来访者；第15次会谈",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 115,
+        "studyDesign": "第15次CBT会谈后自评；探索性单因子结构，六题Cronbach alpha=0.84",
+        "rating": "MIXED",
+        "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115",
+        "doi": "10.32872/cpe.v2i3.3115",
+        "url": "https://cpe.psychopen.eu/index.php/cpe/article/download/3115/3115.html?inline=1",
+        "notes": "与疗程结束样本有17人重叠，不将115+156当作独立271人；本包保守限定ACT会谈后，不因比较样本扩为一般CBT或校园量表。 初步探索性证据，尚需更大样本确认性分析；不是中文本地证据或常模。"
+      },
+      {
+        "evidenceId": "actsq-probst2020-cbt156",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "德国临床CBT门诊来访者；疗程结束",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 156,
+        "studyDesign": "疗程结束后自评；探索性单因子结构，六题Cronbach alpha=0.88",
+        "rating": "MIXED",
+        "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115",
+        "doi": "10.32872/cpe.v2i3.3115",
+        "url": "https://cpe.psychopen.eu/index.php/cpe/article/download/3115/3115.html?inline=1",
+        "notes": "Study 2合计254名来访者、77名CBT实习治疗师；115与156两个样本有17人重叠。成效关联仅为CBT中同期关联，不证明因果或ACT治疗成效。 初步探索性证据，尚需更大样本确认性分析；不是中文本地证据或常模。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Probst等(2020)独立补充题本Appendix A英语6题、完整指导语及全部0–4锚点；本项目AI辅助中文工作翻译，不是已发表或已验证中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原研究证据来自德语临床样本；英文是作者公开形式，不推定英文独立验证。中文题干、指导语、响应标签及新增报告仍待独立译审、认知访谈和本地验证；无原作者背书。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "act_sq6_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "assessmentContexts": [
+      "ACT_PSYCHOTHERAPY_POST_SESSION"
+    ],
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "act_sq6_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "act_sq6_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115 原作者© 2020；原论文及英语/德语ACT-SQ独立补充题本均为CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 。附录许可独立依据DOI 10.23668/psycharchives.3462的DataCite rightsList，不仅从论文许可推定。保留署名、许可链接并注明改动，可再分发及翻译改编，包括商业使用；原题文不是公有领域，也不被仓库MIT许可证替代。中文题干、指导语及五档响应标签是本项目AI辅助工作翻译，通俗报告为新增内容；未获原作者背书，未完成中文专家译审或本地验证。",
+      "补充题本独立权利记录：https://api.datacite.org/dois/10.23668/psycharchives.3462 ；rightsList明确CC-BY 4.0与SPDX cc-by-4.0，描述明确英语/德语ACT-SQ。原题本未见第三方排除；不覆盖论文引用的其他工具。",
+      "许可确认只说明再分发/改编范围，不等于科学审核、部署授权或治疗服务资质。本包DRAFT，未来物化须保持HIDDEN；此内容包本身不执行注册、物化或发布。",
+      "缺独立指导语与XY范围记录接入，禁止开放普通自测或K12筛查；不把说明挤入题干，不为本内容包修改共享引擎。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "ACT-SQ English Appendix A (six items); Chinese working translation, psychotherapy post-session only",
+        "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115 Supplementary questionnaires: https://doi.org/10.23668/psycharchives.3462",
+        "url": "https://doi.org/10.23668/psycharchives.3462",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115 原作者© 2020；原论文及英语/德语ACT-SQ独立补充题本均为CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ 。附录许可独立依据DOI 10.23668/psycharchives.3462的DataCite rightsList，不仅从论文许可推定。保留署名、许可链接并注明改动，可再分发及翻译改编，包括商业使用；原题文不是公有领域，也不被仓库MIT许可证替代。中文题干、指导语及五档响应标签是本项目AI辅助工作翻译，通俗报告为新增内容；未获原作者背书，未完成中文专家译审或本地验证。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "actsq_applicability_0_4",
+          "options": [
+            {
+              "value": "0",
+              "label": "不符合",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "略微符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "较为符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "很大程度上符合",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "极其符合",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ACTSQ_01",
+          "content": "…接纳令人不愉快的感受、想法或身体感觉，而不是与它们对抗。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ACTSQ_02",
+          "content": "…在心里与令人不愉快的感受、想法或身体感觉拉开更多距离，观察它们，而不是陷入其中。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ACTSQ_03",
+          "content": "…把注意力放在此时此地（当下），而不是放在自己的未来和过去。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ACTSQ_04",
+          "content": "…认识到我的感受、想法和身体感觉是我的一部分，但我不仅仅是这些感受、想法和身体感觉。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ACTSQ_05",
+          "content": "…看清生活中什么对我重要，以及什么为我的生活指明方向。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ACTSQ_06",
+          "content": "…在日常生活中，按照那些对我重要、并为我的生活指明方向的事来行动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "actsq_applicability_0_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "ACTSQ_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ACTSQ_06",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "act_session_mean",
+            "type": "total",
+            "label": "指定会谈的帮助感（六题均分）",
+            "description": "六题0–4分等权平均，范围0–4；越高只表示来访者认为指定会谈对ACT过程帮助更多，不代表治疗效果、治疗师绩效或个人心理灵活性等级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ACTSQ_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ACTSQ_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ACTSQ_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ACTSQ_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ACTSQ_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ACTSQ_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "act_session_mean"
+        ],
+        "scoreOrder": [
+          "act_session_mean"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "act_session_mean",
+            "headline": "回顾这次指定会谈的经历",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷帮助你回顾最近明确指定的心理治疗会谈：它在多大程度上帮助你面对不舒服的内在体验、留意当下、看清对自己重要的事，并在生活中据此行动。六题均分越高，只表示你认为这些会谈在题目所说的方面帮助更多；它不是给你或治疗师打等级，也不能说明症状一定改善或治疗一定有效。本版本没有经过验证的高低分界，中文内容仍是工作译稿。比起追求某个分数，更有用的是回想本次会谈里具体发生了什么，哪些练习有帮助，哪些地方仍然困惑，并按自己的意愿与治疗师讨论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "只回想本次已指定的会谈范围：哪一段谈话或练习让你觉得有帮助？有没有某道题与你的经历不贴切，或让你不太明白？可以如实表达。"
+              },
+              {
+                "category": "strategy",
+                "text": "如果愿意，下次会谈可带上一个具体例子，讨论哪些练习适合你、哪些需要调整。接纳内在感受不是认同有害处境，关注当下也不是放弃规划；不要为提高分数勉强自己。"
+              },
+              {
+                "category": "support",
+                "text": "如果会谈中有不舒服、困惑或感觉未被理解的地方，可以直接和治疗师讨论支持需求。分数不应替你决定是否继续、结束或改变治疗，也不应用来评价治疗师绩效。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅回顾最近明确指定的ACT心理治疗会谈；应记录XY次及具体会谈范围。不是一般人格、日常心理灵活性或K12校园通用筛查。",
+          "源证据来自德国临床样本，英语为作者公开题本；本项目中文工作译稿尚无独立专家译审、认知访谈或本地心理测量验证。18岁是平台保守使用边界，不是已验证年龄阈值。",
+          "六题对应ACT六个过程，但源探索性分析支持一个因子；只给出六题均分0–4，不输出六个单题伪分量表或0–24总和。",
+          "分数只表示来访者认为指定会谈对这些过程的帮助感，不证明治疗有效、症状改变、治疗师能力或治疗依从性，不用于治疗师绩效评价。",
+          "没有已核实的临床阈值、高中低档、百分位、常模、可靠变化界值或最小重要差异；较低分不等于来访者不努力或治疗失败。",
+          "六题必须完整作答才计分，不填补、不折算；这是本平台保守缺失政策，未找到作者公布的漏答算法。",
+          "独立会谈指导语及XY范围记录尚未接入完整施测页；本包保持DRAFT，未来物化须保持HIDDEN，不向普通自测入口开放。"
+        ],
+        "disclaimer": "仅供成人在明确指定的ACT心理治疗会谈后回顾经历；中文为未经验证的工作译稿。本报告不作诊断、疗效结论、治疗决策、治疗师绩效评价或K12校园通用筛查，不将较低分归咎于来访者。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and editorial check (not human expert review)",
+            "reviewedAt": "2026-10-25T22:03:00Z",
+            "basis": "Compared source handoff, published Appendix A and article, with independent supplementary DOI rights metadata; no human expert approval, Chinese validation, runtime administration or publication claimed."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "act_sq6",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "ACTSQ_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_06",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "act_session_mean": 0
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "ACTSQ_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_06",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "act_session_mean": 4
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "ACTSQ_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_06",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "act_session_mean": 2
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      },
+      {
+        "name": "mixed_mean",
+        "answers": [
+          {
+            "itemCode": "ACTSQ_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "ACTSQ_06",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "act_session_mean": 1.8333333333333333
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "ACTSQ_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "ACTSQ_05",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "act_session_mean": null
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "act_session_mean": null
+          },
+          "totalScoreKeys": [
+            "act_session_mean"
+          ]
+        }
+      }
+    ]
+  }
+}

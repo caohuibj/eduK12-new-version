@@ -1,0 +1,55 @@
+{
+  "status": "LOCAL_CONTENT_CHECK_WITH_ONE_TARGETED_REPAIR_NOT_CI",
+  "scope": "act_sq6_zh_cn@1.0.0 only; no registration, materialization or deployment",
+  "executions": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/scale/instruments/act_sq6_zh_cn.test.ts",
+      "workingDirectory": "server-version/backend",
+      "exitCode": 1,
+      "executed": 18,
+      "passed": 17,
+      "failed": 1,
+      "failure": "Test accessed nonexistent validateScaleDefinition(...).valid; validator returns {definition, issues}. Source validation itself did not throw.",
+      "evidence": "Original tool output retained in task transcript; no first-run machine-readable reporter was requested."
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/scale/instruments/act_sq6_zh_cn.test.ts -t 'validates the new source without invented scientific approval or publication' --reporter=default --reporter=json --outputFile.json=../../docs/scale-instruments/research-drafts/act_sq6_zh_cn/1.0.0/validation-repair.vitest.json",
+      "workingDirectory": "server-version/backend",
+      "exitCode": 0,
+      "executed": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 17,
+      "repair": "Require no error-severity validation issues, matching the actual API; only failed test rerun.",
+      "evidence": "Actual output and JSON reporter retained outside the repository; 17 prior passing tests were not repeated."
+    }
+  ],
+  "union": {
+    "actualPassedCases": 18,
+    "uniqueCases": 18,
+    "wholeFinalInvocationPassed": false,
+    "qualification": "Disjoint observed-case union, not a successful first or full-final invocation. Parent must compare immutable test bodies and actual import/tool inputs before reuse; missing formal evidence remains missing."
+  },
+  "notExecuted": [
+    "dependency installation",
+    "Prisma generation",
+    "whole repository typecheck",
+    "full test suite",
+    "registry generation",
+    "database checks",
+    "CI",
+    "runtime administration",
+    "publication or deployment"
+  ],
+  "scientificStatus": "Chinese working translation PENDING; no local validation or human scientific approval",
+  "knownRuntimeGaps": [
+    "independent session instruction presentation",
+    "XY session count and exact scope capture",
+    "actual post-session context workflow"
+  ],
+  "postTestEditorialChange": {
+    "scope": "One usageRequirements note replaces transient unregistered status with the durable statement that the data package itself performs no registration/materialization/publication.",
+    "runtimeDefinitionChanged": false,
+    "finalSourceValidationAfterEditorialChange": "NOT_EXECUTED; parent owns current-main integration validation."
+  }
+}

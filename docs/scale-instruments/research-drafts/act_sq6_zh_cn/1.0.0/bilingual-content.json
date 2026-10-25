@@ -1,0 +1,114 @@
+{
+  "instrumentKey": "act_sq6_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "status": "WORKING_TRANSLATION_PENDING_NOT_VALIDATED",
+  "sourceLocale": "en",
+  "evidenceLocale": "de",
+  "targetLocale": "zh-CN",
+  "citation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Development and Initial Validation of a Brief Questionnaire on the Patients’ View of the In-Session Realization of the Six Core Components of Acceptance and Commitment Therapy. Clinical Psychology in Europe, 2(3), Article e3115. https://doi.org/10.32872/cpe.v2i3.3115",
+  "supplementCitation": "Probst, T., Mühlberger, A., Kühner, J., Eifert, G. H., Pieh, C., Hackbarth, T., & Mander, J. (2020). Supplementary materials to the ACT-SQ development and initial validation article [Questionnaire; English and German version]. PsychOpen / PsychArchives. https://doi.org/10.23668/psycharchives.3462",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "instructions": {
+    "en": "The last (XY) psychotherapy session(s) helped me…",
+    "zhWorking": "最近的（XY）次心理治疗会谈帮助我……",
+    "timeframe": "Specify last session or exact preceding XY psychotherapy sessions; not a general-life trait questionnaire.",
+    "xyMustBeSpecified": true,
+    "platformIntegrationStatus": "NOT_INTEGRATED_DO_NOT_ADMINISTER_FROM_ITEMS_ALONE"
+  },
+  "responseOptions": [
+    {
+      "value": 0,
+      "en": "does not apply",
+      "zhWorking": "不符合"
+    },
+    {
+      "value": 1,
+      "en": "applies slightly",
+      "zhWorking": "略微符合"
+    },
+    {
+      "value": 2,
+      "en": "applies fairly well",
+      "zhWorking": "较为符合"
+    },
+    {
+      "value": 3,
+      "en": "applies to a great extent",
+      "zhWorking": "很大程度上符合"
+    },
+    {
+      "value": 4,
+      "en": "applies extremely",
+      "zhWorking": "极其符合"
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "ACTSQ_01",
+      "order": 1,
+      "en": "… to accept unpleasant feelings, thoughts or body sensations rather than fight them.",
+      "zhWorking": "…接纳令人不愉快的感受、想法或身体感觉，而不是与它们对抗。",
+      "sourceComponentEn": "Acceptance",
+      "componentZhWorking": "接纳",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    },
+    {
+      "itemCode": "ACTSQ_02",
+      "order": 2,
+      "en": "… to gain more inner distance from unpleasant feelings, thoughts or body sensations and to observe them rather than getting caught up in them.",
+      "zhWorking": "…在心里与令人不愉快的感受、想法或身体感觉拉开更多距离，观察它们，而不是陷入其中。",
+      "sourceComponentEn": "Cognitive defusion",
+      "componentZhWorking": "认知解离",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    },
+    {
+      "itemCode": "ACTSQ_03",
+      "order": 3,
+      "en": "… to stay in the here and now (in the present moment) rather than concerning myself with my future and my past.",
+      "zhWorking": "…把注意力放在此时此地（当下），而不是放在自己的未来和过去。",
+      "sourceComponentEn": "Contact with the present moment",
+      "componentZhWorking": "接触当下",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    },
+    {
+      "itemCode": "ACTSQ_04",
+      "order": 4,
+      "en": "… to realize that my feelings, thoughts and body sensations are part of me, but that I am more than my feelings, thoughts and body sensations.",
+      "zhWorking": "…认识到我的感受、想法和身体感觉是我的一部分，但我不仅仅是这些感受、想法和身体感觉。",
+      "sourceComponentEn": "Self-as-context",
+      "componentZhWorking": "以己为景",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    },
+    {
+      "itemCode": "ACTSQ_05",
+      "order": 5,
+      "en": "… to recognize what is important to me in my life and what gives orientation to my life.",
+      "zhWorking": "…看清生活中什么对我重要，以及什么为我的生活指明方向。",
+      "sourceComponentEn": "Values",
+      "componentZhWorking": "价值",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    },
+    {
+      "itemCode": "ACTSQ_06",
+      "order": 6,
+      "en": "… to act in daily life according to what is important to me in my life and what gives orientation to my life.",
+      "zhWorking": "…在日常生活中，按照那些对我重要、并为我的生活指明方向的事来行动。",
+      "sourceComponentEn": "Committed action",
+      "componentZhWorking": "承诺行动",
+      "reverse": false,
+      "componentIsValidatedSubscale": false
+    }
+  ],
+  "translationNotes": [
+    "中文题干、指导语、响应标签全部为项目AI辅助工作翻译；未宣称独立双人翻译、回译、原作者确认或中文验证。",
+    "第三题保留对当下与未来/过去的对照，解释不将其引申为禁止规划或回顾。",
+    "第二题的内在距离不是要求压抑情绪或脱离现实；其措辞仍需认知访谈。",
+    "第四题“以己为景”为工作标签，不展示成独立分量表，不将题目理解为解离体验。"
+  ]
+}
