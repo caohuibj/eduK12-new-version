@@ -58,6 +58,8 @@ export interface FinalCompositeAssessmentProps {
     loadVideoCapability: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
   }
   campusMode?: boolean
+  /** Optional product presentation; answer and submission controllers stay unchanged. */
+  instructionsSummary?: string
   campusVideoLoader?: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
 }
 
@@ -85,7 +87,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport, instructionsSummary }) => {
   const item = state.currentItem
   const expiredCognitive = item?.type === 'COGNITIVE' && cognitiveRecovery?.reason === 'LOCAL_DRAFT_EXPIRED'
   const [sectionIndex, setSectionIndex] = useState(0)
@@ -523,7 +525,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       className={isTrainingHost() && !campusMode && !publicMode && isSection ? 'training-form-surface' : undefined}
       title={state.name}
       eyebrow={state.productKind === 'QUESTIONNAIRE' ? '问卷' : '综合测评'}
-      instructionsSummary={isTrainingHost() && !campusMode ? '作答说明' : undefined}
+      instructionsSummary={instructionsSummary ?? (isTrainingHost() && !campusMode ? '作答说明' : undefined)}
       instructions={(
         <div className="space-y-2">
           {state.instruction ? <p>{state.instruction}</p> : null}

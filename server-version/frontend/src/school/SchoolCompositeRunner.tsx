@@ -12,6 +12,7 @@ import type { AssessmentVideoCapabilitySources } from '../modules/assessment-med
 import type { CompositeAttemptState,CompositeCurrentItem } from '../modules/composite/types'
 import type { ApiResponse } from '../types'
 import type { SchoolApi } from './SchoolRecovery'
+import './school-assessment.css'
 
 export type CampusExecutionRef={
   organizationId:string;courseId:string;runId:string;executionId:string
@@ -125,11 +126,12 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
     setChild(null)
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
-  return <section className={"hs-panel hs-runner"+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
+  const studentAnswer=Boolean(title&&state&&!done&&!child&&['FORM_SECTION','SCALE'].includes(state.currentItem?.type??''))
+  return <section className={"hs-panel hs-runner"+(studentAnswer?' hs-school-task-runner--answer':'')+(title?" hs-school-task-runner"+(!state&&!done?" hs-school-task-runner--ready":""):"")} ref={panelRef} tabIndex={-1} aria-label="校园任务作答">
     <div className="hs-actions"><button className="hs-runner-back" disabled={busy} onClick={onExit}><ArrowLeft size={17} aria-hidden="true"/>返回活动</button></div>
-    <p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
+    {!studentAnswer&&<p className="hs-runner-note">返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>}
     {title?<h1 hidden={Boolean(state)&&!done}>{title}</h1>:<h2 hidden={Boolean(state)}>校园正式测评</h2>}
-    <p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>
+    {studentAnswer?<details className="hs-school-runner-help"><summary>任务与隐私说明</summary><p>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p><p>答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p></details>:<p className="hs-runner-note">答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {done?<div role="status" className="hs-message">
       <h3>本次测评已完成</h3>
@@ -157,6 +159,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title}:{
     state?<FinalCompositeAssessment
       state={state}
       campusMode
+      instructionsSummary={studentAnswer?'作答说明':undefined}
       campusVideoLoader={videoLoader}
       submitFormSection={async(_id,sectionId,input)=>{
         return wrapped(await api(runApi('/form-sections/'+encodeURIComponent(sectionId)+'/submit'),

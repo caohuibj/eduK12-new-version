@@ -126,6 +126,25 @@ describe('FinalCompositeAssessment presentation reuse', () => {
     expect(submitFormSection.mock.calls[0][2].answers).toEqual([{ formItemId: 'grade', value: null }])
   })
 
+  it('allows School to collapse instructions without losing an answer or submitting it', async () => {
+    const user = userEvent.setup()
+    const submitFormSection = vi.fn()
+    const props = { state, campusMode:true, instructionsSummary:'作答说明', submitFormSection, submitScale:vi.fn(), onReload:vi.fn().mockResolvedValue(undefined), onExit:vi.fn(), onCompleted:vi.fn(), onEnterCognitive:vi.fn(), onEnterSituational:vi.fn() }
+    const { container } = render(<FinalCompositeAssessment {...props} />)
+    const answer = await screen.findByRole('radio', { name:'一年级' })
+    await user.click(answer)
+    const instructions = container.querySelector('details.assessment-instructions')!
+    expect(instructions).not.toHaveAttribute('open')
+    await user.click(screen.getByText('作答说明', { exact:true }))
+    expect(instructions).toHaveAttribute('open')
+    expect(screen.getByText(/当前单元：学生信息/)).toBeVisible()
+    await user.click(screen.getByText('作答说明', { exact:true }))
+    expect(instructions).not.toHaveAttribute('open')
+    expect(answer).toBeChecked()
+    expect(submitFormSection).not.toHaveBeenCalled()
+    expect(container.querySelector('.training-form-surface')).toBeNull()
+  })
+
   it('limits the Training skin to ordinary Form and leaves other entry/mode surfaces unchanged', async () => {
     trainingHost.mockReturnValue(true)
     const props = { state, submitFormSection: vi.fn(), submitScale: vi.fn(), onReload: vi.fn().mockResolvedValue(undefined), onExit: vi.fn(), onCompleted: vi.fn(), onEnterCognitive: vi.fn(), onEnterSituational: vi.fn() }

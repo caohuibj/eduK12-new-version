@@ -2,9 +2,9 @@ import {describe,expect,it,vi} from 'vitest'
 import {fireEvent,render,screen,waitFor} from '@testing-library/react'
 import type {SchoolApi} from './SchoolRecovery'
 
-const m=vi.hoisted(()=>({entry:vi.fn(),cognitive:vi.fn()}))
+const m=vi.hoisted(()=>({entry:vi.fn(),cognitive:vi.fn(),presentation:vi.fn()}))
 vi.mock('../components/FinalCompositeAssessment',()=>({
-  default:({onEnterCognitive}:any)=><button onClick={()=>onEnterCognitive(m.entry())}>进入冻结认知子测评</button>,
+  default:(props:any)=>{m.presentation(props);return <button onClick={()=>props.onEnterCognitive(m.entry())}>进入冻结认知子测评</button>},
 }))
 vi.mock('../modules/cognitive/pages/CognitiveRunner',()=>({
   CognitiveRunner:({campus}:any)=>{
@@ -92,3 +92,14 @@ it('returns without promising to save or sending a submission',()=>{
   expect(onExit).toHaveBeenCalledOnce()
   expect(api).not.toHaveBeenCalled()
 })
+
+ it.each(['FORM_SECTION','SCALE'])('opts student %s into compact instructions without altering transport',async(type)=>{
+  const api=vi.fn(async(path:string)=>path.endsWith('/start')?{state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}:{id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'unit-1',type}})
+  const {container}=render(<SchoolCompositeRunner api={api as unknown as SchoolApi} title="学生任务" execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}))
+  await screen.findByRole('button',{name:'进入冻结认知子测评'})
+  expect(container.querySelector('.hs-school-task-runner--answer')).not.toBeNull()
+  expect(container.querySelector('.hs-school-runner-help')).not.toHaveAttribute('open')
+  expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({campusMode:true,instructionsSummary:'作答说明'}))
+  expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
+ })
