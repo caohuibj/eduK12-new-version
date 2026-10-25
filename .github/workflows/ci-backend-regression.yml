@@ -25,6 +25,7 @@ jobs:
     timeout-minutes: 35
     env:
       NODE_ENV: test
+      RUNNER_ENVIRONMENT: ${{ runner.environment }}
       DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       COGNITIVE_INTEGRATION_DB_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       PR8_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
@@ -40,6 +41,16 @@ jobs:
       SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      # Explicit opt-ins point only to this job's disposable service.
+      AUTHENTICATED_ADMISSION_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_ARCHIVE_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_PARTICIPATION_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_FOLLOWUP_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_MEMORABLE_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_DIRECTORY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_SJT_ENTRY_AUTHORITY_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_SJT_BINDING_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      SURVEY_NATIVE_SJT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       # C20 creates a UUID-isolated schema in this disposable job service only.
       TRAINING_MATERIAL_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       TRAINING_MATERIAL_ISOLATED_DB: '1'
@@ -80,9 +91,30 @@ jobs:
         working-directory: server-version/backend
     steps:
       - uses: actions/checkout@v4
+      - name: preflight explicit integration database opt-ins
+        if: inputs.focus == 'full'
+        run: |
+          node <<'NODE'
+          const suites={
+            AUTHENTICATED_ADMISSION:'composite/authenticated-admission',TRAINING_ARCHIVE:'composite/student-archived-availability',
+            TRAINING_PARTICIPATION:'integration/trainingParticipation,trainingResetBoundaries,trainingStableAdmission',
+            SURVEY_FOLLOWUP:'survey/governed-native,standard-catalog-fingerprint',SURVEY_MEMORABLE:'survey/memorable-code',
+            SURVEY_DIRECTORY:'survey/project-directory',SURVEY_SJT_BINDING:'survey/situational-native-binding',
+            SURVEY_NATIVE_SJT:'survey/situational-native-*',SURVEY_SJT_ENTRY_AUTHORITY:'survey/situational-entry-authority'
+          };
+          const expected='postgresql://ptool:ptool123@localhost:5432/ptool?schema=public';
+          const problems=Object.entries(suites).flatMap(([key,files])=>{
+            const name=key+'_TEST_DATABASE_URL';
+            return process.env[name]===expected&&process.env[name]===process.env.DATABASE_URL?[]:[name+' -> '+files];
+          });
+          if(problems.length)throw new Error('Missing or foreign job database opt-ins:\n'+problems.join('\n'));
+          console.log('All 9 explicit newer integration opt-ins match the disposable job database; execution remains serial.');
+          NODE
+      - name: validate disjoint regression report controls
+        run: node --test ../../.github/scripts/backend-regression-reports.test.mjs
       - name: clear reports from previous regression jobs
         # Self-hosted /tmp persists between jobs; never upload old-focus evidence.
-        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
+        run: rm -f /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json /tmp/eduk12-parent-vitest.json /tmp/eduk12-r5-vitest.json /tmp/eduk12-hosted-ci-env.txt
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -179,8 +211,43 @@ jobs:
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         # Real-PG suites remain serial. The single hardware-sensitive burst is
-        # covered by the isolated backend job and excluded here; every other file runs here.
-        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+        # covered by the isolated backend job. The export consumer runs separately
+        # on Redis DB 15; every functional file remains covered by the report union.
+        run: npm test -- --no-file-parallelism --exclude=src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --exclude=src/__tests__/integration/training-mac-export.postgres.integration.test.ts --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest-base.json
+      - name: isolated export consumer on this job Redis DB 15
+        if: (success() || failure()) && inputs.focus == 'full'
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}
+          REDIS_URL: redis://localhost:6379/15
+        run: |
+          node <<'NODE'
+          const {execFileSync}=require('node:child_process');
+          const fs=require('node:fs');
+          const id=process.env.CI_REDIS_SERVICE_ID;
+          if(!/^[a-f0-9]{64}$/.test(id||''))throw new Error('Current Actions Redis service identity required');
+          const [container]=JSON.parse(execFileSync('docker',['inspect',id],{encoding:'utf8'}));
+          if(container.Id!==id||!container.State.Running)throw new Error('Current Actions Redis service is not running');
+          const name=container.Name.replace(/^\//,''),image=container.Image;
+          if(!/^[a-zA-Z0-9_-]+$/.test(name)||!/^sha256:[a-f0-9]{64}$/.test(image))throw new Error('Invalid Actions Redis metadata');
+          const value=name+':'+id+':'+image;
+          execFileSync('docker',['exec',id,'redis-cli','-n','15','SET','training-mac:qualification:'+process.env.GITHUB_RUN_ID+':'+process.env.GITHUB_RUN_ATTEMPT,value,'EX','3600']);
+          fs.appendFileSync(process.env.GITHUB_ENV,
+            'TRAINING_MAC_FIXTURE_CONTRACT=actions-regression-service-v1\nTRAINING_MAC_FIXTURE_REDIS_NAME='+name+'\nTRAINING_MAC_FIXTURE_REDIS_ID='+id+'\nTRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST='+image+'\n');
+          // The test process below needs the values in this step as well.
+          fs.writeFileSync('/tmp/eduk12-export-fixture-env.json',JSON.stringify({name,id,image}));
+          NODE
+          node <<'NODE'
+          const {spawnSync}=require('node:child_process');
+          const m=require('/tmp/eduk12-export-fixture-env.json');
+          const result=spawnSync('npm',['test','--','src/__tests__/integration/training-mac-export.postgres.integration.test.ts','--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/tmp/eduk12-backend-vitest-export.json'],
+            {stdio:'inherit',env:{...process.env,TRAINING_MAC_FIXTURE_CONTRACT:'actions-regression-service-v1',TRAINING_MAC_FIXTURE_REDIS_NAME:m.name,TRAINING_MAC_FIXTURE_REDIS_ID:m.id,TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST:m.image}});
+          if(result.error)throw result.error;
+          process.exitCode=result.status??1;
+          NODE
+      - name: preserve both disjoint functional reports and require their complete union
+        if: (success() || failure()) && inputs.focus == 'full'
+        run: node "$GITHUB_WORKSPACE/.github/scripts/backend-regression-reports.mjs" /tmp/eduk12-backend-vitest.json /tmp/eduk12-backend-vitest-base.json /tmp/eduk12-backend-vitest-export.json
       - name: capture hosted runner resources
         if: always()
         run: |-
@@ -195,6 +262,9 @@ jobs:
         if: inputs.focus == 'full'
         run: >-
           node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json
+          src/__tests__/integration/training-mac-export.postgres.integration.test.ts
+          src/__tests__/survey/governed-native.postgres.integration.test.ts
+          src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts
           src/__tests__/cognitive/concurrency.integration.test.ts
           src/__tests__/scale/pr3-managed.postgres.integration.test.ts
           src/__tests__/assessment-reference/scale-wave1-lifecycle.postgres.integration.test.ts
@@ -284,6 +354,8 @@ jobs:
           name: backend-vitest-report
           path: |
             /tmp/eduk12-backend-vitest.json
+            /tmp/eduk12-backend-vitest-base.json
+            /tmp/eduk12-backend-vitest-export.json
             /tmp/eduk12-parent-vitest.json
             /tmp/eduk12-r5-vitest.json
             /tmp/eduk12-hosted-ci-env.txt

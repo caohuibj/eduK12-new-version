@@ -706,3 +706,14 @@ fail-closed，没有改 skip、退回任意 DATABASE_URL、借共享/真实库�
 `assertSurveyPublicationNotPaused` 对 unfinished collection 同事务 fresh 检查原始 SJT 的 pinned entry capability；仍逐一检查 recipient tool grant，不替换为较新许可。同请求只复用已经验证的完全相同 receipt；新请求重新验证。FINAL 重放与历史报告已有单独门禁，此片不扩大历史报告禁读范围，不删保存事实。图片发布匹配同时绑定本 PR 编译器加入的 `sourceGrantId`，保留无此字段的旧冻结身份比较；同正文的替代 grant 不能借用。
 
 局部原生单元 26 项通过；真实隔离 PG 的 V1、带图、variant、source-capability 和 bundle-content 本次 15 项通过，另一个 lifecycle setup 变量笔误在独立修订中处理。逐断言与原失败摘要见 `native-ci-maintenance.json`。新治理授权与历史已存授权测试明确区分：带图来源尚缺原作者 governed-media 授意的提交路径，COURSE_GRANT 来源的系统提交者也不能代替精确入口分发者；保留拒绝，不假称支持新授权闭环。历史夹具只在明确隔离合成库写入 pre-governance storage contract，不是生产 API 兼容通道或正式批准。
+
+
+### 下一次正式 CI 输入收口
+
+用户已明确允许验证维护（门禁与业务权限不变），以及整包认知复制实例使用既有发布函数的最小产品接线。候选已分片备份 `6c9745fd`（Zod4 草稿）、`f7b6c766`（同事务认知发布）、`036a4400`（busy/quota/同请求 option table）、`a12741c5`（原生 pinned authority/media）、`645164f3`（夹具/契约）。这些都是本分支候选，不称已进 main。
+
+原始 CI 203 条失败的逐项证据账本见 `ci-validation-maintenance.json`：198 条同名断言或明确改名合同已有后续局部通过；5 条待真实 Actions（Mini 两条、Survey rollback publication 三条）。这不是一次全量 198/203 成绩；每次失败、过滤和 setup 拒绝原件均保留。新增数据库配置所覆盖的 8 个文件 47 条实跑全过；匿名研究清理修订 4 条实跑全过。Mac export 的真实服务身份正例只由下一轮 Actions 执行，未伪造本地 CI 身份；本地 Mini exact UTC 守卫拒绝 setup，不修改数据库时区。
+
+CI 最小配置：9 个显式 opt-in 指向现有 job PG（14 个 suite 使用），增加缺失/异库一次性预检；保串行与全部原始保护。导出消费者独立进程/同 job Redis DB15，验证真实 container ID、image 与 expiring run marker；保 base/export 两份原 JSON，并要求不相交完整并集成功，失败不变绿。回归原35分钟预算不变。CodeQL只将20分钟上限提高至30分钟，原查询集/语言/路径不变。控制单元18过、路由84过，YAML及四段Node语法通过；生产 backend tsc 退出0。
+
+普通 synchronize 触发下一轮全部适用正式门禁（含隔离 200 完成与短 k6 smoke），没有借用 PR354 或其他固定候选路线，也没有降低 required。正常最终 head 全部必需检查成功、无其他阻断才合并。此片完成后不自动部署或开始下一阶段迁移。

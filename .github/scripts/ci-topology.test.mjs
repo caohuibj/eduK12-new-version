@@ -4,6 +4,7 @@ import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync, statSync
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
+import {runInNewContext} from 'node:vm';
 import { runnerPlan } from './content-scope.mjs';
 import { treeDigest, verifyManifest } from './ci-artifact.mjs';
 import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
@@ -209,4 +210,35 @@ test('temporary browser cleanup cannot target a personal directory or another ch
   assertRunnerTemp(home,home+'/actions-runner/_work/_temp');
   for(const path of ['/Users/Qiang/Library/Caches',home+'/actions-runner/_work/repo/repo',home+'/actions-runner/_work/_temp/..'])
     assert.throws(()=>assertRunnerTemp(home,path));
+});
+
+
+test('regression opts in newer suites only to its own database and isolates the real export consumer',()=>{
+  const w=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  for(const key of ['AUTHENTICATED_ADMISSION','TRAINING_ARCHIVE','TRAINING_PARTICIPATION','SURVEY_FOLLOWUP','SURVEY_MEMORABLE','SURVEY_DIRECTORY','SURVEY_SJT_ENTRY_AUTHORITY','SURVEY_SJT_BINDING','SURVEY_NATIVE_SJT'])
+    assert.ok(w.includes(key+'_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public'));
+  assert.ok(w.includes('RUNNER_ENVIRONMENT: ${{ runner.environment }}'));
+  assert.ok(w.includes('REDIS_URL: redis://localhost:6379/15'));
+  assert.ok(w.includes('CI_REDIS_SERVICE_ID: ${{ job.services.redis.id }}'));
+  assert.ok(w.includes('docker')&&w.includes('container.Id!==id||!container.State.Running'));
+  assert.ok(w.includes('backend-regression-reports.mjs'));
+  assert.ok(w.includes('node --test ../../.github/scripts/backend-regression-reports.test.mjs'));
+  for(const path of ['/tmp/eduk12-backend-vitest-base.json','/tmp/eduk12-backend-vitest-export.json'])assert.ok(w.includes(path));
+  const required=w.split('hosted critical integration suites must not skip')[1].split('      - name:')[0];
+  assert.ok(required.includes('integration/training-mac-export.postgres.integration.test.ts'));
+  assert.ok(required.includes('survey/governed-native.postgres.integration.test.ts'));
+});
+
+test('integration preflight reports every missing or foreign opt-in without falling back or printing URLs',()=>{
+  const w=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  const step=w.split('      - name: preflight explicit integration database opt-ins\n')[1].split('      - name:')[0];
+  const body=step.split("node <<'NODE'\n")[1].split('          NODE')[0].replace(/^          /gm,'');
+  const expected='postgresql://ptool:ptool123@localhost:5432/ptool?schema=public';
+  const names=['AUTHENTICATED_ADMISSION','TRAINING_ARCHIVE','TRAINING_PARTICIPATION','SURVEY_FOLLOWUP','SURVEY_MEMORABLE','SURVEY_DIRECTORY','SURVEY_SJT_BINDING','SURVEY_NATIVE_SJT','SURVEY_SJT_ENTRY_AUTHORITY'].map(k=>k+'_TEST_DATABASE_URL');
+  const env={DATABASE_URL:expected,...Object.fromEntries(names.map(k=>[k,expected]))},messages=[];
+  const run=value=>runInNewContext(body,{process:{env:value},console:{log:m=>messages.push(m)}});
+  run(env);assert.equal(messages.length,1);
+  assert.throws(()=>run({DATABASE_URL:expected}),e=>names.every(k=>e.message.includes(k))&&!e.message.includes('postgresql:'));
+  assert.throws(()=>run({...env,SURVEY_NATIVE_SJT_TEST_DATABASE_URL:'postgresql://foreign.invalid/database'}),/SURVEY_NATIVE_SJT_TEST_DATABASE_URL -> survey\/situational-native-/);
+  assert.throws(()=>run({...env,DATABASE_URL:'postgresql://foreign.invalid/database'}));
 });

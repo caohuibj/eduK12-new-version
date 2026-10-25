@@ -1,3 +1,4 @@
+import {isActionsServiceDatabase} from '../integration/integration-env'
 import {randomUUID} from 'node:crypto'
 import {afterAll,describe,expect,it,vi} from 'vitest'
 import {Prisma} from '@prisma/client'
@@ -17,6 +18,7 @@ function requireFixtureDatabase(){
  if(process.env.NODE_ENV==='production')throw new Error('Production fixture execution forbidden')
  const url=new URL(process.env.DATABASE_URL!)
  if(actions){
+  if(isActionsServiceDatabase(process.env.DATABASE_URL!))return
   if(process.env.SURVEY_TOOL_PUBLICATION_ACCEPTANCE!=='1'||process.env.GITHUB_ACTIONS!=='true'||
    process.env.NODE_ENV!=='test'||process.env.SCHOOL_TEACHER_ISOLATED_DB!=='1'||
    !/^[a-f0-9]{64}$/.test(process.env.CI_POSTGRES_SERVICE_ID??'')||
