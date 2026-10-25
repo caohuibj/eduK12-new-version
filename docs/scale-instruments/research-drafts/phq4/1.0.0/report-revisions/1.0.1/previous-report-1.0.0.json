@@ -1,0 +1,92 @@
+{
+  "reportVersion": "1.0.0",
+  "primaryScoreKeys": [
+    "phq4_total",
+    "gad2",
+    "phq2"
+  ],
+  "scoreOrder": [
+    "phq4_total",
+    "gad2",
+    "phq2"
+  ],
+  "interpretations": [
+    {
+      "scoreKey": "phq4_total",
+      "headline": "困扰总分：描述性反馈",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "该分数描述你在过去两周中报告的困扰总分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "gad2",
+      "headline": "焦虑相关分：描述性反馈",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "该分数描述你在过去两周中报告的焦虑相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ]
+    },
+    {
+      "scoreKey": "phq2",
+      "headline": "抑郁相关分：描述性反馈",
+      "source": {
+        "type": "score_only"
+      },
+      "summary": "该分数描述你在过去两周中报告的抑郁相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "bands": [],
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。"
+        },
+        {
+          "category": "support",
+          "text": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+    "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+    "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+    "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+    "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+    "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。"
+  ],
+  "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+  "audienceContract": {
+    "schemaVersion": 1,
+    "respondent": "ADULT_SELF",
+    "audience": "student",
+    "locale": "zh-CN",
+    "qcReview": {
+      "reviewer": "AI-assisted local editorial check (not human expert review)",
+      "reviewedAt": "2026-10-25T14:13:00Z",
+      "basis": "AI editorial check: adult self-reflection, non-diagnostic language, no automatic external norm transfer; not expert translation approval or psychometric validation."
+    }
+  }
+}

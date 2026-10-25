@@ -1,0 +1,209 @@
+{
+  "instrumentKey": "phq4_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "previousSourceSha256": "65ad0172588530775e11bbe6994e724772d956fed095d83d3489200d3a43d905",
+  "sourceSha256": "dff98d00f0be22625b12efe66b57bbf93e146ba14c641c9fa24f013b7da6a456",
+  "fromReportVersion": "1.0.0",
+  "toReportVersion": "1.0.1",
+  "changeScope": "report-only reader-friendly wording; measurement, scoring, references, licensing and source identity unchanged",
+  "patches": [
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/headline",
+      "before": "困扰总分：描述性反馈",
+      "after": "过去两周：这些困扰占了多少生活空间",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/summary",
+      "before": "该分数描述你在过去两周中报告的困扰总分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "after": "总分把过去两周四种困扰的出现频率加在一起；分数越高，表示这次回答中，这些困扰出现得更频繁。请同时留意它们是否影响休息、工作和日常活动。分数不能确定是否患有某种疾病；分数较低，也不意味着真实的难受不值得关注。这份中文研究译稿不自动划分风险等级，也不提供与他人的排名。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/0/text",
+      "before": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。",
+      "after": "过去两周，哪一种困扰最占用你的时间或精力？有没有一些时刻相对轻松，当时有什么不同？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/0/guidance/1/text",
+      "before": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。",
+      "after": "可以简单记下困扰出现的时间、情境和对生活的影响。若它们持续或已经影响日常生活，可把这些记录带给有资质的心理健康专业人员讨论，不必等分数达到某条线。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/headline",
+      "before": "焦虑相关分：描述性反馈",
+      "after": "焦虑相关体验：紧张和担心是否经常出现",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/summary",
+      "before": "该分数描述你在过去两周中报告的焦虑相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "after": "这一项只看过去两周的紧张、不安，以及难以停止或控制的担心；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有焦虑障碍，也不代表你“想太多”。这份中文研究译稿不自动套用原版研究的筛查分界，请把结果和实际生活影响一起看。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/guidance/0/text",
+      "before": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。",
+      "after": "担心出现时，你还能把注意力转回手头的事情吗？它有没有影响睡眠、工作或与人相处？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/1/guidance/1/text",
+      "before": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。",
+      "after": "试着记下一次担心的内容和它带来的影响。若担心持续、难以摆脱或影响生活，可以寻求专业支持；不需要先证明自己“足够严重”。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/headline",
+      "before": "抑郁相关分：描述性反馈",
+      "after": "抑郁相关体验：心情与兴趣最近怎样",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/summary",
+      "before": "该分数描述你在过去两周中报告的抑郁相关分，数值较高仅表示本次回答中相关困扰出现得更频繁。量表不能确定是否患有某种疾病，也不能排除其他心理困扰。当前中文工作译稿未完成本地验证，因此报告不自动套用美国初级保健成人研究的分档或筛查阈值，也不提供人群排名。即使分数较低，持续的困扰或生活功能受影响仍值得寻求支持。",
+      "after": "这一项只看过去两周的低落、沮丧或无望感，以及对事情缺少兴趣或乐趣的体验；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有抑郁症，也不能靠分数排除其他困扰。这份中文研究译稿不自动套用原版研究的筛查分界。",
+      "reason": "先说明构念和分数含义，用日常语言替代描述性反馈/自陈等术语；不按未知分档对个人下结论。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/guidance/0/text",
+      "before": "回想过去两周这些困扰是否影响睡眠、工作或日常活动；分数不能替代你的实际体验。",
+      "after": "最近有没有哪些原本愿意做的事，变得难以提起兴趣？这些变化怎样影响了你的日常生活？",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/interpretations/2/guidance/1/text",
+      "before": "若困扰持续或影响生活，可以与有资质的心理健康专业人员讨论；不必等到分数达到某个界线。",
+      "after": "可以把最近心情、兴趣和日常活动的变化记下来，与可信赖的人或专业人员谈谈。若困扰持续或影响生活，不必等到分数达到某个界线再求助。",
+      "reason": "将抽象/重复模板改成构念相关的生活反思和可选小行动，不承诺效果或改变计分。"
+    },
+    {
+      "op": "replace",
+      "path": "/executable/definition/report/limitations",
+      "before": [
+        "中文工作译稿未经本地心理测量验证；不是2025年中国青少年研究译本。",
+        "2009美国15家初级保健门诊2149名18–95岁成人的经验分档与分量表≥3规则仅保存在外部参考档案，未自动激活。",
+        "2025中国青少年规则待全文方法核验，不作为可执行参照。",
+        "总分需四题、各分量表需对应两题有效作答；不插补。任一主要分数缺失时现有引擎将整份结果标为invalid，不作阴性判断。",
+        "PHQ-4不直接评估自杀风险；低分不能作为安全判断。",
+        "不用于诊断、高风险选拔、学校排名或未经支持的群体比较。"
+      ],
+      "after": [
+        "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+        "原版成人研究有参考分界，详细来源已记录；本报告不把它自动套在这份尚未验证的中文译稿上，也不使用尚待核实的青少年分界。",
+        "四题需完整回答；漏答不当作零分，也不代填。回答不完整时，不能把结果当作“没有困扰”。",
+        "这些题目不能判断是否有自杀风险；低分也不能证明安全。",
+        "不用于诊断、重要选拔、学校排名或缺少依据的群体比较。"
+      ],
+      "reason": "保留成人、待验证、非诊断、缺失和许可等必要边界，用白话缩短；具体样本统计、算法和文献仍保留在源资料/参数档案，不修改。"
+    }
+  ],
+  "measurementHash": "703f0db7a319334c085cb427b1d1942c0d537cfc7d025d008abe1d76b796fe1a",
+  "originalMeasurementHash": "703f0db7a319334c085cb427b1d1942c0d537cfc7d025d008abe1d76b796fe1a",
+  "finalReport": {
+    "reportVersion": "1.0.1",
+    "primaryScoreKeys": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "scoreOrder": [
+      "phq4_total",
+      "gad2",
+      "phq2"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "phq4_total",
+        "headline": "过去两周：这些困扰占了多少生活空间",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "总分把过去两周四种困扰的出现频率加在一起；分数越高，表示这次回答中，这些困扰出现得更频繁。请同时留意它们是否影响休息、工作和日常活动。分数不能确定是否患有某种疾病；分数较低，也不意味着真实的难受不值得关注。这份中文研究译稿不自动划分风险等级。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "过去两周，哪一种困扰最占用你的时间或精力？有没有一些时刻相对轻松，当时有什么不同？"
+          },
+          {
+            "category": "support",
+            "text": "可以简单记下困扰出现的时间、情境和对生活的影响。若它们持续或已经影响日常生活，可把这些记录带给有资质的心理健康专业人员讨论，不必等分数达到某条线。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "gad2",
+        "headline": "焦虑相关体验：紧张和担心是否经常出现",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项只看过去两周的紧张、不安，以及难以停止或控制的担心；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有焦虑障碍，也不代表你“想太多”。这份中文研究译稿不自动套用原版研究的筛查分界，请把结果和实际生活影响一起看。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "担心出现时，你还能把注意力转回手头的事情吗？它有没有影响睡眠、工作或与人相处？"
+          },
+          {
+            "category": "support",
+            "text": "试着记下一次担心的内容和它带来的影响。若担心持续、难以摆脱或影响生活，可以寻求专业支持；不需要先证明自己“足够严重”。"
+          }
+        ]
+      },
+      {
+        "scoreKey": "phq2",
+        "headline": "抑郁相关体验：心情与兴趣最近怎样",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "这一项只看过去两周的低落、沮丧或无望感，以及对事情缺少兴趣或乐趣的体验；分数越高，表示这些体验在这次回答中出现得更频繁。它不能确定是否患有抑郁症，也不能靠分数排除其他困扰。这份中文研究译稿不自动套用原版研究的筛查分界。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近有没有哪些原本愿意做的事，变得难以提起兴趣？这些变化怎样影响了你的日常生活？"
+          },
+          {
+            "category": "support",
+            "text": "可以把最近心情、兴趣和日常活动的变化记下来，与可信赖的人或专业人员谈谈。若困扰持续或影响生活，不必等到分数达到某个界线再求助。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "这份中文研究译稿仍待专家审校和适用人群验证，目前只供成人研究和自我了解。",
+      "原版成人研究有参考分界，详细来源已记录；本报告不把它自动套在这份尚未验证的中文译稿上，也不使用尚待核实的青少年分界。",
+      "四题需完整回答；漏答不当作零分，也不代填。回答不完整时，不能把结果当作“没有困扰”。",
+      "这些题目不能判断是否有自杀风险；低分也不能证明安全。",
+      "不用于诊断、重要选拔、学校排名或缺少依据的群体比较。"
+    ],
+    "disclaimer": "本报告仅描述过去两周相关症状自报情况，不用于心理诊断。尚未验证的工作译稿不能替代专业评估，未达参考值也不能排除心理困扰。",
+    "audienceContract": {
+      "schemaVersion": 1,
+      "respondent": "ADULT_SELF",
+      "audience": "student",
+      "locale": "zh-CN",
+      "qcReview": {
+        "reviewer": "AI-assisted local editorial check (not human expert review)",
+        "reviewedAt": "2026-10-25T14:13:00Z",
+        "basis": "AI editorial check: adult self-reflection, non-diagnostic language, no automatic external norm transfer; not expert translation approval or psychometric validation."
+      }
+    }
+  },
+  "additionalEditorialAdjustment": "Repeated no-ranking/no-band warnings consolidated in limitations; retained construct-specific caveats and distinct everyday examples."
+}

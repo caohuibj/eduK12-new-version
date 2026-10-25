@@ -1,0 +1,146 @@
+{
+  "dossierVersion": "1.0.0",
+  "kind": "DOCUMENTATION_ONLY_NOT_REFERENCE_SET",
+  "sourceInstrument": "PHQ-4 original English form",
+  "sourceLocale": "en",
+  "sourceScoring": "Sum four 0–3 frequency items; GAD2=A1+A2, PHQ2=D2+D1; original appendix order A1,A2,D2,D1",
+  "activationStatus": "EXTERNAL_EVIDENCE_ONLY_NOT_BOUND",
+  "runtimeSelected": false,
+  "provenance": "literature_reported",
+  "sources": [
+    {
+      "citation": "Kroenke K, Spitzer RL, Williams JBW, Löwe B. An Ultra-Brief Screening Scale for Anxiety and Depression: The PHQ–4. Psychosomatics. 2009;50:613–621.",
+      "doi": "10.1016/S0033-3182(09)70864-3",
+      "url": "https://www.reviva.org.co/wp-content/uploads/2021/09/Ultrabrief-PHQ-4-2009.pdf",
+      "locator": "PDF p3 / printed p615: statistical analysis, patient description, Appendix1; abstract p613 for N/sites"
+    },
+    {
+      "citation": "Instructions for Patient Health Questionnaire (PHQ) and GAD-7 Measures",
+      "url": "https://archive.thepcc.org/sites/default/files/resources/instructions.pdf",
+      "locator": "PDF p2 Coding and Scoring; p6 ultra-brief measures; p8 public-domain statement"
+    }
+  ],
+  "population": {
+    "n": 2149,
+    "country": "US",
+    "ageYears": {
+      "min": 18,
+      "max": 95
+    },
+    "setting": "15 primary-care clinics (13 family practice, 2 internal medicine)",
+    "sampling": "Consecutive patients approached in selected clinic sessions to a weekly quota; not Chinese population norms"
+  },
+  "thresholdProfiles": [
+    {
+      "scoreKey": "phq4_total",
+      "theoreticalRange": [
+        0,
+        12
+      ],
+      "referenceKind": "criterion_threshold",
+      "purpose": "Original study operational symptom-severity categories, not diagnosis",
+      "bands": [
+        {
+          "minInclusive": 0,
+          "maxInclusive": 2,
+          "sourceLabel": "normal",
+          "displayExplanation": "原研究最低症状档，不表示健康或无风险"
+        },
+        {
+          "minInclusive": 3,
+          "maxInclusive": 5,
+          "sourceLabel": "mild",
+          "displayExplanation": "原研究轻度症状档"
+        },
+        {
+          "minInclusive": 6,
+          "maxInclusive": 8,
+          "sourceLabel": "moderate",
+          "displayExplanation": "原研究中度症状档"
+        },
+        {
+          "minInclusive": 9,
+          "maxInclusive": 12,
+          "sourceLabel": "severe",
+          "displayExplanation": "原研究重度症状档"
+        }
+      ],
+      "missingPrerequisites": "All four valid responses required by current project implementation; no imputation."
+    },
+    {
+      "scoreKey": "gad2",
+      "theoreticalRange": [
+        0,
+        6
+      ],
+      "referenceKind": "criterion_threshold",
+      "screeningThreshold": {
+        "minInclusive": 3,
+        "maxInclusive": 6
+      },
+      "missingPrerequisites": "Both corresponding items must have valid responses.",
+      "meaning": "Original-source screening flag, not a diagnosis; below3 does not exclude psychological distress.",
+      "originalFollowUp": "Author manual suggests further GAD-7 and clinical interview in the original applicable setting; not automated treatment advice for this work translation."
+    },
+    {
+      "scoreKey": "phq2",
+      "theoreticalRange": [
+        0,
+        6
+      ],
+      "referenceKind": "criterion_threshold",
+      "screeningThreshold": {
+        "minInclusive": 3,
+        "maxInclusive": 6
+      },
+      "missingPrerequisites": "Both corresponding items must have valid responses.",
+      "meaning": "Original-source screening flag, not a diagnosis; below3 does not exclude psychological distress.",
+      "originalFollowUp": "Author manual suggests further PHQ-9 and clinical interview in the original applicable setting; not automated treatment advice for this work translation."
+    }
+  ],
+  "descriptiveStatistics": {
+    "referenceKind": "descriptive_sample",
+    "scoreKey": "phq4_total",
+    "mean": 2.5,
+    "standardDeviation": 2.8,
+    "percentInBands": [
+      61.5,
+      23.3,
+      10.6,
+      4.6
+    ],
+    "note": "Source-sample descriptions; not additional thresholds, not current Chinese norms."
+  },
+  "applicability": {
+    "originalConditions": "English-source adult primary-care research; interpretation requires context and further assessment.",
+    "currentTranslationApplicability": "NOT_ESTABLISHED",
+    "missingPrerequisites": [
+      "Current Chinese item equivalence and expert review",
+      "Target-population evidence and explicit reference selection",
+      "Existing governed reference system has only school-stage categories; cannot truthfully encode adult original conditions"
+    ]
+  },
+  "exclusionReasons": [
+    "No automatic transfer from US primary-care adults to Chinese adults or students",
+    "Source norms and thresholds are not diagnosis; low scores do not rule out distress",
+    "PHQ4 does not directly assess suicide risk",
+    "No fake school stage, measurementHash or Chinese validation inserted to satisfy reference schema"
+  ],
+  "pendingStudy": {
+    "id": "CN_ADOLESCENTS_2025_PENDING_METHOD_REVIEW",
+    "doi": "10.1016/j.jad.2025.119505",
+    "runtimeSelected": false,
+    "reportedN": 8778,
+    "ageYears": [
+      12,
+      18
+    ],
+    "reportedCutoff": 3,
+    "reportedAUC": 0.94,
+    "holdReasons": [
+      "Full methods and Chinese exact form not verified",
+      "ROC reference, overlapping PHQ9/GAD7 items, inequality and sampling details require review"
+    ],
+    "notCurrentAdultRule": true
+  }
+}

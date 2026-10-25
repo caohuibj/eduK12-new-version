@@ -1,0 +1,18 @@
+{
+  "validatedAt": "2026-10-25T14:59:00Z",
+  "sourceSha256": "dff98d00f0be22625b12efe66b57bbf93e146ba14c641c9fa24f013b7da6a456",
+  "measurementHash": "703f0db7a319334c085cb427b1d1942c0d537cfc7d025d008abe1d76b796fe1a",
+  "previousMeasurementHash": "703f0db7a319334c085cb427b1d1942c0d537cfc7d025d008abe1d76b796fe1a",
+  "sameMeasurementHash": true,
+  "reportVersion": "1.0.1",
+  "sourceChangeScope": "definition.report only; checked against original committed source",
+  "tests": {
+    "totalAcrossAffectedToolsAndRegistry": 138,
+    "exitCode": 0,
+    "log": "/workspace/scratch/5a77e8bdc1ae/local-scale-validation-20261025/report-revisions-tests-final.log"
+  },
+  "typecheckExitCode": 0,
+  "generatorCheckExitCode": 0,
+  "review": "Independent AI content review GO; not human expert psychometric approval",
+  "db": "Not written by content author; existing revision materializer required; preserve old snapshot."
+}
