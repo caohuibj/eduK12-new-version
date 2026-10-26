@@ -6,7 +6,7 @@
   },
   "catalog": {
     "schemaVersion": 1,
-    "catalogManifestVersion": 1,
+    "catalogManifestVersion": 2,
     "catalogStatus": "CANDIDATE",
     "scientificMaturity": "PILOT",
     "identity": {
@@ -46,7 +46,31 @@
         "language_validation:author_english_source",
         "language_validation:platform_chinese_work_translation",
         "language_validation:expert_review_pending",
-        "language_validation:china_validation_not_established"
+        "language_validation:china_validation_not_established",
+        "domain:everyday_life",
+        "population:adult_self_report",
+        "response:fixed_order",
+        "use:not_high_stakes_selection",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:zh_cn_working_translation",
+        "response:no_reverse_items",
+        "response:16_items",
+        "construct:positive_emotion_beliefs",
+        "construct:negative_emotion_beliefs",
+        "情绪信念",
+        "情绪能否改变",
+        "情绪有什么用",
+        "积极情绪",
+        "不舒服的情绪",
+        "情绪调节相关看法",
+        "成人自评",
+        "个人反思",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
       ]
     },
     "population": {
@@ -848,7 +872,7 @@
         ]
       },
       "report": {
-        "reportVersion": "1.0.2",
+        "reportVersion": "1.0.3",
         "primaryScoreKeys": [
           "general_controllability",
           "neg_usefulness",
@@ -871,7 +895,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "这些问题关注你是否觉得难过、担心或生气等不舒服的情绪可以随着行动与情境变化，而不是你最近有没有控制住情绪。较高分数只是更认同“负面情绪很难改变”的一般说法，不能证明你本人缺少调节能力。生活事件、支持与压力都会影响人们的体验；这种看法也可能随着经历改变。请不要把一次回答当成对自我的判决。",
+            "summary": "难过、担心或生气的时候，有人会觉得“这种感觉一来就没办法了”，也有人相信情绪会随着行动和环境慢慢变化。这组回答关注你通常怎么看待这件事，并不是检查你最近有没有控制住情绪。想法可能来自过去的经历，也可能随着新的体验改变。你可以回想一次情绪稍微松动的时刻，看看当时的休息、谈话或处境变化，是否给了你一点帮助。",
             "bands": [],
             "guidance": [
               {
@@ -890,7 +914,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "这一组关注你认为愉快、开心或满足等积极情绪是否可能发生变化。它不测量你最近有多快乐，也不意味着应该随时把快乐保持住。数字反映你是否同意关于情绪的普遍陈述，而不是评价幸福感、情绪稳定性或人格。积极情绪自然会变化，这并非能力好坏的证明。中文工作译稿没有经过科学验证的分档。",
+            "summary": "开心、轻松或满足的感觉，有时来得自然，有时也会随着一天的经历起起落落。这组回答关注你认为这些感受是否能够发生变化，并不是在问你最近有多快乐。快乐不需要时时保持，暂时没有好心情也不是失败。可以留意一个让自己稍微舒服的日常片段，例如散步、听歌或和熟悉的人说说话，再看看什么条件让这样的片段更容易出现。",
             "bands": [],
             "guidance": [
               {
@@ -909,7 +933,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "有些人会觉得不舒服的情绪总是没有价值，也有人发现它可能提醒自己哪里需要被照顾或改变。这组问题测的是你对负面情绪是否有用的看法，不是负面情绪的发生次数。较高得分只说明更认同题目中“没有用或有害”的描述，不能据此判断你是否有同理心或调节技巧。每个人的生活情境不同，分数没有及格线。",
+            "summary": "不舒服的情绪有时像一盏提醒灯，让我们注意到一件在意的事、一个没有满足的需要，或一处需要调整的地方。这组回答关注你是否觉得这些情绪也可能有作用。看到作用，不代表必须喜欢难受，更不代表要一直忍着。你可以挑一个最近的感受，轻轻问自己：它在提醒我什么？有没有一个照顾自己的小行动，是现在就能尝试的？",
             "bands": [],
             "guidance": [
               {
@@ -928,7 +952,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "这些题目关注你怎么看待高兴、愉悦等积极情绪的作用。它们不是在问你最近是否开心，也不是判断你是否具有积极人格。数字只反映你对“积极情绪没有用或有害”这类说法的认同程度。不同文化、经验和环境可能影响回答，没有任何题目能据此单独给人贴上好坏标签。这份中文工作稿尚未建立可信常模。",
+            "summary": "高兴、愉悦或满足，有时会让人更愿意靠近他人、尝试一件事，或停下来享受当下。这组回答关注你怎样理解这些感受的作用。它们并不是越多越好，也不是只有开心才算生活得好。不同的情境里，感受可能带来不同的信息。可以回想一次让你觉得有意义的愉快经历，看看它帮助你注意到了什么，以及你是否愿意为类似的片段留一点空间。",
             "bands": [],
             "guidance": [
               {
@@ -947,7 +971,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "这个综合维度把关于积极与不舒服情绪是否能够改变的八条回答合在一起。它测量信念，而不是实际调节情绪的成功率或能力测验。觉得某种情绪难改变，不意味着一个人不够努力；相信情绪可以改变，也不意味着必须立即消除正常感受。你可以结合具体处境思考自己的回答，不必拿数字与别人排名。当前版本不做临床结论。",
+            "summary": "这一部分把你对不同情绪能否改变的看法放在一起。它记录的是一种看法，而不是实际调节情绪的成功率。相信情绪可能变化，不等于必须立刻把它赶走；觉得某种感觉难改变，也不等于自己不够努力。你可以先看看眼前有哪些可以调整的小条件，例如睡一会儿、换个环境，或找一个愿意听你说话的人，再慢慢观察自己的体验。",
             "bands": [],
             "guidance": [
               {
@@ -966,7 +990,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "这个综合得分把负面和积极情绪是否有价值的八条看法汇总起来。它不意味着情绪只有好或坏两种作用，也不是你平时会不会照顾他人的评价。生活中有些感受不舒服却带来提醒，也有些愉快感受需要合适的环境才能出现。这里的数字是本次信念描述，不代表固定人格特点。本中文版本没有可靠的高低分界。",
+            "summary": "这一部分关注你怎样理解不同情绪在生活中的作用。舒服和不舒服的感受，都可能在某些时候传递信息，也都可能让人有些困惑。没有必要急着给情绪分成“有用”和“没用”两堆。可以回想最近的一件事，看看某种感受有没有让你更清楚自己在意什么，或者提醒你需要休息、沟通或改变做法。理解自己的体验，比给它打一个好坏标签更有帮助。",
             "bands": [],
             "guidance": [
               {
@@ -985,7 +1009,7 @@
             "source": {
               "type": "score_only"
             },
-            "summary": "总分汇总你对情绪是否能够变化、是否有用的16条一般性信念，而不是情绪智力、心理健康、疾病风险或最近症状。数字较高仅代表更认同“情绪难以改变、可能没有用”的描述；较低也不意味着任何时候都可以控制情绪。比追求某个数值更有帮助的是留意你从哪些经验形成这种看法，以及它是否仍适合现在的生活处境。 可以把情绪想成一盏提示灯：先看看它在提醒什么，再决定怎么回应，不必急着把灯关掉。",
+            "summary": "把这些回答放在一起，可以看看你通常怎样理解情绪：它会不会改变，又可能给生活带来什么。这不是一张情绪能力成绩单，也不是对最近心情的判断。你不需要追求某个数字，更不必要求自己随时积极。可以把情绪想成提示灯，先看看它提醒了什么，再决定怎样回应。留意一条愿意重新想想的看法，从一个贴近日常的小体验开始就可以了。",
             "bands": [],
             "guidance": [
               {
@@ -1000,15 +1024,12 @@
           }
         ],
         "limitations": [
-          "澳大利亚英文成人原版N=161，18–83岁；不能泛化到中国成人或K12。本站译本的人工译审/认知访谈/信效度仍未完成。",
-          "4项分维SUM 4–28，8题合成SUM 8–56，16题总SUM 16–112；不采用OpenScales实现的均分算法。",
-          "作者1、4、7选项文字已核实，2/3/5/6只有数字，中文锚点未经原作者审定。",
-          "七个分数中部分包含重叠题目，不能把它们视作七个相互独立构念，或在总分之外再做总加和。",
-          "缺失题保守完整作答，不插补、不外推；项目工作策略非作者证实的漏答规则。",
-          "不创造中文常模、高低阈值、诊断风险、百分位或临床最小变化参数；正式ReferenceSet不存在。",
-          "原版指导语在独立研究文档；当前未完成API、数据库或双入口浏览器完整验收。"
+          "这份结果整理的是你对自己习惯或看法的描述，不能代替对实际生活情况的了解。",
+          "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+          "不能单凭这份结果判断疾病、能力或一个人的价值。",
+          "没有回答的题目不会自动算成最低分；信息不足时，相关结果会提示无法解释。"
         ],
-        "disclaimer": "仅为成人描述性研究的DRAFT工具，原作者Becerra/Preece/Gross(2020)，DOI 10.1371/journal.pone.0231395，CC BY4.0；本站简体中文及报告未经专家科学/翻译审核。不是诊断、K12筛查或疗效测量。",
+        "disclaimer": "用于成年人的自我了解与日常反思，不是考试，也不能用于诊断。中文为平台工作译稿。",
         "audienceContract": {
           "schemaVersion": 1,
           "respondent": "ADULT_SELF",
@@ -1016,8 +1037,8 @@
           "locale": "zh-CN",
           "qcReview": {
             "reviewer": "AI-assisted item and report drafting (not human expert approval)",
-            "reviewedAt": "2026-10-26T03:17:16.348Z",
-            "basis": "Platform wording correction and everyday-language feedback revision against the original author source; not human expert approval. Runtime results are recorded separately in the batch evidence; student is only a technical report audience slot."
+            "reviewedAt": "2026-10-26T04:05:36.048Z",
+            "basis": "AI-assisted plain-language editorial pass, preserving content/scoring/reference policy. No claim of human expert approval; evidence and implementation versions remain separately recorded."
           }
         }
       },
