@@ -15,6 +15,8 @@
 
 > 实施阶段小步⑥：单镜像 Trivy 消费者保留真实 JSON、当前 HIGH/CRITICAL ignore-unfixed 策略和原 producer 图；入口 pure NUL diff parser 不再反向导入旧路由；独立 producer 显式 upstream=[]。仅5＋3＋1个对应纯控制用例分开通过，没有实际 Trivy、Docker、构建或CI；原同输入绿项未重跑。
 
+> 实施阶段小步⑦：完整16 phase/13历史组与 source 输入表、官方 Q/预检/稳定gate/main 接纳核心已实现，所有 ready/approved/policy 状态仍 pending。Q 保留完整 finding 待处置，admit 保存精确 review；独立只读 A 以实际 Q ZIP 建 WeakSet 根、固定17 role元数据及原 Q 过期状态复核，直接4项＋新增精度/状态2项分开通过。**A 未接入 CLI，当前下游仍会重新下载原 phase ZIP，轻量 main 能力尚未完成。** 原整块重写经自动审批拒绝且未执行；B 仅有可审阅 patch/说明，状态 pending，未应用或执行。原件索引包含该补丁字节，不能把提案称已实现。
+
 本轮先修复普通整卷测试的隔离/输出接入缺陷，再提出可执行的合并资格收口设计。**下述新接纳、分阶段作业、真实产品浏览器、required gate 与 main 复用均为待审实现，不是当前工作流已具备的能力。** 当前 `qualificationOnly=true / mergeEligible=false` 保留，不能只翻转这两个布尔值取得合并资格。
 
 用户要求每个完成小步一次 commit/push，使用 `[skip ci]`；最新 dot 接管边界要求每轮 CI 之前独立审查全部修复和计划，并对最终完整 HEAD/tree/base 明确放行。未放行前不 dispatch、Ready、rerun 或推送会触发 CI 的提交。继续现有 PR/任务，不新建替代 PR/对话；不改 main、保护规则、长期凭据、安全设置或生产配置，不部署。
