@@ -9,7 +9,7 @@ type Api=Parameters<typeof HuiteacherFieldWorkspace>[0]['api']
 const invite={invitationId:'invite',organizationId:'school',eventId:'event',title:'课堂实践活动',kind:'CLASSROOM',role:'PEER',expiresAt:'2026-12-01T00:00:00Z',status:'ACCEPTED'}
 const pages:FormDraft['pages']=[{pageKey:'one',title:'课堂观察',questions:[{itemKey:'q1',prompt:'教学目标是否清晰',type:'SINGLE',required:true,options:[{optionKey:'a',label:'目标清晰'}],rows:[]},{itemKey:'q2',prompt:'学生参与情况',type:'SINGLE',required:true,options:[{optionKey:'b',label:'积极参与'}],rows:[]}]},{pageKey:'two',title:'改进建议',questions:[{itemKey:'q3',prompt:'后续跟进',type:'SINGLE',required:true,options:[{optionKey:'c',label:'安排教研跟进'}],rows:[]}]}]
 const form={formId:'form',title:'课堂观察预制表单',definitionDigest:'fixed',pages}
-const note={id:'note',eventId:'event',kind:'FORMAL_FEEDBACK',status:'DRAFT',revision:1,content:'原有意见',createdAt:'2026-10-26',submittedAt:null}
+const note={id:'note',eventId:'event',kind:'FORMAL_FEEDBACK',status:'DRAFT',revision:1,content:'原有意见',createdAt:'2026-10-26',submittedAt:null as string|null}
 function Workspace({api,onDraftStateChange}:{api:Api;onDraftStateChange?:(value:{dirty:boolean;writing:boolean})=>void}){
  const [active,setActive]=useState(false)
  return <TeacherAssessmentProvider scope="ht-professional-practice" onActiveChange={setActive}><div hidden={active}><h1>专业实践首页</h1><HuiteacherFieldWorkspace api={api} onDraftStateChange={onDraftStateChange}/><p>其他协作卡片</p></div></TeacherAssessmentProvider>
@@ -29,6 +29,29 @@ function fixture({bound=form,existing=[] as typeof note[],invites=[invite]}:{bou
 }
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
 describe('Teacher professional practice form pages',()=>{
+ it('opens submitted feedback read-only instead of creating another form, retaining historical duplicates',async()=>{
+  const completed={...note,id:'completed',status:'SUBMITTED',content:'已提交专业意见',submittedAt:'2026-10-26T10:00:00Z'}
+  const older={...completed,id:'older',content:'历史原稿'}
+  const api=fixture({existing:[completed,older]});render(<Workspace api={api as Api}/>)
+  const view=await screen.findByRole('button',{name:'查看已提交记录'})
+  expect(screen.queryByRole('button',{name:'填写实践表单'})).not.toBeInTheDocument()
+  expect(screen.getAllByRole('button',{name:'查看记录'})).toHaveLength(2)
+  fireEvent.click(view)
+  const page=await screen.findByRole('region',{name:'专业实践独立页面'})
+  expect(within(page).getByText('已提交专业意见')).toBeInTheDocument()
+  expect(within(page).queryByRole('textbox')).not.toBeInTheDocument()
+  expect(within(page).queryByRole('button',{name:'正式提交'})).not.toBeInTheDocument()
+  expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+ })
+ it('prevents an older draft from submitting when the activity already has formal feedback',async()=>{
+  const completed={...note,id:'completed',status:'SUBMITTED',content:'已提交专业意见',submittedAt:'2026-10-26T10:00:00Z'}
+  const api=fixture({existing:[note,completed]});render(<Workspace api={api as Api}/>)
+  fireEvent.click(await screen.findByRole('button',{name:'继续填写'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('不能再次填写或提交')
+  expect(screen.getByRole('button',{name:'保存专业意见草稿'})).toBeDisabled()
+  expect(screen.getByRole('button',{name:'正式提交'})).toBeDisabled()
+  expect(api.mock.calls.every(([,method])=>!method)).toBe(true)
+ })
  it('opens the preset form on a dedicated page, keeps the manual block boundary and preserves answers on return',async()=>{
   const api=fixture(),draft=vi.fn();render(<Workspace api={api as Api} onDraftStateChange={draft}/>)
   expect(screen.queryByRole('textbox',{name:'专业意见与补充说明'})).not.toBeInTheDocument()
