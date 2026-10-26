@@ -1,0 +1,641 @@
+{
+  "schema_version": "1.0",
+  "artifact_kind": "RESEARCH_CANDIDATE_TAG_TAXONOMY_NOT_RUNTIME_SCHEMA",
+  "created_date_utc": "2026-10-26",
+  "research_snapshot_commit": "71d8f6598afb02a1b540642635fcb4bdab4a12b2",
+  "value_key_policy": "ASCII snake_case稳定key；中文显示名在label_zh。标签的含义仅限定义和每卡证据，不推定能力、授权或运行状态。",
+  "dimensions": {
+    "cognitive_domain": {
+      "label_zh": "认知领域",
+      "definition_zh": "研究主题归类，不是已验证能力或脑区标签。",
+      "values": [
+        {
+          "key": "attention",
+          "label_zh": "注意"
+        },
+        {
+          "key": "executive_control",
+          "label_zh": "执行控制"
+        },
+        {
+          "key": "visuospatial_working_memory",
+          "label_zh": "视觉空间工作记忆"
+        },
+        {
+          "key": "recognition_memory",
+          "label_zh": "再认记忆"
+        },
+        {
+          "key": "decision_learning",
+          "label_zh": "决策与学习"
+        },
+        {
+          "key": "metacognition",
+          "label_zh": "元认知"
+        }
+      ]
+    },
+    "target_process": {
+      "label_zh": "目标过程",
+      "definition_zh": "任务拟研究过程；不得直接转为个人能力、人格或诊断结论。",
+      "values": [
+        {
+          "key": "alerting",
+          "label_zh": "警觉线索效应"
+        },
+        {
+          "key": "spatial_orienting",
+          "label_zh": "空间定向"
+        },
+        {
+          "key": "conflict_processing",
+          "label_zh": "干扰冲突处理"
+        },
+        {
+          "key": "dynamic_tracking",
+          "label_zh": "动态目标追踪"
+        },
+        {
+          "key": "brief_numerosity_report",
+          "label_zh": "短时数量报告"
+        },
+        {
+          "key": "sustained_monitoring",
+          "label_zh": "持续目标监控"
+        },
+        {
+          "key": "response_withholding",
+          "label_zh": "不反应控制"
+        },
+        {
+          "key": "temporal_selection",
+          "label_zh": "时间选择"
+        },
+        {
+          "key": "visual_search_localization",
+          "label_zh": "视觉搜索与位置辨认"
+        },
+        {
+          "key": "simultaneous_response_coordination",
+          "label_zh": "同时双维度反应协调"
+        },
+        {
+          "key": "repeat_recognition",
+          "label_zh": "重复图像再认"
+        },
+        {
+          "key": "spatial_precision_retention",
+          "label_zh": "空间位置保持与再现"
+        },
+        {
+          "key": "information_seeking",
+          "label_zh": "信息探索"
+        },
+        {
+          "key": "reward_transition_learning",
+          "label_zh": "奖赏与转移学习"
+        },
+        {
+          "key": "effort_reward_choice",
+          "label_zh": "努力收益选择"
+        },
+        {
+          "key": "effort_execution",
+          "label_zh": "按压执行"
+        },
+        {
+          "key": "confidence_monitoring",
+          "label_zh": "判断后的信心监控"
+        }
+      ]
+    },
+    "paradigm": {
+      "label_zh": "任务范式",
+      "definition_zh": "按原卡的具体变式命名；框架名、同名家族或论文经典版不视为同一协议。",
+      "values": [
+        {
+          "key": "ant_pant_cue_flanker",
+          "label_zh": "注意网络线索×侧翼"
+        },
+        {
+          "key": "mot_fixed_five_speed",
+          "label_zh": "固定五目标速度追踪"
+        },
+        {
+          "key": "masked_enumeration_5_9",
+          "label_zh": "掩蔽后5–9点数报告"
+        },
+        {
+          "key": "gradual_cpt",
+          "label_zh": "渐变持续作业"
+        },
+        {
+          "key": "rsvp_dual_letter",
+          "label_zh": "快速字母流双目标"
+        },
+        {
+          "key": "search_then_localize",
+          "label_zh": "先结束搜索再定位"
+        },
+        {
+          "key": "simultaneous_dual_arrow",
+          "label_zh": "同时双箭头双反应"
+        },
+        {
+          "key": "continuous_old_new",
+          "label_zh": "连续新旧图像判断"
+        },
+        {
+          "key": "spatial_delayed_estimation",
+          "label_zh": "颜色提示空间位置延迟估计"
+        },
+        {
+          "key": "horizon_forced_free",
+          "label_zh": "强制采样后长短前景选择"
+        },
+        {
+          "key": "two_stage_reward_learning",
+          "label_zh": "两阶段转移奖赏学习"
+        },
+        {
+          "key": "balloon_effort_choice",
+          "label_zh": "气球努力选择与执行"
+        },
+        {
+          "key": "semantic_judgment_confidence",
+          "label_zh": "语义判断后七档信心"
+        }
+      ]
+    },
+    "stimulus_form": {
+      "label_zh": "刺激形式",
+      "definition_zh": "来源中观察到的刺激，不表示图片、字体或数据已经获权。",
+      "values": [
+        {
+          "key": "geometric_arrows_cues",
+          "label_zh": "几何箭头与提示"
+        },
+        {
+          "key": "moving_objects",
+          "label_zh": "移动视觉对象"
+        },
+        {
+          "key": "brief_dots_mask",
+          "label_zh": "短暂圆点与掩蔽"
+        },
+        {
+          "key": "grayscale_scenes_crossfade",
+          "label_zh": "灰度场景渐变"
+        },
+        {
+          "key": "uppercase_letter_stream",
+          "label_zh": "大写字母流与环形提示"
+        },
+        {
+          "key": "character_array",
+          "label_zh": "字符搜索阵列"
+        },
+        {
+          "key": "colored_arrow_pair",
+          "label_zh": "彩色双箭头"
+        },
+        {
+          "key": "image_stream",
+          "label_zh": "连续图片流"
+        },
+        {
+          "key": "colored_bars_ring",
+          "label_zh": "彩色条形与圆环位置"
+        },
+        {
+          "key": "reward_machines_history",
+          "label_zh": "奖赏机器与历史反馈"
+        },
+        {
+          "key": "abstract_symbols_reward",
+          "label_zh": "抽象符号与奖赏反馈"
+        },
+        {
+          "key": "balloons_cost_reward",
+          "label_zh": "气球及成本收益提示"
+        },
+        {
+          "key": "country_food_facts_images",
+          "label_zh": "国家食物事实与图像"
+        }
+      ]
+    },
+    "input_upstream": {
+      "label_zh": "上游响应输入",
+      "definition_zh": "只记录原卡静态观察；触控路径不等于实测移动端支持，也不等于本项目拟采用。",
+      "values": [
+        {
+          "key": "auto_layout_keys_or_mouse",
+          "label_zh": "布局自动选择键盘或鼠标"
+        },
+        {
+          "key": "pointer_multiselect",
+          "label_zh": "指针依次多选"
+        },
+        {
+          "key": "slider_and_confirm",
+          "label_zh": "整数滑杆与确认"
+        },
+        {
+          "key": "space_key",
+          "label_zh": "空格键"
+        },
+        {
+          "key": "touch_path_observed",
+          "label_zh": "源码观察到触控路径"
+        },
+        {
+          "key": "alphabet_keyboard",
+          "label_zh": "字母键盘"
+        },
+        {
+          "key": "mouse_two_stage",
+          "label_zh": "鼠标双阶段点击"
+        },
+        {
+          "key": "four_key_dual_response",
+          "label_zh": "四键双维度反应"
+        },
+        {
+          "key": "r_key_detection",
+          "label_zh": "R键重复检测"
+        },
+        {
+          "key": "mouse_ring_click",
+          "label_zh": "鼠标圆环定位"
+        },
+        {
+          "key": "left_right_keys",
+          "label_zh": "左右方向键"
+        },
+        {
+          "key": "qp_repeated_press",
+          "label_zh": "Q/P选择与重复按压"
+        },
+        {
+          "key": "keys_seven_step_confidence",
+          "label_zh": "方向键七档信心加空格确认"
+        }
+      ]
+    },
+    "input_proposed": {
+      "label_zh": "拟采用输入状态",
+      "definition_zh": "不把上游输入自动复制成本项目设备能力；未经原卡明确提出的具体方案不填已采用。",
+      "values": [
+        {
+          "key": "keyboard_plan_not_frozen",
+          "label_zh": "键盘方案拟冻结"
+        },
+        {
+          "key": "not_frozen",
+          "label_zh": "尚未冻结拟采用输入"
+        }
+      ]
+    },
+    "key_metric": {
+      "label_zh": "关键指标主题",
+      "definition_zh": "检索指标主题，计算来源与拟议状态见每卡 metrics_and_rules；不是所有指标已由上游输出或已适合个人反馈。",
+      "values": [
+        {
+          "key": "condition_accuracy",
+          "label_zh": "分条件正确率"
+        },
+        {
+          "key": "condition_rt",
+          "label_zh": "分条件反应时间"
+        },
+        {
+          "key": "cue_conflict_rt_differences",
+          "label_zh": "线索与冲突反应时差"
+        },
+        {
+          "key": "tracked_target_count_rate",
+          "label_zh": "正确追踪目标数及比例"
+        },
+        {
+          "key": "numerosity_accuracy_error",
+          "label_zh": "数量正确率与误差"
+        },
+        {
+          "key": "omission_commission",
+          "label_zh": "遗漏与误按"
+        },
+        {
+          "key": "rt_variability",
+          "label_zh": "反应时间变异"
+        },
+        {
+          "key": "signal_detection",
+          "label_zh": "信号检测指标"
+        },
+        {
+          "key": "target_accuracy_by_lag",
+          "label_zh": "分间隔目标报告正确率"
+        },
+        {
+          "key": "search_selection_rt",
+          "label_zh": "搜索与定位时长"
+        },
+        {
+          "key": "dual_condition_response",
+          "label_zh": "单双条件分维度反应"
+        },
+        {
+          "key": "recognition_hit_false_alarm",
+          "label_zh": "重复命中与首次误认率"
+        },
+        {
+          "key": "corrected_recognition",
+          "label_zh": "命中减误认差值"
+        },
+        {
+          "key": "angular_error",
+          "label_zh": "圆周角误差"
+        },
+        {
+          "key": "mixture_parameters",
+          "label_zh": "指定混合模型参数"
+        },
+        {
+          "key": "less_sampled_choice",
+          "label_zh": "少采样侧首个自由选择比例"
+        },
+        {
+          "key": "stay_by_reward_transition",
+          "label_zh": "奖赏×转移条件保持比例"
+        },
+        {
+          "key": "high_effort_choice_rate",
+          "label_zh": "高努力选择率"
+        },
+        {
+          "key": "press_execution",
+          "label_zh": "执行按压数速率与超时"
+        },
+        {
+          "key": "task_reward",
+          "label_zh": "任务实际奖励"
+        },
+        {
+          "key": "confidence_distribution",
+          "label_zh": "信心及正确错误分层"
+        },
+        {
+          "key": "metacognitive_model",
+          "label_zh": "元认知模型指标"
+        }
+      ]
+    },
+    "intended_use": {
+      "label_zh": "使用用途",
+      "definition_zh": "不是临床筛查、诊断、招生分层或儿童能力评级用途。",
+      "values": [
+        {
+          "key": "research_protocol_selection",
+          "label_zh": "研究候选协议选择与定稿"
+        }
+      ]
+    },
+    "code_license": {
+      "label_zh": "代码许可记录",
+      "definition_zh": "检索用，不替代完整许可证据。未审only/or-later时不补SPDX后缀；代码与依赖/素材分开。",
+      "values": [
+        {
+          "key": "mit_recorded",
+          "label_zh": "原卡记录MIT"
+        },
+        {
+          "key": "gpl_2_0_recorded",
+          "label_zh": "原卡记录GPL-2.0"
+        },
+        {
+          "key": "gpl_2_0_file_permission_review",
+          "label_zh": "根GPL-2.0与文件头许可边界待核"
+        },
+        {
+          "key": "lgpl_3_0_recorded",
+          "label_zh": "原卡记录LGPL-3.0"
+        },
+        {
+          "key": "gpl_3_0_recorded",
+          "label_zh": "原卡记录GPL-3.0"
+        },
+        {
+          "key": "cc_by_nc_sa_4_0_root",
+          "label_zh": "根CC BY-NC-SA 4.0（非商业、署名、相同方式共享限制）"
+        }
+      ]
+    },
+    "code_rights_disposition": {
+      "label_zh": "代码版权去向",
+      "definition_zh": "沿用原卡取用结论；条件开放不等于任意闭源或商业复制授权。",
+      "values": [
+        {
+          "key": "github_public_conditional",
+          "label_zh": "可GitHub公开（满足原许可条件）"
+        },
+        {
+          "key": "authorization_pending",
+          "label_zh": "待联系授权或核清适用性"
+        },
+        {
+          "key": "system_only_after_permission",
+          "label_zh": "获权后系统用但不公开"
+        }
+      ]
+    },
+    "asset_rights_disposition": {
+      "label_zh": "素材版权去向",
+      "definition_zh": "未核不表示一定禁止，已知有条件许可不表示本项目已获清权；字体、音频、图片、品牌和事实表单独看。",
+      "values": [
+        {
+          "key": "github_public_conditional",
+          "label_zh": "可GitHub公开（满足原许可条件）"
+        },
+        {
+          "key": "authorization_pending",
+          "label_zh": "待联系授权或核清适用性"
+        },
+        {
+          "key": "system_only_after_permission",
+          "label_zh": "获权后系统用但不公开"
+        }
+      ]
+    },
+    "asset_license_review": {
+      "label_zh": "素材许可限制",
+      "definition_zh": "记录真实具体权利缺口；不以根代码许可覆盖素材，也不以自制计划称已具备素材。",
+      "values": [
+        {
+          "key": "fonts_ui_unverified",
+          "label_zh": "字体与框架UI逐项待核"
+        },
+        {
+          "key": "images_fonts_unverified",
+          "label_zh": "图像与字体逐项待核"
+        },
+        {
+          "key": "cc_by_sa_default_exceptions_unchecked",
+          "label_zh": "CC BY-SA 4.0默认声明及任务例外待核"
+        },
+        {
+          "key": "audio_unverified",
+          "label_zh": "音频独立许可待核"
+        },
+        {
+          "key": "omi_nc_sa_project_unconfirmed",
+          "label_zh": "OMI素材非商业、署名与相同方式共享限制（项目适用性未确认）"
+        },
+        {
+          "key": "generated_shapes_other_assets_unverified",
+          "label_zh": "程序化图形可自制但其他素材待核"
+        },
+        {
+          "key": "external_assets_unverified",
+          "label_zh": "外部图像字体独立许可待核"
+        },
+        {
+          "key": "symbols_feedback_unverified",
+          "label_zh": "符号与反馈图授权链待核"
+        },
+        {
+          "key": "brand_third_party_unverified",
+          "label_zh": "品牌及第三方素材待核"
+        },
+        {
+          "key": "facts_images_rights_unverified",
+          "label_zh": "事实表与图像权利待核"
+        }
+      ]
+    },
+    "implementation_strategy": {
+      "label_zh": "实现策略",
+      "definition_zh": "研究阶段拟用路线，不授权恢复编码；独立实现不复制受限表达与素材。",
+      "values": [
+        {
+          "key": "literature_reimplementation",
+          "label_zh": "文献自研"
+        },
+        {
+          "key": "code_adaptation",
+          "label_zh": "代码适配"
+        },
+        {
+          "key": "defer",
+          "label_zh": "暂缓"
+        }
+      ]
+    },
+    "maturity": {
+      "label_zh": "成熟度",
+      "definition_zh": "13项均未运行、未移植、未入库、未完成本项目验证；非后台生命周期枚举。",
+      "values": [
+        {
+          "key": "source_research_only",
+          "label_zh": "仅来源与协议静态研究"
+        }
+      ]
+    },
+    "evidence_limitations": {
+      "label_zh": "证据限制",
+      "definition_zh": "非科学等级，只标注原卡已指出的限制；共用年龄、人群、中文验证待核见applicability。",
+      "values": [
+        {
+          "key": "timing_device_unverified",
+          "label_zh": "设备与真实时序未验证"
+        },
+        {
+          "key": "protocol_variant_unvalidated",
+          "label_zh": "精确变式及迁移效度未验证"
+        },
+        {
+          "key": "static_runtime_risk",
+          "label_zh": "已记录静态运行或计分风险"
+        },
+        {
+          "key": "protocol_version_decision",
+          "label_zh": "协议版本或参数仍待决策"
+        },
+        {
+          "key": "personal_scoring_redefinition",
+          "label_zh": "个人会话计分需另定义"
+        },
+        {
+          "key": "model_validation_pending",
+          "label_zh": "模型拟合与可靠性待核"
+        },
+        {
+          "key": "short_demo_only",
+          "label_zh": "现有示例不足完整研究协议"
+        },
+        {
+          "key": "cultural_language_burden",
+          "label_zh": "语言文化或知识负担待研究"
+        },
+        {
+          "key": "motor_burden",
+          "label_zh": "动作执行负担待研究"
+        }
+      ]
+    },
+    "baseline_relation": {
+      "label_zh": "与主干重复关系",
+      "definition_zh": "只对固定历史主干基线比较，不代表当前产品新增数量或运行可用性。",
+      "values": [
+        {
+          "key": "protocol_variant",
+          "label_zh": "已有家族协议变体候选"
+        },
+        {
+          "key": "new_family_candidate",
+          "label_zh": "新增家族研究候选"
+        }
+      ]
+    },
+    "research_priority": {
+      "label_zh": "研究优先级",
+      "definition_zh": "排序为选源与定稿顺序，不是科学证据等级、临床有效性或上线顺序；气球努力按原README保留有条件。",
+      "values": [
+        {
+          "key": "priority_finalize",
+          "label_zh": "优先协议定稿"
+        },
+        {
+          "key": "conditional_priority_finalize",
+          "label_zh": "有条件优先协议定稿"
+        },
+        {
+          "key": "reserve",
+          "label_zh": "研究储备"
+        }
+      ]
+    },
+    "rule_type": {
+      "label_zh": "规则登记覆盖维度",
+      "definition_zh": "四类固定用语用于定位原卡的规则登记栏目，不表示每栏已有适用数值、完整外部依据或验证通过；缺依据仍待核。协议参数不是能力阈值。",
+      "values": [
+        {
+          "key": "technical_quality",
+          "label_zh": "技术质量规则"
+        },
+        {
+          "key": "theoretical_reference",
+          "label_zh": "理论参照"
+        },
+        {
+          "key": "literature_experience",
+          "label_zh": "文献经验"
+        },
+        {
+          "key": "project_provisional",
+          "label_zh": "项目暂定研究者规则"
+        }
+      ]
+    }
+  }
+}
