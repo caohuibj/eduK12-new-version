@@ -568,3 +568,29 @@ reader调用点及未变控制绿项没有重跑。旧HTTP5原PASS、catalog2原
 当时payload和9个gzip原字节、15个PASS指针及pending状态；其脚本/stdout/stderr/receipt
 另保留`/followupAttachments/451`至`/followupAttachments/454`，最终总量546。没有为这次
 附录重复运行任何应用检查或原控制绿项，后续只作最终Git版本/原件完整性读取。
+
+
+### 最终收口决定：实现ready与固定SARIF政策
+
+根dot已独审完整5f24候选，明确允许16个现有phase标ready-to-execute，实际执行仍NOTRUN，
+不授予PASS、dispatch、Ready或merge。SARIF固定最小政策pr356-independent-review-v1，
+仅false-positive、not-applicable、pre-existing-no-regression；每条实际finding须由根dot
+核原件与理由，pre-existing须有基线对照，新引入/加重的确证问题不能借该标签通过。
+不允许accepted-risk，不因analyze成功认定无发现。没有新增finding review或扫描。
+另已批准的新15case、A59类型、A62两份lint正按原件接入；剩40文件只执行一次原eslint。
+历史其余组保持待签收，后台生产tsc正映射到已有backend-image-built，排除tests的边界
+保留，不创建一份重复的本地后台类型义务。此段替代前文相应pending实现/政策状态，
+最终完整候选仍须回读并单独放行。
+
+### dot 本地接手与最终候选准备（2026-10-26 15:38 UTC）
+
+用户停止原 Codex 开发任务，明确由 dot 当前本地工作区独立完成必要修复、CI 与正常合并，不新开对话、不部署。接手基线为 `59df55a2447b99092e6cf2d7c9e557f8316b291a`，main/base 未变；应用源码、schema、锁文件和两组件 tree 均未改动。
+
+- 直接补齐缺失/确有输入变化的检查：前端指定 130 PASS / 7 filtered；outbox projection 12 PASS；三个变化输入单元文件 20 PASS；UTC root 3 PASS / 3 filtered；真实 scalar-only eager child 普通/组织消费者 2 PASS。全部实际 exit 0。过滤项不是额外 PASS，整套平台未运行。新执行使用 Node 24.22.1、锁文件安装、Prisma 5.22.0、隔离 PostgreSQL 17.11；不声称与原 Node 24.21.0 / PG16.15 环境同一。
+- 原 404 条历史声明中一条是已迁至独立文件的同一 START 指导语测试旧名称，保留旧声明并显式映射到已列出的当前测试，不重复计数。实际历史主组 403 条；同名参数化的两条 TRAINING 断言要求两条原始指针都 PASS，不能挑一条忽略另一条。其余六组只将模板/短名称映射到真实完整用例名，原记录保留。
+- 依据已取得的精确授权，后台 production tsc 由既有 backend-image 的真实 build 唯一执行；原 backend-affected-types 声明留档。12 个非空历史组、16 个 fresh phase 全部保留。测试目录不在该 production tsc 范围，未冒称其被编译。
+- 本地实际接纳器核查 486 条记录 PASS，约 4.626 秒。历史输入清单按组以内容 SHA-256 引用去重；每个 case 仍逐一比较完整 blob/mode，缺失或变更引用拒绝。单次核验只批读一次不可变 Git tree，不跨调用缓存，不省略消费者或改变结论。当前输入投影不是补签历史完整执行环境。
+- 已有控制组本轮 48 PASS / 1 FAIL，失败仅旧状态/计数断言仍写 pending/404；改为逐项证明九个 fresh 转移及唯一迁移别名后，该断言定向 PASS。另 A59/ready 两项、同名参数原件全覆盖一项、共享输入缺失/漂移拒绝一项均有直接通过记录，不把首轮整组改写为一次全绿。
+- 原本两项被拒的接纳写入保留拒绝历史；随后用户在原任务精确确认了后台类型映射和四组原件接纳。dot 未改变分支保护、权限、扫描阈值或任何生产部署。
+
+原业务、NFC/OPT 内容验收、356-01 基线及未执行产品旅程不因这些记录自动完成。此处仅完成实际适用 CI 的准备。正式 Actions 与 SARIF 处置仍待运行、核读；没有伪造成功检查。最终完整 HEAD/base/tree 由 GitHub 回读后冻结，真实 CI 失败须先记录并回写 Notion 再定向重试。

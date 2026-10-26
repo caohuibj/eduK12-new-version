@@ -3,7 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdirSync,existsSync,readdirSync,lstatSync} from 'node:fs';
 import {resolve,join,relative} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {BRANCH,REPOSITORY,assertPhaseInputs,candidateInputsDigest,canonicalSHA256,positiveId,selectedPhaseIds,sha256} from './pr356-plan.mjs';
+import {BRANCH,REPOSITORY,evidenceInputs,assertPhaseInputs,candidateInputsDigest,canonicalSHA256,positiveId,selectedPhaseIds,sha256} from './pr356-plan.mjs';
 import {verifySarifDisposition,verifyRecordedSarifDisposition,validateSarifEvidence} from './pr356-sarif.mjs';
 
 const phasesVerified=new WeakSet(),historyVerified=new WeakSet(),qualificationsVerified=new WeakSet(),admissionsVerified=new WeakSet(),qualificationEvidence=new WeakMap();
@@ -16,18 +16,34 @@ function bytes(v,label){assert(Buffer.isBuffer(v)||v instanceof Uint8Array||type
 function rawJSON(v,label){const raw=bytes(v,label);return {raw,value:JSON.parse(raw.toString('utf8'))};}
 function pointer(o,p){assert(typeof p==='string'&&p.startsWith('/'),'Explicit JSON pointer required');let x=o;for(const part of p.slice(1).split('/')){const key=part.replace(/~1/g,'/').replace(/~0/g,'~');assert(x!==null&&typeof x==='object'&&Object.hasOwn(x,key),'Original receipt pointer missing');x=x[key];}return x;}
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
-function currentInputs(inputs,head,read){assertPhaseInputs(inputs);for(const f of inputs.files){assert.equal(read('rev-parse',head+':'+f.path),f.blob,'Historical/current consumed input drift: '+f.path);const line=read('ls-tree','-z',head,'--',f.path).replace(/\0$/,'');assert.equal(line,f.mode+' blob '+f.blob+'\t'+f.path,'Historical/current input mode drift');}}
+export function historicalInputTree(head){
+ assert.match(head,/^[a-f0-9]{40}$/,'Immutable historical comparison HEAD required');
+ const raw=execFileSync('git',['ls-tree','-r','-z',head],{encoding:'utf8',maxBuffer:32*1024*1024});
+ assert(raw.endsWith('\0')||raw==='','Incomplete historical input tree');const tree=new Map();
+ for(const line of raw?raw.slice(0,-1).split('\0'):[]){const m=/^([0-7]{6}) (blob|commit) ([a-f0-9]{40})\t([\s\S]+)$/.exec(line);assert(m,'Malformed historical input tree');assert(!tree.has(m[4]),'Duplicate historical input path');tree.set(m[4],{mode:m[1],kind:m[2],blob:m[3]});}
+ return tree;
+}
+function currentInputs(inputs,head,read,tree){assertPhaseInputs(inputs);for(const f of inputs.files){
+ if(tree){assert.deepEqual(tree.get(f.path),{mode:f.mode,kind:'blob',blob:f.blob},'Historical/current consumed input drift: '+f.path);}
+ else{assert.equal(read('rev-parse',head+':'+f.path),f.blob,'Historical/current consumed input drift: '+f.path);const line=read('ls-tree','-z',head,'--',f.path).replace(/\0$/,'');assert.equal(line,f.mode+' blob '+f.blob+'\t'+f.path,'Historical/current input mode drift');}
+}}
+
 
 export function verifyHistoricalEvidence({plan,records,read=git}){
- assertPlan(plan);assert(Array.isArray(records));const specs=plan.historicalEvidence.flatMap(g=>{assert.equal(g.state,'approved','Unreviewed historical evidence');assert(g.cases?.length,'Historical case records missing');return g.cases.map(c=>({...c,groupId:g.id,reviewDigest:g.reviewDigest}));});
+ assertPlan(plan);assert(Array.isArray(records));const specs=plan.historicalEvidence.flatMap(g=>{assert.equal(g.state,'approved','Unreviewed historical evidence');assert(g.cases?.length,'Historical case records missing');return g.cases.map(c=>({...c,inputs:evidenceInputs(g,c),groupId:g.id,reviewDigest:g.reviewDigest}));});
  ids(records.map(r=>r.caseId),specs.map(c=>c.id),'historical records');const accepted=[];
- for(const c of specs){assert.equal(c.ciExecuted,false);assert.equal(c.originalExecutionSigned,false);digest(c.reviewDigest);currentInputs(c.inputs,plan.head,read);const r=records.find(r=>r.caseId===c.id);const raw=bytes(r.rawBytes,'historical evidence');assert.equal(sha256(raw),c.rawSHA256,'Original historical bytes changed');
+ // One immutable tree read per verification call; no cross-call cache or skipped consumer comparisons.
+ const inputTree=read===git?historicalInputTree(plan.head):null;
+ for(const c of specs){assert.equal(c.ciExecuted,false);assert.equal(c.originalExecutionSigned,false);digest(c.reviewDigest);currentInputs(c.inputs,plan.head,read,inputTree);const r=records.find(r=>r.caseId===c.id);const raw=bytes(r.rawBytes,'historical evidence');assert.equal(sha256(raw),c.rawSHA256,'Original historical bytes changed');
   let invocation={exitCode:'unknown',wholeInvocationAccepted:false};
   if(c.scope!=='passed-case'){
    const execution=rawJSON(r.executionBytes,'execution receipt');assert.equal(sha256(execution.raw),c.executionSHA256);assert.equal(pointer(execution.value,c.exitCodePointer),0,'Historical command did not exit 0');equal(pointer(execution.value,c.commandPointer),c.command,'Original command differs');assert.equal(sha256(bytes(r.logBytes,'original log')),c.logSHA256);invocation={exitCode:0,wholeInvocationAccepted:c.scope==='whole-invocation'};
   }
   if(c.scope==='execution'){assert.equal(c.rawSHA256,c.executionSHA256,'Execution raw identity mismatch');}
-  else{const reporter=JSON.parse(raw.toString('utf8'));assert(Array.isArray(reporter.testResults));const suites=reporter.testResults.filter(s=>typeof s.name==='string'&&(s.name===c.suiteSuffix||s.name.endsWith('/'+c.suiteSuffix)));assert.equal(suites.length,1,'Original suite ambiguous/missing');const matches=suites[0].assertionResults.filter(a=>a.fullName===c.fullName);assert.equal(matches.length,1,'Original case ambiguous/missing');assert.equal(matches[0].status,'passed');equal(matches[0].failureMessages??[],[]);
+  else{const reporter=JSON.parse(raw.toString('utf8'));assert(Array.isArray(reporter.testResults));const suites=reporter.testResults.filter(s=>typeof s.name==='string'&&(s.name===c.suiteSuffix||s.name.endsWith('/'+c.suiteSuffix)));assert.equal(suites.length,1,'Original suite ambiguous/missing');const matches=suites[0].assertionResults.filter(a=>a.fullName===c.fullName);
+   if(c.rawAssertionPointers){assert(Array.isArray(c.rawAssertionPointers)&&c.rawAssertionPointers.length>1,'Explicit repeated-name original assertions required');const selected=c.rawAssertionPointers.map(p=>pointer(reporter,p));assert.equal(new Set(selected).size,selected.length,'Duplicate assertion pointer');assert.equal(selected.length,matches.length,'All same-name parameter cases must be covered');assert(matches.every(a=>selected.includes(a)),'Assertion pointer/name/suite mismatch');}
+   else assert.equal(matches.length,1,'Original case ambiguous/missing');
+   assert(matches.length>0);for(const match of matches){assert.equal(match.status,'passed');equal(match.failureMessages??[],[]);}
    if(c.scope==='whole-invocation'){assert.equal(reporter.success,true);assert.equal(reporter.numFailedTests,0);assert.equal(reporter.numPendingTests,0);}
    invocation={...invocation,originalReporterSuccess:reporter.success,originalFailed:reporter.numFailedTests,originalFiltered:reporter.numPendingTests};
   }

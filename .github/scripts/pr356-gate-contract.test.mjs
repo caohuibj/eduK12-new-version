@@ -1,6 +1,7 @@
 // Only pure needs/compact-plan fixtures; no official API/Git/application work.
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {BRANCH,REPOSITORY,REQUIRED_PHASE_IDS,REQUIRED_EVIDENCE_IDS,canonicalSHA256,candidateInputsDigest,compactPlan,pr356Outputs} from './pr356-plan.mjs';
 import {requiredPr356Checks,failedPr356Checks,validatePr356GateNeeds} from './pr356-gate-contract.mjs';
 const H='a'.repeat(40),B='b'.repeat(40),T='c'.repeat(40),P='d'.repeat(40),M='e'.repeat(40),backend='f'.repeat(40),frontend='1'.repeat(40);
@@ -8,6 +9,7 @@ function fixture({attempt='3',sourceAttempt='1',producerAttempt='2',digest='sha2
  const phases=Object.fromEntries(REQUIRED_PHASE_IDS.map(id=>{const inputs={schemaVersion:1,files:[{path:'synthetic/source.ts',mode:'100644',blob:'2'.repeat(40)}],configuration:{phase:id},tools:{node:'24.21.0'},dependencies:{synthetic:'control-only'}};return [id,{jobName:'pr356-'+id,caseIds:[id+' actual required case'],inputs,inputsSHA256:canonicalSHA256(inputs)}]}));
  const inventory=[{path:'synthetic/source.ts',status:'M',oldMode:'100644',newMode:'100644',before:'3'.repeat(40),after:'2'.repeat(40)}];
  const plan={schemaVersion:1,route:'pr356',phase:'admit',repository:REPOSITORY,pr:356,branch:BRANCH,base:B,head:H,checkout:H,tree:T,product:P,components:{backend,frontend},protectedInputs:{'synthetic/source.ts':'2'.repeat(40)},inventory,inventorySHA256:canonicalSHA256(inventory),bindingSHA256:canonicalSHA256({synthetic:'binding'}),acceptanceSHA256:canonicalSHA256({synthetic:'acceptance'}),requiredPhaseIds:[...REQUIRED_PHASE_IDS],phases,historicalEvidence:REQUIRED_EVIDENCE_IDS.map(id=>({id,state:'approved',caseIds:[id+' original evidence case']})),context:{event:'workflow_dispatch',runId:'1001',attempt:sourceAttempt,actualDraft:false,mainSha:B,mergeCommitSha:M}};
+ const retained=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url),'utf8'));plan.backendProductionTypesCoverage=structuredClone(retained.backendProductionTypesCoverage);plan.retainedEvidenceDeclarations=structuredClone(retained.retainedEvidenceDeclarations);plan.phases['backend-image'].caseIds.push('backend-image-built');
  plan.candidateInputsSHA256=candidateInputsDigest(plan);
  const needs={scope:{result:'success',outputs:pr356Outputs(plan)},'pr356-admission':{result:'success',outputs:{artifact_id:'2001',artifact_name:'pr356-merge-admission-precheck-1001-'+producerAttempt,artifact_digest:digest,producer_run:'1001',producer_head:H,producer_attempt:producerAttempt,head:H,base:B,tree:T,candidate_inputs_sha256:plan.candidateInputsSHA256}}};
  const env={GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:REPOSITORY,GITHUB_EVENT_NAME:'workflow_dispatch',GITHUB_SHA:H,GITHUB_RUN_ID:'1001',GITHUB_RUN_ATTEMPT:attempt,GITHUB_REF:'refs/heads/'+BRANCH,GITHUB_REF_NAME:BRANCH};

@@ -8,6 +8,7 @@ const closure={schemaVersion:1,files:[{path:'runtime/unit.ts',mode:'100644',blob
 function fixture(phase='qualify',extra={}){
  const rawReporter=id=>Buffer.from(JSON.stringify({success:false,numFailedTests:1,numPendingTests:2,testResults:[{name:'/synthetic/runtime/unit.test.ts',assertionResults:[{fullName:id,status:'passed',failureMessages:[]},{fullName:'retained failure',status:'failed',failureMessages:['synthetic original failure']}]}]}));
  const acceptance={schemaVersion:1,kind:'pr356-acceptance',repository:REPOSITORY,pr:356,sarifPolicy:{state:'fixed',document:{schemaVersion:1,id:'synthetic-control-policy',allowedDispositions:[]},sha256:canonicalSHA256({schemaVersion:1,id:'synthetic-control-policy',allowedDispositions:[]})},phases:REQUIRED_PHASE_IDS.map(id=>({id,jobName:'pr356-'+id,state:'ready',caseIds:[id+'-fixture-case'],inputRoots:['runtime'],inputFiles:[],configuration:closure.configuration,tools:closure.tools,dependencies:closure.dependencies,maxAgeSeconds:86400,acceptedOrigins:[]})),evidence:REQUIRED_EVIDENCE_IDS.map(id=>{const caseId=id+'-original-case';return {id,state:'approved',caseIds:[caseId],sourceFiles:['runtime/unit.test.ts'],reviewDigest:'8'.repeat(64),cases:[{id:caseId,scope:'passed-case',fullName:caseId,suiteSuffix:'runtime/unit.test.ts',rawSHA256:sha256(rawReporter(caseId)),inputs:closure,ciExecuted:false,originalExecutionSigned:false,contemporaneousSourceManifest:false}]};})};
+ const retained=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url),'utf8'));acceptance.backendProductionTypesCoverage=structuredClone(retained.backendProductionTypesCoverage);acceptance.retainedEvidenceDeclarations=structuredClone(retained.retainedEvidenceDeclarations);acceptance.phases.find(p=>p.id==='backend-image').caseIds.push('backend-image-built');
  const binding={schemaVersion:1,repository:REPOSITORY,pr:356,branch:BRANCH,base:B,product:P,source:{'app.ts':{status:'M',oldMode:'100644',newMode:'100644',before,after:blob}},controls:['control.mjs'],controlBefore:{},components:{backend,frontend},protectedInputs:{'package.json':lock}};
  const entries=[{file:'app.ts',status:'M',oldMode:'100644',newMode:'100644'},{file:'control.mjs',status:'A',oldMode:'000000',newMode:'100644'}];
  const read=(...args)=>{if(args[0]==='ls-tree')return '100644 blob '+runtimeBlob+'\truntime/unit.ts';assert.equal(args[0],'rev-parse');const ref=args[1];if(ref.endsWith('^{tree}'))return T;const [commit,path]=ref.split(':');if(path==='app.ts')return commit===B?before:blob;if(path==='control.mjs')return control;if(path==='server-version/backend')return backend;if(path==='server-version/frontend')return frontend;if(path==='package.json')return lock;if(path==='runtime/unit.ts')return runtimeBlob;throw Error('Unexpected synthetic Git read '+ref);};
@@ -27,8 +28,25 @@ function bundle(plan,phaseId='backend-image',{runId=plan.context.runId,attempt='
 }
 function changedProof(b,mutate){const p=JSON.parse(Buffer.from(b.proofBytes).toString());mutate(p);b.proofBytes=Buffer.from(JSON.stringify(p));b.artifactValidation.proofSHA256=sha256(b.proofBytes);return b;}
 
-test('production acceptance is complete but explicitly pending, never a default admission',()=>{
- const a=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url)));assert.doesNotThrow(()=>validateAcceptance(a,{requireReady:false}));assert.throws(()=>validateAcceptance(a),/SARIF policy must be fixed before qualification/);assert.equal(a.phases.length,16);assert.equal(a.evidence.length,13);assert(a.phases.every(p=>p.state==='pending'));assert(a.evidence.every(p=>p.state==='pending'));assert.equal(a.sarifPolicy.state,'pending');
+test('production reviewed readiness and fixed policy do not authorize execution or release',()=>{
+ const a=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url)));
+ assert.doesNotThrow(()=>validateAcceptance(a,{requireReady:false}));assert.equal(a.phases.length,16);assert(a.phases.every(p=>p.state==='ready'));
+ assert.equal(a.externalDotApprovalRequired,true);assert.equal(a.reviewAuthentication,'not-established');assert.equal(a.releaseAuthorized,false);
+ assert.equal(a.sarifPolicy.state,'fixed');assert.equal(a.sarifPolicy.document.id,'pr356-independent-review-v1');
+ assert.deepEqual(a.sarifPolicy.document.allowedDispositions,['false-positive','not-applicable','pre-existing-no-regression']);
+ assert.equal(a.sarifPolicy.sha256,canonicalSHA256(a.sarifPolicy.document));
+ const pending=structuredClone(a);pending.evidence[0].state='pending';assert.throws(()=>validateAcceptance(pending),/Historical evidence not admitted/);
+ const unready=structuredClone(a);unready.phases[0].state='pending';assert.throws(()=>validateAcceptance(unready),/Unimplemented\/unreviewed phase/);
+});
+test('original frontend A59 literal receipt is admitted unchanged and only for its approved fixed case',()=>{
+ const e=JSON.parse(readFileSync(new URL('./pr356-local-evidence.json',import.meta.url))),entry=e.followupAttachments[59],raw=Buffer.from(entry.rawBase64,'base64'),receipt=JSON.parse(raw),f=fixture();
+ assert.equal(receipt.command,'tsc -p tsconfig.app.json --noEmit');assert.equal(receipt.exitCode,0);assert.equal(receipt.node,'v24.21.0');
+ const g=f.acceptance.evidence.find(g=>g.id==='frontend-app-types'),c=g.cases[0],id='frontend-app-types-a31cbf0bebc11a38';g.caseIds=[id];
+ Object.assign(c,{id,scope:'execution',rawSHA256:sha256(raw),executionSHA256:sha256(raw),exitCodePointer:'/exitCode',commandPointer:'/command',command:receipt.command,logSHA256:sha256('')});
+ const plan=f.make(),records=f.records(),record=records.find(r=>r.caseId===id);Object.assign(record,{rawBytes:raw,executionBytes:raw,logBytes:Buffer.from('')});
+ const accepted=verifyHistoricalEvidence({plan,records,read:f.read});assert.equal(accepted.cases.find(x=>x.id===id).invocation.exitCode,0);
+ c.command='tsc -p tsconfig.app.json --noEmit --changed';assert.throws(()=>f.make(),/original A59 literal/);
+ c.command=receipt.command;c.id='unapproved-literal-case';g.caseIds=[c.id];assert.throws(()=>f.make(),/historical command/);
 });
 test('stable candidate input fingerprint survives qualify/admit/main contexts and old source attempt',()=>{
  const q=fixture(),a=fixture('admit',{runId:'1002',attempt:'2'}),m=fixture('postmerge',{runId:'1003'});const qp=q.make(),ap=a.make(),mp=m.make();assert.equal(qp.candidateInputsSHA256,ap.candidateInputsSHA256);assert.equal(qp.candidateInputsSHA256,mp.candidateInputsSHA256);assert.notEqual(qp.planSHA256,ap.planSHA256);assert.equal(mp.head,H);assert.equal(mp.checkout,A);assert.equal(qp.qualificationOnly,true);assert.equal(qp.releaseAuthorized,false);
@@ -52,7 +70,7 @@ test('another run requires an explicit reviewed origin, not a dispatch Boolean',
  const row=f.acceptance.phases.find(p=>p.id==='backend-image');row.acceptedOrigins=[{runId:'9001',attempt:'1',jobId:'2001',artifactId:'3001',artifactName:b.expected.artifactName,sourceHead:H,sourceTree:T,zipSHA256:b.expected.zipSHA256,zipBytes:1000,inputsSHA256:p.phases['backend-image'].inputsSHA256,reviewDigest:'d'.repeat(64)}];const allowed=f.make();assert.equal(verifyOfficialPhase({plan:allowed,...bundle(allowed,'backend-image',{runId:'9001'})}).originKind,'explicit-reviewed-origin');
 });
 test('original passed case can be retained without declaring its failed invocation passed',()=>{
- const f=fixture(),p=f.make(),r=verifyHistoricalEvidence({plan:p,records:f.records(),read:f.read});assert.equal(r.cases.length,13);assert(r.cases.every(c=>c.invocation.originalReporterSuccess===false&&c.invocation.wholeInvocationAccepted===false&&c.invocation.exitCode==='unknown'));assert.equal(r.originalExecutionSigned,false);assert.throws(()=>verifyHistoricalEvidence({plan:p,records:f.records().slice(1),read:f.read}));const bad=f.records();bad[0].rawBytes=Buffer.from('{}');assert.throws(()=>verifyHistoricalEvidence({plan:p,records:bad,read:f.read}));
+ const f=fixture(),p=f.make(),r=verifyHistoricalEvidence({plan:p,records:f.records(),read:f.read});assert.equal(r.cases.length,REQUIRED_EVIDENCE_IDS.length);assert(r.cases.every(c=>c.invocation.originalReporterSuccess===false&&c.invocation.wholeInvocationAccepted===false&&c.invocation.exitCode==='unknown'));assert.equal(r.originalExecutionSigned,false);assert.throws(()=>verifyHistoricalEvidence({plan:p,records:f.records().slice(1),read:f.read}));const bad=f.records();bad[0].rawBytes=Buffer.from('{}');assert.throws(()=>verifyHistoricalEvidence({plan:p,records:bad,read:f.read}));
 });
 test('empty type log requires an original exit and exact command receipt',()=>{
  const f=fixture(),g=f.acceptance.evidence.find(e=>e.id==='frontend-app-types'),c=g.cases[0],execution=Buffer.from(JSON.stringify({exitCode:0,command:['tsc','--noEmit']}));Object.assign(c,{scope:'execution',rawSHA256:sha256(execution),executionSHA256:sha256(execution),exitCodePointer:'/exitCode',commandPointer:'/command',command:['tsc','--noEmit'],logSHA256:sha256('')});const p=f.make(),records=f.records();records.find(r=>r.caseId===c.id).rawBytes=execution;Object.assign(records.find(r=>r.caseId===c.id),{executionBytes:execution,logBytes:Buffer.from('')});assert.doesNotThrow(()=>verifyHistoricalEvidence({plan:p,records,read:f.read}));delete records.find(r=>r.caseId===c.id).executionBytes;assert.throws(()=>verifyHistoricalEvidence({plan:p,records,read:f.read}));
@@ -226,11 +244,25 @@ test('B reader preserves producer A1 to Q A2 to new admission run and exact-tree
 
 test('production fresh phases solely cover nine retained historical duplicates without admitting evidence',()=>{
  const acceptance=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url),'utf8'));validateAcceptance(acceptance,{requireReady:false});
- const group=acceptance.evidence.find(g=>g.id==='affected-review-contracts'),transfers=acceptance.freshPhaseCoverageTransfers;assert.equal(transfers.length,9);assert.equal(group.pendingDefinitions.length,413);assert.equal(group.caseIds.length,404);assert.equal(new Set(transfers.map(t=>t.historicalCaseId)).size,9);
- const transferredIds=new Set(transfers.map(t=>t.historicalCaseId));assert.deepEqual(group.caseIds,group.pendingDefinitions.map(r=>r.id).filter(id=>!transferredIds.has(id)),'Only the exact nine historical obligations may move');
+ const group=acceptance.evidence.find(g=>g.id==='affected-review-contracts'),transfers=acceptance.freshPhaseCoverageTransfers;assert.equal(transfers.length,9);assert.equal(group.pendingDefinitions.length,413);assert.equal(group.caseIds.length,403);assert.equal(new Set(transfers.map(t=>t.historicalCaseId)).size,9);
+ const alias='affected-review-contracts-9ae2120bf1cb238d';assert.equal(group.reviewDocument.retainedMovedDeclarationAlias,alias);const originalAlias=group.pendingDefinitions.find(d=>d.id===alias);assert(originalAlias);assert(group.cases.some(c=>c.suiteSuffix===group.reviewDocument.aliasTargetFile&&originalAlias.fullName.endsWith(c.fullName)));const transferredIds=new Set(transfers.map(t=>t.historicalCaseId));assert.deepEqual(group.caseIds,group.pendingDefinitions.map(r=>r.id).filter(id=>!transferredIds.has(id)&&id!==alias),'Only nine fresh transfers and the explicitly retained moved-test alias may leave historical IDs');
  for(const [phaseId,count]of Object.entries({vertical4:4,'exact-worker1':1,'ordinary-harness4':4})){
   const phase=acceptance.phases.find(p=>p.id===phaseId),mapped=transfers.filter(t=>t.phaseId===phaseId);assert.equal(phase.caseIds.length,count);assert.equal(mapped.length,count);assert.deepEqual(mapped.map(t=>t.phaseCaseId).sort(),[...phase.caseIds].sort());
   for(const row of mapped){const original=group.pendingDefinitions.find(d=>d.id===row.historicalCaseId);assert(original);assert.equal(row.historicalGroupId,group.id);assert.equal(row.fullName,original.fullName);assert.equal(row.file,original.file);assert.equal(row.phaseCaseId,original.fullName);assert.equal(row.qualificationSource,'fresh-phase-only');assert.equal(row.statusAtTransfer,'NOTRUN');assert.equal(row.priorRawAndStatus,'retained-unchanged');assert(!group.caseIds.includes(row.historicalCaseId));}
  }
- assert(acceptance.phases.every(p=>p.state==='pending'));assert(acceptance.evidence.every(e=>e.state==='pending'));assert.equal(acceptance.sarifPolicy.state,'pending');
+ assert(acceptance.phases.every(p=>p.state==='ready'));assert(acceptance.evidence.every(e=>e.state==='approved'));assert.equal(acceptance.sarifPolicy.state,'fixed');assert.equal(acceptance.releaseAuthorized,false);
+});
+
+// A historical it.each display-name collision must retain every original assertion.
+test('explicit repeated-name pointers require every original parameter row to pass',()=>{
+ const f=fixture(),g=f.acceptance.evidence[0],c=g.cases[0];
+ const makeRaw=bad=>Buffer.from(JSON.stringify({success:!bad,numFailedTests:bad?1:0,numPendingTests:0,testResults:[{name:'/synthetic/runtime/unit.test.ts',assertionResults:[{fullName:c.fullName,status:'passed',failureMessages:[]},{fullName:c.fullName,status:bad?'failed':'passed',failureMessages:bad?['retained failure']:[]}]}]}));
+ let raw=makeRaw(false);c.rawSHA256=sha256(raw);c.rawAssertionPointers=['/testResults/0/assertionResults/0','/testResults/0/assertionResults/1'];
+ const check=()=>{const records=f.records();records.find(r=>r.caseId===c.id).rawBytes=raw;return verifyHistoricalEvidence({plan:f.make(),records,read:f.read})};
+ assert.doesNotThrow(check);c.rawAssertionPointers.pop();assert.throws(check);c.rawAssertionPointers.push('/testResults/0/assertionResults/1');raw=makeRaw(true);c.rawSHA256=sha256(raw);assert.throws(check);
+});
+
+test('shared historical input representation preserves hashes and refuses missing or altered sets',()=>{
+ const f=fixture(),g=f.acceptance.evidence[0],c=g.cases[0],inputs=c.inputs,key=canonicalSHA256(inputs);g.inputSets={[key]:inputs};delete c.inputs;c.inputsRef=key;
+ const check=()=>verifyHistoricalEvidence({plan:f.make(),records:f.records(),read:f.read});assert.doesNotThrow(check);g.inputSets[key]={...inputs,configuration:{changed:true}};assert.throws(check,/digest drift/);delete g.inputSets[key];assert.throws(check,/missing/);
 });

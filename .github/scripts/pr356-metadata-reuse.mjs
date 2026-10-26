@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
-import {BRANCH,REPOSITORY,assertPhaseInputs,candidateInputsDigest,canonicalSHA256,positiveId,selectedPhaseIds,sha256} from './pr356-plan.mjs';
+import {BRANCH,REPOSITORY,assertPhaseInputs,candidateInputsDigest,evidenceInputs,canonicalSHA256,positiveId,selectedPhaseIds,sha256} from './pr356-plan.mjs';
 import {aggregateSpec} from './pr356-admission.mjs';
 import {expectedFromOfficialOrigin,verifyArtifact} from './pr356-artifacts.mjs';
 
@@ -43,7 +43,7 @@ function official(pin,metadata,{head,jobName,maxAgeSeconds,consumerAttempt}){
 const dependencies=Object.freeze({'schema-restore':['schema-upgrade'],vertical4:['schema-restore'],'exact-worker1':['schema-restore'],'ordinary-harness4':['schema-restore'],'exact-lazy-current-child':['schema-restore'],'status-browser':['frontend-image'],'product-browser':['backend-image','frontend-image','schema-restore'],'backend-scan':['backend-image'],'frontend-scan':['frontend-image']});
 function history(plan,h){
  assert.equal(h?.schemaVersion,1);assert.equal(h.kind,'pr356-reviewed-local-admission');for(const k of ['head','tree','candidateInputsSHA256','acceptanceSHA256'])assert.equal(h[k],plan[k]);for(const k of ['ciExecuted','originalExecutionSigned','releaseAuthorized'])assert.equal(h[k],false);assert.equal(h.externalDotApprovalRequired,true);assert.equal(h.reviewAuthentication,'not-established');
- const cases=plan.historicalEvidence.flatMap(g=>g.cases.map(c=>({...c,groupId:g.id,reviewDigest:g.reviewDigest})));coverage(h.cases?.map(c=>c.id),cases.map(c=>c.id),'authenticated historical cases');
+ const cases=plan.historicalEvidence.flatMap(g=>g.cases.map(c=>({...c,inputs:evidenceInputs(g,c),groupId:g.id,reviewDigest:g.reviewDigest})));coverage(h.cases?.map(c=>c.id),cases.map(c=>c.id),'authenticated historical cases');
  for(const row of h.cases){const c=cases.find(c=>c.id===row.id);for(const k of ['groupId','scope','rawSHA256','reviewDigest','ciExecuted','originalExecutionSigned','contemporaneousSourceManifest'])same(row[k],c[k],'Historical admission source differs');assert.equal(row.inputsSHA256,canonicalSHA256(c.inputs));assert.equal(row.invocation?.wholeInvocationAccepted,c.scope==='whole-invocation');if(c.scope!=='passed-case')assert.equal(row.invocation?.exitCode,0);}
  assert.equal(h.proofSHA256,canonicalSHA256(h.cases));
 }
