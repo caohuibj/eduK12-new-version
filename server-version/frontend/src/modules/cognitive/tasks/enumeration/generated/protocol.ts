@@ -1,4 +1,4 @@
-// Generated from frozen pure enumeration protocol. Source SHA256: 3c947be5c15444357fb01f556cd9cafa70bc976dd87ab39de6672cf7eb629a31
+// Generated from frozen pure enumeration protocol. Source SHA256: 9edac0ad3044335ee752f867dba5cddaa7f2f840582d105b556c994f1fa82e6a
 /** Internal pure logic candidate. This file renders no stimuli and establishes no timing tolerance. */
 export const ENUMERATION_IDENTITY = Object.freeze({
   candidateId: 'attention-enumeration-flower', testType: 'enumeration',
@@ -50,6 +50,8 @@ export type EnumerationProfile = 'research' | 'experience'
 export type EnumerationInput = 'touch' | 'pointer' | 'keyboard'
 export const ENUMERATION_QUANTITIES = [5, 6, 7, 8, 9] as const
 export const ENUMERATION_PRACTICE_QUANTITIES = [3, 4, 5] as const
+/** Approved practice exposure count; one source for plan generation and the client seal check. */
+export const ENUMERATION_PRACTICE_TRIAL_COUNT = ENUMERATION_PRACTICE_QUANTITIES.length
 export interface EnumerationConfig {
   status: 'DESIGN_PROPOSAL'
   profile: EnumerationProfile
@@ -159,7 +161,7 @@ function generateEnumerationPlan(config: EnumerationConfig, canonical: Enumerati
   for (const key of Object.keys(canonical) as Array<keyof EnumerationConfig>) {
     if (!enumerationValuesEqual(config[key], canonical[key])) throw new Error('Unsupported enumeration configuration')
   }
-  if (!Number.isInteger(trialIndex) || trialIndex < 0 || trialIndex >= (phase === 'practice' ? 3 : config.totalTrials))
+  if (!Number.isInteger(trialIndex) || trialIndex < 0 || trialIndex >= (phase === 'practice' ? ENUMERATION_PRACTICE_TRIAL_COUNT : config.totalTrials))
     throw new Error('Enumeration index exceeds the frozen phase budget')
   const blockIndex = phase === 'practice' ? 0 : Math.floor(trialIndex / 25)
   const positionInBlock = phase === 'practice' ? trialIndex : trialIndex % 25
@@ -182,10 +184,10 @@ export function enumerationRecipePlan(config: EnumerationRecipeConfig, seed: str
   return generateEnumerationPlan(config, enumerationRecipeConfig(config.profile), seed, trialIndex, phase)
 }
 export function enumerationRecipeSequence(config: EnumerationRecipeConfig, seed: string, phase: 'test' | 'practice' = 'test') {
-  return Array.from({ length: phase === 'practice' ? 3 : config.totalTrials },
+  return Array.from({ length: phase === 'practice' ? ENUMERATION_PRACTICE_TRIAL_COUNT : config.totalTrials },
     (_, index) => enumerationRecipePlan(config, seed, index, phase))
 }
 export function enumerationSequence(config: EnumerationConfig, seed: string, phase: 'test' | 'practice' = 'test') {
-  return Array.from({ length: phase === 'practice' ? 3 : config.totalTrials },
+  return Array.from({ length: phase === 'practice' ? ENUMERATION_PRACTICE_TRIAL_COUNT : config.totalTrials },
     (_, index) => enumerationPlan(config, seed, index, phase))
 }

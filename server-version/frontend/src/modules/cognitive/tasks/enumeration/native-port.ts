@@ -5,7 +5,7 @@ import {enumerationDigest,enumerationContextPlan,type EnumerationArtifact,type E
 import {enumerationLocalArtifact,ENUMERATION_LOCAL_ARTIFACT_KEY} from './local-artifact'
 import type {EnumerationPersistencePort,EnumerationSavedRecord,EnumerationReservation} from './persistence'
 import {ENUMERATION_MAX_FRAME_RECORDS} from './capture'
-import type {EnumerationTrial} from './generated/protocol'
+import {ENUMERATION_PRACTICE_TRIAL_COUNT,type EnumerationTrial} from './generated/protocol'
 const PREFIX='cognitive.enumeration.'
 const reservationKey=(v:EnumerationReservation)=>PREFIX+'reserve.'+v.phase+'.'+v.trialIndex+'.'+v.exposureOrdinal
 const recordKey=(v:EnumerationSavedRecord)=>PREFIX+'record.'+v.record.core.phase+'.'+v.record.core.plan.trialIndex+'.'+v.record.exposureOrdinal
@@ -62,10 +62,17 @@ export function createNativeEnumerationPort(expected:FinalDraftWriteIdentity,art
   return {formal:all.filter(v=>v.record.core.phase==='test').sort((a,b)=>a.record.core.plan.trialIndex-b.record.core.plan.trialIndex),practice:all.filter(v=>v.record.core.phase==='practice'),
    hasReservations:Object.keys(slots).some(k=>k.startsWith(PREFIX+'reserve.')),ended:own.ended||Boolean(slots[END_KEY])||!same(currentOrigin,original.pageOrigin)}
  }
- const completeRecords=(data:Awaited<ReturnType<typeof snapshot>>)=>data.formal.length===original.context.config.totalTrials
-  &&data.formal.every((v,i)=>v.record.core.plan.trialIndex===i)&&[0,1,2].every(i=>data.practice.some(v=>v.record.core.plan.trialIndex===i&&v.record.raw.completion==='confirmed'))
+ const formalComplete=(data:Awaited<ReturnType<typeof snapshot>>)=>data.formal.length===original.context.config.totalTrials
+  &&data.formal.every((v,i)=>v.record.core.plan.trialIndex===i)
+ const practiceComplete=(data:Awaited<ReturnType<typeof snapshot>>)=>Array.from({length:ENUMERATION_PRACTICE_TRIAL_COUNT},(_,i)=>i)
+  .every(i=>data.practice.some(v=>v.record.core.plan.trialIndex===i&&v.record.raw.completion==='confirmed'))
+ const completeRecords=(data:Awaited<ReturnType<typeof snapshot>>)=>formalComplete(data)&&practiceComplete(data)
  const seal=async()=>{for(const value of [...own.pending.values()])await persist(value)
-  const data=await snapshot();if(!completeRecords(data))throw Error('本次作答尚未完成，原记录已保留')
+  const data=await snapshot()
+  // An over-count can only come from a config that does not match the frozen plan; a short run needs a different message.
+  if(data.formal.length>original.context.config.totalTrials)throw Error('原记录数量超过冻结配置，已停止提交并保留原件')
+  if(!formalComplete(data))throw Error(`正式作答尚未完成（已记录 ${data.formal.length}/${original.context.config.totalTrials}），原记录已保留`)
+  if(!practiceComplete(data))throw Error(`练习记录不完整（需 ${ENUMERATION_PRACTICE_TRIAL_COUNT} 次），原记录已保留`)
   await host.sealRaw({schemaVersion:1,artifact:original,formal:data.formal,practice:data.practice});return data}
  const finalize=()=>{
   if(finalActive)return finalActive
