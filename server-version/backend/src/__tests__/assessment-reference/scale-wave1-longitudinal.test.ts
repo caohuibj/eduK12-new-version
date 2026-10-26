@@ -102,4 +102,18 @@ describe('actual frozen adult demographics, never candidate population midpoints
   expect(allowed.points.every(p=>p.reference?.status==='available'&&p.reference.bandProvenance?.schoolStage==='adult')).toBe(true)
  })
 
+ it('does not label a school-to-adult transition as a common compatible later population',()=>{
+  const mixed=adult('same-set-age-transition'),school=structuredClone(testReference().entries[0])
+  school.governance!.schoolStage='upper_secondary';school.governance!.effectiveFrom='2026-01-01T00:00:00Z'
+  school.population={language:'zh-CN',match:{minAgeMonthsInclusive:168,maxAgeMonthsExclusive:216,gradeLevels:['12']}}
+  mixed.entries.push(school)
+  const {input}=build([215,216],[mixed])
+  input.points[0].at='2026-04-01T00:00:00Z';input.points[0].identity.schoolStage='upper_secondary'
+  input.points[0].identity.frozenContext={ageMonthsAtFreeze:215,gradeLevel:'12'}
+  const result=buildLongitudinalReferenceSnapshot(input)
+  expect(result.compatibilityDecision).toBe('FALLBACK_TIME_MATCHED')
+  expect(result.points.map(p=>p.rawValue)).toEqual([3,3])
+  expect(result.points.map(p=>p.reference?.bandProvenance?.schoolStage)).toEqual(['upper_secondary','adult'])
+ })
+
 })
