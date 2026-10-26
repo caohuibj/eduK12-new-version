@@ -71,6 +71,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const [title,setTitle]=useState('')
   const [purpose,setPurpose]=useState<(typeof purposeOptions)[number][0]>('STUDENT_WELLBEING')
   const [classId,setClassId]=useState('')
+  const [allocationClassIds,setAllocationClassIds]=useState<string[]>([])
   const [eligibleClasses,setEligibleClasses]=useState<Array<{id:string;name:string}>>([])
   const [classesLoading,setClassesLoading]=useState(false)
   const [classesError,setClassesError]=useState('')
@@ -151,16 +152,17 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   const fetchDetail=async(courseId:string)=>{
     const request=++detailRequest.current
     resourceRequest.current++;runRequest.current++
-    setSelected(null);setClassId('');setEligibleClasses([])
+    setSelected(null);setClassId('');setAllocationClassIds([]);setEligibleClasses([])
     const data=await api<Detail>(base+'/'+courseId)
     if(request!==detailRequest.current||currentBase.current!==base)return
     setSelected(data)
+    setClassesRetry(value=>value+1)
     setClassId('')
     setActiveRun(null);setResources([]);setPreview(null)
   }
   useEffect(()=>{
     ++detailRequest.current
-    setSelected(null);setClassId('');setEligibleClasses([]);setList([]);setPanel('participants')
+    setSelected(null);setClassId('');setAllocationClassIds([]);setEligibleClasses([]);setList([]);setPanel('participants')
     setListPage(1);setListHasMore(false)
     void fetchList().catch(()=>{})
     return()=>{listRequest.current++;listMore.current=false;resourceRequest.current++;runRequest.current++}
@@ -174,7 +176,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     ?selected.courseId:null
   useEffect(()=>{
     let live=true
-    setEligibleClasses([]);setClassId('');setClassesError('')
+    setEligibleClasses([]);setClassId('');setAllocationClassIds([]);setClassesError('')
     if(!editableCourseId){setClassesLoading(false);return}
     setClassesLoading(true)
     void api<{list:Array<{id:string;name:string}>}>(`${base}/${editableCourseId}/eligible-classes`)
@@ -204,14 +206,15 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     await fetchDetail(selected.courseId);await fetchList()
     setNotice('活动状态已更新，版本 '+next.version)
   })
+  const allocationReady=Boolean(editableCourseId&&!classesLoading&&!classesError&&allocationClassIds.length>0&&allocationClassIds.length<=40&&allocationClassIds.every(id=>eligibleClasses.some(unit=>unit.id===id)))
   const allocate=()=>void execute(async()=>{
-    if(!selected||!classId)return
+    if(!selected||!allocationReady)return
     const result=await api<{selected:number}>(path+'/participants','POST',{
-      classUnitIds:[classId],requestKey:'school-'+crypto.randomUUID(),
+      classUnitIds:allocationClassIds,requestKey:'school-'+crypto.randomUUID(),
       expectedVersion:selected.version,
     })
     await fetchDetail(selected.courseId)
-    setNotice('已按当前获批班级分配 '+result.selected+' 名学生，未关联培训学员。')
+    setNotice('已按所选 '+allocationClassIds.length+' 个班级分配 '+result.selected+' 名学生。')
   })
   const addTask=()=>void execute(async()=>{
     if(!selected)return
@@ -340,18 +343,17 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       <section className="hs-activity-config-panel" id="hs-activity-panel-participants" aria-label="班级与参与者" hidden={compact&&panel!=='participants'}>
         {compact&&selected.status!=='DRAFT'&&<p>当前活动已离开准备阶段，参与范围按现有班级分配保留。</p>}
         {selected.status==='DRAFT'&&<>
-        <h3>1. 准备 · 选择获批班级</h3>
-        <label className="hs-field"><span>班级</span>
-          <select value={classId} disabled={classesLoading||!!classesError} onChange={event=>setClassId(event.target.value)}>
-            <option value="">请选择已审核班级</option>
-            {eligibleClasses.map(unit=>
-              <option value={unit.id} key={unit.id}>{unit.name}</option>)}
-          </select></label>
+        {eligibleClasses.length>0&&<fieldset className="hs-activity-class-picker" disabled={busy||classesLoading||!!classesError}>
+          <legend>选择获批班级（可多选）</legend>
+          <div className="hs-activity-class-options">{eligibleClasses.map(unit=><label key={unit.id}><input type="checkbox" checked={allocationClassIds.includes(unit.id)} disabled={!allocationClassIds.includes(unit.id)&&allocationClassIds.length>=40} onChange={event=>{const checked=event.target.checked;setAllocationClassIds(previous=>checked?[...new Set([...previous,unit.id])].slice(0,40):previous.filter(id=>id!==unit.id))}}/><span>{unit.name}</span></label>)}</div>
+          <div className="hs-activity-class-selection"><span role="status">已选 {allocationClassIds.length} / 40 个班级</span><button type="button" disabled={!allocationClassIds.length} onClick={()=>setAllocationClassIds([])}>清空选择</button></div>
+          <p className="hs-activity-class-hint">勾选用于本次加入，取消勾选不会移除已加入的学生。</p>
+        </fieldset>}
         {classesLoading&&<p role="status">正在加载可分配班级…</p>}
         {classesError&&<div><p role="alert">{classesError}</p>
           <button disabled={classesLoading} onClick={()=>setClassesRetry(value=>value+1)}>重试加载班级</button></div>}
         {!classesLoading&&!classesError&&eligibleClasses.length===0&&<p>当前没有可分配的获批班级。心理教师可选择本校获批班级，普通教师仅能选择本人有效任教指派的班级。</p>}
-        <button disabled={busy||classesLoading||!!classesError||!eligibleClasses.some(item=>item.id===classId)} onClick={allocate}>加入当前班级学生</button>
+        <button disabled={busy||!allocationReady} onClick={allocate}>加入所选班级学生</button>
 </>}
       {isAdmin&&selected.status==='OPEN'&&<section className="hs-panel">
         <h3>自愿同伴互评 · 安全抽样</h3>
