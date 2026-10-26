@@ -83,6 +83,11 @@ describe('Teacher compact workspace',()=>{
   vi.stubEnv('VITE_HUITEACHER_IMPROVEMENT_ENABLED','false')
   render(<HuiteacherApp/>)
   const nav=await screen.findByRole('navigation',{name:'个人任务分区'})
+  const primary=screen.getByRole('navigation',{name:'Teacher 工作台'})
+  const banner=screen.getByRole('button',{name:'Teacher 首页'}).closest('header')!
+  expect(within(banner).getByRole('navigation',{name:'Teacher 工作台'})).toBe(primary)
+  expect(screen.getAllByRole('navigation',{name:'Teacher 工作台'})).toHaveLength(1)
+  expect(within(banner).getByRole('navigation',{name:'产品导航'})).toBeInTheDocument()
   expect(within(nav).getAllByRole('link').map(link=>link.textContent)).toEqual(['参与测评','组织测评'])
   expect(within(nav).getByRole('link',{name:'参与测评'})).toHaveAttribute('aria-current','location')
   const info=screen.getByRole('button',{name:'个人空间说明'})
