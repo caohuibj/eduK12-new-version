@@ -1927,3 +1927,18 @@ historical declarations/raw/statuses remain retained, while the mandatory
 historical case set contains the other 404. No assertion is removed and no
 historical group is approved by this transfer. All other original obligations
 remain subject to independent case review.
+
+
+PR356 CodeQL budgets match main's established30 minutes per language. CI-014's
+independently reviewed20-minute87/89-query timeout and approved30-minute success
+are retained as the reason; security-extended, both languages, complete findings
+and all other job limits remain unchanged. The targeted actual-YAML value check
+does not execute CodeQL or repeat existing green controls.
+
+At2026-10-26 13:14UTC root dot independently read the public ruleset list and
+23665026 using its existing read-only connection: the sole active default-branch
+rule has strict_required_status_checks_policy=true, required context
+merge gate / ready PR with integration_id15368, no bypass actors and
+current_user_can_bypass=never. No protection changed. This ruleset review is
+complete; the current node's earlier403/unread traditional branch-protection
+endpoint remains a separate boundary and was not retried.

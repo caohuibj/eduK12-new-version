@@ -2358,6 +2358,26 @@
       "path": "/workspace/scratch/pr356-review-followup/nine-fresh-coverage-control.receipt.json",
       "sha256": "647ceea80df223713149c0bad7481e0871b2df3fdcdcd324995f82d5aa0ed542",
       "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLS10ZXN0LW5hbWUtcGF0dGVybj1ecHJvZHVjdGlvbiBmcmVzaCBwaGFzZXMgc29sZWx5IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYWRtaXNzaW9uLnRlc3QubWpzIgogIF0sCiAgImN3ZCI6ICIvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbiIsCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDEzOjAzOjU1Ljc3Mzg5NCswMDowMCIsCiAgImNvbXBsZXRlZEF0IjogIjIwMjYtMTAtMjZUMTM6MDM6NTYuNDIyOTA0KzAwOjAwIiwKICAiZXhpdENvZGUiOiAwLAogICJsb2dTSEEyNTYiOiAiYmVlNzAzMDcyNThlMzZmODVmN2RmZDRkM2RjODMyMGMyNDMwYzQzNGE2MzJlZjRhNmFjMDBiOTUwNTI2ZDMxZCIsCiAgInNvdXJjZVNIQTI1NiI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYWNjZXB0YW5jZS5qc29uIjogIjM1YjIxY2Q5ZmI1ZTg0N2I2YzM5MDUxNjIxNWViMDYyOGRiZmNmY2MxOTkzOWQ3ZjY5ZjYxYWY0NGVhNzY4NzciLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hZG1pc3Npb24udGVzdC5tanMiOiAiMTcyNjA1ZTA1OTE2NWFlNjA4OWZkYzM0ZmY5OWJhYmQ4NzJjNzI5MDRmNTc4YTgzMTMxN2JlYTZmZmU3YWFkMiIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFkbWlzc2lvbi5tanMiOiAiZGI4ZjUxNzYyNTViMjlkYjBlNDdlYzM5NWJjNjVjNGU5MTM4NWUzNmYwMTY3YWViM2ZhM2RmYTBiOTk1NWYwMiIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXBsYW4ubWpzIjogIjVjZWNiYWI4OTlmZTQyNzRlMDZiNTRiMWU4MTk1ZjYxODNjMjUzN2ZlMjQ2N2EyNDgxZGM1OTg0Y2EyNTJhNzkiCiAgfSwKICAic291cmNlU3RhYmxlIjogdHJ1ZSwKICAic2NvcGUiOiAiT25seSBuZXcgcHJvZHVjdGlvbiBhY2NlcHRhbmNlIGNvdmVyYWdlLXRyYW5zZmVyIGRhdGEgY29udHJhY3QuIEV4aXN0aW5nIEIvQSBhbmQgYWxsIG90aGVyIGdyZWVuIHRlc3RzIGV4Y2x1ZGVkOyBubyBhY3R1YWwgcGhhc2UsIGZpeHR1cmUgR2l0LCBhcHBsaWNhdGlvbiBvciBDSSBleGVjdXRlZC4iLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZQp9Cg=="
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-budget-static-check.py",
+      "sha256": "4eede877bbf09e5bbdeb44b7f325b20d5f0e06643851707430dae3318f6d90f8",
+      "rawBase64": "ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBzdWJwcm9jZXNzLHlhbWwsY29weSxqc29uLGhhc2hsaWIKcm9vdD1QYXRoKCcvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbicpO2JlZm9yZT1zdWJwcm9jZXNzLmNoZWNrX291dHB1dChbJ2dpdCcsJ3Nob3cnLCdIRUFEOi5naXRodWIvd29ya2Zsb3dzL2NpLnltbCddLGN3ZD1yb290KTthZnRlcj0ocm9vdC8nLmdpdGh1Yi93b3JrZmxvd3MvY2kueW1sJykucmVhZF9ieXRlcygpO21haW49c3VicHJvY2Vzcy5jaGVja19vdXRwdXQoWydnaXQnLCdzaG93JywnZmY4NDcxZTUyOWU3YjNjNTZlMWUyMGYxN2QxZTI1ODEwNDBmYzg5NjouZ2l0aHViL3dvcmtmbG93cy9jaS55bWwnXSxjd2Q9cm9vdCk7b2xkPXlhbWwuc2FmZV9sb2FkKGJlZm9yZSk7Y3VycmVudD15YW1sLnNhZmVfbG9hZChhZnRlcik7YmFzZWxpbmU9eWFtbC5zYWZlX2xvYWQobWFpbik7YXNzZXJ0IGJhc2VsaW5lWydqb2JzJ11bJ2NvZGVxbCddWyd0aW1lb3V0LW1pbnV0ZXMnXT09MzAKZXhwZWN0ZWQ9Y29weS5kZWVwY29weShvbGQpO2NoZWNrcz1bXQpmb3IgbGFuZ3VhZ2UgaW4gWydqYXZhc2NyaXB0LXR5cGVzY3JpcHQnLCdweXRob24nXToKIG5hbWU9J3ByMzU2LWNvZGVxbC0nK2xhbmd1YWdlO2Fzc2VydCBvbGRbJ2pvYnMnXVtuYW1lXVsndGltZW91dC1taW51dGVzJ109PTIwO2Fzc2VydCBjdXJyZW50Wydqb2JzJ11bbmFtZV1bJ3RpbWVvdXQtbWludXRlcyddPT0zMDtleHBlY3RlZFsnam9icyddW25hbWVdWyd0aW1lb3V0LW1pbnV0ZXMnXT0zMAogaW5pdD1uZXh0KHMgZm9yIHMgaW4gY3VycmVudFsnam9icyddW25hbWVdWydzdGVwcyddaWYgcy5nZXQoJ2lkJyk9PSdjb2RlcWwtaW5pdCcpO2FuYWx5emU9bmV4dChzIGZvciBzIGluIGN1cnJlbnRbJ2pvYnMnXVtuYW1lXVsnc3RlcHMnXWlmIHMuZ2V0KCdpZCcpPT0nY29kZXFsLWFuYWx5emUnKTthc3NlcnQgaW5pdFsnd2l0aCddWydsYW5ndWFnZXMnXT09bGFuZ3VhZ2UgYW5kIGluaXRbJ3dpdGgnXVsncXVlcmllcyddPT0nc2VjdXJpdHktZXh0ZW5kZWQnO2Fzc2VydCBhbmFseXplWyd3aXRoJ11bJ3VwbG9hZCddPT0nbmV2ZXInO2Fzc2VydCBjdXJyZW50Wydqb2JzJ11bbmFtZV1bJ3N0ZXBzJ109PW9sZFsnam9icyddW25hbWVdWydzdGVwcyddO2NoZWNrcy5hcHBlbmQoeydqb2InOm5hbWUsJ2xhbmd1YWdlJzpsYW5ndWFnZSwndGltZW91dE1pbnV0ZXMnOjMwLCdzZWN1cml0eUV4dGVuZGVkQW5kQWxsU3RlcHNVbmNoYW5nZWQnOlRydWV9KQphc3NlcnQgY3VycmVudD09ZXhwZWN0ZWQsJ09ubHkgdGhlIHR3byBzZWxlY3RlZCB0aW1lb3V0IHZhbHVlcyBtYXkgY2hhbmdlJwpwcmludChqc29uLmR1bXBzKHsna2luZCc6J3RhcmdldGVkLWFjdHVhbC1ZQU1MLXN0YXRpYy1jaGVjaycsJ2NoZWNrcyc6Y2hlY2tzLCdtYWluQ29kZXFsVGltZW91dE1pbnV0ZXMnOjMwLCdhbGxPdGhlcldvcmtmbG93VmFsdWVzVW5jaGFuZ2VkJzpUcnVlLCdiZWZvcmVXb3JrZmxvd1NIQTI1Nic6aGFzaGxpYi5zaGEyNTYoYmVmb3JlKS5oZXhkaWdlc3QoKSwnYWZ0ZXJXb3JrZmxvd1NIQTI1Nic6aGFzaGxpYi5zaGEyNTYoYWZ0ZXIpLmhleGRpZ2VzdCgpLCdhcHBsaWNhdGlvbkNvZGVxbE9yQ0lFeGVjdXRlZCc6RmFsc2UsJ3F1YWxpZmljYXRpb25DbGFpbSc6RmFsc2V9KSkK"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-budget-static.log",
+      "sha256": "c0b54ed2c39c10d5d9eeadd5e212f7a7d8699194b5f979595da6534148689487",
+      "rawBase64": "eyJraW5kIjogInRhcmdldGVkLWFjdHVhbC1ZQU1MLXN0YXRpYy1jaGVjayIsICJjaGVja3MiOiBbeyJqb2IiOiAicHIzNTYtY29kZXFsLWphdmFzY3JpcHQtdHlwZXNjcmlwdCIsICJsYW5ndWFnZSI6ICJqYXZhc2NyaXB0LXR5cGVzY3JpcHQiLCAidGltZW91dE1pbnV0ZXMiOiAzMCwgInNlY3VyaXR5RXh0ZW5kZWRBbmRBbGxTdGVwc1VuY2hhbmdlZCI6IHRydWV9LCB7ImpvYiI6ICJwcjM1Ni1jb2RlcWwtcHl0aG9uIiwgImxhbmd1YWdlIjogInB5dGhvbiIsICJ0aW1lb3V0TWludXRlcyI6IDMwLCAic2VjdXJpdHlFeHRlbmRlZEFuZEFsbFN0ZXBzVW5jaGFuZ2VkIjogdHJ1ZX1dLCAibWFpbkNvZGVxbFRpbWVvdXRNaW51dGVzIjogMzAsICJhbGxPdGhlcldvcmtmbG93VmFsdWVzVW5jaGFuZ2VkIjogdHJ1ZSwgImJlZm9yZVdvcmtmbG93U0hBMjU2IjogIjhiZTY3YjA2MDQ4MWFmZWQzZTgyMjVlZTgzOTI0MGUxMjIyNDZlZjU4ZTZkODBmMmU4NTkwMGNhYzQwZDRmZDciLCAiYWZ0ZXJXb3JrZmxvd1NIQTI1NiI6ICIwZWRkMTFlNDEwNjExOTUzMmVjMjE2NGQ5ODNiNmFmZTNkMGZjMzM5Y2YzNmUyZDdhOWM3NWFkYjNiMWQwZjkxIiwgImFwcGxpY2F0aW9uQ29kZXFsT3JDSUV4ZWN1dGVkIjogZmFsc2UsICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZX0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-budget-static.execution.json",
+      "sha256": "c0e9ce251f4a29438e57c68f1ce81d71e04c4a45e4d0986ce34bd0b96ae87334",
+      "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgInB5dGhvbjMiLAogICAgIi93b3Jrc3BhY2Uvc2NyYXRjaC9wcjM1Ni1yZXZpZXctZm9sbG93dXAvY29kZXFsLWJ1ZGdldC1zdGF0aWMtY2hlY2sucHkiCiAgXSwKICAiY3dkIjogIi93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uIiwKICAic3RhcnRlZEF0IjogIjIwMjYtMTAtMjZUMTM6MTg6NDQuMjEyMDY0KzAwOjAwIiwKICAiY29tcGxldGVkQXQiOiAiMjAyNi0xMC0yNlQxMzoxODo0Ny40ODc2MjIrMDA6MDAiLAogICJleGl0Q29kZSI6IDAsCiAgImxvZ1NIQTI1NiI6ICJjMGI1NGVkMmMzOWMxMGQ1ZDllZWFkZDVlMjEyZjdhN2Q4Njk5MTk0YjVmOTc5NTk1ZGE2NTM0MTQ4Njg5NDg3IiwKICAiY2hlY2tlclNIQTI1NiI6ICI0ZWVkZTg3N2JiZjA5ZTViYmRlYjQ0YjdmMzI1YjIwZDVmMGUwNjY0Mzg1MTcwNzQzMGRhZTMzMThmNmQ5MGY4IiwKICAid29ya2Zsb3dTSEEyNTYiOiAiMGVkZDExZTQxMDYxMTk1MzJlYzIxNjRkOTgzYjZhZmUzZDBmYzMzOWNmMzZlMmQ3YTljNzVhZGIzYjFkMGY5MSIsCiAgIndvcmtmbG93VW5jaGFuZ2VkRHVyaW5nQ2hlY2siOiB0cnVlLAogICJzY29wZSI6ICJPbmx5IGFjdHVhbCBZQU1MIHRpbWVvdXQgdmFsdWVzLCBleGFjdCB0d28tZmllbGQgZGlmZiwgcmV0YWluZWQgbGFuZ3VhZ2VzL3NlY3VyaXR5LWV4dGVuZGVkL2FsbCBzdGVwcywgYW5kIG1haW4zMCBjb21wYXJpc29uOyBubyBvbGQgdGVzdHMgb3IgQ29kZVFML0NJIGV4ZWN1dGlvbiIsCiAgInF1YWxpZmljYXRpb25DbGFpbSI6IGZhbHNlCn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/dot-ruleset-review-20261026T1314Z.json",
+      "sha256": "9278e48a821cce0a4e0ed4f69c617adeaac786c03c9d48c3ade72ae31ebd8af6",
+      "rawBase64": "ewogICJraW5kIjogImF0dHJpYnV0ZWQtaW5kZXBlbmRlbnQtcmV2aWV3LWZhY3Qtbm90LWxvY2FsLWFwaS1yZWNlaXB0IiwKICAib2JzZXJ2ZXIiOiAicm9vdCBkb3QiLAogICJzb3VyY2VUaHJlYWQiOiAiMDFhMTczMTgtNTcxNS03NzM1LTlhZmUtNzgzNGM1Nzc5MDJiIiwKICAib2JzZXJ2ZWRBdFVUQyI6ICIyMDI2LTEwLTI2IDEzOjE0IiwKICAib2JzZXJ2YXRpb25QcmVjaXNpb24iOiAibWludXRlIGFzIHJlcG9ydGVkIiwKICAiY29ubmVjdGlvbiI6ICJleGlzdGluZyByZWFkLW9ubHkgY29ubmVjdGlvbjsgcHVibGljIHJlcG9zaXRvcnkgcnVsZXNldHMgbGlzdCBhbmQgcnVsZTIzNjY1MDI2IiwKICAicmF3QXBpUmVzcG9uc2VQcmVzZW50SW5UaGlzTm9kZSI6IGZhbHNlLAogICJhY3RpdmVEZWZhdWx0QnJhbmNoUnVsZXNldHMiOiBbCiAgICAyMzY2NTAyNgogIF0sCiAgInN0cmljdF9yZXF1aXJlZF9zdGF0dXNfY2hlY2tzX3BvbGljeSI6IHRydWUsCiAgInJlcXVpcmVkX3N0YXR1c19jaGVja3MiOiBbCiAgICB7CiAgICAgICJjb250ZXh0IjogIm1lcmdlIGdhdGUgLyByZWFkeSBQUiIsCiAgICAgICJpbnRlZ3JhdGlvbl9pZCI6IDE1MzY4CiAgICB9CiAgXSwKICAiYnlwYXNzX2FjdG9ycyI6IFtdLAogICJjdXJyZW50X3VzZXJfY2FuX2J5cGFzcyI6ICJuZXZlciIsCiAgInByb3RlY3Rpb25DaGFuZ2VkIjogZmFsc2UsCiAgInJ1bGVzZXRSZXZpZXdVbnJlc29sdmVkQmxvY2tlciI6IGZhbHNlLAogICJ0cmFkaXRpb25hbEJyYW5jaFByb3RlY3Rpb24iOiAibm90IHJlYWQgaW4gdGhpcyBub2RlOyBlYXJsaWVyIGJyYW5jaGVzL21haW4vcHJvdGVjdGlvbjQwMyByZXRhaW5lZCwgbm8gcmV0cnkvYnlwYXNzIiwKICAiY29kZXFsQnVkZ2V0U291cmNlIjogewogICAgIm5vdGlvbkNoZWNrbGlzdCI6ICJDSS0wMTQiLAogICAgImluZGVwZW5kZW50bHlSZXBvcnRlZFByaW9yT2JzZXJ2YXRpb24iOiAiMjAtbWludXRlIENvZGVRTCB0aW1lZCBvdXQgYXQ4Ny84OSBxdWVyaWVzOyBhcHByb3ZlZDMwLW1pbnV0ZSByZXJ1biBjb21wbGV0ZWQiLAogICAgIm1haW5CYXNlbGluZSI6ICJmZjg0NzFlNTI5ZTdiM2M1NmUxZTIwZjE3ZDFlMjU4MTA0MGZjODk2IiwKICAgICJtYWluVGltZW91dE1pbnV0ZXNMb2NhbGx5UmVhZCI6IDMwCiAgfSwKICAicXVhbGlmaWNhdGlvbkNsYWltIjogZmFsc2UKfQo="
     }
   ],
   "portableRawIndexVersion": 1,
@@ -5505,6 +5525,38 @@
       "originalPath": "/workspace/scratch/pr356-review-followup/nine-fresh-coverage-control.receipt.json",
       "sha256": "647ceea80df223713149c0bad7481e0871b2df3fdcdcd324995f82d5aa0ed542",
       "bytes": 1138
+    },
+    {
+      "kind": "targeted-static-or-attributed-independent-review-not-CI",
+      "pointer": "/followupAttachments/306",
+      "rawBase64Pointer": "/followupAttachments/306/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static-check.py",
+      "sha256": "4eede877bbf09e5bbdeb44b7f325b20d5f0e06643851707430dae3318f6d90f8",
+      "bytes": 1668
+    },
+    {
+      "kind": "targeted-static-or-attributed-independent-review-not-CI",
+      "pointer": "/followupAttachments/307",
+      "rawBase64Pointer": "/followupAttachments/307/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static.log",
+      "sha256": "c0b54ed2c39c10d5d9eeadd5e212f7a7d8699194b5f979595da6534148689487",
+      "bytes": 657
+    },
+    {
+      "kind": "targeted-static-or-attributed-independent-review-not-CI",
+      "pointer": "/followupAttachments/308",
+      "rawBase64Pointer": "/followupAttachments/308/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static.execution.json",
+      "sha256": "c0e9ce251f4a29438e57c68f1ce81d71e04c4a45e4d0986ce34bd0b96ae87334",
+      "bytes": 783
+    },
+    {
+      "kind": "targeted-static-or-attributed-independent-review-not-CI",
+      "pointer": "/followupAttachments/309",
+      "rawBase64Pointer": "/followupAttachments/309/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/dot-ruleset-review-20261026T1314Z.json",
+      "sha256": "9278e48a821cce0a4e0ed4f69c617adeaac786c03c9d48c3ade72ae31ebd8af6",
+      "bytes": 1187
     }
   ],
   "additionalRawRecovery": {
@@ -7171,6 +7223,51 @@
         ".github/scripts/pr356-acceptance.json": "35b21cd9fb5e847b6c390516215eb0628dbfcfcc19939d7f69f61af44ea76877",
         ".github/scripts/pr356-admission.test.mjs": "172605e059165ae6089fdc34ff99babd872c72904f578a831317bea6ffe7aad2"
       },
+      "qualificationClaim": false
+    },
+    {
+      "id": "ci014-codeql-budget-and-independent-ruleset-fact",
+      "records": [
+        {
+          "kind": "targeted-static-or-attributed-independent-review-not-CI",
+          "pointer": "/followupAttachments/306",
+          "rawBase64Pointer": "/followupAttachments/306/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static-check.py",
+          "sha256": "4eede877bbf09e5bbdeb44b7f325b20d5f0e06643851707430dae3318f6d90f8",
+          "bytes": 1668
+        },
+        {
+          "kind": "targeted-static-or-attributed-independent-review-not-CI",
+          "pointer": "/followupAttachments/307",
+          "rawBase64Pointer": "/followupAttachments/307/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static.log",
+          "sha256": "c0b54ed2c39c10d5d9eeadd5e212f7a7d8699194b5f979595da6534148689487",
+          "bytes": 657
+        },
+        {
+          "kind": "targeted-static-or-attributed-independent-review-not-CI",
+          "pointer": "/followupAttachments/308",
+          "rawBase64Pointer": "/followupAttachments/308/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-budget-static.execution.json",
+          "sha256": "c0e9ce251f4a29438e57c68f1ce81d71e04c4a45e4d0986ce34bd0b96ae87334",
+          "bytes": 783
+        },
+        {
+          "kind": "targeted-static-or-attributed-independent-review-not-CI",
+          "pointer": "/followupAttachments/309",
+          "rawBase64Pointer": "/followupAttachments/309/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/dot-ruleset-review-20261026T1314Z.json",
+          "sha256": "9278e48a821cce0a4e0ed4f69c617adeaac786c03c9d48c3ade72ae31ebd8af6",
+          "bytes": 1187
+        }
+      ],
+      "actualChange": "Only two PR356 CodeQL timeout values20→30; main30 confirmed; all steps/languages/security-extended/other job values unchanged",
+      "actualCheck": "Only targeted actual-YAML static check exit0; prior green controls not re-executed",
+      "rulesetObservation": "Root dot independently read23665026 at2026-10-26 13:14UTC; attribution/raw-availability boundary retained",
+      "rulesetUnresolvedBlocker": false,
+      "traditionalBranchProtection": "earlier403/not read/not retried",
+      "phaseReadyHistoryAndSarifPolicy": "all pending",
+      "applicationCodeqlOrCIExecuted": false,
       "qualificationClaim": false
     }
   ]

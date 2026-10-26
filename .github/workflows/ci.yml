@@ -4177,7 +4177,7 @@ jobs:
     needs: scope
     if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
       actions: read
@@ -4289,7 +4289,7 @@ jobs:
     needs: scope
     if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     permissions:
       contents: read
       actions: read

@@ -29,7 +29,7 @@
 
 PR 保持 Open/Draft，未合并；本轮尚未激活 GitHub Actions，累计正式 CI 失败轮次仍为 0。所有本地红轮、filtered、continuation、verify-only、缺失原件继续保留。验收目标始终为 `PR356-merge-qualification`，换 SHA 或改称“限定验证”不重置失败累计。
 
-root 读取 `branches/main/protection` 被 integration 以 HTTP403 `Resource not accessible by integration` 拒绝，状态 **denied**。没有重试绕过或新增身份。现有代码/先前实读记录为 required `merge gate / ready PR`、strict up-to-date；当前远端保护状态须由具有现成读取能力的 dot 独立核对，本节点不冒称已重新验证。
+root 读取 `branches/main/protection` 被 integration 以 HTTP403 `Resource not accessible by integration` 拒绝，状态 **denied**。没有重试绕过或新增身份。该传统endpoint的denied边界保留。根dot已在2026-10-26 13:14UTC用现有只读连接独立读rulesets列表和23665026：仅该active规则作用默认分支，strict=true，required为`merge gate / ready PR`、integration_id15368，无bypass actors且current_user_can_bypass=never。未改变保护；ruleset核对不再是未解决阻碍。本节点没有把该外部实读伪装成本地API receipt，也没有重试传统branch-protection端点。
 
 
 ### 本次已推送的产品身份
@@ -378,14 +378,14 @@ actionlint修订后退出0。先前本地context/alias错误和解释器连字�
 放行后唯一隔离位置的NOTRUN项，不用控制stub替代。
 
 当前上限须据实际YAML核算：共用source job 8分钟、各image 25、audit 5、scan 15、
-CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏览器12、
+CodeQL两语言各30、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏览器12、
 产品浏览器15、Q汇总10、admit预检/required gate各8。拆分后的DB关键依赖链
 最坏预算为source→upgrade→restore→vertical→Q，即78分钟，不再沿用旧48分钟
 或单个DB作业20分钟的总链承诺；这不是已测耗时。最终激活前应独审这个真实
 预算和队列/下载等待，5分钟仅为定位等待项阈值。没有为预算去运行应用或压测。
 
 当前阻碍：phase/历史精确接纳及SARIF既有
-标准待dot核定；保护读取403仍由有现成能力的dot核对。精确非空CONTENT指导语
+标准待dot核定；ruleset核对已由根dot13:14UTC独立完成，传统保护endpoint未读边界仍保留。精确非空CONTENT指导语
 没有已批准的浏览器seed，不虚构科学批准。NFC10/HOLD、原Training范围和
 356-01仍按原表开放；普通ACK已走安全事务callback，旧atomic性能/SQL基线不再
 代表当前候选，只保留计划内单次cold/hot与SQL归因，不追加并发压测或新MOT。
@@ -464,3 +464,36 @@ phase本身的全部caseIds/要求/状态及其他12个历史组均未改。9项
 转移原表/原命令退出/日志后当前393条可移交记录。全16 ready、13 history approved、
 SARIF policy仍pending，最终选择和激活必须交dot独审。共享控制变化导致多个phase
 inputsSHA256变化的边界仍成立，不承诺任意跨commit复用。
+
+
+### CI-014预算对齐与已完成的ruleset核对
+
+按根dot对Notion CI-014的独审：曾有20分钟CodeQL在87/89查询超时，批准调至30后
+完整成功。现仅把两个PR356 CodeQL job由20调30，和本地实读main正式codeql30一致。
+实际YAML定向静态检查退出0：仅这两项timeout变化，两个语言、security-extended、
+全部步骤/结果保留以及所有其他job值完全不变。没有重跑既有控制或实际CodeQL。
+DB关键链上限仍78分钟，没有把所有等待预算扩大。
+
+根dot2026-10-26 13:14UTC经现有只读连接实读公开rulesets列表及23665026：仅该active
+规则作用默认分支，strict_required_status_checks_policy=true；required context为
+merge gate / ready PR、integration_id15368；bypass actors为空，current_user_can_bypass=never。
+这是根dot提供的独立实读事实，原API字节未传本节点，不能冒充本节点API执行原件。
+保护未改；ruleset不是待解决权限阻碍。传统branch-protection endpoint在本节点未读，
+此前403及不重试边界仍保留，不由此重新要求ruleset核对。
+
+最终只剩dot决定的资格项：
+1. 根据既有逐case矩阵决定13历史组的精确合法接纳/必要缺项；affected-review的404
+   强制历史来源与9项fresh-only映射需审定。connected旧8例的raw/log/migration/Prisma
+   缺失仍须恢复原件或只选必要未覆盖case，不默认九套/全平台重跑。
+2. 审定16phase执行和实际预算及各目标唯一位置：升级/恢复、vertical4、worker1、
+   新四库ordinary、exact lazy消费者、同产物产品网页等仍NOTRUN。保留原内容/HOLD、
+   完整Training/获准P-R、356-01范围，不用限定CI自动替代；exact非空CONTENT所需
+   已批准来源/seed仍须决定。
+3. 在qualification前固定既有SARIF适用处置政策；真实两语言分析后对实际findings按
+   精确原件作处置，随后才可同HEAD admission。每次CI/Ready/rerun须独审最终完整
+   HEAD/tree/base与计划；当前所有ready/approved/policy仍pending，未激活。
+
+既有材料指针：`.github/scripts/pr356-acceptance.json`的phases/evidence/
+freshPhaseCoverageTransfers；本页§3及附录A逐case输入/缺证矩阵；原件包portableRawIndex
+与各rawBase64Pointer；B源、CodeQL实际YAML及对应直接控制均已有Git版本和原命令/退出。
+本轮新增预算checker/退出/日志和外部规则实读归属记录后，共397条，旧393条保留。
