@@ -4,7 +4,9 @@ import { MOT_COLORS, MOT_IDENTITY, motCalibrationMatches, motConfig, motGeometry
 import { MotCalibration } from './MotCalibration'
 import { readMotDisplay } from './display'
 import { MotCapture, type MotStage } from './capture'
-import { MotDraftError, type MotDraftPort, type MotDraftRecord } from './draft'
+import { motDraftKey, MotDraftError, type MotDraftPort, type MotDraftRecord } from './draft'
+import { claimMotRecovery, prepareMotRecovery, retainMotRecovery, saveMotRecoveryLocally, releaseMotRecovery, detachMotRecovery,
+  readMotRetainedRecord, freezeMotDraftPort, type MotRecoverySlot, type MotRecordPhase } from './context-retention'
 import { createMotSaveGate } from './save-gate'
 import './mot.css'
 
@@ -16,15 +18,28 @@ export interface MotTaskProps {
   /** Platform uploads raw frames to private COS and verifies its version before the final core is submitted. */
   prepareFinalArchive: (records:{formal:readonly MotDraftRecord[];practice:readonly MotDraftRecord[]})=>Promise<void>
 }
-export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTrialComplete,prepareFinalArchive}:MotTaskProps){
+export function MotTask(props:MotTaskProps){
+  const {config,randomSeed,draft,language='zh'}=props
   if(config.profile!=='research'&&config.profile!=='experience')throw new Error('Unknown MOT profile')
   const expected=motConfig(config.profile)
   if(Object.keys(config).length!==Object.keys(expected).length||Object.entries(expected).some(([key,v])=>config[key as keyof MotConfig]!==v))
     throw new Error('Unsupported frozen MOT config')
   if(draft.binding.protocolKey!==`mot/${MOT_IDENTITY.engineVersion}/${MOT_IDENTITY.scoringVersion}`||draft.binding.randomSeed!==randomSeed)
     throw new Error('MOT draft does not match the frozen execution identity')
+  const key=motDraftKey(draft.binding)+'|'+JSON.stringify(expected)+'|'+language
+  return <MotTaskGeneration key={key} {...props}/>
+}
+/** Same identity rerenders keep initial ports/callbacks. A genuine context or language switch destroys the old generation. */
+function MotTaskGeneration(incoming:MotTaskProps){
+  const [initial]=useState(()=>({config:structuredClone(incoming.config),randomSeed:incoming.randomSeed,language:incoming.language??'zh',
+    draft:freezeMotDraftPort(incoming.draft),onTrialComplete:incoming.onTrialComplete,prepareFinalArchive:incoming.prepareFinalArchive}))
+  const {config,randomSeed,language,draft,onTrialComplete,prepareFinalArchive}=initial
+  const trialIndex=incoming.trialIndex
+  const owner=useRef<object>({}),active=useRef(true),slot=useRef<MotRecoverySlot|null>(null)
+  const capturePhase=useRef<MotRecordPhase>('practice')
+  const [initialRecovery]=useState(()=>readMotRetainedRecord(draft.binding))
   const en=language==='en'
-  const [view,setView]=useState<'intro'|'calibration'|'ready'|'running'|'practice-feedback'|'break'|'saving'|'error'>('intro')
+  const [view,setView]=useState<'intro'|'calibration'|'ready'|'running'|'practice-feedback'|'break'|'saving'|'error'|'recovery'>(initialRecovery?'recovery':'intro')
   const [calibration,setCalibration]=useState<Calibration|null>(null)
   const [practice,setPractice]=useState(0),[formal,setFormal]=useState(false)
   const [stage,setStage]=useState<MotStage>('fixation'),[selected,setSelected]=useState<number[]>([])
@@ -34,40 +49,74 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
   const saveGate=useRef(createMotSaveGate())
   const retry=useRef<(()=>Promise<void>)|null>(null)
   const startRef=useRef<()=>Promise<void>>(async()=>{})
-  const trialCallback=useRef(onTrialComplete);trialCallback.current=onTrialComplete
-  const archiveCallback=useRef(prepareFinalArchive);archiveCallback.current=prepareFinalArchive
+  const ownedSlot=()=>slot.current??(slot.current=claimMotRecovery(draft.binding,owner.current))
+  useEffect(()=>{
+    active.current=true
+    return()=>{
+      active.current=false;retry.current=null
+      const current=capture.current
+      if(current&&current.stage!=='complete'){
+        current.interrupt('runner_restart',performance.now())
+        const retained=ownedSlot()
+        retainMotRecovery(retained,capturePhase.current,current.record())
+      }
+      if(slot.current){
+        // Also covers finish -> retained complete record -> cleanup before the saveGate microtask.
+        // Only the frozen original port may write; the shared promise prevents duplicate practice appends.
+        if(slot.current.record&&!slot.current.localSaved)void saveMotRecoveryLocally(slot.current,draft).catch(()=>undefined)
+        detachMotRecovery(slot.current,owner.current)
+      }
+    }
+  },[])
 
   function persist(record:MotDraftRecord):Promise<void>{
     const snapshot=structuredClone(record)
+    retainMotRecovery(ownedSlot(),'formal',snapshot)
     return saveGate.current.run('formal:'+snapshot.core.trialIndex,()=>persistFormal(snapshot))
   }
   async function persistFormal(record:MotDraftRecord){
+    if(!active.current)return
     setView('saving')
     try{
-      await draft.append(record)
-      if(record.core.trialIndex===config.totalTrials-1)await archiveCallback.current({formal:await draft.records(),practice:await draft.practices()})
-      const accepted=await trialCallback.current(structuredClone(record.core))
+      const retained=ownedSlot()
+      await saveMotRecoveryLocally(retained,draft)
+      if(!active.current)return
+      if(record.core.trialIndex===config.totalTrials-1){
+        const formalRecords=await draft.records();if(!active.current)return
+        const practiceRecords=await draft.practices();if(!active.current)return
+        await prepareFinalArchive({formal:formalRecords,practice:practiceRecords});if(!active.current)return
+      }
+      const accepted=await onTrialComplete(structuredClone(record.core))
+      if(!active.current)return
       if(accepted===false)throw new Error('Core persistence has not been confirmed')
+      releaseMotRecovery(retained);slot.current=null
       retry.current=null
       if(record.core.trialIndex===config.totalTrials-1){setView('saving');return}
       const boundary=(record.core.trialIndex+1)%(config.repetitionsPerSpeedPerBlock*3)===0
       setView(boundary?'break':'ready')
     }catch{
+      if(!active.current)return
       retry.current=()=>persist(record);setError(en?'Saving is not confirmed. Your local record is retained; retry saving without repeating the trial.':'保存尚未确认。本机记录已保留，请重试保存，无需重复作答。');setView('error')
     }
   }
   function persistPractice(record:MotDraftRecord):Promise<void>{
     const snapshot=structuredClone(record)
-    return saveGate.current.run('practice:'+practice,async()=>{
+    retainMotRecovery(ownedSlot(),'practice',snapshot)
+    return saveGate.current.run('practice:'+snapshot.core.trialIndex,async()=>{
+      if(!active.current)return
       setView('saving')
       try{
-        await draft.appendPractice(snapshot)
+        const retained=ownedSlot()
+        await saveMotRecoveryLocally(retained,draft)
+        if(!active.current)return
+        releaseMotRecovery(retained);slot.current=null
         retry.current=null
         const complete=snapshot.core.recordOrigin==='live'&&!snapshot.core.timedOut&&!snapshot.core.interruptions.length
           &&snapshot.core.responseStartedAtPerfMs!==null&&snapshot.core.responses.length===config.targetCount
         setPracticeHits(complete?snapshot.core.responses.filter(r=>snapshot.core.targetIds.includes(r.objectId)).length:null)
         setView('practice-feedback')
       }catch{
+        if(!active.current)return
         retry.current=()=>persistPractice(snapshot)
         setError(en?'The practice record has not been saved. Keep this page open and retry saving; you do not need to repeat the practice.':'练习记录尚未保存。请保留当前页面并重试保存，无需重复练习。')
         setView('error')
@@ -76,18 +125,20 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
   }
   const finishRef=useRef<(value:MotCapture)=>void>(()=>{})
   finishRef.current=value=>{
-    if(working.current)return
+    if(!active.current||working.current)return
     working.current=true
     const save=formal?persist(value.record()):persistPractice(value.record())
-    void save.finally(()=>{working.current=false})
+    void save.finally(()=>{if(active.current)working.current=false})
   }
   startRef.current=async()=>{
-    if(!calibration||working.current)return
+    if(!active.current||!calibration||working.current)return
     working.current=true
     try{
+      const retained=ownedSlot()
+      if(retained.record){setView('recovery');return}
       const display=readMotDisplay(language,calibration.referenceCssPx,calibration.viewingDistanceMm)
       if(!motCalibrationMatches(calibration,display)){setView('calibration');return}
-      const pending=await draft.pending()
+      const pending=await prepareMotRecovery(retained,()=>draft.pending());if(!active.current)return
       if(pending){
         if(pending.trialIndex!==trialIndex)throw new MotDraftError('SEQUENCE','Pending MOT exposure differs from current progress')
         const recovered=new MotCapture(config,motTrialPlan(config,randomSeed,pending.trialIndex),pending.calibration,performance.now())
@@ -96,26 +147,29 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
         working.current=false;await persist(recovered.record());return
       }
       if(formal){
-        const existing=(await draft.records()).find(r=>r.core.trialIndex===trialIndex)
+        const records=await prepareMotRecovery(retained,()=>draft.records());if(!active.current)return
+        const existing=records.find(r=>r.core.trialIndex===trialIndex)
         if(existing){working.current=false;await persist(existing);return}
-        await draft.begin({trialIndex,calibration})
+        await prepareMotRecovery(retained,()=>draft.begin({trialIndex,calibration}));if(!active.current)return
       }
       const value=new MotCapture(config,motTrialPlan(config,randomSeed,formal?trialIndex:practice,!formal),calibration,performance.now())
+      capturePhase.current=formal?'formal':'practice'
       capture.current=value;setStage('fixation');setSelected([]);setView('running')
     }catch(error){
+      if(!active.current)return
       const recoveryConflict=error instanceof MotDraftError&&(error.code==='CONFLICT'||error.code==='SEQUENCE')
       setError(recoveryConflict?(en?'The local records do not match this attempt’s progress. Keep this page open and contact the publisher to recover the record.':'本机记录与本次作答进度不一致。请保留当前页面，联系发布者恢复记录。'):
         en?'Local saving is unavailable. The trial has not started. Please enable storage and try again.':'本机保存暂不可用，任务尚未开始。请允许存储后重试。')
       setView('error')
     }
-    finally{working.current=false}
+    finally{if(active.current)working.current=false}
   }
   useEffect(()=>{
     if(view!=='running')return
     let frame=0,alive=true
     const value=capture.current!
     const paint=(now:number)=>{
-      if(!alive)return
+      if(!alive||!active.current)return
       const previous=value.stage,next=value.tick(now)
       if(previous!==next)setStage(next)
       for(const object of value.plan.objects){
@@ -126,7 +180,7 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
       frame=requestAnimationFrame(paint)
     }
     const interrupt=(reason:MotTrial['interruptions'][number])=>{
-      if(value.stage==='complete')return
+      if(!active.current||value.stage==='complete')return
       value.interrupt(reason,performance.now());finishRef.current(value)
     }
     const visibility=()=>{if(document.hidden)interrupt('visibility_lost')}
@@ -143,7 +197,7 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
   },[view,language])
   const choose=(point:{x:number;y:number},input:'touch'|'pointer'|'keyboard',keyboardId?:number)=>{
     const value=capture.current
-    if(!value||working.current)return
+    if(!active.current||!value||working.current)return
     value.select(point,input,performance.now(),keyboardId)
     setSelected(value.trial.responses.map(r=>r.objectId))
     if(value.stage==='complete')finishRef.current(value)
@@ -152,6 +206,20 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
   const field=calibration?motGeometry(calibration,window.innerWidth-28,window.innerHeight-242).fieldCssPx:0
   const value=capture.current
   return <div className="mot-task" data-cognitive-task-root="true" data-mot-stage={view==='running'?stage:view}>
+    {view==='recovery'&&<section className="mot-intro"><h1>{en?'A previous record needs saving':'有一份原记录等待保存'}</h1>
+      <p>{en?'The original record is retained in this page. Keep the page open and retry saving it without repeating the trial. Memory cannot protect it if browser storage fails and this page is closed or refreshed.':'原记录保留在当前页面中。请保持页面打开并重试保存，无需重复作答。如浏览器存储失败，关闭或刷新页面可能丢失尚未保存的记录。'}</p>
+      <button className="mot-button" onClick={()=>{
+        if(!active.current||working.current)return
+        let retained:MotRecoverySlot
+        try{retained=ownedSlot()}catch{setError(en?'This attempt already has an active page. Keep its record and return to that page.':'本次作答已有活动页面，请保留记录并返回原页面。');setView('error');return}
+        const record=retained.record
+        if(!record)return
+        if(retained.phase==='formal'&&record.core.trialIndex!==trialIndex){setError(en?'The retained record belongs to different progress. Contact the publisher to recover it.':'保留记录与当前进度不同，请联系发布者恢复。');setView('error');return}
+        setCalibration(structuredClone(record.core.calibration));setFormal(retained.phase==='formal');setPractice(record.core.trialIndex)
+        working.current=true
+        const save=retained.phase==='formal'?persist(record):persistPractice(record)
+        void save.finally(()=>{if(active.current)working.current=false})
+      }}>{en?'Retry saving original record':'重试保存原记录'}</button></section>}
     {view==='intro'&&<section className="mot-intro"><h1>{en?'Follow the five targets':'跟住这5个目标'}</h1>
       <p>{en?'Ten circles appear. Remember the five red circles. When they all turn dark and move, keep track of those five. After they stop, select the five original targets.':'画面会出现10个圆点。记住其中5个红色圆点；全部变成深色并移动后，请继续追踪这5个目标。停止后，选出最初的5个目标。'}</p>
       <p>{en?'Tap or click each circle once. Selections cannot be undone; the fifth selection ends the trial. Overlapping circles require a clear, unambiguous point.':'点击或轻触圆点，每个只能选一次，不能撤销；选满5个后本轮自动结束。重叠圆点需点到可以明确区分的位置。'}</p>
@@ -203,6 +271,7 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
         {practice===0?(en?'Next practice':'再练习一次'):(en?'Start formal trials':'进入正式作答')}</button>
       {practice===1&&<button className="mot-button mot-button-secondary" onClick={()=>{setPractice(0);ready()}}>{en?'Repeat practice':'重新练习'}</button>}</>}</section>}
     {view==='saving'&&<section className="mot-intro" role="status"><p>{en?'Saving your record…':'正在保存记录…'}</p></section>}
-    {view==='error'&&<section className="mot-intro"><p role="alert">{error}</p><button className="mot-button" onClick={()=>{if(retry.current)void retry.current();else ready()}}>{en?'Retry':'重试'}</button></section>}
+    {view==='error'&&<section className="mot-intro"><p role="alert">{error}</p>
+      {slot.current?.record&&<p>{en?'Keep this page open. If browser storage fails, memory cannot protect an unsaved record across refresh or closing.':'请保持页面打开。如浏览器存储失败，尚未保存的记录不能仅靠内存在刷新或关闭后保留。'}</p>}<button className="mot-button" onClick={()=>{if(retry.current)void retry.current();else ready()}}>{en?'Retry':'重试'}</button></section>}
   </div>
 }

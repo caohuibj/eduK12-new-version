@@ -6,9 +6,9 @@ import {MotTask} from './MotTask'
 import {motConfig,motTrialPlan} from './generated/protocol'
 import {motDraftKey,type MotDraftPort,type MotDraftRecord} from './draft'
 const config=motConfig('experience'),seed='mot-practice-product-policy'
-let clock=0,paint:FrameRequestCallback
+let testAttempt=0,clock=0,paint:FrameRequestCallback
 const records:MotDraftRecord[]=[]
-const makePort=():MotDraftPort=>({binding:{sessionId:'synthetic-practice',attemptNo:1,protocolKey:'mot/1.1.1/1.1.0',resolvedConfigHash:'synthetic-only',randomSeed:seed},pending:vi.fn(async()=>null),begin:vi.fn(async()=>{}),append:vi.fn(async()=>{}),
+const makePort=():MotDraftPort=>({binding:{sessionId:'synthetic-practice-'+testAttempt,attemptNo:1,protocolKey:'mot/1.1.1/1.1.0',resolvedConfigHash:'synthetic-only',randomSeed:seed},pending:vi.fn(async()=>null),begin:vi.fn(async()=>{}),append:vi.fn(async()=>{}),
  records:vi.fn(async()=>[]),practices:vi.fn(async()=>records),appendPractice:vi.fn(async r=>{records.push(structuredClone(r))})})
 async function setup(){const port=makePort();render(<MotTask config={config} randomSeed={seed} trialIndex={0} draft={port}
  onTrialComplete={vi.fn(async()=>true)} prepareFinalArchive={vi.fn(async()=>{})}/>);
@@ -17,7 +17,7 @@ async function setup(){const port=makePort();render(<MotTask config={config} ran
 async function start(){fireEvent.click(screen.getByRole('button',{name:/^开始$/}));await waitFor(()=>expect(document.querySelector('[data-mot-stage="fixation"]')).not.toBeNull())}
 function toResponse(){const base=clock;for(const offset of[500,1500,9500,10000])act(()=>{clock=base+offset;paint(clock)})}
 function choose(ids:number[]){const board=document.querySelector('.mot-board')!;for(const id of ids){(document.querySelector(`[data-mot-id="${id}"]`) as HTMLElement).focus();fireEvent.keyDown(board,{key:'Enter'})}}
-beforeEach(()=>{records.length=0;clock=0;vi.spyOn(performance,'now').mockImplementation(()=>clock);
+beforeEach(()=>{testAttempt++;records.length=0;clock=0;vi.spyOn(performance,'now').mockImplementation(()=>clock);
  vi.stubGlobal('requestAnimationFrame',vi.fn((cb:FrameRequestCallback)=>{paint=cb;return 1}));vi.stubGlobal('cancelAnimationFrame',vi.fn())})
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 it('keeps interrupted practice as an interrupted record and cannot advance to formal',async()=>{
