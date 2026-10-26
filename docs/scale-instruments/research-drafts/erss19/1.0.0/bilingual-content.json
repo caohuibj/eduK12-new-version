@@ -1,0 +1,210 @@
+{
+  "identity": {
+    "instrumentKey": "erss19_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "authorSource": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2019.01486/full",
+  "sourcePosition": "原作者2019论文Method / Measures / Emotion Regulation Strategies，按四类策略逐项完整列出19题；补充文件仅为领导情境与评分示例，不是另一个题本",
+  "sourceLocale": "en",
+  "platformLocale": "zh-CN",
+  "questions": [
+    {
+      "number": 1,
+      "itemCode": "ERSS_01",
+      "authorEnglish": "When I want to feel more positive emotion, I can change aspects of the situation in order to do that,",
+      "platformChinese": "当我想体验更多积极情绪时，我能改变情境中的某些方面来做到这一点。",
+      "dimension": "situation_modification",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "ERSS_02",
+      "authorEnglish": "I can change the emotional nature of a situation by injecting humor into the situation,",
+      "platformChinese": "我能通过在情境中加入幽默，改变它带来的情绪。",
+      "dimension": "situation_modification",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "ERSS_03",
+      "authorEnglish": "I manage my emotions by changing aspects of the situation",
+      "platformChinese": "我会通过改变情境中的某些方面来调节自己的情绪。",
+      "dimension": "situation_modification",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "ERSS_04",
+      "authorEnglish": "I am able to distract myself from strong emotions,",
+      "platformChinese": "我能够把注意力从强烈的情绪上转移开。",
+      "dimension": "attentional_deployment",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "itemCode": "ERSS_05",
+      "authorEnglish": "When I am in an emotional situation, I manage my emotions by focusing on non-emotional aspects of the situation,",
+      "platformChinese": "处在带有情绪的情境中时，我会把注意力放在其中不涉及情绪的方面，来调节自己的情绪。",
+      "dimension": "attentional_deployment",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "ERSS_06",
+      "authorEnglish": "It is hard for me to stop thinking about the emotions I am feelings",
+      "platformChinese": "我很难停止想着自己正在感受到的情绪。",
+      "dimension": "attentional_deployment",
+      "reverse": true
+    },
+    {
+      "number": 7,
+      "itemCode": "ERSS_07",
+      "authorEnglish": "When experiencing negative emotions, I am unable to think about anything but that emotion",
+      "platformChinese": "体验消极情绪时，除了那种情绪，我无法想到别的事情。",
+      "dimension": "attentional_deployment",
+      "reverse": true
+    },
+    {
+      "number": 8,
+      "itemCode": "ERSS_08",
+      "authorEnglish": "When I want to feel more positive emotions, I can change my perspective on the situation,",
+      "platformChinese": "当我想体验更多积极情绪时，我能换个角度看待情境。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "itemCode": "ERSS_09",
+      "authorEnglish": "When I want to feel less negative emotions, I can change my perspective on the situation,",
+      "platformChinese": "当我想少体验一些消极情绪时，我能换个角度看待情境。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "itemCode": "ERSS_10",
+      "authorEnglish": "I can control my negative emotions by changing the way I think about the situation,",
+      "platformChinese": "我能通过改变对情境的看法来控制自己的消极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "ERSS_11",
+      "authorEnglish": "I can control my positive emotions by changing the way I think about the situation,",
+      "platformChinese": "我能通过改变对情境的看法来控制自己的积极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "ERSS_12",
+      "authorEnglish": "I manage my emotions by changing my perspective on the situation I am in,",
+      "platformChinese": "我会通过改变看待所处情境的角度来调节自己的情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "ERSS_13",
+      "authorEnglish": "I can increase my feelings of positive emotions by thinking about different aspects of the situation,",
+      "platformChinese": "我能通过思考情境中的不同方面，增加自己的积极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "ERSS_14",
+      "authorEnglish": "I can decrease my feelings of negative emotions by thinking about different aspects of the situation",
+      "platformChinese": "我能通过思考情境中的不同方面，减少自己的消极情绪。",
+      "dimension": "cognitive_reappraisal",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "ERSS_15",
+      "authorEnglish": "I generally try not to show my negative emotions,",
+      "platformChinese": "我通常会尽量不表现出自己的消极情绪。",
+      "dimension": "suppression",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "ERSS_16",
+      "authorEnglish": "I keep my emotions to myself,",
+      "platformChinese": "我把自己的情绪留在心里。",
+      "dimension": "suppression",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "itemCode": "ERSS_17",
+      "authorEnglish": "I manage my emotions by not expressing them,",
+      "platformChinese": "我会通过不表达情绪来调节自己的情绪。",
+      "dimension": "suppression",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "itemCode": "ERSS_18",
+      "authorEnglish": "I do not express my negative emotions,",
+      "platformChinese": "我不表达自己的消极情绪。",
+      "dimension": "suppression",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "itemCode": "ERSS_19",
+      "authorEnglish": "I generally try not to show my positive emotions",
+      "platformChinese": "我通常会尽量不表现出自己的积极情绪。",
+      "dimension": "suppression",
+      "reverse": false
+    }
+  ],
+  "sourceOptions": [
+    "Strongly disagree",
+    null,
+    null,
+    null,
+    null,
+    null,
+    "Strongly agree"
+  ],
+  "platformOptions": [
+    {
+      "value": "1",
+      "label": "非常不同意",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "2",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "3",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "4",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "5",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "label": "6",
+      "score": 6
+    },
+    {
+      "value": "7",
+      "label": "非常同意",
+      "score": 7
+    }
+  ]
+}

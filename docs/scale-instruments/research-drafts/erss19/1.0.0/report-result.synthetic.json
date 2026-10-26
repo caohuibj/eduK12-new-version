@@ -1,0 +1,374 @@
+{
+  "kind": "ACTUAL_BUILD_SCALE_RESULT_SYNTHETIC_EXAMPLE",
+  "sourceSha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e",
+  "measurementHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+  "fixture": "mixed_independent",
+  "result": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "synthetic-batch-erss19_zh_cn_research",
+      "code": "erss19_zh_cn_research",
+      "name": "情绪调节策略问卷（Torrence–Connelly 19题，中文工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "synthetic-batch-erss19_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "ERSS_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "ERSS_02",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "ERSS_03",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "ERSS_04",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "ERSS_05",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "ERSS_06",
+        "responseValue": "6",
+        "baseScore": 6,
+        "score": 2
+      },
+      {
+        "itemCode": "ERSS_07",
+        "responseValue": "7",
+        "baseScore": 7,
+        "score": 1
+      },
+      {
+        "itemCode": "ERSS_08",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "ERSS_09",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "ERSS_10",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "ERSS_11",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "ERSS_12",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "ERSS_13",
+        "responseValue": "6",
+        "baseScore": 6,
+        "score": 6
+      },
+      {
+        "itemCode": "ERSS_14",
+        "responseValue": "7",
+        "baseScore": 7,
+        "score": 7
+      },
+      {
+        "itemCode": "ERSS_15",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "ERSS_16",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "ERSS_17",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "ERSS_18",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "ERSS_19",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      }
+    ],
+    "scores": [
+      {
+        "key": "situation_modification",
+        "type": "dimension",
+        "label": "调整眼前的处境",
+        "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 2,
+        "range": {
+          "min": 1,
+          "max": 7
+        },
+        "expectedItems": [
+          "ERSS_01",
+          "ERSS_02",
+          "ERSS_03"
+        ],
+        "answeredItems": [
+          "ERSS_01",
+          "ERSS_02",
+          "ERSS_03"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "attentional_deployment",
+        "type": "dimension",
+        "label": "让注意力换个落点",
+        "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 3,
+        "range": {
+          "min": 1,
+          "max": 7
+        },
+        "expectedItems": [
+          "ERSS_04",
+          "ERSS_05",
+          "ERSS_06",
+          "ERSS_07"
+        ],
+        "answeredItems": [
+          "ERSS_04",
+          "ERSS_05",
+          "ERSS_06",
+          "ERSS_07"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "cognitive_reappraisal",
+        "type": "dimension",
+        "label": "换个角度想一想",
+        "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 4,
+        "range": {
+          "min": 1,
+          "max": 7
+        },
+        "expectedItems": [
+          "ERSS_08",
+          "ERSS_09",
+          "ERSS_10",
+          "ERSS_11",
+          "ERSS_12",
+          "ERSS_13",
+          "ERSS_14"
+        ],
+        "answeredItems": [
+          "ERSS_08",
+          "ERSS_09",
+          "ERSS_10",
+          "ERSS_11",
+          "ERSS_12",
+          "ERSS_13",
+          "ERSS_14"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "suppression",
+        "type": "dimension",
+        "label": "把情绪先留在心里",
+        "description": "本维等权均分1–7，更多表示该类做法自报更符合，不是好坏等级或胜任力评价。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 3,
+        "range": {
+          "min": 1,
+          "max": 7
+        },
+        "expectedItems": [
+          "ERSS_15",
+          "ERSS_16",
+          "ERSS_17",
+          "ERSS_18",
+          "ERSS_19"
+        ],
+        "answeredItems": [
+          "ERSS_15",
+          "ERSS_16",
+          "ERSS_17",
+          "ERSS_18",
+          "ERSS_19"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "situation_modification",
+        "headline": "调整眼前的处境",
+        "label": null,
+        "interpretation": "情绪不舒服时，有时能先动一动眼前的处境：换个沟通方式、调整安排，或在合适的时候缓和气氛。这部分关注你是否会想到这种做法，不是说所有问题都能由你改变。很多限制来自工作、关系或环境，也需要别人一起参与。可以回想一次让自己紧绷的情境，分清哪些是暂时改不了的，哪些还有一点余地。先选择一个可行的小调整，比要求自己立刻开心更实际。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一个让你情绪起伏的情境里，什么还有一点可以调整的余地？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个自己确实能调整的小环节，试一次，再看看实际效果。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "attentional_deployment",
+        "headline": "让注意力换个落点",
+        "label": null,
+        "interpretation": "强烈情绪出现时，注意力有时会被牢牢拉住，也有时能先转向别的线索。这部分关注你平时怎样安放注意力，不是在要求逃避问题或假装没有情绪。暂时把目光移开，和以后再回来处理，可以同时存在。你可以观察什么时候换个落点让自己更有余地，什么时候反而把重要事情拖住。方法是否合适，要结合当时的任务和自己的感受，而不只是看用得多不多。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "什么时候转移注意力给了你缓冲，什么时候让事情一直悬着？"
+          },
+          {
+            "category": "strategy",
+            "text": "先做一个能暂时安顿自己的小动作，并约定什么时候回来处理重要的事。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "cognitive_reappraisal",
+        "headline": "换个角度想一想",
+        "label": null,
+        "interpretation": "同一件事，换个角度理解，感受有时也会跟着变化。这部分关注你会不会尝试重新看待情境，不是要把坏事硬想成好事，也不是否认已经受到的影响。比如，先区分“我知道的事实”和“我猜测的意思”，可能让事情更清楚。可以挑一件负担较小的日常烦恼，试着找出另一个同样说得通的解释。是否有帮助，仍要看现实有没有支持这种理解。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "对最近的一件小烦恼，你知道哪些事实，又猜测了哪些意思？"
+          },
+          {
+            "category": "strategy",
+            "text": "写下一个同样有现实依据的其他解释，不强迫自己接受它。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "suppression",
+        "headline": "把情绪先留在心里",
+        "label": null,
+        "interpretation": "有些场合，我们会先把情绪放在心里，没有马上表现出来。这样做可能是为了保护关系、争取时间，或因为当时不方便表达。这部分关注这种做法有多符合你，并不意味着表达越多越好，也不意味着少表达就是做错了。你可以留意，暂时不说之后，自己有没有找到合适的地方整理感受。需要时，可以选择一个安全的时机，向愿意倾听的人说一点，而不是一次交代所有事情。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "当你把感受留在心里时，之后通常怎样照顾这些感受？"
+          },
+          {
+            "category": "strategy",
+            "text": "找一个安全、合适的时机，向信任的人表达一点真实感受。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+          "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+          "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+          "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+          "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+      "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+      "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+      "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+      "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。"
+  }
+}

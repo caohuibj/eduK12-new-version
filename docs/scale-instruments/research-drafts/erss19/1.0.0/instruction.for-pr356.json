@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "identity": {
+    "instrumentKey": "erss19_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "instructionVersion": "1.0.0",
+    "title": "作答说明",
+    "text": "请根据平时的情况，选择你对下面每句话的同意程度。1表示非常不同意，7表示非常同意，2至6是两端之间的选项。没有对错，请按自己的实际情况选择。",
+    "locale": "zh-CN"
+  },
+  "note": "Prepared content only; adapt to actual PR356 instruction contract before integration. Not part of old-schema executable source."
+}
