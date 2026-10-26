@@ -3,7 +3,7 @@ import {UserRole} from '@prisma/client'
 const mocks=vi.hoisted(()=>{
  process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);process.env.DATA_PSEUDONYM_KEY='b'.repeat(64)
  const db={compositeAssessment:{findUnique:vi.fn(),update:vi.fn()},compositeAssessmentAttempt:{findFirst:vi.fn(),create:vi.fn(),update:vi.fn()},
-  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn(),findMany:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$transaction:vi.fn()}
+  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn(),findMany:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$queryRawUnsafe:vi.fn(),$transaction:vi.fn()}
  return {db,publication:vi.fn(),binding:vi.fn(),freezeScale:vi.fn(),persistScale:vi.fn(),persistSlots:vi.fn(),retain:vi.fn(),recheckPublication:vi.fn(),recheckBinding:vi.fn()}
 })
 vi.mock('../../config/database',()=>({prisma:mocks.db}))
@@ -47,7 +47,7 @@ describe('actual composite service measurement-binding call chain (mock DB and r
   const prepared=await prepareCompositePublication('teacher',UserRole.TEACHER,'composite',mocks.db as never,new Map())
   expect(prepared).toMatchObject({trainingContentSnapshot:snapshot,trainingContentSnapshotHash:snapshotHash})
   expect(mocks.recheckPublication).toHaveBeenCalledTimes(1)
-  expect(mocks.publication).toHaveBeenCalledExactlyOnceWith(mocks.db,fixture(),new Map())
+  expect(mocks.publication).toHaveBeenCalledExactlyOnceWith(mocks.db,fixture(),new Map(),'NEW_ADMINISTRATION','PREVIEW')
   expect(mocks.db.materialGrant.findUnique).not.toHaveBeenCalled()
  })
  it('passes the locked publication and actual sources through createAttempt and persists the exact attempt-bound hash',async()=>{

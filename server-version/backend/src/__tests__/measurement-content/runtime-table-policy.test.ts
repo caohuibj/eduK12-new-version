@@ -45,6 +45,17 @@ function connectedCatalogShape(extra: Record<string, unknown>[] = []) {
 }
 
 describe('measurement-version exact runtime table policy source contract', () => {
+  it('classifies Training participation raw-SQL tables and retains their immutable guards',()=>{
+    const sql=migrations.find(entry=>entry.name==='20261024080000_training_participation_codes')!.sql
+    for(const name of ['anonymous_study_codes','anonymous_study_participation_events']){
+      expect(runtimeTablePolicy.tables[name]).toBe('RUNTIME_RW')
+      expect(sql).toContain('CREATE TABLE '+name+' (')
+    }
+    expect(sql).toContain('CREATE TRIGGER training_participation_code_guard BEFORE INSERT OR UPDATE OR DELETE ON anonymous_study_codes')
+    expect(sql).toContain('CREATE TRIGGER training_participation_events_immutable BEFORE UPDATE OR DELETE ON anonymous_study_participation_events')
+    expect(currentFunctionBody('training_participation_code_guard')).toContain("TG_OP='DELETE' THEN RAISE EXCEPTION")
+    expect(currentFunctionBody('training_participation_events_immutable')).toContain("RAISE EXCEPTION 'Participation audit events are immutable'")
+  })
   it('classifies only named migrated measurement tables as the existing writable category', () => {
     expect(runtimeTablePolicy.schemaVersion).toBe(1)
     for (const [name, migration] of tables) {

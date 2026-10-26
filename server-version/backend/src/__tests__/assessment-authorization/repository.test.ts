@@ -71,3 +71,27 @@ describe('authorization repository mapping', () => {
     expect(proto.some((name) => /delete|destroy|remove/i.test(name))).toBe(false)
   })
 })
+
+describe('retired ledger writes', () => {
+  it.each(['createDraft', 'approve', 'amend', 'revoke', 'attachEvidence'] as const)(
+    '%s rejects before any database or asset access', async (method) => {
+      const db = new Proxy({}, { get() { throw new Error('Unexpected database access') } })
+      const repository = new PrismaAuthorizationRepository(db as never)
+      await expect(repository[method]({} as never)).rejects.toMatchObject({ code: 'AUTHORIZATION_RECORDS_RETIRED' })
+    },
+  )
+})
+
+describe('retired license API compatibility', () => {
+  it('returns explicit 410 for every former endpoint without starting an HTTP server', async () => {
+    const { instrumentAuthorizationController } = await import('../../controllers/instrumentAuthorizationController')
+    for (const handler of Object.values(instrumentAuthorizationController)) {
+      let status: number | undefined
+      let body: unknown
+      const response = { status(code: number) { status = code; return response }, json(value: unknown) { body = value; return response } }
+      handler({} as never, response as never)
+      expect(status).toBe(410)
+      expect(body).toMatchObject({ code: 'AUTHORIZATION_RECORDS_RETIRED' })
+    }
+  })
+})

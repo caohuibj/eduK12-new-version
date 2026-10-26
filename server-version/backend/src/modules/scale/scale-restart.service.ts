@@ -1,10 +1,11 @@
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
+import { assertScaleNewEntryAllowed } from './scale-collection-guard'
 import { requiredScaleContextKeys } from './policy/context-preflight'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
 import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
+import { resolveFrozenScaleInstructionForScale } from './onboarding/instrument-registry'
 import { canStudentAccessScale, canStartLibraryCourseScale } from './scale-access'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import { loadStoredScaleAdmission, standaloneAdmissionPersistenceForRuntime } from './scale-admission.service'
@@ -70,7 +71,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     if (current.userId !== userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此量表测评', 403)
-    await assertTrainingScaleCollectionAllowed(tx, [current.scaleId])
+    await assertScaleNewEntryAllowed(tx, [current.scaleId], userId)
     if (current.questionnaireAssessmentId || current.compositeAttemptId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '嵌入式量表必须重启所属问卷或综合测评', 409)
     }
@@ -89,6 +90,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
       instrumentVersion: current.scale.instrumentVersion,
       definition,
       frozenAt,
+      instruction: resolveFrozenScaleInstructionForScale(current.scale),
     })
     const supplied = contextInput ?? priorAdmission?.contextValues
     const keys = runtimeSnapshot.schemaVersion === 2 ? requiredScaleContextKeys(runtimeSnapshot.compiledPolicy.applicability) : []

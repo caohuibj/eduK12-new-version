@@ -20,7 +20,7 @@ describe('FINAL route inventory', () => {
       copyFileSync(fileURLToPath(new URL('../fixtures/final-route-checker.fixture.mjs', import.meta.url)), checker)
       copyFileSync(fileURLToPath(new URL('../fixtures/final-route-inventory.fixture.csv', import.meta.url)), join(root, 'docs/performance-optimization-v1/route-inventory.csv'))
       const output = execFileSync(process.execPath, [checker], { encoding: 'utf8' })
-      expect(output).toContain('21 registered templates matched')
+      expect(output).toContain('22 registered templates matched')
     } finally { rmSync(root, { recursive: true, force: true }) }
   })
 })

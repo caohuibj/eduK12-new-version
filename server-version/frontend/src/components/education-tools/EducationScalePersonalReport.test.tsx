@@ -1,10 +1,12 @@
 import {act,cleanup,render,screen,waitFor} from '@testing-library/react'
-import {afterEach,describe,expect,it,vi} from 'vitest'
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {EducationScalePersonalReport,type EducationReportApi,type EducationScalePersonalReportData} from './EducationScalePersonalReport'
 import type {SafeScaleUnitReport} from '../../modules/reporting/ScaleUnitReportCard'
 const unit:SafeScaleUnitReport={itemId:'unit',type:'SCALE',kind:'scale',scaleName:'受控量表',scaleCode:'private',caveats:[],disclaimer:'仅描述性反馈',completedAt:null,totalTime:0,rawScoreFeedback:[{scoreKey:'total',rangeKey:'range',text:'私有分数解释',images:[{asset:{assetId:'asset/a',contentHash:'hash',mimeType:'image/png'},altText:'报告图',order:0}]}]}
 const ready:EducationScalePersonalReportData={schemaVersion:1,kind:'EDUCATION_SCALE_PERSONAL_REPORT',state:'READY',mode:'INDIVIDUAL_SUMMARY',unitReports:[unit]}
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(yes=>{resolve=yes});return {promise,resolve}}
+// jsdom does not decode Blob URLs; actual decode refusal is covered by the hook and browser contracts.
+beforeEach(()=>vi.stubGlobal('Image',class {src='';decode=()=>Promise.resolve()}))
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('education personal report projection boundary',()=>{
  it.each([{schemaVersion:2},{kind:'UNKNOWN_REPORT'},{state:'WITHHELD'},{mode:'GROUP_SUMMARY'}])('fails closed despite injected unitReports when headers mismatch (%j)',override=>{

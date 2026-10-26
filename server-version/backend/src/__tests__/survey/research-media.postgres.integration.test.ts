@@ -44,11 +44,11 @@ suite('Survey authorized project-scoped image references — PostgreSQL',()=>{
     }})
   })
   afterAll(async()=>{await db?.$disconnect()})
-  it('authorizes only image identities owned by the correct research project',async()=>{
+  it("reuses private images across the same owner's projects and rejects foreign owners and changed hashes",async()=>{
     const rows=await db.$transaction(tx=>assertSurveyMediaOwned(tx,owner,pid,[source(assetId)]))
     expect(rows).toEqual([{assetId,contentHash:hash,mimeType:'image/png'}])
     await expect(db.$transaction(tx=>assertSurveyMediaOwned(tx,owner,otherPid,[source(assetId)])))
-      .rejects.toBeInstanceOf(SurveyMediaError)
+      .resolves.toEqual(rows)
     const forged=source(assetId)
     forged.definition.pages[0].questions[0].image.asset.contentHash='c'.repeat(64)
     await expect(db.$transaction(tx=>assertSurveyMediaOwned(tx,owner,pid,[forged])))

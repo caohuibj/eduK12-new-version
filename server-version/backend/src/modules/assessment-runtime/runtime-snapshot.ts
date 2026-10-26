@@ -13,6 +13,8 @@ import {
   createFrozenScaleRuntimeSnapshotV2FromV1,
   parseFrozenScaleRuntimeSnapshotV2,
   type FrozenScaleRuntimeSnapshotV2,
+  frozenScaleInstructionSchema,
+  type FrozenScaleInstruction,
 } from './runtime-snapshot-v2'
 import { z } from 'zod'
 
@@ -28,6 +30,7 @@ export interface FrozenScaleRuntimeSnapshotV1 {
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
   measurementPresentation?: FrozenScalePresentation
+  instruction?: FrozenScaleInstruction | null
   snapshotHash: string
 }
 
@@ -45,6 +48,7 @@ const unsignedSnapshot = (input: Omit<FrozenScaleRuntimeSnapshotV1, 'snapshotHas
   referenceBindings: input.referenceBindings,
   definition: input.definition,
   ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
+  ...(input.instruction !== undefined ? { instruction: input.instruction } : {}),
 })
 
 const referenceBindingSchema = z.object({
@@ -58,6 +62,7 @@ const referenceBindingSchema = z.object({
 
 const frozenScaleRuntimeSnapshotSchema = z.object({
   measurementPresentation: frozenScalePresentationSchema.optional(),
+  instruction: frozenScaleInstructionSchema.nullable().optional(),
   schemaVersion: z.literal(1),
   runtimeGeneration: z.literal('UNIFIED_V1'),
   frozenAt: z.string().datetime({ offset: true }),
@@ -166,6 +171,7 @@ const buildFrozenScaleRuntimeSnapshot = (input: {
   compiledRuntime: CompiledInstrumentRuntimeV1
   referenceBindings: ReferenceBindingSnapshot[]
   frozenAt?: Date
+  instruction?: FrozenScaleInstruction | null
 }): FrozenScaleRuntimeSnapshotV1 => {
   const frozenAt = input.frozenAt ?? new Date()
   if (Number.isNaN(frozenAt.getTime())) throw new Error('Invalid frozen Scale runtime snapshot frozenAt')
@@ -180,6 +186,7 @@ const buildFrozenScaleRuntimeSnapshot = (input: {
     compiledRuntime: input.compiledRuntime,
     referenceBindings: input.referenceBindings,
     definition: input.definition,
+    instruction: input.instruction ?? null,
   })
   return { ...unsigned, snapshotHash: canonicalHashObjectParts(unsigned) }
 }
@@ -190,6 +197,7 @@ export const createFrozenScaleRuntimeSnapshot = (input: {
   definition: ScaleDefinitionV2
   referenceBindings?: ReferenceBindingSnapshot[]
   frozenAt?: Date
+  instruction?: FrozenScaleInstruction | null
 }): FrozenScaleRuntimeSnapshotV1 => {
   const { definition, compiledRuntime } = prepareScale(input)
   return buildFrozenScaleRuntimeSnapshot({
@@ -199,6 +207,7 @@ export const createFrozenScaleRuntimeSnapshot = (input: {
     compiledRuntime,
     referenceBindings: input.referenceBindings ?? [],
     frozenAt: input.frozenAt,
+    instruction: input.instruction,
   })
 }
 
@@ -210,6 +219,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     definition: ScaleDefinitionV2
     frozenAt?: Date
     requestedMode?: import('../scale/policy/deployment').ScaleDeploymentModeV1
+    instruction?: FrozenScaleInstruction | null
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
   assertAssessmentStartResources()
@@ -235,6 +245,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     compiledRuntime,
     referenceBindings,
     frozenAt: input.frozenAt,
+    instruction: input.instruction,
   })
 
   // Production Prisma clients expose Scale. Lightweight unit doubles used by
@@ -323,6 +334,7 @@ export const parseFrozenScaleRuntimeSnapshot = (value: unknown): FrozenScaleRunt
     compiledRuntime,
     referenceBindings: snapshot.referenceBindings,
     measurementPresentation: snapshot.measurementPresentation,
+    instruction: (snapshot as FrozenScaleRuntimeSnapshotV1).instruction,
     definition,
   })
   if (canonicalHashObjectParts(unsigned) !== snapshot.snapshotHash) throw new Error('Frozen Scale runtime snapshot hash mismatch')

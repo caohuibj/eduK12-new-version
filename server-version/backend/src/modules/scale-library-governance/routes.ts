@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {readUnifiedCatalog,readUnifiedStandardCatalogEntry,readUnifiedAuthoredCatalogEntry} from './unified-catalog'
 import {libraryMediaRouter} from './media.routes'
 import {Router,type Request,type Response,type NextFunction} from 'express'
@@ -7,6 +8,7 @@ import {authenticate,authenticateSurvey} from '../../middleware/auth'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 import {success,error} from '../../utils/response'
 import {platformSurveyOriginGuard} from '../survey/originGuard'
+import {requireRecentAdminKey} from '../admin-permissions/guards'
 import {AdminPermissionError} from '../admin-permissions/service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -31,7 +33,7 @@ function router(product:'TRAINING'|'SURVEY'){
  if(product==='TRAINING')result.use(platformSurveyOriginGuard)
  result.use(limiter,(_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
  result.use(libraryMediaRouter(product))
- result.get('/catalog',handle(req=>readUnifiedCatalog(req.user!.userId,product,z.object({page:z.coerce.number().int().min(1).max(Math.floor(Number.MAX_SAFE_INTEGER/100)).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(25)}).parse(req.query))))
+ result.get('/catalog',handle(req=>readUnifiedCatalog(req.user!.userId,product,z.object({page:z.coerce.number().int().min(1).max(Math.floor(Number.MAX_SAFE_INTEGER/100)).default(1),pageSize:z.coerce.number().int().min(1).max(100).default(25),...catalogDiscoveryQueryFields,origin:z.enum(['ALL','STANDARD_REGISTRY','AUTHORED']).default('ALL')}).parse(req.query))))
  result.get('/catalog/standard/:instrumentKey/:instrumentVersion',handle(req=>readUnifiedStandardCatalogEntry(req.user!.userId,product,z.string().min(1).max(200).parse(req.params.instrumentKey),z.string().min(1).max(100).parse(req.params.instrumentVersion))))
  result.get('/catalog/authored/:id',handle(req=>readUnifiedAuthoredCatalogEntry(req.user!.userId,product,uuid.parse(req.params.id))))
  result.get('/capabilities',handle(req=>service.readCapabilities(req.user!.userId)))
@@ -44,6 +46,7 @@ function router(product:'TRAINING'|'SURVEY'){
  result.get('/entries',handle(req=>service.listEntries(req.user!.userId)))
  if(product==='TRAINING'){
   result.post('/submissions/:id/review',handle(req=>service.review(req.user!.userId,uuid.parse(req.params.id),req.body)))
+  result.post('/entries/:id/entrypoints',requireRecentAdminKey,handle(req=>service.changeEntryProducts(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.post('/entries/:id/status',handle(req=>service.changeEntryStatus(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.get('/entries/:id/recipients',handle(req=>recipients(req.user!.userId,uuid.parse(req.params.id),req.query)))
   result.get('/entries/:id/grants',handle(req=>listUses(req.user!.userId,uuid.parse(req.params.id))))

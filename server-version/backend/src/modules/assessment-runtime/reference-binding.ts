@@ -4,6 +4,7 @@ import {
 } from '../assessment-reference/reference'
 import { canonicalHash } from './canonical'
 import type { ReferenceBindingSnapshot } from './types'
+import type {Prisma} from '@prisma/client'
 
 type ExactReferenceRow = {
   instrumentType: 'SCALE' | 'COGNITIVE'
@@ -21,7 +22,7 @@ type SingleExactReferenceDb = {
 
 export type ExactReferenceDb = {
   assessmentReferenceSet: {
-    findMany: (args: unknown) => Promise<ExactReferenceRow[]>
+    findMany: (args: {where:Prisma.AssessmentReferenceSetWhereInput}) => Promise<ExactReferenceRow[]>
   }
 }
 

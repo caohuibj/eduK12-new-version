@@ -1,10 +1,13 @@
+import {frozenScaleInstructionSchema,type FrozenScaleInstruction} from '../assessment-runtime/frozen-scale-instruction'
 import {canonicalHash} from '../assessment-runtime/canonical'
+import {standardAxisHashes,standardCombinationHash,compileStandardCombinationReport} from '../measurement-content/standard-combination'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
+import {snapshotScaleInstrumentSource} from '../scale/onboarding/source-snapshot'
 import {validateScaleDefinition,hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {getScaleCustomScorerKeys} from '../scale/scale-scoring'
 import {validateReferenceSetDefinition,type AssessmentReferenceSetDefinition} from '../assessment-reference/reference'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
-import {reportTemplateSchema,type ReportTemplate} from '../measurement-content/report-template'
+import type {ReportTemplate} from '../measurement-content/report-template'
 import {toolReference,type ToolReference} from './tool-reference'
 import type {CatalogSourceSnapshot} from './catalog.sources'
 export type Axis='CONTENT'|'PARAMETERS'|'REPORT'
@@ -15,7 +18,7 @@ export function sourceParts(toolKey:string,version:string):Part[]{
  const source=getScaleInstrumentSource(toolKey,version)
  if(!source?.executable)return []
  const {report,referencePolicy,source:provenance,license,...content}=source.executable.definition
- const reference=toolReference('SCALE',toolKey,{...source,executable:{...source.executable,scorerPlugins:(source.executable.scorerPlugins??[]).map(p=>({key:p.key,version:p.version}))},originalProvenance:provenance,originalLicense:license})
+ const reference=toolReference('SCALE',toolKey,{...snapshotScaleInstrumentSource({...source,executable:{...source.executable,scorerPlugins:source.executable.scorerPlugins??[]}}),originalProvenance:provenance,originalLicense:license})
  const make=(axis:Axis,label:string,payload:unknown):Part=>({axis,version:label,hash:canonicalHash(payload),payload:json(payload),sourceVersion:version,reference})
  return [make('CONTENT',version+':'+content.scoring.scoringVersion,content),make('PARAMETERS',source.executable.references.map(r=>r.referenceVersion).sort().join('+')||'none-v1',{referencePolicy,references:source.executable.references}),make('REPORT',report.reportVersion,report)]
 }
@@ -55,21 +58,24 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
   const report=definition.report.interpretations.find(r=>r.scoreKey===choice.scoreKey)
   if(entry?.statistics.thresholds?.some(t=>!report?.bands.some(b=>b.key===t.key)))blockers.push('报告区间与参数阈值编码不匹配：'+choice.scoreKey)
  }
- const blocks:ReportTemplate['blocks']=[]
- if(parts.REPORT.payload!==null)for(const key of definition.report.scoreOrder){
-  const score=definition.scoring.scores.find(s=>s.key===key),text=definition.report.interpretations.find(r=>r.scoreKey===key)
-  if(!score||!text){blockers.push('报告缺少指标或解释：'+key);continue}
-  blocks.push({type:'METRIC',metricKey:key,label:score.label,display:'RAW'},{type:'TEXT',text:text.headline+'\n'+text.summary})
-  for(const guidance of text.guidance)blocks.push({type:'TEXT',text:guidance.text})
-  const selected=parameters.referencePolicy.type==='declared'?parameters.referencePolicy.selections.filter(s=>s.scoreKey===key):[]
-  for(const band of text.bands)for(const selection of selected)blocks.push({type:'REFERENCE_BAND',metricKey:key,referenceKind:selection.referenceKind,bandKey:band.key,text:band.label+'\n'+band.summary,guidance:band.guidance.map(g=>g.text)})
- }
- const template=parts.REPORT.payload===null?null:reportTemplateSchema.parse({title:source.catalog.identity.canonicalName,blocks,limitations:definition.report.limitations,disclaimer:definition.report.disclaimer})
+ const {template,blockers:reportBlockers}=compileStandardCombinationReport(source.catalog.identity.canonicalName,definition,parts.REPORT.payload!==null)
+ blockers.push(...reportBlockers)
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
- return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:canonicalHash({toolKey:key,CONTENT:parts.CONTENT.hash,PARAMETERS:parts.PARAMETERS.hash,REPORT:parts.REPORT.hash}),blockers:[...new Set(blockers)],reference}
+ return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
+}
+/** The approved CONTENT source already contains its versioned instruction.
+ * Resolve from that immutable record; registry/default changes are not inputs. */
+export function frozenTripletInstruction(triplet:Triplet):FrozenScaleInstruction|null{
+ const reference=triplet.parts.CONTENT.reference
+ if(canonicalHash(reference.metadata)!==reference.metadataHash)throw new Error('STANDARD_CONTENT_REFERENCE_HASH_MISMATCH')
+ const instruction=reference.metadata.instruction
+ if(instruction===undefined)return null
+ if(!instruction||typeof instruction!=='object')throw new Error('STANDARD_INSTRUCTION_SOURCE_INVALID')
+ const value=instruction as Record<string,unknown>
+ return frozenScaleInstructionSchema.parse({text:value.text,language:value.language,version:value.version,origin:'INSTRUMENT_SOURCE'})
 }
 export function tripletSnapshot(triplet:Triplet,releaseId:string,measurement?:{releaseId:string;contentHash:string}):CatalogSourceSnapshot{
- const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE')
- return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
- provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:{CONTENT:triplet.parts.CONTENT.hash,PARAMETERS:triplet.parts.PARAMETERS.hash,REPORT:triplet.parts.REPORT.hash},toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
+ const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE'),instruction=frozenTripletInstruction(triplet)
+ return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,...(instruction?{instruction:instruction.text}:{}),displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
+ provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:standardAxisHashes(triplet.parts),toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
 }

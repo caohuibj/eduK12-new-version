@@ -7,7 +7,7 @@ vi.mock('../../modules/situational/static-measurement-release',async original=>(
 import {prepareAdminStaticSjtMapping,publishAdminStaticSjtMeasurement} from '../../modules/situational/static-measurement-admin.service'
 const mappingId='11111111-1111-4111-8111-111111111111',grantId='22222222-2222-4222-8222-222222222222'
 const identity={instrumentKey:'sjt-assertiveness-golden',instrumentVersion:'1.0.0'},proof={tokenVersion:1,adminSessionId:'session',adminVerifiedAt:123}
-const input={mappingId,grantId,deployment:{locale:'zh-CN',territory:'CN',grantee:'Synthetic test',commercialNature:'NON_COMMERCIAL'}}
+const input={mappingId,grantId,deployment:{locale:'zh-CN',territory:'CN'}}
 const tx={},users=[{id:'actor'}]
 beforeEach(()=>{
  vi.clearAllMocks();mocks.transaction.mockImplementation(async fn=>fn(tx));mocks.actor.mockResolvedValue({users});mocks.recheck.mockResolvedValue(undefined);mocks.authority.mockResolvedValue({grantId,version:1})

@@ -1,3 +1,6 @@
+import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
+import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
+import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
@@ -33,19 +36,17 @@ export type CatalogSourceRef={kind:SurveyKind;sourceId:string;sourceVersion:stri
 export type SourceAnswerMapping={type:'SCALE_TYPED_V1';items:Record<string,string>;options:Record<string,string|number>}
 export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefinition:unknown;compiledDefinition:unknown;
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;nativeSituational?:SurveyNativeSituationalHeader;
+  /** Administration instruction of the exact source version; display metadata outside the definition digest. */
+  instruction?:string;
   adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION|typeof NATIVE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
-export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string}
+export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string;classificationTags?:CatalogClassificationTag[]}
 const CATALOG_MAX_PAGE=40
-export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
+export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null;tagFacets?:ReturnType<typeof discoveryFacets>}
 export class CatalogSourceError extends Error {
   constructor(public readonly code:string,public readonly statusCode=409){super(code);this.name='CatalogSourceError'}
 }
 const fail=(code:string):never=>{throw new CatalogSourceError(code)}
 const copy=<T>(value:T):T=>JSON.parse(JSON.stringify(value))
-function rights(value:{status:string;redistribution:string}|undefined){
-  if(!value||!['verified','authorized','self_authored'].includes(value.status)||value.redistribution!=='allowed')
-    fail('SOURCE_RIGHTS_DO_NOT_ALLOW_SURVEY_REDISTRIBUTION')
-}
 function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unknown,compiled:unknown,
   scoringDigest:string|null,provenance:Record<string,unknown>,answerMapping?:SourceAnswerMapping):CatalogSourceSnapshot {
   return copy({ref,title,displayDefinition:assertSurveyDraft(ref.kind,display,true),compiledDefinition:compiled,
@@ -54,8 +55,7 @@ function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unk
 }
 /** Only presentation identifiers are translated. The canonical score definition is copied byte-for-byte. */
 export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2,
-  options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'}={}):CatalogSourceSnapshot {
-  rights(definition.license)
+  options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';instruction?:string}={}):CatalogSourceSnapshot {
   const valid=validateScaleDefinition(definition,{instrumentClass:options.instrumentClass??'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
   // The canonical Training publisher also rejects randomization: never silently flatten it.
@@ -66,13 +66,13 @@ export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:S
   return copy({ref,title,displayDefinition:display,compiledDefinition:definition,
     definitionDigest:canonicalHash(definition),scoringDigest:canonicalHash(definition.scoring),
     adapterVersion:CANONICAL_SCALE_ADAPTER_VERSION,answerMapping:mapping,
+    ...(options.instruction?{instruction:options.instruction}:{}),
     provenance:{source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true}})
 }
 /** Historical V1 grants keep their exact original presentation, including
  * ALL_AT_ONCE. This adapter is only used to verify an existing immutable grant;
  * new grants always receive the canonical consumption protocol above. */
 function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2):CatalogSourceSnapshot {
-  rights(definition.license)
   const valid=validateScaleDefinition(definition,{instrumentClass:'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
   if(definition.display?.randomizeItems||definition.items.some(i=>i.type!=='single'||!i.required||i.images?.length||i.video||i.randomizeOptions))
@@ -94,13 +94,31 @@ function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:Sc
   return snapshot(ref,title,definition,display,definition,canonicalHash(definition.scoring),
     {source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true},answerMapping)
 }
+/** Read-only compatibility for the historical raw-channel adapter that mislabeled
+ * unknown copyright metadata. Never use this projection for a new grant/write. */
+function preserveHistoricalSjtLicenseProjection(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  const now=current.displayDefinition as {licenseStatus?:string},old=stored.displayDefinition as {licenseStatus?:string}
+  const definition=stored.compiledDefinition as {license?:{status?:string}}
+  if(stored.ref.kind==='SJT'&&stored.adapterVersion===CATALOG_ADAPTER_VERSION&&current.adapterVersion===CATALOG_ADAPTER_VERSION
+    &&definition.license?.status==='unknown'&&now.licenseStatus==='unknown'&&old.licenseStatus==='authorized')
+    return {...current,displayDefinition:{...now,licenseStatus:'authorized'}}
+  return current
+}
 export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  if(Object.prototype.hasOwnProperty.call(stored.provenance,'sourceRights')&&!Object.prototype.hasOwnProperty.call(stored.provenance,'sourceDeploymentIdentity')){
+    const legacy=stored.provenance.sourceRights as Record<string,unknown>|null
+    const identity=current.provenance.sourceDeploymentIdentity as Record<string,unknown>|null
+    if(legacy&&identity&&['runtimePolicyHash','deploymentPolicyHash','deploymentRevision'].some(key=>legacy[key]!==identity[key]))fail('SOURCE_SNAPSHOT_CHANGED')
+    const {sourceDeploymentIdentity: _identity,...provenance}=current.provenance
+    current={...current,provenance:{...provenance,sourceRights:stored.provenance.sourceRights}}
+  }
   if(stored.ref.kind==='SJT'&&stored.adapterVersion===CATALOG_ADAPTER_VERSION&&current.adapterVersion===ONLINE_SJT_ADAPTER_VERSION){
     // A previously admitted raw-channel projection keeps its original digest.
     // New online grants must not rewrite that immutable presentation on recheck.
-    return adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
-      String(current.provenance.definitionHash))
+    return preserveHistoricalSjtLicenseProjection(adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
+      String(current.provenance.definitionHash)),stored)
   }
+  current=preserveHistoricalSjtLicenseProjection(current,stored)
   if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION||isGovernedSource(stored.ref.sourceId))return current
   const legacy=adaptLegacyCatalogScale(current.ref,current.title,current.compiledDefinition as ScaleDefinitionV2)
   return {...current,...legacy,provenance:{...current.provenance,...legacy.provenance}}
@@ -108,7 +126,6 @@ export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:Ca
 /** Exact authorized scoring plane. Online sources retain their validated shared
  * presentation; legacy sources keep the original narrow raw-channel adapter. */
 export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationPackage):CatalogSourceSnapshot {
-  rights(pkg.definition.license)
   if(pkg.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
   const validation=validateSituationPackage(pkg)
   if(!validation.valid)fail('SOURCE_SJT_INVALID')
@@ -166,7 +183,7 @@ function adaptLegacyCatalogSjt(ref:CatalogSourceRef,title:string,d:SituationDefi
   if(visited.size!==nodes.size||scenes.length!==d.scenes.length||new Set(scenes.map(s=>s.sceneKey)).size!==scenes.length)fail('SOURCE_SJT_FLOW_UNSUPPORTED')
   const seen=new Set<string>()
   const display={schemaVersion:2,respondentType:d.respondentType,title,author:d.source.citation||d.source.title||title,
-    sourceNote:d.source.citation||d.source.title||title,licenseStatus:d.license.status==='self_authored'?'self_authored':'authorized',
+    sourceNote:d.source.citation||d.source.title||title,licenseStatus:d.license.status==='unknown'?'unknown':d.license.status==='self_authored'?'self_authored':'authorized',
     redistribution:d.license.redistribution,orderPolicy:'FIXED',metrics:d.scoring.publishedMetrics.map(m=>({metricKey:m.key,label:m.label,direction:'descriptive'})),
     scoring:{modelKey:model.modelKey,modelVersion:'1',sourceNote:d.source.citation||title},
     scenes:scenes.map(s=>({sceneKey:s.sceneKey,title:s.title,stimulus:s.stimulus.text,questions:s.channels.map(c=>{
@@ -238,8 +255,8 @@ export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:Cat
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
   const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!isGovernedSource(r.sourceId)&&!(kind==='SCALE'&&isSurveyStandardSource(r.sourceId))&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
-  // Source advisory locks must precede Scale row locks. A queued license writer
-  // would otherwise invert the explicit converter's source -> Scale order.
+  // Source advisory locks must precede Scale row locks, preserving the explicit
+  // converter's source -> Scale order while identities are verified.
   const scaleIds=ids('SCALE')
   const before=scaleIds.length?await db.$queryRaw<Array<{id:string;code:string;instrument_version:string;instrument_class:string}>>(Prisma.sql`SELECT id,code,instrument_version,instrument_class::text FROM scales WHERE id IN (${Prisma.join(scaleIds)}) ORDER BY id`):[]
   for(const row of [...before].filter(row=>row.instrument_class==='STANDARD').sort((a,b)=>a.code.localeCompare(b.code)||a.instrument_version.localeCompare(b.instrument_version)))
@@ -276,9 +293,9 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     let admitted:Awaited<ReturnType<typeof readPublishedScaleMeasurementSource>>
     try{admitted=await readPublishedScaleMeasurementSource(scaleAuthorityDb as Prisma.TransactionClient,row!,scaleReleases)}
     catch(error){if(error instanceof ContentReleaseError)fail(error.code.replace('CONTENT_SCALE_SOURCE_','SOURCE_SCALE_'));throw error}
-    const result=adaptCatalogScale(ref,row!.name,definition)
+    const result=adaptCatalogScale(ref,row!.name,definition,{instruction:resolveFrozenScaleInstructionForScale(row!)?.text})
     return {...result,provenance:{...result.provenance,code:row!.code,instrumentClass:row!.instrumentClass,
-      sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceRights:admitted.rights}}
+      sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceDeploymentIdentity:admitted.deploymentIdentity}}
   }
   if(ref.kind==='SJT'){
     let pkg:SituationPackage|undefined
@@ -324,58 +341,64 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
   return snapshot(ref,row!.title,definition,definition,definition,null,{organizationId:ref.organizationId,revision:row!.revision,definitionDigest:row!.definitionDigest,createdByUserId:row!.createdByUserId})
 }
 /** Administrative caller owns authorization; omitted kind selects Scale, never a cross-product scan. */
-export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number},db:Database=prisma):Promise<CatalogSourcePage>{
+export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number;query?:string;includeGoverned?:boolean;discovery?:CatalogDiscoveryFilters},db:Database=prisma):Promise<CatalogSourcePage>{
   const kind=input.kind??'SCALE'
   if(kind==='SJT'&&db===prisma)return prisma.$transaction(tx=>listCatalogSources(input,tx))
   const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.max(1,Math.floor(input.page||1))
   if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
   let offset=(page-1)*limit
+  const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%',contains={contains:query,mode:'insensitive' as const}
   const take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
+  const records=catalogDiscoveryRecords(),filters=input.discovery??{},sourceTags=new Map<string,CatalogClassificationTag[]>()
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
-  if(kind!=='SCALE'){
-    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string}>>`SELECT id,title,snapshot_hash FROM survey_governed_tools WHERE family=${kind} AND state='ONLINE' ORDER BY submitted_at,id`
+  if(kind!=='SCALE'&&input.includeGoverned!==false){
+    const governed=await db.$queryRaw<Array<{id:string;title:string;snapshot_hash:string;classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,title,snapshot_hash,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_governed_tools t ${discoveryJoin(records,governedDiscoveryIdentity)} WHERE family=${kind} AND state='ONLINE' AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.title`,Prisma.sql`t.snapshot_hash`],filters)} ORDER BY submitted_at,id`)
+    for(const row of governed)sourceTags.set('survey-tool:'+row.id,row.classification_tags??[])
     for(const row of governed.slice(offset,offset+take))refs.push({ref:{kind,sourceId:'survey-tool:'+row.id,sourceVersion:row.snapshot_hash},title:row.title})
     offset=Math.max(0,offset-governed.length)
   }
   if(kind==='SCALE'){
-    const online=await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string}}>>`SELECT id,combination_hash,snapshot FROM survey_standard_releases WHERE state='ONLINE' ORDER BY tool_key,created_at,id`
+    const online=input.includeGoverned===false?[]:await db.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string};classification_tags?:CatalogClassificationTag[]}>>(Prisma.sql`SELECT id,combination_hash,snapshot,COALESCE(discovery.tags,'[]'::jsonb) AS classification_tags FROM survey_standard_releases t ${discoveryJoin(records,{kind:Prisma.sql`'SCALE'`,key:Prisma.sql`t.tool_key`,version:Prisma.sql`t.snapshot->>'instrumentVersion'`,engine:Prisma.sql`NULL`,scoring:Prisma.sql`NULL`})} WHERE state='ONLINE' AND (${query}='' OR tool_key ILIKE ${pattern} OR snapshot->>'title' ILIKE ${pattern} OR combination_hash ILIKE ${pattern}) AND ${discoverySqlFilter([Prisma.sql`t.tool_key`,Prisma.sql`t.snapshot->>'title'`,Prisma.sql`t.combination_hash`],filters)} ORDER BY tool_key,created_at,id`)
+    for(const row of online)sourceTags.set('survey-standard:'+row.id,row.classification_tags??[])
     for(const r of online.slice(offset,offset+take))refs.push({ref:{kind:'SCALE',sourceId:'survey-standard:'+r.id,sourceVersion:r.combination_hash},title:r.snapshot.title})
-    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
+    const rows=refs.length<take?await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD',...scaleDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{code:contains}]}:{}),...(online.length?{NOT:{code:{in:online.map(r=>(r.snapshot as unknown as {toolKey:string}).toolKey)}}}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-online.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
+    for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='SCALE'&&record.key===row.code&&record.version===row.instrumentVersion)?.tags??[])
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
-    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED').sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
+    const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED'&&matchesCatalogDiscovery([p.key,p.definition.source.title??''],[],filters)&&(!query||(p.key+' '+p.definition.source.title).toLowerCase().includes(query.toLowerCase()))).sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
     for(const pkg of builtins.slice(offset,offset+Math.max(0,take-refs.length)))refs.push({ref:{kind,sourceId:'registry:'+pkg.key,sourceVersion:pkg.instrumentVersion},title:pkg.definition.source.title||pkg.key})
-    const rows=refs.length<take?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
+    const rows=refs.length<take&&!filters.tags?.length?await db.sjtAuthorRelease.findMany({where:{status:'PUBLISHED',AND:filters.keyword?.trim().toLowerCase().split(/\s+/).filter(Boolean).map(term=>({instrumentKey:{contains:term,mode:'insensitive' as const}})),...(query?{instrumentKey:contains}:{})},orderBy:{id:'asc'},skip:Math.max(0,offset-builtins.length),take:take-refs.length}):[]
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.instrumentKey})
     cached={sjtAuthorRelease:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='COGNITIVE'){
-    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=await db.cognitiveTestConfig.findMany({where:{status:'PUBLISHED',...cognitiveDiscoveryWhere(records,filters),...(query?{OR:[{name:contains},{testType:contains}]}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.configVersion},title:row.name})
+    for(const row of rows)sourceTags.set(row.id,records.find(record=>record.kind==='COGNITIVE'&&record.key===row.testType&&record.engine===row.engineVersion&&record.scoring===row.scoringVersion)?.tags??[])
     cached={cognitiveTestConfig:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.configVersion===where.configVersion)??null}} as unknown as Database
   }else if(kind==='FORM'&&!input.organizationId){
-    const rows=await db.questionnaireFormSection.findMany({where:{contextSection:false,items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=filters.tags?.length?[]:await db.questionnaireFormSection.findMany({where:{contextSection:false,AND:filters.keyword?.trim().toLowerCase().split(/\s+/).filter(Boolean).map(term=>({title:{contains:term,mode:'insensitive' as const}})),...(query?{title:contains}:{}),items:{every:{contextKey:null}},questionnaire:{creatorId:input.actorUserId,status:'PUBLISHED'}},include:questionnaireFormInclude,orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:'questionnaire:'+row.id,sourceVersion:questionnaireFormSourceVersion(row)},title:row.title})
     cached={questionnaireFormSection:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.questionnaire.creatorId===where.questionnaire.creatorId)??null}} as unknown as Database
   }else if(kind==='FORM'){
     await formScope(input.actorUserId,input.organizationId,db)
-    const rows=await db.huiteacherFormInstrument.findMany({where:{organizationId:input.organizationId,status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
+    const rows=filters.tags?.length?[]:await db.huiteacherFormInstrument.findMany({where:{AND:filters.keyword?.trim().toLowerCase().split(/\s+/).filter(Boolean).map(term=>({title:{contains:term,mode:'insensitive' as const}})),organizationId:input.organizationId,status:'PUBLISHED',...(query?{title:contains}:{})},orderBy:{id:'asc'},skip:offset,take:Math.max(0,take-refs.length)})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:String(row.revision),organizationId:input.organizationId},title:row.title})
     cached={huiteacherFormInstrument:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.organizationId===where.organizationId&&r.revision===where.revision)??null}} as unknown as Database
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
-    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},cached,true,db,scaleReleases)
-    list.push({...item,available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
+    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},isGovernedSource(item.ref.sourceId)?db:cached,true,db,scaleReleases)
+    list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){
     if(!(e instanceof CatalogSourceError)&&!(e instanceof Error&&e.name==='SurveyDraftError'))throw e
-    list.push({...item,available:false,unsupportedReason:e instanceof CatalogSourceError?e.code:'SOURCE_SURVEY_DISPLAY_SHAPE_UNSUPPORTED'})
+    list.push({...item,...(sourceTags.get(item.ref.sourceId)?.length?{classificationTags:sourceTags.get(item.ref.sourceId)}:{}),available:false,unsupportedReason:e instanceof CatalogSourceError?e.code:'SOURCE_SURVEY_DISPLAY_SHAPE_UNSUPPORTED'})
   }}
   const moreSources=refs.length>limit
   return {list,page,hasMore:moreSources&&page<CATALOG_MAX_PAGE,
-    terminalReason:!moreSources?'END_OF_CATALOG':page===CATALOG_MAX_PAGE?'PAGE_LIMIT_REACHED':null}
+    terminalReason:!moreSources?'END_OF_CATALOG':page===CATALOG_MAX_PAGE?'PAGE_LIMIT_REACHED':null,tagFacets:discoveryFacets(records,kind)}
 }
 
 /** One source-row lock and one bounded source read per family, plus one authority read per distinct Form grantor/organization.
@@ -419,23 +442,12 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   }
 }
 
-/** Current grants/sources were already verified and SHARE-locked by this caller.
- * Only elapsed time can change now. Reuse the verified snapshot after later
- * publication/asset waits instead of rereading/compiling entire packages. */
-export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
-  const managed=[...snapshots].filter(snapshot=>snapshot.ref.kind==='SCALE'&&snapshot.provenance.instrumentClass==='STANDARD'&&!snapshot.provenance.surveyStandardReleaseId)
-  if(!managed.length)return
-  const [clock]=await db.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
-  if(!clock)fail('SOURCE_SCALE_CLOCK_UNAVAILABLE')
-  for(const snapshot of managed){
-    const rights=snapshot.provenance.sourceRights as {validFrom?:string;validTo?:string}|undefined
-    const from=Date.parse(rights?.validFrom??''),to=Date.parse(rights?.validTo??'')
-    if(!Number.isFinite(from)||!Number.isFinite(to)||clock.now.getTime()<from||clock.now.getTime()>=to)fail('SOURCE_SCALE_LICENSE_EXPIRED')
-  }
-}
+/** @deprecated Copyright expiry is no longer a gate. Kept only for old callers.
+ * First source verification already holds transaction-scoped source identity,
+ * Scale/deployment and measurement-release SHARE locks. No mutable license
+ * clock condition remains, so do not repeat identity SQL after later waits. */
+export async function recheckCatalogScaleSourceExpiry(_db:Prisma.TransactionClient,_snapshots:Iterable<CatalogSourceSnapshot>):Promise<void> {}
 
-/** Same-transaction final fence after asset/publication waits. The pinned grant
- * never changes to another grant; frozen participant reads do not call this. */
 export async function recheckCatalogSjtSourceAuthority(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
   const seen=new Set<string>()
   for(const snapshot of snapshots){

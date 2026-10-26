@@ -1,0 +1,361 @@
+{
+  "scope": "PR355 frontend test contract maintenance; next CI requires parent review of exact candidate",
+  "official": {
+    "runId": 40170212567,
+    "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567",
+    "head": "b3760a4b73c1307952279346bc392ed5eaeacdd7",
+    "checkout": "665c3eef0516e6255403139c5dceb9af398fbb9d",
+    "reviewedTree": "40412665e1bddeb5a68ece8cf24c9d63ec26afc0",
+    "result": "failure",
+    "frontend": {
+      "jobId": 121099427478,
+      "failedFiles": 26,
+      "passedFiles": 522,
+      "failedTests": 53,
+      "passedTests": 3630,
+      "skippedTests": 3
+    },
+    "backendRegression": {
+      "jobId": 121099427715,
+      "artifactId": 12590114361,
+      "archiveSha256": "f737a82ffe3a71538dc839108cabed8cd29eea9ecbedd4c481387c4e30b9b563",
+      "passed": 8404,
+      "failed": 0,
+      "skipped": 225,
+      "basePassed": 8401,
+      "isolatedExportPassed": 3
+    }
+  },
+  "outcomes": [
+    {
+      "id": 121099349134,
+      "name": "classify changed content",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099349134",
+      "failedSteps": [
+        "legacy routing contracts only for the legacy route"
+      ]
+    },
+    {
+      "id": 121099427208,
+      "name": "codeql (javascript/typescript SAST)",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427208",
+      "failedSteps": []
+    },
+    {
+      "id": 121099427478,
+      "name": "frontend (lint + types + full tests + build) / frontend checks",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427478",
+      "failedSteps": [
+        "full frontend tests"
+      ]
+    },
+    {
+      "id": 121099427574,
+      "name": "backend (migrate + build + performance gate) / backend (migrate + build + performance gate)",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427574",
+      "failedSteps": [
+        "content routing boundary tests"
+      ]
+    },
+    {
+      "id": 121099427633,
+      "name": "docker (compose config + production builds) / production image build and scan",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427633",
+      "failedSteps": []
+    },
+    {
+      "id": 121099427715,
+      "name": "backend regression (isolated job database) / backend regression (isolated job database)",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427715",
+      "failedSteps": []
+    },
+    {
+      "id": 121099427716,
+      "name": "frontend artifacts / release consumers early / build",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427716",
+      "failedSteps": []
+    },
+    {
+      "id": 121099427798,
+      "name": "frontend artifacts / release consumers early / UI-lab artifact",
+      "conclusion": "success",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121099427798",
+      "failedSteps": []
+    },
+    {
+      "id": 121102919795,
+      "name": "merge gate / ready PR",
+      "conclusion": "failure",
+      "url": "https://github.com/caohuibj/eduK12-new-version/actions/runs/40170212567/job/121102919795",
+      "failedSteps": [
+        "require exact success for the selected route"
+      ]
+    }
+  ],
+  "routingRepair": {
+    "commit": "41c58d17727830d44ae615a914b026da8b1aaf3d",
+    "tree": "fcde1a5bfc4adf0e85cf4201dcca734bfbca2532",
+    "file": ".github/scripts/content-workflows.test.mjs",
+    "cause": "Whole-job prohibition also matched backend-only type dependencies",
+    "preserved": "Frontend npm ci lifecycle scripts and all compilation/full-check gates; exact unconditional backend locked install and Prisma generation only",
+    "directTestsPassed": 140,
+    "failed": 0
+  },
+  "frontendRepair": {
+    "correctedOriginalFailures": 52,
+    "remainingOriginalFailures": 1,
+    "changedTestFiles": 25,
+    "affectedAssertions": 155,
+    "passed": 155,
+    "failed": 0,
+    "skipped": 0,
+    "lastTwoFilesAfterQueryTypeFix": {
+      "passed": 5,
+      "failed": 0
+    },
+    "types": "tsconfig.app.json and tsconfig.cognitive.json exit0; inventory and session gate pretypecheck passed",
+    "lint": "All25 changed files exit0; last two query type corrections lint exit0",
+    "groups": [
+      "Real AuthProvider with STANDARD and exact release review/distribution fixtures; session refusal remains closed",
+      "Real Router, Teacher section navigation and explicit save-and-exit before second task",
+      "Training legacy handoff reaches current course route and embedded list; source ownership/private-data omission unchanged",
+      "Await lazy editors and report controls; frozen controls and write rejection unchanged",
+      "Wait for exact nextId/current-unit parent reload; credential, no-child-restart and expired draft assertions retained",
+      "Local jsdom decode fixtures in transport suites only; real decoder implementation unchanged",
+      "Sharing material loads only after explicit individual preview; revocation/scoped transport unchanged",
+      "Survey membership summary/read-wait fixtures and explicit dirty-discard confirmation",
+      "Current frozen-version DOM and approved Form hint; deduplication and no-private-draft assertions retained"
+    ]
+  },
+  "pending": {
+    "schoolRefresh": {
+      "file": "server-version/frontend/src/components/education-tools/EducationPersonalReportConsumers.test.tsx",
+      "test": "School clears authorized feedback even when refreshing tasks fails",
+      "cause": "SchoolStudentTasks load() does not clear feedback/invalidate prior feedback request",
+      "status": "Additional product repair approval requested; not implemented; original assertion unchanged"
+    },
+    "ci": "No new CI/re-run/dispatch for this candidate; b376 results do not qualify a future head",
+    "unexecuted": "Classification failure and backend routing test stopped downstream selected browser/media/visual/maintenance/performance gates; actual success still required"
+  },
+  "failedCases": [
+    {
+      "test": "FAIL  src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx > real Teacher host and FinalComposite assessment media > routes images and valid video capabilities only through Teacher session and CSRF",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"进入本人自评\""
+    },
+    {
+      "test": "FAIL  src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx > real Teacher host and FinalComposite assessment media > routes images and invalid video capabilities only through Teacher session and CSRF",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"进入本人自评\""
+    },
+    {
+      "test": "FAIL  src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx > real Teacher host and FinalComposite assessment media > does not mount a late old-attempt image after another real task is opened",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"进入本人自评\""
+    },
+    {
+      "test": "FAIL  src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx > uses the real Teacher host and Final form section with CSRF, forwarding the durable sealed FINAL payload only to private-form endpoints",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"打开本人表单\""
+    },
+    {
+      "test": "FAIL  src/school/SchoolCompositeRunner.cognitive.integration.test.tsx > real Huischool CognitiveRunner in a SCHOOL Composite parent (no Cognitive mock) > START → frozen image/video route → REAL trial draft → exactly one FINAL → parent completion",
+      "error": "TestingLibraryElementError: Unable to find role=\"img\" and name \"冻结校园测评说明\""
+    },
+    {
+      "test": "FAIL  src/survey/ResearchCatalog.test.tsx > original source catalog grants > looks up only administrator-owned published Form sections without requesting institution access",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: /仅显示本管理员创建并已发布/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/survey/SurveyQuestionnaireSelection.test.tsx > adds normal questionnaire content in stored order, supports reordering and saves the actual wave selection",
+      "error": "Error: expect(element).toHaveTextContent()"
+    },
+    {
+      "test": "FAIL  src/survey/SurveyWaveStudio.feedback.test.tsx > explicit Wave participant feedback > clears selection when a tool is removed/reselected and when the Wave changes",
+      "error": "TestingLibraryElementError: Unable to find a label with the text of: 启用 量表甲 的原始指标反馈"
+    },
+    {
+      "test": "FAIL  src/components/education-tools/EducationPersonalReportConsumers.test.tsx > School clears authorized feedback even when refreshing tasks fails",
+      "error": "Error: expect(element).not.toBeInTheDocument()"
+    },
+    {
+      "test": "FAIL  src/components/education-tools/EducationPrivateScaleSharing.test.tsx > private-scale application session > loads attachment bytes only on explicit preview, reuses the scoped adapter while metadata changes, and revokes on actor switch",
+      "error": "AssertionError: expected \"vi.fn()\" to be called 1 times, but got 0 times"
+    },
+    {
+      "test": "FAIL  src/components/education-tools/EducationPrivateToolPagination.test.tsx > private tool and frozen version pagination > keeps a newly frozen version and history after page failure, then deduplicates the retried page",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: /^版本 new ·/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/components/education-tools/EducationScalePersonalReport.test.tsx > education personal report projection boundary > uses the execution-scoped Blob API, revokes URLs, and discards late image responses after withdrawal",
+      "error": "TestingLibraryElementError: Unable to find role=\"img\" and name \"报告图\""
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/ScaleEdit.authoring.test.tsx > Training scale authoring additions > orders and duplicates using new identity without changing existing scoring membership",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name \"下移 Q1\""
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/ScaleEdit.authoring.test.tsx > Training scale authoring additions > shares Likert options and persists quality items only outside score selection",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: 更多录入方式与辅助题. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/ScaleEdit.copy-publish.test.tsx > ScaleEdit safe copy, draft editing and publication > copies once, edits the independent hidden draft, saves both parts and publishes without changing the original",
+      "error": "TestingLibraryElementError: Unable to find an element with the placeholder text of: 题目内容"
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/ScaleEdit.readonly.test.tsx > ScaleEdit frozen definition and request ownership > keeps all PUBLISHED CUSTOM_DESCRIPTIVE editing controls and saves disabled",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/^保存/`"
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/ScaleEdit.readonly.test.tsx > ScaleEdit frozen definition and request ownership > keeps all DEPRECATED CUSTOM_DESCRIPTIVE editing controls and saves disabled",
+      "error": "TestingLibraryElementError: Unable to find an accessible element with the role \"button\" and name `/^保存/`"
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/TrainingTaskReuse.test.tsx > reuses assignments into a separate course only after reviewing and saving content",
+      "error": "TestingLibraryElementError: Unable to find role=\"dialog\" and name \"复用练习\""
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/TrainingTaskReuse.test.tsx > reuses checkins into a separate course only after reviewing and saving content",
+      "error": "TestingLibraryElementError: Unable to find role=\"dialog\" and name \"复用打卡\""
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/TrainingTaskReuse.test.tsx > rejects a mismatched assignments source without pre-filling or creating a task",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"使用此内容\""
+    },
+    {
+      "test": "FAIL  src/pages/__tests__/TrainingTaskReuse.test.tsx > rejects a mismatched checkins source without pre-filling or creating a task",
+      "error": "TestingLibraryElementError: Unable to find role=\"button\" and name \"使用此内容\""
+    },
+    {
+      "test": "FAIL  src/pages/admin/EducationProductGovernance.test.tsx > education product governance presentation > keeps HUISCHOOL sensitive verification collapsed without clearing the draft",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: School · 管理员工作台. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/pages/admin/EducationProductGovernance.test.tsx > education product governance presentation > keeps HUITEACHER sensitive verification collapsed without clearing the draft",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Teacher · 管理员工作台. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationApplicability.test.tsx > administrator exact-version applicability snapshot > shows the verified detail declaration and hash read-only rather than using list metadata",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationApplicability.test.tsx > administrator exact-version applicability snapshot > does not present mismatched detail as the reviewed snapshot ({\"version\":1})",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationApplicability.test.tsx > administrator exact-version applicability snapshot > does not present mismatched detail as the reviewed snapshot ({\"releaseId\":\"other-release\"})",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationApplicability.test.tsx > administrator exact-version applicability snapshot > treats an old absent detail declaration as undeclared without edit controls (undefined)",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationApplicability.test.tsx > administrator exact-version applicability snapshot > treats an old absent detail declaration as undeclared without edit controls (null)",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > real admin education distribution gate > keeps readiness closed with a concrete reason even for system administrators",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > real admin education distribution gate > does not infer distribution authority from READY or an unrelated release grant",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > real admin education distribution gate > mounts the picker only for a matching product and exact release delegation",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > uses product readiness rather than aggregate READY in the real admin: different-product",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > uses product readiness rather than aggregate READY in the real admin: missing-products",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > keeps Survey management isolated even when the exact version is ready for both education entries",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryEducationDistribution.test.tsx > preserves all admin targets and exact education readiness outside Survey management",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx > governance visible workspace construction > serializes only the visible Survey detail and preserves inspected data, reason and grants across views",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx > governance visible workspace construction > retains both legacy panels and their required full frozen records",
+      "error": "Error: useAuth must be used within an AuthProvider"
+    },
+    {
+      "test": "FAIL  src/pages/student/StudentProfile.training-admin.test.tsx > Training administrator profile > keeps the legacy student profile URL as an alias and avoids loading the student form",
+      "error": "TestingLibraryElementError: Unable to find an element with the text: Training 管理员资料. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible."
+    },
+    {
+      "test": "FAIL  src/components/app-shell/__tests__/management-frame-loading.test.tsx > loads management frames only after their existing route and grant checks match",
+      "error": "TestingLibraryElementError: Unable to find role=\"region\" and name \"education frame\""
+    },
+    {
+      "test": "FAIL  src/components/staff-ui/__tests__/staff-ui-contract.test.ts > staff experience source contract > keeps course handoffs targetable from compact assignment and check-in management",
+      "error": "AssertionError: expected 'import TrainingCardDescription from \\…' to contain 'const focusId = searchParams.get(\\'id…'"
+    },
+    {
+      "test": "FAIL  src/modules/cognitive/__tests__/CognitiveRunner.training-expiry.test.tsx > Training cognitive expiry recovery navigation > returns 'authenticated-direct' to the server-verified parent without restarting the child",
+      "error": "AssertionError: expected \"vi.fn()\" to be called with arguments: [ 'new-parent-authenticated-direct' ]"
+    },
+    {
+      "test": "FAIL  src/modules/cognitive/__tests__/CognitiveRunner.training-expiry.test.tsx > Training cognitive expiry recovery navigation > returns 'anonymous-direct' to the server-verified parent without restarting the child",
+      "error": "AssertionError: expected \"vi.fn()\" to be called with arguments: [ 'new-parent-anonymous-direct' ]"
+    },
+    {
+      "test": "FAIL  src/modules/cognitive/__tests__/CognitiveRunner.training-expiry.test.tsx > Training cognitive expiry recovery navigation > returns 'different-parent' to the server-verified parent without restarting the child",
+      "error": "AssertionError: expected \"vi.fn()\" to be called with arguments: [ 'new-parent-different-parent' ]"
+    },
+    {
+      "test": "FAIL  src/modules/cognitive/__tests__/CognitiveRunner.training-expiry.test.tsx > Training cognitive expiry recovery navigation > returns 'cross-surface-parent' to the server-verified parent without restarting the child",
+      "error": "AssertionError: expected \"vi.fn()\" to be called with arguments: [ 'new-parent-cross-surface-parent' ]"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx > actual report page feedback image transport wiring (DOM, not browser visual acceptance) > uses the own questionnaire report route rather than nested standalone assessment authority",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 冻结反馈图"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx > actual report page feedback image transport wiring (DOM, not browser visual acceptance) > keeps anonymous questionnaire resume proof out of URL and omits session cookies",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 冻结反馈图"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx > actual report page feedback image transport wiring (DOM, not browser visual acceptance) > uses public composite report authority with the same recovery header",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 冻结反馈图"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx > actual report page feedback image transport wiring (DOM, not browser visual acceptance) > preserves staff composite and frozen snapshot selection for report images",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 冻结反馈图"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx > Training matched feedback display > renders only projected matches and loads from the report-authorized asset route",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 结果配图"
+    },
+    {
+      "test": "FAIL  src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx > Training matched feedback display > uses the collection-provided authorization transport instead of a standalone route",
+      "error": "TestingLibraryElementError: Unable to find an element with the alt text: 结果配图"
+    },
+    {
+      "test": "FAIL  src/modules/situational/__tests__/SjtAuthoring.test.tsx > SJT author workbench course policy > makes the new course policy visible and sends it explicitly when creating an online draft",
+      "error": "Error: useLocation() may be used only in the context of a <Router> component."
+    },
+    {
+      "test": "FAIL  src/modules/situational/__tests__/SjtAuthoring.test.tsx > SJT author workbench course policy > preserves legacy null until an explicit CAS policy save, and does not silently downgrade a controlled draft",
+      "error": "Error: useLocation() may be used only in the context of a <Router> component."
+    },
+    {
+      "test": "FAIL  src/pages/questionnaire/__tests__/TrainingContentSelectionIntegration.test.tsx > Training questionnaire workspace mutual exclusion > blocks metadata, report editing and both publications while selection changes are dirty, then releases them on discard",
+      "error": "TestingLibraryElementError: Unable to find a label with the text of: 报告内容授权 ID"
+    }
+  ]
+}

@@ -39,18 +39,15 @@ export async function transitionResearchProject(input:{
     })
     if(changed.count!==1)fail('项目状态发生并发变化')
     if(action==='CLOSE'){
-      const now=new Date(),grace=new Date(now.getTime()+2*3600000)
+      const now=new Date()
       const waves=await tx.surveyWave.findMany({
         where:{projectId:input.projectId,status:{in:['OPEN','PAUSED']}},
-        select:{id:true,finishUntil:true,groupIpPolicy:true},
+        select:{id:true},
       })
-      // Stop all new admission immediately but preserve a bounded chance for
-      // legitimately started attempts to finish unless a specific HARD_STOP.
+      // Stop new admission without shortening any published completion window.
       for(const w of waves)await tx.surveyWave.update({
         where:{id:w.id},data:{
           status:'CLOSED',revision:{increment:1},
-          finishUntil:w.finishUntil&&w.finishUntil<(w.groupIpPolicy?now:grace)
-            ?w.finishUntil:(w.groupIpPolicy?now:grace),
           updatedAt:now,
         },
       })

@@ -3,8 +3,9 @@ import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authoriza
 import { parseInstrumentAuthorizationRecord } from '../../assessment-authorization/records-schema'
 import {
   hashScaleDeploymentPolicy,
-  scaleDeploymentPolicyV1Schema,
-  type ScaleDeploymentPolicyV1,
+  scaleDeploymentPolicySchema,
+  scaleDeploymentPolicyV2Schema,
+  type ScaleDeploymentPolicy,
 } from '../policy/deployment'
 
 type Db = PrismaClient | Prisma.TransactionClient
@@ -14,7 +15,7 @@ export interface StoredScaleDeploymentPolicyV1 {
   scaleId: string
   revision: number
   status: 'DRAFT' | 'ACTIVE' | 'RETIRED'
-  policy: ScaleDeploymentPolicyV1
+  policy: ScaleDeploymentPolicy
   policyHash: string
   authorizationRefs: string[]
   createdByUserId: string | null
@@ -42,14 +43,14 @@ const stringArray = (value: unknown): string[] => (
 )
 
 const toDeployment = (row: DeploymentRow): StoredScaleDeploymentPolicyV1 => {
-  const policy = scaleDeploymentPolicyV1Schema.parse(row.policyJson)
+  const policy = scaleDeploymentPolicySchema.parse(row.policyJson)
   if (policy.revision !== row.revision) throw new Error('Scale deployment row revision does not match policy')
   if (hashScaleDeploymentPolicy(policy) !== row.policyHash) throw new Error('Scale deployment policy hash mismatch')
   if (row.status !== 'DRAFT' && row.status !== 'ACTIVE' && row.status !== 'RETIRED') {
     throw new Error(`Unsupported Scale deployment status: ${row.status}`)
   }
   const authorizationRefs = stringArray(row.authorizationRefs)
-  if (JSON.stringify([...authorizationRefs].sort()) !== JSON.stringify([...policy.authorizationRefs].sort())) {
+  if (JSON.stringify([...authorizationRefs].sort()) !== JSON.stringify([...(policy.schemaVersion === 1 ? policy.authorizationRefs : [])].sort())) {
     throw new Error('Scale deployment authorization refs do not match policy')
   }
   return {
@@ -91,6 +92,25 @@ export const readActiveScaleDeployment = async (
   return rows[0] ? toDeployment(rows[0]) : null
 }
 
+/** Bounded management-page summary; validates the same stored policy/hash as
+ * individual reads, without one database round-trip for every installed row. */
+export async function readActiveScaleDeployments(db:Db,scaleIds:readonly string[]){
+ const ids=[...new Set(scaleIds)]
+ if(ids.length>50)throw new Error('Scale deployment summary page exceeds 50 identities')
+ if(!ids.length)return new Map<string,StoredScaleDeploymentPolicyV1>()
+ const rows=await db.$queryRaw<DeploymentRow[]>(Prisma.sql`SELECT
+  id,scale_id AS "scaleId",revision,status,policy_json AS "policyJson",policy_hash AS "policyHash",
+  authorization_refs AS "authorizationRefs",created_by_user_id AS "createdByUserId",
+  created_at AS "createdAt",activated_at AS "activatedAt",retired_at AS "retiredAt"
+  FROM scale_deployment_policies WHERE scale_id=ANY(${ids}::text[]) AND status='ACTIVE'`)
+ const result=new Map<string,StoredScaleDeploymentPolicyV1>()
+ for(const row of rows){
+  if(!ids.includes(row.scaleId)||result.has(row.scaleId))throw new Error('Scale deployment summary identity conflict')
+  result.set(row.scaleId,toDeployment(row))
+ }
+ return result
+}
+
 export const readScaleDeploymentRevision = async (
   db: Db,
   scaleId: string,
@@ -120,11 +140,11 @@ export const activateScaleDeploymentRevision = async (input: {
   db: Prisma.TransactionClient
   id: string
   scaleId: string
-  policy: ScaleDeploymentPolicyV1
+  policy: ScaleDeploymentPolicy
   createdByUserId: string | null
   now?: Date
 }): Promise<{ created: boolean; deployment: StoredScaleDeploymentPolicyV1 }> => {
-  const policy = scaleDeploymentPolicyV1Schema.parse(input.policy)
+  const policy = scaleDeploymentPolicyV2Schema.parse(input.policy)
   const policyHash = hashScaleDeploymentPolicy(policy)
   const existing = await readScaleDeploymentRevision(input.db, input.scaleId, policy.revision)
   if (existing) {
@@ -144,7 +164,7 @@ export const activateScaleDeploymentRevision = async (input: {
   await input.db.$executeRaw(Prisma.sql`
     INSERT INTO "scale_deployment_policies" (
       "id", "scale_id", "revision", "status", "policy_json", "policy_hash",
-      "authorization_refs", "created_by_user_id", "created_at", "activated_at"
+      "created_by_user_id", "created_at", "activated_at"
     ) VALUES (
       ${input.id}::uuid,
       ${input.scaleId},
@@ -152,7 +172,6 @@ export const activateScaleDeploymentRevision = async (input: {
       'ACTIVE',
       CAST(${JSON.stringify(policy)} AS jsonb),
       ${policyHash},
-      CAST(${JSON.stringify(policy.authorizationRefs)} AS jsonb),
       ${input.createdByUserId},
       ${now},
       ${now}

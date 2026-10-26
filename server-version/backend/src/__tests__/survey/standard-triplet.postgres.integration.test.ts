@@ -1,7 +1,7 @@
 import {randomUUID} from 'node:crypto'
 import {createServer,type Server} from 'node:http'
 import express from 'express'
-import {describe,it,expect,beforeAll,afterAll} from 'vitest'
+import {describe,it,expect,beforeAll,afterAll,vi} from 'vitest'
 import {prisma as db} from '../../config/database'
 import {generateToken} from '../../utils/jwt'
 import {csrfProtection} from '../../middleware/csrf'
@@ -26,9 +26,11 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
  let system:any,manager:any,training:any,owner:string,server:Server,base:string,onlineId:string,pid:string,wid:string,finalId:string,instrumentKey:string
  const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
  const sources=listScaleInstrumentSources().filter(s=>s.executable)
- function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only'}}
+ function input(index:number){const source=sources[index],p=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Record<Axis,Part>,triplet=composeTriplet(source.identity.instrumentKey,p);return {toolKey:triplet.toolKey,CONTENT:p.CONTENT.hash,PARAMETERS:p.PARAMETERS.hash,REPORT:p.REPORT.hash,expectedCombinationHash:triplet.combinationHash,requestId:randomUUID(),reason:'Isolated synthetic review only',allowedProducts:['SURVEY']}}
  beforeAll(async()=>{
-  const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!u.pathname.startsWith('/survey_triplet_test_'))throw new Error('Schema-only Survey test database required')
+  const u=new URL(process.env.DATABASE_URL!);if(u.port!=='55433'||!(u.pathname.startsWith('/survey_triplet_test_')||/^\/eduk12_ci355_license_entrytriplet_test_[a-f0-9]{10}$/.test(u.pathname)))throw new Error('Schema-only Survey test database required')
+  vi.stubEnv('SURVEY_WORKSPACE_ENABLED','true');vi.stubEnv('SURVEY_PUBLICATION_ENABLED','true')
+  vi.stubEnv('DATA_ENCRYPTION_KEY','a'.repeat(64));vi.stubEnv('DATA_PSEUDONYM_KEY','b'.repeat(64))
   const create=(name:string,platformRole:'STANDARD'|'SYSTEM_ADMIN')=>db.user.create({data:{username:name+'-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',platformRole,role:'STUDENT'}})
   system=await create('system','SYSTEM_ADMIN');manager=await create('survey','STANDARD');training=await create('training','STANDARD')
   await db.adminEntryGrant.createMany({data:[{id:randomUUID(),userId:manager.id,entry:'SURVEY',grantedBy:system.id},{id:randomUUID(),userId:training.id,entry:'TRAINING',grantedBy:system.id}]})
@@ -38,12 +40,23 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/platform',platformSurveyOriginGuard);app.use('/api/platform/survey-standard',surveyStandardTripletRouter);app.use(errorHandler)
   server=createServer(app);await new Promise<void>(r=>server.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+(server.address() as {port:number}).port
  },60000)
- afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()})
+ afterAll(async()=>{if(server)await new Promise<void>(r=>server.close(()=>r()));await (await import('../../config/queue')).closeQueues(true);vi.unstubAllEnvs();await db.$disconnect()})
  async function call(user:any,path:string,body?:unknown,extra:object={},csrf=true,origin='http://localhost:5174'){
   const token=generateToken({userId:user.id,username:user.username,role:user.role,accountDomain:user.accountDomain,tokenVersion:user.tokenVersion,...proof,...extra})
   const response=await fetch(base+'/api/platform/survey-standard'+path,{method:body===undefined?'GET':'POST',headers:{Cookie:'ptool_session='+token+'; ptool_csrf=synthetic-csrf','X-CSRF-Token':csrf?'synthetic-csrf':'wrong',Origin:origin,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,body:await response.json() as any}
  }
  it('allows the highest platform role irrespective of business role and rejects both entry admins',async()=>{expect((await call(system,'/management-design')).status).toBe(200);expect((await call(manager,'/catalog')).status).toBe(403);expect((await call(training,'/catalog')).status).toBe(403);await expect(assertStandardSystem(db,manager.id)).rejects.toMatchObject({statusCode:403})})
+ it('exposes uninstalled onboarding versions read-only only to the current system administrator',async()=>{
+  const before=await db.scale.count(),response=await call(system,'/onboarding-status')
+  expect(response.status).toBe(200)
+  const executable=sources[0]
+  expect(response.body.data.list).toEqual(expect.arrayContaining([expect.objectContaining({instrumentKey:executable.identity.instrumentKey,instrumentVersion:executable.identity.instrumentVersion,scaleId:null,states:expect.objectContaining({imported:true,deployed:false,published:false,visible:false,trainingEntry:'PENDING',surveyEntry:'PENDING'})})]))
+  expect((await call(manager,'/onboarding-status')).status).toBe(403)
+  expect((await call(training,'/onboarding-status')).status).toBe(403)
+  expect((await call(system,'/onboarding-status',undefined,{tokenVersion:99})).status).toBe(401)
+  expect((await call(system,'/onboarding-status',undefined,{},true,'http://training.localhost:5173')).status).toBe(403)
+  expect(await db.scale.count()).toBe(before)
+ })
  it('rechecks session revocation inside transactional authorization',async()=>{await db.user.update({where:{id:system.id},data:{tokenVersion:1}});try{await expect(db.$transaction(tx=>assertStandardSystem(tx,system.id,{...proof,tokenVersion:0}))).rejects.toMatchObject({statusCode:403})}finally{await db.user.update({where:{id:system.id},data:{tokenVersion:0}})}})
  it('keeps preview read only and rejects stale sessions, stale MFA, CSRF and foreign origins',async()=>{
   const request=input(0),before=await db.$queryRaw`SELECT id FROM survey_standard_releases`

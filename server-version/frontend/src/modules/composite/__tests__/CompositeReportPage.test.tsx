@@ -8,6 +8,7 @@ const { mockCompositeApi, authState, trainingHost } = vi.hoisted(() => ({
   trainingHost: vi.fn(() => false),
   mockCompositeApi: {
     report: vi.fn(),
+    reportView: vi.fn(),
     reportStatus: vi.fn(),
     teacherReportStatus: vi.fn(),
     retryReport: vi.fn(),
@@ -45,11 +46,12 @@ beforeEach(() => {
 describe('CompositeReportPage cognitive module', () => {
   it('labels stored missing Form facts as unanswered on the Training report without scoring', async () => {
     trainingHost.mockReturnValue(true)
-    mockCompositeApi.report.mockResolvedValue({ code: 0, data: { id: 'attempt-1', assessmentId: 'q', name: '选填反馈', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', completedAt: '2026-10-18T00:00:00Z', totalTime: 1000, anonymousCode: null, backgroundValues: [{ itemId: 'f1', type: 'FORM', label: '选填意见', value: null }], unitReports: [] } })
+    mockCompositeApi.reportView.mockResolvedValue({ code: 0, data: { generation: { reportStatus: { state: 'READY' } }, report: { id: 'attempt-1', assessmentId: 'q', name: '选填反馈', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', completedAt: '2026-10-18T00:00:00Z', totalTime: 1000, anonymousCode: null, backgroundValues: [{ itemId: 'f1', type: 'FORM', label: '选填意见', value: null }], unitReports: [] } } })
     const { container } = render(<MemoryRouter initialEntries={['/student/composite/attempts/attempt-1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
     expect(await screen.findByText('未作答')).toBeInTheDocument()
     expect(container.querySelector('.training-form-report')).not.toBeNull()
-    expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
+    expect(mockCompositeApi.reportView).toHaveBeenCalledTimes(1)
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
     expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
   })
   it('marks an unfinished collection as read-only partial and never asks for package analysis', async () => {

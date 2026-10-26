@@ -1,8 +1,8 @@
+import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
+import {scaleEntryClassificationTags,matchesCatalogDiscovery} from './catalog-discovery'
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
-  evaluateAuthorizationOverlayStatus,
-  resolveEffectiveAuthorization,
   type InstrumentAuthorizationRecordV1,
 } from '../../assessment-authorization'
 import { hashScaleDefinition } from '../scale-definition'
@@ -59,6 +59,7 @@ export interface ScaleLibraryReadModelContext {
 
 export interface ScaleLibraryFilterInput {
   keyword?: string
+  tags?: readonly string[]
   instrumentFamily?: string
   primaryDomain?: ConstructDomain
   secondaryDomain?: ConstructDomain
@@ -95,7 +96,7 @@ export interface ScaleLibraryLocalizationSummary {
 }
 
 export interface ScaleLibraryRightsSummary {
-  status: 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
+  status: 'NOT_EVALUATED' | 'SELF_AUTHORED' | 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
   commercialNature: InstrumentAuthorizationRecordV1['scope']['commercialNature']
   locales: string[]
   territories: string[]
@@ -184,7 +185,6 @@ const bindingKey = (instrumentKey: string, instrumentVersion: string): string =>
 
 const unique = (values: string[]): string[] => [...new Set(values)]
 
-const normalizeText = (value: string): string => value.trim().toLocaleLowerCase()
 
 const deploymentForKey = (
   deployments: readonly ScaleLibraryDeploymentRecord[],
@@ -193,38 +193,10 @@ const deploymentForKey = (
   deployment.code === pkg.key && deployment.instrumentVersion === pkg.instrumentVersion
 ))
 
-const summarizeRights = (input: {
-  pkg: ScalePackageV2
-  authorizations: readonly InstrumentAuthorizationRecordV1[]
-  locale: string
-  territory: string
-  nowIso: string
-}): ScaleLibraryRightsSummary => {
-  const effective = resolveEffectiveAuthorization({
-    authorizations: [...input.authorizations],
-    instrumentKey: input.pkg.key,
-    instrumentVersion: input.pkg.instrumentVersion,
-    nowIso: input.nowIso,
-  })
-  if (!effective) {
-    return { status: 'NOT_GRANTED', commercialNature: 'UNSPECIFIED', locales: [], territories: [] }
-  }
-  const overlay = evaluateAuthorizationOverlayStatus(effective, input.nowIso)
-  const scopeMatches = effective.scope.locales.includes(input.locale) && effective.scope.territories.includes(input.territory)
-  const eligibleStatus = effective.status === 'APPROVED' || effective.status === 'EVIDENCE_PENDING'
-  const status: ScaleLibraryRightsSummary['status'] = !eligibleStatus || overlay === 'EXPIRED' || overlay === 'REVOKED' || overlay === 'DRAFT'
-    ? 'INELIGIBLE'
-    : (scopeMatches
-      ? (effective.status === 'APPROVED' ? 'APPROVED' : 'EVIDENCE_PENDING')
-      : 'SCOPE_MISMATCH')
-  return {
-    status,
-    commercialNature: effective.scope.commercialNature,
-    locales: [...effective.scope.locales],
-    territories: [...effective.scope.territories],
-    validTo: effective.validTo,
-  }
-}
+/** Copyright permissions are not evaluated or represented as approved. */
+const summarizeRights = (): ScaleLibraryEntry['rights'] => ({
+  status: 'NOT_EVALUATED', commercialNature: 'UNSPECIFIED', locales: [], territories: [],
+})
 
 const summarizeGateReason = (input: {
   pkg: ScalePackageV2
@@ -241,20 +213,23 @@ const summarizeGateReason = (input: {
   const deploymentPublished = input.deployment?.status === 'PUBLISHED'
 
   if (input.pkg.releaseStatus === 'RETIRED') reasons.push('量表包已退役。')
-  if (input.manifest.catalogStatus !== 'ACCEPTED') reasons.push('目录记录尚未完成治理审核。')
+  // Authored source review remains REVIEWED/PILOT; explicit product publication
+  // is not an assertion of new psychometric evidence or external expert review.
+  const publishedAuthored = deploymentPublished && input.pkg.releaseStatus === 'PUBLISHED'
+    && input.manifest.catalogStatus === 'REVIEWED' && Boolean(registeredSelfAuthoredSourceProof(input.pkg.key, input.pkg.instrumentVersion))
+  if (input.manifest.catalogStatus !== 'ACCEPTED' && !publishedAuthored) reasons.push('目录记录尚未完成治理审核。')
+  if (publishedAuthored && input.deployment?.visibility === 'HIDDEN') reasons.push('已正式发布；具体投放及用户使用权限须另行核验。')
   if (!targetLocaleMatches) reasons.push(`当前内容语言为 ${input.localization.targetLocale}，不提供 ${input.locale} 版本。`)
   if (!respondentMatches) reasons.push('当前作答者类型不在该量表的适用范围内。')
   if (!input.deployment) reasons.push('当前环境尚无已发布的可启动量表部署。')
   else if (!deploymentPublished) reasons.push('当前量表部署尚未发布。')
   if (input.pkg.releaseStatus !== 'PUBLISHED') reasons.push('量表包尚未发布，当前仅可浏览目录信息。')
-  const operationalErrors = input.gate.decision.warnings.filter(warning => /rights\/governance|localization\/deployment/.test(warning))
+  const operationalErrors = input.gate.decision.warnings.filter(warning => /localization\/deployment/.test(warning))
   if (input.gate.decision.errors.length > 0 || operationalErrors.length > 0) {
     const allErrors = [...input.gate.decision.errors, ...operationalErrors]
-    const rightsFailure = allErrors.some((error) => /authorization|rights|commercialNature|electronicAdministration|scoring required|translation required|display required|locale\/territory/i.test(error))
     const localizationFailure = allErrors.some((error) => /localization|contentLocale|targetLocale|translation pending/i.test(error))
-    if (rightsFailure) reasons.push('当前 locale/territory 的电子施测、计分或显示授权未满足。')
     if (localizationFailure && targetLocaleMatches) reasons.push('当前语言的本地化治理条件尚未满足。')
-    if (!rightsFailure && !localizationFailure) reasons.push('当前发布门未通过，暂不可启动。')
+    if (!localizationFailure) reasons.push('当前发布门未通过，暂不可启动。')
   }
 
   const dedupedReasons = unique(reasons)
@@ -308,14 +283,12 @@ const buildEntry = (input: {
   const pkg = catalogEntry.pkg!
   const manifest = catalogEntry.manifest
   const respondent = context.respondent ?? manifest.population.respondentTypes[0]
-  const authorizations = context.authorizations ?? []
   const deployments = context.deployments ?? []
   const deployment = deploymentForKey(deployments, pkg)
   const gate = evaluatePilotFirstPublicationGate({
     pkg,
     manifest,
     localizationManifest: localization,
-    authorizations: [...authorizations],
     locale: context.locale,
     territory: context.territory,
     requestedRespondent: respondent,
@@ -330,13 +303,7 @@ const buildEntry = (input: {
     respondent,
     gate,
   })
-  const rights = summarizeRights({
-    pkg,
-    authorizations,
-    locale: context.locale,
-    territory: context.territory,
-    nowIso: context.nowIso,
-  })
+  const rights = summarizeRights()
   const report = buildReportSummary(pkg, gate.reportEligibility)
 
   const entry: ScaleLibraryEntry = {
@@ -374,12 +341,6 @@ const buildEntry = (input: {
   }
 
   if (context.viewerRole === 'ADMIN') {
-    const effective = resolveEffectiveAuthorization({
-      authorizations: [...authorizations],
-      instrumentKey: pkg.key,
-      instrumentVersion: pkg.instrumentVersion,
-      nowIso: context.nowIso,
-    })
     entry.governance = {
       catalogManifestVersion: manifest.catalogManifestVersion,
       catalogStatus: manifest.catalogStatus,
@@ -395,9 +356,6 @@ const buildEntry = (input: {
         warnings: unique([...gate.decision.warnings]),
         reportEligibility: gate.reportEligibility,
       },
-      ...(effective
-        ? { authorization: { authorizationId: effective.authorizationId, status: effective.status, basis: effective.basis } }
-        : {}),
     }
   }
 
@@ -438,18 +396,18 @@ export const filterScaleLibraryEntries = (
   entries: readonly ScaleLibraryEntry[],
   filters: ScaleLibraryFilterInput = {},
 ): ScaleLibraryEntry[] => {
-  const keyword = filters.keyword ? normalizeText(filters.keyword) : undefined
   return entries.filter((entry) => {
-    if (keyword) {
-      const haystack = normalizeText([
+    if (filters.keyword || filters.tags?.length) {
+      const matches = matchesCatalogDiscovery([
         entry.identity.canonicalName,
         entry.identity.abbreviation ?? '',
         entry.identity.instrumentFamily ?? '',
         entry.construct.primaryDomain,
         entry.construct.constructDefinition,
         entry.source.title ?? '',
-      ].join(' '))
-      if (!haystack.includes(keyword)) return false
+        entry.identity.instrumentKey,
+      ], scaleEntryClassificationTags(entry), filters)
+      if (!matches) return false
     }
     if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false
     if (filters.primaryDomain && entry.construct.primaryDomain !== filters.primaryDomain) return false

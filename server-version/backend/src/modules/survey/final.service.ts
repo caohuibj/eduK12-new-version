@@ -1,7 +1,6 @@
 import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { SURVEY_NATIVE_SJT_PROTOCOL,type SurveySituationalReceiptReference } from './situational-native.contract'
 import {persistGovernedPackageReports} from './governed-package.reports'
-import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {rawParticipantFeedback} from './participant-feedback'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import type { SurveyCognitiveReference } from './cognitive.definition'
@@ -70,8 +69,8 @@ export async function submitResearchFinal(input:FinalInput){
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
     // Match Project -> Wave -> Attempt ordering used by pause/close/hard-stop.
-    // The Wave SHARE lock serializes the FINAL decision with HARD_STOP's
-    // Wave UPDATE; a stop committed before this lock must reject the FINAL.
+    // The Wave SHARE lock stabilizes the original completion window. A current
+    // recruitment stop blocks new STARTs, not this already-admitted FINAL.
     await tx.$queryRaw`SELECT id FROM survey_projects
       WHERE id=${known.projectId} FOR SHARE`
     await tx.$queryRaw`SELECT id FROM survey_waves
@@ -129,7 +128,7 @@ export async function submitResearchFinal(input:FinalInput){
     // replay. Historical noncognitive replay behavior remains unchanged.
     if(hasCognitive){
       const end=wave.finishUntil??wave.closesAt
-      if(wave.hardStopAt||!end||end<=new Date())blocked('研究作答提交窗口已结束')
+      if(!end||end<=new Date())blocked('研究作答提交窗口已结束')
       const liveConsent=await tx.surveyConsent.findFirst({where:{projectId:known.projectId,waveId:wave.id,
         attemptId:attempt.id,accepted:true,consentVersion:wave.consentVersion},select:{id:true}})
       if(!liveConsent)blocked('当前研究缺少有效的知情同意记录')
@@ -146,11 +145,10 @@ export async function submitResearchFinal(input:FinalInput){
     // Reuse only this transaction's selected immutable definition. Current
     // authority was checked above; computation still consumes the frozen union.
     const selectedSnapshot=assignedSurveySnapshot(snapshot,assignment)
-    await assertSurveyScaleCollectionAllowed(tx,selectedSnapshot)
     if(attempt.status!=='STARTED')invalid('这份作答已经关闭或终止')
     const now=new Date()
     const finishUntil=wave.finishUntil||wave.closesAt
-    if(wave.hardStopAt||!finishUntil||finishUntil<=now)
+    if(!finishUntil||finishUntil<=now)
       blocked('研究作答提交窗口已结束')
     const consent=hasCognitive||await tx.surveyConsent.findFirst({where:{
       projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
@@ -183,7 +181,7 @@ export async function submitResearchFinal(input:FinalInput){
       definitionDigest:publication.definitionDigest,payloadHash:canonical.hash,
       resultsCipher,resultsHash,
     },select:{id:true,completedAt:true}})
-    await persistGovernedPackageReports(tx,{projectId:known.projectId,waveId:wave.id,finalId:receipt.id,sourceFinalHash:resultsHash,snapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
+    await persistGovernedPackageReports(tx,{projectId:known.projectId,waveId:wave.id,finalId:receipt.id,sourceFinalHash:resultsHash,snapshot:selectedSnapshot,calculated})
     const updated=await tx.surveyWaveAttempt.updateMany({
       where:{id:attempt.id,projectId:known.projectId,status:'STARTED'},
       data:{status:'COMPLETED',completedAt:receipt.completedAt},

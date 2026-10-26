@@ -1,3 +1,4 @@
+import {publishRegisteredScaleFixture} from './registered-resource-fixture'
 import { independentReviewer } from './independent-reviewer'
 import { randomUUID } from 'node:crypto'
 import { createServer, type Server } from 'node:http'
@@ -202,6 +203,7 @@ suite('PR3 reporting HTTP release gate (real PostgreSQL)', () => {
     def.report.primaryScoreKeys = ['total']; def.report.scoreOrder = ['total']
     def.report.interpretations = [{ scoreKey: 'total', headline: '偏好', source: { type: 'score_only' }, summary: '回答描述', bands: [], guidance: [] }]
     const scale = await db.scale.create({ data: { code: `http_resource_${randomUUID().replaceAll('-', '')}`, name: '原创 HTTP 素材', creatorId: admin.id, status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE', definition: def, definitionHash: hashScaleDefinition(def) } })
+    await publishRegisteredScaleFixture(db,scale.id)
     const register = { method: 'POST', user: admin, body: { scaleId: scale.id, mode: 'INDIVIDUAL' } }
     expect((await jsonRequest('/api/organizations/measurement-resources', { ...register, includeCsrf: false })).status).toBe(403)
     expect((await jsonRequest('/api/organizations/measurement-resources', { ...register, user: teacher })).status).toBe(403)

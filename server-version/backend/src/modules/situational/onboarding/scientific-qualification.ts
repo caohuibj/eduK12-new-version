@@ -28,7 +28,6 @@ export function evaluateScopedSituationalQualification(pkg: SituationPackage, va
   const has = (kind: SituationalScientificDeclarationV1['evidence'][number]['kind']) => applicable.some(e => e.kind === kind)
   const definitionProvenance = Boolean(
     (pkg.definition.source.title?.trim() || pkg.definition.source.citation?.trim())
-    && pkg.definition.license.status !== 'unknown'
   )
   const qualification = evaluateScientificQualification({
     hasResearchFoundation: has('RESEARCH_FOUNDATION'),

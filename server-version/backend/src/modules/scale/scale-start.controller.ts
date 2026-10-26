@@ -1,5 +1,5 @@
 import { ScaleLibraryError } from '../scale-library-governance/contracts'
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
+import { assertScaleNewEntryAllowed } from './scale-collection-guard'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { standaloneContextSchema } from './scale-context-input'
 import { withSerializableScaleTransaction } from './deployment/transactions'
@@ -24,6 +24,7 @@ import {
   scaleDefinitionFromRecord,
 } from './scale-workflow.service'
 import { freezeScaleRuntimeAtAttemptStart, persistFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { resolveFrozenScaleInstructionForScale } from './onboarding/instrument-registry'
 import { encryptField } from '../../utils/encryption'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import {
@@ -56,9 +57,10 @@ const buildStandaloneContext = (
 
 const responseEnvelope = async (assessment: any, scale: any) => {
   const admission = await loadStoredScaleAdmission(assessment)
-  const definition = assessment.runtimeSnapshotEncrypted
-    ? (await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)).definition
-    : scaleDefinitionFromRecord(scale)
+  const runtime = assessment.runtimeSnapshotEncrypted
+    ? await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)
+    : undefined
+  const definition = runtime?.definition ?? scaleDefinitionFromRecord(scale)
   const runner = runnerDefinition(definition)
   return {
     assessment: {
@@ -73,7 +75,7 @@ const responseEnvelope = async (assessment: any, scale: any) => {
       code: scale.code,
       name: scale.name,
       description: scale.description,
-      instruction: scale.instruction,
+      instruction: runtime?.instruction !== undefined ? runtime.instruction?.text ?? null : scale.instruction,
       estimatedTime: scale.estimatedTime,
       definition: runner,
       definitionHash: hashScaleDefinition(definition),
@@ -120,7 +122,6 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       // Resume is governed by the already-frozen admission. Current product
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
-      await prisma.$transaction(tx => assertTrainingScaleCollectionAllowed(tx, [existing.scaleId]))
       if (existing.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...existing, scale } as any)
       const stored = (await loadScaleAnswers(existing.answers, existing))
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
@@ -140,7 +141,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         if (!(await canStartLibraryCourseScale(currentScale, userId, tx))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '课程量表使用授权已失效', 403)
         }
-        await assertTrainingScaleCollectionAllowed(tx, [currentScale.id])
+        await assertScaleNewEntryAllowed(tx, [currentScale.id], userId)
         const deployment = await resolveScaleStartDeployment({ db: tx, scale: currentScale, requestedMode: 'STANDALONE' })
         if (req.user?.role !== 'STUDENT' && (deployment.kind !== 'MANAGED_V2' || !deployment.runtimePolicy.applicability.respondentTypes.includes('SELF'))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', 'This content does not authorize governed self-report starts', 403)
@@ -160,6 +161,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
           instrumentVersion: currentScale.instrumentVersion,
           definition: currentDefinition,
           frozenAt,
+          instruction: resolveFrozenScaleInstructionForScale(currentScale),
         })
         const admission = await standaloneAdmissionPersistenceForRuntime({
           db: tx,

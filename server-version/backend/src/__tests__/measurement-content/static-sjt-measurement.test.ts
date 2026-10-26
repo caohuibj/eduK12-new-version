@@ -11,12 +11,12 @@ import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {ASSESSMENT_OPERATIONAL_HOLDS,operationalIdentityKey} from '../../modules/assessment-governance/operational-hold'
 const source=createSituationalInstrumentRegistry(GENERATED_SITUATIONAL_INSTRUMENT_SOURCES).sources[0],identity=source.content.identity
 const id='11111111-1111-4111-8111-111111111111',releaseId='22222222-2222-4222-8222-222222222222'
-const deployment={locale:'zh-CN',territory:'CN',commercialNature:'NON_COMMERCIAL' as const,grantee:'Synthetic deployment'}
+const deployment={locale:'zh-CN',territory:'CN'}
 const sql=(q:any)=>q.strings.join(' ')
 let row:any,records:any[],now:Date,release:any
 const db={$queryRaw:vi.fn(),$executeRaw:vi.fn(),instrumentAuthorization:{findMany:vi.fn()}}
 function authorization(patch:any={}){
- const draft=createInstrumentAuthorizationDraft({...identity,grantor:'Synthetic grantor',grantee:deployment.grantee,
+ const draft=createInstrumentAuthorizationDraft({...identity,grantor:'Synthetic grantor',grantee:'Synthetic deployment',
   scope:{electronicAdministration:true,scoring:true,translation:false,display:true,territories:['CN'],locales:['zh-CN'],commercialNature:'NON_COMMERCIAL'},
   validFrom:'2026-01-01T00:00:00.000Z',validTo:'2027-01-01T00:00:00.000Z',basis:'Synthetic test only',createdByUserId:'actor',now:'2026-10-01T00:00:00.000Z'})
  return {...draft,status:'APPROVED',approvedByUserId:'actor',approvedAt:draft.createdAt,...patch}
@@ -44,48 +44,45 @@ describe('explicit installed static SJT measurement conversion',()=>{
   row.content_digest='f'.repeat(64);await expect(ensureStaticSjtRegistryMapping(db as never,identity)).rejects.toThrow('SOURCE_CHANGED')
  })
  it('uses the real registry/scorer adapter, persists source provenance without inventing an owner, and reuses exact publication',async()=>{
-  const result=await publish();expect(result.release).toMatchObject({family:'SJT',layer:'MEASUREMENT',scope:{kind:'PLATFORM'},provenance:{sourceKind:'STATIC_SJT_REGISTRY',mappingId:id,sourceAuthorization:{authorizationId:records[0].authorizationId}}})
+  const result=await publish();expect(result.release).toMatchObject({family:'SJT',layer:'MEASUREMENT',scope:{kind:'PLATFORM'},provenance:{sourceKind:'STATIC_SJT_REGISTRY',mappingId:id}})
   expect(result.release.scope).not.toHaveProperty('ownerId');expect(result.release.content.measurementHash).toMatch(/^[a-f0-9]{64}$/)
   expect((await publish()).release.releaseId).toBe(releaseId);expect(mocks.publish).toHaveBeenCalledTimes(1)
   expect((await start()).release.contentHash).toBe(result.release.contentHash)
   expect(sql(db.$queryRaw.mock.calls.find(([q])=>sql(q).includes('ORDER BY instrument_key'))![0])).toContain('FOR UPDATE')
  })
- it.each(['DRAFT','REVOKED','EXPIRED','SCOPE_MISMATCH'])('rejects ineligible %s license, not trusting self_authored registry text',async status=>{
-  records=[authorization({status})];await expect(publish()).rejects.toThrow('SOURCE_LICENSE_DENIED');expect(mocks.publish).not.toHaveBeenCalled()
+ it.each(['DRAFT','REVOKED','EXPIRED','SCOPE_MISMATCH'])('ignores historical %s license status without treating source text as permission',async status=>{
+  records=[authorization({status})];await expect(publish()).resolves.toHaveProperty('release');expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
  })
  it.each([{grantee:'other'},{validTo:'2026-10-19T00:00:00.000Z'},
   {scope:{electronicAdministration:false}},{scope:{scoring:false}},{scope:{display:false}},
-  {scope:{territories:['US']}},{scope:{locales:['en']}},{scope:{commercialNature:'UNSPECIFIED'}}])('checks exact deployment and scientific use rights %j',async patch=>{
+  {scope:{territories:['US']}},{scope:{locales:['en']}},{scope:{commercialNature:'UNSPECIFIED'}}])('does not consult retired third-party rights scope %j',async patch=>{
   const base=authorization();records=[{...base,...patch,scope:{...base.scope,...patch.scope}}]
-  await expect(publish()).rejects.toThrow('SOURCE_LICENSE_DENIED');expect(mocks.publish).not.toHaveBeenCalled()
+  await expect(publish()).resolves.toHaveProperty('release');expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
  })
- it('accepts existing approved evidence-pending semantics and refuses commercial use under a noncommercial grant',async()=>{
-  records=[authorization({status:'EVIDENCE_PENDING'})];await expect(publish()).resolves.toHaveProperty('release')
-  row.measurement_release_id=null;row.deployment=null;row.deployment_hash=null
-  await expect(publishStaticSjtMeasurement(db as never,{actorId:'actor',mappingId:id,deployment:{...deployment,commercialNature:'COMMERCIAL'}})).rejects.toThrow('SOURCE_LICENSE_DENIED')
- })
- it('pins source authorization lineage and does not substitute an unrelated license after revocation',async()=>{
+ it('does not substitute or consult authorization lineages on source reads',async()=>{
   await publish();records=[{...records[0],status:'REVOKED'},authorization()]
-  await expect(start()).rejects.toThrow('SOURCE_LICENSE_DENIED')
-  await expect(publish()).rejects.toThrow('SOURCE_LICENSE_DENIED')
+  await expect(start()).resolves.toHaveProperty('release')
+  await expect(publish()).resolves.toHaveProperty('release')
   await expect(readStaticSjtMeasurementForStart(db as never,identity,'HISTORY')).resolves.toHaveProperty('release')
+  expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
  })
  it('keeps exact frozen identity across retirement but rejects new publication and revoked releases',async()=>{
   await publish();release.status='RETIRED';await expect(start()).resolves.toHaveProperty('release')
   await expect(publish()).rejects.toThrow('RELEASE_MISMATCH');release.status='REVOKED';await expect(start()).rejects.toThrow('RELEASE_MISMATCH')
  })
- it('rejects forged provenance, content, deployment, source hash and authorization hash',async()=>{
+ it('rejects forged provenance, content, deployment and source hash independently of license rows',async()=>{
   await publish();release.provenance.mappingId='other';await expect(start()).rejects.toThrow('RELEASE_MISMATCH');release.provenance.mappingId=id
   release.content.measurementHash='e'.repeat(64);await expect(start()).rejects.toThrow('RELEASE_MISMATCH')
   row.deployment_hash='a'.repeat(64);await expect(start()).rejects.toThrow('DEPLOYMENT_INVALID')
   row.deployment_hash=canonicalHash(deployment);row.content_digest='a'.repeat(64);await expect(start()).rejects.toThrow('SOURCE_CHANGED')
   row.content_digest=publicationContentDigest(source.content);db.instrumentAuthorization.findMany.mockResolvedValue([{...dbRecord(records[0]),recordHash:'a'.repeat(64)}])
-  row.measurement_release_id=null;await expect(publish()).rejects.toThrow('LICENSE_HASH')
+  expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
  })
- it('rechecks source license expiry after release lock waits before committing mapping',async()=>{
+ it('does not use license expiry after release lock waits as a publication gate',async()=>{
   mocks.publish.mockImplementation(async(_db,input)=>{now=new Date('2027-01-02T00:00:00Z');return release={...prepareRelease(input),releaseId,status:'PUBLISHED'}})
-  await expect(publish()).rejects.toThrow('SOURCE_LICENSE_DENIED')
-  expect(db.$executeRaw.mock.calls.some(([q])=>sql(q).includes('UPDATE static_sjt'))).toBe(false)
+  await expect(publish()).resolves.toHaveProperty('release')
+  expect(db.$executeRaw.mock.calls.some(([q])=>sql(q).includes('UPDATE static_sjt'))).toBe(true)
+  expect(db.instrumentAuthorization.findMany).not.toHaveBeenCalled()
  })
  it('rejects changed deployment retry and operational hold without modifying mapping',async()=>{
   await publish();await expect(publishStaticSjtMeasurement(db as never,{actorId:'actor',mappingId:id,deployment:{...deployment,territory:'US'}})).rejects.toThrow('DEPLOYMENT_IMMUTABLE')
@@ -99,13 +96,13 @@ describe('explicit installed static SJT measurement conversion',()=>{
  })
 })
 
-it('final consumer fence rejects elapsed expiry after later report/reference/child waits without recompiling',async()=>{
+it('final consumer fence retains transaction identity without a license expiry gate',async()=>{
  await publish();const receipt=await start();mocks.get.mockClear();mocks.publish.mockClear()
  now=new Date('2027-01-02T00:00:00Z')
- await expect(recheckStaticSjtConsumerLicense(db as never,receipt)).rejects.toThrow('SOURCE_LICENSE_DENIED')
+ await expect(recheckStaticSjtConsumerLicense(db as never,receipt)).resolves.toBeUndefined()
  expect(mocks.get).not.toHaveBeenCalled();expect(mocks.publish).not.toHaveBeenCalled()
- await expect(recheckStaticSjtConsumerLicense(db as never,{...receipt})).rejects.toThrow('SOURCE_LICENSE_RECEIPT_INVALID')
- await expect(recheckStaticSjtConsumerLicense({} as never,receipt)).rejects.toThrow('SOURCE_LICENSE_RECEIPT_INVALID')
+ await expect(recheckStaticSjtConsumerLicense(db as never,{...receipt})).rejects.toThrow('SOURCE_RECEIPT_INVALID')
+ await expect(recheckStaticSjtConsumerLicense({} as never,receipt)).rejects.toThrow('SOURCE_RECEIPT_INVALID')
  const history=await readStaticSjtMeasurementForStart(db as never,identity,'HISTORY')
  await expect(recheckStaticSjtConsumerLicense(db as never,history)).resolves.toBeUndefined()
 })

@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import * as catalog from './catalog.service'
 import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
@@ -60,7 +61,7 @@ const sourceRef=z.object({kind:z.enum(['SCALE','SJT','COGNITIVE','FORM']),source
   sourceVersion:z.string().min(1).max(100),organizationId:z.string().guid().optional()}).strict()
 const page=(raw:unknown)=>z.coerce.number().int().min(1).max(1000).default(1).parse(raw)
 surveyPlatformRouter.get('/source-catalog',handler(req=>catalog.sourceCatalog(req.user!.userId,{
-  page:page(req.query.page),kind:sourceRef.shape.kind.optional().parse(req.query.kind),
+  discovery:z.object(catalogDiscoveryQueryFields).parse(req.query),page:page(req.query.page),kind:sourceRef.shape.kind.optional().parse(req.query.kind),
   organizationId:sourceRef.shape.organizationId.parse(req.query.organizationId)})))
 surveyPlatformRouter.get('/researchers/:id/tool-grants',handler(req=>catalog.listToolGrants(req.user!.userId,inviteId.parse(req.params.id),page(req.query.page))))
 surveyPlatformRouter.post('/researchers/:id/tool-grants',handler(async req=>{

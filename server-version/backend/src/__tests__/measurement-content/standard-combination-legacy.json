@@ -1,0 +1,8 @@
+{
+  "sourceCommit": "6fedb640fdd0700b9c1ca9974bf417b5a43cf58c",
+  "kind": "synthetic-read-only-compatibility-witness-not-trial",
+  "syntheticInputSha256": "d00937d985c3a4d1ac9876c7db315d1b11f3f1c926af2a8d1183bb9a31c42c4c",
+  "combinationHash": "d9c84ba0b96b7e262046e0019762ba20a9d9b098ef3e0031e80e465fe131e7fc",
+  "platformMeasurementInputHash": "d925f03cbaf5a9890faba3c9c3a00ff6b011cf20b624b4f9ec82d4b6506e5c8a",
+  "canonicalSnapshotHash": "7ccff27e93a8a96c125122b0724bdab0462a450584d3e1e09924f5c234f8d556"
+}

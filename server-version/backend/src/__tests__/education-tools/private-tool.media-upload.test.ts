@@ -8,7 +8,7 @@ import {uploadPrivateToolImage,privateToolMediaScope,privateToolMediaLibrary} fr
 import type {PrivateToolContext} from '../../modules/education-tools/private-tool.contracts'
 const c:PrivateToolContext={principal:{userId:'00000000-0000-4000-8000-000000000001',accountDomain:'SCHOOL'},entry:'TEACHER',organizationId:'00000000-0000-4000-8000-000000000002'}
 const tool='00000000-0000-4000-8000-000000000003',asset='00000000-0000-4000-8000-000000000004'
-const row={id:asset,sha256:'a'.repeat(64),mimeType:'image/png'}
+const row={id:asset,sha256:'a'.repeat(64),mimeType:'image/png',sizeBytes:64}
 const file={buffer:Buffer.from('synthetic already validated bytes'),originalname:'synthetic.png',detectedMimeType:'image/png'}
 const tx={$queryRaw:mocks.query,educationPrivateTool:{findFirst:mocks.tool},storedAsset:{findMany:mocks.assets}}
 describe('Education image upload staged finalization (mocked storage only)',()=>{

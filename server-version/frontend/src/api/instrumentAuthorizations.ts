@@ -1,4 +1,4 @@
-import apiClient from './client'
+const retired = (): Promise<never> => Promise.reject(new Error('AUTHORIZATION_RECORDS_RETIRED'))
 
 export type InstrumentAuthorizationRow = {
   authorizationId: string
@@ -14,15 +14,10 @@ export type InstrumentAuthorizationRow = {
   }
 }
 
+/** Compatibility surface only. Never issue a ledger request. */
 export const instrumentAuthorizationApi = {
-  list: () => apiClient.get<any>('/admin/instrument-authorizations'),
-  create: (body: Record<string, unknown>) => apiClient.post<any>('/admin/instrument-authorizations', body),
-  approve: (authorizationId: string, selfApprovalDeclaration: string) => (
-    apiClient.post<any>(`/admin/instrument-authorizations/${authorizationId}/approve`, {
-      selfApprovalDeclaration,
-    })
-  ),
-  publishPreviewScale: (body: Record<string, unknown>) => (
-    apiClient.post<any>('/admin/instrument-authorizations/publish-preview/scale', body)
-  ),
+  list: retired,
+  create: (_body: Record<string, unknown>) => retired(),
+  approve: (_authorizationId: string, _selfApprovalDeclaration: string) => retired(),
+  publishPreviewScale: (_body: Record<string, unknown>) => retired(),
 }

@@ -1,0 +1,179 @@
+{
+  "baseline": "21634b9b21686c0643feb46e2e0269fdd15d9c1c",
+  "codeHead": "4233c5ad4be0e381bfe307c71b3b00000aa7d675",
+  "fixCommit": "e1e3a88248d6061c24397afa9dd03fc372e62b4d",
+  "results": {
+    "rendering": {
+      "passed": 3,
+      "failed": 0,
+      "includes": "Original 2 assertions retained, plus no-session rejection; actual AuthProvider, exact release-scoped capabilities"
+    },
+    "selection": {
+      "passed": 1,
+      "failed": 0,
+      "filtered": 2,
+      "includes": "Explicit limit 10; no all-results grant; no writes on selection"
+    },
+    "httpFinal": {
+      "passed": 5,
+      "failed": 0,
+      "requests": 27,
+      "server500": 0,
+      "commandExit": 0,
+      "node": "24.21.0"
+    }
+  },
+  "httpScope": {
+    "authentication": "Actual signed synthetic sessions; current database principal/entry/target guards; no auth/service mocks. Login/MFA ceremony not tested.",
+    "limiter": "Unchanged dynamic production branches enabled within isolated router harness; actual Redis-backed RateLimit-Limit 90/120 observed. Not production startup qualification.",
+    "data": "Empty owned database after real schema migrations; 4 synthetic accounts, 31 SUBMITTED incomplete governed metadata rows, 31 deliberately unsupported cognitive config metadata fixtures. No actual source onboarding, approval, runtime or target use grant.",
+    "readback": "All scales, measurements, standard releases, trials, tool grants, use grants and drafts remain 0; see http-final-readback.txt",
+    "runtime": "Task-owned PostgreSQL16.15/Redis7.4.11 on loopback, normal shutdown after completed checks; no production or existing task database"
+  },
+  "failuresPreserved": [
+    "First HTTP invocation failed setup because synthetic project id was omitted; 0 requests, 5 pending, not passed.",
+    "Scoped test type check exposed unknown JSON, ES2020 replaceAll, JWT username and callback types. These harness contracts were corrected; actual protection/assertions unchanged.",
+    "After final HTTP, only two non-null assertions were added for strict stage typing. TypeScript and esbuild emitted bytes are identical, with old/new source and emitted SHA retained; no passing HTTP body was weakened."
+  ],
+  "typeReceipts": [
+    {
+      "command": "frontend tsc -p tsconfig.app.json --noEmit --pretty false",
+      "exit": 0,
+      "session": 94140
+    },
+    {
+      "command": "frontend app types after new selection assertion",
+      "exit": 0,
+      "session": 53525
+    },
+    {
+      "command": "backend tsc -p scoped HTTP closure tsconfig --pretty false",
+      "exit": 0,
+      "session": 75072
+    }
+  ],
+  "lint": {
+    "exit": 0,
+    "warnings": 3,
+    "notes": "Existing ScaleLibraryGovernance ref-cleanup warnings; new selection test lint 0"
+  },
+  "coordination": {
+    "original39": "original-39-paths.json; commit file intersection empty",
+    "standard-triplet.model.ts": "unchanged",
+    "standard-triplet.service.ts": "No new changes; original catalog fields classificationTags/tagFacets only",
+    "standardTripletDetail/versionMappings": "unchanged; other node owns mapping modules and Training preflight",
+    "remote355": "No new CI-maintenance commits absorbed. Base remains specified f7b6c766."
+  },
+  "artifacts": [
+    {
+      "path": "rendering-1.json",
+      "sha256": "ab227d972e360644898a1677dbe9f92c187fd036c36a8f3c10cb62206f040a9b",
+      "bytes": 1877
+    },
+    {
+      "path": "rendering-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "rendering-lint.log",
+      "sha256": "eeaa938926e3037bd6a06acd8874476b7c03e351047f0d07c911a8fa15851e21",
+      "bytes": 1147
+    },
+    {
+      "path": "selection-boundary.json",
+      "sha256": "8a3c84954029332ec90c7bf7d39797883b5f158b0ab558fa9a825893ab5b4452",
+      "bytes": 2075
+    },
+    {
+      "path": "selection-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "selection-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "http-1.json",
+      "sha256": "806ad9639945cecab196d5715cd14abdd4af6acac5e226803e30278e1afb133e",
+      "bytes": 3346
+    },
+    {
+      "path": "http-1.log",
+      "sha256": "a5d17f3d2e293f7a864550d85c954e669db0f82688dd24979f2d0a7d5eec9137",
+      "bytes": 69
+    },
+    {
+      "path": "http-journal-1.json",
+      "sha256": "2d2cd8e197deaa4ec310986fc2a1a20692709d46c46e9581e4825f8f49c5583e",
+      "bytes": 89
+    },
+    {
+      "path": "http-2.json",
+      "sha256": "3161287dddb9e22eb3c612b3094e2e88b675b9b35302d99e5a3216c007c62c2c",
+      "bytes": 3222
+    },
+    {
+      "path": "http-journal-2.json",
+      "sha256": "87f9242f2065f4c01b389500a5b7d71658e4a068c979768db506ef18108a9634",
+      "bytes": 13587
+    },
+    {
+      "path": "http-final.json",
+      "sha256": "3060f289fad123bc62e471780c14234da154fe0cc41570143f65cdc0fcd4d277",
+      "bytes": 3220
+    },
+    {
+      "path": "http-final.log",
+      "sha256": "312702d76d848f763c87079eeb3f50620a3df938c638f309e064e3e855da4c19",
+      "bytes": 73
+    },
+    {
+      "path": "http-journal-final.json",
+      "sha256": "de7ef4805e4f979b72cd96bb6939d6f63eabb81d2f27f7ec56da3bd9bd21a69e",
+      "bytes": 13587
+    },
+    {
+      "path": "http-final-inputs.sha256",
+      "sha256": "a7a64575d0a33d54c11ce4cd697cda41667a0d8a3d937edc1a4e107f15923c36",
+      "bytes": 302
+    },
+    {
+      "path": "http-type-only-equivalence.json",
+      "sha256": "b64b94f1db9ea0d435a5a7b685cfdc946125714b3eae8804780eb7ab324caf7b",
+      "bytes": 539
+    },
+    {
+      "path": "http-before-nonnull.txt",
+      "sha256": "7d38a5b26befc1c0881625802f2582c188b47f2cd7cb0aad0f863f0497daf9da",
+      "bytes": 15490
+    },
+    {
+      "path": "http-types.log",
+      "sha256": "991112f2be4f050d938fbd868c80d8227fbb5cf130deea95594e220284ad73e5",
+      "bytes": 2787
+    },
+    {
+      "path": "http-types-final.log",
+      "sha256": "b0cc80f403c8a0925f7db7f2f3a9e8b91ee510350290c9faba39c26f14fb2d8e",
+      "bytes": 240
+    },
+    {
+      "path": "http-types-confirmed.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "http-final-readback.txt",
+      "sha256": "7a0dc1a69fae05846212460ed3da8a8073a05db424880d1906bc8af46abe4121",
+      "bytes": 120
+    },
+    {
+      "path": "original-39-paths.json",
+      "sha256": "47e5cca3adac069c9899bc0438b6250346cf424713877694471c87197a8af2f0",
+      "bytes": 3703
+    }
+  ]
+}

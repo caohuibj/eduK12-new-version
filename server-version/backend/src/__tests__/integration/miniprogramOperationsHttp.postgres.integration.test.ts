@@ -108,7 +108,7 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   expect(await prisma.checkinSubmission.count({where:{checkinId:checkin.id,studentId:student.id}})).toBe(1)
   const submitted=await s.runtime.api.post('/checkins/'+checkin.id+'/submit',{content:'forged',studentId:stranger.id,expectedRevision:1});expect(submitted.studentId).toBe(student.id);expect(await prisma.checkinSubmission.count({where:{checkinId:checkin.id,studentId:stranger.id}})).toBe(0)
  })
- it('teacher grades but cannot freeze globally; SYSTEM_ADMIN freeze refreshes current membership',async()=>{
+ it('teacher grades while native roster refuses global freeze and hands system administration to its dedicated entry',async()=>{
   const t=await logged(teacher),s=await logged(student),submission=await prisma.submission.findFirstOrThrow({where:{assignmentId:assignment.id}})
   await t.runtime.operations.grade(assignment.id,submission.id,'Good')
   expect((await prisma.submission.findUniqueOrThrow({where:{id:submission.id}})).comment).toBe('Good')
@@ -116,12 +116,11 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   expect((await prisma.user.findUniqueOrThrow({where:{id:student.id}})).isFrozen).toBe(false)
   const administrator=await account('ADMIN');await prisma.user.update({where:{id:administrator.id},data:{platformRole:'SYSTEM_ADMIN'}})
   const a=await logged(administrator)
-  await a.runtime.operations.roster(course.id,student.id,'freeze')
-  await expect(s.runtime.api.get('/mobile/lists/assignments')).rejects.toMatchObject({kind:'unauthorized'})
-  expect(s.runtime.session.get().user).toBe(null)
-  await a.runtime.operations.roster(course.id,student.id,'unfreeze')
+  await expect(a.runtime.operations.roster(course.id,student.id,'freeze')).rejects.toMatchObject({kind:'forbidden',status:403})
+  expect((await prisma.user.findUniqueOrThrow({where:{id:student.id}})).isFrozen).toBe(false)
+  expect(s.runtime.session.get().user).not.toBe(null)
  })
- it('current legacy ADMIN manages invitations and creates parents without child authority; platform lifecycle needs SYSTEM_ADMIN',async()=>{
+ it('current entry administrator manages invitations without child authority; system identity cannot reuse this native entry',async()=>{
   const admin=await account('ADMIN'),a=await logged(admin)
   const form=await a.runtime.operations.prepare('users',undefined,'create'),parent=await a.runtime.operations.execute('users',undefined,'create',form,{username:'mini-parent-'+randomUUID(),password:'Synthetic-parent-2026',role:'PARENT',nickname:'Synthetic parent'});userIds.push(parent.id)
   expect(parent.role).toBe('PARENT');expect(await prisma.parentStudentRelationship.count({where:{parentUserId:parent.id}})).toBe(0)
@@ -129,8 +128,9 @@ suite('Mini role operations and shared classroom against actual HTTP/PostgreSQL/
   const codeForm=await a.runtime.operations.prepare('teacherCodes',undefined,'create'),code=await a.runtime.operations.execute('teacherCodes',undefined,'create',codeForm,{maxUses:'1'});expect(code.code).toBeTruthy()
   await a.runtime.operations.execute('teacherCodes',code.id,'delete',await a.runtime.operations.prepare('teacherCodes',code.id,'delete'),{})
   await expect(a.runtime.api.put('/users/'+parent.id,{isActive:false})).rejects.toMatchObject({kind:'forbidden'})
-  await prisma.user.update({where:{id:admin.id},data:{platformRole:'SYSTEM_ADMIN'}});expect((await a.runtime.operations.context('users',parent.id)).allowedActions).toContain('deactivate')
-  await a.runtime.operations.execute('users',parent.id,'deactivate',await a.runtime.operations.prepare('users',parent.id,'deactivate'),{});expect((await prisma.user.findUniqueOrThrow({where:{id:parent.id}})).isActive).toBe(false)
+  await prisma.user.update({where:{id:admin.id},data:{platformRole:'SYSTEM_ADMIN'}})
+  await expect(a.runtime.operations.context('users',parent.id)).rejects.toMatchObject({kind:'forbidden',status:403})
+  expect((await prisma.user.findUniqueOrThrow({where:{id:parent.id}})).isActive).toBe(true)
  })
  it('tool policy editor uses real Cookie/CSRF, current platform discovery, sealed command and optimistic version',async()=>{
   const root=await account('ADMIN');retainedAuditActors.add(root.id);await prisma.user.update({where:{id:root.id},data:{platformRole:'SYSTEM_ADMIN'}});const a=await logged(root),tool={family:'SCALE',key:'synthetic-'+randomUUID(),version:'1.0.0'},snapshot=await a.runtime.toolPolicies.read(tool)

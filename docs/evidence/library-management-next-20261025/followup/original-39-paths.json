@@ -1,0 +1,55 @@
+{
+  "commits": {
+    "8a95facba6157c3f5a1be34ee279f5ea4533abbf": [
+      "server-version/backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts",
+      "server-version/backend/src/__tests__/scale-library-governance/unified-catalog.test.ts",
+      "server-version/backend/src/__tests__/survey/catalog-classification.test.ts",
+      "server-version/backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+      "server-version/backend/src/__tests__/survey/library-discovery.pagination.test.ts",
+      "server-version/backend/src/modules/scale-library-governance/routes.ts",
+      "server-version/backend/src/modules/scale-library-governance/service.ts",
+      "server-version/backend/src/modules/scale-library-governance/unified-catalog-model.ts",
+      "server-version/backend/src/modules/scale-library-governance/unified-catalog.ts",
+      "server-version/backend/src/modules/scale/library/catalog-discovery.ts",
+      "server-version/backend/src/modules/scale/library/scale-library-read-model.ts",
+      "server-version/backend/src/modules/survey/catalog-discovery.ts",
+      "server-version/backend/src/modules/survey/catalog.service.ts",
+      "server-version/backend/src/modules/survey/catalog.sources.ts",
+      "server-version/backend/src/modules/survey/governed-tool.routes.ts",
+      "server-version/backend/src/modules/survey/governed-tool.service.ts",
+      "server-version/backend/src/modules/survey/library-admin.service.ts",
+      "server-version/backend/src/modules/survey/platform.routes.ts",
+      "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "server-version/frontend/src/api/catalogDiscovery.ts",
+      "server-version/frontend/src/api/scaleLibraryGovernance.ts",
+      "server-version/frontend/src/api/surveyGovernance.ts",
+      "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.tsx",
+      "server-version/frontend/src/components/scale-governance/catalog-discovery.css",
+      "server-version/frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx",
+      "server-version/frontend/src/pages/admin/GovernedToolLibrary.tsx",
+      "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.tsx",
+      "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx",
+      "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx",
+      "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx",
+      "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx"
+    ],
+    "f269feed24b31d8cf1f276f70cb953b7143fef8c": [
+      "server-version/backend/src/__tests__/scale/self-authored-onboarding.test.ts",
+      "server-version/backend/src/__tests__/survey/library-preflight.test.ts",
+      "server-version/backend/src/modules/scale/onboarding/install.ts",
+      "server-version/backend/src/modules/survey/library-preflight.service.ts",
+      "server-version/backend/src/modules/survey/standard-triplet.routes.ts",
+      "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.test.tsx",
+      "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.tsx",
+      "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx"
+    ]
+  },
+  "intersection": [],
+  "unionCount": 39,
+  "versionMappingCoordination": {
+    "standard-triplet.model.ts": "unchanged",
+    "standard-triplet.service.ts": "standardTripletCatalog discovery only: classificationTags/tagFacets and matching before pagination",
+    "standardTripletDetail/versionMappings": "unchanged; owned by other node",
+    "Training": "No ONLINE-to-publication claim or new consumer"
+  }
+}

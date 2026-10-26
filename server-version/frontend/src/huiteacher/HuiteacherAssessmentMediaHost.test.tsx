@@ -1,5 +1,5 @@
 import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
-import {afterEach,describe,expect,it,vi} from 'vitest'
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import HuiteacherApp from './HuiteacherApp'
 vi.mock('./HuiteacherPersonalSelf',()=>({HuiteacherPersonalSelf:()=>null}))
 vi.mock('./HuiteacherMyFormTasks',()=>({HuiteacherMyFormTasks:()=>null}))
@@ -7,6 +7,7 @@ vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>
 const reply=(data:unknown)=>({ok:true,status:200,json:async()=>({code:0,data})})
 function state(id:string,video=true){return {id,assessmentId:'assessment',name:'教师题图测评',instruction:null,status:'IN_PROGRESS',progress:0,completedItems:0,totalItems:1,currentIndex:0,startedAt:'2026-10-22T00:00:00Z',lastSavedAt:'2026-10-22T00:00:00Z',completedAt:null,anonymousCode:null,items:[{id:'unit',type:'SCALE',position:0,label:'题图单元',completed:false,index:0}],deliveryMode:'FINAL_ONLY',attemptEpoch:1,contextSnapshotHash:null,currentItem:{id:'unit',type:'SCALE',position:0,required:true,definitionHash:'hash-'+id,scaleAssessmentId:'scale-assessment',scale:{id:'scale',name:'题图量表',definition:{schemaVersion:2,respondentType:'participant_self_report',display:{randomizeItems:false},items:[{itemCode:'q',content:'教师题目',type:'single',required:true,sortOrder:0,responseSetKey:'set',randomizeOptions:false,options:[{value:'yes',label:'同意'}],images:[{asset:{assetId:'image',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'教师题图',order:0}],...(video?{video:{schemaVersion:1,video:{assetId:'video',contentHash:'b'.repeat(64),mimeType:'video/webm'}}}:{})}]}}}}}
 function deferred<T>(){let resolve!:(value:T)=>void;const promise=new Promise<T>(yes=>{resolve=yes});return {promise,resolve}}
+beforeEach(()=>vi.stubGlobal('Image',class {src='';decode=()=>Promise.resolve()}))
 afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
 describe('real Teacher host and FinalComposite assessment media',()=>{
  it.each(['valid','invalid'] as const)('routes images and %s video capabilities only through Teacher session and CSRF',async mode=>{
@@ -26,6 +27,7 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
    return reply({list:[],canAuthor:false})
   })
   vi.stubGlobal('fetch',request);render(<HuiteacherApp/>)
+  fireEvent.click(await screen.findByRole('link',{name:'量表任务'}))
   fireEvent.click(await screen.findByRole('button',{name:'进入本人自评'}))
   await screen.findByRole('img',{name:'教师题图'})
   const videoPath=`${prefix}/composite-attempts/${id}/items/unit/scale/items/q/video-capability`
@@ -53,8 +55,11 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
    return reply({list:[],canAuthor:false})
   })
   vi.stubGlobal('fetch',request);render(<HuiteacherApp/>)
+  fireEvent.click(await screen.findByRole('link',{name:'量表任务'}))
   const buttons=await screen.findAllByRole('button',{name:'进入本人自评'});fireEvent.click(buttons[0])
   await waitFor(()=>expect(request.mock.calls.some(([url])=>url.includes('/old/items/unit/scale/assets/'))).toBe(true))
+  expect(screen.getAllByRole('button',{name:'进入本人自评'})[1]).toBeDisabled()
+  fireEvent.click(await screen.findByRole('button',{name:'保存并退出'}))
   await waitFor(()=>expect(screen.getAllByRole('button',{name:'进入本人自评'})[1]).toBeEnabled())
   fireEvent.click(screen.getAllByRole('button',{name:'进入本人自评'})[1])
   expect(await screen.findByRole('img',{name:'教师题图'})).toHaveAttribute('src','blob:current')

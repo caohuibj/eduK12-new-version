@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 import { Prisma, PrismaClient, UserRole } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -9,11 +9,12 @@ vi.mock('../../config/database', () => ({
   prisma: { $transaction: (...args: unknown[]) => (binding.db.$transaction as Function)(...args) },
 }))
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { PrismaAuthorizationRepository } from '../../modules/assessment-authorization/repository'
+import { lockInstrumentSourceIdentity } from '../../modules/assessment-authorization/source-identity-lock'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 import { listScaleInstrumentSources, getScaleInstrumentRuntimePolicy } from '../../modules/scale/onboarding/instrument-registry'
 import { materializeScaleInstrumentContent } from '../../modules/scale/onboarding/materialize'
 import { planStandardScalePublication } from '../../modules/scale/onboarding/publish'
-import { activateScaleDeploymentRevision } from '../../modules/scale/deployment/repository'
+import { activateScaleDeploymentRevision, rollbackScaleDeploymentActivation, readActiveScaleDeployment } from '../../modules/scale/deployment/repository'
 import { convertLegacyScaleMeasurement, planLegacyScaleMeasurementConversion } from '../../modules/scale/onboarding/measurement-conversion'
 import { getCatalogSourceSnapshot } from '../../modules/survey/catalog.sources'
 import { publishSurveyMeasurementDraft } from '../../modules/survey/measurement-publication.service'
@@ -117,42 +118,42 @@ async function createFixture(expiresInMs?: number) {
   }
   const [clock] = await one.$queryRaw<Array<{ now: Date }>>`SELECT clock_timestamp() AS now`
   const validTo = new Date(clock.now.getTime() + (expiresInMs ?? 60000))
-  const authorizations = new PrismaAuthorizationRepository(client(one))
-  const created = await authorizations.createDraft({ ...source.identity, grantor: 'V10 synthetic rights owner',
-    grantee: 'V10 isolated synthetic deployment', scope: { electronicAdministration: true, scoring: true,
-      display: true, translation: true, territories: ['CN'], locales: ['zh-CN'], commercialNature: 'NON_COMMERCIAL' },
-    validFrom: new Date(clock.now.getTime() - 60000).toISOString(), validTo: validTo.toISOString(),
-    basis: 'Synthetic acceptance fixture only; not a real instrument license', createdByUserId: actor })
-  const evidence = Buffer.from('Synthetic acceptance evidence, no real rights granted: ' + created.record.authorizationId)
-  const asset = await one.storedAsset.create({ data: { objectKey: `v10-synthetic/${randomUUID()}.txt`,
-    mimeType: 'text/plain', sizeBytes: evidence.length, sha256: createHash('sha256').update(evidence).digest('hex'),
-    ownerId: actor, accessScope: 'PRIVATE', originalName: 'synthetic-license-fixture.txt' } })
-  await authorizations.attachEvidence({ authorizationId: created.record.authorizationId, evidenceAssetId: asset.id, actorUserId: actor })
-  const approved = await authorizations.approve({ authorizationId: created.record.authorizationId, actorUserId: reviewer })
-  expect(approved.record.status).toBe('APPROVED')
+  // Optional historical rows are seeded as inert metadata, never as a new
+  // permission or via the retired ledger API. Most scenarios have no ledger row.
+  if (expiresInMs !== undefined) await one.instrumentAuthorization.create({ data: {
+    authorizationKey: randomUUID(), version: 1, ...source.identity, grantor: 'Synthetic historical reference',
+    grantee: 'Disposable test database', electronicAdministration: true, scoring: true, display: true,
+    translation: true, territories: ['CN'], locales: ['zh-CN'], commercialNature: 'NON_COMMERCIAL',
+    validFrom: new Date(clock.now.getTime() - 60000), validTo, basis: 'Historical metadata fixture; not a current grant',
+    status: 'APPROVED', approvedByUserId: reviewer, approvedAt: clock.now, createdByUserId: actor, recordHash: 'a'.repeat(64),
+  } })
   const materialized = await materializeScaleInstrumentContent(one, { ...source.identity, actorUserId: actor })
   await one.$transaction(tx => activateScaleDeploymentRevision({ db: tx, id: randomUUID(), scaleId: materialized.scale.id,
-    createdByUserId: actor, policy: { schemaVersion: 1, revision: 1, locale: 'zh-CN', territory: 'CN',
-      commercialNature: 'NON_COMMERCIAL', deploymentModes: ['COMPOSITE'],
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'],
-      authorizationRefs: [created.record.authorizationId],
+    createdByUserId: actor, policy: { schemaVersion: 2, revision: 1, locale: 'zh-CN', territory: 'CN',
+      deploymentModes: ['COMPOSITE'],
       runtimePolicyHash: getScaleInstrumentRuntimePolicy(source.identity.instrumentKey, '1.0.0')!.runtimePolicyHash,
       localizationVersion: source.localization!.localizationVersion, inFlightCompletion: 'FROZEN_DEADLINE' } }))
   const ready = await planStandardScalePublication(one, { ...source.identity, actorUserId: actor, visibility: 'COURSE' })
   expect(ready.blockers).toEqual([])
   // Recreate the valid pre-upgrade state: a fully validated legacy publication,
-  // exact registered bytes, approved license/deployment, and no invented pointer.
+  // exact registered bytes, operational deployment, and no invented pointer.
   // Calling today's publisher here would already convert it and erase the test.
   const scale = await one.scale.update({ where: { id: materialized.scale.id }, data: { status: 'PUBLISHED', visibility: 'COURSE' } })
   const input = { requestId: randomUUID(), scaleId: scale.id, actorUserId: actor,
     recoveryPoint: 'isolated synthetic empty-cluster baseline; no historical data' }
   const preview = await planLegacyScaleMeasurementConversion(client(one), input)
-  return { actor, reviewer, source, scale, authorizationId: created.record.authorizationId, validTo,
+  return { actor, reviewer, source, scale, validTo,
     request: { ...input, expectedProofHash: preview.proofHash }, targetKey: preview.proof.target.key }
 }
 type Fixture = Awaited<ReturnType<typeof createFixture>>
-const revoke = (db: PrismaClient, f: Fixture) => new PrismaAuthorizationRepository(db).revoke({
-  authorizationId: f.authorizationId, actorUserId: f.reviewer, note: 'V10 synthetic source withdrawal race',
+// Exercise a real operational deployment withdrawal, not copyright revocation.
+// This trusted repository operation uses the same source-identity lock as readers.
+const withdraw = (db: PrismaClient, f: Fixture) => db.$transaction(async tx => {
+  await lockInstrumentSourceIdentity(tx, f.source.identity, 'WRITE')
+  const active = await readActiveScaleDeployment(tx, f.scale.id)
+  if (!active) throw new Error('Synthetic operational deployment already absent')
+  await rollbackScaleDeploymentActivation({ db: tx, scaleId: f.scale.id, appliedRevision: active.revision,
+    expectedPolicyHash: active.policyHash, previousRevision: null })
 })
 async function scaleState(db: PrismaClient, f: Fixture) {
   const scale = await db.scale.findUniqueOrThrow({ where: { id: f.scale.id } })
@@ -197,14 +198,18 @@ async function surveyState(db: PrismaClient, f: Survey) {
 suite('V10 high-level source authority races through real services and PostgreSQL', () => {
   beforeAll(async () => {
     if (process.env.NODE_ENV !== 'test' || !/^[a-f0-9]{40}$/.test(process.env.MEASUREMENT_V10_HEAD || '')) throw new Error('Exact isolated invocation required')
-    const url = new URL(process.env.MEASUREMENT_V10_RUNTIME_DATABASE_URL || '')
-    if (url.hostname !== '127.0.0.1' || url.port !== '39403' || url.pathname !== '/eduk12_measurement_v10_test'
-      || !/^v10_runtime_[a-f0-9]{8}$/.test(url.username) || process.env.DATABASE_URL !== url.href) throw new Error('Dedicated synthetic runtime required')
+    const selected = integrationDatabaseUrl('MEASUREMENT_V10_RUNTIME_DATABASE_URL')
+    if (!selected) throw new Error('Explicit synthetic runtime URL required')
+    requireIsolatedReleaseDatabase(selected)
+    const url = new URL(selected)
     url.searchParams.set('connection_limit', '1')
     one = new PrismaClient({ datasources: { db: { url: url.href } } })
     two = new PrismaClient({ datasources: { db: { url: url.href } } })
     three = new PrismaClient({ datasources: { db: { url: url.href } } })
     await Promise.all([one.$connect(), two.$connect(), three.$connect()])
+    const [role] = await one.$queryRaw<Array<{rolsuper: boolean; rolbypassrls: boolean}>>`
+      SELECT rolsuper,rolbypassrls FROM pg_roles WHERE rolname=current_user`
+    if (!role || role.rolsuper || role.rolbypassrls) throw new Error('Synthetic non-superuser, non-bypass runtime required')
   }, 15000)
   afterAll(async () => {
     // Keep immutable evidence in the disposable cluster; no deletion/grant changes.
@@ -213,13 +218,13 @@ suite('V10 high-level source authority races through real services and PostgreSQ
 
   it('Scale conversion waits for source withdrawal, denies fresh and retried requests, and leaves no release/pointer/audit', async () => {
     const f = await createFixture(), before = await scaleState(three, f), writer = holdCommit(one), readerPid = signal<number>()
-    const revoked = observed(revoke(writer.db, f))
+    const revoked = observed(withdraw(writer.db, f))
     const held = await readyOrFailure(writer.ready, revoked)
     const converted = observed(convertLegacyScaleMeasurement(client(two, { start: (_tx, pid) => readerPid.resolve(pid) }), f.request))
     try { await actualWait(held, await readerPid.promise, 'advisory') } finally { writer.release() }
     await success(revoked)
-    await rejected(converted, /STANDARD_PUBLICATION_BLOCKED|MANAGED_SOURCE_LICENSE_REQUIRED/)
-    await expect(convertLegacyScaleMeasurement(client(two), f.request)).rejects.toThrow(/STANDARD_PUBLICATION_BLOCKED|MANAGED_SOURCE_LICENSE_REQUIRED/)
+    await rejected(converted, /STANDARD_PUBLICATION_BLOCKED|MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
+    await expect(convertLegacyScaleMeasurement(client(two), f.request)).rejects.toThrow(/STANDARD_PUBLICATION_BLOCKED|MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
     expect(await scaleState(three, f)).toEqual(before)
     expect(before).toMatchObject({ pointer: null, releases: 0, audits: 0 })
   }, 15000)
@@ -228,7 +233,7 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     const f = await createFixture(), before = await scaleState(three, f), reader = holdCommit(one), writerPid = signal<number>()
     const converted = observed(convertLegacyScaleMeasurement(reader.db, f.request))
     const held = await readyOrFailure(reader.ready, converted)
-    const revoked = observed(revoke(client(two, { start: (_tx, pid) => writerPid.resolve(pid) }), f))
+    const revoked = observed(withdraw(client(two, { start: (_tx, pid) => writerPid.resolve(pid) }), f))
     try {
       await actualWait(held, await writerPid.promise, 'advisory')
       expect(await scaleState(three, f)).toEqual(before)
@@ -236,19 +241,19 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     const saved = await success(converted); await success(revoked)
     expect(await convertLegacyScaleMeasurement(client(one), f.request)).toMatchObject({ ...saved, converted: false })
     await expect(one.$transaction(tx => getCatalogSourceSnapshot({ actorUserId: f.reviewer,
-      ref: { kind: 'SCALE', sourceId: f.scale.id, sourceVersion: '1.0.0' } }, tx))).rejects.toThrow(/MANAGED_SOURCE_LICENSE_REQUIRED/)
+      ref: { kind: 'SCALE', sourceId: f.scale.id, sourceVersion: '1.0.0' } }, tx))).rejects.toThrow(/MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
     expect(await scaleState(three, f)).toEqual({ ...before, pointer: saved.measurementReleaseId, releases: 1, audits: 1 })
   }, 15000)
 
   it('Survey explicit catalog publication waiting behind source withdrawal fails without project release or partial draft/audit changes', async () => {
     const f = await createFixture(), survey = await surveyFixture(f), before = await surveyState(three, survey)
     const sourceBefore = await scaleState(three, f), writer = holdCommit(one), readerPid = signal<number>()
-    const revoked = observed(revoke(writer.db, f)), held = await readyOrFailure(writer.ready, revoked)
+    const revoked = observed(withdraw(writer.db, f)), held = await readyOrFailure(writer.ready, revoked)
     const publication = observed(publish(client(two, { start: (_tx, pid) => readerPid.resolve(pid) }), survey))
     try { await actualWait(held, await readerPid.promise, 'advisory') } finally { writer.release() }
     await success(revoked)
-    await rejected(publication, /MANAGED_SOURCE_LICENSE_REQUIRED/)
-    await expect(publish(client(two), survey)).rejects.toThrow(/MANAGED_SOURCE_LICENSE_REQUIRED/)
+    await rejected(publication, /MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
+    await expect(publish(client(two), survey)).rejects.toThrow(/MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
     expect(await surveyState(three, survey)).toEqual(before)
     expect(before.releases).toEqual([])
     expect(await scaleState(three, f)).toEqual(sourceBefore)
@@ -258,13 +263,13 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     const f = await createFixture(), survey = await surveyFixture(f), before = await surveyState(three, survey)
     const reader = holdCommit(one), writerPid = signal<number>()
     const publication = observed(publish(reader.db, survey)), held = await readyOrFailure(reader.ready, publication)
-    const revoked = observed(revoke(client(two, { start: (_tx, pid) => writerPid.resolve(pid) }), f))
+    const revoked = observed(withdraw(client(two, { start: (_tx, pid) => writerPid.resolve(pid) }), f))
     try {
       await actualWait(held, await writerPid.promise, 'advisory')
       expect(await surveyState(three, survey)).toEqual(before)
     } finally { reader.release() }
     const saved = await success(publication); await success(revoked)
-    await expect(publish(client(one), survey)).rejects.toThrow(/MANAGED_SOURCE_LICENSE_REQUIRED/)
+    await expect(publish(client(one), survey)).rejects.toThrow(/MANAGED_SOURCE_DEPLOYMENT_REQUIRED/)
     const after = await surveyState(three, survey)
     expect(after).toEqual({ ...before, releases: [{ id: saved.releaseId, source_release_id: survey.converted.measurementReleaseId,
       content_hash: saved.contentHash, published_by: survey.actor }] })
@@ -332,7 +337,21 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     expect((await surveyState(one, survey)).releases).toHaveLength(1)
   }, 15000)
 
-  it('Scale source license expires during a real downstream publication wait; inserted release rolls back with pointer/audit and retry stays denied', async () => {
+  it('rolls back a real inserted release, pointer and audit on a downstream failure and supports an exact retry', async () => {
+    const f = await createFixture(), before = await scaleState(three, f)
+    let inserted = false
+    const failed = client(two, { afterSql: sql => {
+      if (sql.includes('INSERT INTO measurement_content_releases')) { inserted = true; throw new Error('synthetic downstream failure after actual release insert') }
+    } })
+    await expect(convertLegacyScaleMeasurement(failed, f.request)).rejects.toThrow('synthetic downstream failure')
+    expect(inserted).toBe(true)
+    expect(await scaleState(three, f)).toEqual(before)
+    const saved = await convertLegacyScaleMeasurement(client(two), f.request)
+    expect(await scaleState(three, f)).toEqual({ ...before, pointer: saved.measurementReleaseId, releases: 1, audits: 1 })
+    expect(await convertLegacyScaleMeasurement(client(two), f.request)).toMatchObject({ ...saved, converted: false })
+  }, 15000)
+
+  it('historical Scale copyright expiry during a real downstream wait does not change publication or replay identity', async () => {
     const f = await createFixture(3500), before = await scaleState(three, f)
     const ready = signal<Tx>(), release = signal(), readerPid = signal<number>()
     const version = [f.source.identity.instrumentVersion, f.source.executable!.definition.scoring.scoringVersion,
@@ -358,14 +377,13 @@ suite('V10 high-level source authority races through real services and PostgreSQ
       expect(expired).toBe(true)
     } finally { release.resolve() }
     await success(blocker)
-    await rejected(conversion, /MANAGED_SOURCE_LICENSE_REQUIRED/)
+    const saved = await success(conversion)
     expect(inserted).toBe(true)
-    expect(await scaleState(three, f)).toEqual(before)
-    await expect(convertLegacyScaleMeasurement(client(two), f.request)).rejects.toThrow(/STANDARD_PUBLICATION_BLOCKED|MANAGED_SOURCE_LICENSE_REQUIRED/)
-    expect(await scaleState(three, f)).toEqual(before)
+    expect(await scaleState(three, f)).toEqual({ ...before, pointer: saved.measurementReleaseId, releases: 1, audits: 1 })
+    expect(await convertLegacyScaleMeasurement(client(two), f.request)).toMatchObject({ ...saved, converted: false })
   }, 15000)
 
-  it('static SJT actual Composite publication rechecks source expiry after a downstream report-row wait and leaves its draft/snapshot unchanged', async () => {
+  it('static SJT Composite publication retains exact facts after historical copyright expiry during a report-row wait', async () => {
     const sources = createSituationalInstrumentRegistry(GENERATED_SITUATIONAL_INSTRUMENT_SOURCES).sources
       .filter(source => source.publication.releaseStatus === 'PUBLISHED')
     const mappings = await one.$queryRaw<Array<{ instrument_key: string }>>`SELECT instrument_key FROM static_sjt_measurement_mappings`
@@ -375,18 +393,15 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     for (const id of [actor, reviewer]) await one.user.create({ data: { id, username: `${prefix}-static-${id}`,
       passwordHash: 'synthetic-no-login', accountDomain: 'TRAINING', role: 'TEACHER', teacherApproved: true,
       platformRole: 'SYSTEM_ADMIN', isActive: true } })
-    const authorizations = new PrismaAuthorizationRepository(client(one))
     const [clock] = await one.$queryRaw<Array<{ now: Date }>>`SELECT clock_timestamp() AS now`
     const expiresAt = new Date(clock.now.getTime() + 4000)
-    const deployment = { locale: 'zh-CN', territory: 'CN', grantee: 'V10 synthetic static deployment', commercialNature: 'NON_COMMERCIAL' as const }
-    const authorization = await authorizations.createDraft({ ...identity, grantor: 'V10 synthetic rights owner',
-      grantee: deployment.grantee, scope: { electronicAdministration: true, scoring: true, display: true, translation: true,
-        territories: ['CN'], locales: ['zh-CN'], commercialNature: 'NON_COMMERCIAL' },
-      validFrom: new Date(clock.now.getTime() - 60000).toISOString(), validTo: expiresAt.toISOString(),
-      basis: 'Synthetic static consumer acceptance only', createdByUserId: actor })
-    // This source service explicitly supports the existing EVIDENCE_PENDING
-    // approval semantics. Approval still goes through the real audited service.
-    await authorizations.approve({ authorizationId: authorization.record.authorizationId, actorUserId: reviewer })
+    const deployment = { locale: 'zh-CN', territory: 'CN' }
+    await one.instrumentAuthorization.create({ data: { authorizationKey: randomUUID(), version: 1, ...identity,
+      grantor: 'Synthetic historical reference', grantee: 'Historical synthetic deployment', electronicAdministration: true,
+      scoring: true, display: true, translation: true, territories: ['CN'], locales: ['zh-CN'],
+      commercialNature: 'NON_COMMERCIAL', validFrom: new Date(clock.now.getTime() - 60000), validTo: expiresAt,
+      basis: 'Historical metadata fixture; not a current grant', status: 'APPROVED', approvedByUserId: reviewer,
+      approvedAt: clock.now, createdByUserId: actor, recordHash: 'a'.repeat(64) } })
     const mapping = await one.$transaction(tx => ensureStaticSjtRegistryMapping(tx, identity)), grantId = randomUUID()
     // Explicit synthetic fixture, not root issuance or WebAuthn acceptance.
     // Never manufacture an admin proof or call a positive strong-auth endpoint.
@@ -423,8 +438,8 @@ suite('V10 high-level source authority races through real services and PostgreSQ
     await one.compositeAssessment.update({ where: { id: compositeId }, data: {
       trainingReportSelectionDraft: { schemaVersion: 1, units: [{ itemId, reportReleaseId: report.releaseId }] } } })
     const before = await one.compositeAssessment.findUniqueOrThrow({ where: { id: compositeId } })
-    // One short-lived approved lineage only. Do not amend a long-lived earlier
-    // approval, which the existing effective-license resolver may still select.
+    // Historical metadata expires while a real downstream report row is held.
+    // It must not enter the frozen source proof or block publication.
     const ready = signal<Tx>(), release = signal(), readerPid = signal<number>()
     const blocker = observed(client(one).$transaction(async tx => {
       await tx.$queryRaw(Prisma.sql`SELECT id FROM measurement_content_releases WHERE id=${report.releaseId} FOR UPDATE`)
@@ -448,12 +463,19 @@ suite('V10 high-level source authority races through real services and PostgreSQ
       expect(expired).toBe(true)
     } finally { release.resolve() }
     await success(blocker)
-    await rejected(publication, /CONTENT_STATIC_SJT_SOURCE_LICENSE_DENIED/)
-    expect(await one.compositeAssessment.findUniqueOrThrow({ where: { id: compositeId } })).toEqual(before)
+    await success(publication)
+    const after = await one.compositeAssessment.findUniqueOrThrow({ where: { id: compositeId } })
     expect(before).toMatchObject({ status: 'DRAFT', trainingContentSnapshot: null, trainingContentSnapshotHash: null, publishedAt: null })
-    await expect(client(two).$transaction(tx => publishComposite(actor, UserRole.TEACHER, compositeId, tx)))
-      .rejects.toThrow(/CONTENT_STATIC_SJT_SOURCE_LICENSE_DENIED/)
-    expect(await one.compositeAssessment.findUniqueOrThrow({ where: { id: compositeId } })).toEqual(before)
+    expect(after).toMatchObject({ status: 'PUBLISHED', id: compositeId, createdBy: actor })
+    expect(after.publishedAt).toBeInstanceOf(Date)
+    expect(after.trainingContentSnapshotHash).toMatch(/^[a-f0-9]{64}$/)
+    expect(JSON.stringify(after.trainingContentSnapshot)).toContain(measurement.contentHash)
+    expect(JSON.stringify(after.trainingContentSnapshot)).not.toContain('sourceLicenseProof')
+    // Republishing a published composite remains a conflict, not a new approval.
+    await expect(client(two).$transaction(tx => publishComposite(actor, UserRole.TEACHER, compositeId, tx))).rejects.toMatchObject({statusCode:409})
+    const replay = await one.compositeAssessment.findUniqueOrThrow({ where: { id: compositeId } })
+    expect(replay.trainingContentSnapshot).toEqual(after.trainingContentSnapshot)
+    expect(replay.trainingContentSnapshotHash).toBe(after.trainingContentSnapshotHash)
     const [current] = await one.$queryRaw<Array<{ measurement_release_id: string }>>`
       SELECT measurement_release_id FROM static_sjt_measurement_mappings WHERE id=${mapping.id}`
     expect(current.measurement_release_id).toBe(published.measurementReleaseId)

@@ -33,6 +33,25 @@ export type LocalizationAdaptationMethod = z.infer<typeof localizationAdaptation
 export const localizationReviewItemStatusSchema = z.enum(['COMPLETED', 'PENDING', 'NOT_ESTABLISHED'])
 export type LocalizationReviewItemStatus = z.infer<typeof localizationReviewItemStatusSchema>
 
+/**
+ * Evidence-bearing review record for a localization decision. Optional for
+ * first-generation content (legacy APPROVED manifests stay valid), but a
+ * present record is strongly validated: it names the reviewer, binds the
+ * exact instrument/localization versions it covers, and lists the evidence
+ * it rests on — so an old record cannot be reused after a version bump.
+ */
+export const localizationReviewRecordSchema = z.object({
+  reviewer: z.string().min(1),
+  reviewedAt: z.string().regex(ISO_TIMESTAMP_RE, 'reviewedAt 必须是 ISO 时间戳'),
+  instrumentVersion: z.string().regex(VERSION_RE),
+  localizationVersion: z.string().regex(VERSION_RE),
+  evidenceIds: z.array(z.string().min(1)).min(1),
+  reason: z.string().min(1).optional(),
+}).strict()
+export type LocalizationReviewRecord = z.infer<typeof localizationReviewRecordSchema>
+
+const reviewItemStatusWithReturn = z.enum(['COMPLETED', 'PENDING', 'NOT_ESTABLISHED', 'RETURNED'])
+
 export const localizationManifestV1Schema = z.object({
   schemaVersion: z.literal(1),
   instrumentKey: z.string().regex(INSTRUMENT_KEY_RE, 'instrumentKey 必须是 snake_case 产品 key'),
@@ -42,13 +61,15 @@ export const localizationManifestV1Schema = z.object({
   localizationVersion: z.string().regex(VERSION_RE, 'localizationVersion 必须是 x.y.z 三段数字'),
   translationSource: z.string({ error: issue => issue.input === undefined ? 'translationSource 必填：必须记录当前部署文本的来源' : undefined }).min(1, 'translationSource 必填：必须记录当前部署文本的来源'),
   adaptationMethod: localizationAdaptationMethodSchema,
-  expertReviewStatus: localizationReviewItemStatusSchema,
+  expertReviewStatus: reviewItemStatusWithReturn,
   cognitiveDebriefStatus: localizationReviewItemStatusSchema,
   /** 指向 catalog manifest evidence matrix 中的 evidenceId。 */
   localEvidenceRefs: z.array(z.string().min(1)).default([]),
   /** manifest 级治理审核：APPROVED 必须带 reviewedAt。 */
-  reviewStatus: z.enum(['APPROVED', 'PENDING']),
+  reviewStatus: z.enum(['APPROVED', 'PENDING', 'RETURNED']),
   reviewedAt: z.string().regex(ISO_TIMESTAMP_RE, 'reviewedAt 必须是 ISO 时间戳').optional(),
+  review: localizationReviewRecordSchema.optional(),
+  expertReview: localizationReviewRecordSchema.optional(),
   notes: z.string().min(1).optional(),
 }).strict().superRefine((manifest, ctx) => {
   if (manifest.reviewStatus === 'APPROVED' && !manifest.reviewedAt) {
@@ -57,6 +78,22 @@ export const localizationManifestV1Schema = z.object({
       path: ['reviewedAt'],
       message: 'reviewStatus=APPROVED 时必须提供 reviewedAt',
     })
+  }
+  if ((manifest.reviewStatus === 'APPROVED' || manifest.reviewStatus === 'RETURNED') && manifest.review) {
+    if (manifest.review.instrumentVersion !== manifest.instrumentVersion || manifest.review.localizationVersion !== manifest.localizationVersion) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['review'], message: 'REVIEW_RECORD_VERSION_MISMATCH: 审核记录绑定的版本与 manifest 不一致，不能复用旧版本审核' })
+    }
+    if (manifest.reviewStatus === 'RETURNED' && !manifest.review.reason) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['review.reason'], message: 'RETURNED 时必须说明退回原因' })
+    }
+  }
+  if ((manifest.expertReviewStatus === 'COMPLETED' || manifest.expertReviewStatus === 'RETURNED') && manifest.expertReview) {
+    if (manifest.expertReview.instrumentVersion !== manifest.instrumentVersion || manifest.expertReview.localizationVersion !== manifest.localizationVersion) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expertReview'], message: 'REVIEW_RECORD_VERSION_MISMATCH: 专家审校记录绑定的版本与 manifest 不一致，不能复用旧版本审核' })
+    }
+    if (manifest.expertReviewStatus === 'RETURNED' && !manifest.expertReview.reason) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expertReview.reason'], message: 'RETURNED 时必须说明退回原因' })
+    }
   }
   if (manifest.sourceLocale === manifest.targetLocale && manifest.adaptationMethod !== 'ORIGINAL_SOURCE') {
     ctx.addIssue({

@@ -1,0 +1,127 @@
+{
+  "scope": "Only six existing E2E consumers and diagnostic evidence; no product, permission, workflow or required-check changes",
+  "baseHead": "fedc8629bdc0748bfec0cfe5cbc041c20a9e16bc",
+  "officialRun": 40177411402,
+  "officialResult": "failure",
+  "failureGroups": [
+    {
+      "jobs": [
+        121121217535,
+        121121217508,
+        121121217694
+      ],
+      "cause": "Old assignment labels; current exact-detail view intentionally has no list filters",
+      "files": [
+        "server-version/e2e/visual-interaction-states-browser-e2e.cjs",
+        "server-version/e2e/visual-legacy-dialogs-browser-e2e.cjs",
+        "server-version/e2e/visual-staff-complex-browser-e2e.cjs"
+      ],
+      "repair": "Use formal practice labels. Keep exact-detail focus/narrow-read assertions in populated handoff. Filter an actual list by explicit disclosure/query and verify the server query; preserve loading/empty/error/retry, keyboard, modal, overflow and no-business-write assertions",
+      "local": "Full Chromium staff3 and legacy41 cases passed. Existing supported assignment-list-states scope:5 states x4 widths,20 captures passed. No full three-engine local claim."
+    },
+    {
+      "jobs": [
+        121121545548
+      ],
+      "cause": "SJT V2 current open path reports viewed steps and answer navigation labels, not completed-step count",
+      "repair": "Assert current viewed positions, including round-two view4 after reload; reject mutable denominator for both old and current labels; preserve durable checked answers, required blockers, prune, FINAL/receipt/scoring/report/anonymous/asset assertions",
+      "local": {
+        "script": "situational-branching-browser-e2e.cjs",
+        "fullUnfiltered": true,
+        "recordedPassChecks": 29,
+        "result": "ALL PASS"
+      }
+    },
+    {
+      "jobs": [
+        121121545559
+      ],
+      "cause": "Old anonymous identity fixture waits for a raw credential hidden in diagnostic details",
+      "repair": "Use the actual save-link download and confirmation journey; verify exact origin/study path, empty query, training-study fragment and credential; consent, scoped Bearer/recovery headers, return/resume and revocation denial remain",
+      "local": {
+        "script": "anonymous-study-browser-e2e.cjs",
+        "fullUnfiltered": true,
+        "passedViewports": 3
+      }
+    },
+    {
+      "jobs": [
+        121121545564
+      ],
+      "cause": "Projection recovery predicate excludes actual ?view=current-unit GET",
+      "repair": "Match GET, exact API pathname and attempt ID plus current-unit projection; preserve actual COMPLETED DB repair and exactly one snapshot/canonical fact",
+      "local": {
+        "script": "pr5-product-scenarios.ts",
+        "fullUnfiltered": true,
+        "status": "PASSED",
+        "recordedChecks": 5,
+        "runtimeAttempts": 27,
+        "database": "New own loopback synthetic database matching original dedicated-name guard;229 actual migrations. Guard unchanged; earlier rejection retained."
+      }
+    }
+  ],
+  "sourceFiles": {
+    "server-version/e2e/anonymous-study-browser-e2e.cjs": "7466d9d08bc325a57a477a93b7405650b7f53a57000f4fc30cbc71e237fbe671",
+    "server-version/e2e/pr5-product-scenarios.ts": "ee207d768c7314adf712a8b40465b766d5da7323229995eaf0fe2d29aff6d8de",
+    "server-version/e2e/situational-branching-browser-e2e.cjs": "ab6bf080e462fed166df5c7bef322d7af37329ff6322fa51d658ae5eb5e4e218",
+    "server-version/e2e/visual-interaction-states-browser-e2e.cjs": "a07ed9567b4cf09f130b7cb11f20f5622bc9f17828fa8e9eb45c69d70cbf2021",
+    "server-version/e2e/visual-legacy-dialogs-browser-e2e.cjs": "61347d3709e57f41071a9f7cf4e590d044f05a03d4e2a80a2842f78b75c289a4",
+    "server-version/e2e/visual-staff-complex-browser-e2e.cjs": "91a81cee6616f932cdc04a6614d2287c0c1f2c24a37d5db5e2c460a5dff6b35b"
+  },
+  "frontendArtifact": {
+    "id": 12592982304,
+    "archiveSha256": "8ee8b799cd8ae3badd3d4e17a74f6bbe6686355db8608da7fabeeeba438d870c",
+    "checkout": "03a4318563c66caf4a42d0b06bc362dede9c7664",
+    "runId": "40177411402",
+    "kind": "frontend-ui-lab",
+    "lockDigest": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "contentDigest": "957303bbdb468c89bbdbb9c63a110992f0e1a4615bdba76426142d34c5d70997",
+    "verification": "ZIP hash, source/run/kind/lock and complete emitted content verified before and after diagnostics; original bytes, no rebuild"
+  },
+  "runtimeBoundary": "Source backend with locked dependencies and synthetic fixtures for local SJT; existing CI-defined PR5 source scenario server; actual Chromium, DOM, IndexedDB, HTTP and PostgreSQL. UI uses exact official compiled artifact. These local results do not qualify new-head GitHub checks.",
+  "syntax": "Five CJS node --check plus PR5 TypeScript transpile diagnostics exit0; session/auth control exit0; diff check exit0",
+  "localLimitations": [
+    {
+      "action": "Firefox launch for bounded assignment states",
+      "target": "This existing task cloud container",
+      "outcome": "failed before scenarios",
+      "reason": "Read-only /proc/self/uid_map and software framebuffer crash; no sandbox bypass attempted"
+    },
+    {
+      "action": "Official Playwright WebKit install-deps",
+      "target": "This task cloud OS dependencies",
+      "outcome": "command failed, not auto-review rejection",
+      "reason": "su authentication failure; no credentials supplied, no alternate privilege route"
+    }
+  ],
+  "rawEvidence": {
+    "merge355-fedc-visual-staff-fixed.log": {
+      "sha256": "c2149ab47d4c4f0bb5e7629dfb979eb0551f9754280bd607e965182f0c2f7231"
+    },
+    "merge355-fedc-legacy-dialogs-chromium.log": {
+      "sha256": "6111e199be6e7b3aa918d147b4c9aaf9d4532ae15d7f5f9b0c6e3632fdafed93"
+    },
+    "merge355-fedc-list-states-chromium2.log": {
+      "sha256": "a6c1320e9b78dad9feba3cabb8cb2b28cb12be1deaee71a1374bfbee6ced5392"
+    },
+    "merge355-fedc-anonymous-study-fixed.log": {
+      "sha256": "d33e4ae5f57fa287861437cbcacf54bd0076db1d319ff3822341d03dce2a0909"
+    },
+    "merge355-fedc-branching-browser2.log": {
+      "sha256": "1997b73e402c4089f7fac596b304dbb3362bce9e58c0748dd101594c2a714ce8"
+    },
+    "merge355-fedc-pr5-browser1.log": {
+      "sha256": "59ba41a1b228dd7f03bb24fd16eef720a4e79225af666fcd963373fe47823546"
+    },
+    "merge355-fedc-pr5/browser/manifest.json": {
+      "sha256": "d1f45fe5745cd223fb4e2d896fceb9c3899f85eebd1a8f00da2749f1189dc3ef"
+    },
+    "merge355-fedc-browser-auth-contract.log": {
+      "sha256": "597e00cf23bc41311ef1ab58740700b63a1bfbbbf72e9021bd82e061b0501294"
+    },
+    "merge355-fedc-browser-auth-contract2.log": {
+      "sha256": "c80fe1131b037c1d07c7ca61452fdd3bb9b388ea312834cc5fe3de3b45566846"
+    }
+  },
+  "remaining": "Freeze exact candidate for parent independent review before new CI. All selected final-head formal checks, including all3 engines, must really succeed before merge; no deployment."
+}

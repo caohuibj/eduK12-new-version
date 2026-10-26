@@ -3,6 +3,7 @@ import { canonicalHash } from '../../assessment-runtime/canonical'
 import { referenceSetHash } from '../../assessment-runtime/reference-binding'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale-definition'
 import type { ScaleInstrumentSourceV1 } from './types'
+import {snapshotScaleInstrumentSource} from './source-snapshot'
 const newer=(a:string,b:string)=>{const x=a.split('.').map(Number),y=b.split('.').map(Number);return x.some((n,i)=>n>y[i] && x.slice(0,i).every((v,j)=>v===y[j]))}
 /** Only explicitly versioned report/reference revisions may retain measurement identity. */
 export function allowsScaleAxisRevision(previous:unknown,next:ScaleDefinitionV2):boolean {
@@ -16,15 +17,26 @@ export function allowsScaleAxisRevision(previous:unknown,next:ScaleDefinitionV2)
  if(canonicalHash(old.referencePolicy)!==canonicalHash(next.referencePolicy)) {
   if(old.referencePolicy.type!=='declared' || next.referencePolicy.type!=='declared')return false
   const oldVersions=new Set(old.referencePolicy.selections.map(s=>s.referenceVersion))
-  if(next.referencePolicy.selections.some(s=>oldVersions.has(s.referenceVersion)))return false
+  const previous=new Map(old.referencePolicy.selections.map(s=>[s.scoreKey+':'+s.referenceKind,s]))
+  let revised=false
+  for(const selection of next.referencePolicy.selections){
+   const prior=previous.get(selection.scoreKey+':'+selection.referenceKind)
+   if(prior&&canonicalHash(prior)===canonicalHash(selection))continue
+   if(oldVersions.has(selection.referenceVersion))return false
+   revised=true
+  }
+  // A changed binding needs a new exact version; unchanged independent
+  // references keep their original identity. Removal/reordering alone is not
+  // a versioned parameter revision.
+  if(!revised)return false
  }
  return true
 }
 export async function freezeScaleAxisSnapshot(db:PrismaClient|Prisma.TransactionClient,scaleId:string,source:ScaleInstrumentSourceV1) {
  const e=source.executable!,d=e.definition
  if(!d.versionAxes)return
- const axes={instrumentVersion:source.identity.instrumentVersion,measurementHash:hashScaleDefinition(d),scoringVersion:d.scoring.scoringVersion,reportVersion:d.report.reportVersion,referenceVersions:e.references.map(r=>({version:r.referenceVersion,hash:referenceSetHash(r)})),localizationVersion:source.localization!.localizationVersion,catalogManifestVersion:source.catalog.catalogManifestVersion}
- const safeSource={...source,executable:{...e,scorerPlugins:(e.scorerPlugins??[]).map(p=>({key:p.key,version:p.version}))}},sourceHash=canonicalHash(safeSource),axisHash=canonicalHash(axes)
+ const axes={instrumentVersion:source.identity.instrumentVersion,measurementHash:hashScaleDefinition(d),scoringVersion:d.scoring.scoringVersion,reportVersion:d.report.reportVersion,referenceVersions:e.references.map(r=>({version:r.referenceVersion,hash:referenceSetHash(r)})),localizationVersion:source.localization!.localizationVersion,catalogManifestVersion:source.catalog.catalogManifestVersion,...(source.instruction?{instructionVersion:source.instruction.version}:{})}
+ const safeSource=snapshotScaleInstrumentSource({...source,executable:{...e,scorerPlugins:e.scorerPlugins??[]}}),sourceHash=canonicalHash(safeSource),axisHash=canonicalHash(axes)
  await db.$executeRaw(Prisma.sql`INSERT INTO scale_axis_snapshots(scale_id,axis_hash,source_hash,axes,source_snapshot) VALUES (${scaleId},${axisHash},${sourceHash},${JSON.stringify(axes)}::jsonb,${JSON.stringify(safeSource)}::jsonb) ON CONFLICT (scale_id,axis_hash) DO NOTHING`)
  const rows=await db.$queryRaw<Array<{source_hash:string}>>(Prisma.sql`SELECT source_hash FROM scale_axis_snapshots WHERE scale_id=${scaleId} AND axis_hash=${axisHash}`)
  if(rows[0]?.source_hash!==sourceHash)throw new Error('SCALE_AXIS_VERSION_CONTENT_CONFLICT')

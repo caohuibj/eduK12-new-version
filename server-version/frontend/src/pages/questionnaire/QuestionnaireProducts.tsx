@@ -73,6 +73,8 @@ async function request(
   return response.data
 }
 const message = apiErrorMessage
+type StandardAxisVersions={CONTENT:string;PARAMETERS:string;REPORT:string}
+const standardVersionLabel=(axes:StandardAxisVersions)=>`内容 ${axes.CONTENT} · 参数 ${axes.PARAMETERS==='none-v1'?'未配置':axes.PARAMETERS} · 报告 ${axes.REPORT==='none-v1'?'未配置':axes.REPORT}`
 const labels: Record<string, string> = {
   SCALE: '量表',
   COGNITIVE: '认知测验',
@@ -227,6 +229,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   const [detail, setDetail] = useState<any>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
+    standardCombinations: [],
     cognitive: [],
     situational: [],
     courses: [],
@@ -614,7 +617,14 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
         }
       }
       const item: any = { type, required: type === 'FORM' ? required : true }
-      if (type === 'SCALE') item.scaleId = selected
+      if (type === 'SCALE') {
+        const approved=standardCombinationChoices.find(choice=>choice.id===selected)
+        if(approved){item.scaleId=approved.scaleId;item.standardCombination={...approved.combination}}
+        else {
+          if(selected.startsWith('standard:'))throw new Error('所选批准组合已变化，请重新读取工具。')
+          item.scaleId=selected
+        }
+      }
       if (type === 'COGNITIVE') item.cognitiveAssignmentId = selected
       if (type === 'SITUATIONAL') {
         const row = catalog.situational.find((v: any) => v.id === selected)
@@ -651,6 +661,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
           .map((v: any) => ({
             ...v,
             label:
+              (v.standardCombinationSummary ? (v.scale?.name??'标准量表')+' · 已批准组合 · '+standardVersionLabel(v.standardCombinationSummary.axisVersions) : null) ||
               v.scale?.name ||
               v.cognitiveAssignment?.title ||
               v.situational?.key ||
@@ -758,9 +769,15 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
     !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
+  const standardCombinationChoices: Array<{id:string;name:string;scaleId:string;instrumentVersion:string;version:string;code:string;profile:string;combination:{releaseId:string;combinationHash:string}}> = trainingDesign&&kind==='COURSE'&&!formTemplate
+    ? (catalog.standardCombinations??[]).map((choice:any)=>{
+      const axes=choice.axisVersions
+      const version=axes?standardVersionLabel(axes):choice.instrumentVersion
+      return {...choice,id:'standard:'+choice.combination.releaseId+':'+choice.combination.combinationHash,name:choice.title,version,code:choice.toolKey,profile:'已批准组合'}
+    }) : []
   const choices =
     type === 'SCALE'
-      ? catalog.scales
+      ? [...standardCombinationChoices,...catalog.scales]
       : type === 'COGNITIVE'
         ? catalog.cognitive
         : catalog.situational
@@ -1002,7 +1019,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                   <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <>
                     <div className="qt-content-task-heading"><span>01</span><div><h3>选择内容类型</h3><p>选用已发布且有权限的工具，或编写表单题。</p></div></div>
                     <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
-                      ['SCALE','量表',BookOpen,'分别计分与反馈',catalog.scales.length],
+                      ['SCALE','量表',BookOpen,'分别计分与反馈',catalog.scales.length+standardCombinationChoices.length],
                       ['COGNITIVE','认知测验',Brain,'选用已有任务，保留冻结配置',catalog.cognitive.length],
                       ['SITUATIONAL','情境判断',Route,'使用获授权的固定版本',catalog.situational.length],
                       ['FORM','自定义表单',ClipboardList,'收集背景信息或课程反馈',null],
@@ -1031,6 +1048,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       )}
                     </select>
                   </label>
+                  {type==='SCALE'&&trainingDesign&&kind!=='COURSE'&&(catalog.standardCombinations??[]).length>0&&<p className="qt-content-availability">精确批准组合目前适用于课程问卷。</p>}
                   {type !== 'FORM' ? (
                     trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评

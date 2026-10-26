@@ -1,0 +1,70 @@
+{
+  "authorization": "User explicitly approved isolated validation maintenance and SAST budget without weakening gates or business rights",
+  "changes": [
+    "Nine explicit newer integration opt-ins map to the same existing job PG; serial suite execution unchanged",
+    "Dependency-free preflight rejects all missing/foreign values with suite names, without automatic DATABASE_URL fallback",
+    "Mac export test runs separately on current job-owned Redis DB15 with actual container ID/image and expiring run marker; base/export raw reports retained and disjoint full union mandatory",
+    "CodeQL timeout 20 to 30 minutes; identical queries, languages, scope, permissions and merge requirements"
+  ],
+  "localControls": {
+    "ciTopologyAndReportControls": "18 passed, 0 failed; includes actual embedded preflight code missing/foreign cases and report failure/interruption preservation",
+    "selectedRoutingControls": "84 passed, 0 failed",
+    "yaml": "Both workflows parsed; four embedded Node scripts passed node --check",
+    "backendTypes": "npx tsc --noEmit exit 0; original log retained"
+  },
+  "privateLogSha256": {
+    "merge355-ci-controls-final4.log": "5babb3be7ce2053a52247a5fa0e049e49ac42dbe65319a964afdffec1482ee7a",
+    "merge355-routing-final.log": "ea03746768eddb7488071eb48bb5e567f1c7a3cc90a2c654d105271ee68d5c64",
+    "merge355-backend-types-final.log": "842b1c959f182a3c80197ee0ec1c80c6f0f990b49ef58b4bf6a2f79f14deb3ec",
+    "merge355-ci-controls-final5.log": "d255e2b80fecc680d22aac64893c67ad97d60dcccc4f18b9cfc717795856339f"
+  },
+  "currentSourceSha256": {
+    ".github/workflows/ci.yml": "cf08c565fe3deafc643c90a5afb3cf0716a203997ea919f4ee274159d1ef244b",
+    ".github/workflows/ci-backend-regression.yml": "679e638af35cfaadccb3a1b8471351d7d28e138a7b783cbcbd4db19249ea3b8b",
+    ".github/scripts/ci-topology.test.mjs": "a70546e39c68b4f4cfa1c600d76901925314a4e676297b3b9012328627889b8c",
+    ".github/scripts/backend-regression-reports.mjs": "37c489dfafe66162de7c601a7d3c565ff66d88837be435b77e50245e773e6571",
+    ".github/scripts/backend-regression-reports.test.mjs": "8117d56da03a12bd852c5b16dfd6e1f1e0d594e6130fa42cdd49589f880c1ebd",
+    "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts": "f9fbad840f63f9fd0865d43407344292c19dd05db065eac2b5110946d30329d0",
+    "server-version/backend/src/__tests__/survey/tool-publication.postgres.integration.test.ts": "5a85e8b04c4807013f145f079decc540c70b712e4cb1fde4fdf9eec6e3d74e7b"
+  },
+  "pendingOfficial": [
+    "Normal selected final-head gates, including own-job 200 completion and short k6 smoke",
+    "Two revised Mini native entry contracts (local exact UTC guard denied setup; no timezone change)",
+    "Three rollback-only Survey publication cases require actual Actions service identity",
+    "Mac export isolated consumer needs real Actions positive execution; no locally forged CI/container identity"
+  ],
+  "budget": {
+    "backendRegressionMinutes": 35,
+    "codeqlMinutes": 30,
+    "localControlSecondsApprox": 8
+  },
+  "notAuthorized": [
+    "Deployment",
+    "Forced merge or bypass",
+    "Training next policy/version/report migrations"
+  ],
+  "workflowValidationCorrection": {
+    "failedHead": "b59e6af55a340a72479b7ee23535c64c24e2ee2c",
+    "runs": [
+      {
+        "id": 40166657738,
+        "error": "Job env cannot evaluate runner.environment; no jobs created"
+      },
+      {
+        "id": 40166660581,
+        "error": "Called workflow semantic validation propagated; no application checks executed"
+      }
+    ],
+    "fix": "Evaluate runner.environment only in the full regression and isolated export step env; keep exact identity requirements",
+    "newControl": "Reject job-level runner context and require the two step-level environments",
+    "actionlint": {
+      "version": "1.7.12",
+      "source": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+      "archiveSha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "binarySha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4"
+    },
+    "command": "actionlint -shellcheck= -pyflakes= .github/workflows/ci.yml .github/workflows/ci-backend-regression.yml",
+    "exitCode": 0,
+    "limits": "This local check validates workflow syntax, expressions and semantics. Shell/Python linters are outside this check; normal mandatory CI remains unchanged."
+  }
+}

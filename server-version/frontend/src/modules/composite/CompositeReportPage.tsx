@@ -60,6 +60,8 @@ const CompositeReportPage: React.FC = () => {
   const adminMode = teacherMode && user?.role === 'ADMIN'
   const selectedSnapshotId = staffMode ? new URLSearchParams(location.search).get('snapshotId') || undefined : undefined
   const partial = staffMode && new URLSearchParams(location.search).get('partial') === '1'
+  const combinedReportView = isTrainingHost() && !teacherMode && !staffMode && !partial && !selectedSnapshotId &&
+    (publicMode || location.pathname.startsWith('/student/composite/'))
   const [recoveryToken, setRecoveryToken] = useState(publicMode && attemptId ? readRecovery(attemptId) : '')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [report, setReport] = useState<CompositeReport | null>(null)
@@ -123,6 +125,23 @@ const CompositeReportPage: React.FC = () => {
       return
     }
     try {
+      if (combinedReportView && !snapshotId) {
+        const response = await withReportReadRecovery(async () => {
+          const view = await (publicMode ? publicCompositeApi(credential) : compositeApi).reportView(attemptId, waitMs, abort.signal)
+          if (view.code === 0 && view.data?.generation.reportStatus.state === 'READY' &&
+            (!view.data.generation.participantFeedback || view.data.generation.participantFeedback.state === 'AVAILABLE') && !view.data.report) {
+            throw new Error('报告暂时无法读取，请稍后重试')
+          }
+          return view
+        }, abort.signal, undefined, { completionBusyMaxAttempts: 2 })
+        if (current !== epoch.current) return
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '报告状态无法读取')
+        const { generation: status, report: currentReport } = response.data
+        setGeneration(status)
+        setReport(status.reportStatus.state === 'READY' &&
+          (!status.participantFeedback || status.participantFeedback.state === 'AVAILABLE') ? currentReport : null)
+        return
+      }
       if (!partial && !snapshotId) {
         const status = await runWithCompletionRetry(() => teacherMode && id
           ? compositeApi.teacherReportStatus(id, attemptId)
@@ -151,7 +170,7 @@ const CompositeReportPage: React.FC = () => {
       setGeneration(previous => previous && (previous.wholeSubmissionReceived || previous.hasAcceptedSubmission) && ['PENDING', 'PROCESSING'].includes(previous.reportStatus.state) ? { ...previous } : null)
       setReport(null)
     } finally { if (current === epoch.current) setLoading(false) }
-  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, staffMode, partial])
+  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, staffMode, partial, combinedReportView])
 
   useEffect(() => {
     if (!canPollGeneration || !(generation?.wholeSubmissionReceived || generation?.hasAcceptedSubmission) || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state)) return

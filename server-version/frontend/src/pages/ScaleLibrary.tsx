@@ -1,3 +1,7 @@
+import { scaleRightsStatusLabel } from '../modules/scale/rightsPresentation'
+import CatalogDiscoveryFilters from '../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../components/scale-governance/CatalogClassificationTags'
+import {catalogQuery,EMPTY_CATALOG_FILTERS,EMPTY_CATALOG_FACETS,type CatalogFilters} from '../api/catalogDiscovery'
 import { ParentToolDisclosureSettings } from '../components/ParentToolDisclosureSettings'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -17,6 +21,7 @@ const DOMAIN_OPTIONS = [
   ['EXECUTIVE_FUNCTION', '执行功能'],
   ['SELF_REGULATION', '自我调节'],
   ['SELF_EFFICACY', '自我效能'],
+  ['MOTIVATION', '学习动机'],
   ['SOCIAL_EMOTIONAL', '社会情绪'],
   ['BEHAVIORAL_DIFFICULTIES', '行为与困难'],
   ['PARENT_OBSERVATION', '家长观察'],
@@ -50,7 +55,7 @@ const statusClass: Record<ScaleLibraryAvailabilityStatus, string> = {
 const respondentLabel = (value: string): string => RESPONDENT_OPTIONS.find(([key]) => key === value)?.[1] ?? value
 const domainLabel = (value: string): string => DOMAIN_OPTIONS.find(([key]) => key === value)?.[1] ?? value
 const filterLabels: Partial<Record<keyof ScaleLibraryFilters, string>> = {
-  keyword: '关键词', respondent: '作答者', availability: '可用性', primaryDomain: '主要构念',
+  keyword: '关键词', tags: '分类标签', respondent: '作答者', availability: '可用性', primaryDomain: '主要构念',
   locale: '内容语言', intendedUse: '用途', minAge: '年龄下界', maxAge: '年龄上界', minGrade: '年级下界', maxGrade: '年级上界',
 }
 const filterValueLabel = (key: string, value: string | number): string => {
@@ -66,14 +71,6 @@ const formatAge = (entry: ScaleLibraryEntry): string => {
   if (entry.applicability.minAge === undefined || entry.applicability.maxAge === undefined) return '年龄边界见说明'
   return `${entry.applicability.minAge}–${entry.applicability.maxAge} 岁`
 }
-
-const formatStatus = (value: string): string => ({
-  APPROVED: '已批准',
-  EVIDENCE_PENDING: '证据待补充（不阻断试行）',
-  NOT_GRANTED: '尚无授权记录',
-  SCOPE_MISMATCH: '授权范围不匹配',
-  INELIGIBLE: '授权当前不可用',
-}[value] ?? value)
 
 const LoadingState: React.FC = () => (
   <div className="flex items-center justify-center min-h-64 text-gray-500">量表库加载中...</div>
@@ -105,6 +102,7 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
     </div>
 
     <p className="mt-4 text-sm leading-6 text-gray-700">{entry.construct.constructDefinition}</p>
+    <CatalogClassificationTags tags={entry.classificationTags}/>
     <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-600">
       <span className="rounded bg-gray-100 px-2 py-1">{domainLabel(entry.construct.primaryDomain)}</span>
       {entry.applicability.respondentTypes.map((respondent) => (
@@ -250,6 +248,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold text-gray-900">{entry.identity.canonicalName}</h1>
+              <CatalogClassificationTags tags={entry.classificationTags}/>
               <AvailabilityBadge entry={entry} />
             </div>
             <p className="mt-2 text-sm text-gray-500">
@@ -307,9 +306,9 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
           {entry.source.citation && <p className="mt-2">{entry.source.citation}</p>}
           {entry.source.url && <a className="mt-2 inline-flex items-center text-action hover:underline" href={entry.source.url} target="_blank" rel="noreferrer">查看来源 <ExternalLink className="ml-1 h-3.5 w-3.5" /></a>}
         </Section>
-        <Section title="授权与参考">
-          <p>授权状态：{formatStatus(entry.rights.status)}；商业性质：{entry.rights.commercialNature}。</p>
-          <p className="mt-2">覆盖语言：{entry.rights.locales.length > 0 ? entry.rights.locales.join('、') : '暂无可用授权范围'}；适用地区：{entry.rights.territories.length > 0 ? entry.rights.territories.join('、') : '暂无'}</p>
+        <Section title="使用边界与参考">
+          <p>{scaleRightsStatusLabel(entry.rights.status)}；入口及用户使用权限另行核验。</p>
+          <p className="mt-2">内容语言、科学适用地区与适用人群请查看版本说明；系统不判断是否已获版权许可。</p>
           <p className="mt-3">{entry.references.displayText}</p>
           <p className="mt-1 text-gray-500">参考版本 {entry.references.packageReferenceCount} 个；适用性记录 {entry.references.applicabilityCount} 条。</p>
         </Section>
@@ -357,6 +356,7 @@ const ScaleLibrary: React.FC = () => {
   const [detail, setDetail] = useState<ScaleLibraryEntry | null>(null)
   const [filters, setFilters] = useState<ScaleLibraryFilters>({})
   const [appliedFilters, setAppliedFilters] = useState<ScaleLibraryFilters>({})
+  const [classification,setClassification]=useState<CatalogFilters>(EMPTY_CATALOG_FILTERS)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const loadRequest = useRef(0)
@@ -396,7 +396,9 @@ const ScaleLibrary: React.FC = () => {
 
   const entries = listData?.entries ?? []
   const activeFilters = Object.entries(appliedFilters).filter(([, value]) => value !== undefined && value !== '')
-  const clearFilters = () => { setFilters({}); setAppliedFilters({}) }
+  const clearFilters = () => { setFilters({}); setAppliedFilters({});setClassification({...EMPTY_CATALOG_FILTERS}) }
+  const withClassification=(next:CatalogFilters)=>({...filters,tags:new URLSearchParams(catalogQuery(1,next)).get('tags')??undefined})
+  const classificationLabel=(key:string,value:string|number)=>key==='tags'?String(value).split(',').map(id=>Object.values(listData?.tagFacets??{}).flat().find(tag=>tag?.id===id)?.label??id).join('、'):filterValueLabel(key,value)
   return (
     <div className="hui-scale-library">
       <div className="mb-6">
@@ -409,12 +411,15 @@ const ScaleLibrary: React.FC = () => {
         onApply={() => setAppliedFilters(filters)}
         onClear={clearFilters}
       />
+      <CatalogDiscoveryFilters label="八轴分类筛选" showKeyword={false} filters={classification} facets={listData?.tagFacets??EMPTY_CATALOG_FACETS}
+        onChange={next=>{setClassification(next);setFilters(withClassification(next))}}
+        onApply={next=>{setClassification(next);const updated=withClassification(next);setFilters(updated);setAppliedFilters(updated)}}/>
       {activeFilters.length > 0 && <div className="mb-4 flex flex-wrap gap-2" aria-label="已应用筛选">
         {activeFilters.map(([key, value]) => <button key={key} type="button"
           className="min-h-11 max-w-full break-words rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700"
-          aria-label={`移除${filterLabels[key as keyof ScaleLibraryFilters] ?? key}：${filterValueLabel(key, value!)}`}
-          onClick={() => { setFilters({ ...filters, [key]: undefined }); setAppliedFilters({ ...appliedFilters, [key]: undefined }) }}>
-          {filterLabels[key as keyof ScaleLibraryFilters] ?? key}：{filterValueLabel(key, value!)} <span aria-hidden="true">×</span>
+          aria-label={`移除${filterLabels[key as keyof ScaleLibraryFilters] ?? key}：${classificationLabel(key, value!)}`}
+          onClick={() => { setFilters({ ...filters, [key]: undefined }); setAppliedFilters({ ...appliedFilters, [key]: undefined });if(key==='tags')setClassification({...EMPTY_CATALOG_FILTERS}) }}>
+          {filterLabels[key as keyof ScaleLibraryFilters] ?? key}：{classificationLabel(key, value!)} <span aria-hidden="true">×</span>
         </button>)}
       </div>}
       {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={load} /> : <>

@@ -1,0 +1,450 @@
+{
+  "recordedAt": "2026-10-25T05:24:36.798638+00:00",
+  "kind": "recorded-local-contract-execution-not-ci-or-live-consumption-qualification",
+  "baseCommit": "5703bccbfda53b92564f62e7d52f7265d2dadec7",
+  "codeCommit": "d7826bfe8bb5642e99c360adbbb3f22d6fe09837",
+  "codeTree": "496e777ae198f989bb902ad85c7ee28828bc4130",
+  "newDistinctPassedCases": 46,
+  "passedCaseExecutions": 47,
+  "targetedRepeatedCaseCount": 1,
+  "reports": [
+    {
+      "id": "attempt1",
+      "exitCode": 0,
+      "rawReportSha256": "cf943f0694655616306883970611242f2ba9aaf6ac5bee71906c44508970e696",
+      "passed": 36,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management preserves the existing combination hash formula and ignores unrelated metadata",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management changes only the CONTENT pointer when that axis changes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management changes only the PARAMETERS pointer when that axis changes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management changes only the REPORT pointer when that axis changes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reuses the exact existing platform MEASUREMENT producer without a second release scheme",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management maps existing snapshots and formal content separately while both entry authorizations remain unevaluated",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management distinguishes explicit empty P/R from missing database pointers",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports tool-key mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports combination mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports snapshot-combination mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports content-source mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports axis-kind mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports axis-payload mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management reports required-content mismatch without granting runtime or entry use",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management keeps unrecorded, absent and stopped formal releases distinct",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal release-id for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal hash for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal family for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal layer for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal scope for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal key for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal version for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal provenance for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal source for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management does not mistake another formal assets for this C axis",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management APPROVED and valid content still never imply Training is connected or a target is authorized",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management TRIAL_RUNNING and valid content still never imply Training is connected or a target is authorized",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management TRIAL_FAILED and valid content still never imply Training is connected or a target is authorized",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management ONLINE and valid content still never imply Training is connected or a target is authorized",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination.test.ts",
+          "name": "one exact C/P/R identity shared by entry management WITHDRAWN and valid content still never imply Training is connected or a target is authorized",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping reads existing content records in one batch, without publishing or creating grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping does not query content records or snapshots when the system role is refused",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping keeps a recorded pointer with absent content separate from missing training consumption",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping maps historical combinations independently, without latest selection or duplicate reads",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping does not invent a formal version when there are no approval records",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/survey/standard-combination-mapping.test.ts",
+          "name": "existing system management detail exposes the common exact-version mapping preserves repository integrity failures instead of converting them to missing content",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "compatibility",
+      "exitCode": 0,
+      "rawReportSha256": "b88746f1e8d66aedc8a08b35132bd9c4f7631132b385e1be74a2e8907cb40adb",
+      "passed": 3,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps the original C/P/R combination digest",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps every byte of the canonical Survey source snapshot and provenance",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps the original platform measurement input identity",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "compatibility-typed-fixture",
+      "exitCode": 0,
+      "rawReportSha256": "45b2198370a30c41fbf4150b02780a379dde3d4162481008372a3ba4eb2a3978",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 2,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps the original C/P/R combination digest",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps every byte of the canonical Survey source snapshot and provenance",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/standard-combination-compatibility.test.ts",
+          "name": "existing source identity survives shared mapping extraction keeps the original platform measurement input identity",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "training-boundaries",
+      "exitCode": 0,
+      "rawReportSha256": "18d78a2965ae498419e536e2ac632a2c68f5e272a3d7a622d2c766ffa4ec54f7",
+      "passed": 7,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a combination id as the existing V1 Scale/config/SJT source contract",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM theoretical_range parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM descriptive_sample parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope a PLATFORM criterion_threshold parameter snapshot is not a formal normative publication just because its Survey combo is approved",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope does not admit a Survey private parameter copy to the Training owner/composite",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a SURVEY report pointer as an existing Training private report binding",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-combination-boundary.test.ts",
+          "name": "current Training consumers do not borrow Survey approval or PRIVATE scope does not treat a PLATFORM report pointer as an existing Training private report binding",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "typeChecks": [
+    {
+      "id": "types",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": []
+    },
+    {
+      "id": "test-types",
+      "exitCode": 2,
+      "sha256": "5507c08e53670811f06186fb617241e01025d4c0f20e9db84a006a56da756cef",
+      "diagnostics": [
+        "src/__tests__/measurement-content/standard-combination-compatibility.test.ts(17,40): error TS2352: Conversion of type '{ title: string; references: never[]; template: null; blockers: never[]; schemaVersion: 1; reference: ToolReference; toolKey: string; instrumentVersion: string; combinationHash: string; parts: Record<StandardAxis, AxisSnapshot>; definition: ScaleDefinitionV2; }' to type 'Triplet' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.",
+        "  The types of 'parts.CONTENT' are incompatible between these types.",
+        "    Property 'reference' is missing in type 'AxisSnapshot' but required in type 'Part'."
+      ]
+    },
+    {
+      "id": "test-types-attempt2",
+      "exitCode": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": []
+    }
+  ],
+  "directInputs": {
+    "server-version/backend/src/modules/measurement-content/standard-combination.ts": "096bf8d0bf05ff69b3e3b65f14331ddeea324da989f4ee2e2a9e08d2577edeab",
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": "2a1b61592b6fe136dc9e3b73cd3407c4b487e498ddc3062e104cece2d4a63686",
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": "2bc7fcce6ddd2479561ac0876977828b7f8c09e0d20ff95511fbd2f8bc93eb3f",
+    "server-version/backend/src/__tests__/measurement-content/standard-combination.fixture.ts": "bbe87f10fb0c030d785a84f9280e3f47e2b6cb7e3598c66d74c54d7bf75ba0fb",
+    "server-version/backend/src/__tests__/measurement-content/standard-combination.test.ts": "e8172e1b15645dbeba6c986816bee509668392cfd4f81b59b477debd0c0d2e15",
+    "server-version/backend/src/__tests__/measurement-content/standard-combination-compatibility.test.ts": "9100e3031916a04bda8fe2294a79a805b8d1d1799c82ac0f68d0405b77feebcb",
+    "server-version/backend/src/__tests__/measurement-content/standard-combination-legacy.json": "0161d3725c952b9c45395217f11e59c52ba425ef62d8e8186ea78010c21e48c3",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts": "721ffd636a79565c463435fe072453b5c8839f8c069331ca152fa8b3a72c9faf",
+    "server-version/backend/src/__tests__/survey/standard-combination-mapping.test.ts": "44f3371bed588d49f60f7919dcb8c73927a27608e7d83dd76791af5038550c9d",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+  },
+  "interfaceFiles": {
+    "server-version/backend/src/modules/measurement-content/standard-combination.ts": {
+      "beforeBlob": null,
+      "afterBlob": "34f87f5340d3deabb3984e78c89315d92cd461b6"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
+      "beforeBlob": "91b15e0e3c7da634e9e21df9272036c5f3d44f5f",
+      "afterBlob": "9784b320c319f3a2b52ab2a76dc4658e0128c0c9"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": {
+      "beforeBlob": "541bc1ca74efe3923172c5e9496da51c5141809b",
+      "afterBlob": "75a3ae48228fca86d1f9f423c486db29c385489c"
+    }
+  },
+  "golden": {
+    "sourceCommit": "6fedb640fdd0700b9c1ca9974bf417b5a43cf58c",
+    "kind": "synthetic-read-only-compatibility-witness-not-trial",
+    "syntheticInputSha256": "d00937d985c3a4d1ac9876c7db315d1b11f3f1c926af2a8d1183bb9a31c42c4c",
+    "combinationHash": "d9c84ba0b96b7e262046e0019762ba20a9d9b098ef3e0031e80e465fe131e7fc",
+    "platformMeasurementInputHash": "d925f03cbaf5a9890faba3c9c3a00ff6b011cf20b624b4f9ec82d4b6506e5c8a",
+    "canonicalSnapshotHash": "7ccff27e93a8a96c125122b0724bdab0462a450584d3e1e09924f5c234f8d556"
+  },
+  "goldenRawSha256": "0161d3725c952b9c45395217f11e59c52ba425ef62d8e8186ea78010c21e48c3",
+  "goldenProgramSha256": "44367810212fc60aabe4225dda68465882c9672ae902c01421f6699932d1dab4",
+  "priorBaselineFailureEvidence": {
+    "file": "docs/evidence/tool-onboarding-next-20261025/preflight-validation.json",
+    "sha256": "c3c479ddc8b3da6531a52e0d782aa704f782736f4838f1ca6e81452c1e48c6f8",
+    "failures": 11,
+    "status": "original failures preserved; not repaired or rerun in this block"
+  },
+  "scope": {
+    "endpoint": "GET /api/platform/survey-standard/candidate/:key/:version",
+    "additiveField": "versionMappings",
+    "maximumHistoryRows": 50,
+    "measurementReads": "one existing getContentReleaseBatch call; no per-row read loop",
+    "databaseWrites": 0,
+    "permissionsChanged": false,
+    "publicLibraryUiChanged": false,
+    "classificationOrSearchChanged": false,
+    "bulkOnboardingModelChanged": false,
+    "trainingRuntimeConnected": false
+  },
+  "divisionUpdate": {
+    "publicLibraryTaskId": "01a17181-e464-749a-a717-a10d2e304037",
+    "parentReportedBase355": "f7b6c766 (abbreviated, not independently fetched by this node)",
+    "parentReportedDotChanges": "five private bundle commits; Library identity not yet supplied to this node; not needed for this contract block",
+    "localBaselineRetained": "6c9745fd + ordered three #356 patches; no automatic rebase or source import"
+  },
+  "commands": {
+    "mapping": "vitest run src/__tests__/measurement-content/standard-combination.test.ts src/__tests__/survey/standard-combination-mapping.test.ts --maxWorkers=1 --reporter=json",
+    "compatibility": "vitest run src/__tests__/measurement-content/standard-combination-compatibility.test.ts --maxWorkers=1 --reporter=json",
+    "compatibilityTypedFixture": "same compatibility file/options with -t \"every byte\" only",
+    "trainingBoundaries": "vitest run src/__tests__/measurement-content/training-standard-combination-boundary.test.ts --maxWorkers=1 --reporter=json",
+    "productionTypes": "tsc --noEmit --pretty false",
+    "testTypesFinal": "tsc --noEmit --skipLibCheck --strict --esModuleInterop --target ES2020 --module commonjs --moduleResolution node --resolveJsonModule --experimentalDecorators --emitDecoratorMetadata --strictPropertyInitialization false src/middleware/auth.ts src/__tests__/measurement-content/standard-combination.test.ts src/__tests__/measurement-content/standard-combination-compatibility.test.ts src/__tests__/measurement-content/training-standard-combination-boundary.test.ts src/__tests__/survey/standard-combination-mapping.test.ts"
+  },
+  "limitations": [
+    "46 distinct cases pass, not a full repository or green baseline claim. Historical 11 failures keep their original invocation identity.",
+    "First scoped test type command failed because the synthetic Triplet lacked Part.reference. The fixture was made structurally complete without changing production types or assertions; only that already-passed snapshot case was executed again, two others were filtered and retain original pass identity.",
+    "Golden was computed by unmodified 6fedb640 archived source, using synthetic definitions; no install, approve, release publish, synthetic trial or real DB operations were invoked.",
+    "Pure mapping validates axis identity and recorded formal C pointer; compatibility and entry/user/runtime authorization deliberately remain NOT_EVALUATED.",
+    "Training boundaries document existing unsupported consumers; no source/distribution/collection path was opened.",
+    "Direct inputs were recorded after execution; no signed full transitive runtime-byte or CI attestation asserted.",
+    "No frontend build/tests, HTTP, database lifecycle, schema migration, image scan, CI, push, merge, production operation or user Mac access."
+  ]
+}

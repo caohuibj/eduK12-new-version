@@ -99,9 +99,7 @@ export async function readSjtEntryDistributionSource(
     if (!validation.valid || compiled.contentDigest !== release.contentDigest
       || compiled.definitionHash !== release.definitionHash || validation.definitionHash !== release.definitionHash
       || pkg.key !== release.instrumentKey || pkg.instrumentVersion !== release.instrumentVersion
-      || canonicalHash(pkg) !== canonicalHash(release.package)
-      || !['verified', 'authorized', 'self_authored'].includes(pkg.definition.license.status)
-      || pkg.definition.license.redistribution !== 'allowed') fail('SOURCE_SJT_ENTRY_SOURCE_INVALID')
+      || canonicalHash(pkg) !== canonicalHash(release.package)) fail('SOURCE_SJT_ENTRY_SOURCE_INVALID')
     const expected = prepareRelease(sjtMeasurementRelease({
       localId: pkg.key, version: pkg.instrumentVersion, instrumentVersion: pkg.instrumentVersion,
       definition: pkg.definition, onlineProtocol: pkg.online,
@@ -166,7 +164,7 @@ export async function assertSjtEntryDistributionAuthority(tx: Prisma.Transaction
         WHERE subject_id=${input.actorId} AND product='SURVEY' AND scope_kind='PLATFORM'
           AND scope_id='situational-library-governance' AND resource_kind='material'
           AND ${source.measurementReleaseId}=ANY(resource_keys) AND 'material.distribute'=ANY(capabilities)
-          AND revoked_at IS NULL AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp()
+          AND revoked_at IS NULL AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
         ORDER BY id LIMIT 129`)
       if (candidates.length > 128) fail('SOURCE_SJT_ENTRY_GRANT_LIMIT')
       for (const candidate of candidates) {

@@ -71,7 +71,7 @@ const evaluate = (input: {
 
 describe('Scale deployment policy', () => {
   it('is deterministic and allows every explicitly bound surface', () => {
-    expect(hashScaleDeploymentPolicy(policy())).toBe(hashScaleDeploymentPolicy(policy()))
+    expect(hashScaleDeploymentPolicy(policy())).toBe(canonicalHash(policy())) // legacy hash is unchanged
     for (const requestedMode of ['STANDALONE', 'QUESTIONNAIRE', 'PUBLIC_QUESTIONNAIRE', 'COMPOSITE'] as const) {
       expect(evaluate({ requestedMode })).toMatchObject({ allowNewStarts: true, reasons: [] })
     }
@@ -84,35 +84,30 @@ describe('Scale deployment policy', () => {
     }).reasons).toContain('DEPLOYMENT_MODE_NOT_BOUND')
   })
 
-  it('fails closed for missing, expired, revoked and stale authorization bindings', () => {
-    expect(evaluate({ authorizations: [] }).reasons).toContain('AUTHORIZATION_MISSING')
-    expect(evaluate({ authorizations: [authorization({ validTo: '2026-01-02T00:00:00.000Z' })] }).allowNewStarts).toBe(false)
-    expect(evaluate({ authorizations: [authorization({ status: 'REVOKED' })] }).allowNewStarts).toBe(false)
-    expect(evaluate({ deployment: policy({ authorizationRefs: ['different-auth'] }) }).reasons).toContain('AUTHORIZATION_BINDING_STALE')
+  it('does not use missing, expired, revoked or stale copyright records as a gate', () => {
+    for(const authorizations of [[],[authorization({validTo:'2020-01-01T00:00:00Z'})],[authorization({status:'REVOKED'})]])
+      expect(evaluate({authorizations})).toMatchObject({allowNewStarts:true,authorization:null,reasons:[]})
+    expect(evaluate({deployment:policy({authorizationRefs:['unrelated']})}).allowNewStarts).toBe(true)
   })
-
-  it('rejects rights, scope, commercial and runtime-policy widening', () => {
-    expect(evaluate({ deployment: policy({ territory: 'US' }) }).reasons).toContain('AUTHORIZATION_SCOPE_MISMATCH')
-    expect(evaluate({ deployment: policy({ commercialNature: 'COMMERCIAL' }) }).reasons).toContain('COMMERCIAL_NATURE_MISMATCH')
-    expect(evaluate({ deployment: policy({ requiredRightsActions: ['translation'] }) }).reasons).toContain('RIGHT_translation_MISSING')
-    expect(evaluate({ deployment: policy({ runtimePolicyHash: 'a'.repeat(64) }) }).reasons).toContain('RUNTIME_POLICY_HASH_MISMATCH')
+  it('ignores license scope/actions but still rejects runtime identity mismatch', () => {
+    expect(evaluate({deployment:policy({territory:'US',commercialNature:'COMMERCIAL',requiredRightsActions:['translation']})}).allowNewStarts).toBe(true)
+    expect(evaluate({deployment:policy({runtimePolicyHash:'a'.repeat(64)})}).reasons).toContain('RUNTIME_POLICY_HASH_MISMATCH')
   })
-
   it('ignores a newer DRAFT row while a valid approved lineage remains effective', () => {
     const older = authorization({ version: 1, status: 'APPROVED' })
     const newer = authorization({ version: 2, status: 'DRAFT' })
     expect(evaluate({ authorizations: [older, newer] })).toMatchObject({ allowNewStarts: true, reasons: [] })
   })
-  it('does not resurrect an older grant after a newer revocation', () => {
-    expect(evaluate({ authorizations: [authorization({ version: 1 }), authorization({ version: 2, status: 'REVOKED' })] }).allowNewStarts).toBe(false)
+  it('does not interpret either old or revoked license records as user grants', () => {
+    expect(evaluate({ authorizations: [authorization({ version: 1 }), authorization({ version: 2, status: 'REVOKED' })] }).allowNewStarts).toBe(true)
   })
 
   it('resolves the bound authorization rather than an unrelated higher version', () => {
     expect(evaluate({ authorizations: [authorization(), authorization({ authorizationId: 'other', version: 20 })] }).allowNewStarts).toBe(true)
   })
 
-  it('rejects unknown commercial scope', () => {
-    expect(evaluate({ authorizations: [authorization({ scope: { ...authorization().scope, commercialNature: 'UNSPECIFIED' } })] }).reasons).toContain('AUTHORIZATION_COMMERCIAL_NATURE_UNKNOWN')
+  it('does not gate on unknown commercial scope', () => {
+    expect(evaluate({ authorizations: [authorization({ scope: { ...authorization().scope, commercialNature: 'UNSPECIFIED' } })] }).allowNewStarts).toBe(true)
   })
 
 })

@@ -9,9 +9,9 @@ describe('staff experience source contract', () => {
   it('keeps course handoffs targetable from compact assignment and check-in management', () => {
     const assignments = source('src/pages/AssignmentList.tsx')
     const checkins = source('src/pages/CheckinList.tsx')
-    expect(assignments).toContain("const focusId = searchParams.get('id')")
+    expect(assignments).toContain("const focusId = searchParams.get(embeddedCourse ? 'assignmentId' : 'id')")
     expect(assignments).toContain('assignment-record-${assignment.id}')
-    expect(checkins).toContain("const focusId = searchParams.get('id')")
+    expect(checkins).toContain("const focusId = searchParams.get(embeddedCourse ? 'checkinId' : 'id')")
     expect(checkins).toContain('checkin-record-${checkin.id}')
     expect(assignments).toContain('staff-table')
     expect(checkins).toContain('staff-table')

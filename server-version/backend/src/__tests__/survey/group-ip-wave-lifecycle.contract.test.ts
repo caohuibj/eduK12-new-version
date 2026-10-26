@@ -98,19 +98,19 @@ describe('Survey group IP open and lifecycle persistence contracts (mocked trans
     }
     expect(mocks.tx.surveyEntryToken.create).toHaveBeenCalledWith(expect.objectContaining({data:expect.objectContaining({expiresAt:close})}))
   })
-  it('closes a group immediately and hard-stops after expiry without extending its persisted finish',async()=>{
+  it('stops new group admission without changing its original completion deadline or deleting checkpoints',async()=>{
     activated();const beforeClose=new Date(now.getTime()+3600000);vi.setSystemTime(beforeClose)
     await transitionWave('owner','project','wave',3,'CLOSE')
-    expect(mocks.tx.surveyWave.updateMany.mock.calls[0][0].data.finishUntil).toEqual(beforeClose)
+    expect(mocks.tx.surveyWave.updateMany.mock.calls[0][0].data).not.toHaveProperty('finishUntil')
     vi.setSystemTime(new Date(close.getTime()+3600000))
     await transitionWave('owner','project','wave',3,'HARD_STOP')
-    expect(mocks.tx.surveyWave.updateMany.mock.calls[1][0].data.finishUntil).toEqual(close)
+    expect(mocks.tx.surveyWave.updateMany.mock.calls[1][0].data).not.toHaveProperty('finishUntil')
     expect(mocks.tx.surveyWave.updateMany.mock.calls[1][0].data.hardStopAt).toEqual(new Date(close.getTime()+3600000))
   })
-  it('keeps ordinary close grace and existing ordinary resume behavior unchanged',async()=>{
+  it('keeps the published ordinary completion deadline and existing resume behavior',async()=>{
     activated();wave.groupIpPolicy=null;wave.groupIpActivatedAt=null;setPublication(null)
     await transitionWave('owner','project','wave',3,'CLOSE')
-    expect(mocks.tx.surveyWave.updateMany.mock.calls[0][0].data.finishUntil).toEqual(new Date(now.getTime()+2*3600000))
+    expect(mocks.tx.surveyWave.updateMany.mock.calls[0][0].data).not.toHaveProperty('finishUntil')
     wave.status='PAUSED';vi.setSystemTime(new Date(close.getTime()+1))
     await expect(transitionWave('owner','project','wave',3,'RESUME')).resolves.toMatchObject({status:'OPEN'})
   })

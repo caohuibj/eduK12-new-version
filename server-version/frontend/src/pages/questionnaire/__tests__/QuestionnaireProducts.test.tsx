@@ -531,6 +531,60 @@ describe('C20 material flow editor and attempt budget', () => {
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
     api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, revision: 4, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts } }))
   })
+  it('C20 guided authoring exposes delivery and advanced JSON before saving and publishing', async () => {
+    trainingPresentation.enabled = true
+    const user = userEvent.setup()
+    let current: any = { ...row, trainingFlowDraft: null, maxAttempts: 1 }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : current }))
+    api.post.mockImplementation(async (path, body) => {
+      if (path.endsWith('/preflight')) return { code: 0, data: { revision: current.revision, ok: true, checks: [] } }
+      if (path.endsWith('/training-flow')) current = { ...current, revision: current.revision + 1, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts }
+      else if (path.endsWith('/publish')) current = { ...current, status: 'PUBLISHED', trainingFlowFrozen: current.trainingFlowDraft, trainingFlowDraft: null }
+      else throw new Error('Unexpected synthetic mutation')
+      return { code: 0, data: current }
+    })
+    mount('materials')
+    await screen.findByDisplayValue('材料实验')
+    const steps = screen.getByRole('navigation', { name: '编制步骤' })
+    // jsdom has no scrolling layout API; visibility and disclosure behavior remain real DOM.
+    steps.scrollIntoView = vi.fn()
+    const flowToggle = screen.getByLabelText('启用跨工具条件流程', { exact: true })
+    expect(flowToggle).not.toBeVisible()
+    await user.click(within(steps).getByRole('link', { name: /投放设置/ }))
+    expect(flowToggle).not.toBeVisible()
+    await user.click(screen.getByText('分组与条件路径', { exact: true }))
+    expect(flowToggle).toBeVisible()
+    await user.click(flowToggle)
+    const region = screen.getByRole('region', { name: '跨工具条件流程' })
+    await user.click(within(region).getByRole('button', { name: '启用两组材料实验' }))
+    await user.click(within(region).getByRole('button', { name: '添加配额示例' }))
+    const editor = within(region).getByLabelText('流程 JSON（高级编辑）', { exact: true })
+    expect(editor).not.toBeVisible()
+    await user.click(within(region).getByText('编辑流程规则（高级 JSON）', { exact: true }))
+    expect(editor).toBeVisible()
+    const authored = JSON.parse((editor as HTMLTextAreaElement).value)
+    expect(authored.schemaVersion).toBe(2)
+    authored.experiment = config.experiment
+    authored.quotaPolicy = { schemaVersion: 1, groupLimits: { a: 1, b: 1 } }
+    fireEvent.change(editor, { target: { value: JSON.stringify(authored) } })
+    fireEvent.change(within(region).getByLabelText('最多作答次数（材料实验）'), { target: { value: '2' } })
+    await user.click(within(region).getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/training-flow', { revision: 3, config: authored, maxAttempts: 2 }))
+    await waitFor(() => expect(within(region).getByRole('button', { name: '保存流程设置' })).toBeDisabled())
+    expect(editor).toBeVisible()
+    await user.click(within(steps).getByRole('link', { name: /检查与发布/ }))
+    await user.click(screen.getByRole('button', { name: '发布前自检' }))
+    await screen.findByText('当前草稿自检通过', { exact: true })
+    await user.click(screen.getByRole('button', { name: '发布组合测评' }))
+    expect(api.post.mock.calls.some(([path]) => path.endsWith('/publish'))).toBe(false)
+    await user.click(within(screen.getByRole('dialog', { name: '确认发布组合测评' })).getByRole('button', { name: '确认发布' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/publish', { revision: 4 }))
+    await user.click(within(steps).getByRole('link', { name: /投放设置/ }))
+    expect(editor).toBeVisible()
+    expect(editor).toHaveAttribute('readonly')
+    expect(JSON.parse((editor as HTMLTextAreaElement).value)).toEqual(authored)
+    expect(current.maxAttempts).toBe(2)
+  })
   it('loads the saved budget and sends budget-only changes with V2 config', async () => {
     mount('materials')
     const input = await screen.findByLabelText('最多作答次数（材料实验）')
@@ -717,7 +771,7 @@ describe('Training questionnaire guided editor', () => {
     api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 8 } })
     mount('guided', '#questionnaire-content')
     fireEvent.click(await screen.findByRole('button', { name: label }))
-    fireEvent.click(screen.getByRole('button', { name: new RegExp('选择' + label) }))
+    fireEvent.click(await screen.findByRole('button', { name: new RegExp('选择' + label) }))
     const dialog = screen.getByRole('dialog')
     const title = type === 'SCALE' ? '可用量表' : type === 'COGNITIVE' ? '授权认知' : '授权情境'
     fireEvent.change(within(dialog).getByRole('textbox', { name: '检索工具' }), { target: { value: title } })
@@ -1023,4 +1077,67 @@ describe('Training toolkit separation',()=>{
     expect(screen.getByRole('button',{name:'保存全部设置'})).toBeDisabled()
     expect(api.put).not.toHaveBeenCalled()
   })
+})
+
+
+it('selects and submits an exact approved Training combination without collapsing versions to the physical Scale',async()=>{
+ vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true
+ trainingPresentation.enabled=true
+ const row={id:'exact',name:'精确组合草稿',status:'DRAFT',revision:7,questionnaireType:'COURSE',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
+ const first={combination:{releaseId:'release-one',combinationHash:'a'.repeat(64)},scaleId:'same-scale',title:'授权标准量表',toolKey:'synthetic',instrumentVersion:'1.0.0',useGrantId:'use-one',useGrantVersion:1}
+ const second={...first,combination:{releaseId:'release-two',combinationHash:'b'.repeat(64)},instrumentVersion:'2.0.0',useGrantId:'use-two'}
+ api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[],standardCombinations:[first,second]}:row}))
+ api.post.mockResolvedValue({code:0,data:{...row,revision:8}})
+ mount('exact','#questionnaire-content')
+ fireEvent.click(await screen.findByRole('button',{name:'量表'}))
+ fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
+ const dialog=await screen.findByRole('dialog',{name:'选择量表'})
+ expect(within(dialog).getAllByRole('button',{name:/选择 授权标准量表，版本/})).toHaveLength(2)
+ fireEvent.click(within(dialog).getByRole('button',{name:'选择 授权标准量表，版本 2.0.0'}))
+ expect(api.post).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/exact/items',{revision:7,item:{type:'SCALE',required:true,scaleId:'same-scale',standardCombination:second.combination}}))
+ expect(JSON.stringify(api.post.mock.calls[0][1])).not.toMatch(/useGrantId|useGrantVersion|authorityGrantId/)
+})
+
+
+it('distinguishes approved parameter/report versions sharing one content version and submits the selected exact combination',async()=>{
+ vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true
+ trainingPresentation.enabled=true
+ const row={id:'same-content',name:'同内容参数选择',status:'DRAFT',revision:9,questionnaireType:'COURSE',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
+ const first={combination:{releaseId:'release-school',combinationHash:'a'.repeat(64)},scaleId:'same-scale',title:'授权标准量表',toolKey:'synthetic',instrumentVersion:'1.0.0',axisVersions:{CONTENT:'1.0.0:1.0.0',PARAMETERS:'school-v1',REPORT:'report-v1'}}
+ const second={...first,combination:{releaseId:'release-adult',combinationHash:'b'.repeat(64)},axisVersions:{CONTENT:'1.0.0:1.0.0',PARAMETERS:'adult-v1',REPORT:'none-v1'}}
+ api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[],standardCombinations:[first,second]}:row}))
+ api.post.mockResolvedValue({code:0,data:{...row,revision:10,items:[{id:'added-exact',type:'SCALE',position:0,required:true,scale:{id:'same-scale',name:'授权标准量表'},standardCombinationSummary:{instrumentVersion:'1.0.0',axisVersions:second.axisVersions}}]}})
+ mount('same-content','#questionnaire-content')
+ fireEvent.click(await screen.findByRole('button',{name:'量表'}))
+ fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
+ const dialog=await screen.findByRole('dialog',{name:'选择量表'})
+ expect(within(dialog).getByRole('button',{name:'选择 授权标准量表，版本 内容 1.0.0:1.0.0 · 参数 school-v1 · 报告 report-v1'})).toBeVisible()
+ fireEvent.click(within(dialog).getByRole('button',{name:'选择 授权标准量表，版本 内容 1.0.0:1.0.0 · 参数 adult-v1 · 报告 未配置'}))
+ expect(api.post).not.toHaveBeenCalled()
+ expect(screen.getByText('内容 1.0.0:1.0.0 · 参数 adult-v1 · 报告 未配置 · 已批准组合')).toBeVisible()
+ fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/same-content/items',{revision:9,item:{type:'SCALE',required:true,scaleId:'same-scale',standardCombination:second.combination}}))
+ expect(JSON.stringify(api.post.mock.calls[0][1])).not.toMatch(/axisVersions|useGrantId|authorityGrantId/)
+ expect(await screen.findByRole('button',{name:'配置第 1 项：1. 授权标准量表 · 已批准组合 · 内容 1.0.0:1.0.0 · 参数 adult-v1 · 报告 未配置'})).toBeVisible()
+})
+
+
+it('keeps course-only approved combinations out of GENERAL while retaining an authorized native Scale',async()=>{
+ vi.resetAllMocks();sessionStorage.clear();capabilities.enabled=true
+ trainingPresentation.enabled=true
+ const row={id:'general-exact',name:'通用问卷',status:'DRAFT',revision:4,questionnaireType:'GENERAL',expiresAt:'2027-01-01T00:00:00.000Z',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false}
+ const combo={combination:{releaseId:'course-only',combinationHash:'c'.repeat(64)},scaleId:'approved-scale',title:'课程批准组合',toolKey:'synthetic',instrumentVersion:'1.0.0',axisVersions:{CONTENT:'1.0.0:1.0.0',PARAMETERS:'none-v1',REPORT:'none-v1'}}
+ api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[{id:'native-general',name:'通用可用量表',instrumentVersion:'1.0.0'}],cognitive:[],situational:[],courses:[],standardCombinations:[combo]}:row}))
+ api.post.mockResolvedValue({code:0,data:{...row,revision:5}})
+ mount('general-exact','#questionnaire-content')
+ fireEvent.click(await screen.findByRole('button',{name:'量表'}))
+ expect(screen.getByText('精确批准组合目前适用于课程问卷。')).toBeVisible()
+ fireEvent.click(await screen.findByRole('button',{name:/^选择量表/}))
+ const dialog=await screen.findByRole('dialog',{name:'选择量表'})
+ expect(within(dialog).queryByRole('button',{name:/选择 课程批准组合/})).toBeNull()
+ fireEvent.click(within(dialog).getByRole('button',{name:'选择 通用可用量表，版本 1.0.0'}))
+ fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+ await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/general-exact/items',{revision:4,item:{type:'SCALE',required:true,scaleId:'native-general'}}))
 })

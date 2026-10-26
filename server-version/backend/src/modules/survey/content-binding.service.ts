@@ -1,4 +1,3 @@
-import {assertSurveyPublicationNotPaused} from './tool-policy'
 import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -25,7 +24,7 @@ export const surveyAttemptContentBindingSchema=z.object({schemaVersion:z.literal
 export type SurveyAttemptContentBinding=z.infer<typeof surveyAttemptContentBindingSchema>
 function fail():never{throw new SurveyWaveError(409,'研究作答的冻结内容绑定缺失、变更或已不可用')}
 type Scope={projectId:string;waveId:string;attemptId:string;publicationId:string}
-type Row={content_binding_cipher:string|null;content_binding_hash:string|null;flow_assignment_cipher:string|null;
+type Row={status:string;content_binding_cipher:string|null;content_binding_hash:string|null;flow_assignment_cipher:string|null;
   owner_id:string;definition_digest:string;compiled_snapshot:ResearchFrozenPublication}
 
 /** Pure immutable receipt validation; null is explicit pre-binding legacy data.
@@ -61,7 +60,7 @@ export function decodeSurveyAttemptContentBinding(input:Scope&{definitionDigest:
  * No payload or private template is returned to participant DTOs.
  */
 export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input:Scope&{newAttempt:boolean}):Promise<void>{
-  const rows=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT attempt.content_binding_cipher,attempt.content_binding_hash,
+  const rows=await tx.$queryRaw<Row[]>(Prisma.sql`SELECT attempt.status,attempt.content_binding_cipher,attempt.content_binding_hash,
     attempt.flow_assignment_cipher,project.owner_user_id AS owner_id,publication.definition_digest,publication.compiled_snapshot
     FROM survey_wave_attempts attempt JOIN survey_projects project ON project.id=attempt.project_id
     JOIN survey_waves wave ON wave.id=attempt.wave_id AND wave.project_id=attempt.project_id
@@ -73,10 +72,12 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
   if(snapshot.projectId!==input.projectId||snapshot.waveId!==input.waveId||snapshot.runtimeStatus!=='SURVEY_FINAL_V1'
     ||canonicalHash(snapshot)!==row.definition_digest)fail()
   if(Boolean(row.content_binding_cipher)!==Boolean(row.content_binding_hash))fail()
-  if(!input.newAttempt&&!row.content_binding_cipher)return // Legacy recovery never invents an assignment/content binding.
   const assignment=row.flow_assignment_cipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(row.flow_assignment_cipher):null
   const selected=assignedSurveySnapshot(snapshot,assignment)
-  if(input.newAttempt){await assertSurveyPublicationNotPaused(tx,selected);await assertSurveyScaleCollectionAllowed(tx,selected)}
+  // The parent START transaction admits this frozen publication once. Recovery
+  // validates its immutable binding; later tool policy changes cannot reopen it.
+  if(input.newAttempt)await assertSurveyScaleCollectionAllowed(tx,selected)
+  if(!input.newAttempt&&!row.content_binding_cipher)return // Legacy recovery never invents an assignment/content binding.
   const cache=new Map<string,StoredRelease>()
   const read=async(id:string)=>{
     if(cache.has(id))return cache.get(id)!

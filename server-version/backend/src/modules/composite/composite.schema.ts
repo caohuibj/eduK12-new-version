@@ -5,6 +5,7 @@ import { formQuestionSchema } from '../assessment-core/form/definition'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { MAX_TOKEN_USES } from '../../constants'
 import { deviceInputProvenanceV1Schema } from '../scale/device-input-provenance'
+import {standardCombinationPointerSchema} from '../measurement-content/standard-combination'
 
 const dateTime = z.string().datetime()
 const exportDate = z.string().refine((value) => !Number.isNaN(new Date(value).getTime()), { message: '日期格式无效' })
@@ -69,6 +70,7 @@ export const addCompositeItemSchema = z.object({
   position: z.number().int().min(0).optional(),
   required: z.boolean().optional().default(true),
   scaleId: z.string().min(1).optional(),
+  standardCombination: standardCombinationPointerSchema.optional(),
   cognitiveAssignmentId: z.string().min(1).optional(),
   situationalInstrumentKey: z.string().min(1).max(120).optional(),
   situationalInstrumentVersion: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确情境化题包版本').optional(),
@@ -81,6 +83,7 @@ export const addCompositeItemSchema = z.object({
   formOptions: z.array(formOption).nullable().optional(),
   contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
 }).strict().superRefine((input, ctx) => {
+  if(input.standardCombination&&(input.type!=='SCALE'||!input.scaleId))ctx.addIssue({code:'custom',path:['standardCombination'],message:'批准组合必须绑定现有量表来源'})
   const advanced = ['number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'].includes(input.formType ?? '')
   // V3 acceptance policy is explicit and frozen with the typed definition.
   if (input.formPolicy && !input.formDefinition) ctx.addIssue({code:'custom',path:['formPolicy'],message:'V3 策略必须绑定 typed 定义'})
@@ -140,6 +143,11 @@ export const createCompositeTokenSchema = z.object({
 export const compositeExportQuerySchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),
 })
+
+export const compositeReportViewQuerySchema = z.object({
+  view: z.literal('combined'),
+  waitMs: z.string().regex(/^\d{1,5}$/).transform(Number).optional(),
+}).strict()
 
 export const compositeReportQuerySchema = z.object({
   partial: z.literal('1').optional(),

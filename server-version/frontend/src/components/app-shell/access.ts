@@ -38,7 +38,7 @@ export function internalReturnTo(value: string | null | undefined): string | nul
   } catch { return null }
 }
 const staffRoots = ['dashboard', 'courses', 'students', 'assignments', 'checkins', 'scales', 'questionnaires', 'general-questionnaires', 'composite-assessments', 'bundle-products', 'cognitive-assignments', 'videos', 'images', 'documents', 'profile']
-const adminRoots = ['users', 'teacher-codes', 'admin/training', 'admin/material-grants', 'admin/instrument-authorizations', 'admin/survey-researchers']
+const adminRoots = ['users', 'teacher-codes', 'admin/training', 'admin/material-grants', 'admin/survey-researchers']
 const inRoot = (pathname: string, root: string) => pathname === `/${root}` || pathname.startsWith(`/${root}/`)
 export function returnAfterLogin(value: string | null | undefined, role: Role, adminFallback?: string): string {
   const fallback = role === 'ADMIN' && adminFallback === '/users' ? adminFallback : homeFor(role)

@@ -1,5 +1,5 @@
 import { prisma } from '../config/database'
-import { getScaleInstrumentRuntimePolicy } from '../modules/scale/onboarding/instrument-registry'
+import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from '../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument, planScaleInstrumentInstall } from '../modules/scale/onboarding/install'
 import { scaleDeploymentModeSchema, type ScaleDeploymentModeV1 } from '../modules/scale/policy/deployment'
 
@@ -8,9 +8,6 @@ const flag = (name: string): string | undefined => {
   const index = args.indexOf(`--${name}`)
   return index >= 0 ? args[index + 1] : undefined
 }
-const repeated = (name: string): string[] => args.flatMap((entry, index) => (
-  entry === `--${name}` && args[index + 1] ? [args[index + 1]!] : []
-))
 const has = (name: string): boolean => args.includes(`--${name}`)
 
 const required = (name: string): string => {
@@ -22,18 +19,13 @@ const required = (name: string): string => {
 const main = async () => {
   const instrumentKey = required('instrument-key')
   const instrumentVersion = required('instrument-version')
+  if (has('authorization') || has('commercial')) throw new Error('License-record arguments are retired; deploy operational/scientific identity only')
+  const source = getScaleInstrumentSource(instrumentKey, instrumentVersion)
   const locale = required('locale')
-  const territory = required('territory').toUpperCase()
+  const territory = (flag('territory') ?? source?.scientificReview?.territory ?? 'ZZ').toUpperCase()
   const revision = Number(required('revision'))
   if (!Number.isInteger(revision) || revision <= 0) throw new Error('--revision must be a positive integer')
-  const commercial = required('commercial')
-  if (commercial !== 'NON_COMMERCIAL' && commercial !== 'COMMERCIAL') {
-    throw new Error('--commercial must be NON_COMMERCIAL or COMMERCIAL')
-  }
-  const commercialNature: 'NON_COMMERCIAL' | 'COMMERCIAL' = commercial
   const deploymentModes = required('modes').split(',').filter(Boolean).map((mode) => scaleDeploymentModeSchema.parse(mode)) as ScaleDeploymentModeV1[]
-  const authorizationRefs = repeated('authorization')
-  if (authorizationRefs.length === 0) throw new Error('At least one --authorization is required')
   const actorUserId = required('actor-user-id')
   const runtimePolicy = getScaleInstrumentRuntimePolicy(instrumentKey, instrumentVersion)
   if (!runtimePolicy) throw new Error(`No compiled runtime policy for ${instrumentKey}@${instrumentVersion}`)
@@ -43,14 +35,11 @@ const main = async () => {
     instrumentVersion,
     actorUserId,
     deploymentPolicy: {
-      schemaVersion: 1 as const,
+      schemaVersion: 2 as const,
       revision,
       locale,
       territory,
       deploymentModes,
-      commercialNature,
-      requiredRightsActions: ['electronicAdministration', 'scoring', 'display'] as Array<'electronicAdministration' | 'scoring' | 'display'>,
-      authorizationRefs,
       runtimePolicyHash: runtimePolicy.runtimePolicyHash,
       ...(flag('localization-version') ? { localizationVersion: flag('localization-version')! } : {}),
       inFlightCompletion: 'FROZEN_DEADLINE' as const,

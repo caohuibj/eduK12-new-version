@@ -11,14 +11,19 @@ import {
 import type { AssessmentContextValues } from '../assessment-context/context'
 import type { FrozenEligibilityDecisionV1 } from '../scale/policy/types'
 
-export interface FrozenScaleDeploymentAdmissionBindingV1 {
+interface FrozenScaleDeploymentAdmissionBase {
   revision: number
   policyHash: string
-  authorizationId: string
-  authorizationVersion: number
   evaluatedAt: string
   completionDeadline?: string
 }
+/** Keep the original third-party shape/hash intact. Authored sources instead
+ * use DEPLOYMENT_IDENTITY; prior authored provenance is read-only compatibility. */
+export type FrozenScaleDeploymentAdmissionBindingV1 = FrozenScaleDeploymentAdmissionBase & (
+  | { authorizationId: string; authorizationVersion: number; basis?: never; sourceHash?: never }
+  | { basis: 'SELF_AUTHORED_SOURCE'; sourceHash: string; authorizationId?: never; authorizationVersion?: never }
+  | { basis: 'DEPLOYMENT_IDENTITY'; sourceHash?: never; authorizationId?: never; authorizationVersion?: never }
+)
 
 export interface FrozenScalePolicyAdmissionBindingV2 {
   runtimePolicyHash: string
@@ -68,14 +73,18 @@ const eligibilitySchema = z.object({
   }).strict(),
 }).strict()
 
-const deploymentBindingSchema = z.object({
+const deploymentBindingBase = {
   revision: z.number().int().positive(),
   policyHash: z.string().regex(/^[0-9a-f]{64}$/),
-  authorizationId: z.string().min(1),
-  authorizationVersion: z.number().int().positive(),
   evaluatedAt: z.string().datetime({ offset: true }),
   completionDeadline: z.string().datetime({ offset: true }).optional(),
-}).strict()
+}
+// Strict alternatives reject absent, mixed and partially supplied rights proof.
+const deploymentBindingSchema = z.union([
+  z.object({ ...deploymentBindingBase, authorizationId: z.string().min(1), authorizationVersion: z.number().int().positive() }).strict(),
+  z.object({ ...deploymentBindingBase, basis: z.literal('SELF_AUTHORED_SOURCE'), sourceHash: z.string().regex(/^[0-9a-f]{64}$/) }).strict(),
+  z.object({ ...deploymentBindingBase, basis: z.literal('DEPLOYMENT_IDENTITY') }).strict(),
+])
 
 const frozenUnitAdmissionV2Schema = z.object({
   schemaVersion: z.literal(2),

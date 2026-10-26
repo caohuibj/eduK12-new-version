@@ -1,0 +1,104 @@
+{
+  "base": "ad2b1634da90ce08fdc89b8f0d68f92b71e090f1",
+  "codeHead": "f269feed24b31d8cf1f276f70cb953b7143fef8c",
+  "checks": [
+    {
+      "file": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "function": "grantCatalogSource",
+      "unchanged": true,
+      "sha256": "ddbc0f4302237bc32efb31324eb7bc4c20d673ca7e2ac77bcb4eb36b5adc8bf1"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "function": "listToolGrants",
+      "unchanged": true,
+      "sha256": "63c833ba792d5d7b8d7119661c4c897636b9494a39b39de384d5a5209afa4fce"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "function": "revokeToolGrant",
+      "unchanged": true,
+      "sha256": "ce9066f15ce76495ac2127e3319da384d033f3bf1c154c80ff6eca32c187ea64"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "function": "catalogSnapshotsForDrafts",
+      "unchanged": true,
+      "sha256": "c1070d9731d4967ed5eeb39d295db22a57b8f5cc1946fff5506e0b4b91b86698"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "function": "approveStandardTriplet",
+      "unchanged": true,
+      "sha256": "15c2b2a0cb8fb7a6145e79b1820acb2f3cfab865b0297db987c78f2622440ff1"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "function": "runStandardTrial",
+      "unchanged": true,
+      "sha256": "a5557e74e4a3e1b3ead930eccde726946ec6cc53ad7215754698a6dec48279f6"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "function": "withdrawStandardTriplet",
+      "unchanged": true,
+      "sha256": "a8962cc9f1a2758132ab2e6cbfbdf80f87ff540acb48b6a63c2d9f4c31c5f322"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/governed-tool.service.ts",
+      "function": "approveGovernedTool",
+      "unchanged": true,
+      "sha256": "9524f0f013471cd9e7d8a3fa7f299b247b28710872960f048c8f75561382a10d"
+    },
+    {
+      "file": "server-version/backend/src/modules/survey/governed-tool.service.ts",
+      "function": "runGovernedTrial",
+      "unchanged": true,
+      "sha256": "33a3b09e2d876a7e9a23e7f7e2a7307fdc9e20b4f4db2a674883aadfc3d3f8f7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.content.ts",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/distribution.ts",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "unchanged": true
+    },
+    {
+      "path": ".github",
+      "unchanged": true
+    }
+  ]
+}

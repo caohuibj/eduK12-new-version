@@ -48,6 +48,7 @@ describe('real system session bounded Survey content root issuance',()=>{
   expect(queries.find(q=>q.includes('FROM users'))).toContain('ORDER BY id FOR SHARE')
   expect(queries.filter(q=>q.includes('FROM measurement_content_releases'))).toHaveLength(1)
   expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({id:grantId,actorUserId:actor,targetUserId:target,entry:'SURVEY',action:'CONTENT_ROOT_GRANTED',version:1})})
+  expect(queries.find(q=>q.includes('INSERT INTO content_capability_grants'))?.match(/::timestamptz AT TIME ZONE 'UTC'/g)).toHaveLength(2)
   expect(mocks.execute).not.toHaveBeenCalled()
  })
  it('accepts separate exact FINAL reinterpretation and does not grant report publishing',async()=>{

@@ -1,0 +1,8 @@
+
+/workspace/eduK12-library-management/server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx
+  78:118  warning  The ref value 'lookupGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'lookupGeneration.current' to a variable inside the effect, and use that variable in the cleanup function                react-hooks/exhaustive-deps
+  78:151  warning  The ref value 'catalogReadGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'catalogReadGeneration.current' to a variable inside the effect, and use that variable in the cleanup function      react-hooks/exhaustive-deps
+  78:186  warning  The ref value 'catalogDetailGeneration.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'catalogDetailGeneration.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+✖ 3 problems (0 errors, 3 warnings)
+

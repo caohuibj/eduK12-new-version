@@ -1,3 +1,5 @@
+import {refuseUnplannedPR356} from './pr356-entry.mjs';
+export {refuseUnplannedPR356} from './pr356-entry.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
@@ -44,6 +46,10 @@ import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
 import { dependencyScope } from './dependency-scope.mjs';
 import { plan as applicationPlan, toolingOnly } from '../../server-version/scripts/release/policy.mjs';
+
+// Keep route refusal independent of the candidate verifier. The official
+// source CLI consumes this module while awaiting metadata; importing it back
+// from here would leave its top-level await unresolved.
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';
@@ -306,6 +312,7 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
+  refuseUnplannedPR356();
   const base = process.env.CI_BASE_SHA;
   const surveyGovernance=surveyGovernancePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(surveyGovernance){const output=surveyGovernanceOutputs(surveyGovernance);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}

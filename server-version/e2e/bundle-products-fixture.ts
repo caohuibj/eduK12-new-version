@@ -6,6 +6,7 @@ import { MIXED_SCALE_DEFINITION } from '../backend/src/__tests__/questionnaire/p
 import { hashScaleDefinition } from '../backend/src/modules/scale/scale-definition'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../backend/src/modules/cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../backend/src/modules/cognitive/cognitive.registry'
+import {publishTrainingSourcesFixture} from '../backend/src/__tests__/fixtures/published-measurement'
 
 async function main() {
   if (process.env.NODE_ENV !== 'test' || !process.env.BUNDLE_PRODUCT_TEST_DATABASE_URL ||
@@ -25,7 +26,7 @@ async function main() {
       await db.user.create({ data: { id, username: id, passwordHash, role, teacherApproved: true, mustChangePassword: false } })
     }
     const cs = []
-    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
+    for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseCode: 'Q1-'+suffix+'-'+i, courseType:'TRAINING_COURSE',status: 'PUBLISHED' } }))
     course1=cs[0].id; course2=cs[1].id
     await db.courseStudent.createMany({ data: [{ courseId: course1, studentId: student, status: 'ACTIVE' }, { courseId: course2, studentId: student2, status: 'APPROVED' }] })
     const entry = requireCognitiveRegistryEntry('gonogo','1.0.0','1.0.0')
@@ -40,6 +41,7 @@ async function main() {
 
   const {createCodeBundleDefinitionProvider}=await import('../backend/src/modules/bundle-product/code-catalog')
   const {SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE:sjt}=await import('../backend/src/modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1')
+  await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[scaleId],assignmentIds:[assignmentId],situational:[{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion}]})
   const bundle=createCodeBundleDefinitionProvider().exact('integrated_gonogo_adexi_adult_zh_cn_v1','1.0.0')!
   bundle.definition.bundleKey='b2_browser_fixture_v1';bundle.definition.name='Bundle browser fixture';bundle.definition.status='PUBLISHED'
   bundle.definition.rightsRequirements={required:false,instrumentKeys:[]}

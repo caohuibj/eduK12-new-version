@@ -1,5 +1,5 @@
 import { Blob as NodeBlob } from 'node:buffer'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import ScaleUnitReportCard from '../ScaleUnitReportCard'
 import { toScaleUnitReport, type Assessment } from '../../../pages/student/ScaleResult'
@@ -9,10 +9,12 @@ const feedback = [{ scoreKey: 'total', rangeKey: 'a', text: '服务器匹配的�
 const report = () => ({ type: 'SCALE' as const, kind: 'scale' as const, reportKind: 'full' as const, assessmentId: 'assessment-1', scaleName: '量表', caveats: [], disclaimer: '', completedAt: null, totalTime: null, rawScoreFeedback: feedback })
 beforeEach(() => {
   vi.clearAllMocks()
+  vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
   Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:feedback') })
   Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() })
   fetcher.mockResolvedValue({ ok: true, blob: async () => new Blob(['image'], { type: 'image/png' }) })
 })
+afterEach(() => vi.unstubAllGlobals())
 describe('Training matched feedback display', () => {
   it('renders only projected matches and loads from the report-authorized asset route', async () => {
     render(<ScaleUnitReportCard report={report()} />)

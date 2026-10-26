@@ -30,6 +30,8 @@ import { compositeFormSectionVideoPresentations, retainFormSectionVideos } from 
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
 import { listQuestionnaireScaleResources } from './scale-resources'
+import {prepareTrainingStandardItemSource,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
+import {listTrainingStandardCombinationChoices} from '../measurement-content/standard-combination-use'
 import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
@@ -313,10 +315,11 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
   const { revision, item, formSectionId } = itemSchema.parse(raw)
   return mutate(actor, id, revision, async (tx, row) => {
     if (row.productKind === 'FORM_TEMPLATE' && item.type !== 'FORM') throw compositeBadRequest('独立表单只能加入表单题目')
-    await assertValidItem(item, actor.userId, actor.role, row.productKind === 'FORM_TEMPLATE' ? { ...row, productKind: 'QUESTIONNAIRE' } : row, tx)
+    const itemId = randomUUID()
+    const standard=item.standardCombination?await prepareTrainingStandardItemSource(tx,actor.userId,row,{id:itemId,scaleId:item.scaleId!},item.standardCombination):null
+    if(!standard)await assertValidItem(item, actor.userId, actor.role, row.productKind === 'FORM_TEMPLATE' ? { ...row, productKind: 'QUESTIONNAIRE' } : row, tx)
     if (row.items.length >= 500) throw compositeBadRequest('问卷最多包含 500 个内容项')
     const position = Math.max(-1, ...row.items.map((v: any) => v.position), ...row.formSections.map((v: any) => v.position)) + 1
-    const itemId = randomUUID()
     const targetSection = formSectionId ? row.formSections.find((section:any)=>section.id===formSectionId) : null
     if (formSectionId && (item.type!=='FORM' || !targetSection || targetSection.contextSection || item.contextKey)) throw compositeBadRequest('只能加入当前草稿已有的普通表单区段')
     if (targetSection) {
@@ -326,6 +329,7 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
     }
     await tx.compositeAssessmentItem.create({ data: {
       id: itemId,
+      ...(standard?{standardCombinationSource:{reference:standard.reference,referenceHash:standard.referenceHash} as Prisma.InputJsonValue}:{}),
       ...(targetSection ? {formSectionId:targetSection.id, formSectionPosition:Math.max(-1,...targetSection.items.map((child:any)=>child.formSectionPosition??child.position))+1}: {}),
       ...(item.type==='FORM' && item.formPolicy ? {formPolicy:item.formPolicy}: {}),
       ...(item.type === 'FORM' && item.formDefinition ? { formDefinition: { ...item.formDefinition, itemKey: 'q_' + itemId } as Prisma.InputJsonValue } : {}),
@@ -407,6 +411,7 @@ async function validateDelivery(tx: Tx, actor: Actor, row: any) {
 async function validateResources(tx: Tx, actor: Actor, row: any, inspected?: Awaited<ReturnType<typeof inspectCompositeSituationalItems>>) {
   const situational = inspected?.releases ?? await resolveCompositeSituationalItems(row.items, tx, true, compositeSjtGrantScope(row))
   for (const item of row.items) {
+    if(item.standardCombinationSource!=null){await verifyStoredTrainingStandardItem(tx,row,item);continue}
     // Legacy storage accepts arbitrary strings. Do not publish an unknown
     // field type as a text input through the player's compatibility fallback.
     if (item.type === 'FORM' && item.formDefinition == null && !['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month'].includes(item.formType)) {
@@ -616,16 +621,18 @@ export async function available(userId: string) {
 }
 export async function resources(actor: Actor) {
   author(actor)
-  const [scales, cognitive, courseRows, situational] = await Promise.all([
+  const [scales, cognitive, courseRows, situational,standardCombinations] = await Promise.all([
     listQuestionnaireScaleResources(actor),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true, courseType: true } }),
     listSituationalResourceSummaries(actor.userId),
+    actor.role==='TEACHER'?listTrainingStandardCombinationChoices(actor.userId):Promise.resolve([]),
   ])
   for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
     scales, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational,
+    standardCombinations,
     courses: courseRows,
   }
 }
@@ -733,7 +740,10 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
           } })
           data.cognitiveAssignmentId = binding.id
         }
+        const standard=item.standardCombinationSource!=null?await prepareTrainingStandardItemSource(tx,actor.userId,
+          {...target,questionnaireCourses:sourceCourses.map(courseId=>({courseId}))},{id:copiedIds.get(item.id)!,scaleId:item.scaleId!},decodeTrainingStandardItemSource(item.standardCombinationSource).reference.combination):null
         await tx.compositeAssessmentItem.create({ data: { ...data, id:copiedIds.get(item.id), compositeAssessmentId: target.id,
+          standardCombinationSource:standard?{reference:standard.reference,referenceHash:standard.referenceHash} as Prisma.InputJsonValue:Prisma.DbNull,
           formOptions: item.formOptions ?? Prisma.JsonNull,
           formDefinition: item.formDefinition != null ? remapTrainingFormDefinition(item.formDefinition,copiedKeys) : Prisma.DbNull,
           formPolicy: item.formPolicy ?? Prisma.DbNull,

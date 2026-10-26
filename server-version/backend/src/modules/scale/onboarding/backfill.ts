@@ -10,13 +10,13 @@ import {
 } from '../deployment/repository'
 import { getScaleInstrumentSource } from './instrument-registry'
 import { planScaleInstrumentInstall } from './install'
-import { scaleDeploymentPolicyV1Schema } from '../policy/deployment'
+import { scaleDeploymentPolicyV2Schema } from '../policy/deployment'
 import { hashScaleDefinition } from '../scale-definition'
 
 const entrySchema = z.object({
   instrumentKey: z.string().min(1),
   instrumentVersion: z.string().min(1),
-  deploymentPolicy: scaleDeploymentPolicyV1Schema,
+  deploymentPolicy: scaleDeploymentPolicyV2Schema,
 }).strict()
 
 export const scaleOnboardingBackfillPlanSchema = z.object({

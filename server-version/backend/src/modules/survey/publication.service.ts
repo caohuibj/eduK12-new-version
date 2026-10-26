@@ -14,7 +14,7 @@ import { publishContentRelease,requirePublishedContentRelease } from '../measure
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import {recheckCatalogSjtSourceAuthority,recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
+import {recheckCatalogSjtSourceAuthority,type SourceAnswerMapping} from './catalog.sources'
 import { freezeSurveyMeasurementNotice,type SurveyMeasurementNotice } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -50,6 +50,8 @@ export interface ResearchFrozenUnit {
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
   sourceAnswerMapping?:SourceAnswerMapping
+  /** Administration instruction frozen with this unit's exact source version. */
+  instruction?:string
   draftId:string
   instrumentKey:string
   kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'
@@ -80,6 +82,14 @@ export interface ResearchFrozenPublication {
   runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
+
+/** One publication rule for read-only preflight and locked freeze. Catalog
+ * families still migrated at freeze must not gain an extra manual publish step. */
+export function surveyMeasurementPublicationMode(unit:Pick<ResearchFrozenUnit,'kind'|'sourceProvenance'>):'NONE'|'EXPLICIT'|'AT_FREEZE'{
+  if(unit.kind==='FORM')return 'NONE'
+  return unit.sourceProvenance&&(unit.kind!=='SCALE'||Boolean(unit.sourceProvenance.surveyPackage))
+    ?'AT_FREEZE':'EXPLICIT'
+}
 
 /** Both paths derive identical identity from the existing compiler and adapters. */
 export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:string,projectId:string){
@@ -218,7 +228,7 @@ export async function freezeResearchWaveDraft(input:{
       if (unit.kind === 'FORM') continue
       // Scale catalog imports now use the same explicit publication action as
       // native drafts. Other catalog families retain their separate migration.
-      const release=unit.sourceProvenance&&(unit.kind!=='SCALE'||Boolean(unit.sourceProvenance.surveyPackage))
+      const release=surveyMeasurementPublicationMode(unit)==='AT_FREEZE'
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
@@ -374,7 +384,6 @@ export async function freezeResearchWaveDraft(input:{
       metadata:{waveId:input.waveId,publicationId,definitionDigest:digest,
         runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
-    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     await recheckCatalogSjtSourceAuthority(tx,sources.values())
     return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })

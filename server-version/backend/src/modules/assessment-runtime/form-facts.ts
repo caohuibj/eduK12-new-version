@@ -78,19 +78,22 @@ const typedFactsSchema = z.object({
   schemaVersion: z.literal(2), sectionKey: z.string().min(1),
   items: z.array(z.object({ key: z.string().min(1), label: z.string().min(1), value: typedFormValueSchema }).strict()).max(500),
 }).strict()
-export const createTypedFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV2, 'schemaVersion'>): FormSectionCollectionFactsV2 => {
-  const facts = typedFactsSchema.parse({ ...input, schemaVersion: 2 })
+// Private: callers must first parse with the version's strict schema.
+const finishTypedFacts = (facts: FormSectionCollectionFactsV2): FormSectionCollectionFactsV2 => {
   if (new Set(facts.items.map(item => item.key)).size !== facts.items.length) throw new Error('Form section fact keys must be unique')
   if (canonicalJsonBytes(facts).byteLength > 512000) throw new Error('Form section facts exceed 500 KB')
   return facts
 }
 
+export const createTypedFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV2, 'schemaVersion'>): FormSectionCollectionFactsV2 =>
+  finishTypedFacts(typedFactsSchema.parse({ ...input, schemaVersion: 2 }))
+
 /** Shared reader for encrypted canonical snapshots; never consult String projections. */
 export const readFormSectionCollectionFacts = (value: unknown): FormSectionCollectionFacts => {
-  if(value && typeof value === "object" && (value as {schemaVersion?:unknown}).schemaVersion===3) return createPolicyFormSectionCollectionFacts(v3FactsSchema.parse(value))
+  if(value && typeof value === "object" && (value as {schemaVersion?:unknown}).schemaVersion===3) return finishPolicyFacts(v3FactsSchema.parse(value))
   if (value && typeof value === 'object' && (value as {schemaVersion?: unknown}).schemaVersion === 2) {
     const parsed = typedFactsSchema.parse(value)
-    return createTypedFormSectionCollectionFacts(parsed)
+    return finishTypedFacts(parsed)
   }
   return parseFormSectionCollectionFacts(value)
 }
@@ -107,9 +110,11 @@ const v3FactsSchema = z.object({schemaVersion:z.literal(3),sectionKey:z.string()
   rowStates:z.record(z.string(), factState).optional(),otherText:z.string().optional(),
 }).strict()).max(500)}).strict()
 export type FormSectionCollectionFactsV3 = z.infer<typeof v3FactsSchema>
-export const createPolicyFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV3,'schemaVersion'>): FormSectionCollectionFactsV3 => {
-  const facts = v3FactsSchema.parse({...input,schemaVersion:3})
+const finishPolicyFacts = (facts: FormSectionCollectionFactsV3): FormSectionCollectionFactsV3 => {
   if(new Set(facts.items.map(item=>item.key)).size!==facts.items.length)throw new Error('Form section fact keys must be unique')
   if(canonicalJsonBytes(facts).byteLength>512000)throw new Error('Form section facts exceed 500 KB')
   return facts
 }
+
+export const createPolicyFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV3,'schemaVersion'>): FormSectionCollectionFactsV3 =>
+  finishPolicyFacts(v3FactsSchema.parse({...input,schemaVersion:3}))

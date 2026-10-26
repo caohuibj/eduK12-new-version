@@ -12,10 +12,11 @@ const experiment=():MaterialExperiment=>({experimentKey:'materials',linkedPolicy
 ]})
 const capture=(fn:()=>unknown)=>{try{return {ok:true,value:fn()}}catch(e:any){return {ok:false,name:e.constructor.name,message:e.message,...(e.issues?{issues:e.issues}:{})}}}
 const golden=JSON.parse(readFileSync(new URL('./fixtures/materials-survey-legacy.json',import.meta.url),'utf8'))
+const zod4=JSON.parse(readFileSync(new URL('./fixtures/materials-zod4-errors.json',import.meta.url),'utf8'))
 describe('Shared material core preserves pre-C20 Survey contracts',()=>{
   for(const c of golden.flows)it('legacy parse, errors and exact hash: '+c.name,()=>{
-    expect(JSON.parse(JSON.stringify(capture(()=>parseSurveyFlowDraft(c.input))))).toEqual(c.parse)
-    expect(JSON.parse(JSON.stringify(capture(()=>compileSurveyFlow(c.input,[],c.mode))))).toEqual(c.compile)
+    expect(JSON.parse(JSON.stringify(capture(()=>parseSurveyFlowDraft(c.input))))).toEqual(zod4.flows[c.name]?.parse??c.parse)
+    expect(JSON.parse(JSON.stringify(capture(()=>compileSurveyFlow(c.input,[],c.mode))))).toEqual(zod4.flows[c.name]?.compile??c.compile)
   })
   for(const [i,c] of golden.quotas.entries())it('legacy quota schema/compiler: '+i,()=>{
     const flow=compileSurveyFlow(golden.flows[0].input,[],'LINKED_WAVES')
