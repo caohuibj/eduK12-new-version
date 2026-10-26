@@ -1,0 +1,1508 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ebq16_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "情绪信念问卷（EBQ-16，中文研究工作译稿）",
+      "abbreviation": "EBQ-16-ZH",
+      "instrumentFamily": "Emotion Beliefs Questionnaire"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "自陈关于积极/负面情绪能否改变、是否有用的一般信念；不是情绪管理客观能力、临床筛查或ACT/CBT/DBT专属工具。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ebq16_zh_cn_research",
+        "domain:social_emotional",
+        "construct:emotion_beliefs",
+        "construct:controllability",
+        "construct:usefulness",
+        "orientation:emotion_regulation_beliefs",
+        "orientation:ACT_CBT_DBT_related_not_specific",
+        "population:adult",
+        "population:australia_source_evidence",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:sixteen_items",
+        "response:seven_point_agreement",
+        "use:research",
+        "use:reflection",
+        "use:not_diagnostic",
+        "use:no_validated_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "language_validation:author_english_source",
+        "language_validation:platform_chinese_work_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established"
+      ]
+    },
+    "population": {
+      "populationNotes": "英文源研究从澳大利亚成年人中招募161名调查对象，年龄18–83岁（M47.03，SD18.02）；初始30题筛选得到最终16题。当前独立中文工作译本没有中国成人或K12人群有效性证据；技术受众student不是中小学生资格。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 18
+    },
+    "administration": {
+      "itemCount": 16,
+      "estimatedMinutes": 5,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "关于情绪的一般信念，非最近7天/30天症状回忆",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "必须依原作者16题推荐顺序，不把最初30题开发池或OpenScales分维展示顺序代替原16题。",
+        "原作者七档响应的1/4/7有文字锚点；2/3/5/6只有数值，没有独立作者文本，中文工作稿亦只显示数字。",
+        "独立指导语在research-drafts/ebq16/1.0.0/administration.md；不把独立说明拼接到第1题。",
+        "原版四维、二综合和总分全部使用SUM，拒绝移植OpenScales的mean_coded。",
+        "5分钟仅为本站负担估计。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英文原研究有成人证据；本平台简体中文翻译及数字呈现未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "审批后才可提供非诊断的描述性反思，当前只为内容候选。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ebq-becerra2020-structural",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "澳大利亚成年人线上N=161；非中国常模",
+        "ageRange": "18–83岁，均值47.03，SD18.02",
+        "locale": "en",
+        "territory": "AU",
+        "sampleSize": 161,
+        "studyDesign": "30题发展池选出16题，CFA支持整体可控性、负面用处、积极用处三一阶因子和高阶因子",
+        "rating": "MIXED",
+        "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395.",
+        "doi": "10.1371/journal.pone.0231395",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0231395",
+        "notes": "研究心理测量证据针对英文成人原版，不自动迁移至中文工作译本。"
+      },
+      {
+        "evidenceId": "ebq-becerra2020-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "同一161名澳大利亚成人样本，非第二独立验证",
+        "locale": "en",
+        "territory": "AU",
+        "sampleSize": 161,
+        "studyDesign": "四个分量表和组合分数α在约0.70–0.88范围",
+        "rating": "MIXED",
+        "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395.",
+        "doi": "10.1371/journal.pone.0231395",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0231395",
+        "notes": "量尺可靠性不等于跨语言信效度或个体诊断阈值。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Becerra、Preece、Gross(2020)作者英文Table3 + 斯坦福作者16题PDF；简体中文为本站独立工作翻译，非经过验证的既存中文量表。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "原作者完整英文版和计分页已经核对。中文译稿尚无人工译审/认知访谈/目标群体效度证据；只使用作者有文字支持的1、4、7锚点。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ebq16_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ebq16_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ebq16_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2020 Becerra, Preece & Gross. Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395. Original sixteen EBQ items were authored and published by these authors in PLOS ONE Table 3 and supplemental material under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The Stanford author-supplied questionnaire/scoring PDF (https://spldev.sites.stanford.edu/sites/g/files/sbiybj19321/files/media/file/ebq_questionnaire_and_scoring_instructions_042020.pdf) is independently used to verify exact item order and seven SUM formulas; its own standalone PDF is not assumed to inherit unrestricted rights beyond the author's originally published article. The project independently translated the English items and three labeled anchors into a Chinese WORK DRAFT and wrote its own descriptive report. Credit, source, license URL and these changes must be retained; there is no author endorsement, human translation review or Chinese validation. OpenScales is discovery only: its 'mean_coded' scoring disagrees with the original author SUM instructions and was not reused.",
+      "文章原作者CC BY题项再分发权不等于平台用户使用授权、科学译审或临床用途。原样本与中文版缺口明确保留，本内容包为DRAFT/HIDDEN。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Becerra/Preece/Gross 2020 original English EBQ16; Stanford author PDF scoring, project Chinese working translation",
+        "citation": "Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395.",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0231395",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2020 Becerra, Preece & Gross. Becerra, R., Preece, D. A., & Gross, J. J. (2020). Assessing beliefs about emotions: Development and validation of the Emotion Beliefs Questionnaire. PLOS ONE, 15(4), e0231395. https://doi.org/10.1371/journal.pone.0231395. Original sixteen EBQ items were authored and published by these authors in PLOS ONE Table 3 and supplemental material under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The Stanford author-supplied questionnaire/scoring PDF (https://spldev.sites.stanford.edu/sites/g/files/sbiybj19321/files/media/file/ebq_questionnaire_and_scoring_instructions_042020.pdf) is independently used to verify exact item order and seven SUM formulas; its own standalone PDF is not assumed to inherit unrestricted rights beyond the author's originally published article. The project independently translated the English items and three labeled anchors into a Chinese WORK DRAFT and wrote its own descriptive report. Credit, source, license URL and these changes must be retained; there is no author endorsement, human translation review or Chinese validation. OpenScales is discovery only: its 'mean_coded' scoring disagrees with the original author SUM instructions and was not reused."
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ebq_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "既不同意也不赞同",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "6",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "EBQ_01",
+          "content": "人一旦开始体验负面情绪，就无法再做些什么来改变这种情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_02",
+          "content": "人们无法控制自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_03",
+          "content": "负面情绪几乎没有什么用处。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_04",
+          "content": "积极情绪对人们很没有帮助。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_05",
+          "content": "无论人们多么努力，都无法改变自己的负面情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_06",
+          "content": "人们无法学会有效调节积极情绪的方法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_07",
+          "content": "人们不需要自己的负面情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_08",
+          "content": "积极情绪几乎没有什么用处。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_09",
+          "content": "人们无法控制自己的负面情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_10",
+          "content": "无论人们多么努力，都无法改变自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_11",
+          "content": "负面情绪是有害的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_12",
+          "content": "人们不需要自己的积极情绪。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_13",
+          "content": "人们无法学会有效调节负面情绪的方法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_14",
+          "content": "人一旦开始体验积极情绪，就没有办法改变它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_15",
+          "content": "出现负面情绪，对人们来说是一件坏事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 14,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "EBQ_16",
+          "content": "积极情绪是有害的。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 15,
+          "responseSetKey": "ebq_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "EBQ_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "EBQ_16",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "neg_controllability",
+            "type": "dimension",
+            "label": "觉得不舒服情绪是否可以改变",
+            "description": "原作者明确规定的4题SUM分数，范围4–28；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "pos_controllability",
+            "type": "dimension",
+            "label": "觉得愉快情绪是否可以改变",
+            "description": "原作者明确规定的4题SUM分数，范围4–28；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "neg_usefulness",
+            "type": "dimension",
+            "label": "觉得不舒服情绪是否有用",
+            "description": "原作者明确规定的4题SUM分数，范围4–28；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "pos_usefulness",
+            "type": "dimension",
+            "label": "觉得愉快情绪是否有用",
+            "description": "原作者明确规定的4题SUM分数，范围4–28；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "general_controllability",
+            "type": "dimension",
+            "label": "对情绪可调节性的整体看法",
+            "description": "原作者明确规定的8题SUM分数，范围8–56；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "general_usefulness",
+            "type": "dimension",
+            "label": "对情绪是否有用的整体看法",
+            "description": "原作者明确规定的8题SUM分数，范围8–56；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "整体情绪信念",
+            "description": "原作者明确规定的16题SUM分数，范围16–112；得分仅表征对相关情绪不可控/无用陈述的认同，不是能力或诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "EBQ_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "EBQ_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "general_controllability",
+          "neg_usefulness",
+          "pos_usefulness",
+          "total"
+        ],
+        "scoreOrder": [
+          "neg_controllability",
+          "pos_controllability",
+          "neg_usefulness",
+          "pos_usefulness",
+          "general_controllability",
+          "general_usefulness",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "neg_controllability",
+            "headline": "觉得不舒服情绪是否可以改变",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些问题关注你是否觉得难过、担心或生气等不舒服的情绪可以随着行动与情境变化，而不是你最近有没有控制住情绪。较高分数只是更认同“负面情绪很难改变”的一般说法，不能证明你本人缺少调节能力。生活事件、支持与压力都会影响人们的体验；这种看法也可能随着经历改变。请不要把一次回答当成对自我的判决。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次不舒服时，有什么事情让情绪逐渐发生变化？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以先给感受命名，再选择休息、沟通或做一件小事，不必强迫它消失。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pos_controllability",
+            "headline": "觉得愉快情绪是否可以改变",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一组关注你认为愉快、开心或满足等积极情绪是否可能发生变化。它不测量你最近有多快乐，也不意味着应该随时把快乐保持住。数字反映你是否同意关于情绪的普遍陈述，而不是评价幸福感、情绪稳定性或人格。积极情绪自然会变化，这并非能力好坏的证明。中文工作译稿没有经过科学验证的分档。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "一次开心的时刻是怎样出现又自然变化的？"
+              },
+              {
+                "category": "strategy",
+                "text": "允许愉快情绪自然起伏，不把一直开心当成任务。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "neg_usefulness",
+            "headline": "觉得不舒服情绪是否有用",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有些人会觉得不舒服的情绪总是没有价值，也有人发现它可能提醒自己哪里需要被照顾或改变。这组问题测的是你对负面情绪是否有用的看法，不是负面情绪的发生次数。较高得分只说明更认同题目中“没有用或有害”的描述，不能据此判断你是否有同理心或调节技巧。每个人的生活情境不同，分数没有及格线。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪次负面情绪曾让你注意到自己需要什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试询问“这份感受想提醒我什么”，但不必遵从每一个冲动。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "pos_usefulness",
+            "headline": "觉得愉快情绪是否有用",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这些题目关注你怎么看待高兴、愉悦等积极情绪的作用。它们不是在问你最近是否开心，也不是判断你是否具有积极人格。数字只反映你对“积极情绪没有用或有害”这类说法的认同程度。不同文化、经验和环境可能影响回答，没有任何题目能据此单独给人贴上好坏标签。这份中文工作稿尚未建立可信常模。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "积极情绪何时帮助你休息、联结或继续做事？"
+              },
+              {
+                "category": "strategy",
+                "text": "留意生活中一件带来满足的小事，不用靠问卷证明它有价值。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "general_controllability",
+            "headline": "对情绪可调节性的整体看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这个综合维度把关于积极与不舒服情绪是否能够改变的八条回答合在一起。它测量信念，而不是实际调节情绪的成功率或能力测验。觉得某种情绪难改变，不意味着一个人不够努力；相信情绪可以改变，也不意味着必须立即消除正常感受。你可以结合具体处境思考自己的回答，不必拿数字与别人排名。当前版本不做临床结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有哪种情绪你曾觉得永远不会改变，后来却出现了变化？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一种负担小、环境允许的应对办法，不将情绪变化速度当作成绩。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "general_usefulness",
+            "headline": "对情绪是否有用的整体看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这个综合得分把负面和积极情绪是否有价值的八条看法汇总起来。它不意味着情绪只有好或坏两种作用，也不是你平时会不会照顾他人的评价。生活中有些感受不舒服却带来提醒，也有些愉快感受需要合适的环境才能出现。这里的数字是本次信念描述，不代表固定人格特点。本中文版本没有可靠的高低分界。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "同一种情绪在不同情境中可能有什么不同作用？"
+              },
+              {
+                "category": "strategy",
+                "text": "区分感受发出的信号与实际要采取的行动，允许自己慢慢判断。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "整体情绪信念",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "总分汇总你对情绪是否能够变化、是否有用的16条一般性信念，而不是情绪智力、心理健康、疾病风险或最近症状。数字较高仅代表更认同“情绪难以改变、可能没有用”的描述；较低也不意味着任何时候都可以控制情绪。比追求某个数值更有帮助的是留意你从哪些经验形成这种看法，以及它是否仍适合现在的生活处境。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "选择一条最犹豫的题目：哪些经验塑造了你的看法？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以记一次情绪随着事情进展的变化，只观察，不要求分数提高。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "澳大利亚英文成人原版N=161，18–83岁；不能泛化到中国成人或K12。本站译本的人工译审/认知访谈/信效度仍未完成。",
+          "4项分维SUM 4–28，8题合成SUM 8–56，16题总SUM 16–112；不采用OpenScales实现的均分算法。",
+          "作者1、4、7选项文字已核实，2/3/5/6只有数字，中文锚点未经原作者审定。",
+          "七个分数中部分包含重叠题目，不能把它们视作七个相互独立构念，或在总分之外再做总加和。",
+          "缺失题保守完整作答，不插补、不外推；项目工作策略非作者证实的漏答规则。",
+          "不创造中文常模、高低阈值、诊断风险、百分位或临床最小变化参数；正式ReferenceSet不存在。",
+          "原版指导语在独立研究文档；当前未完成API、数据库或双入口浏览器完整验收。"
+        ],
+        "disclaimer": "仅为成人描述性研究的DRAFT工具，原作者Becerra/Preece/Gross(2020)，DOI 10.1371/journal.pone.0231395，CC BY4.0；本站简体中文及报告未经专家科学/翻译审核。不是诊断、K12筛查或疗效测量。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted item and report drafting (not human expert approval)",
+            "reviewedAt": "2026-10-26T01:50:00Z",
+            "basis": "Original author-published 16 English items, Stanford scoring PDF and GitHub mismatch checked, golden expectations independent arithmetic only. Not Vitest/DB/API or scientific approval. Student is technical report slot only."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ebq16",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "EBQ_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_16",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "neg_controllability": 4,
+            "pos_controllability": 4,
+            "neg_usefulness": 4,
+            "pos_usefulness": 4,
+            "general_controllability": 8,
+            "general_usefulness": 8,
+            "total": 16
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "EBQ_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_16",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "neg_controllability": 28,
+            "pos_controllability": 28,
+            "neg_usefulness": 28,
+            "pos_usefulness": 28,
+            "general_controllability": 56,
+            "general_usefulness": 56,
+            "total": 112
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "EBQ_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_16",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "neg_controllability": 16,
+            "pos_controllability": 16,
+            "neg_usefulness": 16,
+            "pos_usefulness": 16,
+            "general_controllability": 32,
+            "general_usefulness": 32,
+            "total": 64
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "EBQ_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "EBQ_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EBQ_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "EBQ_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EBQ_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "EBQ_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "EBQ_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "EBQ_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "EBQ_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "EBQ_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "EBQ_16",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "neg_controllability": 14,
+            "pos_controllability": 18,
+            "neg_usefulness": 15,
+            "pos_usefulness": 12,
+            "general_controllability": 32,
+            "general_usefulness": 27,
+            "total": 59
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "EBQ_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "EBQ_16",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "neg_controllability": null,
+            "pos_controllability": 16,
+            "neg_usefulness": 16,
+            "pos_usefulness": 16,
+            "general_controllability": null,
+            "general_usefulness": 32,
+            "total": null
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "neg_controllability": null,
+            "pos_controllability": null,
+            "neg_usefulness": null,
+            "pos_usefulness": null,
+            "general_controllability": null,
+            "general_usefulness": null,
+            "total": null
+          },
+          "totalScoreKeys": [
+            "neg_controllability",
+            "pos_controllability",
+            "neg_usefulness",
+            "pos_usefulness",
+            "general_controllability",
+            "general_usefulness",
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
