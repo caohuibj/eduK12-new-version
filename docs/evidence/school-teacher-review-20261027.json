@@ -12,8 +12,8 @@
     "server-version/backend/src/__tests__/measurement-content/training-standard-connected.postgres.integration.test.ts"
   ],
   "upstreamApplicationChangesAreTestsOnly": true,
-  "backendTree": "8ee14711d9144536c98d16ea9dca411e6696e0dc",
-  "frontendTree": "467647b34b7690e040cbcee03f862568d3fecbf4",
+  "backendTree": "e2b321cf0f0b6d36981c927104250a15a7eee72f",
+  "frontendTree": "827cce8612c227e0569db226cd50557227f33349",
   "sourceChangePaths": [
     "docs/school-management-execution-plan.md",
     "docs/school-personnel-import.md",
@@ -246,7 +246,7 @@
     "docs/school-teacher-review-summary-20261027.md",
     "docs/evidence/school-teacher-review-20261027.json"
   ],
-  "sourceDiffRawSHA256": "a950aeaeb4127575007b69185137011928938c9f254229abbb06e6e2b4a1062e",
+  "sourceDiffRawSHA256": "139401bdf66e4d23a37b54f1db7e47c8b0548a54172166e08d228b99953f5313",
   "existingEvidenceIndex": [
     {
       "localReceipt": "personnel-validation.json",
@@ -366,5 +366,24 @@
   "workflowOrProtectionModifiedByThisPR": false,
   "credentialPatternMatches": 0,
   "checks": "source/ancestry/schema/dependency/workflow inventory and git diff check only",
-  "createdAt": "2026-10-26T22:29:45.937985+00:00"
+  "createdAt": "2026-10-26T22:29:45.937985+00:00",
+  "consolidationWhitespaceOnlyChanges": [
+    {
+      "path": "server-version/backend/src/utils/bounded-xlsx.ts",
+      "change": "remove one extra final blank line only",
+      "beforeSHA256": "724f4d9e7202cc0beb8a203c15d390d0e0e0aebdb4de2fa0c7723a39ba0fdd20",
+      "afterSHA256": "599d18b606c108c81187bf19191546b8cfe362a0ca5681e2f3ce89c19de498bd"
+    },
+    {
+      "path": "server-version/frontend/src/school/SchoolTaskHelp.tsx",
+      "change": "remove one extra final blank line only",
+      "beforeSHA256": "e146502c1f7fbfe35b61e15ec2f6a3f4095446666a6187d909e386a1f0e28d15",
+      "afterSHA256": "fb2a5bd5cbe5e0ca29c252ac87fc1b0aed7f01c3accb7ce51c13a244e389ab21"
+    }
+  ],
+  "fullDiffCheckInitialResult": {
+    "exit": 2,
+    "finding": "two preexisting extra blank lines at EOF",
+    "fix": "remove one final blank line from each; no semantic/source-token edits"
+  }
 }

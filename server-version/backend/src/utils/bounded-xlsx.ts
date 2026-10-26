@@ -72,4 +72,3 @@ export function validateBoundedXlsxContainer(buffer: Buffer, limits: Partial<Xls
   if (cursor !== end || !names.has('xl/workbook.xml')) throw new Error('不是受支持的 Excel 模板')
   return files
 }
-

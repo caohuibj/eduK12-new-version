@@ -17,4 +17,3 @@ export function SchoolTaskHelp({children,label='观察任务与隐私说明',but
     {open&&<div id={id} className="hs-teacher-task-help-content" role="note" aria-label={label}>{children}</div>}
   </div>
 }
-
