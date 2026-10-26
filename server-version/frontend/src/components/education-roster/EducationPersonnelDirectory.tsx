@@ -68,7 +68,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
  }
  return <section id="school-roster-directory" className="education-roster hs-panel hs-personnel-directory" data-entry={entry} aria-label="全校人员目录" aria-busy={busy}>
   <div className="hs-directory-heading"><h2>人员名单</h2><div className="hs-actions">
-   <button type="button" disabled={disabled} aria-expanded={importOpen} onClick={()=>{setImportStarted(true);setImportOpen(v=>!v);setSelected('');setDetail(null);detailRequest.current++}}>批量导入</button>
+   <button type="button" disabled={disabled||busy||mfa||!data} aria-expanded={importOpen} onClick={()=>{setImportStarted(true);setImportOpen(v=>!v);setSelected('');setDetail(null);detailRequest.current++}}>批量导入</button>
    <button type="button" aria-label="检索全校人员" aria-expanded={searchOpen} aria-pressed={searchOpen||!!query} onClick={()=>setSearchOpen(v=>!v)}><Search size={18}/></button>
    <button type="button" aria-label="刷新全校人员" disabled={busy||disabled} onClick={()=>setVersion(v=>v+1)}><RefreshCw size={18}/></button>
   </div></div>
