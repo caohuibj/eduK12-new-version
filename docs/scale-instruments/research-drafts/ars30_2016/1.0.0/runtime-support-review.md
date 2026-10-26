@@ -2,11 +2,13 @@
 
 范围：只读检查内容导入、测量定义／发布投影、冻结快照和实际前端消费者；结论绑定基线 `ebbf389bb9812189f06987038b6a0859c8cea72b`，各文件字节摘要在[runtime-source-inputs.json](runtime-source-inputs.json)。没有运行测试、浏览器、API或数据库；不是全面系统审计。
 
+**基线限制：本结论仅针对量表内容分支基线，不代表最新 PR356 的指导语修复仍未实现；采用 PR356 后须按新基线重核，不能直接重复报旧问题。**
+
 结论：**发现展示指导语的既有位置，但未找到在当前量表内容线内、无需系统修改就能同时把ARS-30必需情境纳入冻结内容身份并可靠展示的完整路径。接入BLOCKED，文档可独立交付。** 不把这解释为所有普通量表都不可用。
 
 | 支持位置 | 静态事实 | 对本工具的限制 |
 | --- | --- | --- |
-| [source schema](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/scale/onboarding/schema.ts#L73) | 顶层严格字段包含identity/catalog/localization/executable等；executable.definition使用ScaleDefinitionV2 | localization可以保留资料，但没有把必需情境交付给runner的正式契约；https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/PARED资料不是已展示证据 |
+| [source schema](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/scale/onboarding/schema.ts#L73) | 顶层严格字段包含identity/catalog/localization/executable等；executable.definition使用ScaleDefinitionV2 | localization可以保留资料，但没有把必需情境交付给runner的正式契约；PREPARED资料不是已展示证据 |
 | [ScaleDefinitionV2](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/scale/scale-definition.ts#L160)及[测量hash](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/scale/scale-definition.ts#L479) | display只含randomizeItems；定义的测量身份投影包含题目、选项、计分等，没有量表级必需情境字段 | 额外加JSON字段不能推定被schema保留、纳入hash并渲染 |
 | [materializer](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/scale/onboarding/materialize.ts#L29) | 创建DRAFT/HIDDEN、definition、构念description；没有从source设置Scale.instruction | 不将构念介绍伪装成情境，也不手工更新数据库补齐冻结协议 |
 | [内容发布投影](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/measurement-content/scale.ts#L34)及[冻结快照](https://github.com/caohuibj/eduK12-new-version/blob/ebbf389bb9812189f06987038b6a0859c8cea72b/server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts#L19) | 发布从已验证definition投影；快照保留definition和presentation等 | 未发现把另行存放的Scale.instruction绑定为这一工具必需材料的投影／hash字段 |
