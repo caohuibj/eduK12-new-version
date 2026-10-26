@@ -12,10 +12,11 @@ export function EducationRosterSource({api,organizationId,kind,text,disabled,onT
  const alive=useRef(true),request=useRef(0),blocked=useRef(onBlocked)
  blocked.current=onBlocked
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;blocked.current(false)}},[])
+ const selectedFile=useRef<File|undefined>(undefined)
  const previousText=useRef(text)
  useEffect(()=>{
   if(previousText.current!==text){
-   previousText.current=text;request.current++;setSheets([]);setStructureRows([]);setReading(false);blocked.current(false)
+   previousText.current=text;selectedFile.current=undefined;request.current++;setSheets([]);setStructureRows([]);setReading(false);blocked.current(false)
   }
  },[text])
  const invalidate=()=>{onInvalidate();onBlocked(true);setError('');setStructureRows([])}
@@ -31,6 +32,7 @@ export function EducationRosterSource({api,organizationId,kind,text,disabled,onT
  }
  const read=async(file:File|undefined)=>{
   if(!file)return
+  selectedFile.current=file
   const id=++request.current
   invalidate();setSheets([]);setReading(true);setFilename('')
   try{
@@ -55,7 +57,7 @@ export function EducationRosterSource({api,organizationId,kind,text,disabled,onT
   invalidate();setFilename('粘贴内容')
   try{prepare([{name:'粘贴内容',rows:readRosterText(text)}])}catch(cause){report(cause);onBlocked(false)}
  }
- const finish=(value:string)=>{onText(value);setSheets([]);setStructureRows([]);setError('');onBlocked(false)}
+ const finish=(value:string)=>{selectedFile.current=undefined;onText(value);setSheets([]);setStructureRows([]);setError('');onBlocked(false)}
  const apply=()=>{
   if(!headerValid)return
   try{finish(mappedRosterText(sheets[sheet].rows,kind,mapping))}catch(cause){report(cause)}
@@ -64,7 +66,7 @@ export function EducationRosterSource({api,organizationId,kind,text,disabled,onT
   if(kind!=='GRADE'&&kind!=='CLASS')return
   try{finish(structureFileText(structureRows,kind))}catch(cause){report(cause)}
  }
- const cancel=()=>{request.current++;setSheets([]);setStructureRows([]);setError('');onBlocked(false)}
+ const cancel=()=>{selectedFile.current=undefined;request.current++;setSheets([]);setStructureRows([]);setError('');onBlocked(false)}
  const chooseSheet=(index:number)=>{
   invalidate()
   try{prepare(sheets,index)}catch(cause){report(cause);onBlocked(false)}
@@ -88,7 +90,7 @@ export function EducationRosterSource({api,organizationId,kind,text,disabled,onT
   </div>
   <button className="er-match-paste" type="button" disabled={disabled||reading||!text.trim()} onClick={pasted}>匹配粘贴表头</button>
   {reading&&<p role="status">正在读取文件…</p>}
-  {error&&<div className="er-file-error" role="alert"><span>{error} 当前输入未覆盖。</span><button type="button" onClick={()=>downloadRosterErrors([{line:'文件／映射',message:error}])}>下载问题清单</button></div>}
+  {error&&<div className="er-file-error" role="alert"><span>{error} 当前输入未覆盖。</span>{selectedFile.current&&<button type="button" disabled={disabled||reading} onClick={()=>void read(selectedFile.current)}>重新读取文件</button>}<button type="button" onClick={()=>downloadRosterErrors([{line:'文件／映射',message:error}])}>下载问题清单</button></div>}
   {headerless&&<div className="er-headerless"><span>文件没有表头时，可保留首行作为名单内容。</span><button type="button" disabled={disabled||reading} onClick={useHeaderless}>按无表头名单使用（保留首行）</button></div>}
   {current&&<section className="er-mapping" aria-label="表头映射与样例">
    <div className="er-mapping-heading"><strong>核对表头 · {filename}</strong>
