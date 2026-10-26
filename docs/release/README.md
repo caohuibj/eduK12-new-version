@@ -1942,3 +1942,24 @@ merge gate / ready PR with integration_id15368, no bypass actors and
 current_user_can_bypass=never. No protection changed. This ruleset review is
 complete; the current node's earlier403/unread traditional branch-protection
 endpoint remains a separate boundary and was not retried.
+
+
+PR356 received only the independently authorized local15 supplement: complete
+connected8 first produced7PASS/1FAIL; its stale issuance-vs-frozen-use test
+consumer was corrected without changing production authorization, then only
+that case was reexecuted (1PASS/7filtered). Catalog2 and HTTP5 each passed once.
+Original failures, filtered cases and old HTTP/catalog observations remain.
+The raw reporters, exact commands/exits, contemporaneous source/Prisma/tool/
+fixture/environment records are indexed under local15Supplement in the retained
+evidence JSON. Large manifests use explicitly labelled lossless gzip transport;
+decode base64, decompress, and verify original bytes/SHA. This supplements only
+these four actual invocations, never backfills historical manifests or signs
+old runs. The connected fixture remains APPROVED_WITHOUT_TRIAL.
+
+The source binding now pins the small test-only commit feb5f12d678af008dcc2397ba752889c0f4350cd,
+342 source paths,41 controls and the actual updated backend tree. All16 phase
+readiness,13 history groups and SARIF policy remain pending independent exact
+candidate review. No other opt-in suites/types/build/browser/CI were executed;
+no Ready/merge/deploy/protection/credential action occurred. Detailed per-case
+mapping, portable pointers and remaining decisions are in
+[the activation record](../pr356-ci-activation-20261026.md).

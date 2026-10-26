@@ -32,17 +32,17 @@ PR 保持 Open/Draft，未合并；本轮尚未激活 GitHub Actions，累计正
 root 读取 `branches/main/protection` 被 integration 以 HTTP403 `Resource not accessible by integration` 拒绝，状态 **denied**。没有重试绕过或新增身份。该传统endpoint的denied边界保留。根dot已在2026-10-26 13:14UTC用现有只读连接独立读rulesets列表和23665026：仅该active规则作用默认分支，strict=true，required为`merge gate / ready PR`、integration_id15368，无bypass actors且current_user_can_bypass=never。未改变保护；ruleset核对不再是未解决阻碍。本节点没有把该外部实读伪装成本地API receipt，也没有重试传统branch-protection端点。
 
 
-### 本次已推送的产品身份
+### 当前源码冻结锚点（完整控制HEAD提交后回读）
 
 | 输入 | 实值 |
 | --- | --- |
-| 产品提交 / 父提交 | `862c324be459c6ab6f0daabb4798034388c0410c` / `c064b38eb6ef68517e5a3861072cf3dc055da978` |
-| 产品 tree | `6048b438ff682c3928e0e9152fb51ee4b47af57a` |
+| 产品提交 / 父提交 | `feb5f12d678af008dcc2397ba752889c0f4350cd` / `cb0181a045e318e9ddb30b6df336c6417a494711` |
+| 产品 tree | `7efd4128fa3fbae755b8cb23118ef6ebc2df4789` |
 | base/main | `ff8471e529e7b3c56e1e20f17d1e2581040fc896` |
-| backend / frontend tree | `ff7edd58e3824178075aaaf74730e2fa2367a5fe` / `87590586f2902baf14f0a94e8d444ac9e4b2e7e8` |
-| 严格差异 | 342 source＋11 control＝353路径；两新增路径仅test harness/helper contract |
-| main→产品的NUL raw差异 SHA-256 | `6a073eb15e656d070faa6ed8a77bcab61e1961e5f231b60a71c467d5244a0738`（包含产品提交时的control字节，不冒充下一控制提交raw摘要） |
-| bindings SHA-256 | `274587659e8ffdb5863c252c9c72fd7dbdb31c98eb85c4826d5d440eef2b9b19` |
+| backend / frontend tree | `8b2b7892401efac7cbdcddad8c73acacf5eb424d` / `87590586f2902baf14f0a94e8d444ac9e4b2e7e8` |
+| 严格差异 | 342 source＋41 control＝383路径；本轮源码仅修connected第6例测试消费者，生产/fixture/其余7例未改 |
+| main→产品的NUL raw差异 SHA-256 | `b1e550dd69dc6b563978b6334820ffea9396ecb5a95b3b4f2bd1d7bc9cb8a6bf`（产品提交时的control字节，不冒充下一控制提交raw摘要） |
+| 本轮 bindings SHA-256 | `809ab768d8dfeec9ed2440d23c5f7d242c567510a19a7ec0ec77ce02c70aacd9`（严格固定实际已提交的test blob与新backend tree） |
 
 最终控制提交的完整HEAD/tree/远端PR merge preview在提交后实读并于对话交付；任何后续CI实现/fixture/控制变动均产生新的最终候选，须重新独审，不能拿本次“设计提交”激活将来不同代码。
 
@@ -483,8 +483,9 @@ merge gate / ready PR、integration_id15368；bypass actors为空，current_user
 
 最终只剩dot决定的资格项：
 1. 根据既有逐case矩阵决定13历史组的精确合法接纳/必要缺项；affected-review的404
-   强制历史来源与9项fresh-only映射需审定。connected旧8例的raw/log/migration/Prisma
-   缺失仍须恢复原件或只选必要未覆盖case，不默认九套/全平台重跑。
+   强制历史来源与9项fresh-only映射需审定。本轮仅按dot明确授权补齐connected8、
+   catalog2、HTTP5的新原件，case映射见下节；旧connected原件仍未恢复且不补造。
+   这15项已无需再次执行，是否接纳由dot逐case决定；不默认另六套/全平台重跑。
 2. 审定16phase执行和实际预算及各目标唯一位置：升级/恢复、vertical4、worker1、
    新四库ordinary、exact lazy消费者、同产物产品网页等仍NOTRUN。保留原内容/HOLD、
    完整Training/获准P-R、356-01范围，不用限定CI自动替代；exact非空CONTENT所需
@@ -497,3 +498,73 @@ merge gate / ready PR、integration_id15368；bypass actors为空，current_user
 freshPhaseCoverageTransfers；本页§3及附录A逐case输入/缺证矩阵；原件包portableRawIndex
 与各rawBase64Pointer；B源、CodeQL实际YAML及对应直接控制均已有Git版本和原命令/退出。
 本轮新增预算checker/退出/日志和外部规则实读归属记录后，共397条，旧393条保留。
+
+
+### 本地15项目标的补证（实际执行，待独审）
+
+根dot独立核对旧证据后，仅授权本节点在自有隔离PG/Redis补connected8、catalog2、
+HTTP5。本轮确实执行这三个完整文件各一次；仅connected第6例失败后，修正该测试
+调用合同并单独复验此例一次。没有执行另外六个opt-in、全项目types、构建、浏览器
+或Actions。没有Ready、merge、部署、保护变更或生产数据/凭据。
+
+| 实际invocation | 原结果及退出 | E内原reporter指针 | 命令/退出指针 |
+| --- | --- | --- | --- |
+| connected完整8例 | 7 PASS / 1 FAIL / 0skip，exit1，44.46秒 | `/followupReports/63` | `/followupAttachments/337` |
+| connected修正后只选第6例 | 1 PASS / 7 filtered，exit0，37.89秒 | `/followupReports/64` | `/followupAttachments/362` |
+| catalog完整2例 | 2 PASS / 0 FAIL / 0skip，exit0，26.83秒 | `/followupReports/62` | `/followupAttachments/320` |
+| HTTP完整5例 | 5 PASS / 0 FAIL / 0skip，exit0，48.54秒 | `/followupReports/65` | `/followupAttachments/399` |
+
+15个不同目标case现均有真实PASS原件，这是四次实际invocation的逐case提案，**不是
+connected整文件一次8绿或正式资格通过**。首轮1FAIL及复验7filtered保持原身份，其他
+14个已通过目标未重复执行。E的`local15Supplement.caseEvidenceProposals`保留15个既有
+caseId、声明名/真实fullName、原状态与指定PASS原reporter/断言下标；不改acceptance的
+13历史组pending，也不自行批准这些新原件。
+
+失败定位：原case以issuer当前`assertLibraryAuthority`分配资格检验冻结原21B根；
+fixture从开始就有正式TRAINING入口管理员身份，该issuance正当通过。修正仅第6例，
+为单独合格synthetic教师建立绑定该root的raw use，调用真实生产消费者
+`assertTrainingStandardUse`验证撤销前可用、撤销后`CONTENT_AUTHORITY_DENIED`；另外
+明确断言原issuer仍可凭当前entry分配。没有放宽原拒绝断言或生产权限。raw行保持
+APPROVED_WITHOUT_TRIAL合成性质，不制造ONLINE/科学批准/学生纵向资格。其他7例及
+imports/fixture在该例之前和之后的字节均未变。
+
+前三次执行的真实HEAD均为`cb0181a045e318e9ddb30b6df336c6417a494711`且源码干净。
+定向复验仍为该HEAD、仅该test未提交修改；其实际raw SHA
+`bc2a1398b8899ccaaa9719165bd86546cf685c1e606e364123130e399d606e22`与随后提交
+`feb5f12d678af008dcc2397ba752889c0f4350cd`的test字节一致，不把后来的commit冒充
+执行HEAD。三次初始保守源码清单3149项SHA为
+`c863f0385e1e19de8c3857791dc0e5a378e7441cb7bef7053cf27361a596f914`；复验清单
+`46071d9a7d763ae74c3d8f3150543d81f1df63486a39992ffaaa92edce14ef46`，差异只有
+该测试。catalog/HTTP没有导入它，其他7例局部前后文未变，交dot审定这些窄输入联系。
+每次实际执行前后source/generated/head均一致，没有把当前tree追认到旧历史执行。
+
+环境：复用Node24.21.0和已安装依赖，无npm ci/新增依赖。14个记录的直接工具/运行时
+包版本与lock一致；保留Node二进制、68个Prisma/client/engine生成文件的hash，而非
+声称整个node_modules已逐字节绑定。`prisma generate`实际exit0；源码与generated
+schema的raw hash差异经同版Prisma5.22对scratch副本format证实仅格式，两者格式后
+SHA完全一致。最初raw-equality失败诊断保留，源schema未改。
+新PG16.15仅loopback55445/tmpfs、自有空catalog库与独立connected/HTTP库；新Redis
+7.4.11分别56385/56386。两个应用库各真实deploy237迁移；第6例复验另建新库再deploy，
+旧失败库/ledger/报告保留。没有生产数据，workers明确关闭，flags/fixture/端口/版本/
+迁移checksum与完整argv/退出已入每次前后记录。五份首轮SQL/CPU trace/profile保留，
+复验只产生新setup trace，不覆盖旧profile。
+
+E仍为`.github/scripts/pr356-local-evidence.json`，原397个portable记录逐字节/顺序保留，
+本轮执行原件新增145个，加实际静态reader的脚本/输出/退出4个，最终共546个；旧25主报告、历史关联/失败/缺证身份不变。四份新reporter
+直接保留raw字节；9份大清单/副本用gzip**无损传输**。对有compression=gzip的
+portable项，先base64解码再gzip解压，以uncompressedBytes/uncompressedSHA256
+核回原字节；originalPath是gzip payload路径，uncompressedOriginalPath指原文件。
+`local15Supplement.invocations`给每次beforeInputs/afterInputs、命令和reporter精确
+pointer；新前后manifest仅关联本轮四次真实执行，不改变旧followupSourceAssociation。
+
+当前remaining：16phase ready、13历史approved和SARIF policy继续pending。dot需先审
+本轮15个case及其他既有映射、实际缺项/唯一执行位置和最终完整HEAD/tree/base，再
+决定如何接纳与激活。已知ruleset strict/required无变化；CodeQL30分钟预算、B实际
+reader调用点及未变控制绿项没有重跑。旧HTTP5原PASS、catalog2原PASS/整次12P1F继续
+保留，不再称为“从未执行”；connected旧raw缺失也未被本轮新报告伪装补回。
+
+
+实际既有`verifyDevelopmentObservations`读取器已针对新数据执行一次，exit0，核过542个
+当时payload和9个gzip原字节、15个PASS指针及pending状态；其脚本/stdout/stderr/receipt
+另保留`/followupAttachments/451`至`/followupAttachments/454`，最终总量546。没有为这次
+附录重复运行任何应用检查或原控制绿项，后续只作最终Git版本/原件完整性读取。
