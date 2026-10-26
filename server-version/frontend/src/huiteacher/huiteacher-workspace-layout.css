@@ -281,3 +281,23 @@
 /* The dedicated page already supplies its accessible title. */
 .ht-task-answer-form>section>h3{display:none}
 .ht-task-answer-form>p{margin:0 0 16px;color:var(--ht-quiet);font-size:13px}
+
+/* Professional practice follows the same compact list hierarchy as student tasks. */
+.ht-workspace .ht-practice-section-title{margin:22px 0 4px;font-size:14px;font-weight:600;color:var(--ht-quiet)}
+.ht-practice-workbench>.ht-event-list{gap:0}
+.ht-app[data-theme] .ht-practice-card{display:grid;grid-template-columns:32px minmax(0,1fr);align-items:start;gap:8px 12px;margin:0;padding:16px 0;border:0;border-bottom:1px solid var(--ht-line);border-radius:0;background:transparent;box-shadow:none}
+.ht-app[data-theme] .ht-practice-card:last-child{border-bottom:0}
+.ht-practice-card-icon{display:flex;align-items:center;justify-content:center;width:32px;min-height:28px;color:var(--ht-copper)}
+.ht-practice-card-copy{min-width:0}
+.ht-workspace .ht-practice-card-copy h4{margin:0 0 7px;font-size:15px;line-height:1.65;font-weight:600;overflow-wrap:anywhere}
+.ht-practice-card-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;font-size:12px;color:var(--ht-quiet)}
+.ht-practice-card .ht-practice-card-meta .ht-tag{margin:0;font-size:12px}
+.ht-practice-card-copy>p{margin:6px 0 0;font-size:13px}
+.ht-practice-card>button{grid-column:2;justify-self:start;margin:2px 0 0;font-size:14px}
+.ht-practice-consensus .ht-section-heading{align-items:center;gap:10px}
+.ht-practice-consensus .ht-section-heading h2{min-width:0}
+.ht-practice-consensus .ht-consensus-refresh{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;min-height:40px;margin:0;padding:0}
+.ht-practice-consensus>.ht-empty{margin:18px 0 0;padding:16px;font-size:13px;text-align:left;border:1px dashed var(--ht-line);border-radius:10px}
+.ht-practice-consensus .ht-event h3{font-size:15px}
+@media(min-width:1101px){.ht-practice-layout{grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:18px}}
+@media(max-width:640px){.ht-practice-card>button{min-height:44px}.ht-practice-consensus .ht-section-heading h2{font-size:17px}}

@@ -1,3 +1,5 @@
+import {ClipboardList,Compass,NotebookPen} from 'lucide-react'
+import {SchoolTaskHelp as PracticeHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { TaskForm } from '../survey/SurveyPublicApp'
@@ -157,19 +159,21 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     page.questions.some(q=>visibleFormKeys(bound.pages.flatMap(p=>p.questions),answers).has(q.itemKey)),
   ).length-1)
   return <section className="ht-panel ht-practice-workbench" aria-label="我的专业实践">
-    <h2>我的专业实践</h2>
-    <p className="ht-muted">从受邀活动进入，填写组织者配置的实践表单。私人反思与提交给学校的专业意见分别保存。</p>
+    <header className="ht-section-heading"><h2>我的专业实践</h2><PracticeHelp label="专业实践与记录说明" buttonText=""><p>从受邀活动进入，填写组织者配置的实践表单。私人反思仅本人可见，与提交给学校的专业意见分别保存。</p></PracticeHelp></header>
+    <p className="ht-muted">参与受邀活动，留下观察与专业反馈。</p>
     {notice&&!opened&&<p className="ht-notice" role="status">{notice}</p>}
-    <details className="ht-practice-disclosure"><summary>使用活动邀请码</summary>
-      <div className="ht-inline"><label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
-        <input value={expertInviteCode} maxLength={60} onChange={e=>setExpertInviteCode(e.target.value)} placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
-      </label><button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())} onClick={joinExpert}>使用当前账号领取专家任务</button></div>
-    </details>
-    <h3>实践活动</h3>
-    {!invitations.length?<p className="ht-empty">尚未收到实践活动邀请。</p>:<div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId} className="ht-event">
-      <strong>{inv.title}</strong><span className="ht-tag">{inv.role==='EXPERT'?'外部专家':'同行观察者'} · {inv.status==='ACCEPTED'?'已领取':'待接受'}</span>
-      <p className="ht-muted">到期：{new Date(inv.expiresAt).toLocaleString()}</p>
+    <h3 className="ht-practice-section-title">实践活动</h3>
+    {!invitations.length?<p className="ht-empty">尚未收到实践活动邀请。</p>:<div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId} className="ht-event ht-practice-card">
+      <span className="ht-practice-card-icon" aria-hidden="true"><Compass size={20}/></span>
+      <div className="ht-practice-card-copy"><h4>{inv.title}</h4><div className="ht-practice-card-meta"><span>{inv.role==='EXPERT'?'外部专家':'同行观察者'}</span><span className="ht-tag">{inv.status==='ACCEPTED'?'已领取':'待接受'}</span><span>到期：{new Date(inv.expiresAt).toLocaleString('zh-CN')}</span></div></div>
       {inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy} onClick={()=>openActivity(inv)}>填写实践表单</button>}
+    </article>)}</div>}
+    <h3 className="ht-practice-section-title">我的记录</h3>
+    {!notes.length?<p className="ht-empty">尚未创建实践记录。</p>:<div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event ht-practice-card">
+      <span className="ht-practice-card-icon" aria-hidden="true">{note.kind==='PRIVATE_REFLECTION'?<NotebookPen size={20}/>:<ClipboardList size={20}/>}</span>
+      <div className="ht-practice-card-copy"><h4>{invitations.find(inv=>inv.eventId===note.eventId)?.title??labels[note.kind]}</h4><div className="ht-practice-card-meta"><span>{labels[note.kind]}</span><span className="ht-tag">{note.status==='SUBMITTED'?'已提交':'草稿'}</span></div>
+      <p className="ht-muted">{note.kind==='PRIVATE_REFLECTION'?'仅本人可见':note.status==='SUBMITTED'?'已提交的原稿不可改写':'尚未正式提交给学校'}</p></div>
+      <button disabled={busy} onClick={()=>openNote(note)}>{note.status==='SUBMITTED'?'查看记录':'继续填写'}</button>
     </article>)}</div>}
     {active.length>0&&<details className="ht-practice-disclosure"><summary>新建辅助记录或私人反思</summary>
       <div className="ht-inline"><label className="ht-field"><span>本次活动</span><select value={newEvent} onChange={e=>setNewEvent(e.target.value)}>
@@ -179,12 +183,11 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
       </select></label></div>
       <button disabled={busy||!newEvent} onClick={()=>{if(kind==='FORMAL_FEEDBACK')setKind('FACT');setActiveNoteId('');setOpened(true);setNotice('')}}>打开辅助记录页面</button>
     </details>}
-    <h3>我的记录</h3>
-    {!notes.length?<p className="ht-empty">尚未创建实践记录。</p>:<div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event">
-      <strong>{invitations.find(inv=>inv.eventId===note.eventId)?.title??labels[note.kind]}</strong><span className="ht-tag">{labels[note.kind]} · {note.status==='SUBMITTED'?'已提交':'草稿'}</span>
-      <p className="ht-muted">{note.kind==='PRIVATE_REFLECTION'?'仅本人可见':note.status==='SUBMITTED'?'已提交的原稿不可改写':'尚未正式提交给学校'}</p>
-      <button disabled={busy} onClick={()=>openNote(note)}>{note.status==='SUBMITTED'?'查看记录':'继续填写'}</button>
-    </article>)}</div>}
+    <details className="ht-practice-disclosure"><summary>使用活动邀请码</summary>
+      <div className="ht-inline"><label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
+        <input value={expertInviteCode} maxLength={60} onChange={e=>setExpertInviteCode(e.target.value)} placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
+      </label><button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())} onClick={joinExpert}>使用当前账号领取专家任务</button></div>
+    </details>
     {opened&&<TeacherAssessmentPage kind="practice" scope="ht-professional-practice" title={currentInvite?.title??labels[currentKind]} busy={busy} onBack={()=>setOpened(false)}>
       <div className="ht-practice-page">
         {notice&&<p className="ht-notice" role="status">{notice}</p>}

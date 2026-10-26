@@ -1,3 +1,4 @@
+import {RefreshCw} from 'lucide-react'
 import {useEffect,useState} from 'react'
 type Api=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 type Formal={id:string;kind:'FACT'|'FORMAL_FEEDBACK';content:string}
@@ -105,12 +106,17 @@ export function HuiteacherConsensusManager({organizationId,eventId,api}:{
 export function HuiteacherConsensusReviews({api}:{api:Api}){
   const [reviews,setReviews]=useState<Consensus[]>([])
   const [busy,setBusy]=useState(false),[notice,setNotice]=useState('')
-  const refresh=async()=>setReviews((await api<{list:Consensus[]}>('/my-consensus-reviews')).list)
+  const [loaded,setLoaded]=useState(false),[readError,setReadError]=useState(false)
+  const refresh=async()=>{
+    try{setReviews((await api<{list:Consensus[]}>('/my-consensus-reviews')).list);setLoaded(true);setReadError(false)}
+    catch(error){setReadError(true);throw error}
+  }
   useEffect(()=>{
     let live=true
+    setLoaded(false);setReadError(false)
     void api<{list:Consensus[]}>('/my-consensus-reviews')
-      .then(r=>{if(live)setReviews(r.list)})
-      .catch(e=>{if(live)setNotice(e instanceof Error?e.message:'共识待办读取失败')})
+      .then(r=>{if(live){setReviews(r.list);setLoaded(true)}})
+      .catch(e=>{if(live){setReadError(true);setNotice(e instanceof Error?e.message:'共识待办读取失败')}})
     return()=>{live=false}
   },[api])
   const approve=(r:Consensus)=>{
@@ -122,13 +128,15 @@ export function HuiteacherConsensusReviews({api}:{api:Api}){
       .catch(e=>setNotice(e instanceof Error?e.message:'独立签署失败'))
       .finally(()=>setBusy(false))
   }
-  return <section className="ht-panel" aria-label="协商共识独立签署">
-    <h2>专家／同行共识确认</h2>
+  return <section className="ht-panel ht-practice-consensus" aria-label="协商共识独立签署">
+    <header className="ht-section-heading"><h2>专家／同行共识确认</h2>
+    <button type="button" className="ht-consensus-refresh" aria-label="刷新待办" title="刷新待办" disabled={busy} onClick={()=>{setBusy(true);setNotice('');void refresh()
+      .catch(e=>setNotice(e instanceof Error?e.message:'刷新失败'))
+      .finally(()=>setBusy(false))}}><RefreshCw size={17} aria-hidden="true"/></button></header>
     <p className="ht-muted">仅能确认明确引用了本人正式反馈的活动；个人观察原稿不被替换。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    <button disabled={busy} onClick={()=>{setBusy(true);void refresh()
-      .catch(e=>setNotice(e instanceof Error?e.message:'刷新失败'))
-      .finally(()=>setBusy(false))}}>刷新待办</button>
+    {!loaded&&!readError&&<p role="status" className="ht-muted">正在读取共识待办…</p>}
+    {loaded&&!busy&&!readError&&reviews.length===0&&<p className="ht-empty">暂无需要你确认的共识。收到待办后，可在这里阅读并确认。</p>}
     {reviews.map(r=><article className="ht-event" key={r.id}>
       <h3>{r.title}</h3><p className="ht-field-content">{r.content}</p>
       <p className="ht-muted">版本 {r.revision} · 评价者确认数 {r.approvalCount} · {r.status}</p>
