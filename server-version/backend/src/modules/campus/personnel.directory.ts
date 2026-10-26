@@ -5,6 +5,7 @@ import type {AuthenticatedPrincipal} from '../../types'
 import {assertPersonnelGovernor,decryptPersonnel,personnelFail,personnelHash} from './personnel.binding'
 import {digestCampusStudentNumber} from './admission.service'
 import {campusStudentReference} from './studentReference'
+import {readPersonnelAccess} from './personnel.access'
 
 export const directoryQuery=z.object({
  kind:z.enum(['ALL','STUDENT','STAFF']).default('ALL'),
@@ -138,6 +139,7 @@ export async function readPersonnelDirectoryEntry(input:Input&{entryId:string}){
    WHERE a.organization_id=${org} AND a.person_id=${row.personId} AND ${row.userId}::text IS NULL
    ORDER BY grade,"className",role
   `
-  return {...project(org,row),classes}
+  const access=await readPersonnelAccess(tx,{organizationId:org,userId:row.userId})
+  return {...project(org,row),classes,access}
  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:15000})
 }

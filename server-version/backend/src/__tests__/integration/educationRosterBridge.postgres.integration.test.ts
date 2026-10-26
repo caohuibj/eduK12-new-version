@@ -13,6 +13,7 @@ import {csrfProtection} from '../../middleware/csrf'
 import {generateToken} from '../../utils/jwt'
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?describe:describe.skip
 let server:Server,base:string
+type BridgeBody={data:{token:string;personnel:boolean;list:Array<{source:string;activation:string;membership:string}>;access:Awaited<ReturnType<typeof import('../../modules/campus/personnel.directory').readPersonnelDirectoryEntry>>['access']}}
 const csrf='synthetic-roster-'+ 'a'.repeat(32)
 async function fixture(){
  const username='bridge_'+randomUUID().slice(0,12)
@@ -27,7 +28,7 @@ async function fixture(){
   const teacherEntry=entry==='TEACHER',prefix=teacherEntry?'huiteacher':'campus',cookie=teacherEntry?'huiteacher':'huischool'
   const token=generateToken({userId:user.id,username,role:'TEACHER',accountDomain:'SCHOOL',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),...(teacherEntry?{sessionProduct:'HUITEACHER' as const}:{})})
   const response=await fetch(`${base}/api/${prefix}/organizations/${org.id}${path}`,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',Origin:`http://${teacherEntry?'teacher':'school'}.localhost:5197`,'X-CSRF-Token':csrf,Cookie:`${cookie}_csrf=${csrf}; ${cookie}_session=${token}`},...(body?{body:JSON.stringify(body)}:{})})
-  return {status:response.status,body:await response.json(),cache:response.headers.get('cache-control')}
+  return {status:response.status,body:await response.json() as BridgeBody,cache:response.headers.get('cache-control')}
  }
  return {user,org,member,teacher,call}
 }
@@ -65,4 +66,18 @@ suite('shared roster bridge with real isolated PostgreSQL and product authentica
   expect((await f.call('SCHOOL','/personnel/directory')).status).toBe(403)
   const rows=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int AS n FROM campus_personnel WHERE organization_id=${f.org.id}`;expect(rows[0].n).toBe(0)
  })
+ it('phase4 shares the same read-only permission detail through authenticated product adapters without inheriting grants',async()=>{
+  const f=await fixture(),path='/personnel/directory/u.'+f.user.id
+  const before=await prisma.educationProductRoleGrant.count({where:{organizationId:f.org.id}})
+  const school=await f.call('SCHOOL',path),teacher=await f.call('TEACHER',path)
+  expect(school.status).toBe(200);expect(teacher.status).toBe(200);expect(teacher.cache).toBe('no-store')
+  expect(teacher.body.data.access).toEqual(school.body.data.access)
+  expect(teacher.body.data.access.functions).toContainEqual({key:'TEACHER_ADMIN',available:true})
+  expect(await prisma.educationProductRoleGrant.count({where:{organizationId:f.org.id}})).toBe(before)
+  await prisma.educationProductRoleGrant.update({where:{id:f.teacher.id},data:{revokedAt:new Date(),revokedByUserId:f.user.id}})
+  expect((await f.call('TEACHER',path)).status).toBe(403)
+  const remaining=await f.call('SCHOOL',path);expect(remaining.status).toBe(200)
+  expect(remaining.body.data.access.functions).toContainEqual({key:'TEACHER_ADMIN',available:false})
+ })
+
 })
