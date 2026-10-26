@@ -222,3 +222,15 @@ test('B reader preserves producer A1 to Q A2 to new admission run and exact-tree
  const wrongProducer=f.clone(f.state);wrongProducer.jobs['2001'].run_attempt=2;const rejectedProducer=f.invoke({mode:'gate',plan:f.aPlan,api:wrongProducer,admissionPin:precheck,allowedZipIds:[precheck.artifactId,f.qPin.artifactId]});f.expectFailure(rejectedProducer);assert(rejectedProducer.downloads.every(id=>[precheck.artifactId,f.qPin.artifactId].includes(id)));
  assert.throws(()=>f.planFor('postmerge','3001','1',f.wrongMain),/regular merge parents/);const merged=f.clone(f.state);merged.pr={...merged.pr,state:'closed',merged:true,merge_commit_sha:f.main};merged.mainRef=f.main;const wrongCheckout=f.invoke({mode:'postmerge',plan:f.mPlan,api:merged,checkout:f.wrongMain,allowedZipIds:[stable.artifactId,f.qPin.artifactId]});f.expectFailure(wrongCheckout);assert.equal(wrongCheckout.trace.length,0,'Actual CWD/head mismatch must fail before official evidence reads');
 });
+
+
+test('production fresh phases solely cover nine retained historical duplicates without admitting evidence',()=>{
+ const acceptance=JSON.parse(readFileSync(new URL('./pr356-acceptance.json',import.meta.url),'utf8'));validateAcceptance(acceptance,{requireReady:false});
+ const group=acceptance.evidence.find(g=>g.id==='affected-review-contracts'),transfers=acceptance.freshPhaseCoverageTransfers;assert.equal(transfers.length,9);assert.equal(group.pendingDefinitions.length,413);assert.equal(group.caseIds.length,404);assert.equal(new Set(transfers.map(t=>t.historicalCaseId)).size,9);
+ const transferredIds=new Set(transfers.map(t=>t.historicalCaseId));assert.deepEqual(group.caseIds,group.pendingDefinitions.map(r=>r.id).filter(id=>!transferredIds.has(id)),'Only the exact nine historical obligations may move');
+ for(const [phaseId,count]of Object.entries({vertical4:4,'exact-worker1':1,'ordinary-harness4':4})){
+  const phase=acceptance.phases.find(p=>p.id===phaseId),mapped=transfers.filter(t=>t.phaseId===phaseId);assert.equal(phase.caseIds.length,count);assert.equal(mapped.length,count);assert.deepEqual(mapped.map(t=>t.phaseCaseId).sort(),[...phase.caseIds].sort());
+  for(const row of mapped){const original=group.pendingDefinitions.find(d=>d.id===row.historicalCaseId);assert(original);assert.equal(row.historicalGroupId,group.id);assert.equal(row.fullName,original.fullName);assert.equal(row.file,original.file);assert.equal(row.phaseCaseId,original.fullName);assert.equal(row.qualificationSource,'fresh-phase-only');assert.equal(row.statusAtTransfer,'NOTRUN');assert.equal(row.priorRawAndStatus,'retained-unchanged');assert(!group.caseIds.includes(row.historicalCaseId));}
+ }
+ assert(acceptance.phases.every(p=>p.state==='pending'));assert(acceptance.evidence.every(e=>e.state==='pending'));assert.equal(acceptance.sarifPolicy.state,'pending');
+});

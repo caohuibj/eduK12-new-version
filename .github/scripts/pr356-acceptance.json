@@ -989,11 +989,6 @@
         "affected-review-contracts-db2a2a942af4a0d2",
         "affected-review-contracts-5bfe6078668889cb",
         "affected-review-contracts-8be85daf3aeb2a44",
-        "affected-review-contracts-d09c738e5571c5c0",
-        "affected-review-contracts-8f423a5044d4a0db",
-        "affected-review-contracts-4b11974a88536ef4",
-        "affected-review-contracts-27ff718893ff6f61",
-        "affected-review-contracts-f309af10eaada6ba",
         "affected-review-contracts-d06008ff84f7fd89",
         "affected-review-contracts-a6e6af53247d9913",
         "affected-review-contracts-325e19fe06300f10",
@@ -1134,10 +1129,6 @@
         "affected-review-contracts-d64c7874a64e5d8d",
         "affected-review-contracts-a41fdb48810479ea",
         "affected-review-contracts-0e24b3c9d69069bd",
-        "affected-review-contracts-9388bc8c695fb3b6",
-        "affected-review-contracts-7bf75738ed96d7df",
-        "affected-review-contracts-f8fdd8ea8038514f",
-        "affected-review-contracts-726dbb0d82a35f5d",
         "affected-review-contracts-263059f0d64e86fd",
         "affected-review-contracts-b28fbce3a58571b0",
         "affected-review-contracts-869c8c0aacd6f5a1",
@@ -1383,7 +1374,7 @@
         "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
         "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx"
       ],
-      "reason": "Complete source declarations/original asserted names are enumerated, but no case/exit/input compatibility is admitted. Parameterized declarations require explicit expansion and all records require independent review before approval.",
+      "reason": "Complete source declarations/original asserted names are enumerated, but no case/exit/input compatibility is admitted. Parameterized declarations require explicit expansion and all records require independent review before approval. Nine exact fullName duplicates now have the corresponding fresh phase as their sole required qualification source; original declarations, raw evidence and statuses remain retained. No other history is admitted.",
       "cases": [],
       "pendingDefinitions": [
         {
@@ -7898,5 +7889,106 @@
   },
   "externalDotApprovalRequired": true,
   "reviewAuthentication": "not-established",
-  "releaseAuthorized": false
+  "releaseAuthorized": false,
+  "freshPhaseCoverageTransfers": [
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-d09c738e5571c5c0",
+      "file": "server-version/backend/src/__tests__/measurement-content/training-receipt-recovery.postgres.integration.test.ts",
+      "fullName": "accepted STANDARD whole receipt actual report-worker recovery recovers an expired real lease and completes parent/report after withdrawal without losing the accepted envelope",
+      "phaseId": "exact-worker1",
+      "phaseCaseId": "accepted STANDARD whole receipt actual report-worker recovery recovers an expired real lease and completes parent/report after withdrawal without losing the accepted envelope",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-8f423a5044d4a0db",
+      "file": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "fullName": "dot356 registered source to real ONLINE and Training FINAL real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R",
+      "phaseId": "vertical4",
+      "phaseCaseId": "dot356 registered source to real ONLINE and Training FINAL real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-4b11974a88536ef4",
+      "file": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "fullName": "dot356 registered source to real ONLINE and Training FINAL stores exactly one role/delegation basis and protects active use identity in PostgreSQL",
+      "phaseId": "vertical4",
+      "phaseCaseId": "dot356 registered source to real ONLINE and Training FINAL stores exactly one role/delegation basis and protects active use identity in PostgreSQL",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-27ff718893ff6f61",
+      "file": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "fullName": "dot356 registered source to real ONLINE and Training FINAL keeps entry-role revocation separate from explicit reissue through the original exact 21B root",
+      "phaseId": "vertical4",
+      "phaseCaseId": "dot356 registered source to real ONLINE and Training FINAL keeps entry-role revocation separate from explicit reissue through the original exact 21B root",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-f309af10eaada6ba",
+      "file": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "fullName": "dot356 registered source to real ONLINE and Training FINAL keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop",
+      "phaseId": "vertical4",
+      "phaseCaseId": "dot356 registered source to real ONLINE and Training FINAL keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-9388bc8c695fb3b6",
+      "file": "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts",
+      "fullName": "ordinary durable whole receipt collection boundary processes accepted single units after emergency stop while retaining receipt and lease identity",
+      "phaseId": "ordinary-harness4",
+      "phaseCaseId": "ordinary durable whole receipt collection boundary processes accepted single units after emergency stop while retaining receipt and lease identity",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-7bf75738ed96d7df",
+      "file": "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts",
+      "fullName": "ordinary durable whole receipt collection boundary processes accepted batch units after emergency stop while retaining receipt and lease identity",
+      "phaseId": "ordinary-harness4",
+      "phaseCaseId": "ordinary durable whole receipt collection boundary processes accepted batch units after emergency stop while retaining receipt and lease identity",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-f8fdd8ea8038514f",
+      "file": "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts",
+      "fullName": "ordinary durable whole receipt collection boundary rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction",
+      "phaseId": "ordinary-harness4",
+      "phaseCaseId": "ordinary durable whole receipt collection boundary rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    },
+    {
+      "historicalGroupId": "affected-review-contracts",
+      "historicalCaseId": "affected-review-contracts-726dbb0d82a35f5d",
+      "file": "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts",
+      "fullName": "ordinary durable whole receipt collection boundary rechecks wall-clock lease after a real job-lock wait rather than transaction start",
+      "phaseId": "ordinary-harness4",
+      "phaseCaseId": "ordinary durable whole receipt collection boundary rechecks wall-clock lease after a real job-lock wait rather than transaction start",
+      "qualificationSource": "fresh-phase-only",
+      "statusAtTransfer": "NOTRUN",
+      "priorRawAndStatus": "retained-unchanged"
+    }
+  ]
 }

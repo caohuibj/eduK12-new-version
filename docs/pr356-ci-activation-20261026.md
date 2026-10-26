@@ -448,3 +448,19 @@ finding/review/phase/attempt/source/checkout调用均拒绝且无成功proof。
 不是任意跨候选复用。phase输入含完整acceptance/bindings/ci.yml，改共享控制会
 改变多个inputsSHA256，不能承诺任意修复后仍复用旧镜像。实际失败由精确影响
 决定下一步，不新增通用缓存架构。所有ready/approved/SARIF policy仍pending。
+
+
+### 九项重复资格改由fresh phase唯一承担
+
+根dot逐名确认 affected-review-contracts 有9个fullName与fresh phase相同。
+现仅将它们从强制历史caseIds集合迁移到`freshPhaseCoverageTransfers`：vertical4
+的4项、exact-worker1的1项、ordinary-harness4的4项。413条原pendingDefinitions
+及其原报告/执行/filtered等状态完整未改，原raw不变；历史强制集合为其余404项。
+phase本身的全部caseIds/要求/状态及其他12个历史组均未改。9项当前仍NOTRUN，
+只能由既定fresh phase提供主要资格，不要求额外用旧continuation/旧编排再批准一次。
+没有删除测试断言、标PASS或批准任何历史项。
+
+仅新数据完整性契约1PASS，B三组/A及其它旧绿项未复跑；原390条记录未改，新增
+转移原表/原命令退出/日志后当前393条可移交记录。全16 ready、13 history approved、
+SARIF policy仍pending，最终选择和激活必须交dot独审。共享控制变化导致多个phase
+inputsSHA256变化的边界仍成立，不承诺任意跨commit复用。

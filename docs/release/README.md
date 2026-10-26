@@ -1917,3 +1917,13 @@ No actual CI, Ready, merge, protection change, new credentials or deployment is
 executed by these implementation commits. The three reader/CLI groups use only
 synthetic Git/ZIP/API fixtures. Final exact HEAD/tree/base and executable budget
 require independent review before activation.
+
+
+Nine affected-review historical fullNames are also exact fresh-phase targets:
+vertical4 (four), exact-worker1 (one), ordinary-harness4 (four). Their sole required
+qualification source is now explicitly mapped by freshPhaseCoverageTransfers;
+all fresh case requirements remain unchanged and NOTRUN. The 413 original
+historical declarations/raw/statuses remain retained, while the mandatory
+historical case set contains the other 404. No assertion is removed and no
+historical group is approved by this transfer. All other original obligations
+remain subject to independent case review.
