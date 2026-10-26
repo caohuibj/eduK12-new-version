@@ -1,0 +1,303 @@
+{
+  "scope": "PR356 supplied 11 correctness/reliability findings",
+  "qualification": "Development-node targeted validation only; not formal CI, release acceptance or deployment approval",
+  "reviewStartHead": "486b545888b1ed9ea61985828ffbf183bc686ccd",
+  "main": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "lastProductionSourceCommit": "bc2686bf5ab3c73c2d0748470c20a0baa229bb05",
+  "checks": [
+    {
+      "scope": "receipts-and-revocation",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-receipts/test.json",
+          "sha256": "01f03f23bc9069acccdaf06ab51e86563c5c7cf55aca17bd305ad23bcc1b46b7",
+          "success": false,
+          "passed": 2,
+          "failed": 2,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-receipts/recheck.json",
+          "sha256": "0e0a21c95e2d60d87804081117bd270022b7cd2b855aad6b3b95c86893f93cf4",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 3
+        }
+      ]
+    },
+    {
+      "scope": "instruction-consistency",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/unit.json",
+          "sha256": "11bcf1efe0bf326bf36edbe79eb5a2b28428f5decf32bc5d1d5f8e5a6cf74c35",
+          "success": false,
+          "passed": 8,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/unit-recheck.json",
+          "sha256": "9ce5b4bfdfa79a5c95f63350577e1b880476442dcaf692a5d3808299abd35af1",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 6
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/unit-recheck2.json",
+          "sha256": "954c475df1a10771925ec3965ac916cf239272352859487e998c996ec109207e",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 6
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/integration.json",
+          "sha256": "082cf347d8635b846223b318765e9e25bc57ad1d33a51ec2c605e7076cb3a36c",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/integration-recheck.json",
+          "sha256": "1eb89be49501612ad0af1e2d172c9ac4b5f2c60883dca00ba8f5f61ab7bd0613",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-instructions/integration-recheck2.json",
+          "sha256": "0e6ed8a53c19eec0a51892e19a92741fd447f822fe742de311ee1f6ece100f56",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 0
+        }
+      ]
+    },
+    {
+      "scope": "frozen-demographics",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-adult/test.json",
+          "sha256": "ece4b0cd57065f25a32fcd1cda4d8db3228ba9d53258d6b520e0388bec26f1e7",
+          "success": false,
+          "passed": 12,
+          "failed": 8,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-adult/recheck.json",
+          "sha256": "c9b6ce8d8415815939ae1cc008e181ae665cb31a25d1d426cfecdf5ac36b2351",
+          "success": true,
+          "passed": 9,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-adult/propagation.json",
+          "sha256": "c319f0dfc1af11d6d54579b98158611c455833bae9ff5006e44b11ad0294629d",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 11
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-adult/propagation-recheck.json",
+          "sha256": "d51a71a2ac286bca2bdbefb114b285f283973ab52b30e8217a788a8a29883a47",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 11
+        }
+      ]
+    },
+    {
+      "scope": "shared-library-utc",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-utc/test.json",
+          "sha256": "93432de38533ede96e3fef85250574ebaff3d513e1c2d2804d1452c403fab542",
+          "success": true,
+          "passed": 3,
+          "failed": 0,
+          "pending": 3
+        }
+      ]
+    },
+    {
+      "scope": "explicit-report-budget",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-history/test.json",
+          "sha256": "469785872d8b68d14df0d98c3df9a247b56341d1553034f46ca7161693f3ef39",
+          "success": true,
+          "passed": 15,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-history/writer.json",
+          "sha256": "ed36c13a37c61f56159925357ce2381c164f97034a2c2e5b4b5e0917f82e4885",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 7
+        }
+      ]
+    },
+    {
+      "scope": "approval-scope-and-audit",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-approval/test.json",
+          "sha256": "539e9205abb6be5ba0253654f6369852dcfcb2ea3643eabffe2e1f46b74d2e73",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-approval/legacy.json",
+          "sha256": "48802a2585bc0c3be6db13f670a7e1d15bcf52d9c909587512b12f153abdbad2",
+          "success": false,
+          "passed": 0,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-approval/legacy-recheck.json",
+          "sha256": "1d5647b784ce2e186f628268efc46b9d49edf690eea8a83df1c79e175eca069f",
+          "success": true,
+          "passed": 5,
+          "failed": 0,
+          "pending": 0
+        }
+      ]
+    },
+    {
+      "scope": "bounded-onboarding",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-status/backend.json",
+          "sha256": "c3e24070afe2548470e1045b7f7ef1bdc760b3c92b406bd620067718eb1f5cba",
+          "success": true,
+          "passed": 3,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-status/frontend.json",
+          "sha256": "d1e1b6abe950c622861594bc499bd33727f66397bc6423893abdf6daeb3b90df",
+          "success": true,
+          "passed": 6,
+          "failed": 0,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-status/integration.json",
+          "sha256": "444c3f0296053b076e55fdf49ca9edefd6dd40cfa5be0b7620e234c6e589de1d",
+          "success": false,
+          "passed": 2,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-status/http-recheck.json",
+          "sha256": "548b74b65b20d7681805820ee7730985ca9a955829b94886c25e98d07b0f8ab3",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 2
+        }
+      ]
+    },
+    {
+      "scope": "actual-receipt-worker",
+      "reports": [
+        {
+          "path": "/workspace/scratch/pr356-review-receipt-recovery/fresh-test.json",
+          "sha256": "1f367adfc5e6d9beef2af776662289a0cd4b36717c9f06308263e599f1065321",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-receipt-recovery/continue.json",
+          "sha256": "259c17df8b9515b952aa8059af11de26ed0649158b4478692b865ebd677c24f9",
+          "success": false,
+          "passed": 0,
+          "failed": 1,
+          "pending": 0
+        },
+        {
+          "path": "/workspace/scratch/pr356-review-receipt-recovery/verify-only.json",
+          "sha256": "47c59223a71abe15a89958ec74eab213439dbdbd1608b88b4d85490589e15546",
+          "success": true,
+          "passed": 1,
+          "failed": 0,
+          "pending": 0
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "path": "/workspace/scratch/pr356-review-status/backend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-status/frontend-types.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-status/frontend-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-history/migration.log",
+      "bytes": 457,
+      "sha256": "03a43431018d4352d19b4c772bf1151d44b98006100f29a2afe4a70f0dbb0e32"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-history/schema.log",
+      "bytes": 68,
+      "sha256": "bee5101868eb0c4dd866096848fb44cc416cd17a1866535a0c054cdb414d9d4b"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-receipt-recovery/fresh-migration.log",
+      "bytes": 33707,
+      "sha256": "95350173e37f3603993a9c391b427ad84292739cf38caaa0ec1edb458cb18ec3"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-receipt-recovery/stored-readback.log",
+      "bytes": 478,
+      "sha256": "9b398935f333b6f400aa6feff2a9a2a34f78fd128174532c32deceb1591be6a6"
+    }
+  ],
+  "checkInterpretation": "Failed fixture/command attempts are retained. Affected-only continuations complete the missing assertions; filtered checks are not counted as new passes. Actual worker reached READY in continue.json before an invalid compact-only storage assertion failed; verify-only.json checks saved results and replay without rerunning the worker.",
+  "environmentIncident": {
+    "action": "clone retained synthetic receipt database",
+    "target": "local pr356-step5-postgres",
+    "initialStatus": "not executed: container exited before clone",
+    "cause": "512 MiB tmpfs exhausted during PostgreSQL checkpoint",
+    "resolution": "New independent local pr356-review-final-postgres with 2 GiB tmpfs; only the required whole-receipt fixture was reconstructed and latest 237 migrations applied. Other groups were not repeated.",
+    "remainingBlocker": false
+  },
+  "notExecuted": [
+    "formal GitHub CI",
+    "full regression",
+    "stress/performance benchmark",
+    "production database access",
+    "merge",
+    "deployment"
+  ]
+}
