@@ -109,12 +109,12 @@ describe('CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1', () =>
     expect(def.license.note).toContain('© 2020 Tsukasa Kato')
     expect(def.license.note).toContain('https://creativecommons.org/licenses/by/4.0/')
     expect(source.usageRequirements?.allowedCommercialNatures).toEqual(['NON_COMMERCIAL','COMMERCIAL'])
-    expect(def.report.limitations.join(' ')).toContain('缺少真实年龄')
+    expect(def.report.limitations.join(' ')).toContain('不能单凭这份结果判断疾病')
     expect(source.disclosure?.audiences.teacher).toBeUndefined()
   })
   it('does not modify measurement hash on report-only updates', () => {
     const amended=structuredClone(def)
-    amended.report.reportVersion='1.0.2'
+    amended.report.reportVersion='1.0.3'
     amended.report.disclaimer+=' 新版本解释'
     expect(hashScaleDefinition(amended)).toBe(hashScaleDefinition(def))
     amended.items[0].content+='（测试改动）'
