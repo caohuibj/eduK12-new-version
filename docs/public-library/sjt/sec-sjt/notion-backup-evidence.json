@@ -1,0 +1,70 @@
+{
+  "notion_page_url": "https://app.notion.com/p/400d27635a3881cea235fd5df7384d28?pvs=204",
+  "title": "SEC-SJT 社会情绪能力情境判断｜德中研究草稿 r2",
+  "version": "research-draft-2026-10-21-r2",
+  "result": "COMPLETE",
+  "readback": {
+    "expected_bilingual_units": 148,
+    "matched_bilingual_units": 148,
+    "missing_units": [],
+    "formal_item_heading_count": 10,
+    "hosted_native_attachment_count": 3,
+    "native_types": [
+      "pdf",
+      "pdf",
+      "file"
+    ],
+    "truncated": false,
+    "unknown_block_count": 0,
+    "page_last_edited_at": "2026-10-21T18:16:12.659Z"
+  },
+  "boundaries": {
+    "runtime_status": "HOLD",
+    "human_bilingual_review_completed": false,
+    "Chinese_validation_completed": false,
+    "permission_changes_made": false,
+    "registry_or_runtime_changes_made": false,
+    "CI_run": false,
+    "original_279_assertions_rerun": false,
+    "commit_or_push_performed": false
+  },
+  "attachments": [
+    {
+      "filename": "sec-sjt-manual.pdf",
+      "source_url": "https://fis.uni-bamberg.de/server/api/core/bitstreams/12d3fbfe-be50-4ff2-b35c-6253bd3c74cf/content",
+      "license": "CC-BY-SA-4.0",
+      "local_original_sha256": "514a0b046c27b63e575efe2b242bb580c9eb07d6acb9dc7250c1e7eedf9e9dd3",
+      "local_original_bytes": 5999660,
+      "upload_status": "uploaded",
+      "notion_import_content_length": 5999660,
+      "native_attachment_verified_on_page": true,
+      "remote_attachment_redownload_sha256_verified": false
+    },
+    {
+      "filename": "sec-sjt-materials.pdf",
+      "source_url": "https://fis.uni-bamberg.de/server/api/core/bitstreams/56cebab3-7970-4357-8825-296dcad97731/content",
+      "license": "CC-BY-SA-4.0",
+      "local_original_sha256": "c457fd71b6163c8c200f21cfbea4cd8c58cf8e2ab68d2641cbe54eba0c82bd21",
+      "local_original_bytes": 622219,
+      "upload_status": "uploaded",
+      "notion_import_content_length": 622219,
+      "native_attachment_verified_on_page": true,
+      "remote_attachment_redownload_sha256_verified": false
+    },
+    {
+      "filename": "sec-sjt-scoring.xlsx",
+      "source_url": "https://fis.uni-bamberg.de/server/api/core/bitstreams/1dde1637-d85f-48a6-bc5c-19cd751bd8db/content",
+      "license": "CC-BY-SA-4.0",
+      "local_original_sha256": "00be8717e23682da7cc6e1590eb54578a51e2452ee6034293e6c1e7f12a7b546",
+      "local_original_bytes": 429254,
+      "upload_status": "uploaded",
+      "notion_import_content_length": 429254,
+      "native_attachment_verified_on_page": true,
+      "remote_attachment_redownload_sha256_verified": false
+    }
+  ],
+  "hash_scope_note": "SHA-256 labels identify the already verified local originals. Notion imported the official source URLs and returned matching byte counts; page readback verifies actual hosted native file blocks, not mere external links. No remote re-download hash is claimed.",
+  "resolved_import_issue": "The workbook download URL redirected, so the connector rejected that import without attaching it. The official direct content endpoint then imported successfully. No unresolved upload blocker.",
+  "permissions_note": "Only content, title and attachments of the existing authorized page were changed. No permission/share operations were invoked. Existing page access remains unchanged.",
+  "repository_scope": "docs/public-library/sjt/sec-sjt only; 18 copied r2 source files plus repository README, manifest and this evidence file."
+}

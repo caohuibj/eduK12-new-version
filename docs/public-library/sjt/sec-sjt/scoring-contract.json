@@ -1,0 +1,259 @@
+{
+  "schema_version": "1.0",
+  "instrument_id": "SEC-SJT",
+  "contract_version": "research-draft-2026-10-21-r2",
+  "license": "CC-BY-SA-4.0",
+  "measurement_type": "situational_judgment_performance_single_best_answer",
+  "not_measurement_types": [
+    "typical_behavior_self_report",
+    "likert_agreement",
+    "health_screening_validated_in_Chinese"
+  ],
+  "formal_item_count": 10,
+  "options_per_item": 5,
+  "single_choice": true,
+  "option_index_base": 1,
+  "answer_key_1based": [
+    3,
+    4,
+    2,
+    1,
+    4,
+    3,
+    3,
+    3,
+    2,
+    3
+  ],
+  "answer_key_0based": [
+    2,
+    3,
+    1,
+    0,
+    3,
+    2,
+    2,
+    2,
+    1,
+    2
+  ],
+  "key_origin": "Original consensus/expert key, cross-checked against the source scoring form and workbook. No rescoring by option endorsement frequency.",
+  "key_sources": [
+    {
+      "source": "sec-sjt-materials.pdf",
+      "pdf_page_1based": 39,
+      "section": "SEC-SJT Auswertungsbogen, highlighted keyed cells"
+    },
+    {
+      "source": "sec-sjt-manual.pdf",
+      "pdf_page_1based": 50,
+      "printed_page": 48,
+      "section": "2.3.5.3, Schritt 1"
+    },
+    {
+      "source": "sec-sjt-manual.pdf",
+      "pdf_page_1based": 51,
+      "printed_page": 49,
+      "section": "2.3.5.3, Schritt 2"
+    },
+    {
+      "source": "sec-sjt-scoring.xlsx",
+      "cells": "BD41:BM41",
+      "formulas": [
+        "IF(G42=3,1,0)",
+        "IF(G43=4,1,0)",
+        "IF(G46=2,1,0)",
+        "IF(G47=1,1,0)",
+        "IF(G50=4,1,0)",
+        "IF(G51=3,1,0)",
+        "IF(P42=3,1,0)",
+        "IF(P43=3,1,0)",
+        "IF(P46=2,1,0)",
+        "IF(P47=3,1,0)"
+      ]
+    }
+  ],
+  "item_scoring": {
+    "keyed_option": 1,
+    "any_other_valid_option": 0,
+    "partial_credit": false,
+    "reverse_scoring": false
+  },
+  "aggregate": {
+    "name": "SEC-SJT raw total",
+    "operation": "sum of 10 item scores after eligibility checks",
+    "minimum": 0,
+    "maximum": 10,
+    "subscales": []
+  },
+  "eligibility": {
+    "all_10_required": true,
+    "each_answer_one_integer_between_1_and_5": true,
+    "null_is_missing": true,
+    "boolean_is_invalid": true,
+    "string_is_invalid_in_reference_contract": true,
+    "multi_selection_is_invalid": true,
+    "out_of_range_is_invalid": true,
+    "unknown_or_duplicate_item_id_is_invalid": true,
+    "invalid_shape_is_rejected": true,
+    "runtime_must_bind_answers_to_stable_item_ids": true
+  },
+  "missing_data": {
+    "rule": "Any missing response means no total score for the entire SEC-SJT; do not treat missing as wrong.",
+    "minimum_answered_for_score": 10,
+    "max_missing_allowed": 0,
+    "imputation": false,
+    "proration": false,
+    "mean_substitution": false,
+    "partial_total": false,
+    "score_value_when_incomplete": null,
+    "source_refs": [
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 42,
+        "printed_page": 40,
+        "section": "2.3.3.3 Fehlende Antworten"
+      },
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 43,
+        "printed_page": 41,
+        "section": "2.3.4.1"
+      },
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 44,
+        "printed_page": 42,
+        "section": "2.3.4.2: interpolation applies to SEC-I global scales, not SEC-SJT"
+      }
+    ],
+    "followup_if_missing": "A participant may be asked to supply a missing response soon after testing, without coaching and without coercion. If missing responses remain, no total is produced."
+  },
+  "practice": {
+    "count": 1,
+    "source_pdf_page": 21,
+    "included_in_formal_count": false,
+    "scored": false,
+    "maximum_contribution": 0,
+    "keyed_option_1based": null
+  },
+  "administration": {
+    "timed": false,
+    "time_limit_seconds": null,
+    "automatic_submit_timeout": false,
+    "estimated_minutes": 30,
+    "source_reports_individual_cases_minutes": 60,
+    "allow_breaks": true,
+    "keep_original_order": true,
+    "randomize_options": false,
+    "preserve_source_paging_if_claiming_paper_equivalence": true,
+    "source_items_per_page": 2,
+    "source_refs": [
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 32,
+        "printed_page": 30,
+        "section": "2.2.3 Allgemeine Hinweise zur Erhebung"
+      },
+      {
+        "source": "sec-sjt-materials.pdf",
+        "pdf_page_1based": 21,
+        "section": "Breaks allowed at any time"
+      }
+    ],
+    "assistance": "Reading or physical entry assistance must not choose, suggest, explain, or reword answers. Record any presentation deviation; the Chinese working translation is already a nonvalidated adaptation."
+  },
+  "population_and_evidence": {
+    "original_language": "German",
+    "age_min_months": 180,
+    "age_max_months": 299,
+    "age_text": "15 years 0 months through 24 years 11 months",
+    "intended_population": "Adolescents and young adults with (sub)clinical cognitive and/or psychological impairment, especially learning-disability support and vocational preparation settings.",
+    "norm_country": "Germany",
+    "norm_sample_n": 306,
+    "sample_type": "Institution-based convenience sample, not representative of the general population.",
+    "cronbach_alpha": 0.65,
+    "reliability_note": "Limited internal consistency. No Chinese reliability estimate is asserted.",
+    "retest_evidence": "Manual reports no test-retest study; stability not established there.",
+    "source_refs": [
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 30,
+        "printed_page": 28,
+        "section": "2.1 Anwendungsbereich"
+      },
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 97,
+        "printed_page": 95,
+        "section": "Table 1"
+      },
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 96,
+        "printed_page": 94,
+        "section": "3.2.2 Reliabilität"
+      },
+      {
+        "source": "sec-sjt-manual.pdf",
+        "pdf_page_1based": 122,
+        "printed_page": 120,
+        "section": "4.1 and 4.2"
+      }
+    ],
+    "not_claimed": [
+      "Validated Chinese translation",
+      "Validated Chinese K12 norms",
+      "Suitability across ordinary youth population",
+      "Suitability for children under age 15",
+      "Eight subscale scores from these 10 SJT items"
+    ]
+  },
+  "interpretation": {
+    "score_meaning": "A larger raw total means more choices match the original German consensus/expert key; it does not establish health, morality, real-world behavior, or a clinical diagnosis.",
+    "runtime_output": "raw_total_only_with_version_and_limitations",
+    "norm_percentiles_enabled": false,
+    "diagnostic_labels_enabled": false,
+    "screening_cutoff_enabled": false,
+    "risk_levels_enabled": false,
+    "health_direction_enabled": false,
+    "automated_high_impact_decisions_enabled": false,
+    "original_screening_note": {
+      "source_refs": [
+        {
+          "source": "sec-sjt-manual.pdf",
+          "pdf_page_1based": 76,
+          "printed_page": 74,
+          "section": "2.4.9 Screening: raw <= 5 could prompt further SEC-I assessment"
+        }
+      ],
+      "do_not_apply_to_Chinese": true,
+      "value_in_original_context": 5,
+      "operator": "<=",
+      "not_a_diagnosis": true
+    },
+    "original_norm_note": {
+      "source_refs": [
+        {
+          "source": "sec-sjt-manual.pdf",
+          "pdf_page_1based": 150,
+          "printed_page": 148,
+          "section": "Table A7"
+        }
+      ],
+      "do_not_apply_to_Chinese": true
+    },
+    "quality_gate": "Check administration quality; do not interpret when quality is doubtful. Missing responses preclude scoring. Individual choices are not standalone trait diagnoses.",
+    "quality_gate_source": {
+      "source": "sec-sjt-manual.pdf",
+      "pdf_page_1based": 53,
+      "printed_page": 51,
+      "section": "2.4.2 Allgemeine Hinweise zur Interpretation"
+    }
+  },
+  "source_quality_warnings": [
+    "Manual PDF 93 / printed 91 gives keyed-response frequency upper bound 76.14%, but Table A16 PDF 161 / printed 159 lists item 4 keyed option 1 at 80.72%.",
+    "Some Table A16 option percentages do not sum to 100%; preserve the printed values and do not silently correct, normalize, or use them to calibrate scoring."
+  ],
+  "deployment_status": "Research derivative prepared; independent human bilingual review and target-population validation pending. No product integration or validated-use claim is authorized by this metadata."
+}

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "scientificMaturity": "PILOT",
+  "governanceRevision": 1,
+  "claimScope": {
+    "language": "原生中文Study3",
+    "population": "成人研究样本；不外推为全国或学生常模",
+    "use": "内容草案，研究讨论与描述性反思；未发布",
+    "claim": "五个人格侧面的情境反应倾向，非完整大五、能力、临床或选拔测验"
+  },
+  "evidence": [],
+  "knownLimitations": [
+    "仅Study3原中文40题，五个具体侧面，不是完整大五人格；无跨侧面总分、常模、百分位或切点。",
+    "作者原始key的1/0仅表示特质方向，不表示正确、优秀或健康；自我意识不是一般自我觉察能力。",
+    "Study3有效样本443、18–58岁，效标子样本130、两周重测80；高学历样本不能作为人群常模。依从性、自律性及部分效度证据有限。",
+    "作者未提供已核实的独立施测导语及缺失规则；提示语为平台新编typical-behavior说明；未完成侧面不计分、不填0、不插补是平台保守guard。",
+    "保留原文瑕疵，见选定素材notes；不作临床、招聘、录取等高风险决策。",
+    "evidence为空表示未声明新的平台科学资格或经人工批准的执行绑定证据，不否认已有Study3研究；完整作者引用保留在definition.source及docs。"
+  ],
+  "changeReason": "Selected licensed Study3 content draft; no human scientific review or publication approval asserted."
+}
