@@ -467,6 +467,52 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
     expect((await listCampusStudentTasks(f.student,{page:1,pageSize:20})).list).toHaveLength(0)
   })
 
+  it('keeps completed campus reading, practice and checkin immutable across concurrent and stale requests',async()=>{
+    const f=await fixture()
+    const activity=await createCampusActivity({actor:f.admin,organizationId:f.organizationId,title:'重复提交隔离回归',purpose:'STUDENT_WELLBEING'})
+    const scope={actor:f.admin,organizationId:f.organizationId,courseId:activity.id}
+    const tasks:Array<Awaited<ReturnType<typeof addCampusActivityTask>>>=[]
+    for(const kind of ['READING','ASSIGNMENT','CHECKIN'] as const)
+      tasks.push(await addCampusActivityTask({...scope,kind,title:'独立任务 '+kind}))
+    const next=await addCampusActivityTask({...scope,kind:'CHECKIN',title:'下一次活动记录'})
+    await allocateCampusActivityParticipants({...scope,classUnitIds:[f.classUnitId],requestKey:randomUUID(),expectedVersion:1})
+    await changeCampusActivityStatus({...scope,action:'SUBMIT',expectedVersion:1})
+    await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:2})
+    const submit=async(task:typeof tasks[number],content:string,key?:string)=>{
+      let status=200,value:any
+      const res={status(code:number){status=code;return res},json(payload:any){value=payload;return res}} as unknown as Response
+      const req={user:f.student,params:{id:task.id},body:{content},header:()=>key} as unknown as Request
+      await (task.kind==='CHECKIN'?checkinController:assignmentController).submit(req,res)
+      return {status,value}
+    }
+    for(const task of tasks){
+      const results=await Promise.all([submit(task,'first A'),submit(task,'first B')])
+      expect(results.map(r=>r.status).sort()).toEqual([200,409])
+      const read=()=>task.kind==='CHECKIN'
+        ?db.checkinSubmission.findUniqueOrThrow({where:{checkinId_studentId:{checkinId:task.id,studentId:f.student.userId}}})
+        :db.submission.findUniqueOrThrow({where:{assignmentId_studentId:{assignmentId:task.id,studentId:f.student.userId}}})
+      const original=await read()
+      expect(original.revision).toBe(1)
+      expect((await submit(task,'changed from old tab')).status).toBe(409)
+      expect((await submit(task,original.content??'',randomUUID())).status).toBe(409)
+      expect(await read()).toEqual(original)
+      if(task.kind!=='CHECKIN'){
+        expect(await db.submissionHistory.count({where:{submissionId:original.id}})).toBe(0)
+        // A migrated legacy row can still be revision zero: the final status is authoritative.
+        await db.submission.update({where:{id:original.id},data:{revision:0}})
+        expect((await submit(task,'overwrite migrated final')).status).toBe(409)
+        expect((await read()).content).toBe(original.content)
+      }
+    }
+    // A separate occurrence remains a legal new task, with exact-key retry reusing its receipt.
+    const keyed={...next,kind:'CHECKIN' as const},key=randomUUID()
+    const first=await submit(keyed,'new occurrence',key)
+    expect(first.status).toBe(200)
+    expect((await submit(keyed,'new occurrence',key)).value.data.id).toBe(first.value.data.id)
+    expect((await submit(keyed,'changed occurrence',key)).status).toBe(409)
+    expect(await db.checkinSubmission.count({where:{checkinId:next.id,studentId:f.student.userId}})).toBe(1)
+  })
+
   it('rejects delayed Assignment and Checkin submissions after STUDENT persona revocation',async()=>{
     const f=await fixture()
     const activity=await createCampusActivity({

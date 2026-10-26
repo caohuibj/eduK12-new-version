@@ -100,6 +100,13 @@ class IdempotencyPayloadMismatchError extends Error {
   }
 }
 
+class CampusTaskAlreadySubmittedError extends Error {
+  constructor() {
+    super('本次校园活动已提交，请刷新查看已有记录')
+    this.name = 'CampusTaskAlreadySubmittedError'
+  }
+}
+
 class SubmissionRevisionConflictError extends Error {
   constructor() {
     super('提交版本已过期，请刷新后重试')
@@ -621,7 +628,7 @@ export const assignmentController = {
       const assignment = await prisma.assignment.findUnique({
         where: { id },
         // Submission gates do not consume the task body or attachment JSON.
-        select: { courseId: true, status: true, deadline: true },
+        select: { courseId: true, status: true, deadline: true, course: { select: { courseType: true } } },
       })
 
       if (!assignment) {
@@ -756,6 +763,12 @@ export const assignmentController = {
           return { submission: existing, wasExisting: true }
         }
 
+        // Campus tasks are final once submitted. Keep Training's intentional
+        // resubmissions, while guarding stale pages inside the existing lock.
+        if (assignment.course?.courseType === 'CAMPUS_ACTIVITY' && existing.status !== SubmissionStatus.DRAFT) {
+          throw new CampusTaskAlreadySubmittedError()
+        }
+
         // The advisory transaction lock serializes writers; this revision
         // check makes the serialized order observable to clients as an OCC
         // conflict instead of allowing a late first request to overwrite a
@@ -818,6 +831,9 @@ export const assignmentController = {
           : '练习提交成功'
       return success(res, submissionResult.submission, message)
     } catch (err) {
+      if (err instanceof CampusTaskAlreadySubmittedError) {
+        return error(res, err.message, -1, 409)
+      }
       if (err instanceof IdempotencyPayloadMismatchError) {
         return error(res, err.message, -1, 409)
       }

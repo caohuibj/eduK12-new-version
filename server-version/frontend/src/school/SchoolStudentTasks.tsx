@@ -47,7 +47,7 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
   const [loading,setLoading]=useState(false)
   const [listError,setListError]=useState('')
   const [retryPage,setRetryPage]=useState(1)
-  const scope=useMemo(()=>({pending:false}),[api,activityId])
+  const scope=useMemo(()=>({pending:false,submitting:false}),[api,activityId])
   const currentScope=useRef<typeof scope|null>(scope)
   currentScope.current=scope
   const detailRef=useRef<HTMLDivElement>(null)
@@ -93,7 +93,8 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
       const segment=task.kind==='CHECKIN'?'checkins':'assignments'
       const d=await api<TaskDetails>(`/activities/${task.activityId}/${segment}/${task.id}`)
       if(currentScope.current!==scope)return
-      setSelected(task);setDetails(d);setAnswer(d.mySubmission?.content??'')
+      const completed=Boolean(d.mySubmission&&(task.kind==='CHECKIN'||['SUBMITTED','GRADED'].includes(d.mySubmission.status)))
+      setSelected(completed?{...task,status:'COMPLETED'}:task);setDetails(d);setAnswer(d.mySubmission?.content??'')
     }catch(err){if(currentScope.current===scope)setError(err instanceof Error?err.message:'活动材料不可访问')}
     finally{if(currentScope.current===scope)setBusy(false)}
   }
@@ -108,17 +109,20 @@ export function SchoolStudentTasks({api,activityId}: {api:SchoolApi;activityId?:
     }
   }
   const submit=async()=>{
-    if(!selected || !details)return
+    if(!selected||!details||selected.status==='COMPLETED'||scope.submitting||currentScope.current!==scope)return
+    scope.submitting=true
     setBusy(true);setError('');setNotice('')
     try{
       const segment=selected.kind==='CHECKIN'?'checkins':'assignments'
       await api(`/activities/${selected.activityId}/${segment}/${selected.id}/submit`,'POST',{
         content:selected.kind==='READING'?(answer.trim()||'已阅读'):answer,
       })
+      if(currentScope.current!==scope)return
       setSelected(null);setDetails(null);setAnswer('')
-      await load(page);setNotice('提交成功。感谢你完成今天的校园活动。')
-    }catch(err){setError(err instanceof Error?err.message:'提交失败，请核实活动是否仍开放')}
-    finally{setBusy(false)}
+      await load(page)
+      if(currentScope.current===scope)setNotice('提交成功。感谢你完成今天的校园活动。')
+    }catch(err){if(currentScope.current===scope)setError(err instanceof Error?err.message:'提交失败，请核实活动是否仍开放')}
+    finally{scope.submitting=false;if(currentScope.current===scope)setBusy(false)}
   }
   const partial=Boolean(items&&(items.total>items.list.length||items.hasMore||items.truncated))
   const visibleTasks=(items?.list??[]).filter(task=>schoolSearchText(task.title+' '+task.activityTitle).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='deadline'?(schoolDeadline(a.deadline)-schoolDeadline(b.deadline))||0:0)
