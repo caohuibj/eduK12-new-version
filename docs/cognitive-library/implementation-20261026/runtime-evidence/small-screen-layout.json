@@ -1,0 +1,27 @@
+{
+  "viewport": {
+    "width": 390,
+    "height": 530
+  },
+  "board": {
+    "x": 54.21875,
+    "y": 73.21875,
+    "width": 281.5625,
+    "height": 281.5625,
+    "top": 73.21875,
+    "right": 335.78125,
+    "bottom": 354.78125,
+    "left": 54.21875
+  },
+  "root": {
+    "x": 0,
+    "y": 0,
+    "width": 390,
+    "height": 530,
+    "top": 0,
+    "right": 390,
+    "bottom": 530,
+    "left": 0
+  },
+  "scrollWidth": 390
+}

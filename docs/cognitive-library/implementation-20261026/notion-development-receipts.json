@@ -1,0 +1,30 @@
+{
+  "kind": "NOTION_WRITE_READBACK_RECEIPTS",
+  "date": "2026-10-26",
+  "pages": [
+    {
+      "id": "405d27635a38816ca391ff133b9eb446",
+      "title": "认知测评配色规范",
+      "writtenAndReadBack": true
+    },
+    {
+      "id": "405d27635a3881d29e35c376138fd259",
+      "title": "数据库核心与COS完整归档",
+      "writtenAndReadBack": true
+    },
+    {
+      "id": "405d27635a3881a28a7bd30ce2ec44a5",
+      "title": "精简报告/可选take-home图/EDUK12.TOP",
+      "writtenAndReadBack": true,
+      "latestRule": "optional; at most one; no mandatory decoration"
+    },
+    {
+      "id": "405d27635a388174b2d3c82e2968dfd4",
+      "title": "PR356开发与验收清单",
+      "writtenAndReadBack": true
+    }
+  ],
+  "rootIndexAppended": true,
+  "existingRoadmapIndexAppended": true,
+  "notClaimingProductImport": true
+}

@@ -1,0 +1,17 @@
+{
+  "kind": "SYNTHETIC_CLOUD_BROWSER_AND_NATIVE_SCORER_NOT_PRODUCT_API_DB_OR_COS",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": true,
+  "formal": 9,
+  "practice": 2,
+  "actualCapture": true,
+  "virtualClock": true,
+  "coreAckRetry": true,
+  "archiveRetry": true,
+  "formalCaptureReused": true,
+  "localDraftPersistence": true,
+  "nativeScorerBound": true,
+  "realCOS": false,
+  "realProductAPI": false,
+  "errors": []
+}

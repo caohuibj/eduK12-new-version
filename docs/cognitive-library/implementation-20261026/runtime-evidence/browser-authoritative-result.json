@@ -1,0 +1,42 @@
+{
+  "metrics": {
+    "expectedTrialCount": 9,
+    "receivedTrialCount": 9,
+    "validTrialCount": 9,
+    "excludedTrialCount": 0,
+    "excludedTrialIndices": [],
+    "excludedTrialReasons": {},
+    "meanTargetsSpeed1": 5,
+    "accuracySpeed1": 1,
+    "validTrialsSpeed1": 3,
+    "totalTrialsSpeed1": 3,
+    "observedTrialsSpeed1": 3,
+    "meanTargetsSpeed4": 5,
+    "accuracySpeed4": 1,
+    "validTrialsSpeed4": 3,
+    "totalTrialsSpeed4": 3,
+    "observedTrialsSpeed4": 3,
+    "meanTargetsSpeed8": 5,
+    "accuracySpeed8": 1,
+    "validTrialsSpeed8": 3,
+    "totalTrialsSpeed8": 3,
+    "observedTrialsSpeed8": 3,
+    "meanTrackedTargets": 5,
+    "trackingAccuracy": 1
+  },
+  "quality": {
+    "state": "interpretable",
+    "flags": {
+      "incompleteRecords": false,
+      "unreliableSpeed1": false,
+      "unreliableSpeed4": false,
+      "unreliableSpeed8": false,
+      "noInterpretableCondition": false
+    },
+    "reasons": []
+  },
+  "audit": {
+    "trialCount": 9,
+    "scorerVersion": "1.1.0"
+  }
+}
