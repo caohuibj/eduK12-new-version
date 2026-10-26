@@ -224,3 +224,13 @@ test('native CodeQL SARIF uses finalized database language and exact pack build 
   else assert.throws(()=>f.collector().finish('javascript-typescript'),/SARIF_LANGUAGE|SARIF_QUERY_PACK_IDENTITY|ACTION_DATABASE_LANGUAGE/);
  }finally{f.clean();}}
 });
+
+
+test('Python CodeQL extraction cannot add bytecode to the frozen CLI installation',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const block=workflow.split('\n  pr356-codeql-python:\n')[1].split(/\n  [a-z][a-z0-9-]*:\n/)[0];
+ const jobEnv=block.split('    env:\n')[1].split('    steps:\n')[0];
+ assert.match(jobEnv,/^      PYTHONDONTWRITEBYTECODE: '1'$/m);
+ assert.equal((block.match(/PYTHONDONTWRITEBYTECODE:/g)||[]).length,1,'No step may override bytecode suppression');
+ assert.match(block,/uses: github\/codeql-action\/analyze@v3/);
+});

@@ -4322,6 +4322,8 @@ jobs:
       tree: ${{ steps.identity.outputs.tree }}
       candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
     env:
+      # Keep the frozen CLI installation immutable during Python extraction.
+      PYTHONDONTWRITEBYTECODE: '1'
       GH_TOKEN: ${{ github.token }}
       PR356_PHASE: qualify
       PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
