@@ -17,7 +17,7 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
 surveyStandardTripletRouter.get('/management-design',handle(async()=>MANAGEMENT_DESIGN))
 // Per-version onboarding governance view: distinct lifecycle states, located
 // blockers with owner/next-action, and stage labels (导入 ≠ 上线).
-surveyStandardTripletRouter.get('/onboarding-status',handle(async()=>(await import('../scale/onboarding/status')).listStandardOnboardingStatus(prisma)))
+surveyStandardTripletRouter.get('/onboarding-status',handle(async(req)=>(await import('../scale/onboarding/status')).listStandardOnboardingStatus(prisma,req.query)))
 const hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().trim().min(1).max(300),reason=z.string().trim().min(1).max(1000)
 const selection=z.object({toolKey:text,CONTENT:hash,PARAMETERS:hash,REPORT:hash}).strict()
 surveyStandardTripletRouter.get('/catalog',handle(req=>{const {page,...filters}=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),...catalogDiscoveryQueryFields}).parse(req.query);return service.standardTripletCatalog(req.user!.userId,page,filters)}))

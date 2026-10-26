@@ -1,10 +1,12 @@
+import {z} from 'zod'
+import {AdminPermissionError} from '../../admin-permissions/service'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { readToolPolicies } from '../../assessment-governance/tool-entry-policy'
 import { getScaleInstrumentSource, listScaleInstrumentSources } from './instrument-registry'
 import { previewScaleInstrument } from './preview'
 import { scaleSourcePolicyIdentity } from './source-snapshot'
 import { localizationNextActions } from '../policy/localization'
-import { readActiveScaleDeployment } from '../deployment/repository'
+import { readActiveScaleDeployments } from '../deployment/repository'
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
 import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
 
@@ -62,23 +64,32 @@ export interface StandardOnboardingEntry {
  * separate (translation review / expert review / scientific maturity /
  * deployment / publication / product entry); the page explains where each
  * blocker lives and what the next action is. */
-export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: StandardOnboardingEntry[] }> => {
+const statusQuerySchema=z.object({limit:z.coerce.number().int().min(1).max(50).default(25),
+ query:z.string().trim().max(160).default(''),cursor:z.string().max(1024).regex(/^[A-Za-z0-9_-]+$/).optional()}).strict()
+const cursorSchema=z.object({key:z.string().min(1).max(240),version:z.string().min(1).max(240)}).strict()
+const encodeCursor=(row:{code:string;instrument_version:string})=>Buffer.from(JSON.stringify({key:row.code,version:row.instrument_version})).toString('base64url')
+export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): Promise<{ list: StandardOnboardingEntry[];pageSize:number;hasMore:boolean;nextCursor:string|null }> => {
+  const input=statusQuerySchema.parse(rawQuery)
+  let cursor:z.infer<typeof cursorSchema>|undefined
+  if(input.cursor){try{cursor=cursorSchema.parse(JSON.parse(Buffer.from(input.cursor,'base64url').toString('utf8')))}
+   catch{throw new AdminPermissionError(400,'接入状态分页游标无效')}}
   type Row = { id: string | null; code: string; name: string; instrument_version: string; status: string; visibility: string; measurement_release_id: string | null }
-  const installed = await db.$queryRaw<Row[]>(
-    Prisma.sql`SELECT id, code, name, instrument_version, status::text, visibility::text, measurement_release_id FROM scales WHERE instrument_class='STANDARD' ORDER BY code, instrument_version`)
-  // Pending translations cannot be installed yet. They still need a row in the
-  // governance view; an installed-only query hides precisely those blockers.
-  const byVersion = new Map(installed.map(row => [JSON.stringify([row.code, row.instrument_version]), row]))
-  for (const source of listScaleInstrumentSources()) {
-    const key = JSON.stringify([source.identity.instrumentKey, source.identity.instrumentVersion])
-    if (!byVersion.has(key)) byVersion.set(key, {
-      id: null, code: source.identity.instrumentKey, instrument_version: source.identity.instrumentVersion,
-      name: source.catalog.identity.canonicalName, status: 'NOT_INSTALLED', visibility: 'HIDDEN', measurement_release_id: null,
-    })
-  }
-  const rows = [...byVersion.values()].sort((a, b) => a.code.localeCompare(b.code) || a.instrument_version.localeCompare(b.instrument_version))
-  const deployments = new Map<string, Awaited<ReturnType<typeof readActiveScaleDeployment>>>()
-  for (const row of rows) if (row.id) deployments.set(row.id, await readActiveScaleDeployment(db, row.id))
+  const registered=listScaleInstrumentSources()
+  const candidates=registered.length?Prisma.sql`VALUES ${Prisma.join(registered.map(source=>Prisma.sql`(${source.identity.instrumentKey},${source.identity.instrumentVersion},${source.catalog.identity.canonicalName})`))}`
+   :Prisma.sql`SELECT NULL::text,NULL::text,NULL::text WHERE false`
+  const pattern='%'+input.query.replace(/[\\%_]/g,'\\$&')+'%'
+  // Union registered/uninstalled versions with installed historical identities
+  // in SQL. Fetch only one page plus a sentinel; never load every Scale first.
+  const fetched=await db.$queryRaw<Row[]>(Prisma.sql`WITH registered(code,instrument_version,name) AS (${candidates}),versions AS (
+   SELECT id,code,name,instrument_version,status::text,visibility::text,measurement_release_id FROM scales WHERE instrument_class='STANDARD'
+   UNION ALL SELECT NULL,r.code,r.name,r.instrument_version,'NOT_INSTALLED','HIDDEN',NULL FROM registered r
+    WHERE NOT EXISTS(SELECT 1 FROM scales s WHERE s.instrument_class='STANDARD' AND s.code=r.code AND s.instrument_version=r.instrument_version)
+  ) SELECT * FROM versions WHERE true
+   ${input.query?Prisma.sql`AND (code ILIKE ${pattern} ESCAPE '\\' OR name ILIKE ${pattern} ESCAPE '\\' OR instrument_version ILIKE ${pattern} ESCAPE '\\')`:Prisma.empty}
+   ${cursor?Prisma.sql`AND (code COLLATE "C",instrument_version COLLATE "C")>(${cursor.key},${cursor.version})`:Prisma.empty}
+   ORDER BY code COLLATE "C",instrument_version COLLATE "C" LIMIT ${input.limit+1}`)
+  const hasMore=fetched.length>input.limit,rows=fetched.slice(0,input.limit)
+  const deployments=await readActiveScaleDeployments(db,rows.flatMap(row=>row.id?[row.id]:[]))
   const identities = rows.flatMap(row => {
     const source = getScaleInstrumentSource(row.code, row.instrument_version)
     return source ? [scaleSourcePolicyIdentity(source)] : []
@@ -137,5 +148,5 @@ export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: Stan
       }),
     }
   })
-  return { list }
+  return { list,pageSize:input.limit,hasMore,nextCursor:hasMore?encodeCursor(rows[rows.length-1]):null }
 }

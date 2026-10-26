@@ -15,3 +15,5 @@ export type StandardOnboardingEntry={
  nextActions:Array<{code:string;stage:string;owner:string;next:string}>
 }
 export async function standardRequest<T>(path:string,body?:unknown):Promise<T>{const r=body===undefined?await api.get<T>('/platform/survey-standard'+path):await api.post<T>('/platform/survey-standard'+path,body);if(r.code!==0||r.data==null)throw new Error(r.message||'操作未完成');return r.data}
+
+export interface StandardOnboardingStatusPage {list:StandardOnboardingEntry[];pageSize:number;hasMore:boolean;nextCursor:string|null}
