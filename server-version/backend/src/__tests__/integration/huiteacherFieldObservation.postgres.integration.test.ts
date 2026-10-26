@@ -162,10 +162,22 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       id:raw.id,actorUserId:expert.id,expectedRevision:2,
       fieldFormId:draft.id,answers:{q1:'unknown'},
     })).rejects.toThrow()
+    const staleDraft=await createHuiteacherObservation({
+      organizationId:school.id,eventId:event.id,actorUserId:expert.id,
+      kind:'FORMAL_FEEDBACK',content:'另一标签页预先保存的草稿',
+    })
     const submitted=await submitHuiteacherObservation({
       id:raw.id,actorUserId:expert.id,expectedRevision:2,
       fieldFormId:draft.id,answers:{q1:'high'},
     })
+    await expect(createHuiteacherObservation({
+      organizationId:school.id,eventId:event.id,actorUserId:expert.id,
+      kind:'FORMAL_FEEDBACK',content:'再次新建正式反馈',
+    })).rejects.toMatchObject({code:'HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED',statusCode:409})
+    await expect(submitHuiteacherObservation({
+      id:staleDraft.id,actorUserId:expert.id,expectedRevision:1,
+      fieldFormId:draft.id,answers:{q1:'low'},
+    })).rejects.toMatchObject({code:'HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED',statusCode:409})
     const structured=await db.huiteacherFieldFormEvidence.findUniqueOrThrow({
       where:{recordId:raw.id},
     })
@@ -214,6 +226,31 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,actorUserId:manager.id,
     })
     expect(grants.list[0].observerUserId).toBe(expert.id)
+    // A different evaluator owns a different slot. Two pre-existing drafts
+    // for that evaluator race through real PostgreSQL transactions.
+    const concurrentExpert=await makeUser()
+    const concurrentInvite=await inviteHuiteacherObserver({
+      organizationId:school.id,eventId:event.id,actorUserId:manager.id,
+      observerUserId:concurrentExpert.id,role:'EXPERT',expiresAt:new Date(Date.now()+3600_000),
+    })
+    await acceptHuiteacherObserver({userId:concurrentExpert.id,invitationId:concurrentInvite.id})
+    const racing=[]
+    for(const content of ['并发草稿 A','并发草稿 B'])racing.push(await createHuiteacherObservation({
+      organizationId:school.id,eventId:event.id,actorUserId:concurrentExpert.id,
+      kind:'FORMAL_FEEDBACK',content,
+    }))
+    const outcomes=await Promise.allSettled(racing.map(row=>submitHuiteacherObservation({
+      id:row.id,actorUserId:concurrentExpert.id,expectedRevision:1,
+      fieldFormId:draft.id,answers:{q1:'high'},
+    })))
+    expect(outcomes.filter(row=>row.status==='fulfilled')).toHaveLength(1)
+    expect(outcomes.filter(row=>row.status==='rejected').map(row=>(row as PromiseRejectedResult).reason.code))
+      .toEqual(['HUITEACHER_FORMAL_FEEDBACK_ALREADY_SUBMITTED'])
+    expect(await db.huiteacherObservationRecord.count({where:{
+      organizationId:school.id,eventId:event.id,observerUserId:concurrentExpert.id,
+      kind:'FORMAL_FEEDBACK',status:'SUBMITTED',
+    }})).toBe(1)
+    expect(await db.huiteacherFieldFormEvidence.count({where:{recordId:{in:racing.map(row=>row.id)}}})).toBe(1)
     await revokeHuiteacherObserver({
       organizationId:school.id,eventId:event.id,
       actorUserId:manager.id,observerUserId:expert.id,
