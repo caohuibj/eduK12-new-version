@@ -1,0 +1,166 @@
+import {describe,it,expect,vi} from 'vitest'
+import {freezeCandidate} from '../../../../../../backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol'
+import {RecognitionCapture} from './capture'
+import {RecognitionSaveQueue} from './save-queue'
+import {RecognitionSession} from './session'
+import {validateContext,decodeAssets} from './assets'
+import type {RecognitionContext,RecognitionPorts,CapturedRecord} from './contracts'
+import {sealDigest} from './digest'
+const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve()}
+function context():RecognitionContext {
+ const request={profile:'experience' as const,seed:'recognition-golden',formalAssetIds:Array.from({length:184},(_,i)=>'logic-'+i),practiceAssetIds:Array.from({length:6},(_,i)=>'practice-'+i)}
+ const f=freezeCandidate(request)
+ return {contextKey:'attempt-one',configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),manifestHash:f.snapshotHash,randomSeed:request.seed,
+  config:{...request,imageMs:750,isiMs:800,responseRule:'image-and-following-isi-half-open-0.1.0',generatorVersion:'seeded-blocks-0.1.0'} as any,
+  manifest:f.manifest,presentationApproval:'recognition-300-css-single-seen-20261026',
+  assetManifest:{status:'authorized',manifestHash:'c'.repeat(64),evidenceRef:'synthetic-test-evidence',assets:[...new Set([...f.manifest.formal.map(x=>x.assetId),...request.practiceAssetIds])].map(assetId=>({assetId,sha256:'d'.repeat(64),url:'data:image/svg+xml,fixture',width:512,height:512}))}}
+}
+function ports():RecognitionPorts {return {prepareLocalAttempt:vi.fn(async c=>({contextKey:c.contextKey,bindingDigest:sealDigest(c),fresh:true as const})),
+ persistLocalDraft:vi.fn(async r=>({contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true as const})),
+ finalize:vi.fn(async i=>({contextKey:i.contextKey,manifestHash:i.manifestHash,finalPayloadDigest:i.finalPayloadDigest,formalCount:i.formalCount,practiceCount:i.practiceCount,finalSaved:true as const,receiptId:'synthetic-final',report:{state:'limited' as const,
+ hitRate:null,falseAlarmRate:null,correctedRecognitionRate:null,targetHits:null,targetFalseAlarms:null,denominator:null,
+ completeTargetPairs:20,plannedTargetPairs:20,receivedTrialCount:i.formalCount,expectedTrialCount:100,
+ reasons:['quality-review-required'],canGenerateTakeHomeImage:false,logo:'EDUK12.TOP'}}))}}
+function record(i=0):CapturedRecord {const c=new RecognitionCapture(i,'id-'+i,'target-first',100+i*1550);c.tick(850+i*1550);c.tick(1650+i*1550)
+ return {contextKey:'attempt-one',recordKey:'formal:'+i,binding:{configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),manifestHash:'c'.repeat(64),assetManifestHash:'d'.repeat(64),randomSeed:'test'},phase:'formal',envelope:c.envelope(),note:{stopReason:null,synthetic:true,unassignedBoundaryEvents:[],allEvents:[],actualExposure:{imageOnsetMs:100+i*1550,imageOffsetMs:850+i*1550,windowEndMs:1650+i*1550},realm:{timeOriginMs:1000,pageInstanceId:'test-page'}}}}
+describe('recognition actual capture',()=>{
+ it('records actual 750/800 transitions and does not end on seen/no-response',()=>{
+  const c=new RecognitionCapture(0,'A','target-first',100);c.input(200,'touch');expect(c.stage).toBe('image')
+  expect(c.tick(850)).toBe('isi');expect(c.tick(1649)).toBe('isi');expect(c.tick(1650)).toBe('complete')
+  expect(c.envelope().payload.record).toMatchObject({imageOnsetMs:100,imageOffsetMs:850,windowEndMs:1650,status:'complete'})
+  expect(c.envelope().flags.timeout).toBe(false)
+ })
+ it('never fabricates past stages after a long frame stall',()=>{
+  const c=new RecognitionCapture(0,'A','target-first',100);expect(c.tick(90000)).toBe('isi')
+  expect(c.payload.record.imageOffsetMs).toBe(90000);expect(c.payload.record.windowEndMs).toBeNull()
+ })
+ it('retains key repeat and additional touches as bounded raw without adding scorer truth',()=>{
+  const c=new RecognitionCapture(0,'A','target-repeat',100);c.input(101,'keyboard','r',true);c.input(102,'keyboard','x');c.input(103,'touch');c.input(104,'touch')
+  c.tick(850);c.tick(1650);expect(c.envelope().payload.events.map(e=>[e.action,e.isRepeat])).toEqual([['seen',true],['other',false],['seen',false],['seen',false]])
+ })
+ it('does not assign an equal-clock boundary event to an unshown future image',()=>{
+  const c=new RecognitionCapture(0,'A','target-first',100);c.tick(850);c.input(1650,'touch')
+  expect(c.tick(1650)).toBe('isi');expect(c.tick(1651)).toBe('complete');expect(c.envelope().payload.events[0].atMs).toBe(1650)
+ })
+ it.each(['blur','hidden','rotation','multi-pointer','image-load-failure'])('retains interrupted %s without invented offset',(reason)=>{
+  const c=new RecognitionCapture(0,'A','target-first',100)
+  if(reason==='multi-pointer')c.input(200,'touch',null,false,false);else c.interrupt(reason,200)
+  const e=c.envelope();expect(e.payload.record.status).toBe('interrupted');expect(e.payload.record.imageOffsetMs).toBeNull()
+  expect(e.startedAtPerfMs).toBe(100);expect(e.endedAtPerfMs).toBe(200);expect(e.qualityEvents.length).toBeGreaterThan(0)
+ })
+ it('bounds events and stops on overflow instead of silently dropping and continuing',()=>{
+  const c=new RecognitionCapture(0,'A','target-first',100);for(let i=0;i<21;i++)c.input(101+i,'keyboard','r',true)
+  expect(c.stage).toBe('complete');expect(c.envelope().payload.telemetryOverflow).toBe(true);expect(c.allEvents()).toHaveLength(20)
+ })
+ it('rejects reversed actual paint clocks',()=>{
+  const c=new RecognitionCapture(0,'A','target-first',100);c.tick(500);expect(()=>c.tick(400)).toThrow()
+ })
+})
+describe('recognition bound assets',()=>{
+ it.each(['pending','missing','dimension','overlap','manifest','unapproved','practice'])('blocks %s before exposure',(problem)=>{
+  const c=context()
+  if(problem==='pending')c.assetManifest.status='pending'
+  if(problem==='missing')c.assetManifest.assets=[]
+  if(problem==='dimension')c.assetManifest.assets[0].height=511
+  if(problem==='overlap')c.config.practiceAssetIds[0]=c.config.formalAssetIds[0]
+  if(problem==='manifest')c.manifest.formal[0].assetId='unknown'
+  if(problem==='unapproved')(c as any).presentationApproval='new-geometry'
+  if(problem==='practice')c.manifest.practice[3].seenBefore=false
+  expect(()=>validateContext(c)).toThrow()
+ })
+ it('synthetic rights never unlock formal mode, but explicit review mode remains marked',()=>{
+  const c=context();c.assetManifest.status='synthetic-review-only';expect(()=>validateContext(c)).toThrow();expect(validateContext(c,true).assetManifest.status).toBe('synthetic-review-only')
+ })
+ it('decode failure blocks all exposure, with no fallback image',async()=>{
+  const c=context();await expect(decodeAssets(c,()=>({set src(_s:string){},decode:async()=>{throw Error('bad image')}} as unknown as HTMLImageElement))).rejects.toThrow()
+ })
+})
+describe('recognition local durability queue',()=>{
+ it('serializes local writes, requires matching receipt, retains identical failed record for retry',async()=>{
+  const seen:CapturedRecord[]=[],failure=vi.fn();let fail=true
+  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);if(fail)throw Error('local failed');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true}},failure)
+  q.enqueue(record());q.enqueue(record(1));await flush();expect(q.pendingCount).toBe(2);expect(failure).toHaveBeenCalledTimes(1)
+  fail=false;await q.retry();await q.idle();expect(q.retained).toHaveLength(2);expect(seen[0]).toEqual(seen[1]);expect(seen.map(r=>r.recordKey)).toEqual(['formal:0','formal:0','formal:1'])
+ })
+ it('bounds pending drafts, detects replaced exposure/context and rejects false durable receipts',async()=>{
+  const q=new RecognitionSaveQueue('attempt-one',async()=>({contextKey:'other',recordKey:'wrong',recordDigest:'wrong',retained:true}),()=>{})
+  for(let i=0;i<5;i++)q.enqueue(record(i));expect(q.pendingCount).toBe(5);expect(q.failed).not.toBeNull();expect(()=>q.enqueue(record(5))).toThrow()
+  const changed=record();changed.envelope.payload.events.push({id:'change',atMs:101,action:'seen',input:'touch',key:null,isRepeat:false})
+  expect(()=>q.enqueue(changed)).toThrow();expect(()=>q.enqueue({...record(),contextKey:'other'})).toThrow()
+  await flush();expect(q.failed).not.toBeNull();expect(q.retained).toEqual([])
+ })
+})
+describe('recognition session boundaries and final save',()=>{
+ async function prepared(p=ports()){const s=new RecognitionSession(context(),p,true,()=>{},()=>1000);await s.prepare();s.begin(100);return {s,p}}
+ async function practice(s:RecognitionSession){let now=100;for(let i=0;i<8;i++){s.tick(now+750);s.tick(now+1550);now+=1550;await flush()}await flush()}
+ it('completes eight separately retained practice images before allowing formal start',async()=>{
+  const {s}=await prepared();s.begin(101);expect(s.capture?.payload.record.index).toBe(0);await practice(s)
+  expect(s.view).toBe('ready-formal');expect(s.queue.retained.filter(r=>r.phase==='practice')).toHaveLength(8)
+  s.begin(20000);expect(s.phase).toBe('formal');expect(s.capture?.payload.startedAtPerfMs).toBe(20000)
+ })
+ it('stops on local save failure, retries exact records and never re-exposes failed practice',async()=>{
+  const p=ports();let fail=true;p.persistLocalDraft=vi.fn(async r=>{if(fail)throw Error('local');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true}})
+  let now=1651;const s=new RecognitionSession(context(),p,true,()=>{},()=>now);await s.prepare();s.begin(100);s.tick(850);s.tick(1650);await flush()
+  expect(s.view).toBe('retry');expect(s.capture).toBeNull();const pending=s.queue.pendingCount
+  fail=false;await s.retry();expect(s.queue.retained).toHaveLength(pending);expect(s.view).toBe('blocked');expect(p.finalize).not.toHaveBeenCalled()
+ })
+ it('stops on bounded backlog instead of waiting for each image save or inventing catch-up',async()=>{
+  const p=ports();let release:()=>void=()=>{};p.persistLocalDraft=vi.fn(r=>new Promise(resolve=>{release=()=>resolve({contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true})}))
+  const {s}=await prepared(p);let now=100
+  for(let i=0;i<4;i++){s.tick(now+750);s.tick(now+1550);now+=1550}
+  expect(s.view).toBe('retry');expect(s.queue.pendingCount).toBe(4);expect(s.capture).toBeNull();await flush();release()
+ })
+ it('does not show final success on callback resolution or mismatched final host receipt',async()=>{
+  const {s,p}=await prepared();await practice(s);s.begin(20000)
+  s.halt('blur',20001);await s.retry();expect(s.view).toBe('report');expect(s.receipt?.finalSaved).toBe(true)
+  const bad=ports();bad.finalize=vi.fn(async()=>undefined as any)
+  const second=new RecognitionSession(context(),bad,true,()=>{},()=>20001);await second.prepare();second.begin(100);await practice(second);second.begin(20000);second.halt('blur',20001);await second.retry()
+  expect(second.view).toBe('retry');expect(second.receipt).toBeNull()
+ })
+ it('isolates asynchronous old context on dispose and never starts an uncertain/opened attempt',async()=>{
+  const p=ports();let resolve:(r:{contextKey:string;bindingDigest:string;fresh:true})=>void=()=>{}
+  p.prepareLocalAttempt=()=>new Promise(r=>{resolve=r})
+  const s=new RecognitionSession(context(),p,true,()=>{});const work=s.prepare();s.dispose();resolve({contextKey:'attempt-one',bindingDigest:sealDigest(context()),fresh:true});await work
+  s.begin(100);expect(s.capture).toBeNull()
+  const bad=ports();bad.prepareLocalAttempt=async()=>({contextKey:'wrong',bindingDigest:'wrong',fresh:true})
+  const t=new RecognitionSession(context(),bad,true,()=>{});await t.prepare();expect(t.view).toBe('blocked')
+ })
+})
+
+describe('recognition sealed receipt boundaries',()=>{
+ it('rejects stale ACK digest even when context and record keys match, then retries identical sealed content',async()=>{
+  const seen:any[]=[],failure=vi.fn();let wrong=true
+  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:wrong?'0'.repeat(64):r.recordDigest,retained:true}},failure)
+  q.enqueue(record());await flush();expect(q.failed).not.toBeNull();expect(q.retained).toEqual([])
+  wrong=false;await q.retry();expect(seen[0]).toEqual(seen[1]);const history=q.retained;history[0].envelope.payload.record.assetId='tampered'
+  expect(q.retained[0].envelope.payload.record.assetId).toBe('id-0')
+ })
+ it('retains true onset, realm and all equal-clock interrupted-end events in sidecar',async()=>{
+  const p=ports(),s=new RecognitionSession(context(),p,true,()=>{},()=>200)
+  await s.prepare();s.begin(100);s.input(200,'touch',null,false,false);await flush()
+  const r=s.queue.retained[0]
+  expect(r.envelope.payload.record.imageOnsetMs).toBeNull();expect(r.note.actualExposure).toEqual({imageOnsetMs:100,imageOffsetMs:null,windowEndMs:200})
+  expect(r.note.allEvents).toHaveLength(1);expect(r.note.unassignedBoundaryEvents).toHaveLength(1)
+  expect(r.note.realm.pageInstanceId).toBeTruthy();expect(r.note.realm.timeOriginMs).toBeGreaterThan(0)
+  const {recordDigest,...core}=r;expect(recordDigest).toBe(sealDigest(core))
+ })
+ it('rejects stale prepare ACK with matching context but different frozen-content digest',async()=>{
+  const p=ports();p.prepareLocalAttempt=async c=>({contextKey:c.contextKey,bindingDigest:'0'.repeat(64),fresh:true})
+  const s=new RecognitionSession(context(),p,true,()=>{});await s.prepare();expect(s.view).toBe('blocked');s.begin(100);expect(s.capture).toBeNull()
+ })
+ it.each(['context','manifest','digest','formal-count','practice-count','projection-count','performance'])('rejects final %s ACK instead of showing saved report',async problem=>{
+  const p=ports(),base=p.finalize;p.finalize=async input=>{const r=await base(input)
+   if(problem==='context')r.contextKey='wrong'
+   if(problem==='manifest')r.manifestHash='0'.repeat(64)
+   if(problem==='digest')r.finalPayloadDigest='0'.repeat(64)
+   if(problem==='formal-count')r.formalCount=0
+   if(problem==='practice-count')r.practiceCount=0
+   if(problem==='projection-count')r.report.receivedTrialCount=0
+   if(problem==='performance')(r.report as any).hitRate=.8
+   return r}
+  const s=new RecognitionSession(context(),p,true,()=>{},()=>20001);await s.prepare();s.begin(100);let now=100
+  for(let i=0;i<8;i++){s.tick(now+750);s.tick(now+1550);now+=1550;await flush()}
+  await flush();expect(s.view).toBe('ready-formal');s.begin(20000);s.halt('blur',20001);await s.retry()
+  expect(s.view).toBe('retry');expect(s.receipt).toBeNull()
+ })
+})

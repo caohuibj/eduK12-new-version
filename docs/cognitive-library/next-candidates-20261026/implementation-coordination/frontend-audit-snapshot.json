@@ -1,0 +1,119 @@
+{
+  "artifactKind": "PRELIMINARY_FRONTEND_AUDIT_SNAPSHOT_NOT_RELEASE_QUALIFICATION",
+  "recordedUtc": "2026-10-26T07:28:27.827340+00:00",
+  "parentCoreCommit": "d78332d54488cc677dff3dcb2b64761dc3fca207",
+  "branch": "cognitive-next-three-core-20261026",
+  "snapshotRequest": "Coordinator requested a safe immutable frontend/raw/screenshot snapshot before all remaining issues are finished.",
+  "ownersPausedAtSafeBoundary": {
+    "enumeration_plan": true,
+    "ant_plan": true,
+    "recognition_plan": true
+  },
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "3e8c88b885a2ca147a1da350eeb0cda256ffa67fc5b20f4bf04c77e1f34d8809",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx": "f0cfef3f05de42002b3bf4fe64c900b52ec6c4472fa5126d4eb42c146a0abbf9",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "bc35b6273cd3815788873de981d427cbbb35aad09ce31158429e3f4c9a588fb0",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/ant.css": "c9f5df2248708e9444629d384a972837f279e780d9f8bb67961e8b0f6458ffc4",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.test.ts": "20dc2d3327854f6e2e2f2e5945ace00970b69257ce190c564f0f3c85f5387a5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/capture.ts": "3ea2e3dcd4bdc7010b209b4edf980b67d2572bf4560487e0c4d3994faefe5f90",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/display.ts": "6046840499f49662756f48c56a435deec06db6f892c4c9908e5a41c75498cd5a",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts": "3792e7a94f6be7e19c9d496cafa380412c1760242e8a76c5cd9d064153c78cc9",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts": "371c1834ad1a63ba8962b21173c6a399c398f5d40b5d254077b5da0502814326",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/local-save.ts": "ce23b298a385435a122bdc1992c21401490f4637ce7946fd9ba6ab9e3cba8219",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/paint.ts": "d4a43342fa73c7e591901a7411d04304d7d5b70e63e85514035589ea86438ef3",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/seal.ts": "5c0e39ea3cf60286ba37db5a89fcc21319f46ba980dd9f08b589ad595692b029",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.test.ts": "c0c2df9c4a6c13ffc017334080a6b4707f9163b9529cc96ea36fbfee8977bd8c",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts": "1b30fb429d31f118b6e29559afe999fa3dec5a7befe9d822a12b4cae60d69fed",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/test-fixtures.ts": "5f727f76b8249281d282354d6a913faab33ee173b01b9f54b01b077c9897acb4",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx": "b5fcf337cd149127b4d1c0ca27eb63f0dd64e36731a1b3497e4f80792a65d322",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx": "0268b96e3e7efffa844e9311f526d26f87e64d87fab966eb8b6bfad9749db61d",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/assets.ts": "2f8a79262e49859ad5ff5a4758e8dd7004d231f33fda85a74a6ca68500534dc3",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/capture.ts": "5a15054ae89d8766462e13f3f0efb8d010ee8a20609ca9cf7deac27c9567f1c5",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/contracts.ts": "1767b61bbf6f317415a3525908c616cc56deb532ee4317380626acef875547de",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/digest.ts": "0c5c254b9777ab57ddc29cc12b52beced70457b944ba47aa97a96d23984079eb",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/lifecycle.test.tsx": "c7de6c3994d86cc848e4c11b616d606d4b387dee496dc1a9f148fcceb4f9c042",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.css": "3f5ba7495fe4048f73b398a966a10155c9462110c4d2f747242d20af3cea2891",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/recognition.test.ts": "940ff9351e7165f4798ec363ecefc14b948aefcd95e15200e91b0cf54fd0db56",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/save-queue.ts": "633026e45619a8ec5a59d7be78de669be8b8da1671044517e7bcc25580bb573f",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/session.ts": "5fcbee5659a0f5443d496881853fbfdf3e6a5e681a78e237ceb57beaa152b4a5",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "45257667e9cbb2b00ceae6dd3823eb1580084ea297956661c4dcf53483c90421",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts": "27b4f2fd796a7be570d6b313dc2254cc4da31ffd83ad7ada9d73953951cf4990",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration-candidate.test.tsx": "270b09bab20a0fa4261b4505b8f6535c2a8c4d7ad3f1f9e987a69099d1bf9e02",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/enumeration.css": "08587111a926937b2f63bf6c5c7ecb346002adb31401a28e890211efe10a1999",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/protocol.ts": "9b0257c9e96e01c6ac5c70b7fd61c5deafe6df3cf57a562e623d06ed5aa70abb",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/generated/report.ts": "0f05977a63f4197fa503c7bdd48ac2e2159b2350e680efdd2f77654d54a7c245",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/persistence.ts": "57954df32232655d91521a464d0bc0e21a0ce5de443eb6683380fedb9c9e01a4",
+    "server-version/scripts/cognitive/ant-content.cjs": "0cc449ba248cc9a241d3a4cfe2bf2e29b7cad012979782582a6366f04b92b2fe",
+    "server-version/scripts/cognitive/enumeration-content.cjs": "0c8c09206999dbdbdea66ba6430fc438fbe30648ca1e4b323ee3525e475cead2",
+    "server-version/scripts/cognitive/recognition-browser-review.cjs": "621356dcc16400a94dbac01b5fc08f23c771e3eb0e8178540e05bcc3acf039ff"
+  },
+  "knownFailedNominalTiming": {
+    "candidateId": "attention-enumeration-flower",
+    "nominalMs": 50,
+    "rawSource": "docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/browser-captured-raw.json",
+    "rawSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+    "formalSyntheticTrials": 25,
+    "fourFrameIndices": [
+      1,
+      2,
+      11,
+      12,
+      14,
+      16,
+      22
+    ],
+    "fourFrameApproxMs": 66.6,
+    "threeFrameTrials": 18,
+    "threeFrameApproxMs": [
+      50.0,
+      50.1
+    ],
+    "physicalOnsetOrDurationMeasured": false,
+    "clockSource": "rAF callback timestamp supplied to EnumerationCapture.frame; draw occurs later in the same callback",
+    "rootCauseIndependentlyEstablished": false,
+    "toleranceOrFrameStrategyChangedToPass": false,
+    "formalAdministrationAllowed": false
+  },
+  "timingSourceLocations": {
+    "capture": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts:55",
+    "threshold": "server-version/frontend/src/modules/cognitive/tasks/enumeration/capture.ts:65",
+    "drawCaller": "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx:145",
+    "recipe": "server-version/frontend/src/modules/cognitive/tasks/enumeration/display.ts:68"
+  },
+  "developmentSelfChecks": {
+    "enumeration": "17 distinct directed tests; types/projection checks; real rAF3 practice+25 formal;24 browser assertions/17 screenshots. Not a 50ms qualification.",
+    "recognition": "46 distinct frontend cases; initial and targeted cloud browser evidence,8+100 synthetic flow; original unchanged report200% evidence retained.",
+    "ant": "owner reports30 distinct frontend cases plus approved-primitive DOM check;24 browser checks/17 shots,then4 affected responsive-report checks/4 updated shots. Final aggregate evidence not yet written."
+  },
+  "pendingAtThisSnapshot": [
+    "participant-facing wording still contains engineering terms; requested cleanup not started",
+    "ANT final frontend evidence manifest not yet generated",
+    "post-change AntTask/AntReportCard targeted type closure pending; earlier11-root result retains original source hashes",
+    "independent audit conclusion",
+    "enumeration timing root cause and acceptable frame/display protocol",
+    "formal recognition stimulus asset authorization and population validity",
+    "real phone/tablet/desktop physical timing and browser coverage",
+    "product native registration/profile admission,host durable ports,FINAL/API/DB/COS,4entrances,export/tag consumers"
+  ],
+  "timeRealmPolicy": "Interrupted/refreshed/changed-realm formal attempts terminate. Preserve and retry original records only. Never reset timestamps or repeat exposures to manufacture continuity. Native recognition projection remains restricted; client ResearchReview not accepted.",
+  "notImplementedOrAuthorized": {
+    "runtimeRegistration": false,
+    "realDBOrCosPersistence": false,
+    "CIActivated": false,
+    "merged": false,
+    "deployed": false
+  },
+  "approvalSource": {
+    "commit": "9969583b2c95fa87ff44a4f2b3aa68cbd7471390",
+    "notionPage": "405d27635a3881b2a2d3fecce26d7cb3",
+    "nativeApprovedImagesReadBack": 3
+  },
+  "licensingBoundary": {
+    "enumeration": "MIT upstream code reference; original task logic/geometric candidate; no upstream noise/fonts copied; physical/mask equivalence unverified",
+    "recognition": "MIT plugin reference; original OMI image NC-SA rights not transferred; current assets are explicit synthetic placeholders only",
+    "ant": "GPL upstream PEBL protocol reference; original TypeScript/SVG implementation, not a claim of blanket GPL clearance or original-paper equivalence"
+  },
+  "selfReviewIsIndependentAudit": false
+}

@@ -1,0 +1,22 @@
+{
+  "scope": "contact sheet rendered from existing candidate screenshots; no product checks repeated",
+  "sourceScreenshots": [
+    {
+      "file": "phone-intro.png",
+      "sha256": "31bb9820fd651f421a46ab7100855702b9c1a630658c25cb7d51f3ebfc1769de"
+    },
+    {
+      "file": "phone-practice-stimulus.png",
+      "sha256": "d101e845e70d6bc503c41737e64bd9a2043f4351cf1335d35d316a6bc893cb93"
+    },
+    {
+      "file": "phone-response.png",
+      "sha256": "1690e40f961f006dca09d02869a2dce2b36f90d4c703d07fb50ce0ef07aba54d"
+    },
+    {
+      "file": "phone-report-invalid.png",
+      "sha256": "2b3fb231e7126cee6121f689759f9b67fff1f51b57f19491762077a19b42c876"
+    }
+  ],
+  "reviewSha256": "6d2934e8aef50324f1532949415afb3c09b10d2328ac8127956a480d3953371a"
+}

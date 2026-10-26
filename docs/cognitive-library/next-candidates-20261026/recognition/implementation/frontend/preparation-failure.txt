@@ -1,0 +1,1 @@
+First frontend test command was launched from repository cwd with node_modules/vitest path, failing MODULE_NOT_FOUND before any tests ran, exit 1. Source edits succeeded. Corrected execution cwd to server-version/frontend; no test passed in that failed invocation.

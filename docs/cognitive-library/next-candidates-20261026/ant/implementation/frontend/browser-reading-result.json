@@ -1,0 +1,117 @@
+{
+  "status": "PASS",
+  "scope": "Only changed narrow report presentation",
+  "checks": [
+    {
+      "state": "interpretable",
+      "language": "zh",
+      "zoom": 1,
+      "file": "phone-report-interpretable-responsive.png",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "rowHeaders": [
+        {
+          "text": "无提示",
+          "width": 362
+        },
+        {
+          "text": "中央提示",
+          "width": 362
+        },
+        {
+          "text": "双位置提示",
+          "width": 362
+        },
+        {
+          "text": "空间提示",
+          "width": 362
+        }
+      ],
+      "tables": 1,
+      "overall": 1,
+      "cardRows": [
+        "block",
+        "block",
+        "block",
+        "block"
+      ]
+    },
+    {
+      "state": "limited",
+      "language": "zh",
+      "zoom": 1,
+      "file": "phone-report-limited-responsive.png",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "rowHeaders": [
+        {
+          "text": "无提示",
+          "width": 362
+        },
+        {
+          "text": "中央提示",
+          "width": 362
+        },
+        {
+          "text": "双位置提示",
+          "width": 362
+        }
+      ],
+      "tables": 1,
+      "overall": 0,
+      "cardRows": [
+        "block",
+        "block",
+        "block"
+      ]
+    },
+    {
+      "state": "invalid",
+      "language": "zh",
+      "zoom": 1,
+      "file": "phone-report-invalid-responsive.png",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "rowHeaders": [],
+      "tables": 0,
+      "overall": 0,
+      "cardRows": []
+    },
+    {
+      "state": "interpretable",
+      "language": "en",
+      "zoom": 2,
+      "file": "phone-report-en-200-responsive.png",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "rowHeaders": [
+        {
+          "text": "No cue",
+          "width": 334
+        },
+        {
+          "text": "Central cue",
+          "width": 334
+        },
+        {
+          "text": "Double cue",
+          "width": 334
+        },
+        {
+          "text": "Spatial cue",
+          "width": 334
+        }
+      ],
+      "tables": 1,
+      "overall": 1,
+      "cardRows": [
+        "block",
+        "block",
+        "block",
+        "block"
+      ]
+    }
+  ],
+  "errors": [],
+  "zoom": "CSS200% reading proxy, not physical calibration"
+}
