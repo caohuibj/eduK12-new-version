@@ -288,17 +288,17 @@ const preserveFrozenArtifacts=(next:FinalDraftMeta,existing?:FinalDraftMeta):Fin
   throw new FinalDraftStorageError('冻结原件不可通过普通update替换')
  return existing?.frozenInstrumentArtifacts?{...next,frozenInstrumentArtifacts:existing.frozenInstrumentArtifacts}:next
 }
-const freezeArtifactMeta=<T,>(current:FinalDraftMeta,expected:FinalDraftWriteIdentity,key:string,value:T):{meta:FinalDraftMeta;value:T}=>{
+const freezeArtifactMeta=<T,>(current:FinalDraftMeta,expected:FinalDraftWriteIdentity,key:string,value:T):{meta:FinalDraftMeta;value:T;created:boolean}=>{
  assertFinalDraftWriteIdentity(current,expected);assertNotExpired(current)
  if(!key||key.length>128||['__proto__','constructor','prototype'].includes(key))throw new FinalDraftStorageError('无效原件键')
  const slots=current.frozenInstrumentArtifacts??{}
  if(Object.prototype.hasOwnProperty.call(slots,key)){
   if(serialize(slots[key])!==serialize(value))throw new FinalDraftStorageError('本次冻结原件不允许替换')
-  return {meta:cloneValue(current),value:cloneValue(slots[key] as T)}
+  return {meta:cloneValue(current),value:cloneValue(slots[key] as T),created:false}
  }
  assertWritable(current)
  const meta=stampChangedRetentionWrite(current,{...current,frozenInstrumentArtifacts:{...slots,[key]:value},updatedAt:Date.now()})
- return {meta,value:cloneValue(value)}
+ return {meta,value:cloneValue(value),created:true}
 }
 
 const assertNotExpired = (meta: FinalDraftMeta) => {
@@ -428,7 +428,7 @@ export interface FinalDraftStore {
   get(draftKey: string): Promise<FinalDraftMeta | null>
   ensure(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
-  freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T):Promise<{meta:FinalDraftMeta;value:T}>
+  freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T):Promise<{meta:FinalDraftMeta;value:T;created:boolean}>
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   /** Answer and optional timing metadata commit together under the seal lock. */
   putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>): Promise<void>
@@ -859,7 +859,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
 
   async freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T){
     const copy=immutableArtifactCopy(value)
-    return this.run<{meta:FinalDraftMeta;value:T}>([META_STORE],'readwrite',async transaction=>{
+    return this.run<{meta:FinalDraftMeta;value:T;created:boolean}>([META_STORE],'readwrite',async transaction=>{
       const store=transaction.objectStore(META_STORE),current=await requestResult<FinalDraftMeta|undefined>(store.get(expected.draftKey))
       if(!current)throw new FinalDraftStorageError('本地测评草稿不存在')
       const result=freezeArtifactMeta(current,expected,key,copy)

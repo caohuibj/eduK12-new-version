@@ -9,6 +9,8 @@ import { EnumerationPersistence, type EnumerationPersistencePort } from './persi
 import './enumeration.css'
 export interface EnumerationTaskProps {
   context: EnumerationContext
+  /** Native host routes to its authoritative saved report; core confirmation is not archive confirmation. */
+  hostManagedReport?: boolean
   persistence: EnumerationPersistencePort
   /** Optional frozen host result. The generated report projection permits only version-compatible session descriptions. */
   result?: EnumerationPublicResult
@@ -34,7 +36,7 @@ export function EnumerationTask(props: EnumerationTaskProps) {
   const key = enumerationDigest({ context: props.context, portId: props.persistence.id })
   return <EnumerationSession key={key} {...props} />
 }
-function EnumerationSession({ context: incoming, persistence: incomingPort, result, storedResult }: EnumerationTaskProps) {
+function EnumerationSession({ context: incoming, persistence: incomingPort, result, storedResult,hostManagedReport }: EnumerationTaskProps) {
   const persistence = useMemo<EnumerationPersistencePort>(() => ({
     id: incomingPort.id, durability: { ...incomingPort.durability },
     openAttempt: incomingPort.openAttempt.bind(incomingPort), endAttempt: incomingPort.endAttempt.bind(incomingPort),
@@ -220,7 +222,8 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
       {practiceRepeat >= 11 && <p role="alert">{en ? 'Practice has been interrupted repeatedly. Please contact the publisher before continuing.' : '练习多次中断，请联系发布者后再继续。'}</p>}</section>}
     {view === 'saving' && <p role="status">{en ? 'Submitting… Please keep this page open.' : '正在提交，请保持页面打开…'}</p>}
     {view === 'error' && <section><p role="alert">{error}</p>{retry.current && <button onClick={() => { if (!busy.current) void retry.current?.() }}>{en ? 'Retry submission' : '重试提交'}</button>}</section>}
-    {view === 'report' && <section className="enum-reading"><h1>{en ? 'Your record' : '这次的记录'}</h1>
+    {view === 'report' && hostManagedReport && <p role="status">{en ? 'Your answers were submitted. Loading the saved report…' : '作答已提交，正在读取已保存报告…'}</p>}
+    {view === 'report' && !hostManagedReport && <section className="enum-reading"><h1>{en ? 'Your record' : '这次的记录'}</h1>
       <p>{synthetic ? (en ? 'This is a synthetic demonstration. It does not confirm submission of a real assessment.' : '当前为合成演示，不代表真实作答已提交。') : (en ? 'Your submission is confirmed.' : '本次作答已确认提交。')}</p>
       <EnumerationReport result={result} storedResult={storedResult} config={context.config} randomSeed={context.randomSeed} language={context.language} />
       <p>{en ? 'For next time: keep the device still, reduce interruptions and maintain your viewing position.' : '下次可把设备放稳，减少通知干扰，并保持观看位置。'}</p>

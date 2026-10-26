@@ -1,0 +1,105 @@
+{
+  "kind": "AFFECTED_ENTRY_CLOSURE",
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx",
+    "src/modules/cognitive/tasks/enumeration/native-port.test.tsx",
+    "src/vite-env.d.ts"
+  ],
+  "sourceClosure": [
+    {
+      "path": "src/modules/assessment-media/types.ts",
+      "sha256": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70"
+    },
+    {
+      "path": "src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "src/services/persistence/finalDraftStore.ts",
+      "sha256": "007bfcbe75134e424b306940d60001698595ef8499598f956cf509f7af6787ca"
+    },
+    {
+      "path": "src/training/training-cognitive-retention.ts",
+      "sha256": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e"
+    },
+    {
+      "path": "src/modules/cognitive/types.ts",
+      "sha256": "07e70b71fc4f479e89056ea5004cfd20006dda7d5dc5445536b193ca17014df7"
+    },
+    {
+      "path": "src/modules/cognitive/core/administration-provenance.ts",
+      "sha256": "b85adf8d4a0702ebb85d861f33d88f3343bb99d7e4d712213d45aaf134a3aa84"
+    },
+    {
+      "path": "src/modules/cognitive/core/runner.types.ts",
+      "sha256": "3078ccd02febd16203205266b719d0d03a86e763725bf3ca6384dcc815be0889"
+    },
+    {
+      "path": "src/modules/cognitive/core/native-enumeration-draft-key.ts",
+      "sha256": "088d98a30f5c1dbe4283aea9e366f98dd8f275571511d4738f18b4b5d317a91d"
+    },
+    {
+      "path": "src/modules/cognitive/core/raw-archive.ts",
+      "sha256": "9b3b4a11179c471ff4e91938ba9b9ae31cdc481c28190535d4cfddd42844c0fb"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/generated/protocol.ts",
+      "sha256": "4b7ff685b4b899435c2028ff2e9a90f85af569f302ffee53d265c297403502fe"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/display.ts",
+      "sha256": "dd6675148fa214c328e6b4f7e24644742175b2fd7fb4eea9183bbec1ba3bc0fb"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/local-artifact.ts",
+      "sha256": "0a724c5699c487545c12769e6da4890cfd4e7aed9efd99eef5390ce242843569"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/capture.ts",
+      "sha256": "05e0dc40d8be27cc0d7efa7bfab48594d23d4e0ebffa35e818aaa23a337cb8ce"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/persistence.ts",
+      "sha256": "9e9053fac439290201b3a474051a87692e779413d1179d07850238058c0967c4"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/native-port.ts",
+      "sha256": "adb17d66a35516cbefc1e0fb8c7544ab9e906e5d6599ce212d3f557271d341bc"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/EnumerationCalibration.tsx",
+      "sha256": "646649ef9f86ba2fd122c1069314a1737fa16972add435f16a3a6b14bd28b48e"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/generated/report.ts",
+      "sha256": "b74995c7a872811c2bd7fa08f4e7f7bc8a4b09b5def64c03f0df2f6c0bacc373"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/EnumerationReport.tsx",
+      "sha256": "1c531e18e522ba918a9665430c6537b6c83abf49c0846d1b2c2cf409c40d0628"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx",
+      "sha256": "aa3d6cc2aff6fc1b678fa64becf6e7f9222211ef4e1d42beae0de4d9b0543ab8"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/NativeEnumerationRunner.tsx",
+      "sha256": "c21c775833624dc21d15699553c2da819ce8940a310167d8de293ca3f31ca7ae"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/fixtures.test-support.ts",
+      "sha256": "335418859e893eaaf5bf01e1dee02d187d5a123ce2e01bbb1427b18f8a70f8d4"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/enumeration/native-port.test.tsx",
+      "sha256": "ad522d757a8b3bfc5e99b3fe0034496b774ef554cec0d42f70c729984f5768ad"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

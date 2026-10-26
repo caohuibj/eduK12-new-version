@@ -25,7 +25,7 @@ export interface EnumerationPersistencePort {
   /** Raw core only, no client score. ACK binds the same full-record digest. */
   onTrialComplete(core: EnumerationTrial, value: EnumerationSavedRecord): Promise<EnumerationReceipt>
   onPracticeComplete(value: EnumerationSavedRecord): Promise<EnumerationReceipt>
-  /** Host confirms durable final/core/archive contract. A void/false/mismatched result cannot show saved success. */
+  /** Native confirmed means the actual core result is saved; archive confirmation is separate. A void/false/mismatched result is insufficient. */
   complete(value: { contextId: string; attemptId: string; artifactHash: string; recordHashes: string[] }):
     Promise<{ contextId: string; attemptId: string; artifactHash: string; recordHashes: string[]; confirmed: true }>
 }
@@ -105,9 +105,13 @@ export class EnumerationPersistence {
     if (this.active) return this.active.hash === recordHash ? this.active.promise : Promise.reject(Error('A different record is still saving'))
     if (this.pending && this.pending.recordHash !== recordHash) return Promise.reject(Error('Retry must preserve the captured record'))
     const value = this.pending ?? { record: snapshot, recordHash }; this.pending = value
-    const promise = Promise.resolve().then(async () => {
-      this.alive()
-      const local = await this.port.retain(structuredClone(value)); this.alive(); this.receipt(local, value)
+    // Hand the finished original to the host before any microtask can unmount this session.
+    // Disposal may stop core/FINAL continuation, but must not discard this already captured record.
+    let retained: Promise<EnumerationReceipt>
+    try { retained = this.port.retain(structuredClone(value)) }
+    catch (error) { return Promise.reject(error) }
+    const promise = Promise.resolve(retained).then(async local => {
+      this.alive(); this.receipt(local, value)
       const acknowledgement = value.record.core.phase === 'test'
         ? await this.port.onTrialComplete(structuredClone(value.record.core) as EnumerationTrial, structuredClone(value))
         : await this.port.onPracticeComplete(structuredClone(value))

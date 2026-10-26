@@ -8,6 +8,7 @@ import {
 } from './session-ledger'
 import { initialRunnerState, runnerReducer } from './runner.state'
 import { assertNativeSession, nativeCoreReceipt, nativeCompletedReceipt } from './native-session-contract'
+import { standaloneCognitiveDraftKey } from './native-enumeration-draft-key'
 import { finishCognitiveCoreDraft, requireCognitiveDurability, sealCognitiveArchive, cognitiveRawDigest } from './raw-archive'
 import type { CognitiveNativeHost, RunnerError, RunnerState } from './runner.types'
 import { wrapCognitiveTrial } from './trial-envelope'
@@ -46,7 +47,8 @@ const trainingBinding = (session: CognitiveSession) => {
 }
 export const cognitiveDraftKey = (session: CognitiveSession) => {
   const binding = trainingBinding(session)
-  return binding ? trainingCognitiveDraftKey(binding) : `cognitive:${session.sessionId}`
+  if (binding) return trainingCognitiveDraftKey(binding)
+  return standaloneCognitiveDraftKey(session)
 }
 
 interface CognitiveCheckpointPayload {
@@ -617,8 +619,11 @@ export function useCognitiveSession(
     if ('recoveryToken' in payload && payload.recoveryToken) {
       saveCognitiveRecoveryCredential(nextSession.sessionId, payload.recoveryToken)
     }
+    // The authorized restart can reuse its session URL; reload the new enum epoch explicitly.
+    if(nextSession.sessionId===sessionId&&nextSession.nativeTask&&nextSession.testType==='enumeration'
+      &&nextSession.engineVersion==='0.2.0')await load()
     return nextSession
-  }, [api, sessionId])
+  }, [api, sessionId, load])
 
   const coreReceiptRef = useRef<Awaited<ReturnType<CognitiveNativeHost['complete']>> | null>(null)
   // Each published port owns the render's frozen identity, never a later stateRef session.
