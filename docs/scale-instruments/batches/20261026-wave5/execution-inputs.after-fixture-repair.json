@@ -1,0 +1,71 @@
+{
+  "kind": "direct input snapshot after exact golden-metadata-only repair; actual score dimensions/algorithms and report prose unchanged",
+  "head": "7ccada6b3746eb755f5615e812c58691c1b7ef8c",
+  "records": [
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/ffmq15_zh_cn_research.test.ts",
+      "sha256": "e22c491d3db50e66c2e82829fb109d84a72ddce7b19b21dcd07b791114019384",
+      "bytes": 9325
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/erss19_zh_cn_research.test.ts",
+      "sha256": "0ad70221deefb1b5944b97503b078057aecc4bf74280ca9237086506060a81d9",
+      "bytes": 9260
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/wave5-mindfulness-emotion.postgres.integration.test.ts",
+      "sha256": "92080f0693496a49278519667f7710bd0e198cddef576e38df76e7f972ac74e1",
+      "bytes": 6557
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/source.json",
+      "sha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff",
+      "bytes": 54139
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/source.json",
+      "sha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e",
+      "bytes": 58024
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "bytes": 245999
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+      "bytes": 7246
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "bytes": 521
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "sha256": "4a638614ef01f9fec59e15b3e4d820b7f53df617a2a868dd39872f1af962206e",
+      "bytes": 13754
+    },
+    {
+      "path": "server-version/backend/scripts/scale-content-batch.ts",
+      "sha256": "fc35c785c11dfceea9682325b5a80ef13171fc57d43b6a8bd3da1afef5dc9783",
+      "bytes": 9898
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+      "bytes": 25883
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-result.ts",
+      "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+      "bytes": 14023
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/eligibility.ts",
+      "sha256": "a6266923493ab36ffa34da3b361cd92bf36a1ee2beda9f5e66ac75d42b92b515",
+      "bytes": 3675
+    }
+  ]
+}

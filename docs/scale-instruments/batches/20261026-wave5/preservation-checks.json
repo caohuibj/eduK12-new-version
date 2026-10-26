@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "fixedSnapshot": "2ef54a302c3d4b10ab0a0f0e823c832d834ee95f",
+  "unchangedSourceVersions": 47,
+  "includes": "original37, RES catalogv2, all prior revisions and tools",
+  "newSourceVersionsInThisBatch": 2,
+  "engineSchemaChanges": false
+}

@@ -1,0 +1,151 @@
+{
+  "status": "PASS",
+  "method": "FFMQ source PDF raw numbered-row extraction independently compared across 2016/2018 files; ERSS original XML curly-quoted Methods sentences; no OpenScales item copying",
+  "tools": [
+    {
+      "tool": "ffmq15",
+      "completeAuthorEnglishTextAndOrderMatch": true,
+      "count": 15,
+      "reverse": [
+        3,
+        4,
+        7,
+        8,
+        9,
+        13,
+        14
+      ]
+    },
+    {
+      "tool": "erss19",
+      "completeAuthorEnglishTextAndOrderMatch": true,
+      "count": 19,
+      "reverse": [
+        6,
+        7
+      ]
+    }
+  ],
+  "ffmq15": {
+    "authorFileLicense": "CC BY 3.0, explicit Jenny Gu upload page",
+    "validationPaperLicense": "http://creativecommons.org/licenses/by/3.0/",
+    "authorPdf2018Sha256": "f0c7d7875ed6eac280d166b0329ec06d1b788ee00dbaf108b33ece4f1f3d4a2c",
+    "authorPdf2016Sha256": "cbefa78230be86a9476b389f47c63f74d2d384e4a69bff796fa026c9d71ac839",
+    "itemTextUnchangedAcrossAuthorFiles": true,
+    "shortFormDevelopment": "Baer2012 corrected in author2018 file; Gu2016 validation",
+    "fiveFacetRange": "3–15 sum, Gu2016 Methods/Table1",
+    "prePostStructureInvariant": false,
+    "noAutomaticTotal": true
+  },
+  "erss19": {
+    "articleLicense": "CC BY 4.0",
+    "dimensions": [
+      3,
+      4,
+      7,
+      5
+    ],
+    "originalCountNarrative": "24 initial - 4 removed differs from 19 explicitly enumerated; no fabricated twentieth item",
+    "item6OriginalGrammarRetained": true,
+    "sourceOnlyEndpointLabels": true,
+    "supplementContents": "Appendices A/B leadership vignettes and performance anchors; not a separate emotion item source"
+  },
+  "sourceFiles": {
+    "ffmq15-author-2018-raw.txt": {
+      "bytes": 5994,
+      "sha256": "d7e3a1c9d323d52ac48e7d8ae4a9b8a38c0ee3ce844b827684c47d38b3ddf654"
+    },
+    "ffmq15-author-2016.pdf": {
+      "bytes": 139242,
+      "sha256": "cbefa78230be86a9476b389f47c63f74d2d384e4a69bff796fa026c9d71ac839"
+    },
+    "ffmq15-author-2016.txt": {
+      "bytes": 8016,
+      "sha256": "4a61c2ad01cad944a45e06f2d842b37647501e8fd7afe32bb998a2acec833153"
+    },
+    "ffmq15-rg.txt": {
+      "bytes": 25399,
+      "sha256": "84c3b28e5489fc1f56566cef4f312e9740d9ee6f3cd22421bc69b101c1337d6b"
+    },
+    "ffmq-downloads.json": {
+      "bytes": 737,
+      "sha256": "e2cbef42cfbed58aae9354240ad6dd61d4e26a0c686bd0f0ff76abec12ec8f7f"
+    },
+    "ffmq15-author-items.json": {
+      "bytes": 2023,
+      "sha256": "924838800b74b19a0cb582a85607f79e3771b0e0eabb72a2de91a8b74e8975d9"
+    },
+    "erss-supplementary.zip": {
+      "bytes": 115015,
+      "sha256": "0d2cfe3d3eae1f6d974c449d4efd5bd845932b3ae03c9fcdab0719c3a505d54d"
+    },
+    "ffmq15-gu2016.xml": {
+      "bytes": 155554,
+      "sha256": "a569469e2e7f3b236b8fb9b69d63e692a51cb3dfd217582f511af197c97cbf19"
+    },
+    "retrieval.json": {
+      "bytes": 2172,
+      "sha256": "fa75cf0cb6e59f33912579f14f825e6f530fba5f9cf1223131946705607498d2"
+    },
+    "ffmq15-discovery.osd": {
+      "bytes": 10109,
+      "sha256": "5da99369ca249ffedb57e12deb9a3b58894b0985e598e35711beb3503d84dc0d"
+    },
+    "erss-author-supplement.pdf": {
+      "bytes": 127268,
+      "sha256": "7dbcf8ebd33ff713e6948dd94c58e556c14ae3da83e64aec03337d167ecaaca9"
+    },
+    "ffmq15-author-2018.txt": {
+      "bytes": 7820,
+      "sha256": "5c83cdb8a69f0f1d1ac9b4622c0740edd239db6fe8e19544f8cd994c4c7d256a"
+    },
+    "erss-author-supplement.txt": {
+      "bytes": 15253,
+      "sha256": "770b2720d251c3d9555af1ecad854163a2cc4999c95bf0c536c35beb27a61f52"
+    },
+    "ffmq15-author-2018.pdf": {
+      "bytes": 96618,
+      "sha256": "f0c7d7875ed6eac280d166b0329ec06d1b788ee00dbaf108b33ece4f1f3d4a2c"
+    },
+    "erss-author.txt": {
+      "bytes": 77493,
+      "sha256": "d0cc52887f9b3998581ab90942b842edf18866e901a1e7a6965a072d8f18d6bf"
+    },
+    "erss-author-items.json": {
+      "bytes": 1742,
+      "sha256": "f2658b92d2f92709831bdfefbd0c88fa6cca3e3ab1b077c469fe512c100459f1"
+    },
+    "erss-discovery.osd": {
+      "bytes": 7814,
+      "sha256": "5b9cdc2c8e6917a10e1d9851d2e4636521ff533d51dfc052231a0690202adc91"
+    },
+    "ffmq15-rg.html": {
+      "bytes": 395160,
+      "sha256": "c0a68f29dfcaa906af2102c8ac58b908d729c677c85cd4357df35131ed7215b5"
+    },
+    "pmc-retrieval.json": {
+      "bytes": 860,
+      "sha256": "11ceef708a14e718dd3246dc8106d8f5ef1070e2dcd334f67dde79dd95195b39"
+    },
+    "erss-author-pdf.txt": {
+      "bytes": 85861,
+      "sha256": "50625a192d96a560310830e9a5e3cf8660f7d6737b80c0b0a5fbea14da91f9ad"
+    },
+    "ffmq15-gu-search.json": {
+      "bytes": 1105,
+      "sha256": "63be4ccc59ee855424a03475fe0996b33ba3382f2f09adf5379702464943b834"
+    },
+    "erss-pmc.xml": {
+      "bytes": 126362,
+      "sha256": "81442a17604a0eb289d5583815d602b3b10260d4532fa99d3d3e4588fb701034"
+    },
+    "erss-author.pdf": {
+      "bytes": 296290,
+      "sha256": "23dbf5a5093b98f56f4b00df49421cb60b4aa024a22ce08b701bc88f0fef255b"
+    },
+    "erss-author.html": {
+      "bytes": 893020,
+      "sha256": "63c430edd8b916aa7f2721a975b89262f2b0da8622235711e0cd6e312f25b418"
+    }
+  }
+}

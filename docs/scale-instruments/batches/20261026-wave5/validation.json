@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DEVELOPMENT_EVIDENCE_NOT_CI_OR_PUBLICATION_ACCEPTANCE",
+  "baseline": "7ccada6b3746eb755f5615e812c58691c1b7ef8c",
+  "scope": "FFMQ15 and ERSS19 independent working translations only; parallel-agent tools excluded",
+  "unit": {
+    "status": "PASS",
+    "actualUniqueCases": 48,
+    "firstInvocation": "FAIL_AT_SOURCE_REGISTRATION_ZERO_ASSERTIONS",
+    "firstExit": 1,
+    "firstReporterSha256": "422cc541371e8d6c9780d97cb3d63e87ca8437e292260b7fb6173ab3b82ca812",
+    "firstActualCases": 0,
+    "repairExit": 0,
+    "repairReporterSha256": "3e04d55818b1c2de97aec68115fbba89e7ae9fafe5c423588881ff56451ca4ca",
+    "repairActualCases": 48,
+    "repair": "Only legacy golden metadata totalScoreKeys changed to list every dimension key, not a real total. Algorithms/items/interpretations unchanged."
+  },
+  "strictTypes": {
+    "status": "PASS_REUSED_AFTER_FIXTURE_METADATA_ONLY_CHANGE",
+    "observedExitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "configSha256": "a21c4a2fed55f67c95b04bce614327dad008cd0080a2a39c8e222341320ae78d",
+    "scope": "three new test files and transitive imports",
+    "review": "Source JSON imported through unchanged unknown-to-ScaleInstrumentSourceV1 cast; fixture expected key arrays alter no public TS type; paired rollback marker text changes no type or assertion semantics. No repeated full type run."
+  },
+  "postgres": {
+    "status": "PASS",
+    "actualAssertions": 12,
+    "exitCode": 0,
+    "reporterSha256": "2cb9f0e9b77aac54e5554054a9b0c4bc70d734867df99def1228d5aa7b34ce55",
+    "nonOwnerApplicationRole": true,
+    "restoredTaskOwnedSyntheticOnly": true,
+    "priorDefinitionsPreserved": 5,
+    "priorSnapshotsPreserved": 7,
+    "draftHiddenRowsAfter": 7,
+    "snapshotCountAfter": 9,
+    "referenceSetCount": 0,
+    "deploymentPolicyCount": 0
+  },
+  "reports": {
+    "status": "PASS",
+    "newReportConfigs": 2,
+    "primarySections": 9,
+    "actualBuildScaleResultSamples": 24,
+    "mixedActualExamples": 2,
+    "persistedDefinitionResultsAlsoChecked": true
+  },
+  "sourceManifestSha256": "2ee8cc3c4fdd9d1827619cc48e2ce550f47591f0a066465040df01a3709bf669",
+  "registration": "Original generator runs in explicit HEAD-plus-selected source-path snapshot so parallel pending sources are not accidentally registered; receipts stored separately",
+  "parameterPolicy": "none / score_only; no fabricated normative or empirical thresholds; independent parameter identity remains a feature-line gap",
+  "image": "NOTRUN_NOT_REQUIRED; text takeaway only",
+  "classification": {
+    "newlyDiscoveredLeads": 0,
+    "reexamined": [
+      "FFMQ15",
+      "ERSS19",
+      "BRCS author old link"
+    ],
+    "firstCategoryAdded": 2,
+    "secondCategoryAdded": 0,
+    "thirdCategoryAdded": 0
+  },
+  "notRun": [
+    "product HTTP/browser",
+    "instruction UI",
+    "formal dual-entry use",
+    "activation",
+    "GitHub CI",
+    "production",
+    "human platform translation review",
+    "Chinese population validation"
+  ],
+  "evidenceLimits": "Direct source/test/lock bytes saved before executions; complete transitive execution closure and all node_modules bytes not attested; not signed CI evidence"
+}

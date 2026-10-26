@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave5-mindfulness-emotion-20261026",
+  "startedAt": "2026-10-26T05:48:34.328Z",
+  "updatedAt": "2026-10-26T05:48:34.928Z",
+  "mode": "ISOLATED_DRAFT_MATERIALIZE",
+  "manifestSha256": "2ee8cc3c4fdd9d1827619cc48e2ce550f47591f0a066465040df01a3709bf669",
+  "entries": [
+    {
+      "id": "ffmq15_zh_cn_research@1.0.0",
+      "status": "PASS",
+      "sourceSha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff",
+      "reportFile": "ffmq15_zh_cn_research@1.0.0.reports.json",
+      "materialization": {
+        "scaleId": "262e4b79-51e5-4adc-be34-f2d3c9bba4dd",
+        "created": false,
+        "definitionHash": "d95a1a9bbe3499ef0b654ddc97997f3f50f84829a8ba4e558e43033b6330c9ce",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    },
+    {
+      "id": "erss19_zh_cn_research@1.0.0",
+      "status": "PASS",
+      "sourceSha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e",
+      "reportFile": "erss19_zh_cn_research@1.0.0.reports.json",
+      "materialization": {
+        "scaleId": "80a06ead-ba30-4072-bc3e-d29aefeede83",
+        "created": false,
+        "definitionHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    }
+  ],
+  "activation": "NOTRUN",
+  "production": "NOTRUN",
+  "browser": "NOTRUN"
+}

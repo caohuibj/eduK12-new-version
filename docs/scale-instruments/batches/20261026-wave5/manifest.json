@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave5-mindfulness-emotion-20261026",
+  "sources": [
+    {
+      "instrumentKey": "ffmq15_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff"
+    },
+    {
+      "instrumentKey": "erss19_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e"
+    }
+  ]
+}
