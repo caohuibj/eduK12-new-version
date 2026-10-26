@@ -57,3 +57,14 @@ describe('School unified personnel directory',()=>{
   expect(screen.queryByRole('button',{name:'刷新人员名单'})).toBeNull()
  })
 })
+
+it('opens explicitly requested structure import only after the guarded directory read succeeds',async()=>{
+ let finish!:(value:unknown)=>void
+ const pending=new Promise(resolve=>{finish=resolve})
+ const api=vi.fn().mockImplementation((path:string)=>path.includes('/directory?')?pending:Promise.resolve({list:[]}))
+ render(<SchoolPersonnelDirectory api={api as SchoolApi} organizationId="school-a" units={units} initialImportKind="GRADE"/> )
+ expect(screen.queryByRole('combobox',{name:'导入内容'})).not.toBeInTheDocument()
+ await act(async()=>{finish({...page,batchImport:true});await pending})
+ expect(await screen.findByRole('combobox',{name:'导入内容'})).toHaveValue('GRADE')
+ expect(api.mock.calls.every(([,method])=>!method||method==='GET')).toBe(true)
+})

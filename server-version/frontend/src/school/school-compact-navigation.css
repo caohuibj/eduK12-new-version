@@ -88,3 +88,8 @@
  .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{width:100%;justify-content:flex-start}
  .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{flex-basis:100%;padding:0;border:0}
 }
+
+@media(max-width:380px){
+ .hs-app.hs-workspace.hs-school-admin .hs-header .hs-professional-navigation .hs-professional-pages:has(>a:nth-child(3):last-child)>a{padding-inline:6px;gap:4px;font-size:12px}
+ .hs-app.hs-school-admin .hs-professional-pages:has(>a:nth-child(3):last-child)>a>svg{display:none}
+}

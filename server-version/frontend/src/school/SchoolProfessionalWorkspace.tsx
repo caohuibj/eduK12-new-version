@@ -4,7 +4,7 @@ import {SchoolTaskHelp} from './SchoolTaskHelp'
 import {workspaceHref,type SchoolNavigationItem} from './school-navigation'
 
 const sections=(items:SchoolNavigationItem[])=>{
- const entries=items.filter(item=>!['overview','account'].includes(item.id))
+ const entries=items.filter(item=>!['overview','account'].includes(item.id)&&!item.parentId)
  return [...new Set(entries.map(item=>item.group))].map(group=>({group,items:entries.filter(item=>item.group===group)}))
 }
 function follow(event:MouseEvent<HTMLAnchorElement>,id:string,onNavigate:(id:string)=>void){
@@ -14,7 +14,8 @@ function follow(event:MouseEvent<HTMLAnchorElement>,id:string,onNavigate:(id:str
 
 export function SchoolProfessionalNavigation({items,page,onNavigate}:{items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void}){
  const groups=sections(items)
- const active=groups.find(section=>section.items.some(item=>item.id===page))
+ const parentPage=items.find(item=>item.id===page)?.parentId??page
+ const active=groups.find(section=>section.items.some(item=>item.id===parentPage))
  const pages=useRef<HTMLElement>(null)
  useEffect(()=>{
   const nav=pages.current,link=nav?.querySelector<HTMLAnchorElement>('[aria-current="page"]')
@@ -32,10 +33,10 @@ export function SchoolProfessionalNavigation({items,page,onNavigate}:{items:Scho
  if(!groups.length)return null
  return <div className="hs-professional-navigation">
   <nav className="hs-professional-groups" aria-label="校园功能分组">{groups.map(section=>{
-   const destination=section.items.find(item=>item.id===page)||section.items.find(item=>item.id==='activities')||section.items[0]
+   const destination=section.items.find(item=>item.id===parentPage)||section.items.find(item=>item.id==='activities')||section.items[0]
    return <a key={section.group} href={workspaceHref(destination.id)} aria-current={active?.group===section.group?'true':undefined} onClick={event=>follow(event,destination.id,onNavigate)}>{section.group}</a>
   })}</nav>
-  {active&&active.items.length>1&&<nav ref={pages} className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
+  {active&&active.items.length>1&&<nav ref={pages} className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={parentPage===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
  </div>
 }
 

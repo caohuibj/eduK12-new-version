@@ -51,7 +51,7 @@ it('shows the governor home using only actual authorized entries and keeps schoo
  render(<SchoolProfessionalHome administrator items={adminItems} username="示例管理员" schoolName="管理学校" onNavigate={navigate}/>)
  expect(screen.getByRole('heading',{name:'学校管理工作台'})).toBeInTheDocument()
  expect(screen.queryByRole('heading',{name:'心理教师工作台'})).not.toBeInTheDocument()
- const expected=adminItems.filter(item=>!['overview','account'].includes(item.id))
+ const expected=adminItems.filter(item=>!['overview','account'].includes(item.id)&&!item.parentId)
  expect(screen.getAllByRole('link')).toHaveLength(expected.length)
  for(const item of expected){
   const card=screen.getByRole('heading',{name:item.label}).closest('a')!
@@ -71,4 +71,14 @@ it('omits a redundant secondary row for a single authorized destination',()=>{
  expect(screen.queryByRole('navigation',{name:'校园活动功能入口'})).not.toBeInTheDocument()
  fireEvent.click(within(screen.getByRole('navigation',{name:'校园功能分组'})).getByRole('link',{name:'校园活动'}))
  expect(navigate).toHaveBeenCalledWith('activities')
+})
+
+it('keeps three primary management tabs and highlights the parent for original workflow deep links',()=>{
+ const adminItems=schoolNavigation('ADMIN','',{orgRole:'ORG_ADMIN',canGovern:true,personas:[],capabilities:[],explicitDenies:[]},false)
+ const view=render(<SchoolProfessionalNavigation items={adminItems} page="staff" onNavigate={()=>{}}/>)
+ const tabs=within(screen.getByRole('navigation',{name:'学校管理功能入口'}))
+ expect(tabs.getAllByRole('link').map(a=>a.textContent)).toEqual(['年级与班级','人员名单','关系与权限'])
+ expect(tabs.getByRole('link',{name:'关系与权限'})).toHaveAttribute('aria-current','page')
+ view.rerender(<SchoolProfessionalNavigation items={adminItems} page="admission" onNavigate={()=>{}}/>)
+ expect(within(screen.getByRole('navigation',{name:'学校管理功能入口'})).getByRole('link',{name:'年级与班级'})).toHaveAttribute('aria-current','page')
 })

@@ -166,11 +166,12 @@ export default function SchoolApp(){
     return()=>window.removeEventListener('popstate',pop)
   },[])
   useEffect(()=>{acceptedWorkspaceUrl.current=window.location.href},[page,schoolId,classId])
-  const navigateWorkspace=(id:string)=>{
-    if(id===page||!canLeavePrivateTools())return
+  const navigateWorkspace=(id:string,importKind?:'GRADE'|'CLASS')=>{
+    if((id===page&&!importKind)||!canLeavePrivateTools())return
     const query=new URLSearchParams()
     if(schoolId)query.set('organizationId',schoolId)
     if(classId)query.set('classUnitId',classId)
+    if(importKind)query.set('importKind',importKind)
     const suffix=query.size?'?'+query.toString():''
     window.history.pushState(null,'',workspacePath(id)+suffix)
     setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
@@ -385,8 +386,10 @@ export default function SchoolApp(){
   const professionalAdmissionPage=professionalWorkspace&&!schoolAdmin&&page==='admission'
   const professionalRecoveryPage=groupedWorkspace&&page==='recovery'
   const administratorClassPage=administratorWorkspace&&page==='classes'
+  const administratorPersonnelPage=administratorWorkspace&&page==='personnel'
+  const initialImportKind=new URLSearchParams(window.location.search).get('importKind')
   const administratorAdmissionPage=administratorWorkspace&&page==='admission'
-  const professionalScopePage=professionalClassPage||professionalAdmissionPage||professionalRecoveryPage||administratorClassPage||administratorAdmissionPage
+  const professionalScopePage=professionalClassPage||professionalAdmissionPage||professionalRecoveryPage||administratorClassPage||administratorAdmissionPage||administratorPersonnelPage
   const classApprovalDisabled=working||!summary||summary.status!=='CLOSED'
     ||summary.rosterExpectedCount!==summary.eligibleCount||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0
   const contextSecurity=(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>
@@ -396,6 +399,8 @@ export default function SchoolApp(){
     {['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}
     {professionalScopePage&&contextSecurity}
   </section>:undefined
+
+  const managementLinks=(id:string)=><nav className="hs-management-actions" aria-label={id==='classes'?'班级相关事务':'关系与授权事务'}>{educatorEntries.filter(item=>item.parentId===id).map(item=><a key={item.id} href={workspaceHref(item.id)} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace(item.id)}}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>
 
   return <div className={`hs-app${user?' hs-workspace':''}${user?.role==='STUDENT'?' hs-learner':''}${ordinaryTeacher?' hs-educator':''}${parentWorkspace?' hs-parent':''}${groupedWorkspace?' hs-professional':''}${administratorWorkspace?' hs-school-admin':''}`} data-theme={appearance.theme}>
     <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
@@ -517,8 +522,8 @@ export default function SchoolApp(){
           </>:
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
-          {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><a className="hs-structure-import-toggle" href="#school-roster-directory">批量导入年级、班级或人员：在下方人员名单中选择“批量导入”</a><details className="hs-admin-manual-create"><summary>手动新建年级／班级</summary><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></details></SchoolAdminPanel></div>}
-          {administratorClassPage&&schoolId&&<SchoolPersonnelDirectory api={api} organizationId={schoolId} units={units} onUnits={setUnits} disabled={working}/>}
+          {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><a className="hs-structure-import-toggle" href={workspaceHref('personnel')+(workspaceHref('personnel').includes('?')?'&':'?')+'importKind=GRADE'} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('personnel','GRADE')}}>批量导入年级／班级</a>{managementLinks('classes')}<div className="hs-structure-summary">{units.filter(u=>u.unitKind==='GRADE').map(grade=><details key={grade.id}><summary>{grade.name}<span>{units.filter(u=>u.unitKind==='CLASS'&&u.parentUnitId===grade.id).length} 个班级</span></summary><ul>{units.filter(u=>u.unitKind==='CLASS'&&u.parentUnitId===grade.id).map(cls=><li key={cls.id}>{cls.name}</li>)}</ul></details>)}</div><details className="hs-admin-manual-create"><summary>手动新建年级／班级</summary><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></details></SchoolAdminPanel></div>}
+          {administratorPersonnelPage&&schoolId&&<><section className="hs-panel hs-personnel-school" aria-label="人员名单学校选择">{workspaceContext}</section><SchoolPersonnelDirectory titleHidden api={api} organizationId={schoolId} units={units} onUnits={setUnits} disabled={working} initialImportKind={initialImportKind==='GRADE'||initialImportKind==='CLASS'?initialImportKind:undefined}/></>}
           {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
           {page==='classes'&&!professionalClassPage&&!administratorClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
@@ -558,7 +563,7 @@ export default function SchoolApp(){
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
-          {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships compact={administratorWorkspace} key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
+          {page==='relationships'&&schoolAdmin&&schoolId&&<><section className="hs-management-related">{managementLinks('relationships')}<a href={workspaceHref('personnel')} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('personnel')}}>按人员查看有效权限 →</a></section><SchoolRelationships compact={administratorWorkspace} key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/></>}
           {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
             &&page==='activities'&&schoolId
             &&canManageSchoolActivities(access)

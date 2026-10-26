@@ -1,5 +1,6 @@
 import {EducationRosterWorkbench} from './EducationRosterWorkbench'
-import type {RosterUnit} from './types'
+import {EducationPersonnelAccess,type PersonnelAccess} from './EducationPersonnelAccess'
+import type {RosterUnit,RosterKind} from './types'
 import './education-roster.css'
 import {useEffect,useRef,useState} from 'react'
 import {Search,RefreshCw,X,ChevronLeft,ChevronRight} from 'lucide-react'
@@ -11,17 +12,17 @@ type Entry={id:string;personId:string|null;kind:'STUDENT'|'STAFF';persona:string
  number:string|null;name:string|null;username:string|null;reference:string|null;
  activation:string;account:string;membership:string;admission:string;existingAccount:boolean;
  classUnitId:string|null;className:string|null;grade:string|null}
-type Detail=Entry&{classes:{className:string;grade:string;role:string;pending:boolean}[]}
+type Detail=Entry&{access?:PersonnelAccess;classes:{className:string;grade:string;role:string;pending:boolean}[]}
 type Page={list:Entry[];total:number;page:number;pageSize:number;batchImport?:boolean}
 type Unit={id:string;unitKind:string;name:string;parentUnitId?:string|null}
-type Props={api:SchoolApi;organizationId:string;units:Unit[];disabled?:boolean;onUnits?:(units:RosterUnit[])=>void;entry?:'SCHOOL'|'TEACHER'}
+type Props={api:SchoolApi;organizationId:string;units:Unit[];disabled?:boolean;onUnits?:(units:RosterUnit[])=>void;entry?:'SCHOOL'|'TEACHER';titleHidden?:boolean;initialImportKind?:RosterKind}
 const activation:Record<string,string>={ACTIVATED:'已激活',PENDING:'待激活',OWNER_CONFIRMATION:'待本人确认'}
 const membership:Record<string,string>={CURRENT:'当前成员',ENDED:'成员关系已结束',NONE:'尚未建立成员关系'}
 const accounts:Record<string,string>={USABLE:'账号可用',UNAVAILABLE:'账号暂不可用',NOT_CREATED:'尚未激活账号'}
 const admissions:Record<string,string>={APPROVED:'已通过班级审批',PENDING_CLASS_APPROVAL:'待班级审批',NOT_REGISTERED:'尚未注册',QUARANTINED:'已隔离',ENDED:'准入已结束',REVOKED:'准入已撤销'}
 const title=(p:Entry)=>p.name||p.number||p.reference||p.username||'校园成员'
 export function EducationPersonnelDirectory(props:Props){return <Directory key={props.organizationId} {...props}/>}
-function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Props){
+function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL',titleHidden=false,initialImportKind}:Props){
  const [batchImport,setBatchImport]=useState(false)
  const [kind,setKind]=useState('ALL'),[state,setState]=useState('ALL'),[member,setMember]=useState('ALL')
  const [classId,setClassId]=useState(''),[sort,setSort]=useState('recent'),[query,setQuery]=useState(''),[draft,setDraft]=useState('')
@@ -30,6 +31,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
  const [detail,setDetail]=useState<Detail|null>(null),[selected,setSelected]=useState(''),[detailBusy,setDetailBusy]=useState(false)
  const [importStarted,setImportStarted]=useState(false)
  const [importOpen,setImportOpen]=useState(false),[mfa,setMfa]=useState(false),[code,setCode]=useState(''),[verifying,setVerifying]=useState(false),[notice,setNotice]=useState('')
+ const autoImportHandled=useRef(false)
  const alive=useRef(true),listRequest=useRef(0),detailRequest=useRef(0)
  const base=`/organizations/${organizationId}/personnel/directory`
  useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
@@ -49,6 +51,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
    .catch(cause=>{if(alive.current&&request===listRequest.current)report(cause)})
    .finally(()=>{if(alive.current&&request===listRequest.current)setBusy(false)})
  },[api,base,disabled,kind,state,member,classId,sort,query,page,version])
+ useEffect(()=>{if(initialImportKind&&data&&!busy&&!mfa&&!disabled&&!autoImportHandled.current){autoImportHandled.current=true;setImportStarted(true);setImportOpen(true)}},[initialImportKind,data,busy,mfa,disabled])
  const choose=(id:string)=>{
   const request=++detailRequest.current
   if(selected===id){setSelected('');setDetail(null);setDetailBusy(false);return}
@@ -67,7 +70,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
   catch(cause){if(alive.current)report(cause)}finally{if(alive.current)setVerifying(false)}
  }
  return <section id="school-roster-directory" className="education-roster hs-panel hs-personnel-directory" data-entry={entry} aria-label="全校人员目录" aria-busy={busy}>
-  <div className="hs-directory-heading"><h2>人员名单</h2><div className="hs-actions">
+  <div className="hs-directory-heading"><h2 className={titleHidden?'er-visually-hidden':undefined}>人员名单</h2>{titleHidden&&<span className="hs-directory-heading-count">{data?`共 ${data.total} 人`:'全校人员'}</span>}<div className="hs-actions">
    <button type="button" disabled={disabled||busy||mfa||!data} aria-expanded={importOpen} onClick={()=>{setImportStarted(true);setImportOpen(v=>!v);setSelected('');setDetail(null);detailRequest.current++}}>批量导入</button>
    <button type="button" aria-label="检索全校人员" aria-expanded={searchOpen} aria-pressed={searchOpen||!!query} onClick={()=>setSearchOpen(v=>!v)}><Search size={18}/></button>
    <button type="button" aria-label="刷新全校人员" disabled={busy||disabled} onClick={()=>setVersion(v=>v+1)}><RefreshCw size={18}/></button>
@@ -85,21 +88,22 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
   {query&&<div className="hs-directory-query">检索：{query}<button type="button" aria-label="清除全校检索" onClick={()=>{setDraft('');change(setQuery,'')}}><X size={15}/></button></div>}
   {error&&<p role="alert" className="hs-alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {mfa&&<form className="hs-directory-search" aria-label="目录身份验证" onSubmit={e=>{e.preventDefault();void verify()}}><label className="hs-field"><span>6 位动态验证码</span><input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/></label><button disabled={verifying||!/^\d{6}$/.test(code)}>验证身份</button></form>}
-  {importStarted&&<div hidden={!importOpen}><EducationRosterWorkbench batchImport={batchImport} api={api} organizationId={organizationId} disabled={disabled} units={units.filter(u=>u.unitKind==='GRADE'||u.unitKind==='CLASS').map(u=>({...u,unitKind:u.unitKind as RosterUnit['unitKind'],parentUnitId:u.parentUnitId??null}))} onUnits={onUnits} entry={entry} onChanged={()=>setVersion(v=>v+1)}/></div>}
+  {importStarted&&<div hidden={!importOpen}><EducationRosterWorkbench initialKind={initialImportKind} batchImport={batchImport} api={api} organizationId={organizationId} disabled={disabled} units={units.filter(u=>u.unitKind==='GRADE'||u.unitKind==='CLASS').map(u=>({...u,unitKind:u.unitKind as RosterUnit['unitKind'],parentUnitId:u.parentUnitId??null}))} onUnits={onUnits} entry={entry} onChanged={()=>setVersion(v=>v+1)}/></div>}
   {busy&&<p role="status">正在读取全校人员…</p>}
   {data&&<>
-   <div className="hs-directory-meta"><span>共 {data.total} 人</span>{filtered&&<button type="button" onClick={reset}>清除筛选</button>}<details><summary>名单与状态说明</summary><p>汇总导入名单、已有学校成员及注册学生。仅合并本人已确认的账号；待确认记录保留独立条目。账号激活、成员关系和学生审批分别显示，不代表报告权限。旧记录不补造姓名。</p></details></div>
+   <div className="hs-directory-meta">{!titleHidden&&<span>共 {data.total} 人</span>}{filtered&&<button type="button" onClick={reset}>清除筛选</button>}<details><summary>名单与状态说明</summary><p>汇总导入名单、已有学校成员及注册学生。仅合并本人已确认的账号；待确认记录保留独立条目。账号激活、成员关系和学生审批分别显示，不代表报告权限。旧记录不补造姓名。</p></details></div>
    <ul className="hs-directory-list">{data.list.map(p=><li key={p.id}>
     <button type="button" className="hs-directory-person" aria-expanded={selected===p.id} onClick={()=>choose(p.id)}>
      <span className="hs-directory-identity"><strong>{title(p)}</strong><small>{[p.kind==='STUDENT'?'学生':p.persona==='COUNSELOR'?'心理教师':'教职工',p.number&&p.name?p.number:null,p.grade,p.className].filter(Boolean).join(' · ')}</small></span>
      <span className="hs-directory-state"><span>{activation[p.activation]??'需核对'}</span><small>{p.kind==='STUDENT'&&p.admission!=='NOT_REGISTERED'?(admissions[p.admission]??'准入需核对'):membership[p.membership]}</small></span><ChevronRight size={17}/>
     </button>
     {selected===p.id&&<section className="hs-directory-detail" aria-label="人员详情">
-     <div className="hs-directory-detail-heading"><strong>{title(p)}</strong><button type="button" aria-label="关闭人员详情" onClick={()=>{detailRequest.current++;setSelected('');setDetail(null);setDetailBusy(false)}}><X size={18}/></button></div>
+     <div className="hs-directory-detail-heading"><strong>账号与关系</strong><button type="button" aria-label="关闭人员详情" onClick={()=>{detailRequest.current++;setSelected('');setDetail(null);setDetailBusy(false)}}><X size={18}/></button></div>
      {detailBusy&&<p role="status">正在读取人员详情…</p>}
      {detail&&<>
       <dl><div><dt>资料来源</dt><dd>{detail.source==='IMPORTED'?'导入名单':'原有学校记录'}</dd></div><div><dt>账号状态</dt><dd>{accounts[detail.account]}</dd></div><div><dt>成员状态</dt><dd>{membership[detail.membership]}</dd></div><div><dt>校园用户名</dt><dd>{detail.username??'尚未由本人激活确认'}</dd></div>{detail.kind==='STUDENT'&&<div><dt>班级审批</dt><dd>{admissions[detail.admission]??'准入需核对'}</dd></div>}</dl>
-      {detail.classes.length>0&&<div><h3>任班关系</h3><ul>{detail.classes.map((c,i)=><li key={i}>{c.grade} / {c.className} · {c.role==='HOMEROOM'?'班主任':'任课教师'}{c.pending?'（激活后生效）':''}</li>)}</ul></div>}
+      {(!detail.access||detail.access.state==='PENDING_ACTIVATION')&&detail.classes.length>0&&<div><h3>任班关系</h3><ul>{detail.classes.map((c,i)=><li key={i}>{c.grade} / {c.className} · {c.role==='HOMEROOM'?'班主任':'任课教师'}{c.pending?'（激活后生效）':''}</li>)}</ul></div>}
+      {detail.access&&<EducationPersonnelAccess access={detail.access}/>}
       {detail.personId&&detail.activation!=='ACTIVATED'&&<EducationPersonnelImport api={api} organizationId={organizationId} disabled={disabled} mode="person" onChanged={()=>{setNotice('核实结果已记录，请由本人确认激活。');setVersion(v=>v+1)}} person={{id:detail.personId,kind:detail.kind,number:detail.number??'',name:detail.name??'',persona:detail.persona,grade:detail.grade,className:detail.className,activated:false,existingAccount:detail.existingAccount} satisfies PersonnelPerson}/>}
      </>}
     </section>}
