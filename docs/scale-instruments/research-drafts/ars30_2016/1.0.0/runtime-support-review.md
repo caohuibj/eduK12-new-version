@@ -1,5 +1,28 @@
 # 必需情境的现有正式支持点核查
 
+---
+
+## 重核结论（2026-10-27，PR356 合并后）
+
+上文要求的重核已执行，结论为**阻塞解除**。下方原始 BLOCKED 结论及其字节摘要照旧保留，不改写历史。
+
+核实事实：
+
+| 项 | 值 |
+| --- | --- |
+| PR356 状态 | `merged=true`，2026-10-26T22:17:30Z，merge commit `83955b898b84722a6518a908d6d1038e44e08a7d` |
+| 内容分支对齐 | merge commit `601a43a86d02891bf050bedd721e54748a9f0e40`，双亲 `0f723dae` + `83955b89`，Tree `7c74e3623d5cad4543eef116e5d4790c49042776` |
+| `schema.ts` | 顶层 `instruction` 对象存在，`.optional()` 且内部 `.strict()`；字段为 schemaVersion/text/language/version/source |
+| `materialize.ts` | 写入 `instruction: source.instruction?.text ?? null`；另有 update 分支在呈现修订时保留计分定义与生命周期 |
+| `scale-definition.ts` | 全文不含 `instruction`，故指导语不参与 measurement hash——修订措辞不改变测量身份 |
+| 采用结果 | 必需本人情境通过 `source.json` 顶层 `instruction` 冻结并展示，原「删除情境、塞入第1题、假计分题、未冻结图片附件」等规避方案均不需要 |
+
+对 Blocked 结论的性质说明：原先的限制并非平台缺少能力，而是能力已在 PR356 交付但尚未合并、当前分支无法承载。PR356 合并后该前提消失。
+
+**仍未完成（不因本次注册而声称已做）**：浏览器／公共作答端实机展示复现、真实数据库物化回读、双入口（STANDARD 独立入口与组合入口）实际作答验证、旧尝试继续作答的情境版本一致性、正式 CI 与administered data 验收。这些仍为 NOTRUN。
+
+---
+
 范围：只读检查内容导入、测量定义／发布投影、冻结快照和实际前端消费者；结论绑定基线 `ebbf389bb9812189f06987038b6a0859c8cea72b`，各文件字节摘要在[runtime-source-inputs.json](runtime-source-inputs.json)。没有运行测试、浏览器、API或数据库；不是全面系统审计。
 
 **基线限制：本结论仅针对量表内容分支基线，不代表最新 PR356 的指导语修复仍未实现；采用 PR356 后须按新基线重核，不能直接重复报旧问题。**
