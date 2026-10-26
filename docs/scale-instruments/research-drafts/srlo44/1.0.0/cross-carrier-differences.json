@@ -1,0 +1,62 @@
+{
+  "status": "EIGHT_WORDING_OR_PRESENTATION_DIFFERENCES_NOT_SILENTLY_MERGED",
+  "selectedQuestionCarrier": "Corrected2022publishedTable8; QSF not same text identity",
+  "differences": [
+    {
+      "facet": "Online Intrinsic Motivation (Response Scale 1–7)",
+      "itemWithinFacet": 4,
+      "publishedTable8": "I find it very satisfying when I learn new material in this online course",
+      "authorQSF": "I find it very satisfying when I learn material in this online course",
+      "QSFmatrix": "QID11"
+    },
+    {
+      "facet": "Online Intrinsic Motivation (Response Scale 1–7)",
+      "itemWithinFacet": 5,
+      "publishedTable8": "I get a sense of achievement when I learn new skills or information",
+      "authorQSF": "I get a sense of achievement when I learn skills or information",
+      "QSFmatrix": "QID11"
+    },
+    {
+      "facet": "Online Negative Achievement Emotion (Response Scale 1–7)",
+      "itemWithinFacet": 3,
+      "publishedTable8": "While studying, I want to distract myself to lower my anxiety level",
+      "authorQSF": "While studying I want to distract myself to lower my anxiety level",
+      "QSFmatrix": "QID29"
+    },
+    {
+      "facet": "Online Negative Achievement Emotion (Response Scale 1–7)",
+      "itemWithinFacet": 5,
+      "publishedTable8": "When I have to study online, I start to feel bad",
+      "authorQSF": "When I have to study online I start to feel bad",
+      "QSFmatrix": "QID29"
+    },
+    {
+      "facet": "Planning and time management (Response Scale 1–7)",
+      "itemWithinFacet": 5,
+      "publishedTable8": "I plan out my schedule each week so I have the appropriate amount of time available for online study",
+      "authorQSF": "I plan out my schedule each week, so I have the appropriate amount of time available for online study",
+      "QSFmatrix": "QID15"
+    },
+    {
+      "facet": "Metacognition (Likert scale 1–7)",
+      "itemWithinFacet": 5,
+      "publishedTable8": "I think about how I might improve my work by evaluating it against the marking criteria provided by the teacher",
+      "authorQSF": "I think about how I might improve my work by evaluating it against marking criteria provided by the teacher",
+      "QSFmatrix": "QID17"
+    },
+    {
+      "facet": "Online Social Support (Response Scale 1–7)",
+      "itemWithinFacet": 1,
+      "publishedTable8": "I try to help other students when they ask a question online, I can answer",
+      "authorQSF": "I try to help other students when they ask a question online I can answer",
+      "QSFmatrix": "QID27"
+    },
+    {
+      "facet": "Online Social Support (Response Scale 1–7)",
+      "itemWithinFacet": 5,
+      "publishedTable8": "I use email, discussion boards, social media, etc., to connect with the teacher and other students when I need help",
+      "authorQSF": "I use email, discussion boards, social media, etc. to connect with the teacher and other students when I need help",
+      "QSFmatrix": "QID27"
+    }
+  ]
+}

@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "sourceCarrier": "Corrected published Table 8, DOI10.1007/s11409-022-09319-6",
+  "instructions": [
+    {
+      "id": "motivation",
+      "beforeItemCode": "SRLO_01",
+      "throughItemCode": "SRLO_17",
+      "originalEnglish": "The following questions ask about your motivation for and attitudes about this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+      "platformChinese": "以下问题询问你对这门课程的学习动机和态度。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+    },
+    {
+      "id": "learning_strategies",
+      "beforeItemCode": "SRLO_18",
+      "throughItemCode": "SRLO_44",
+      "originalEnglish": "The following questions ask about your learning strategies used in this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+      "platformChinese": "以下问题询问你在这门课程中使用的学习策略。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+    }
+  ],
+  "options": [
+    {
+      "value": "1",
+      "originalEnglish": "Not at all true of me",
+      "platformChinese": "完全不符合我",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "originalEnglish": "2",
+      "platformChinese": "2",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "originalEnglish": "3",
+      "platformChinese": "3",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "originalEnglish": "4",
+      "platformChinese": "4",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "originalEnglish": "5",
+      "platformChinese": "5",
+      "score": 5
+    },
+    {
+      "value": "6",
+      "originalEnglish": "6",
+      "platformChinese": "6",
+      "score": 6
+    },
+    {
+      "value": "7",
+      "originalEnglish": "Very true of me",
+      "platformChinese": "非常符合我",
+      "score": 7
+    }
+  ],
+  "groups": [
+    {
+      "scoreKey": "online_academic_self_efficacy",
+      "publishedName": "Online Academic Self-efficacy (Response Scale 1–7)",
+      "platformLabel": "面对这门课程的信心",
+      "firstItem": 1,
+      "lastItem": 4,
+      "itemCodes": [
+        "SRLO_01",
+        "SRLO_02",
+        "SRLO_03",
+        "SRLO_04"
+      ],
+      "itemCount": 4
+    },
+    {
+      "scoreKey": "online_intrinsic_motivation",
+      "publishedName": "Online Intrinsic Motivation (Response Scale 1–7)",
+      "platformLabel": "学习本身带来的兴趣",
+      "firstItem": 5,
+      "lastItem": 9,
+      "itemCodes": [
+        "SRLO_05",
+        "SRLO_06",
+        "SRLO_07",
+        "SRLO_08",
+        "SRLO_09"
+      ],
+      "itemCount": 5
+    },
+    {
+      "scoreKey": "online_extrinsic_motivation",
+      "publishedName": "Online Extrinsic Motivation (Response Scale 1–7)",
+      "platformLabel": "成绩与他人期待的推动",
+      "firstItem": 10,
+      "lastItem": 12,
+      "itemCodes": [
+        "SRLO_10",
+        "SRLO_11",
+        "SRLO_12"
+      ],
+      "itemCount": 3
+    },
+    {
+      "scoreKey": "online_negative_achievement_emotion",
+      "publishedName": "Online Negative Achievement Emotion (Response Scale 1–7)",
+      "platformLabel": "学习时的难受与压力",
+      "firstItem": 13,
+      "lastItem": 17,
+      "itemCodes": [
+        "SRLO_13",
+        "SRLO_14",
+        "SRLO_15",
+        "SRLO_16",
+        "SRLO_17"
+      ],
+      "itemCount": 5
+    },
+    {
+      "scoreKey": "planning_time_management",
+      "publishedName": "Planning and time management (Response Scale 1–7)",
+      "platformLabel": "安排目标和时间",
+      "firstItem": 18,
+      "lastItem": 22,
+      "itemCodes": [
+        "SRLO_18",
+        "SRLO_19",
+        "SRLO_20",
+        "SRLO_21",
+        "SRLO_22"
+      ],
+      "itemCount": 5
+    },
+    {
+      "scoreKey": "metacognition",
+      "publishedName": "Metacognition (Likert scale 1–7)",
+      "platformLabel": "检查与调整学习方法",
+      "firstItem": 23,
+      "lastItem": 27,
+      "itemCodes": [
+        "SRLO_23",
+        "SRLO_24",
+        "SRLO_25",
+        "SRLO_26",
+        "SRLO_27"
+      ],
+      "itemCount": 5
+    },
+    {
+      "scoreKey": "study_environment",
+      "publishedName": "Study Environment (Response Scale 1–7)",
+      "platformLabel": "可用的学习环境",
+      "firstItem": 28,
+      "lastItem": 30,
+      "itemCodes": [
+        "SRLO_28",
+        "SRLO_29",
+        "SRLO_30"
+      ],
+      "itemCount": 3
+    },
+    {
+      "scoreKey": "online_effort_regulation",
+      "publishedName": "Online Effort Regulation (Response Scale 1–7)",
+      "platformLabel": "遇到干扰时继续投入",
+      "firstItem": 31,
+      "lastItem": 34,
+      "itemCodes": [
+        "SRLO_31",
+        "SRLO_32",
+        "SRLO_33",
+        "SRLO_34"
+      ],
+      "itemCount": 4
+    },
+    {
+      "scoreKey": "online_social_support",
+      "publishedName": "Online Social Support (Response Scale 1–7)",
+      "platformLabel": "通过网络互相支持",
+      "firstItem": 35,
+      "lastItem": 39,
+      "itemCodes": [
+        "SRLO_35",
+        "SRLO_36",
+        "SRLO_37",
+        "SRLO_38",
+        "SRLO_39"
+      ],
+      "itemCount": 5
+    },
+    {
+      "scoreKey": "online_task_strategies",
+      "publishedName": "Online Task Strategies (Response Scale 1–7)",
+      "platformLabel": "理解和联系课程内容",
+      "firstItem": 40,
+      "lastItem": 44,
+      "itemCodes": [
+        "SRLO_40",
+        "SRLO_41",
+        "SRLO_42",
+        "SRLO_43",
+        "SRLO_44"
+      ],
+      "itemCount": 5
+    }
+  ],
+  "questions": [
+    {
+      "itemCode": "SRLO_01",
+      "publishedTable8English": "I am confident that I will be able to master the content and assignments in this online class",
+      "platformChinese": "我有信心掌握这门在线课程的内容并完成作业。",
+      "scoreKey": "online_academic_self_efficacy",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_02",
+      "publishedTable8English": "I am confident in my ability to successfully persist in this online class, even if I find the content difficult",
+      "platformChinese": "即使觉得内容困难，我也有信心顺利坚持学完这门在线课程。",
+      "scoreKey": "online_academic_self_efficacy",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_03",
+      "publishedTable8English": "I am confident I can put in the effort required to get a high grade in this online class",
+      "platformChinese": "我有信心付出这门在线课程取得高分所需的努力。",
+      "scoreKey": "online_academic_self_efficacy",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_04",
+      "publishedTable8English": "I am confident that I can accurately work out what the task is requiring me to do",
+      "platformChinese": "我有信心准确弄清任务要求我做什么。",
+      "scoreKey": "online_academic_self_efficacy",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_05",
+      "publishedTable8English": "I always find aspects of the content that arouse my curiosity",
+      "platformChinese": "我总能在课程内容中找到引起自己好奇的部分。",
+      "scoreKey": "online_intrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_06",
+      "publishedTable8English": "I love learning new things in this online class",
+      "platformChinese": "我喜欢在这门在线课程中学习新东西。",
+      "scoreKey": "online_intrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_07",
+      "publishedTable8English": "I find studying for this online class enjoyable",
+      "platformChinese": "我觉得学习这门在线课程很愉快。",
+      "scoreKey": "online_intrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_08",
+      "publishedTable8English": "I find it very satisfying when I learn new material in this online course",
+      "platformChinese": "在这门在线课程中学到新内容时，我会感到很满足。",
+      "scoreKey": "online_intrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_09",
+      "publishedTable8English": "I get a sense of achievement when I learn new skills or information",
+      "platformChinese": "学到新的技能或知识时，我会有成就感。",
+      "scoreKey": "online_intrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_10",
+      "publishedTable8English": "I want to do well in this online course so I can show off to my friends and family",
+      "platformChinese": "我想在这门在线课程中表现出色，好向朋友和家人展示一番。",
+      "scoreKey": "online_extrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_11",
+      "publishedTable8English": "I want to do well because of others real or perceived expectations of me",
+      "platformChinese": "我想表现出色，是因为别人确实对我有期待，或我认为他们对我有期待。",
+      "scoreKey": "online_extrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_12",
+      "publishedTable8English": "I want to get a better grade than others in my online class",
+      "platformChinese": "我想在这门在线课程中取得比其他同学更好的成绩。",
+      "scoreKey": "online_extrinsic_motivation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_13",
+      "publishedTable8English": "I feel so helpless that I cannot dedicate all my effort to my online studies",
+      "platformChinese": "我感到很无助，以至于无法全力投入在线学习。",
+      "scoreKey": "online_negative_achievement_emotion",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_14",
+      "publishedTable8English": "I consider dropping out because I feel overwhelmed by my online studies",
+      "platformChinese": "在线学习让我觉得难以承受，因此我考虑退学。",
+      "scoreKey": "online_negative_achievement_emotion",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_15",
+      "publishedTable8English": "While studying, I want to distract myself to lower my anxiety level",
+      "platformChinese": "学习时，我想分散自己的注意力来减轻焦虑。",
+      "scoreKey": "online_negative_achievement_emotion",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_16",
+      "publishedTable8English": "I get so anxious that I don't even want to start studying online",
+      "platformChinese": "我焦虑得甚至不想开始在线学习。",
+      "scoreKey": "online_negative_achievement_emotion",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_17",
+      "publishedTable8English": "When I have to study online, I start to feel bad",
+      "platformChinese": "一想到必须在线学习，我就开始感到难受。",
+      "scoreKey": "online_negative_achievement_emotion",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_18",
+      "publishedTable8English": "I set short-term (daily or weekly) goals",
+      "platformChinese": "我会设定短期目标，例如每天或每周的目标。",
+      "scoreKey": "planning_time_management",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_19",
+      "publishedTable8English": "I set realistic deadlines for learning",
+      "platformChinese": "我会为学习设定切实可行的截止时间。",
+      "scoreKey": "planning_time_management",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_20",
+      "publishedTable8English": "I break larger goals into smaller actionable goals",
+      "platformChinese": "我会把大目标拆成可以付诸行动的小目标。",
+      "scoreKey": "planning_time_management",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_21",
+      "publishedTable8English": "I make a list of detailed actions that I need to complete",
+      "platformChinese": "我会列出需要完成的具体行动。",
+      "scoreKey": "planning_time_management",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_22",
+      "publishedTable8English": "I plan out my schedule each week so I have the appropriate amount of time available for online study",
+      "platformChinese": "我每周都会安排日程，确保有适当的时间用于在线学习。",
+      "scoreKey": "planning_time_management",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_23",
+      "publishedTable8English": "I think about what learning strategies have worked for me in the past when doing similar assignments/types of study",
+      "platformChinese": "做类似的作业或学习任务时，我会想一想过去哪些学习方法对自己有用。",
+      "scoreKey": "metacognition",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_24",
+      "publishedTable8English": "I spend time trying to interpret the task to ensure I understand accurately what I need to do",
+      "platformChinese": "我会花时间理解任务，确保准确明白自己需要做什么。",
+      "scoreKey": "metacognition",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_25",
+      "publishedTable8English": "I usually self-assess my performance once I finish",
+      "platformChinese": "完成任务后，我通常会评价自己的表现。",
+      "scoreKey": "metacognition",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_26",
+      "publishedTable8English": "I look over past feedback I have received and check that I have made improvements in my current learning",
+      "platformChinese": "我会回顾过去收到的反馈，检查当前的学习是否已有改进。",
+      "scoreKey": "metacognition",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_27",
+      "publishedTable8English": "I think about how I might improve my work by evaluating it against the marking criteria provided by the teacher",
+      "platformChinese": "我会对照老师提供的评分标准评价自己的作业，想一想怎样改进。",
+      "scoreKey": "metacognition",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_28",
+      "publishedTable8English": "I am able to study for my online course without distraction",
+      "platformChinese": "我能够不受干扰地学习这门在线课程。",
+      "scoreKey": "study_environment",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_29",
+      "publishedTable8English": "I have access to a quiet and distraction-free place to study",
+      "platformChinese": "我能找到安静、不受干扰的地方学习。",
+      "scoreKey": "study_environment",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_30",
+      "publishedTable8English": "I know where I can study most efficiently for this online course",
+      "platformChinese": "我知道在哪里学习这门在线课程最有效率。",
+      "scoreKey": "study_environment",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_31",
+      "publishedTable8English": "I work hard in my online study, even when there are more interesting things to do",
+      "platformChinese": "即使有更有趣的事情可做，我也会努力进行在线学习。",
+      "scoreKey": "online_effort_regulation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_32",
+      "publishedTable8English": "When my online study gets difficult, I remain committed to reaching my study goals",
+      "platformChinese": "在线学习遇到困难时，我仍会坚持实现自己的学习目标。",
+      "scoreKey": "online_effort_regulation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_33",
+      "publishedTable8English": "When my mind begins to wander during a learning session for this online course, I make a special effort to keep concentrating",
+      "platformChinese": "学习这门在线课程时，如果开始走神，我会特意努力重新集中注意力。",
+      "scoreKey": "online_effort_regulation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_34",
+      "publishedTable8English": "No matter how I am feeling, I persevere with my online study",
+      "platformChinese": "无论心情如何，我都会坚持在线学习。",
+      "scoreKey": "online_effort_regulation",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_35",
+      "publishedTable8English": "I try to help other students when they ask a question online, I can answer",
+      "platformChinese": "其他同学在网上提出我能回答的问题时，我会尽量帮助他们。",
+      "scoreKey": "online_social_support",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_36",
+      "publishedTable8English": "I ask for help from knowledgeable others through online channels when I am not sure what to do in my online class",
+      "platformChinese": "不确定这门在线课程该怎么学时，我会通过网络向了解相关知识的人求助。",
+      "scoreKey": "online_social_support",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_37",
+      "publishedTable8English": "I ask the teacher and/or my peers to clarify information in my online course",
+      "platformChinese": "我会请老师或同学澄清这门在线课程中的信息。",
+      "scoreKey": "online_social_support",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_38",
+      "publishedTable8English": "When I have difficulties with my online class, I seek assistance from others through online means (discussion boards, social media, email, instant messaging etc.)",
+      "platformChinese": "这门在线课程遇到困难时，我会通过网络向他人求助，例如讨论区、社交媒体、电子邮件或即时消息。",
+      "scoreKey": "online_social_support",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_39",
+      "publishedTable8English": "I use email, discussion boards, social media, etc., to connect with the teacher and other students when I need help",
+      "platformChinese": "需要帮助时，我会使用电子邮件、讨论区、社交媒体等联系老师和其他同学。",
+      "scoreKey": "online_social_support",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_40",
+      "publishedTable8English": "When studying online, I create my own examples of the content to make it more meaningful",
+      "platformChinese": "在线学习时，我会为课程内容想出自己的例子，让内容对自己更有意义。",
+      "scoreKey": "online_task_strategies",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_41",
+      "publishedTable8English": "When studying online, I organise my thoughts by making summaries of what I am learning",
+      "platformChinese": "在线学习时，我会总结所学内容，整理自己的思路。",
+      "scoreKey": "online_task_strategies",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_42",
+      "publishedTable8English": "When studying online, I try and relate the content to what I already know",
+      "platformChinese": "在线学习时，我会尝试把课程内容与已有知识联系起来。",
+      "scoreKey": "online_task_strategies",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_43",
+      "publishedTable8English": "When learning the online content, I try and develop my own ideas about it",
+      "platformChinese": "学习在线课程内容时，我会尝试形成自己的想法。",
+      "scoreKey": "online_task_strategies",
+      "reverse": false
+    },
+    {
+      "itemCode": "SRLO_44",
+      "publishedTable8English": "I try and improve my understanding by doing additional work beyond the core content (e.g., doing extra problem-solving activities or extra readings)",
+      "platformChinese": "我会尝试做核心课程内容以外的额外学习来加深理解，例如多做解题练习或额外阅读。",
+      "scoreKey": "online_task_strategies",
+      "reverse": false
+    }
+  ],
+  "translationStatus": "INDEPENDENT_WORKING_TRANSLATION_HUMAN_REVIEW_PENDING",
+  "translationDecisions": {
+    "SRLO_11": "real or perceived expectations分别保留为真实或自己认为存在的期待，不省略perceived。",
+    "SRLO_14": "dropping out译作退学，保留原文退出学习的严肃含义，不改成偶尔休息。",
+    "SRLO_35": "按Table8的逗号理解为他人提出自己能回答的问题；不拿QSF无逗号文本替换。",
+    "study_context": "online class/course统一称在线课程；项目限定也包含作者混合学习场景，不擅改每题为混合课程。"
+  }
+}

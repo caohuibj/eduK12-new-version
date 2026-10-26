@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "1.0.0",
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "requiredScenario": "UNIVERSITY_ONLINE_OR_BLENDED_CURRENT_COURSE",
+  "respondent": "SELF",
+  "minAgeYearsProjectPolicy": 18,
+  "courseSelectionChinese": "请以你当前正在修读的一门大学在线或混合课程为参照，整份问卷都围绕同一门课程作答。",
+  "courseSelectionIsPlatformAdaptation": true,
+  "recallPeriod": null,
+  "instructions": [
+    {
+      "id": "motivation",
+      "beforeItemCode": "SRLO_01",
+      "throughItemCode": "SRLO_17",
+      "originalEnglish": "The following questions ask about your motivation for and attitudes about this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+      "platformChinese": "以下问题询问你对这门课程的学习动机和态度。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+    },
+    {
+      "id": "learning_strategies",
+      "beforeItemCode": "SRLO_18",
+      "throughItemCode": "SRLO_44",
+      "originalEnglish": "The following questions ask about your learning strategies used in this course. Remember there are no right or wrong answers, just answer as accurately as possible. Use the scale below to answer the questions. If you think the statement is very true of you, select 7; if a statement is not at all true of you, select 1. If the statement is more or less true of you, find the number between 1 and 7 that best describes you.",
+      "platformChinese": "以下问题询问你在这门课程中使用的学习策略。没有对错之分，请尽可能准确地作答。若某句话非常符合你的情况，选7；若完全不符合，选1；若介于两者之间，请从1到7中选择最能描述你的数字。"
+    }
+  ],
+  "runtimeGap": "旧source schema无instruction与课程选择字段；本sidecar尚未接入runtime。不把指导语塞入第一题，不冒称浏览器已展示。"
+}

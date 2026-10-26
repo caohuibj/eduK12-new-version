@@ -1,0 +1,58 @@
+{
+  "purpose": "Immutable official source provenance, not execution evidence",
+  "records": [
+    {
+      "path": "publisher-article.html",
+      "url": "https://link.springer.com/article/10.1007/s11409-022-09319-6",
+      "bytes": 479469,
+      "sha256": "eab47681217a051ff9e1d2715affbacdd6145fe313ec5a1e82bd1eb204ec205c"
+    },
+    {
+      "path": "publisher-correction.html",
+      "url": "https://link.springer.com/article/10.1007/s11409-022-09323-w",
+      "bytes": 238201,
+      "sha256": "329eea3ac4c97051a60f7a3a0997d0cce81def49d2f2a00704e1da5f6080ef24"
+    },
+    {
+      "path": "article-pmc.xml",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9433525/fullTextXML",
+      "bytes": 203519,
+      "sha256": "93133bb4ebcb654ec9d40ec901784b30d584dbcbf6e664c515bfba5c284dfe1a"
+    },
+    {
+      "path": "author-download.html",
+      "url": "https://www.srl-o.com/download-srl-o",
+      "bytes": 148020,
+      "sha256": "a9318b2dd8437624f325320d3e37e72a3f21e7637eb87e2a0e63dde151280a00"
+    },
+    {
+      "path": "author-manual.docx",
+      "url": "https://www.srl-o.com/s/Broadbent-et-al-2022-SRL-O-Questionnaire.docx",
+      "bytes": 33620,
+      "sha256": "aace30c35f7d4866cdcdefb695ed4e43fda39b40cd0b95428a9cad864f47bcb1"
+    },
+    {
+      "path": "author-qualtrics.docx",
+      "url": "https://www.srl-o.com/s/SRL-O_Questionnaire_Qualtrics.docx",
+      "bytes": 39758,
+      "sha256": "7493f9d2647934e84040306e83718c223617bd1760343ddbeaf6b3698fddcced"
+    },
+    {
+      "path": "author-qualtrics.qsf",
+      "url": "https://www.srl-o.com/s/SRL-O_Questionnaire_Qualtrics.qsf",
+      "bytes": 67432,
+      "sha256": "e31915c7236d50e32abc602923cd85a6c06b8e8a94cc5f0181c03e20c9d30681"
+    },
+    {
+      "path": "publisher-corrected.pdf",
+      "url": "https://link.springer.com/content/pdf/10.1007/s11409-022-09319-6.pdf",
+      "bytes": 1460264,
+      "sha256": "26a57eed8fb02538edfb306303da61ed7c9a7460eccfc320f935d8e88402e5a4"
+    }
+  ],
+  "formalTable8Extraction": {
+    "sha256": "450d254ffa361e80757c59233123c9bfb36d183223f4a8e28b208c7552a54b2a",
+    "carrier": "Corrected published Table 8, private extraction; English items reproduced in bilingual-content.json"
+  },
+  "localWorkingTranslation": "EDUK12.TOP independent zh-CN research working draft; human review PENDING"
+}

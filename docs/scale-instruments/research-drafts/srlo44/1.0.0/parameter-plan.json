@@ -1,0 +1,13 @@
+{
+  "parameterPlanVersion": "1.0.0",
+  "status": "NONE_SCORE_ONLY",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentParameterVersionSupported": false,
+  "reason": "没有中文常模或评级；作者4分为带来源经验建议，不是诊断或中国参照。none参数独立版本尚未被引擎表达，此计划版本仅文档追踪。",
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "reportVersion": "1.0.0"
+}
