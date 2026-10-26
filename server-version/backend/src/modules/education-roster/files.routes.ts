@@ -21,7 +21,7 @@ export function educationRosterFileRouter(entry:'SCHOOL'|'TEACHER'){
   let personnel=false
   try{await prisma.$transaction(tx=>assertPersonnelGovernor(tx,req.user!,req.params.organizationId));personnel=true}
   catch(error){if(!(error instanceof CampusAdmissionError&&error.statusCode===403))throw error}
-  return success(res,{structure:true,personnel})
+  return success(res,{structure:true,personnel,batchImport:true})
  }))
  router.get(base+'/template',...identity,mfa,rate,asyncHandler(async(req,res)=>{
   const parsed=z.object({kind:z.enum(rosterKinds)}).strict().safeParse(req.query)
@@ -33,10 +33,10 @@ export function educationRosterFileRouter(entry:'SCHOOL'|'TEACHER'){
  }))
  router.post(base+'/read',...identity,mfa,rate,asyncHandler(async(req,res)=>{
   try{
-   const {content}=z.object({content:z.string().min(4).max(85336).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/)}).strict().parse(req.body)
-   return success(res,await readRosterWorkbook(Buffer.from(content,'base64')))
+   const {content,mode}=z.object({mode:z.enum(['single','job']).default('single'),content:z.string().min(4).max(1333336).regex(/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/)}).strict().parse(req.body)
+   return success(res,await readRosterWorkbook(Buffer.from(content,'base64'),mode))
   }catch(error){
-   if(error instanceof ZodError)return res.status(400).json({code:'BAD_REQUEST',message:'请上传不超过 64 KB 的普通 .xlsx 文件。',data:null})
+   if(error instanceof ZodError)return res.status(400).json({code:'BAD_REQUEST',message:'请上传符合当前大小限制的普通 .xlsx 文件。',data:null})
    return res.status(400).json({code:'ROSTER_FILE_INVALID',message:error instanceof Error?error.message:'文件无法读取。',data:null})
   }
  }))

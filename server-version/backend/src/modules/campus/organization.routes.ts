@@ -1,3 +1,4 @@
+import {educationRosterJobRouter} from '../education-roster/jobs.routes'
 import {educationRosterFileRouter} from '../education-roster/files.routes'
 import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
 import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
@@ -19,6 +20,7 @@ import { readCampusRelationshipDirectory, appointCampusCounselorClient, endCampu
 // Reuse the existing Organization structure and relationship services, never
 // the legacy /api/organizations entrypoint or its training session cookie.
 const router=Router()
+router.use(educationRosterJobRouter('SCHOOL'))
 router.use(educationRosterFileRouter('SCHOOL'))
 router.use('/organizations/:organizationId/private-tools',authenticateSchool,educationPrivateToolRouter('SCHOOL'))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})

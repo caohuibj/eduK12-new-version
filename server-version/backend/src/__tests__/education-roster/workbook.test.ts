@@ -10,6 +10,15 @@ describe('bounded shared education roster workbooks',()=>{
   expect(result.sheets[0].rows[1].numeric).toEqual([])
   if(kind==='STUDENT')expect(result.sheets[0].rows[1].cells[0]).toBe('0001')
  })
+ it('accepts 5000 textual identities only under the explicit job profile',async()=>{
+  const file=await bytes([['学号','姓名'],...Array.from({length:5000},(_,i)=>[String(i).padStart(5,'0'),'合成'])])
+  const result=await readRosterWorkbook(file,'job');expect(result.sheets[0].rows).toHaveLength(5001);expect(result.sheets[0].rows[1].cells[0]).toBe('00000')
+  await expect(readRosterWorkbook(file)).rejects.toThrow();await expect(readRosterWorkbook(Buffer.alloc(1000001),'job')).rejects.toThrow('1 MB')
+ },60000)
+ it('rejects too many job rows and bounds actual decompression in the larger profile',async()=>{
+  await expect(readRosterWorkbook(await bytes([['年级'],...Array.from({length:5001},(_,i)=>[String(i)])]),'job')).rejects.toThrow(/5000/)
+  const zip=new JSZip();zip.file('xl/workbook.xml','x'.repeat(4*1024*1024+1));await expect(readRosterWorkbook(await zip.generateAsync({type:'nodebuffer',compression:'DEFLATE'}),'job')).rejects.toThrow()
+ },60000)
  it('marks numeric cells for explicit identifier rejection instead of inventing zeros',async()=>{
   const result=await readRosterWorkbook(await bytes([['学号','姓名'],[12,'合成']],wb=>{wb.worksheets[0].getCell('A2').numFmt='0000'}))
   expect(result.sheets[0].rows[1]).toMatchObject({cells:['12','合成'],numeric:[0]})

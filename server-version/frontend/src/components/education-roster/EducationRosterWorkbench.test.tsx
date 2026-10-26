@@ -89,4 +89,12 @@ describe('shared roster workbench interactions',()=>{
   expect(onText).not.toHaveBeenCalled();click('使用这份名单');expect(onText).toHaveBeenCalledWith('"工号","姓名"\n"T0001","合成教师"')
  })
 
+ it('clears a prior file mapping when matching malformed pasted content fails',async()=>{
+  const api=vi.fn(),onText=vi.fn()
+  render(<EducationRosterSource api={api as EducationRosterApi} organizationId="org" kind="STAFF" text={'"broken CSV'} onText={onText} onBlocked={vi.fn()} onInvalidate={vi.fn()}/>)
+  fireEvent.change(screen.getByLabelText('CSV／Excel 文件'),{target:{files:[{size:20,name:'名单.csv',text:async()=> '工号,姓名\nT001,合成教师'}]}})
+  await screen.findByRole('region',{name:'表头映射与样例'});click('匹配粘贴表头')
+  expect(screen.getByRole('alert')).toHaveTextContent('引号未闭合');expect(screen.queryByRole('region',{name:'表头映射与样例'})).toBeNull();expect(onText).not.toHaveBeenCalled()
+ })
+
 })

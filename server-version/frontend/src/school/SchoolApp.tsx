@@ -82,7 +82,7 @@ async function api<T>(path:string,method='GET',payload?:unknown,options?:{respon
   })
   if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
   const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status})
+  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
 const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(

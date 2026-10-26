@@ -264,6 +264,8 @@
     "survey_package_grants": "RUNTIME_RW",
     "survey_package_imports": "RUNTIME_RW",
     "survey_package_members": "RUNTIME_RW",
-    "survey_package_report_artifacts": "RUNTIME_RW"
+    "survey_package_report_artifacts": "RUNTIME_RW",
+    "education_roster_import_jobs": "RUNTIME_RW",
+    "education_roster_import_parts": "RUNTIME_RW"
   }
 }

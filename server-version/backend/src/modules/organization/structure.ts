@@ -1,3 +1,4 @@
+import type {Prisma} from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { OrganizationDomainError } from './types'
@@ -27,12 +28,12 @@ const selectUnitSql = `
  * Structural writes are deliberately kept separate from PR1 identity/governance.
  * API authorization is added in PR2-C16; this service owns structural invariants.
  */
-export async function createOrganizationUnit(input: {
+export async function createOrganizationUnitInTransaction(tx:Prisma.TransactionClient,input: {
   organizationId: string
   unitKind: OrganizationUnitKind
   name: string
   parentUnitId?: string | null
-}): Promise<OrganizationUnitRecord> {
+}) : Promise<OrganizationUnitRecord> {
   const name = input.name.trim()
   if (!name) throw new OrganizationDomainError('UNIT_NAME_REQUIRED', '结构单元名称不能为空', 400)
   if (input.unitKind === 'GRADE' && input.parentUnitId) {
@@ -42,7 +43,7 @@ export async function createOrganizationUnit(input: {
     throw new OrganizationDomainError('CLASS_GRADE_REQUIRED', '班级必须属于一个年级', 400)
   }
 
-  return prisma.$transaction(async (tx) => {
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.organizationId},7926))`
     const orgRows = await tx.$queryRaw<OrganizationStateRow[]>`
       SELECT "id", "status"
       FROM "organizations"
@@ -83,7 +84,14 @@ export async function createOrganizationUnit(input: {
                 "updated_at" AS "updatedAt"
     `
     return rows[0]
-  })
+}
+export async function createOrganizationUnit(input: {
+  organizationId: string
+  unitKind: OrganizationUnitKind
+  name: string
+  parentUnitId?: string | null
+}): Promise<OrganizationUnitRecord> {
+ return prisma.$transaction(tx=>createOrganizationUnitInTransaction(tx,input))
 }
 
 export async function listOrganizationUnits(organizationId: string): Promise<OrganizationUnitRecord[]> {
