@@ -1,0 +1,148 @@
+{
+  "kind": "ACTUAL_BUILD_SCALE_RESULT_SYNTHETIC_EXAMPLE",
+  "sourceSha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98",
+  "measurementHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+  "fixture": "mixed_independent",
+  "result": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "synthetic-batch-wibps7_adolescent_zh_cn_research",
+      "code": "wibps7_adolescent_zh_cn_research",
+      "name": "上床后活动问卷（WIBPS青少年7题，中文工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "synthetic-batch-wibps7_adolescent_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "WIBPS_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "WIBPS_02",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "WIBPS_03",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "WIBPS_04",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "WIBPS_05",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "WIBPS_06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "WIBPS_07",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      }
+    ],
+    "scores": [
+      {
+        "key": "while_in_bed_procrastination",
+        "type": "total",
+        "label": "上床后，还在做些什么",
+        "description": "7题等权求和7–35，更多表示自述更常在上床后、入睡前进行所列活动，不代表每种活动都妨碍睡眠。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 18,
+        "range": {
+          "min": 7,
+          "max": 35
+        },
+        "expectedItems": [
+          "WIBPS_01",
+          "WIBPS_02",
+          "WIBPS_03",
+          "WIBPS_04",
+          "WIBPS_05",
+          "WIBPS_06",
+          "WIBPS_07"
+        ],
+        "answeredItems": [
+          "WIBPS_01",
+          "WIBPS_02",
+          "WIBPS_03",
+          "WIBPS_04",
+          "WIBPS_05",
+          "WIBPS_06",
+          "WIBPS_07"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "while_in_bed_procrastination",
+        "headline": "上床后，还在做些什么",
+        "label": null,
+        "interpretation": "已经上床，可能还想看看视频、听听音乐，或回一条消息。这份回答帮你回顾入睡前常做哪些活动，并不表示这些活动一定有问题，也不能直接告诉我们它们让你晚睡了多久。比如听音乐，有时是放松，也可能让人继续忙下去，需要结合自己的体验来看。你可以挑一个最常出现的活动，留意它什么时候自然结束、什么时候又多延长了一会儿，再试一个适合自己的暂停办法。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "上床后的哪件事最容易越做越久？它是在帮你放松，还是让你更难停下来？"
+          },
+          {
+            "category": "strategy",
+            "text": "挑一个活动试着留到明天继续，比如把还想看的内容记下来，再观察自己是否更容易收尾。"
+          },
+          {
+            "category": "support",
+            "text": "如果作息常被功课、家里安排或其他事情挤占，可以和信任的人一起找一个更可行的安排。"
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+          "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+          "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+          "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+      "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+      "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+      "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "供青少年回顾上床后、入睡前的活动；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。"
+  }
+}

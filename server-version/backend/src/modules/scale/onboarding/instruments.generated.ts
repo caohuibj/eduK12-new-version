@@ -103,6 +103,7 @@ import { SCALE_INSTRUMENT_SOURCE as source99 } from '../instruments/value_cost_e
 import { SCALE_INSTRUMENT_SOURCE as source100 } from '../instruments/value_cost_mathematics_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source101 } from '../instruments/value_cost_physics_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source102 } from '../instruments/who5/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source103 } from '../instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -213,4 +214,5 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source100,
   source101,
   source102,
+  source103,
 ]

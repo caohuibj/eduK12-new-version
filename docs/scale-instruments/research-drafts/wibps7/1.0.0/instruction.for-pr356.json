@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "identity": {
+    "instrumentKey": "wibps7_adolescent_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "instructionVersion": "1.0.0",
+    "title": "作答说明",
+    "text": "请根据平时的情况，选择自己上床后、入睡前进行下列活动的频率。没有对错，请按实际情况选择。选项从几乎从不到几乎总是；中间选项“中立”保留原论文Neutral的表述，不等于漏答。",
+    "locale": "zh-CN"
+  },
+  "note": "Prepared content only; adapt to the actual PR356 instruction schema before integration. Not included in current executable old-schema source."
+}

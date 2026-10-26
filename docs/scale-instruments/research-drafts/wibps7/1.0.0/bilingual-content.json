@@ -1,0 +1,110 @@
+{
+  "identity": {
+    "instrumentKey": "wibps7_adolescent_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": "https://www.mdpi.com/1660-4601/17/16/5892",
+  "sourcePosition": "2020作者论文2.2节与Table 2（PDF第7页），完整独立7题；不是同文BPS8",
+  "originalAdministrationLanguage": "pt",
+  "platformLocale": "zh-CN",
+  "independentWorkingTranslation": true,
+  "questions": [
+    {
+      "number": 1,
+      "itemCode": "WIBPS_01",
+      "platformChinese": "上床后、入睡前，我会看YouTube视频。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Watch videos on YouTube",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I watch videos on YouTube."
+    },
+    {
+      "number": 2,
+      "itemCode": "WIBPS_02",
+      "platformChinese": "上床后、入睡前，我会看电视。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Watch TV",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I watch TV."
+    },
+    {
+      "number": 3,
+      "itemCode": "WIBPS_03",
+      "platformChinese": "上床后、入睡前，我会看电影或连续剧。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Watch movies and series",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I watch movies and series."
+    },
+    {
+      "number": 4,
+      "itemCode": "WIBPS_04",
+      "platformChinese": "上床后、入睡前，我会听音乐。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Listen to music",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I listen to music."
+    },
+    {
+      "number": 5,
+      "itemCode": "WIBPS_05",
+      "platformChinese": "上床后、入睡前，我会发信息、打视频电话或打电话。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Send texts, make video calls/calls",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I send texts, make video calls/calls."
+    },
+    {
+      "number": 6,
+      "itemCode": "WIBPS_06",
+      "platformChinese": "上床后、入睡前，我会玩游戏（用平板、电脑或手机）。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Play games (tablet, computer, mobile phone)",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I play games (tablet, computer, mobile phone)."
+    },
+    {
+      "number": 7,
+      "itemCode": "WIBPS_07",
+      "platformChinese": "上床后、入睡前，我会吃点心（饼干、谷物食品、牛奶、薯片、巧克力）。",
+      "reverse": false,
+      "authorSharedStem": "While in bed, before I fall asleep I …",
+      "authorFragment": "Eat snacks (cookies, cereals, milk, chips, chocolate)",
+      "expandedEnglishMeaning": "While in bed, before I fall asleep I eat snacks (cookies, cereals, milk, chips, chocolate)."
+    }
+  ],
+  "sourceOptionLabels": [
+    "Almost Never",
+    "Rarely",
+    "Neutral",
+    "Frequently",
+    "Almost Always"
+  ],
+  "platformOptions": [
+    {
+      "value": "1",
+      "label": "几乎从不",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "很少",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "中立",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "经常",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "几乎总是",
+      "score": 5
+    }
+  ]
+}
