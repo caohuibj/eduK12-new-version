@@ -1,4 +1,5 @@
-import { useCallback,useEffect,useState } from 'react'
+import {TeacherAssessmentPage} from './TeacherAssessmentPage'
+import { useCallback,useEffect,useRef,useState } from 'react'
 import { TaskForm } from '../survey/SurveyPublicApp'
 import { sanitizeFormAnswers,visibleFormKeys } from '../survey/form-visibility'
 import type {FormDraft} from '../survey/builder.types'
@@ -13,7 +14,7 @@ type FieldForm={formId:string;title:string;definitionDigest:string;pages:FormDra
 const labels:Record<Kind,string>={
   FACT:'事实观察依据',FORMAL_FEEDBACK:'正式专业反馈',PRIVATE_REFLECTION:'私人反思日志',
 }
-export function HuiteacherFieldWorkspace({api}:{api:Api}){
+export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDraftStateChange?:(state:{dirty:boolean;writing:boolean})=>void}){
   const [invitations,setInvitations]=useState<Invite[]>([])
   const [notes,setNotes]=useState<Note[]>([])
   const [text,setText]=useState<Record<string,string>>({})
@@ -23,9 +24,23 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
   const [newEvent,setNewEvent]=useState('')
   const [expertInviteCode,setExpertInviteCode]=useState('')
   const [kind,setKind]=useState<Kind>('FACT')
-  const [content,setContent]=useState('')
+  const [opened,setOpened]=useState(false)
+  const [activeNoteId,setActiveNoteId]=useState('')
+  const [formErrors,setFormErrors]=useState<Record<string,string>>({})
+  const [formReload,setFormReload]=useState(0)
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
+  const pending=useRef(false)
+  const dirty=Object.entries(text).some(([key,value])=>key.startsWith('new:')?!!value.trim():notes.some(note=>note.id===key&&note.status==='DRAFT'&&value!==note.content))
+    ||Object.entries(formAnswers).some(([key,values])=>Object.keys(values).length>0&&(key.startsWith('new:')||notes.some(note=>note.id===key&&note.status==='DRAFT')))
+  useEffect(()=>{onDraftStateChange?.({dirty,writing:busy})},[dirty,busy,onDraftStateChange])
+  useEffect(()=>()=>onDraftStateChange?.({dirty:false,writing:false}),[onDraftStateChange])
+  useEffect(()=>{
+    if(!dirty&&!busy)return
+    const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
+    window.addEventListener('beforeunload',protect)
+    return()=>window.removeEventListener('beforeunload',protect)
+  },[dirty,busy])
   const refresh=useCallback(async()=>{
     const [inv,note]=await Promise.all([
       api<{list:Invite[]}>('/my-field-invitations'),
@@ -52,21 +67,37 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
   },[api])
   useEffect(()=>{
     let active=true
-    void Promise.all(invitations.filter(i=>i.status==='ACCEPTED').map(async invite=>{
-      const form=await api<FieldForm|null>(
-        '/field-invitations/'+invite.invitationId+'/form')
-      return [invite.eventId,form] as const
-    })).then(entries=>{
-      if(active)setFieldForms(Object.fromEntries(entries))
-    }).catch(e=>{
-      if(active)setNotice(e instanceof Error?e.message:'现场表单资格读取失败')
-    })
+    setFieldForms({});setFormErrors({})
+    for(const invite of invitations.filter(i=>i.status==='ACCEPTED')){
+      void api<FieldForm|null>('/field-invitations/'+invite.invitationId+'/form')
+        .then(form=>{if(active)setFieldForms(old=>({...old,[invite.eventId]:form}))})
+        .catch(error=>{if(active)setFormErrors(old=>({...old,[invite.eventId]:error instanceof Error?error.message:'实践表单读取失败'}))})
+    }
     return()=>{active=false}
-  },[invitations,api])
+  },[invitations,api,formReload])
+  const currentNote=notes.find(note=>note.id===activeNoteId)
+  const currentInvite=invitations.find(invite=>currentNote?invite.eventId===currentNote.eventId:invite.invitationId===newEvent)
+  const currentKind=currentNote?.kind??kind
+  const recordKey=currentNote?.id??('new:'+newEvent+':'+kind)
+  const content=text[recordKey]??currentNote?.content??''
+  const eventId=currentNote?.eventId??currentInvite?.eventId??''
+  const bound=fieldForms[eventId]
+  const answers=formAnswers[recordKey]??{}
+  const formError=formErrors[eventId]
+  const formLoaded=Object.prototype.hasOwnProperty.call(fieldForms,eventId)
+  const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'
+  const formal=currentKind==='FORMAL_FEEDBACK'
+  const ready=editable&&(!formal||!!bound)
+  const openActivity=(invite:Invite)=>{
+    const draft=notes.find(note=>note.eventId===invite.eventId&&note.kind==='FORMAL_FEEDBACK'&&note.status==='DRAFT')
+    setNewEvent(invite.invitationId);setKind('FORMAL_FEEDBACK');setActiveNoteId(draft?.id??'');setOpened(true);setNotice('')
+  }
+  const openNote=(note:Note)=>{setActiveNoteId(note.id);setOpened(true);setNotice('')}
   const action=(fn:()=>Promise<void>)=>{
-    setBusy(true);setNotice('')
+    if(pending.current)return
+    pending.current=true;setBusy(true);setNotice('')
     void fn().catch(e=>setNotice(e instanceof Error?e.message:'现场观察操作失败'))
-      .finally(()=>setBusy(false))
+      .finally(()=>{pending.current=false;setBusy(false)})
   }
   const joinExpert=()=>action(async()=>{
     await api('/education/join-expert','POST',{inviteCode:expertInviteCode.trim()})
@@ -81,13 +112,17 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
   const create=()=>action(async()=>{
     const inv=invitations.find(x=>x.invitationId===newEvent)
     if(!inv||inv.status!=='ACCEPTED'||!content.trim())
-      throw new Error('请选择已领取的现场观察活动，并填写内容')
-    await api('/organizations/'+inv.organizationId+'/evaluation-events/'+inv.eventId+
+      throw new Error('请选择已领取的实践活动，并填写专业意见或记录内容')
+    if(kind==='FORMAL_FEEDBACK'&&!fieldForms[inv.eventId])throw new Error('本活动尚无可填写的预制表单，请联系组织者配置。')
+    const created=await api<Pick<Note,'id'>>('/organizations/'+inv.organizationId+'/evaluation-events/'+inv.eventId+
       '/field-notes','POST',{kind,content:content.trim()})
-    setContent('');await refresh()
+    setText(old=>{const next={...old,[created.id]:content.trim()};delete next[recordKey];return next})
+    setFormAnswers(old=>{const next={...old,[created.id]:old[recordKey]??{}};delete next[recordKey];return next})
+    setFormPages(old=>{const next={...old,[created.id]:old[recordKey]??0};delete next[recordKey];return next})
+    await refresh();setActiveNoteId(created.id)
     setNotice(kind==='PRIVATE_REFLECTION'?
       '私人反思草稿已加密保存，仅你本人可以读取。':
-      '观察草稿已加密保存。正式提交后才会交付给学校。')
+      '专业意见草稿已加密保存；表单答案仍在本页暂存，正式提交时一并保存。')
   })
   const save=(note:Note)=>action(async()=>{
     const current=text[note.id]??note.content
@@ -95,7 +130,8 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     await api('/field-notes/'+note.id,'PUT',{
       expectedRevision:note.revision,content:current.trim(),
     })
-    await refresh();setNotice('草稿已保存。正式提交前仍可修订。')
+    setText(old=>({...old,[note.id]:current.trim()}))
+    await refresh();setNotice('意见正文已加密保存。表单答案在正式提交时一并保存。')
   })
   const submit=(note:Note)=>action(async()=>{
     if(!window.confirm(note.kind==='PRIVATE_REFLECTION'
@@ -104,6 +140,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     if((text[note.id]??note.content)!==note.content)
       throw new Error('请先保存当前修改，再正式提交。')
     const bound=fieldForms[note.eventId]
+    if(note.kind==='FORMAL_FEEDBACK'&&!bound)throw new Error('本活动尚无可填写的预制表单，请联系组织者配置。')
     const input:Record<string,unknown>={expectedRevision:note.revision}
     if(note.kind==='FORMAL_FEEDBACK'&&bound){
       const answers=formAnswers[note.id]??{}
@@ -111,95 +148,71 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
       input.answers=sanitizeFormAnswers(bound.pages.flatMap(p=>p.questions),answers)
     }
     await api('/field-notes/'+note.id+'/submit','POST',input)
+    setFormAnswers(old=>{const next={...old};delete next[note.id];return next})
     await refresh();setNotice(note.kind==='PRIVATE_REFLECTION'?
       '私人反思已归档，未向学校披露。':'正式观察记录已提交，原稿将保持不可改写。')
   })
   const active=invitations.filter(i=>i.status==='ACCEPTED')
-  return <section className="ht-panel" aria-label="我的现场观察与专家反思">
-    <h2>我的现场观察与专家反思</h2>
-    <p>课堂、会议和教研观察使用限定活动授权。私人反思与正式提交给学校的专业意见严格分离。</p>
-    {notice&&<p className="ht-notice" role="status">{notice}</p>}
+  const onLastFormPage=!bound||(formPages[recordKey]??0)>=Math.max(0,bound.pages.filter(page=>
+    page.questions.some(q=>visibleFormKeys(bound.pages.flatMap(p=>p.questions),answers).has(q.itemKey)),
+  ).length-1)
+  return <section className="ht-panel ht-practice-workbench" aria-label="我的专业实践">
+    <h2>我的专业实践</h2>
+    <p className="ht-muted">从受邀活动进入，填写组织者配置的实践表单。私人反思与提交给学校的专业意见分别保存。</p>
+    {notice&&!opened&&<p className="ht-notice" role="status">{notice}</p>}
     <details className="ht-practice-disclosure"><summary>使用活动邀请码</summary>
-    <div className="ht-inline">
-      <label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
-        <input value={expertInviteCode} maxLength={60}
-          onChange={e=>setExpertInviteCode(e.target.value)}
-          placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
-      </label>
-      <button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())}
-        onClick={joinExpert}>使用当前账号领取专家任务</button>
-    </div>
+      <div className="ht-inline"><label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
+        <input value={expertInviteCode} maxLength={60} onChange={e=>setExpertInviteCode(e.target.value)} placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
+      </label><button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())} onClick={joinExpert}>使用当前账号领取专家任务</button></div>
     </details>
-    <h3>受邀任务</h3>
-    {!invitations.length?<p className="ht-empty">尚未收到现场评价邀请。</p>:
-      <div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId}
-        className="ht-event"><strong>{inv.title}</strong> · <span className="ht-tag">
-          {inv.role==='EXPERT'?'外部专家':'同行观察者'} / {inv.status}</span>
-        <p className="ht-muted">到期：{new Date(inv.expiresAt).toLocaleString()}</p>
-        {inv.status==='INVITED'&&<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>}
-      </article>)}</div>}
-    <details className="ht-practice-disclosure" open={active.length>0}><summary>新的现场记录</summary>
-    <div className="ht-inline">
-      <label className="ht-field"><span>本次活动</span><select
-        value={newEvent} onChange={e=>setNewEvent(e.target.value)}>
-        <option value="">请选择已领取的观察任务</option>
-        {active.map(inv=><option key={inv.invitationId} value={inv.invitationId}>
-          {inv.title} · {inv.role==='EXPERT'?'专家':'同行'}</option>)}
-      </select></label>
-      <label className="ht-field"><span>记录类型</span><select value={kind}
-        onChange={e=>setKind(e.target.value as Kind)}>
-        {Object.entries(labels).map(([value,label])=><option key={value} value={value}>
-          {label}</option>)}
-      </select></label>
-    </div>
-    <label className="ht-field"><span>{labels[kind]}（草稿加密保存）</span>
-      <textarea maxLength={12000} rows={5} value={content}
-        onChange={e=>setContent(e.target.value)} aria-label="观察记录草稿"/></label>
-    <button disabled={busy||!newEvent||!content.trim()} onClick={create}>保存加密草稿</button>
-    </details>
+    <h3>实践活动</h3>
+    {!invitations.length?<p className="ht-empty">尚未收到实践活动邀请。</p>:<div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId} className="ht-event">
+      <strong>{inv.title}</strong><span className="ht-tag">{inv.role==='EXPERT'?'外部专家':'同行观察者'} · {inv.status==='ACCEPTED'?'已领取':'待接受'}</span>
+      <p className="ht-muted">到期：{new Date(inv.expiresAt).toLocaleString()}</p>
+      {inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy} onClick={()=>openActivity(inv)}>填写实践表单</button>}
+    </article>)}</div>}
+    {active.length>0&&<details className="ht-practice-disclosure"><summary>新建辅助记录或私人反思</summary>
+      <div className="ht-inline"><label className="ht-field"><span>本次活动</span><select value={newEvent} onChange={e=>setNewEvent(e.target.value)}>
+        <option value="">请选择已领取的实践活动</option>{active.map(inv=><option key={inv.invitationId} value={inv.invitationId}>{inv.title}</option>)}
+      </select></label><label className="ht-field"><span>记录类型</span><select value={kind==='FORMAL_FEEDBACK'?'FACT':kind} onChange={e=>setKind(e.target.value as Kind)}>
+        <option value="FACT">事实观察依据</option><option value="PRIVATE_REFLECTION">私人反思日志</option>
+      </select></label></div>
+      <button disabled={busy||!newEvent} onClick={()=>{if(kind==='FORMAL_FEEDBACK')setKind('FACT');setActiveNoteId('');setOpened(true);setNotice('')}}>打开辅助记录页面</button>
+    </details>}
     <h3>我的记录</h3>
-    {!notes.length?<p className="ht-empty">尚未创建现场记录。</p>:
-      <div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event">
-        <strong>{labels[note.kind]}</strong> · <span className="ht-tag">
-          {note.status==='SUBMITTED'?'不可修改':'草稿'}</span>
-        {note.kind==='PRIVATE_REFLECTION'&&
-          <p className="ht-muted">只有本人能读取这份私人反思；学校管理者不可访问。</p>}
-        {note.status==='DRAFT'?<>
-          <label className="ht-field"><span>记录正文</span><textarea
-            value={text[note.id]??note.content} rows={5} maxLength={12000}
-            onChange={e=>setText(old=>({...old,[note.id]:e.target.value}))}/></label>
-          {note.kind==='FORMAL_FEEDBACK'&&fieldForms[note.eventId]&&
-            <div className="ht-task">
-              <h4>本次课堂／教研结构化 Form</h4>
-              <p className="ht-muted">不计分。正式提交时与专业意见一起加密冻结，不能将表单视为诊断量表。</p>
-              <TaskForm purpose="HUITEACHER"
-                unit={{kind:'FORM',instrumentKey:fieldForms[note.eventId]!.formId,
-                  title:fieldForms[note.eventId]!.title,pages:fieldForms[note.eventId]!.pages}}
-                answer={formAnswers[note.id]??{}}
-                onChange={(key,value)=>setFormAnswers(old=>({
-                  ...old,[note.id]:{...(old[note.id]??{}),[key]:value},
-                }))}
-                pageIndex={formPages[note.id]??0}
-                onPageChange={next=>setFormPages(old=>({...old,[note.id]:next}))}/>
-            </div>}
-          <div className="ht-inline">
-            <button disabled={busy||!(text[note.id]??note.content).trim()}
-              onClick={()=>save(note)}>保存修订</button>
-            <button disabled={busy||(
-              note.kind==='FORMAL_FEEDBACK'&&!!fieldForms[note.eventId]&&
-              (formPages[note.id]??0)<
-              fieldForms[note.eventId]!.pages.filter(page=>
-                page.questions.some(q=>visibleFormKeys(
-                  fieldForms[note.eventId]!.pages.flatMap(p=>p.questions),
-                  formAnswers[note.id]??{},
-                ).has(q.itemKey)),
-              ).length-1
-            )} onClick={()=>submit(note)}>
-              {note.kind==='PRIVATE_REFLECTION'?'归档私人反思':'正式提交'}
-            </button>
-          </div>
-        </>:<p className="ht-field-content">{note.content}</p>}
-      </article>)}</div>}
-    <p className="ht-muted">正式提交后的记录禁止覆盖。本阶段尚未完成多人协商共识与独立评价的全部流程。</p>
+    {!notes.length?<p className="ht-empty">尚未创建实践记录。</p>:<div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event">
+      <strong>{invitations.find(inv=>inv.eventId===note.eventId)?.title??labels[note.kind]}</strong><span className="ht-tag">{labels[note.kind]} · {note.status==='SUBMITTED'?'已提交':'草稿'}</span>
+      <p className="ht-muted">{note.kind==='PRIVATE_REFLECTION'?'仅本人可见':note.status==='SUBMITTED'?'已提交的原稿不可改写':'尚未正式提交给学校'}</p>
+      <button disabled={busy} onClick={()=>openNote(note)}>{note.status==='SUBMITTED'?'查看记录':'继续填写'}</button>
+    </article>)}</div>}
+    {opened&&<TeacherAssessmentPage kind="practice" scope="ht-professional-practice" title={currentInvite?.title??labels[currentKind]} busy={busy} onBack={()=>setOpened(false)}>
+      <div className="ht-practice-page">
+        {notice&&<p className="ht-notice" role="status">{notice}</p>}
+        {currentNote?.status==='SUBMITTED'?<>
+          <p className="ht-tag">{labels[currentKind]} · 已提交</p>
+          <p className="ht-muted">{currentKind==='PRIVATE_REFLECTION'?'私人反思仅本人可见，未向学校披露。':'原稿已冻结。本页展示获准读取的专业意见正文。'}</p>
+          <p className="ht-field-content">{currentNote.content}</p>
+        </>:<>
+          {!editable&&<p role="alert" className="ht-notice">当前活动授权不可用，不能保存或提交新内容。</p>}
+          {formal&&<section className="ht-task ht-practice-form" aria-label="活动预制表单">
+            {!currentInvite?<p className="ht-empty">无法读取此活动的预制表单，请联系组织者核实活动授权。</p>:formError?<div role="alert" className="ht-notice"><p>实践表单暂时无法读取：{formError}</p><button disabled={busy} onClick={()=>setFormReload(value=>value+1)}>重试实践表单</button></div>:!formLoaded?<p role="status">正在读取本活动的预制表单…</p>:!bound?<p className="ht-empty">本活动尚未配置预制表单，请联系组织者绑定已发布的实践表单。</p>:<>
+              <p className="ht-muted">按表单逐页填写，最后一页由你确认正式提交。本表单不计分。</p>
+              <TaskForm purpose="HUITEACHER" advanceSingleChoiceFocus readOnly={busy||!editable}
+                unit={{kind:'FORM',instrumentKey:bound.formId,title:bound.title,pages:bound.pages}}
+                answer={answers} onChange={(key,value)=>setFormAnswers(old=>({...old,[recordKey]:{...(old[recordKey]??{}),[key]:value}}))}
+                pageIndex={formPages[recordKey]??0} onPageChange={next=>setFormPages(old=>({...old,[recordKey]:next}))}/>
+            </>}
+          </section>}
+          {(!formal||bound)&&<>
+            <label className="ht-field"><span>{formal?'专业意见与补充说明（必填）':labels[currentKind]}</span><textarea aria-label={formal?'专业意见与补充说明':'记录正文'} disabled={busy||!editable} maxLength={12000} rows={4} value={content} onChange={e=>setText(old=>({...old,[recordKey]:e.target.value}))}/></label>
+            <p className="ht-muted">{formal?'保存意见草稿仅保存文字正文。表单答案在本页暂存，返回列表不会丢失；正式提交时一并加密保存，请勿刷新或关闭页面。':currentKind==='PRIVATE_REFLECTION'?'私人反思加密保存，仅本人可见；归档后不可修改。':'事实观察依据单独保存，不替代活动的正式实践表单。'}</p>
+            <div className="ht-inline"><button disabled={busy||!ready||!content.trim()} onClick={()=>currentNote?save(currentNote):create()}>{formal?'保存专业意见草稿':'保存加密草稿'}</button>
+              <button disabled={busy||!ready||!currentNote||!onLastFormPage||content!==currentNote.content} onClick={()=>currentNote&&submit(currentNote)}>{currentKind==='PRIVATE_REFLECTION'?'归档私人反思':'正式提交'}</button>
+            </div>
+            {!currentNote&&<p className="ht-muted">请先保存正文草稿，再确认正式提交。</p>}
+          </>}
+        </>}
+      </div>
+    </TeacherAssessmentPage>}
   </section>
 }

@@ -235,3 +235,27 @@
 .ht-assessment-page .assessment-instructions>summary{min-height:44px;padding:10px 0;color:var(--ht-copper);font-size:13px;cursor:pointer}
 .ht-assessment-page .assessment-instructions>div{padding:10px 0;font-size:13px;line-height:1.75}
 @media(max-width:640px){.ht-app .ht-assessment-page [data-assessment-shell-header] h1{font-size:18px}}
+
+/* Activity forms use the same full-page host as assessments. */
+.ht-practice-page .ht-practice-form{margin:12px 0 24px}
+.ht-workspace .ht-practice-page h2{font-size:18px;margin:0 0 10px}
+.ht-practice-page>.ht-field{padding-top:18px;border-top:1px solid var(--ht-line)}
+.ht-practice-page>.ht-inline{gap:10px;margin-bottom:0}
+.ht-practice-page>.ht-inline>button{margin:0}
+.ht-practice-workbench .ht-event-list .ht-event>strong{font-size:15px}
+.ht-practice-workbench .ht-event-list .ht-tag{font-size:12px;margin-top:6px}
+.ht-practice-page .ht-field-content{white-space:pre-wrap;overflow-wrap:anywhere}
+
+.ht-workspace .ht-practice-form>section>h3{font-size:18px;margin:0 0 12px}
+.ht-practice-form>section{margin:12px 0 0;padding:20px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper)}
+.ht-practice-form fieldset{min-width:0;margin:18px 0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:10px}
+.ht-practice-form legend{max-width:100%;padding:0 4px;font-size:14px;font-weight:600;line-height:1.7;overflow-wrap:anywhere}
+.ht-practice-form fieldset>label{display:flex;align-items:center;gap:10px;min-height:44px;margin:2px 0;padding:8px 4px;font-size:14px;line-height:1.7;cursor:pointer}
+.ht-practice-form input:is([type=radio],[type=checkbox]){width:18px;height:18px;flex:none;accent-color:var(--ht-copper)}
+.ht-practice-form :is(textarea,input:not([type=radio]):not([type=checkbox]),select){max-width:100%;width:100%;min-height:44px;padding:10px;border:1px solid var(--ht-line);border-radius:7px;background:var(--ht-bg);color:var(--ht-ink);font-size:16px}
+.ht-practice-form textarea{min-height:110px;resize:vertical}
+.ht-practice-form progress{display:block;width:100%;height:6px;border:0;border-radius:8px;overflow:hidden;accent-color:var(--ht-copper);background:var(--ht-line)}
+.ht-practice-form progress::-webkit-progress-bar{background:var(--ht-line)}
+.ht-practice-form progress::-webkit-progress-value{background:var(--ht-copper)}
+.ht-practice-form progress::-moz-progress-bar{background:var(--ht-copper)}
+@media(max-width:640px){.ht-practice-form>section{padding:14px}.ht-practice-form fieldset{padding:12px}.ht-workspace .ht-practice-form>section>h3{font-size:16px}}

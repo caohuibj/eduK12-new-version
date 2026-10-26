@@ -153,10 +153,14 @@ export default function HuiteacherApp(){
   },[personalSection,schoolSection])
   const [formDraftState,setFormDraftState]=useState({dirty:false,writing:false})
   const privateDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
+  const practiceDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
+  const setPracticeDraftState=useCallback((state:PrivateDraftState)=>{practiceDraft.current=state},[])
   const setPrivateDraftState=useCallback((state:PrivateDraftState)=>{privateDraft.current=state},[])
   const canLeaveForm=()=>{
     if(privateDraft.current.writing){setMessage('私有工具正在处理，请等待完成后再离开。');return false}
     if(privateDraft.current.dirty&&!window.confirm('私有工具草稿尚未保存，确定放弃修改并离开吗？'))return false
+    if(practiceDraft.current.writing){setMessage('实践记录正在保存或提交，请等待完成后再离开。');return false}
+    if(practiceDraft.current.dirty&&!window.confirm('实践表单或记录尚未正式保存，确定放弃当前输入并离开吗？'))return false
     if(formDraftState.writing){setMessage('表单正在保存或发布，请等待完成后再离开。');return false}
     return !formDraftState.dirty||window.confirm('当前表单草稿尚未保存，确定放弃修改并离开吗？')
   }
@@ -474,7 +478,7 @@ export default function HuiteacherApp(){
       <h1>首次登录 · 修改教育账号密码</h1>
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
-    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:'other'}><div className={'ht-workspace'+(workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
+    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:workspaceTab==='expert'?'ht-professional-practice':'other'}><div className={'ht-workspace'+(workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
       <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
@@ -566,7 +570,7 @@ export default function HuiteacherApp(){
       {workspaceTab==='expert'&&<>
         <p className="ht-workspace-context"><Compass size={16} aria-hidden="true"/><span>专业实践 · 现场观察、专业反馈与同行协作</span></p>
         <div className="ht-practice-layout">
-          <HuiteacherFieldWorkspace api={teacherApi}/>
+          <HuiteacherFieldWorkspace api={teacherApi} onDraftStateChange={setPracticeDraftState}/>
           <HuiteacherConsensusReviews api={teacherApi}/>
         </div>
       </>}
