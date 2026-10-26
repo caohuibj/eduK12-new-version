@@ -163,10 +163,10 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
     {listReady&&!listPending&&!listError&&tasks.length===0&&!unified?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
       <div className="ht-event-list">{tasks.map(item=><article className={'ht-event'+(student?' ht-student-task-card':'')} key={item.executionId}>
         {student?<><span className="ht-student-task-icon" aria-hidden="true"><ClipboardList size={20}/></span><div className="ht-student-task-copy"><h3>{item.formTitle}</h3>{(item.eventTitle!==item.formTitle||item.teacherName)&&<p>{[item.eventTitle===item.formTitle?'':item.eventTitle,item.teacherName].filter(Boolean).join(' · ')}</p>}<div className="ht-student-task-meta"><span className="ht-tag" data-status={item.status}>{assessmentStatus(item.status)}</span>{item.deadline&&<span>截止：{new Date(item.deadline).toLocaleString('zh-CN')}</span>}</div></div></>:<><strong>{item.formTitle}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span><p>{item.eventTitle}</p></>}
-        <button disabled={busy||item.status==='COMPLETED'}
+        {(!student||item.status!=='COMPLETED')&&<button disabled={busy||item.status==='COMPLETED'}
           onClick={()=>void open(item)}>
-          {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(student&&item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始评价':'继续评价')}
-        </button>
+          {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(item.status==='ASSIGNED'?'开始评价':'继续评价')}
+        </button>}
       </article>)}</div>}
     {active&&<TeacherAssessmentPage kind="answer" title={active.title} onBack={()=>{if(active.status==='STARTED')storeDraft(active,answers);setActive(null)}}><div className="ht-task ht-form-surface ht-task-answer-form">
       {notice&&<p role="status" className="ht-notice">{notice}</p>}
