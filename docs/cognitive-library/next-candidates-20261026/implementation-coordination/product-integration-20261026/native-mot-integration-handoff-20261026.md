@@ -38,3 +38,15 @@ PR356最新读取392b8128b9f4b9d9d4b6375279ea5e0e559e0554，仍open/draft；main
 4. 四入口全消费者、公开/综合/Survey固定模板、高级library、完整标签持久/搜索、英文真实入口、真机设备待续。没有年龄或常模结论；内容标签不代表诊断或招聘效度。
 
 已有三项及MOT批准保持；新测验先人工审图再实现。最新用户体验原则已执行，严格计时提案superseded且历史原件保留；未做时序重研究、COS回算或报告修正。Notion母页第18节已写入并读回，保留原第9节批准图片。
+
+## 追加：宿主归属收口已推送（2026-10-26）
+
+上文第1项待办已完成候选开发，独立提交6518f9eb82b8b95c97adea6a4b7c3fda2cc5b765，tree19b5065ed5b247703c33a9c85bf93d52db5a73ab。push后远端ref/tree/useCognitiveSession blob已读回一致；该SHA Actions0。
+
+nativeHost捕获原session/epoch/definition/protocol/版本/seed及生命周期代数，load/restart/卸载使旧代失效；await后不推进新UI，也不让旧FINAL/replay回包写新meta。Store的putTrial/sealForSubmission/setStatus/delete以可选expected身份在现有事务内核对，legacy调用不传仍按原规则。raw seal及core finish逐步带原身份；already-issued FINAL可按原server事务落账，不宣称取消，也不丢原Mot绑定端口原件。当前同key新epoch遇旧meta仍明确冲突并保留原件，不声称能无条件覆盖续答。
+
+新增8个不同host合同，首轮7通过、续验2通过（其中active因fixture合法PHONE枚举更正重复一次，不计作第9项）；真实frontend tsconfig四入口闭包0诊断。主线另在真实云端Chromium/IndexedDB验证当前身份正常写/封存/完成/清理，以及旧epoch四种操作与旧submission清理均拒绝且新数据不变，2个合同首次通过。原2+9完整browser、旧scorer/时序及其原件不重跑、不覆盖。
+
+原件为raw-archive/client/host-generation-followup/；真实IDB子目录parent-indexeddb/。本次没有改协议、刺激、输入、试次数、raw/core字段语义、版本或后台schema。开发验证不是外部根dot的独立审计批准。
+
+下一项已批准点数判断的7步实际消费者差异见enumeration-next-native-slice.md，首个直接阻碍是stimulusRecipe:null与INTERNAL_REVIEW_ONLY不能当真实冻结artifact。先固定已批设计对应recipe/calibration合同，再接产品；其它未验证与未放行事项仍按上文保留。Notion母页随后追加此精确候选与已回读事实。
