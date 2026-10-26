@@ -1,0 +1,166 @@
+{
+  "identity": {
+    "instrumentKey": "ffmq15_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "authorSource": "https://www.researchgate.net/publication/303709635_FFMQ-15_items_and_scoring_information",
+  "sourcePosition": "Jenny Gu作者2018修订PDF第1页完整15题、第2页Scoring Information；2016上传稿题文一致但短版开发引文有更正",
+  "sourceLocale": "en",
+  "platformLocale": "zh-CN",
+  "questions": [
+    {
+      "number": 1,
+      "itemCode": "FFMQ15_01",
+      "authorEnglish": "When I take a shower or a bath, I stay alert to the sensations of water on my body.",
+      "platformChinese": "洗澡或泡澡时，我会留意水接触身体的感觉。",
+      "dimension": "observe",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "FFMQ15_02",
+      "authorEnglish": "I’m good at finding words to describe my feelings.",
+      "platformChinese": "我很会找到词语来描述自己的感受。",
+      "dimension": "describe",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "FFMQ15_03",
+      "authorEnglish": "I don’t pay attention to what I’m doing because I’m daydreaming, worrying, or otherwise distracted.",
+      "platformChinese": "因为在做白日梦、担心事情或被其他事分心，我没有注意自己正在做什么。",
+      "dimension": "act_aware",
+      "reverse": true
+    },
+    {
+      "number": 4,
+      "itemCode": "FFMQ15_04",
+      "authorEnglish": "I believe some of my thoughts are abnormal or bad and I shouldn’t think that way.",
+      "platformChinese": "我认为自己的一些想法不正常或不好，觉得不该那样想。",
+      "dimension": "nonjudge",
+      "reverse": true
+    },
+    {
+      "number": 5,
+      "itemCode": "FFMQ15_05",
+      "authorEnglish": "When I have distressing thoughts or images, I “step back” and am aware of the thought or image without getting taken over by it.",
+      "platformChinese": "当出现令人苦恼的想法或画面时，我会“退后一步”，觉察它们，而不被它们带着走。",
+      "dimension": "nonreact",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "FFMQ15_06",
+      "authorEnglish": "I notice how foods and drinks affect my thoughts, bodily sensations, and emotions.",
+      "platformChinese": "我会注意食物和饮料怎样影响自己的想法、身体感觉和情绪。",
+      "dimension": "observe",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "FFMQ15_07",
+      "authorEnglish": "I have trouble thinking of the right words to express how I feel about things.",
+      "platformChinese": "我很难想到合适的词语，来表达自己对事情的感受。",
+      "dimension": "describe",
+      "reverse": true
+    },
+    {
+      "number": 8,
+      "itemCode": "FFMQ15_08",
+      "authorEnglish": "I do jobs or tasks automatically without being aware of what I’m doing.",
+      "platformChinese": "我会自动地做事或完成任务，却没有意识到自己正在做什么。",
+      "dimension": "act_aware",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "itemCode": "FFMQ15_09",
+      "authorEnglish": "I think some of my emotions are bad or inappropriate and I shouldn’t feel them.",
+      "platformChinese": "我认为自己的某些情绪不好或不合适，觉得不该有这些感受。",
+      "dimension": "nonjudge",
+      "reverse": true
+    },
+    {
+      "number": 10,
+      "itemCode": "FFMQ15_10",
+      "authorEnglish": "When I have distressing thoughts or images I am able just to notice them without reacting.",
+      "platformChinese": "当出现令人苦恼的想法或画面时，我能够只是注意到它们，而不作出反应。",
+      "dimension": "nonreact",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "FFMQ15_11",
+      "authorEnglish": "I pay attention to sensations, such as the wind in my hair or sun on my face.",
+      "platformChinese": "我会留意一些感觉，比如风吹动头发，或阳光照在脸上的感觉。",
+      "dimension": "observe",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "FFMQ15_12",
+      "authorEnglish": "Even when I’m feeling terribly upset I can find a way to put it into words.",
+      "platformChinese": "即使心烦意乱，我也能找到用语言表达感受的方式。",
+      "dimension": "describe",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "FFMQ15_13",
+      "authorEnglish": "I find myself doing things without paying attention.",
+      "platformChinese": "我发现自己做事时没有留意。",
+      "dimension": "act_aware",
+      "reverse": true
+    },
+    {
+      "number": 14,
+      "itemCode": "FFMQ15_14",
+      "authorEnglish": "I tell myself I shouldn’t be feeling the way I’m feeling.",
+      "platformChinese": "我会告诉自己，不该有现在这样的感受。",
+      "dimension": "nonjudge",
+      "reverse": true
+    },
+    {
+      "number": 15,
+      "itemCode": "FFMQ15_15",
+      "authorEnglish": "When I have distressing thoughts or images I just notice them and let them go.",
+      "platformChinese": "当出现令人苦恼的想法或画面时，我只是注意到它们，然后让它们过去。",
+      "dimension": "nonreact",
+      "reverse": false
+    }
+  ],
+  "sourceOptions": [
+    "Never or very rarely true",
+    "Rarely true",
+    "Sometimes true",
+    "Often true",
+    "Very often or always true"
+  ],
+  "platformOptions": [
+    {
+      "value": "1",
+      "label": "从不或极少符合",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "很少符合",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "有时符合",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "经常符合",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "非常经常或总是符合",
+      "score": 5
+    }
+  ]
+}

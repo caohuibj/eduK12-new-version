@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "identity": {
+    "instrumentKey": "ffmq15_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "instructionVersion": "1.0.0",
+    "title": "作答说明",
+    "text": "请根据平时的情况，选择下面每句话有多符合你。选项从“从不或极少符合”到“非常经常或总是符合”。例如，经常符合可选4，有时符合可选3。没有对错，请按自己的实际情况作答。",
+    "locale": "zh-CN"
+  },
+  "note": "Prepared content only; adapt to actual PR356 instruction contract before integration. Not part of old-schema executable source."
+}
