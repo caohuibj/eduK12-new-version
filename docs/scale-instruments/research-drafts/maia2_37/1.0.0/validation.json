@@ -1,0 +1,67 @@
+{
+  "status": "LOCAL_TARGETED_PASS_NOT_PUBLISHED",
+  "identity": {
+    "instrumentKey": "maia2_37_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "bytes": 82088,
+    "sha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb"
+  },
+  "unit": {
+    "exitCode": 0,
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0,
+    "reporter": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/20261026T065729Z.vitest.json",
+    "log": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/20261026T065729Z.unit.log",
+    "result": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/20261026T065729Z.unit.result.json",
+    "executionCount": 1,
+    "runtimeRegistry": "Vitest mock for registry lookup; preview receives explicit source; no shared registry registration."
+  },
+  "strictTypes": {
+    "exitCode": 0,
+    "result": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/20261026T065729Z.types.result.json",
+    "inputCount": 558,
+    "inputDrift": [],
+    "scope": "Unique MAIA2 test entry and its transitive TypeScript closure; no full backend entry compilation."
+  },
+  "engineReports": {
+    "exitCode": 0,
+    "count": 8,
+    "completeCount": 6,
+    "interpretationCount": 48,
+    "invalidCount": 2,
+    "result": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/reports.result.json",
+    "inputHashBefore": "/workspace/eduk12-scale-evidence/20261026-wave7/maia2/reports-input-before.json"
+  },
+  "contentReview": {
+    "selectedEnglishAll37Matches": true,
+    "sourceChineseAll37MatchesBilingual": true,
+    "sourceOptionsMatchBilingual": true,
+    "summaryChineseCounts": [
+      164,
+      161,
+      162,
+      155,
+      168,
+      162,
+      163,
+      164
+    ],
+    "tagCount": 66
+  },
+  "scientificReview": "PENDING",
+  "chinaValidation": "NOT_ESTABLISHED",
+  "notRun": [
+    "NIH DOCX readback (403; not required source carrier)",
+    "DB install/transactions/runtime-role",
+    "browser and independent instruction consumer",
+    "global registry generation",
+    "CI",
+    "publication",
+    "deployment",
+    "author contact"
+  ],
+  "capturedAt": "2026-10-26T07:00:57.179376+00:00"
+}
