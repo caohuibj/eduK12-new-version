@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {binding} from './pr356-scope.mjs';
+const e=JSON.parse(readFileSync(new URL('./pr356-local-evidence.json',import.meta.url)));
+assert.equal(e.kind,'retained-development-observation');assert.equal(e.ciExecuted,false);assert.equal(e.originalExecutionSigned,false);assert.equal(e.qualificationClaim,false);
+assert.equal(e.product,binding.product);assert.deepEqual(e.components,binding.components);assert(e.reports.length>=20);
+const rows=e.reports.map(r=>{const raw=Buffer.from(r.rawBase64,'base64');assert.equal(createHash('sha256').update(raw).digest('hex'),r.sha256);const x=JSON.parse(raw);assert.equal(x.numPassedTests,r.passed);assert.equal(x.numFailedTests,r.failed);assert.equal(x.numPendingTests,r.pending);assert.equal(x.success,r.success);return {originalPath:r.path,sha256:r.sha256,passed:r.passed,failed:r.failed,pending:r.pending,success:r.success}});
+const out=process.env.PR356_EVIDENCE_DIR||'pr356-evidence';mkdirSync(out,{recursive:true});
+writeFileSync(out+'/retained-development-observations.json',JSON.stringify({...e,reports:rows},null,2));
+console.log(JSON.stringify({originalReporters:rows.length,failedInvocationsRetained:rows.filter(r=>r.failed>0).length,ciExecuted:false,qualificationClaim:false}));
