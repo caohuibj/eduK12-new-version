@@ -1,0 +1,32 @@
+{
+  "artifactKind": "PRIMARY_SOURCE_DESIGN_REVIEW_NOT_VALIDATION",
+  "dateUtc": "2026-10-26",
+  "reviewer": "main_agent",
+  "source": {
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.880375/full",
+    "doi": "10.3389/fpsyg.2022.880375",
+    "section": "2.4.2 Enumeration Task",
+    "access": "official article via web tool; targeted method passage"
+  },
+  "observations": [
+    {
+      "claim": "Paper describes white circles against a middle-gray background.",
+      "status": "direct_method_description"
+    },
+    {
+      "claim": "Paper describes a 5-degree diameter region; the reviewed code uses a 7-degree square sampling region.",
+      "status": "paper_and_fixed_code_discrepancy"
+    },
+    {
+      "claim": "Circle diameter is 0.5 degrees, nominal display is 50 ms, and each of five number conditions has 20 presentations.",
+      "status": "direct_method_description"
+    }
+  ],
+  "stillUnspecified": [
+    "Exact gray RGB, gamma and physical luminance.",
+    "Full boundary/placement algorithm inferred from the diameter phrase must not be treated as fully verified.",
+    "Code inherited fill/background composition and the final noise mask properties.",
+    "Real mobile frame timing and hardware calibration."
+  ],
+  "impact": "Preview should separate a paper-description candidate from a project-modified stimulus; no automatic protocol freeze or original-version equivalence."
+}

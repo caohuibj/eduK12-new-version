@@ -1,0 +1,536 @@
+{
+  "kind": "STATIC_DESIGN_PROPOSAL_CLOUD_CHROMIUM_ONLY",
+  "resumeAfterInitialFailure": false,
+  "initialFailures": [
+    {
+      "status": "failed",
+      "message": "Limited condition not hidden",
+      "cause": "innerText was queried inside closed details; now opens details before verification"
+    },
+    {
+      "status": "failed",
+      "message": "Identifier fixtures has already been declared",
+      "cause": "setContent reused the same JavaScript realm; now each preview initialization navigates to a fresh about:blank document"
+    }
+  ],
+  "qualificationNote": "Failed development invocations remain failed. Fresh-document initialization changes affected all browser-rendered states, which were checked again. No product/scientific code was changed.",
+  "candidateId": "attention-enumeration-flower",
+  "dateUtc": "2026-10-26T06:00:59.629Z",
+  "cloud": true,
+  "chromiumSandbox": true,
+  "browser": "151.0.7922.173",
+  "actualTimingEmulated": false,
+  "checks": {
+    "layouts": [
+      {
+        "state": "guide",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": null
+      },
+      {
+        "state": "setup",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": null
+      },
+      {
+        "state": "fixation",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      },
+      {
+        "state": "stimulus",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      },
+      {
+        "state": "mask",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      },
+      {
+        "state": "answer",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": null
+      },
+      {
+        "state": "report",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": null
+      },
+      {
+        "state": "guide",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": null
+      },
+      {
+        "state": "setup",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": null
+      },
+      {
+        "state": "fixation",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": {
+          "x": 258,
+          "y": 384.390625,
+          "width": 304,
+          "height": 304,
+          "top": 384.390625,
+          "right": 562,
+          "bottom": 688.390625,
+          "left": 258
+        }
+      },
+      {
+        "state": "stimulus",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": {
+          "x": 258,
+          "y": 384.390625,
+          "width": 304,
+          "height": 304,
+          "top": 384.390625,
+          "right": 562,
+          "bottom": 688.390625,
+          "left": 258
+        }
+      },
+      {
+        "state": "mask",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": {
+          "x": 258,
+          "y": 384.390625,
+          "width": 304,
+          "height": 304,
+          "top": 384.390625,
+          "right": 562,
+          "bottom": 688.390625,
+          "left": 258
+        }
+      },
+      {
+        "state": "answer",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": null
+      },
+      {
+        "state": "report",
+        "width": 820,
+        "scrollWidth": 820,
+        "field": null
+      }
+    ],
+    "syntheticFixtureBinding": true,
+    "range1To15AndKeyboard": true,
+    "explicitConfirm": true,
+    "threeReportStatesAndImageGate": true,
+    "optionalImage": true,
+    "paperPolarityNominalOnly": {
+      "field": "rgb(128, 128, 128)",
+      "dot": "#FFFFFF",
+      "centres": [
+        [
+          121.60000000000001,
+          42.56
+        ],
+        [
+          209.76,
+          60.800000000000004
+        ],
+        [
+          63.839999999999996,
+          106.39999999999999
+        ],
+        [
+          158.08,
+          121.60000000000001
+        ],
+        [
+          243.20000000000002,
+          145.92
+        ],
+        [
+          76,
+          206.72000000000003
+        ],
+        [
+          158.08,
+          249.27999999999997
+        ],
+        [
+          221.92,
+          218.88
+        ]
+      ]
+    },
+    "noisePreviewOnly": {
+      "algorithm": "lcg1664525-1013904223-u32-topbit",
+      "seed": 20261026,
+      "size": [
+        48,
+        48
+      ],
+      "lightPixels": 1139,
+      "darkPixels": 1165,
+      "colors": [
+        "#141414",
+        "#EBEBEB"
+      ],
+      "meanByte": 126.28689236111111
+    },
+    "zoom200": [
+      {
+        "lang": "zh",
+        "state": "guide",
+        "width": 390,
+        "scrollWidth": 390
+      },
+      {
+        "lang": "zh",
+        "state": "report",
+        "width": 390,
+        "scrollWidth": 390
+      },
+      {
+        "lang": "en",
+        "state": "guide",
+        "width": 390,
+        "scrollWidth": 390
+      },
+      {
+        "lang": "en",
+        "state": "report",
+        "width": 390,
+        "scrollWidth": 390
+      }
+    ]
+  },
+  "sourceBindings": [
+    {
+      "file": "README.md",
+      "sha256": "102980cb8608c6f3c194e73cafdcfdb7ddef136b3a1a553b49d9e668fc2f37e5"
+    },
+    {
+      "file": "design.json",
+      "sha256": "46aa28f0b5075283f4844f106ea4a1f0ad787310b39b56bc650d56c58aa7486b"
+    },
+    {
+      "file": "preview.html",
+      "sha256": "f388b07ad0d4fb5088db97d5df52818f6a71388d3dbf4735e5daa06a19f1483f"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "guide-390.png",
+      "sha256": "75773c8c14a50affd884e0c10ee9fb472d905e256477e82f660cba2c1d330c01"
+    },
+    {
+      "file": "answer-390.png",
+      "sha256": "f9ddc31c13d58fc82c53736d709b00a96b38893b840febb34d9fea91886db743"
+    },
+    {
+      "file": "report-390.png",
+      "sha256": "fcb5fb4bfb7bdf0d7d8a4d71c38893f4c426bc670e626270dc3aa3a499b9f33a"
+    },
+    {
+      "file": "guide-820.png",
+      "sha256": "91c660747b687617a5342869121a8c74c986dbf8d0503ca1bf03023cd9f1d22e"
+    },
+    {
+      "file": "stimulus-820.png",
+      "sha256": "3005bffcbb4b012afc1f1cfd5639f3b5c1a654c92ae1f00ef45be1972dd88a0b"
+    },
+    {
+      "file": "answer-820.png",
+      "sha256": "0c851984c036d8fa3de2bf2e86e75c639121a3deb26ba6c0a02f17a7e0b65354"
+    },
+    {
+      "file": "report-820.png",
+      "sha256": "0382fb9ec5a8b083ef4523c5bf393b26fb40c24e91e90b823178a08f33ee098f"
+    },
+    {
+      "file": "stimulus-project-alternative-390.png",
+      "sha256": "ae5cb2e116aa00c1b53b71387ee52dcec038285df4fbb26c9d4fd7df462add78"
+    },
+    {
+      "file": "report-interpretable-390.png",
+      "sha256": "fcb5fb4bfb7bdf0d7d8a4d71c38893f4c426bc670e626270dc3aa3a499b9f33a"
+    },
+    {
+      "file": "report-limited-390.png",
+      "sha256": "c306109b65024c4dfad71c0504a61813103e173d7e41b08b657977395df4babe"
+    },
+    {
+      "file": "report-invalid-390.png",
+      "sha256": "d4dc163d1945260e96b6d18b21d3351a9ca9696f9198b2c3f48292ae7ddd1f6e"
+    },
+    {
+      "file": "guide-zh-200percent.png",
+      "sha256": "7e5e9e0293dce7b316e368b2ee71b7fb1c45d81434b399bc3b7bd2d20f97fd70"
+    },
+    {
+      "file": "report-zh-200percent.png",
+      "sha256": "e2e4760d2d5c952955a5a087ffd7023eaa8f52dd02de928f8148a9c36849acd8"
+    },
+    {
+      "file": "guide-en-200percent.png",
+      "sha256": "fd82c981575d9fdc89edb4e6d79946df3758cc0b64459a587d956a8b8b1858a6"
+    },
+    {
+      "file": "report-en-200percent.png",
+      "sha256": "29539fe110531753e1b6e3402355d6e2e27e204dbe1890436fb32941b8fe5be9"
+    },
+    {
+      "file": "guide-en-390.png",
+      "sha256": "6f7967ccd52d479d30f647f6904501f0ea2cf0f84e3fbbcc499d21a8833693d9"
+    },
+    {
+      "file": "report-en-390.png",
+      "sha256": "ccf4dc91da35f2d92da4960458eb6d58f2d494b96729e458fa1f070b1c2f0b74"
+    },
+    {
+      "file": "fixation-390.png",
+      "sha256": "baf0d5ed365928d563fa356e07568bb4b7546907a34df41a6d8603c2846e8a35"
+    },
+    {
+      "file": "stimulus-390.png",
+      "sha256": "eac95130afd55310103d7fbdd7fac59c577c2134fa14e3347e47bde8b77d24e6"
+    },
+    {
+      "file": "mask-390.png",
+      "sha256": "fe10f6a01dbe528a1c92652d2da3bc5de6684f8167e6535d64146f51ae1a34b9"
+    },
+    {
+      "file": "review.png",
+      "sha256": "65b63eeaa6045ce0554a5e6c197e6752480aba7bd36b7db3f83bc6f4624fe538"
+    }
+  ],
+  "errors": [],
+  "notVerified": [
+    "50ms actual stimulus presentation",
+    "physical visual-angle/luminance calibration",
+    "real phone/tablet hardware",
+    "four product entry consumers",
+    "Chinese/English comprehension",
+    "norms/reliability/validity",
+    "runner/scorer/API/DB/COS/registration"
+  ],
+  "layoutRevision": {
+    "reason": "Mobile review text wrapping previously moved stimulus/mask 23.4 CSS px. Reserved review-text slots now keep the phase field fixed.",
+    "previousMobilePhaseRects": [
+      {
+        "state": "fixation",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 340.984375,
+          "width": 304,
+          "height": 304,
+          "top": 340.984375,
+          "right": 347,
+          "bottom": 644.984375,
+          "left": 43
+        }
+      },
+      {
+        "state": "stimulus",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 364.375,
+          "width": 304,
+          "height": 304,
+          "top": 364.375,
+          "right": 347,
+          "bottom": 668.375,
+          "left": 43
+        }
+      },
+      {
+        "state": "mask",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 364.375,
+          "width": 304,
+          "height": 304,
+          "top": 364.375,
+          "right": 347,
+          "bottom": 668.375,
+          "left": 43
+        }
+      }
+    ],
+    "currentMobilePhaseRects": [
+      {
+        "state": "fixation",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      },
+      {
+        "state": "stimulus",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      },
+      {
+        "state": "mask",
+        "width": 390,
+        "scrollWidth": 390,
+        "field": {
+          "x": 43,
+          "y": 443,
+          "width": 304,
+          "height": 304,
+          "top": 443,
+          "right": 347,
+          "bottom": 747,
+          "left": 43
+        },
+        "notice": {
+          "client": 120,
+          "scroll": 120
+        }
+      }
+    ],
+    "rectanglesEqual": true,
+    "experimentTimingValidated": false,
+    "otherChecksReexecuted": false,
+    "projectAlternativeRect": {
+      "x": 43,
+      "y": 443,
+      "width": 304,
+      "height": 304
+    }
+  },
+  "retainedEvidenceSourceBindings": [
+    {
+      "file": "README.md",
+      "sha256": "8b8640ce2ed9be2e422cf08d776e777e98019616e319e5802cb41063c686ad37"
+    },
+    {
+      "file": "design.json",
+      "sha256": "46aa28f0b5075283f4844f106ea4a1f0ad787310b39b56bc650d56c58aa7486b"
+    },
+    {
+      "file": "preview.html",
+      "sha256": "3aa039e241488a795530e0cbf429c09b615246ca0e0aa3becf9903c68b08ad75"
+    }
+  ],
+  "controlScripts": [
+    {
+      "file": "review-capture.cjs",
+      "sha256": "541e5101ade97a43ced03c66de406709f5fbc016d2f8d04133ac95bee409b75d",
+      "executedAs": "/workspace/scratch/cognitive-plan-enumeration/capture.cjs"
+    },
+    {
+      "file": "review-layout-check.cjs",
+      "sha256": "a96bd327d083e4d0844241e1951181c1b49424e2c08075fa49076a222a6b218f",
+      "executedAs": "/workspace/scratch/cognitive-plan-enumeration/layout-fix.cjs"
+    },
+    {
+      "file": "review-alternative-check.cjs",
+      "sha256": "bd0a995a18b8ce56ce56608342cbf6c8cdc75abd4ea7cd726b503192dd9367a7",
+      "executedAs": "/workspace/scratch/cognitive-plan-enumeration/alternative-capture.cjs"
+    }
+  ],
+  "inspectionScope": {
+    "touchscreenHardwareValidated": false,
+    "responsiveEmulatedViewports": [
+      [
+        390,
+        844
+      ],
+      [
+        820,
+        1180
+      ]
+    ],
+    "keyboardRangeAndConfirmChecked": true,
+    "realProductEntrancesTested": false,
+    "formalQualification": false
+  }
+}
