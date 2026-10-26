@@ -1,3 +1,4 @@
+import { seedNativeMotConfig } from './native-cognitive'
 import { Prisma, PrismaClient } from '@prisma/client'
 import type { CognitiveSeed } from '../../src/modules/cognitive/task-seed.types'
 import { cognitiveSeeds } from '../../src/modules/cognitive/generated/seeds'
@@ -58,4 +59,5 @@ export async function seedCognitiveConfigs(prisma: PrismaClient): Promise<void> 
   for (const expected of COGNITIVE_SEEDS) {
     await seedOneCognitiveConfig(prisma, expected)
   }
+  await seedNativeMotConfig(prisma)
 }

@@ -1,0 +1,136 @@
+{
+  "status": "READY_FOR_PARENT_REVIEW_NATIVE_MOT_LOGGED_COURSE_BACKEND",
+  "observedHead": "4b91b5acff3f9830722c65107e60f188be297909",
+  "pr356HeadRead": "a57b6c8d1a671209b55ae5558da0964c1d4eea6f",
+  "pr356BaseBlobsCompared": 11,
+  "sourceSha256": {
+    "server-version/backend/src/modules/cognitive/task-resource.ts": "011d87092aead51548e67aa323b13d332e3ef6d051008d35567c43c9cdb3f14f",
+    "server-version/backend/src/modules/cognitive/catalog.service.ts": "86dc6ab61134a7aec657cf36f9169f7b682c649838fa1e1ac440a3cf71e9b075",
+    "server-version/backend/src/modules/cognitive/library/product-readiness.ts": "40688df4d555349cd27b807834ad19d8228b0b2f48d65289f6115cca8c64dbfc",
+    "server-version/backend/src/modules/cognitive/assignment.service.ts": "e747173e655a39c0b278a76cbe0d828c35b9b6ba9cfdc6ba7d4f9a0449a39fcf",
+    "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts": "f88e4741e5e2a4445f91776a46528c08c48c82bad80cf9855bc572928d5f0f95",
+    "server-version/backend/src/modules/cognitive/profile-freeze.ts": "47d9d6177755119bb7948451fc2b52bb11360c7a510fd2e8617a6e7332cb995b",
+    "server-version/backend/src/modules/cognitive/session.service.ts": "aef1621f328030a89ea58a5372570b21c880ab80acf927435e93ba179c759334",
+    "server-version/backend/src/modules/cognitive/public.service.ts": "5f3b204aa9c201676868bd68dc2b695dc3572520e96f129f36bd56176b1fd98f",
+    "server-version/backend/src/modules/cognitive/release.service.ts": "cc751ad2664ade1849ab5cec77b4d147670e5805c6c490c7f222e47fea557f25",
+    "server-version/backend/prisma/seeds/native-cognitive.ts": "3aeeb0b454633671a50ddcf9ca1471a61b68947c309b99bba346daaa9114304f",
+    "server-version/backend/prisma/seeds/cognitive.ts": "44919bbd51f59ddfc10c705c532b49506395e1aa80619bbc36fc0ffbc45b232b",
+    "server-version/backend/src/__tests__/cognitive/native-mot-journey.postgres.integration.test.ts": "581e7cba4bcebdefea7b9eceb4edab70cb2471c478477e1ceb6b7ae068abc95b",
+    "server-version/backend/src/__tests__/cognitive/native-task-resource.test.ts": "aae4b953fb503abd5deeb944a93dd6e5e9393c5e8019819ccb1eda29beeaa485"
+  },
+  "typesFinalOwnSourceHashesMatch": true,
+  "checks": {
+    "postgres-run1": {
+      "exitCode": 1,
+      "elapsedSeconds": 5.666194227000233,
+      "inputStable": true,
+      "passed": 1,
+      "failed": 1,
+      "pending": 0
+    },
+    "postgres-run2-seed-and-final": {
+      "exitCode": 0,
+      "elapsedSeconds": 4.666455771999608,
+      "inputStable": true,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    "resource-boundaries": {
+      "exitCode": 0,
+      "elapsedSeconds": 2.049558782004169,
+      "inputStable": true,
+      "passed": 4,
+      "failed": 0,
+      "pending": 0
+    },
+    "native-types": {
+      "exitCode": 1,
+      "elapsedSeconds": 20.64890485500655,
+      "inputStable": true
+    },
+    "native-types-run2": {
+      "exitCode": 0,
+      "elapsedSeconds": 17.30571301499731,
+      "inputStable": true
+    }
+  },
+  "distinctNewBusinessAndBoundaryCases": 6,
+  "nativeSeed": {
+    "realEntrypoint": "prisma/seeds/native-cognitive.ts::seedNativeMotConfig",
+    "wiredIntoExisting": "prisma/seeds/cognitive.ts::seedCognitiveConfigs",
+    "nativeTypesSeeded": [
+      "mot"
+    ],
+    "baseConfigRowsPerVersion": 1,
+    "initialStatus": "DRAFT",
+    "preservesExistingLifecycle": true,
+    "rejectsSameVersionDivergentContent": true,
+    "wholeDatabaseSeedExecuted": false
+  },
+  "actualBusinessFunctionsMocked": false,
+  "testEnvironmentFileReaderMockedOnly": true,
+  "negativeSeedGuardUsesExplicitMockDb": true,
+  "realDatabase": "parent-provided disposable loopback cognitive_native_test/cognitive_native_20261026",
+  "ownFixturesCleaned": true,
+  "implemented": [
+    "score-free native metadata branch",
+    "basic tests catalog",
+    "native dual-profile config readiness",
+    "explicit system-admin config release",
+    "owned teacher course assignment publication and measurement source",
+    "frozen native report tuple and bytes",
+    "authorized member UNIFIED START",
+    "real native session snapshot DTO",
+    "existing authoritative FINAL normal/invalid/replay without numeric score"
+  ],
+  "notEnabled": [
+    "other3 native product delivery/seed",
+    "native public/anonymous",
+    "native composite/library wrapper delivery",
+    "Survey native templates",
+    "advanced legacy library/domain discovery and tag filtering"
+  ],
+  "notVerified": [
+    "frontend HTTP/browser integrated journey",
+    "production API/DB/COS",
+    "real device physical timing",
+    "population validity",
+    "CI/build/deployment"
+  ],
+  "routesControllersFinalServiceOwnedByParent": true,
+  "schemaMigrationOrQueueChanged": false,
+  "measurementScorerOrVersionChanged": false,
+  "noFakeScoreOrStandardAlias": true,
+  "productionCredentialsRead": false,
+  "prismaGenerateOrDbPushExecutedByThisAgent": false,
+  "developerEvidenceNotIndependentAudit": true,
+  "committedByThisAgent": false,
+  "pushedByThisAgent": false,
+  "evidenceSha256": {
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/README.md": "5c75a2c25621ba76776da472546d799ed84068f6d2f4f5035bb14bffb44069a2",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/finalize-evidence.py": "5c9dec9baab1632fb440cc716d32645b7f7e1286260c9f0813f50af8ffb7d0c7",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types-run2.check.json": "1dfb8128f50770df693a685631d99c8d896bdac15c0cbeee3a8dc22bc71be193",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types-run2.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types-run2.stdout.txt": "42569b95177b2b8875dbc6c9dbe3e80b5b25b16bac937436358868d3c810d6b4",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types.check.json": "b1c27e4df11ebcd2a73697de650fcc16f7494f6d0a6b932b3ba61a9c1bb3c7f6",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/native-types.stdout.txt": "a4c5607227324a28671fd5c91418b2db78158090002d2103b8ad31bc04128c32",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run1-test-source.ts.txt": "075f3263e74667bc942db68a761011593911c5125edd348aa919de82628e40d5",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run1.check.json": "7adeaee32c0cea9fafaa07b6ea4d18411f41d92e2bb3d46434238197bb15e53d",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run1.json": "9e4822e180100d2956e59f803e36263e76860bb024210e20b54114ba4bf44428",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run1.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run1.stdout.txt": "4c0cd04414cf344c6e6903e8f74fab7ee4a920fe105b5474d33e489065e98722",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run2-seed-and-final.check.json": "fa7b7031cc11064bd42936d70e665cb8a2f041ca3ec5bd57a0287dddfb11a464",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run2-seed-and-final.json": "c74dbf4a4c86b24fd706086d990150a6d16644879034518c00f8a0cdd6d0ca84",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run2-seed-and-final.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/postgres-run2-seed-and-final.stdout.txt": "6f5a3d08898b8d87265a872ddb981a12af18046a7fe309acb88adb8e46f5cff2",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/pr356-comparison.json": "2909cf66064877c8278e42026e5554cde7450d0261f7fedea2a1bbe77a411377",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/resource-boundaries.check.json": "ece7b9eff785667f647c5972d10e793b09a3f302c8053acd2212f421e57a4646",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/resource-boundaries.json": "a178c9848d8176679746129c6cdd9a9ea20664193a308a910822b0510708e0f5",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/resource-boundaries.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/resource-boundaries.stdout.txt": "a4f848052efbf4c8a9764f582873486e8d61ba7bee785508db815441b35af6d2",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/run-check.py": "26d5e38b9f745e41b8cc9e8fd1cd2f14d9f16f2356da49e65f9febb5e3b5dcc3",
+    "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/native-journey/typecheck.cjs": "f73c28ead0eaec302a70366e0947825b3c35f2b65e69dedabed17bef1475cd2b"
+  }
+}

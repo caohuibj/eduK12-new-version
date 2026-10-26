@@ -1,0 +1,73 @@
+{
+  "reference": "caohuibj/eduK12-new-version@a57b6c8d1a671209b55ae5558da0964c1d4eea6f",
+  "earlierReference": "58c43e22",
+  "status": "current shared source baseline compared, not a PR merge or CI claim",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/catalog.service.ts",
+      "remoteGitBlob": "0da0693eaa94a9ee67a8d1dc07ac1c4afa163891",
+      "localHeadGitBlob": "0da0693eaa94a9ee67a8d1dc07ac1c4afa163891",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment.service.ts",
+      "remoteGitBlob": "24641cd9e59a36a3f493f3b6eea9c49cce28ae31",
+      "localHeadGitBlob": "24641cd9e59a36a3f493f3b6eea9c49cce28ae31",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/session.service.ts",
+      "remoteGitBlob": "e1e8aa9042a3a67649678dc71f18a3a59f0c5b65",
+      "localHeadGitBlob": "e1e8aa9042a3a67649678dc71f18a3a59f0c5b65",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+      "remoteGitBlob": "8e9eb65be43b00cc30f8dbf459e88ec7fab7c109",
+      "localHeadGitBlob": "8e9eb65be43b00cc30f8dbf459e88ec7fab7c109",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+      "remoteGitBlob": "85101728b1b03acdd9583cd0971d0fce55a34302",
+      "localHeadGitBlob": "85101728b1b03acdd9583cd0971d0fce55a34302",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/release.service.ts",
+      "remoteGitBlob": "dd208d63cd282118bef775edc34bacc42eac1027",
+      "localHeadGitBlob": "dd208d63cd282118bef775edc34bacc42eac1027",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/public.service.ts",
+      "remoteGitBlob": "740ddf6029a892a4eea80ed829f1037dde80c35c",
+      "localHeadGitBlob": "740ddf6029a892a4eea80ed829f1037dde80c35c",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/completion.service.ts",
+      "remoteGitBlob": "c0a1b5b75fc194eb33a1c2e93f7d263abbc043c7",
+      "localHeadGitBlob": "c0a1b5b75fc194eb33a1c2e93f7d263abbc043c7",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/trial.service.ts",
+      "remoteGitBlob": "6005cd10a1a1bf18162d69c8d7f86dd19185da6b",
+      "localHeadGitBlob": "6005cd10a1a1bf18162d69c8d7f86dd19185da6b",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+      "remoteGitBlob": "0377ada25cee265d398ef9fe082006a790c7dfe8",
+      "localHeadGitBlob": "0377ada25cee265d398ef9fe082006a790c7dfe8",
+      "equalBeforeOurWorkingTreeDelta": true
+    },
+    {
+      "path": "server-version/backend/prisma/seeds/cognitive.ts",
+      "remoteGitBlob": "4b5238f400ddf9c71dc7d88e7398b5782b656e0d",
+      "localHeadGitBlob": "4b5238f400ddf9c71dc7d88e7398b5782b656e0d",
+      "equalBeforeOurWorkingTreeDelta": true
+    }
+  ]
+}

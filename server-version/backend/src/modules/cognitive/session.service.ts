@@ -13,7 +13,7 @@ import {
   decryptCognitivePayload,
   getParticipantKey,
 } from './cognitive.security'
-import { requireCognitiveRegistryEntry } from './cognitive.registry'
+import { getCognitiveTaskResource, requireCognitiveTaskResource, assertResourceConfigVersion, assertNativeDeliverySupported } from './task-resource'
 import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
 import { lockSession } from './session-lock'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from './attempt-quota'
@@ -237,7 +237,9 @@ export const loadStartableAssignment = async (
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
   assertCognitiveProductEligible(config.testType)
 
-  const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
+  const entry = requireCognitiveTaskResource(config.testType, config.engineVersion, config.scoringVersion)
+  assertResourceConfigVersion(entry, config.configVersion)
+  assertNativeDeliverySupported(entry, 'authenticated')
   let validatedConfig: unknown
   let configSnapshotEncrypted: string
   let frozenReport: FrozenReportSnapshot | null = null
@@ -301,6 +303,8 @@ const buildRunnerPayload = async (session: {
   randomSeed: string
   deliveryMode?: string
   submittedAt?: Date | null
+  submissionId?: string | null
+  submissionPayloadHash?: string | null
   anonymousCode?: string | null
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
   compositeAttempt?: { contextSnapshotHash?: string | null } | null
@@ -320,7 +324,22 @@ const buildRunnerPayload = async (session: {
   const validatedConfig = storedConfig.config
   const snapshot = storedConfig.snapshot
   const report = frozenReport ?? readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
-  const entry = report ? null : requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
+  const entry = report ? null : requireCognitiveTaskResource(session.testType, session.engineVersion, session.scoringVersion)
+  const resource = getCognitiveTaskResource(session.testType, session.engineVersion, session.scoringVersion)
+  if (resource) assertResourceConfigVersion(resource, session.configVersion)
+  if (report?.nativeIdentity && resource?.kind !== 'native') throw CONFLICT('Native Cognitive frozen implementation is unavailable')
+  if (resource?.kind === 'native') {
+    assertNativeDeliverySupported(resource, 'authenticated')
+    if ((session as { compositeAttemptId?: string | null }).compositeAttemptId) throw BAD_REQUEST('Native Cognitive composite delivery is not enabled')
+    if (!snapshot || !report?.nativeIdentity
+      || report.nativeIdentity.testType !== snapshot.testType || report.nativeIdentity.engineVersion !== snapshot.engineVersion
+      || report.nativeIdentity.scoringVersion !== snapshot.scoringVersion || report.nativeIdentity.configVersion !== snapshot.configVersion
+      || report.nativeIdentity.protocolSignature !== snapshot.protocolSignature || report.reportDefinitionVersion !== resource.reportDefinitionVersion
+      || report.profileDefinitionVersion !== resource.profileDefinitionVersion || report.metricDefinitionVersion !== resource.metricDefinitionVersion
+      || report.qualityDefinitionVersion !== resource.qualityDefinitionVersion
+      || !resource.profiles[report.profile] || (validatedConfig as Record<string, unknown>).profile !== report.profile)
+      throw CONFLICT('Native Cognitive frozen profile/report identity mismatch')
+  }
   return { storedConfig, payload: {
     sessionId: session.id,
     ...(admission ? { sessionEpoch: admission.attemptEpoch } : {}),
@@ -344,6 +363,7 @@ const buildRunnerPayload = async (session: {
     qualityDefinitions: report?.qualityDefinitions ?? entry?.qualityDefinitions,
     reportDefinition: report?.reportDefinition ?? entry?.reportDefinition,
     ...(snapshot ? { definitionHash: snapshot.configHash } : {}),
+    ...(resource?.kind === 'native' && snapshot ? { nativeTask: true, sessionSnapshot: snapshot, submissionId: session.submissionId ?? null, submissionPayloadHash: session.submissionPayloadHash ?? null } : {}),
     contextSnapshotHash: session.compositeAttempt?.contextSnapshotHash ?? null,
     ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
     ...(session.submittedAt ? { submittedAt: session.submittedAt } : {}),
@@ -561,6 +581,8 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     session.compositeAttempt?.recoveryTokenHash === recoveryTokenHash
   )
   if (!allowed) throw FORBIDDEN('Recovery credential does not own this session')
+  const publicResource = getCognitiveTaskResource(session.testType, session.engineVersion, session.scoringVersion)
+  if (publicResource) assertNativeDeliverySupported(publicResource, 'public')
 
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
   const { payload: runnerPayload, storedConfig } = await buildRunnerPayload(session, nextTrialIndex, true)

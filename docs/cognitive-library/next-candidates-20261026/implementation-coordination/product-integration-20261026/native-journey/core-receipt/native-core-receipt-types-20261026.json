@@ -1,0 +1,4066 @@
+{
+  "kind": "NATIVE_FINAL_RECEIPT_ACTUAL_BACKEND_TSCONFIG_ROOT_CLOSURE",
+  "roots": [
+    "server-version/backend/src/modules/cognitive/native-final-receipt.ts",
+    "server-version/backend/src/modules/cognitive/final-submit.service.ts",
+    "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+    "server-version/backend/src/__tests__/cognitive/native-final-receipt.test.ts",
+    "server-version/backend/src/middleware/auth.ts"
+  ],
+  "source": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/native-final-receipt.ts",
+      "sha256": "57d760f72ccda4ee1688034c44234d196baf2a1c0503b11e2bd2fe54f01ce5db"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/governance.ts",
+      "sha256": "6487175a5e4f4905264938e4e6ebe99db645e3c40e72a92d9796090fe9fa0930"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/material.ts",
+      "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/context.ts",
+      "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+    },
+    {
+      "path": "server-version/backend/src/utils/logger.ts",
+      "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15"
+    },
+    {
+      "path": "server-version/backend/src/utils/encryption.ts",
+      "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/security.ts",
+      "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/index.ts",
+      "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/reference.ts",
+      "sha256": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/types.ts",
+      "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/presentation.ts",
+      "sha256": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/types.ts",
+      "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-package.types.ts",
+      "sha256": "ab1e4e3d040190162b46008a1f6d3e4d72a92d19034232a462d22631e41db25a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.types.ts",
+      "sha256": "c1983d53cb88a1ed220fc8a3349b536cfd713a7187e292cc30c861bc14a71e46"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/semantics.ts",
+      "sha256": "80277a5b34f1d45ae59e40de56f0eef37adfc46f5bbdb647a3909b7819f6db07"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/fake.config.ts",
+      "sha256": "ff4cecb4ccb0f2305b1a9af9643705af1ec88b1c939423648f2f442b50e497f5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/fake.trial.ts",
+      "sha256": "c583bca6b14736ff71419c8a952ad53962c24682a8dded44014b98c900240c78"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/fake.v1.ts",
+      "sha256": "6ddcca087a0776f2b60eb1f34ac4138bcfb7d12fb90e91c5e719c20ced82df0e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+      "sha256": "9bf9ba2bb7e4bafdc4c437c881bb979b3790c9775ee24eeda4ab27fe98e3e774"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-primitives.ts",
+      "sha256": "9f3295d749d28376ad18a4ca46135efafa107c4b1bde16221dc5a4fba2318687"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/definitions.ts",
+      "sha256": "8872d3161fe81a2d31568f8692298f27ed1de4b15126000ceb73ea18ae064fbf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/package.ts",
+      "sha256": "e676de220444211896cf8ba52b3ddef99ebb31a60251dbc5269586cec8201133"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/semantics.ts",
+      "sha256": "ee47842ef0afbab3a2b3377a58db5e370f056a4831d14d574e097ad0c962eff5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/report-meta.ts",
+      "sha256": "8446a4df87158f9cf4c602fcf60d65fe5635a2aab8808c33828a1c0afda8f2f0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/reaction.config.ts",
+      "sha256": "a978d894500babb62964d4acdda22c787a73ed03c766fe089ffa194ef536d71f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/reaction.trial.ts",
+      "sha256": "42d0c8886fb0f86ef5fdf45911bf9b12cc94d63e1096d39033dea11437692ce3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/reaction.v1.ts",
+      "sha256": "85a456ae63fc6855bc89a94dca13089bb90968f6c18de0ab89f3aac826da5a11"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/reaction.v1_1.ts",
+      "sha256": "0d1b0a124f0103ff0bf411050c08d9b970e1174457a4f45626ad4592c3243868"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/definitions.ts",
+      "sha256": "6f18bfb89dbf0ad2dbab21b87dd395f4b4da57e662830ae7794f4fc1d9aedd11"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/package.ts",
+      "sha256": "0b7b6e30063fd19962c284b733cdd2ec304f7be8d7dc4d1e937bf3005a3094f3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/semantics.ts",
+      "sha256": "d26a0c4b4604837eee7333ce06f37d559700bc8d034b1e0148a158206b36092d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/memory.config.ts",
+      "sha256": "a815dca7322667ed3100ab81380f77ffd3910fe0fc2498ab9c6e67d9983074f6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/memory.trial.ts",
+      "sha256": "3d5c196360b8fc856c63c5758afc0dbf89195914f9ddb06a20506ecae5a519aa"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/memory.v1.ts",
+      "sha256": "24843ff3ef2f237e238fba85935babea27e9c6b8ec8dd8bca36b6381d5fbdf32"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/memory.v1_1.ts",
+      "sha256": "c375d37e0831db1715098bd23cd2633c7b8e6f4c85cbdc0c702b8a6962e1284b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/definitions.ts",
+      "sha256": "3671328bdc1f94a06da6e7e034d8703e148109e7bc3ecee7c9492e1196cb939b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/package.ts",
+      "sha256": "2a83d000b9754c13e29bc30a90b7f252a2c7036f270449390060bf1b7383f412"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/semantics.ts",
+      "sha256": "abc16ca1253bd283748590276ca637a2db8e05db42078ab387f156457fccc4e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/stroop.config.ts",
+      "sha256": "606447752212becf06d8c30ad62f5cf1180944160f9d3bbae893cc38af0c3145"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/stroop.trial.ts",
+      "sha256": "92e7442ce07b7e162109836f75db5166f4b512c7502da633e4750ebe1adc91cb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/stroop.v1.ts",
+      "sha256": "ead0a3791e8866ba269bfb9999c46b748e37b61325d8dbfcc8735de52340568d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/stroop.v1_1.ts",
+      "sha256": "8e7fdb4d26abdc5ede69624a753fb8b4a15e5753a2eef98fa0cabad210bc61ca"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/definitions.ts",
+      "sha256": "38102049a5522460deb5fe83140c0bc28aac5b0f73041b4ef9f7a1aa97aa34d4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/package.ts",
+      "sha256": "ee971b8c89d3b1a094fde0dd9d5f54b4cdd18988b71d64430f643be72fa9f686"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/semantics.ts",
+      "sha256": "5c64e53a6c07503a0d8376203dfdb58c5336353142c1caa423296fd4ae8fac8e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/gonogo.config.ts",
+      "sha256": "9ce60c616e06a7114029278cd263430a4181962282484347387bf2b2c5d63f67"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/gonogo.trial.ts",
+      "sha256": "a38114d8532fc50f394c7a1dd49a6c46a759676fcdce5db7b5e9458c731b9199"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/signal-detection.ts",
+      "sha256": "84ce439d6e51e1ad2b9331d63b4e6389dbd0dd0bac0a9f83b468258a46fc3457"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/randomization-primitives.ts",
+      "sha256": "13e5ad811502f6382b3bbdb35536c6a97677b65b38536e9f1eab8cde4791cc76"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/emotionrecognition.config.ts",
+      "sha256": "56a5380cf14abf0746ffc526c85bc013dc0d61bc5f9359fa2994bf52ebb22984"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/emotionrecognition.trial.ts",
+      "sha256": "6ce1cc817230dcde9c9b05b93ff7bedd52cf12a958de0b21665e95560581de08"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/lexicaldecision.config.ts",
+      "sha256": "3a3563311fe4ef3aaf3a4dfee89647eb0777c7819d769e9801e75d08d7019c39"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/wordlist.config.ts",
+      "sha256": "0da459b86ac4f2f512bb7384f5bd38708fe123d4318078f07761c6d443532e2d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/pr13-lexical-bank.ts",
+      "sha256": "18b3004c9bfbb9fed9f5d73e738debbbb5aa54919b6c793a762bf4b62e87685f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/pr13-stimuli.ts",
+      "sha256": "db1115dcc14b1e7a4c42afd0fa07b4ed71932f52b4457dbf71c30741b369cfd9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/randomization.ts",
+      "sha256": "3cadba7aaf177fdfb79323270544a644899aa7c710b0832b0b49c3a332b17b96"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/gonogo.v1.ts",
+      "sha256": "93ad3afe5342176dc7d2bb3121d9ad7648a9f9ff50fd192e49c1003973e901a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/definitions.ts",
+      "sha256": "eace0bb5a908a01ec60c0cefdab5b0ae80c66df621f9dcf2e719793b92819dcc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/package.ts",
+      "sha256": "48a932ce8efa19b024afce916bc13e65e187826f926ea8eb2ad92f72e1a7abb0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/semantics.ts",
+      "sha256": "51f4d17804cc800c81ca4569c48cd18fad4ea265ac37bd125334fb2a9f39b35f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/cpt.config.ts",
+      "sha256": "da09773de5ff28688d351b5e195141d39c6064119d7fcfb58aaa0d69b52760fd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/cpt.trial.ts",
+      "sha256": "03d5803c6704227c4fb92c97cc886e8e22a887aad0d6aab0e9dbecc6fa8b87bb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/cpt.v1.ts",
+      "sha256": "be29fa5f1fb6ac57f74f4bdeebd01309d2bfd50ee715141f280adf54f23d121f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/definitions.ts",
+      "sha256": "3bfbc3ec423cee68ce372e78e991cd7068bb5caea8412db0ffc97683cd5fe5ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/package.ts",
+      "sha256": "81f857e16f871429cdba0a95cb1d020602f39683e2c74546c96a7b11a4fd2e22"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/semantics.ts",
+      "sha256": "056087c09ee86d7f8a276452c1be5654740b0169da855ddbafea6a284b84b45e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/nback.config.ts",
+      "sha256": "e5d45f417f13e7f158685963e2ed982c59fc7f0680892169f6e671b292a14472"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/nback.trial.ts",
+      "sha256": "43fee9c19dfd8b0d33d61e0f31e0609d961f10bad9aeec71b196d39f9dd171c7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/nback.v1.ts",
+      "sha256": "75c736a7727f97107d6d635f09a13efee3bdd0b7e84b1ccf0034356beae457a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/definitions.ts",
+      "sha256": "bf9d91cb2e6540d4b5709ef34bf2727e90abd094077f31e9265f595700881aaa"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/package.ts",
+      "sha256": "3837b3a8cc5fc21fc904a850c44a5ade968c18d8f36a2f7eb485f4554b085ff3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/semantics.ts",
+      "sha256": "8e151e88b8811401c68c1627e1a1fa5a2d1b8c9cd7aa28e4d9787a9f0462b9e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/corsi.config.ts",
+      "sha256": "a193ba2a5766f2941f6dceb6ed644ac81796599af66ebcbdaa50f1dbb29cc36c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/corsi.trial.ts",
+      "sha256": "357a85115256224f4f5272c440bd13bacf1da9ffa0e3b2226a4872fc87c0accd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/corsi.v1.ts",
+      "sha256": "1d97552448a0c06ea7301a988e484816e4e85ef720ea47ef1ed4794f39051e41"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/definitions.ts",
+      "sha256": "59781b197dd1a038d81e470db7cf5097b4dbbc9111d4b2c3051178994017faea"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/package.ts",
+      "sha256": "791a39d107151ae03fef04648fc66437af4cd27040a1928378dd0a10bea2a443"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/semantics.ts",
+      "sha256": "a430c152ae80ef5edb5152aef41028a49e751c0a35a57444112b20a624b89052"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/sst.config.ts",
+      "sha256": "e86ffc643f4803d0b0969cdb2cd7ae891579387ea452fe4398afe13e72d1ed6b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/sst.trial.ts",
+      "sha256": "4fe9cf1d284ba601e565e7b12a2183d600b99ab686430f9fa544e82b952d0911"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/sst.v1.ts",
+      "sha256": "c89ce635d0adf74003026d2a78f0f6608b816a02761fe7ca2f5c6d6dded609fb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/definitions.ts",
+      "sha256": "c65741fef0db5e8b4e2c16089b2fa14afe2f9135689d86870df7a6e5b7454ccf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/package.ts",
+      "sha256": "b17dde069367dbb0261ca8152dcbca80b52694e924e3f471bdf00cab58e27be8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/semantics.ts",
+      "sha256": "1d887a6662b3ea7f01190f4267ce465fd3fa2d2ffc6052150e8b2e556c0826c9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/taskswitch.config.ts",
+      "sha256": "499551c15296964a744fc4e16f158b8b63c34893d90bf7b0c0741f9a7d51d569"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/taskswitch.trial.ts",
+      "sha256": "803c2f4b2d60a0c97a54209f1a1fb14caff96b3dbb5a44a68577916b0d2e5251"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/taskswitch.v1.ts",
+      "sha256": "f79f3552da4e762ea77274c4c3e9de804b5e4a7c97c29d0dff71de60ccebf507"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/definitions.ts",
+      "sha256": "a9844ef797c56b86b0537711c8faa73c1f63cdb3075af9937da5651891996788"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/package.ts",
+      "sha256": "1e917e21ccb666c0353a075620f3a7579e3d5d84c35103dbd0f81929266cc92f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/semantics.ts",
+      "sha256": "8e8c6f547291dc5e5acda6575dc526634dd317af4185458aced55e13cc31f9eb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/patterncompare.config.ts",
+      "sha256": "4f523ef1d205b89d6ee0903118f76990c3fa18198ebd1d9178468fd5327f3d74"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/patterncompare.trial.ts",
+      "sha256": "5786cc61160d60a349c59231e3fddcecbedb75ed08d351ad028a03ec4a746def"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/patterncompare.v1.ts",
+      "sha256": "17b29583f055bc5318ddc825f1a3d74d42fe2ba028f328790f75066b766b9e7d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/definitions.ts",
+      "sha256": "44d7e36cbe8ae48c5eeed4c0d714635e8d18d1f3cd5d133e3ae70067277b3bd4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/package.ts",
+      "sha256": "b4872e8f51e11913be8258fc6d27010439451f670fbbe887187207eae8f80c50"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/semantics.ts",
+      "sha256": "2caefa63ed27520f89ccae1971e27894ae836b94c06dcb3e4ceb0d919b173a7c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/flanker.config.ts",
+      "sha256": "2ab2b1b497237d4ee02fe7446c84fa9a91a21c65728737d83f45a3ff3e04d6fb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/flanker.trial.ts",
+      "sha256": "3c8a7c6be0a6ca033567838cd2258a6cf8dc4885f6a135af3a8f03aede88ae2c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/flanker.v1.ts",
+      "sha256": "c2eaf878732a34866877588380a8f450b87aec05f976c2552c323efbd9547cbe"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/definitions.ts",
+      "sha256": "b5678e3aff2eb4911131ae2e73af142433af1e81aef02d91526c5f37def929ec"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/package.ts",
+      "sha256": "413f4b46b994a9aabfe2ea495977fa29dec3d9d7d086ee05fee1efa20413a965"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/semantics.ts",
+      "sha256": "2e37bef7ff60837fa5a6105dc42f6e879f7f3f1fc91d9bdb126ceca2f22585a4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/cardsort.config.ts",
+      "sha256": "69f47c57f9eba482ed223d1f6d16e0d27a8dabba5e26830125bf5412103d518f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/cardsort.trial.ts",
+      "sha256": "57c7df1329ee77a2841dbdd1f94e994bc62fd72d968fd43c8ad83171d2327a96"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/cardsort.v1.ts",
+      "sha256": "268f62761fe473d633f7334dd1231be9471b7d4aeb6cad1218610a1f57bf3ba6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/definitions.ts",
+      "sha256": "1f2a8a26cf7a51ee38cb8607510d91ffc2a75b0b652f0c5adc133a08791e717f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/package.ts",
+      "sha256": "a84683c22e5a75c83967c50a153d5ce11088e7c44ac5070f88e584b29934595a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/semantics.ts",
+      "sha256": "e29ea70dddeb4bb8cd2253dd69f7002e52b930e6fca7ea40f9f7100f7d9894bb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/digitbackward.config.ts",
+      "sha256": "8222e191a98a2433e73be383fbb665dcb7846abc2b9978e67d47c8c84bc0b0fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/digitbackward.trial.ts",
+      "sha256": "e7836c5d0a1c2612f8bd0d4a2295d846215c3139e6dc65671961c04ffd5e65a1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/digitbackward.v1.ts",
+      "sha256": "56a826d76f81047f075bcb88383f520760561aff5a4315b41663baaf3a371a2d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/definitions.ts",
+      "sha256": "52dbb8bc019eecc63975080e6af1217cf2c622c720087db2bb962d205b8ad890"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/package.ts",
+      "sha256": "452726019e84dbe305411fc957550e1866ee67c9e29051514e2bfa13cf888218"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/semantics.ts",
+      "sha256": "9708f7ba97f0ff39c0b149346e456f6cc0cfcceedbf0fc143c81656e0de2c1b1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/picturesequence.config.ts",
+      "sha256": "d1724840dca7a526377d211472d8629e8d96dd0f112c62dd262b3e1c74177e90"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/picturesequence.trial.ts",
+      "sha256": "25be09f2d52c39a018dd6c25bab6d315132c0e9aa24928fcd325d99f52ee2f1d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/picturesequence.v1.ts",
+      "sha256": "812e1a090bf7896d14a73a4fb9a131a3eb4e2fad57ab9603590fbde76d82a999"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/definitions.ts",
+      "sha256": "2b1cd9e3041d598c2d00b5b7a177e98db0c3fdff59f31ad3a6e032b42e38f0b1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/package.ts",
+      "sha256": "7fef58820655f21c8e3691f8e661ad52869c358d622807b316dd6af926c81a05"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/semantics.ts",
+      "sha256": "03ea9d7b4cb3f844c5a0025ceb5ebfa78e1736e502fa6e8c3e5c4a4bda69bc48"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/pairedassociate.config.ts",
+      "sha256": "dda8a9ef4969d9c73d40a7b72f5ee638111fd25e79e7b76d0af858677b02ef80"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/pairedassociate.trial.ts",
+      "sha256": "2693f96c526f18693a06f6c1d4874c2d01863611e01bff361b92d01999fcf833"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/pairedassociate.v1.ts",
+      "sha256": "87a7beb1b9b46eed9ac422690b9751dc1a20f265d2c0a981ae10d2ee18103266"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/definitions.ts",
+      "sha256": "15e6620faa2755942232b09e219fdd5c5851ef40b21ac3a6532c90ff071752a7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/package.ts",
+      "sha256": "7c9fcc68e7fb587dd1b8f53c78c5dddb11224b1357f9fa407c3d4d4a1b77296b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/semantics.ts",
+      "sha256": "c5e1cee7c29755ffe7c73ab97c789cb971bb66a03bd03e01468e6aa6714f9983"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/matrix.config.ts",
+      "sha256": "3fa6d4f4875f4d2ad561d65b5476eafdf9a083c8aa794a048fe25158e25834dc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/matrix.trial.ts",
+      "sha256": "6cfc846c3b3d6b0557645af018731a7f23c8cee0f10625bfd8b6bfe3273d948b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/matrix.v1.ts",
+      "sha256": "8ed74d9cc03ce888a289ca1cb38376bfb034642b934ae94939209b48cde9e018"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/definitions.ts",
+      "sha256": "9604b41776f7ffb684ef5110454a79a30fa28ba2f1c551c265b91767ca3af5fd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/package.ts",
+      "sha256": "8b7c1938c02404187e82e99407318d1da8a6670aeb0360a541cea21ed4cc4286"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/semantics.ts",
+      "sha256": "2324952975a4d63beb5ae9995ce6bd69b767c1ac7417cb4d8491860f45b8cef7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/mentalrotation.config.ts",
+      "sha256": "03f1332572291134fac200f66d98225e0de924c390156ce8e829039f83c87754"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/mentalrotation.trial.ts",
+      "sha256": "1528821905f7e9e5bb6041b716c05a321b14289b6135b3d4eaea9f0f2a7bc113"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/mentalrotation.v1.ts",
+      "sha256": "9db48603005a079d535d6667ba86de618e0da8b11cfebe7cc84d04ef9b5f650b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/definitions.ts",
+      "sha256": "ea857f230bf1d293ad196738f52641a82866fc10a73619b531c2307e359fd2d9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/package.ts",
+      "sha256": "a000c1dff547df9a785abd49d4a01769aea3b8efdffcbe867e1c03c3feda238b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/semantics.ts",
+      "sha256": "0ec5a29a3a58d91d512c7d6892d7494e2d83e48e3023dc6e9db3308338796119"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/tower.config.ts",
+      "sha256": "7a5058fb3ab78f8e3251de811fc00af64a5ebb9e17c54047f4b5aac3f3f9c91e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/tower.trial.ts",
+      "sha256": "fa00308d2f196cb3ba5ab2d318523571b8f9e0ff5ff1b209ad4ddbb23207fde1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/tower.v1.ts",
+      "sha256": "bc81d5453454188a7721ba524d36711a067ea5dd54a655e8c3dbacd947984e3e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/definitions.ts",
+      "sha256": "3c14c98ca774d4a7b6cdfa66187e865b9c5ebebb4d97288a830e5d95454f8ba1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/package.ts",
+      "sha256": "f1e51a887e50f81b7bbdc1c2629be23e6fe1eda5ee120bfe5ce348dca12ae5cb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/semantics.ts",
+      "sha256": "b02933b42c5464febbbdbac49e0f73adc00b2912b63891c2240d91d5e42dae7c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/trailmaking.config.ts",
+      "sha256": "26e5e1e7e46b342b90a0ffac506f11668b6c2bb14fd84edf415ede4d1ba4c73a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/trailmaking.trial.ts",
+      "sha256": "a64f653ec75dddc946aaa8d45dbb7322eb0fe52feff608be9424d0f7e91a5668"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/trailmaking.v1.ts",
+      "sha256": "d1fb15ce14fcb04986e608630291019b7902c9272670b26bc43066c16ef123b2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/definitions.ts",
+      "sha256": "3bc9622a4da494430bfd17dd153144ddf844e2fdbbe3351ad76295bfc8884b9d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/package.ts",
+      "sha256": "4a73220a13dc30e62947ff6013747825414d3d5e44deeed4e42a8d1d36744ca9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/semantics.ts",
+      "sha256": "cee53b087aa58e0a93211386ddac917ff8e842018a9927ae18ca3dc8912c1052"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/reversallearning.config.ts",
+      "sha256": "5f9ba8fe88116caec7555c2d84d7d238b490ba0e39143326126e67da6ef316f4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/reversallearning.trial.ts",
+      "sha256": "0b2e64cdff2fa24cfb8b359ccd6f56611cfe16b236c163a21b76c183c12c432b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/reversallearning.v1.ts",
+      "sha256": "22e66d6b39938eff5136aefb09193129487eb98068db520ea864fa9ff88d4cb8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/definitions.ts",
+      "sha256": "581664ae5f7328e5c7a35ce8989f00ecb2d5078ee6720f1d976cc06fbad08588"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/package.ts",
+      "sha256": "6c046aba049efcb24be1ab8133cc55d00d5eb463afd51ec3e771bd4dfda8fc38"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/semantics.ts",
+      "sha256": "a33e1d0409ca496a605242b608d13bf61dfbc706d68e0dd6250794c2785ac554"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/bart.config.ts",
+      "sha256": "16f122403e2779f2d269b9de49131db87f844f2b9a7e3716c5eb244e4d100024"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/bart.trial.ts",
+      "sha256": "04560edb25b9f46784ff7e17f7fabac41246bd68d7f726948d31b3c54d45feb7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/bart.v1.ts",
+      "sha256": "065dfe50f0db8d70e9451f62ab8be98ec71ba022f490d53a5c2a090eac8199b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/definitions.ts",
+      "sha256": "c5c47b6f54ffa2ea67d417f1386b4a192a344ff3990040a7d203ee2844460158"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/package.ts",
+      "sha256": "bb36f1c99b20ddf68d0d16d78a596992f6e4a76a0aba2f7ea78b06e319478d50"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/semantics.ts",
+      "sha256": "5ee46a0e66566cb94af8669feb9df15e53411880093c21df200a40005c6e13ea"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/wordlist.trial.ts",
+      "sha256": "0019552e92e85afdecd7e23dfd70f527db1d474f289834e6b62aa2a2876cd21c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/wordlist.v1.ts",
+      "sha256": "7207a1bf2cc4b5ad820d5ace4ef2bf4a74ad0b8960258393da025ed766da70a0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/definitions.ts",
+      "sha256": "76b0ea5c4a0c84d9c9d3507cebd5c1c18a8ffd3a9358ed888c92528daf8919f4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/package.ts",
+      "sha256": "609a4e5f110492ae0ed85e109e424c3d8a837a5a51e90c68c95ebfe083f2b105"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/semantics.ts",
+      "sha256": "d43917b4bc7726b2e3a820a68a5b5ba0b668e49efabf8356040ba1a1ec9f63b1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/schemas/lexicaldecision.trial.ts",
+      "sha256": "fcb32e491e6c32d2cb880809042594dc018b69af49b1c3bf06cb814f595c013b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/lexicaldecision.v1.ts",
+      "sha256": "1a891cfa3726f03c4550de7d79258ffc045958fe4a03ab1c11d9bd29bf91b444"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/definitions.ts",
+      "sha256": "050903c107fea63fa7bade53a04b53be0eae66c0d06d881b286c8ffc94dfdc98"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/package.ts",
+      "sha256": "bb40c89bd277fcbbd9396eb6ecd04c43ff373f196b5028e080ae571134e0b351"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/semantics.ts",
+      "sha256": "f5df9137ee06402b1187baae0764dd79cce932d7d30c2ad139512c0aca87c438"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/scoring/emotionrecognition.v1.ts",
+      "sha256": "34b04d2e175a6caa686cb703cbe55685a2e871081a5867784572e2a6509b73cd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/definitions.ts",
+      "sha256": "c09a92f1cf2483b1c85a0eabb249253e03db3e2af8b554df2f3e9c6947c8d4a7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/package.ts",
+      "sha256": "3ed5a38fba1e67bf2555510d9e539cd76eee7e2297a2490d9f6ffa1fc1b42c20"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/generated/execution.ts",
+      "sha256": "ec4e3211472333cd66c58f12371e9809a6f623fe2356a5812e2ffe7e16888793"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.registry.ts",
+      "sha256": "4f1aef535310f2d9dccc17a076cd9bfb6b2cfc7e2319c595331561a05158bb4e"
+    },
+    {
+      "path": "server-version/backend/src/services/runtimeObservability.ts",
+      "sha256": "fad3be33a8f6851565143fb1b91081e237f7cc760ac5e7165d8459ee40392f5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+      "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+      "sha256": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-definition.ts",
+      "sha256": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+      "sha256": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-branching.ts",
+      "sha256": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+      "sha256": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compiler.ts",
+      "sha256": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+      "sha256": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+      "sha256": "ad18c4c83881e2c39c6e3cc176be6454626d093ddfb15ef47873dd77aa657a8a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+      "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/protocol.ts",
+      "sha256": "59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/schema.ts",
+      "sha256": "094ca7760198f49bbe2126036fe58a27aa8389bfba0959be5f8217113e2d04f6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/scorer.ts",
+      "sha256": "0a6afc6aaabb6a1464b0b957f5a99dea912d49b8ad85d4cf827b7ebfb90e88d4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/metadata.ts",
+      "sha256": "53f026377e29e4a96ec7f747e51d68d22739f6e11a59f4f21963bd38a6cca8cd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/trial-envelope.ts",
+      "sha256": "d6a63ac33a75f79dfc4fc3fefb86be934f105ffb2b480ef5cd17b6765590037d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/catalog-tag-labels.json",
+      "sha256": "4078cfedffc6591017e83c479cf346bdc4b239f19adc3ed0606bbee97b213dd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/catalog-discovery.ts",
+      "sha256": "69650416187e87a1114969c6d954b545f32cb0d36767379114eb088dcb632210"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/catalog.ts",
+      "sha256": "8946a10a2c40aa70dfc5d506502a3469211085074a59652c10568b12e409b7cb"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/package.ts",
+      "sha256": "709b00610482a2d4014090e9a400728009d5b2e2ad9cdd5468d3bc4cfe73c261"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+      "sha256": "b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts",
+      "sha256": "3e4fc5221eb4733ad9557f4559ee18d65773ce2c062325c63821e362f4b3a345"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+      "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/report.ts",
+      "sha256": "3b8643091d49cae56724d58348198ee928faa2d72c6d2fdb3fcad823297adafa"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+      "sha256": "33e7e771f11d5c99e75db92f26df3d2dd1e6de1b9b1367f102ac6fd143974e88"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts",
+      "sha256": "308c0fbe3315d5e4b5d62621b85bae431d09354f5a82cb85abf4d3a034a5802a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts",
+      "sha256": "87bb3ec491005ebbfb6419a778f598ffafa29e503e49414c29398d4e2c12afbd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+      "sha256": "2d002b020ed9053ea6d16299ba7edd14afd30a6d1263964a28d600d6b64c2028"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/protocol.ts",
+      "sha256": "f9b724b0bbca7c172089ae1699b311605e1681845a331f192f9afc4de454804b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/scorer.ts",
+      "sha256": "cd3f53ad81d127da6342fe62f91ed7aa52b6c9a665c1484d0895ed7bbb7272ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/native.ts",
+      "sha256": "8780ed5a2d7ec90f14a4f5129c97f1a84fd271197c40c32a39148a4b256d0016"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/metadata.ts",
+      "sha256": "17bd8861353a0c93f04b708ae260c1bd8524e5fe16408f78a38cfe5a53d6c706"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/continuous-recognition/package.ts",
+      "sha256": "eaf7c9e3b2d41d95c77546deebb3ce80c0ee9bd12b5b1c235849024fecf7dfc3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "sha256": "3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts",
+      "sha256": "8f9a947b91700be855a1c126f82d8dd0c6e49c6ef0b598f5ee6ca349666c1712"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "sha256": "e86d4004d7aac162a75ce25ca849a041efc624616b063382fdaaa090fb63a60d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/metadata.ts",
+      "sha256": "c7663e62c297d566482bef46af6dadc6758ad801d67bcd4ecdf6d7f7c06bef76"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "sha256": "dccf4723f4ea9b66d317b532310fc30768406c74614e7d645aa990939266f56f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "sha256": "d00bcca6851175120c548d7b56c53e658259ab34e33afb51ca803a8cdcfc8a5a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-resource.ts",
+      "sha256": "011d87092aead51548e67aa323b13d332e3ef6d051008d35567c43c9cdb3f14f"
+    },
+    {
+      "path": "server-version/backend/src/config/databasePool.ts",
+      "sha256": "03f64717cb0f923c4de89d9e5ae2e4603fde10caef3216108894c4bb1cf6fbc5"
+    },
+    {
+      "path": "server-version/backend/src/config/database.ts",
+      "sha256": "fbfb331ffc1f0b04acc32f52cb23b5702bcd38d0ad6e9a317f210debc5e4982a"
+    },
+    {
+      "path": "server-version/backend/src/services/instrumentFinalSubmit.ts",
+      "sha256": "abdd778dbb2df0883f5b975b240155ca0158fd0cd075b72a7c11c94adf72ce51"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-admission.ts",
+      "sha256": "a49c25d2c9c996b078d856bd459bd71433cd41b7981e8278562a4e9e7fc1e542"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/security.ts",
+      "sha256": "a260a76f743828b3e5c752a719e8a146b1e60269febeb32b6c3f999efaa78f83"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/definition-primitives.ts",
+      "sha256": "779117cbdd076a448afc1b468d5a10037c8e1fb850686f13a2e01a2ff7e546b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/flow/definition.ts",
+      "sha256": "0422d9fd44d69235ec51c052e1f5963e01e869f26784195a4e01c89113bc07c0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/flow/compiler.ts",
+      "sha256": "f63c4e53f91548d123f27aa699078864d88bf633ab17b7dc8a6ebfc10241f147"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/materials/definition.ts",
+      "sha256": "53486fef6dbf39b82d5a5439eaf9cecff474288791526bf80b7918efe5df61d4"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/materials/allocation.ts",
+      "sha256": "4d2432ba36fb406f55a6ef778baed96604d98eaaae19cc56f27df42e0cf39c40"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/flow/training.ts",
+      "sha256": "013479c9721df20f4d2868505704a0a69790924d34d9c83e3de44d18b179ae90"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.errors.ts",
+      "sha256": "639ec8a761116d74dfe376530e4b6478bf94a2f7c61d3280721e24d4a9c83c82"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-material-allocation.ts",
+      "sha256": "74c1b24673dd21f457b7168c9e5ac80056f12d395441d06554bc691bda72104f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/scale/item-timing.ts",
+      "sha256": "ceeb4b50fd66a0717319954f7bfa2dcf9904c0b87b55c7ba30c875b84bf2ba70"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/training-scale-timing.ts",
+      "sha256": "94c1abbdd306360fe4a5e5d1ae0d1ccb81b455736f71511979c2089d6003def9"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/bounded-artifact-cache.ts",
+      "sha256": "eca1e9c1d890acc5874b496ff0b1403bdc37f7a407d17fbadad0505d953239cd"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+      "sha256": "304171fc512a89142d52ed684d4c6d86fe0e6c73920bcf402756c418328eebc5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/admission-snapshot.ts",
+      "sha256": "0d8631d81db5f0b678cdca1cddb084cdebcd2b8d98eeed2fe087c43d81cf0fab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/types.ts",
+      "sha256": "30a25b201b6ad1149425d1c7f162f0bf838e6ceffc9b9bb731048459d52d8d9f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/admission-snapshot-v2.ts",
+      "sha256": "a3dc64c0b0aef464acda50b2139f007d9b1bf6c603ddf6ee5cf3ac102626875b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/shared-control-records.ts",
+      "sha256": "13e38ea7d39f928ad049612e9aeb8e5970de901822842e72838c98a09be6dacb"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/slot-set.ts",
+      "sha256": "bf02fd707f5406a2c0411cbbaf55eacdeb622e098f0ac453500eae0705e2c4d1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/form/definition.ts",
+      "sha256": "e482ec3a13d0f0e30087663c7acbd75eb7617428dd78a2ac2297fe6d2f9e6b60"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/form/answers.ts",
+      "sha256": "172eb777fc670d6b2fa421474d77a75b607b84fbfd43c91cc25bca02e4477716"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/form/runtime.ts",
+      "sha256": "4fa9d8643754c4cc2041a8146eb20757897b8ee79d4c0323291ebe0981ee9e12"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-section-definition.ts",
+      "sha256": "520c0731bf4e652f769cf3ab3b20911618ff6b00757f112ad397da8a061e65df"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-policy.ts",
+      "sha256": "b4c440e0f73ed49b08be37845b71036da4bd1a30c23d4ec0133bc854ea71c727"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/typed-form.ts",
+      "sha256": "255c3c025105477b193ebeb38686d08c1c4a1c2d712145c0180a6aad7fd3cf01"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-facts.ts",
+      "sha256": "2656474d2187527e9f65e2d10c637e685b25fd79b3f448268f1be04758147939"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/report-template.ts",
+      "sha256": "a368a11f0ddbda1c6dcf48ee60702daa0cb57002f7e24b3aa5e8ebe2a29f9945"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/release.ts",
+      "sha256": "a725ec0f3eead8d0ab362ca328c0a0d7624e257a49a43edae5cf81e0e6301a4d"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/repository.ts",
+      "sha256": "df801abdbbd7f0c344a401eba78417ae811dc1a72cd9bb36d7e55ca0ca98e78a"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-private-reference-use.ts",
+      "sha256": "65c67b70afcc9ca765b80b09f971b550cdf4e82f4d84b5e399425a32b31e6ec7"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaireFormAnswerValidation.ts",
+      "sha256": "6d8df68436951e6688b573e5a5994059c324b178f50c0ce82d8a23884b81fd2f"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/reference-candidate.ts",
+      "sha256": "4e47314823820a3a70f0ca108a7755bd4e8129a37a9931c8355df277b6b08138"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/reference-policy.ts",
+      "sha256": "a06d6d2848a9ff6ab681b32081e74094a21e97ea627b2a677840ae1ee37d9c00"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/product-definition-readiness.ts",
+      "sha256": "bd95351b1bb87e865f493f85901bc4c71d4ca14a4c58893d60c0bd3864a25c79"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/scale.ts",
+      "sha256": "b9cff21374621809e6b04a6a4a65104ec7714549e75a4a3dd14b4b9e5db33afe"
+    },
+    {
+      "path": "server-version/backend/src/workers/workerSubprocessRegistry.ts",
+      "sha256": "a0acfeaffb9d81f5abc961862a59434dc95b6d931434cb0388d93f3dd559d4de"
+    },
+    {
+      "path": "server-version/backend/src/utils/videoProbe.ts",
+      "sha256": "bfc30d0dce978260f7b60c4e64a89bc9804ca7e3b682896c13349a6e43e9a24c"
+    },
+    {
+      "path": "server-version/backend/src/config/redis.ts",
+      "sha256": "7fd2ee56f2c8a90b162ae201e11a91cbcfda3a4af9cb2278e70c48af3b9c79e0"
+    },
+    {
+      "path": "server-version/backend/src/config/runtimeResources.ts",
+      "sha256": "4ad1f8cebc0214459a391c65c893e3c322617fdf52b0e7c92ffed30a0dd90bd8"
+    },
+    {
+      "path": "server-version/backend/src/config/queue.ts",
+      "sha256": "35217ec956dfd043b5d5243e50f3f628449478a142d6d6d4af79a4f186663419"
+    },
+    {
+      "path": "server-version/backend/src/utils/videoDownloader.ts",
+      "sha256": "536d97a74c717941e2d49a593b090d824ca639bf40b28e0cdf89693c5dc465b0"
+    },
+    {
+      "path": "server-version/backend/src/services/videoProcessingState.ts",
+      "sha256": "a13eb81c75e707ecef0a89e420e2fefe43abb881f6d0230c077706a127a4c282"
+    },
+    {
+      "path": "server-version/backend/src/services/cacheService.ts",
+      "sha256": "447f6a49e3a1143d193533cbabd728f65840dea7b70c3e413e833211c0021af3"
+    },
+    {
+      "path": "server-version/backend/src/services/boundedAdmissionGate.ts",
+      "sha256": "630bbe64109c6e0ca5890c36568ac319f9bc3810ade4ac33e84180989e07e1a5"
+    },
+    {
+      "path": "server-version/backend/src/services/remoteVideoAdmission.ts",
+      "sha256": "233fa422677bc6d0b5256dc7269fb1317ebeda2b1fa5a2c8b58899f153b4958e"
+    },
+    {
+      "path": "server-version/backend/src/services/videoProcessingRecovery.ts",
+      "sha256": "f8cc8a17f59fd50c6a48fbecd4efde8d6cc1b142fbd63545bf0b3aaae69dcb29"
+    },
+    {
+      "path": "server-version/backend/src/workers/videoProcessorOptimized.ts",
+      "sha256": "52d064c0e013f5cad622fbae34e3d3141ac366e0f8c2dc6b3942f2862edeaf57"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-course-scope.ts",
+      "sha256": "8e53dbd209301af0fb34ae9b986743f13718d56c776d292e98cd79248cc83fdc"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/schema.ts",
+      "sha256": "f3039e91b4b44e9d8f84191f2d15e8605194d2845ca643d7d0623de515ab8286"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/disclosure.ts",
+      "sha256": "281b533e81015d82a8387e02b1347bab1c894df373211abd80e00a086f694436"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/device-input-provenance.ts",
+      "sha256": "ece4e8503dbb0c1afefdb874fe64aff9d78699f8cf65443d17e7158d2552a689"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-result.ts",
+      "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/serialization.ts",
+      "sha256": "c4e53db7a326cb59bfc8866b596f9fa9b6e7e2c3d1fa7e72653b536232f23a13"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/types.ts",
+      "sha256": "31bd25be429f6e25ddeab9ac0b45dc8c1bd44de65b368d6b360aedae24282f31"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/context.ts",
+      "sha256": "885229b3f6679e9fb5a2b5a228c9265e109b81ee49e4870ef2728ea80f62a8ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/content-locale.ts",
+      "sha256": "4e163c26096d1b35815b5a5a9d468837095c98f4e706527ab8ffbde98edc1ec2"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/scientific-maturity.ts",
+      "sha256": "cadef7312021a52de9f1caadf5557b6bf51e6a9e361dcfbfac75659b19a0ef09"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/catalog-manifest.ts",
+      "sha256": "b041a4196f3fdaef889d2e4d5be548639a7a89198be9ea55e6018127c151e154"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/localization-manifest.ts",
+      "sha256": "30cb6de473ae935c7e52b9dca8625c84d7c370797b866d067d5550dd7851d036"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/types.ts",
+      "sha256": "7e6b6b4c69114a7480dde09581402ed637bc0fb22eab282ae4c13176aa0d1974"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/source.json",
+      "sha256": "2e51623acca802e54c58047f6f99121a9c9443bf5517a5ab489e16f4f15af4d2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "db94c510847f7712c7960ca2eacece050d25d7a6f31f7baa86073a07fb679388"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "bb786d0aa03ff1b622731fa72f4c6979b11899c449027ce48ad2220b2b0feb2b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_english_zh_cn/1.0.0/source.json",
+      "sha256": "de0d8d68d703f95e061471f30e338a98bd08cfc57575171a34c9ef117e3b6d2a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "c2682735dc95e0ec1a233e4fef16f149d55ed428bcf578ed2aa159a4637d0ffe"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_physics_zh_cn/1.0.0/source.json",
+      "sha256": "0b21e2adbe142127c3b95c1de8afc559730d2922b9c96ba7cd2805e55b38f00c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_concept_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_biology_zh_cn/1.0.0/source.json",
+      "sha256": "4ad47e821e51e294a769615d377af2ef386bd08890930188faf4f43fefbab48b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "95c9bacdb6f63dbe102f045638b32efc067b439c3c4f2dbd9ab05e58c890b87b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "56e9591ef617df15b480a3e488fe051bd2c09910274cfbfdbedd95a596d1ea40"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_english_zh_cn/1.0.0/source.json",
+      "sha256": "57e52e4cf24e55969e467490ca4c7d0be480788ebb478713b7be8b177c6931cd"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "1aaa3a30a8cc5d3556cb7d8d89281aeeaf974385d703056ec97cac299209d494"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_physics_zh_cn/1.0.0/source.json",
+      "sha256": "170d57a31481af1ce2f15cbb2c7c2a23a5e62ea3246f5c3716141ae7cfb1694c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/catalog-defaults.ts",
+      "sha256": "1e8c71d2729da0db7a59b6175a6054f459fca33129062b6998df18aacd8fe7f1"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/adexi-v2.ts",
+      "sha256": "2eca9f499e976d8f1e123fd4ee5edc968040db5dca5dcc03ab8a71bbd335f71e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/adexi_v1/2.0.0/instrument.ts",
+      "sha256": "74366b1a1043feb791b827c5a9620372c5921b87006b1e934231600f838d05bb"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bscs_zh_cn/1.0.0/instrument.ts",
+      "sha256": "2e22fcb19a12dbc63b89eacb2d60d8d8d828fbcf15103d9db7d3780375ee481d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cbi_en/1.0.0/instrument.ts",
+      "sha256": "cf75d68c70610f337d011b1eb06b4cc211e8b8e1ce32c4209f6d96bc4da305df"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cdrisc2_zh_cn/1.0.0/instrument.ts",
+      "sha256": "f0b21040f634fc9e8db3aea2cefb40c22796a52d257e423256a1745639f54144"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/copsoq3_job_satisfaction_en/1.0.0/instrument.ts",
+      "sha256": "104562aaeb9c563d290b6b047a62fe66e02aab04482f99f059a812d61e6a959d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/cross_domain_talent_beliefs_zh_cn/1.0.0/instrument.ts",
+      "sha256": "aa82e7f3a4cdb894cc21d38e18e5ab74e6e9c9ffc7f67c75d744902bf1eb3462"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/dass21_zh_cn/1.0.0/instrument.ts",
+      "sha256": "503e91b60dae40800624f95c3bad6364751916b5d0cfb56f14d7a66a79ef44d7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_biology_zh_cn/1.0.0/source.json",
+      "sha256": "bf90e37814c03ce4c1799ade448fdc54b2ff0a432f3209d7cd939a63ad00fc3e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "370266b66c891b9b282317bb075a958dac408d4fa1e669b19d69c41f423add15"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "ee92ea0b441558a5707c4ee5b8ee88b0fb48dcfa8ee7fd4b6b7b24e3a1cb0741"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_english_zh_cn/1.0.0/source.json",
+      "sha256": "ba2db7e5689636ede4012c6f76bfb32d23c4613a100505f4e4c88af87122ccb9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "e36a32913df46abf43aa059caa45c81b9d9c4c9c5722a643e0693c51168bd918"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_physics_zh_cn/1.0.0/source.json",
+      "sha256": "9a56ddfa90c6f88235c9e41106e9661a28d20fc752b6ae64683925904794d3da"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/general_fixed_mindset_zh_cn/1.0.0/instrument.ts",
+      "sha256": "3148c75ab7566debaa25b1b9dde085d70265cabd1fe5ee23a12903ce93508fe8"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/grit_s_zh_cn/1.0.0/instrument.ts",
+      "sha256": "5fd0f0a16fd4b70699f16b12be228f86d5eafc73dcef2f23f9726cf0f83afca9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gse_zh_cn/1.0.0/instrument.ts",
+      "sha256": "347a9acd17dea5b1a1c9a505af08d5c85395c042b5da7fd7d07b4ec2354a3349"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/hse_msit_en/1.0.0/instrument.ts",
+      "sha256": "977d126d59cb84b2d5a37a66e98136c0d1122f84013e08b46ae9b350d04859ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/jcq_en/1.0.0/instrument.ts",
+      "sha256": "a4b20ff69f130a8fd0fe34fc8c4ca57ce18f8b09734a598858b6a915bf59dfc4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpfi24_zh_cn/1.0.0/instrument.ts",
+      "sha256": "33121852d8d79369d35f8d4fbf7ed65515eadbf6b0fd58639e2bf1f293ce6018"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/pss10_zh_cn/1.0.0/instrument.ts",
+      "sha256": "b00bc67ac9fa34316c53922d1975c2ecf30673d0a409d62b4b134aba8d65021b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/sdq-shared.ts",
+      "sha256": "a71f0376b3f458e35e0cc7ccc490a0e683239adea6798a01502de986d13e5ea4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/sdq-parent-zh-cn-v1.ts",
+      "sha256": "954acd115b9e53fe271bd5165be5a9d5061d2aed4d03f5f7c5d9175e2913180a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sdq_parent_zh_cn/1.0.0/instrument.ts",
+      "sha256": "300f7a7198bcc7a9c13ffbb7018a5b51350d09bf4af956ce89b12e1621a15dc2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/sdq-teacher-impact-scorer.ts",
+      "sha256": "1966ada4007cc6383b669dd5797144c7a722109cabc0eb217452889b8c2d982a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/sdq-teacher-en-t4-10-v1.ts",
+      "sha256": "2a98bf9a72ab30544cb239937863558f3f5c24390074555cba71115f10e3132c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/sdq_teacher_zh_cn/1.0.0/instrument.ts",
+      "sha256": "1af379a99ec383907fbe14a1fb25e629857e8c56b9354c594d20a87753748823"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_biology_zh_cn/1.0.0/source.json",
+      "sha256": "eb710b260e652bf6c2a214fac1a03ccac0181691349f99dd19577bd544c7fb40"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "fc1ab3e73140b80dabf4abd1c3cf39b3bb3db7ab91f100dc5b58008e5ad98375"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "da3944b76741a19ca020627dfd450d949a357a197bef9fbf312f889cb8298412"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_english_zh_cn/1.0.0/source.json",
+      "sha256": "a957b8dbcdb40c6651f275b55e1fb3c4558c8249301f2cc8e6ab455f4e6dc3e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "41c2a4d57a85dc812ae2fb96d045aaa4ecdee3195839f3e45905a186f2a909b9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_physics_zh_cn/1.0.0/source.json",
+      "sha256": "0612df20e998a58b874070b23ad8d0649443eea1b247d11df46b727f36ce25e0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/texi-en-v1.ts",
+      "sha256": "15a602452b18d1146fbb9bcd8a43bb0bc8deefe6c1f59bf31ee01c8416e6e705"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/texi_parent_zh_cn/1.0.0/instrument.ts",
+      "sha256": "187123ea3b66537311da664011859c6c714f50a457b53bd5e372f9233b934033"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/texi_teacher_zh_cn/1.0.0/instrument.ts",
+      "sha256": "bc472484324fc159ff271a2b0d54432ea7cb493362905c4c90ab251bce0e9447"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tipi_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d8e839bc60f2ebbf9660b302bfb44928ab3727eea0e202de001eb6514957ef0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tswq_en/1.0.0/instrument.ts",
+      "sha256": "25ec3ef94c006e2ad5d40e67c8a30a3554ea51dfffac1dea46e76d21c4650778"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_biology_zh_cn/1.0.0/source.json",
+      "sha256": "00703d1b44653757034ffecb238ad31a192fa4f3abb195478ad384a1c0c684e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "a72d4963db8890f0a736adac6d062a196ef8e90128ae6886d11253b1f4314241"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "2f7fc517145dc21710267549f047ded656395eb819b4523a9d0c6d9ab89d1bbf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_english_zh_cn/1.0.0/source.json",
+      "sha256": "b2436a35cd44884d7ba9c4f5e8d4babdfa48e6096300c94c065d00cb9f9af6dd"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "5d95fce360402bc0c65e0222423b3c581ef03ddd1ffdc2ce1d6387e500e90c7f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_physics_zh_cn/1.0.0/source.json",
+      "sha256": "a16d6f59340201c1aa02006ee438a208caa3c3065793b2dabe6ce33dfb82f367"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/tutoring_necessity_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_biology_zh_cn/1.0.0/source.json",
+      "sha256": "ce4aaaa29a4c0f2ff00775a23d57f8009b6acb5f6d2ba7663527558362316a71"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_biology_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_chemistry_zh_cn/1.0.0/source.json",
+      "sha256": "1a8d774f7493048d5ef1b12ad25396c3b657ab464ba3c32529b853f6bb746b75"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_chemistry_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_chinese_zh_cn/1.0.0/source.json",
+      "sha256": "58bbb2a73e718ddd9c38216686138efe3b02aecf4ed01d1280584a1261099b71"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_chinese_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_english_zh_cn/1.0.0/source.json",
+      "sha256": "9ac423e7369aa612dbcd2573be6b4d0969c1a6e3afbb54dd55d02f7b5af06f70"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_english_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_mathematics_zh_cn/1.0.0/source.json",
+      "sha256": "702559e55ded2dbeaf6c4b0c6214ba159277ddeebd3072c808de41d66e61adec"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_mathematics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_physics_zh_cn/1.0.0/source.json",
+      "sha256": "e0ee021320bac9b0851ad8f1d91dacbde7b417886b80a47e627c5de449131f95"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/value_cost_physics_zh_cn/1.0.0/instrument.ts",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/packages/who5-zh-cn-v1.ts",
+      "sha256": "054d947a408e94fde7dfa6fb9bed0923611dc13155ad4260a6f7fe0cbc073946"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/who5/1.0.0/instrument.ts",
+      "sha256": "063037130a17a5a5da5e6c1548abd08bdcd702f133086d76fcd7667b5939f138"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "sha256": "e220eec00f491fc89a7b3df914bda1d224bc993645d9eb79c88f1ff3eb210564"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/executable-registry.ts",
+      "sha256": "ed7cda27ca2e8a9bcd1a92613419fe8b0759282c575fdabe3f32d7aad7471c86"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-package.registry.ts",
+      "sha256": "c62cf8d764820ef0e8ecb7c7897bff68dcbef40305d6bcb62eb83576cf494c57"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/compile.ts",
+      "sha256": "34ffb8e5536ea09b509e28cace6042e07e935145fb8388e85665877fe3a07610"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "sha256": "8667396de1184dd9ee137d432fd95aded6437593f7a3e22f83cb47077d15bfdf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+      "sha256": "b04825206d508d8e1ee27fba7acc3410fbd3313c235770ba8863c01c268e3966"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/define-instrument.ts",
+      "sha256": "e6ade3db43e3945d7a33f7426cfe7056c6aae42e54cdc01d442450f628c52a93"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts",
+      "sha256": "0e409cf6bfa0c2851855ead108c58128bb7b6f6d38ac346daddce4ed2b3be474"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/legacy-profile.ts",
+      "sha256": "7466a342d3fa8dfb29a8c77ad492a0573938cd9fcb026956f86a340410482466"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/policy-resolver.ts",
+      "sha256": "98c638bb2e2a9b83a6c6b54f58648903a85ff9806fd76c8fe5b001bec4c9f48d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/context-factory.ts",
+      "sha256": "72de08284e3112ecfe27a6890ba521be8d7b735303729dfb57d94a302b167b0b"
+    },
+    {
+      "path": "server-version/backend/src/services/qualityItemExport.ts",
+      "sha256": "0966ba9c841400f7e4531a68a63808993244eb20b1f09a7cffed5795fc9c2575"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-raw.ts",
+      "sha256": "3978c443298693da04c75f4b572da160955b58d7b91bb1ca7d28695dadfc4bf4"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/reference-binding.ts",
+      "sha256": "6c5d702d2dd6b9cb8e2f819bed9d475350ecaf1029f43f5a7083ca9d20c6ff59"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/longitudinal.ts",
+      "sha256": "5eb89508698911682a8ca1e6185fb5eb8d2ea778381e0307092385d2e3bc1273"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-scoring.ts",
+      "sha256": "8213485115e7f5f8a90eb12be24f8a774ed74245245f6694fca404c85fe02844"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unit-result.ts",
+      "sha256": "11248649f57e2e6667091b233e4b67e74c162fbc1241f0ce16ae1cc1e2dd71ae"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-scale-facts.ts",
+      "sha256": "edf5a34d5b98c6c10e28ff05b90e9327cbc7367438c3202443e76d628b17d37a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-final-submit-conflict.ts",
+      "sha256": "ea19bcbe9f87369b6db60d75e9de21ecc7c8afe168fea6284bfbbb4ffc31c845"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/scale-fact-records.ts",
+      "sha256": "c97ba5cc43862a397e15f5e6650b252ae6c87ed8cfef3a0827acbd961cb561ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts",
+      "sha256": "b13afcfceb399e2b9953622aea13a39a7180bd3b9285cf44a03e267f90c0cce7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-presentation.ts",
+      "sha256": "a7839196b1f77ab36767ba875b797ff6624a85f87d10fd8d31bfb4aa01d28042"
+    },
+    {
+      "path": "server-version/backend/src/services/assessmentResourceProtection.ts",
+      "sha256": "6ba724a156e6ec3ccfd44a735c55e6be80efb0a4953cb73198f4ddb05bc8d3a1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts",
+      "sha256": "56dbf8a4186bf8907a836a4b9b848f3d1775ac15444b25b6fdda137f9fca7eb0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/types.ts",
+      "sha256": "7763082031274dd8cbcde6660b2c5b1a22ce5ef48dc02c492f14dc76760698db"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/deployment.ts",
+      "sha256": "8f9eb7d6b80487d3a694d3694462a086df1dbe6a802d25c5576e5ce822a0316a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/localization.ts",
+      "sha256": "a8f32dbff24b79f4d31d38485f54af8cd18eacd8b887aa4a1bb3097c9a14ee9e"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/errors.ts",
+      "sha256": "7a0b4eaae4335467a8583b67d6ac6068c04e35ed3b66a2f938d24e9b01166aae"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/records-schema.ts",
+      "sha256": "81eaaa29dd58a82874181159ff1f308a0bf0c9912ac89d24f60972b76290a4c1"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/deployment/repository.ts",
+      "sha256": "38888993193f11aa0ec7b4484dff38e7f1d35c792f14a11795e1119c61ded3ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/deployment/service.ts",
+      "sha256": "0f768686052026ebd74ea70573b1d55748a6c752d15321d718f7f687380a3b61"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/shared-scale-runtime.ts",
+      "sha256": "6852666d6d271df4ca2728bdf80f382f917544ee197494b27b33fbc856906475"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts",
+      "sha256": "6ccdfc7e3e19c60247304ff38ccc8dd4bae0f12282c1ea875bae6117dd9f7096"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/scale-result.projector.ts",
+      "sha256": "3631f95e824f50115a9beaa71e6764b3163a647e64e65502e1306aef4ab262be"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/projection/scale-attempt.projector.ts",
+      "sha256": "2ecea354c49f5412d986d0c01928f654c5d9dd7f78b26723c27c23dba564e7fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-workflow.service.ts",
+      "sha256": "a11ec2ddea76887ca28b9ea19e82657af10bf52e95ab06e673d7caa5afe94289"
+    },
+    {
+      "path": "server-version/backend/src/services/scaleExportScope.ts",
+      "sha256": "0c827f3d32d8528904dce265b17096605f88de581fd579dce2d7393b4369b67e"
+    },
+    {
+      "path": "server-version/backend/src/services/exportService.legacy.ts",
+      "sha256": "7d836141e8d4d87864376cda4fefca8c5656e7f4d9a694f2e526967c04614737"
+    },
+    {
+      "path": "server-version/backend/src/services/exportProjectionPolicy.ts",
+      "sha256": "a78f3ed69ba03f5e5de5d4b630679593acf6d2fe5f29aa96c7421fc5309ea19e"
+    },
+    {
+      "path": "server-version/backend/src/services/exportArtifactService.ts",
+      "sha256": "1b5aff3d69b0bba0827c6d7d8d83bdf75ac7536f355ce65124bb9d543a76d190"
+    },
+    {
+      "path": "server-version/backend/src/services/exportStorage.ts",
+      "sha256": "d3ee0a31635e555db01dfc9885d430c95ed0a6b9a00dd9a08a7ad04f5278227a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/export-zip.ts",
+      "sha256": "c098293c0ad529ee40d364e4f9ef1c201abb1716d9ebff17c8cf78943657aed1"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/types.ts",
+      "sha256": "53b4f3e2e260fa2514ef19fcd56313124a4e0b0cb14f405c2696ae496b600559"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/types.ts",
+      "sha256": "7d16310fbedbf6e7d87b5cb1229fd768cded7a05a8be6d1664af13ea1951c9f4"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/manifest.ts",
+      "sha256": "846b1b1bf7bbd691124f33fd1e5604600c0079420ec9ae2223b6a6077234990b"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/comparability.ts",
+      "sha256": "721b936e4daff215db7cdddb2592a6007141e9ac984aaf1ab0d83340a81a86d7"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/statistics.ts",
+      "sha256": "d7f8f947551f2bfdcbd56747b99b071240dbdaaeb706f3d8cde183e4a2ee5b3a"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/engine.ts",
+      "sha256": "cfc3c4838225bc9d895e8c65ae2d65e6f1b130605082adeacee860cf8c4cdaf8"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/matched.ts",
+      "sha256": "2a7fa890cfd51f72444982e71415d0a7bba84d44f43eefeb01963df17f59adc4"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/core.ts",
+      "sha256": "c2f8812ccddb480daf2a9dd5fe1a25b06667ec0fc5a7e36a8c1945e24f24e8bc"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/export.ts",
+      "sha256": "59483a4f008bde51e1e24809e866cb7971b3593315d492baf1b38144b9c817fd"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-flow-definition.ts",
+      "sha256": "bf6c6a817012ba5547c577b3098640f6245cfe869b0b9c6f4bcc0ee1289dae5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/weighted-variants.ts",
+      "sha256": "aeecaa9828204cfb86ab6e588694cbf53996aeb2252dca4255db34ff8312ebbf"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-read-batch.ts",
+      "sha256": "fa3de5cdf5ce541adf9fe21239245452c6cbe507b396ba79457ea5e9977afd2c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/administration-provenance.ts",
+      "sha256": "c5e4f47695e5d06b534e12700e54e11de1149b0fd782993927bc88c804905154"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-raw-submission.ts",
+      "sha256": "4a76c052ae223b6d4079d34fb66b62762c8be424a2c4232bacd400738ad0f378"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/typed-form-export.ts",
+      "sha256": "4ab70a0593cffa47384bd9d295cc7fd520424e3ed2128f85455978d920137288"
+    },
+    {
+      "path": "server-version/backend/src/utils/exportCsvCell.ts",
+      "sha256": "89731d5aa6fee0c207613179ba2a35ea23ac787e59750d79092df627630feaef"
+    },
+    {
+      "path": "server-version/backend/src/services/wideExportPackage.ts",
+      "sha256": "35f68ae0d27446823685db987e80b3e195cf6c80aa85866c8d361b2ed15b278a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/participant-key.ts",
+      "sha256": "58bf1e6c9fcc6cba9812050ddde2c4613b9397e7b15d8fee2392c06dc582c699"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.security.ts",
+      "sha256": "e400a5647e657733ef57476edcc96d59adf87b2d32dcf2f5e79493c39cdf92b4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/protocol-presentation.types.ts",
+      "sha256": "1249da54565c3d2ae2e3b25c0eb214b850d8731eee973efbeae0c9cc73febd26"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/participant-presentation.types.ts",
+      "sha256": "7f75ead7b5fa6307dd04813b65d5b1a5ac6f9dfcad2d0e0bd34e27605ab19309"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/participant-presentation.ts",
+      "sha256": "a046b6c7a4b88c89d0a73d0ba3398b027c15f0d1e3cb594c8adcf0c9124ffd78"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/participant-presentation.ts",
+      "sha256": "c77d111a5cffcd09957007a11f81d7497d96ce896b0cbaaaca27142df89de2e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/participant-presentation.ts",
+      "sha256": "e711916fa314c28cfd600e21c9cb5c549f714624e97132771ba1b030179772b7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/participant-presentation.ts",
+      "sha256": "39cd1cea2bd0e1787194066bf80676c470a41867752d49b2467a9efae50d4cde"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/participant-presentation.ts",
+      "sha256": "728324258c70def87fb31f221d3b317fec2bc4d085c8f879f299cf6173bb2204"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/participant-presentation.ts",
+      "sha256": "01f0241b0f3549b1a6cfd7ab9a91448604fdfaac9cb76e5f7f47516c5e8b86a2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/participant-presentation.ts",
+      "sha256": "818e4439a0834fb16c11cdd64d84ba7472494bdc629550df6d85f1f5b070c1b3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/participant-presentation.ts",
+      "sha256": "17c2fb088ab0487e096273e7507d70b27cf3bab637ee097f4491a7e8bfdb5aa6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/participant-presentation.ts",
+      "sha256": "a19be93d78b41f0adf1c7a0b8f3f841d2f10c05960362f102f0f6d1b11e666cc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/participant-presentation.ts",
+      "sha256": "718c477fc600f55a3871c22b3850909e2538bd019b1f70fff74896d0bbee622d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/participant-presentation.ts",
+      "sha256": "f45d37427b54391ff1bf7e1889714c9c78404bd718d95750f3d821b1449e52ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/participant-presentation.ts",
+      "sha256": "9aede78492d5009bb0b9b4ac7a30eecfa34935631e13803c28511d32aef3d1ae"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/participant-presentation.ts",
+      "sha256": "2bc4317a690c9142748df8b57567055b4aefd56cd49c81f7fdba36f1ee59ada7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/participant-presentation.ts",
+      "sha256": "ec8e385d7008c7ca4025dbfdf3e54143a16d0190d046ea232a7a850d542b26fc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/participant-presentation.ts",
+      "sha256": "d43e085b5204f2881b7d71e0374a88bb618e7dcf74de7f922873aa8755d6420d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/participant-presentation.ts",
+      "sha256": "0fdc63cb16d4f7d898954c665fcb1e503198cc121f171872f40fcde179885628"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/participant-presentation.ts",
+      "sha256": "c6289f7c8a597e0a0da4fdf3599a716ecac41b2335b19b805ed9817540ecbabe"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/participant-presentation.ts",
+      "sha256": "5463202967ef038bbe495b3fb2316a150f21b92b38e9b42787f130cfe46a89bf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/participant-presentation.ts",
+      "sha256": "a22e79c718e86e1864b1f136c4dae035ca963e720e77e7d7f8df9b90a439438b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/participant-presentation.ts",
+      "sha256": "4578e8999a7e1d4a5254352c55378c5b20ee18e282fa0c676b15971bcb5e342a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/participant-presentation.ts",
+      "sha256": "126f7e730784c8c68b32912a4843e172c2b107d42ffbd3a2f47b92ea44b6ad5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/participant-presentation.ts",
+      "sha256": "7caaf295e9b46d61c7c69d645f785d5f1411a7530c4e9290be7dea3e91e0f068"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/participant-presentation.ts",
+      "sha256": "d9eb860b5d4203be3b3b3db96377a8398f55551eb18c8376cee32f6dc4bed67b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/participant-presentation.ts",
+      "sha256": "d7f79d60ca6ec424a099de94faed4c140fe3e92898cfac754b20c70a3c8951c5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/participant-presentation.ts",
+      "sha256": "c3b289d37a8e05d65c869e0b7eb867771c6a526a389847700f5612c497929e36"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/generated/presentation.ts",
+      "sha256": "117179f44290167ed429f4ca93735cb71971f6fc0b9df4e4ecc7e8d37a7c2fa5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/participant-presentation.ts",
+      "sha256": "09b56761b7e2ca08bab080113c3c035c6598b1537a9c7ec091d42c30e892bb0e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/quality.ts",
+      "sha256": "517543aaa235a9ac6db6bc1792f06b11715c9c4503c20853b6a7159993f62427"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/registry.ts",
+      "sha256": "3097ab3b6b52f8cfb8f73c851db93dc4da09815725e19952431d1e762f166f97"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/protocol-presentation.ts",
+      "sha256": "c9008d8d27370ded0cfd6154306210e40447aecfd801600d78b14890b573d4b7"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+      "sha256": "47d9d6177755119bb7948451fc2b52bb11360c7a510fd2e8617a6e7332cb995b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment.access.ts",
+      "sha256": "bf689de0e5eb73ef0c86f4b8008a78575739c9542716591b91c4b03dd5bbf699"
+    },
+    {
+      "path": "server-version/backend/src/utils/excelWorkbook.ts",
+      "sha256": "a5f3928712fd00c24a0c9c1b5b292857281033f2d2be47f90da156defdb18944"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts",
+      "sha256": "683c21f4a6f0a85dfba5d1802a04cd9f2701798f59129014a3924c05924f6eb1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/export.service.ts",
+      "sha256": "5a360df9e3179b9ff1abcca45abb61422a855a552b95e8af2c22f82f7e3729fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/publication-gate.ts",
+      "sha256": "2f0ff974f4be034c88cb47831f63e6768ee7fabd5e8896095ebd56358302daf9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/cognitive-analysis.types.ts",
+      "sha256": "9cc56a931ec9da46eb1c55e22b6eb6156dce1a3e3e9a20f85c6d7a9d02e9e24f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/domain.registry.ts",
+      "sha256": "584270af4e392df516294d03f22159941fe696d786e5b39b622f5afb2c72190a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/evidence-mapping.registry.ts",
+      "sha256": "23b5248b20ec86f43ef616c9f0160cb79c1cc9b8bd4d12b26fb7e7dedf60dacf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/recommendation.registry.ts",
+      "sha256": "aa681e4c162075546872e269b0d95716bfe8aee8f4f5ae340f60696b9c92e93b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/scale-evidence-mapping.registry.ts",
+      "sha256": "6d4f36a8d0ecc8e20a67ae337830923aa8340110387e2bdd86ec1928a56b4a99"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/analysis-protocol.registry.ts",
+      "sha256": "687516f7eecb1ccd99a2d98546af58f0df0bb5b934c5e5edbe5f26945ae105a4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/catalog.service.ts",
+      "sha256": "9e6ec36ee4eb6e9dfd3ebc44d851a055b020ebd5f13b36818f3672e9381801f6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/protocol-freeze.ts",
+      "sha256": "96e9a02e80ead5b9706845558b1af3561d037bd231fe8219dc5c8006d3901fbf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/report-package.registry.ts",
+      "sha256": "76aeab789fe4999eddf1a9dba6174daa8bc8f6542a023f32f627648346c1666e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/report-package-freeze.ts",
+      "sha256": "82bf04d1170e9bf14d2977648beed007a089d8d5468ef7b3a9ad2f2f36488938"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/report-package.catalog.service.ts",
+      "sha256": "74d3531891512617c39b8425d74de8b6cabc73d187ddbe2253418acb74efda25"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/package-analysis.engine.ts",
+      "sha256": "1d71570dda0d2c7c0c8af5b904ae1910990e1bb9357b526bc3aa504db1c309c5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive-analysis/index.ts",
+      "sha256": "8cc50f754f89c10fb60eb432baf7f32394f06bbc7e434e61540481ef30a30310"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/report-package-label.ts",
+      "sha256": "5bb8eea50e945d31c00ef2c311f3c2a4e93a204826d0574e4b71b33165fbec60"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/shared-cognitive-runtime.ts",
+      "sha256": "eacc01d155245be4c9a4689854fb0740c8d5c1d60de5aa2bb67830b31d475e5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-analysis-snapshot.service.ts",
+      "sha256": "56a7b55a95994191bf01daec9f8d40d591c6f780b1f498a783c1457159e49a90"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report.types.ts",
+      "sha256": "15e5ca4abccc18fdc71390e797902fd8c4650c32a1762df1e1b841d7bba825da"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/frozen-single-report-adapter.ts",
+      "sha256": "55d10e957ff3067ca4226e1218b268ad82fb29898eaf2738e2816347557ce0cf"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report.projector.legacy.ts",
+      "sha256": "2f4cf33f5c2d4c54546edc9117c1ee1b3ee8317b43d1565e51125d679197a485"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/scale-unit-report.ts",
+      "sha256": "99b33d6796a6d23532f4bad567fe1bfc7e527ebe7ac96f2b0aaa7eff4f953ba1"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report.projector.ts",
+      "sha256": "c4a1b791d37e40cf5570009cc5a810507b200ccb2625b96048eb4b0dace34c95"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-analysis-export.service.ts",
+      "sha256": "16fa7fb5a94d19905e395b1298fb7798ef57274d0f8e483f9bd538cdda82eccc"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-export.service.ts",
+      "sha256": "d4693e06b3714dd3d1b3a58066836249f30d904bb14720c4f4fc40a58738e595"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/situational-canonical-export.ts",
+      "sha256": "cfd07ba0fd66bf13770d800e4f10276ae5342de239aa80e32661a012acdd3109"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-export.ts",
+      "sha256": "d23d990c044621d1eb9682c529a0f9bdd6d57bf58a180790d8d7f7f2086ce441"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/source.ts",
+      "sha256": "6297999ecd975dddfd94e03fb651d68140478f1562ae12054e5c42caa564ff20"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-analysis/service.ts",
+      "sha256": "2416cac6e9bd0b543e8586a91f145cd24e42d9bdfd1409db950377276476549a"
+    },
+    {
+      "path": "server-version/backend/src/services/assessmentExportArtifact.ts",
+      "sha256": "667d142f28f0ff1166e08c442c828ad653664d380e8cba4dac1ab61904ad98fc"
+    },
+    {
+      "path": "server-version/backend/src/services/exportJobService.ts",
+      "sha256": "940a278c8920d7d19471a40559fd9e8d6ae9647db77605dd1ac9c85bbd33e454"
+    },
+    {
+      "path": "server-version/backend/src/workers/exportProcessor.ts",
+      "sha256": "170879ab051967ced21e103f82141c7fc62e73947155ee814e0e3c3414620b59"
+    },
+    {
+      "path": "server-version/backend/src/utils/cos.ts",
+      "sha256": "137e73d5376ebd9d1ca84c8dd12893e81bb50ca2f0d00bbe4d289bed80bcbf55"
+    },
+    {
+      "path": "server-version/backend/src/utils/watermark.ts",
+      "sha256": "5f78594a6f712fbc42108cc7664bf6a0c27e2a816c34965473f5f4786a66aca5"
+    },
+    {
+      "path": "server-version/backend/src/workers/imageProcessor.ts",
+      "sha256": "6493039f8a158cc43836d146ddc025de1f579827fb88ff7e22ac4b3a116d540a"
+    },
+    {
+      "path": "server-version/backend/src/config/backgroundWorkers.ts",
+      "sha256": "e5e70cae5338296f149f9570e274ca0d3f8d65e8fa5a889592bf05d9b26a3f05"
+    },
+    {
+      "path": "server-version/backend/src/config/index.ts",
+      "sha256": "182ed73d849d34275d7b957e522501b7b02432b3636f925616a57584c4bc0433"
+    },
+    {
+      "path": "server-version/backend/src/services/assetStorageKey.ts",
+      "sha256": "d53ca978f193ed4f5be8f85714a584996083f4e53b1e393a58d21394ca4a64d2"
+    },
+    {
+      "path": "server-version/backend/src/services/assetUploadDeduplication.ts",
+      "sha256": "03dbe09686604a2ab110b809f6aab30427c082889437b3d439d8072fc23d9d78"
+    },
+    {
+      "path": "server-version/backend/src/utils/streamResponse.ts",
+      "sha256": "28263420549a9dc86c5f453295b09b8bee61931b800727b6800e782ce95543cb"
+    },
+    {
+      "path": "server-version/backend/src/modules/admin-permissions/proof.ts",
+      "sha256": "c155027547cef00ab5381987aea752b91a92d8d1adcae34a460f8174e2ac4860"
+    },
+    {
+      "path": "server-version/backend/src/modules/admin-permissions/service.ts",
+      "sha256": "ed15dcb699b4b11708372db9ee47236fd4570b5e422b63b00c6ee9954014f2e7"
+    },
+    {
+      "path": "server-version/backend/src/types/index.ts",
+      "sha256": "3281383a499c02bf2ec3f6578afdec0183e5838b58c58eb6b3aab47f52d4c59e"
+    },
+    {
+      "path": "server-version/backend/src/utils/response.ts",
+      "sha256": "e20da523305df0609f72baa3644f1e13fb524ed416362d0b8bb5d98568876394"
+    },
+    {
+      "path": "server-version/backend/src/services/workspaceMedia.ts",
+      "sha256": "1cdb8d0e7208609945b15dba2a1b3f2e2cbd2cb2b5c97d744e9171a790e4c270"
+    },
+    {
+      "path": "server-version/backend/src/constants/messages.ts",
+      "sha256": "e7534a913b4904efbd1d6ea3dbb4b326bcf6fd2ebc1538786194a857dbc5e19a"
+    },
+    {
+      "path": "server-version/backend/src/constants/index.ts",
+      "sha256": "33c6b53c33213f02710147d65579ae74fe5b0cb1abe5888aba589ae51d3c95cc"
+    },
+    {
+      "path": "server-version/backend/src/services/checkinTokenCrypto.ts",
+      "sha256": "ac4e7dd420cd24d098082c7eef2c0fa77cafe48cdc9fbc894bf8be17c86295b4"
+    },
+    {
+      "path": "server-version/backend/src/services/checkinTokenService.ts",
+      "sha256": "98dfa5fbef6466e8371796061aef960e93062d0cf810314277185c4411f0bce3"
+    },
+    {
+      "path": "server-version/backend/src/services/assetStorage.ts",
+      "sha256": "1669cfbf2635d6af1ce46b21ac1df761f458dc839ec1948c55c9249be8226728"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-asset.ts",
+      "sha256": "5dfb7abe9b422e9b14870c673b9dc55969530a178739da2f56fa42170f6e7511"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/educationProductAccess.ts",
+      "sha256": "6178de222793c849c5e141614695ba1b39eabc2fa18c86363bd8cbed7022e665"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/access.ts",
+      "sha256": "88b868ee65aa2728146428cd4ff09458b7a9f7c92520b95390726d8469c51768"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.contracts.ts",
+      "sha256": "c4e215517e1cb92fc83e88a556bd952933ac0de2cda5abc302c9089d8c2407e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.media-definition.ts",
+      "sha256": "3a8216696bc409e18c76fbfb60caca8c11d5d97680507997649f2b807eca6094"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.definition.ts",
+      "sha256": "06f0eb9fe4846354da8400592596535deb54a4d23c1141f98b57d369043b0ff8"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/types.ts",
+      "sha256": "9f61d6ed4a08ce3ba1d89509f81488cda4cf203c7d13795793136401f34eba20"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-applicability.ts",
+      "sha256": "ec2c953443a0fc4728ba765347f3ee37d70e9fff1c5d900d8d59e125ee8ea1ee"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/contracts.ts",
+      "sha256": "b3bf39142c6f2c9499e475f76f842670037918c46096e5526c69d15f2a0d4a6c"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-supported-variants.ts",
+      "sha256": "da4ef2873b2d17908c19144632d2aeafce0de749593b30df96a9c56ed063485a"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts",
+      "sha256": "2e305e32c18d3bee7c10419c89b4653d4147811775076a8c2cce3204af068180"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.runtime-source.ts",
+      "sha256": "12d298e768dd675295b1570466ab3b12fdf1290a8a00d4bfb6503ee140b024ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.access.ts",
+      "sha256": "5dc9fc4962e4be1f33f44881e1ce303ceabc300d9f868a9f62fd2b192ab281af"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/content-authority.ts",
+      "sha256": "370af7c2a84e1cafef60790e30d1513bd194dd15f52b49e6a7aed5ea2de0abb7"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/content-authority.repository.ts",
+      "sha256": "0ca17d2000286382945e589c2dc2ce2121a0785356e9a0668325bfd754c01313"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/authority.ts",
+      "sha256": "185272847b3fc0fcd4bfa831060df499db6c69fc35da5fb98618d5bd05d8e8c4"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-source.ts",
+      "sha256": "cc15924db8bb6f9fe4dfabe0c86f7f6703cf390928d3c60cb06e94c70d184bf9"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/definition.ts",
+      "sha256": "fc7f91e611a2b48d3e0334bcb0946a22f442ac83ecf4b34aa23a6cb3607a3a4b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/selection.ts",
+      "sha256": "ac8abaea269dbe888fbd72477119ee9545bc6d0fb57d18c0892aabb54bb2ff7f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/structure.ts",
+      "sha256": "00b064c8c131391e409bc6e914a6a7ebcf691850342d7c26e1f4444478fbf692"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/compiler.ts",
+      "sha256": "d6d83bc427bcc4c33bffb083c0956711ac6ad088896047425a1c7f41e6a332e0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/validation.ts",
+      "sha256": "54ac44ac605abe1198d832b19fb254a14358cebd1abf15ef29ba3d9ad4cf1933"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-model-resolver.ts",
+      "sha256": "4d39d1b07c4a09956a548c287955df33b2ebe58f77ccb4d38ede8b9ff8548eea"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/sjt/runtime.ts",
+      "sha256": "37613c4ffaf7a0af38f833830cf467b4f7b45b75d3998fed532a81d111f71e93"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/online.ts",
+      "sha256": "ed6ca911b50948f7a261adcdb6d400295d00b6b9b677ab1fa8558da4d74792dd"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-trajectory.ts",
+      "sha256": "24b9c653fee0c590fb4c885333d80566d8a975d3fa261d376a4fa050f1b0d76d"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-package.ts",
+      "sha256": "2c3568fcac0353e4762a3cd5386e18c2f2a812b56212d4e2b777e2de134b0548"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/template.ts",
+      "sha256": "0778a9c6f9cee20e0ca4e953b3b93811dbcacc900d240e5e74643f673dad41c3"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/sjt-selection.ts",
+      "sha256": "fae6fbcd93c8a9d97dc87998f3b4212b7244cee6988f2f5b52e79a06db796c1d"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/sjt-v2.validation.ts",
+      "sha256": "3dcc21336fa0d6680b83e60601046ed552709461b64863c54788ccd2dc569dc8"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.definition.ts",
+      "sha256": "978ed4cbae8ba42020f0f3f0e4979cee2d61c03d49f71dac693c512ef8360f9a"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/builder.definition.ts",
+      "sha256": "5bae73521fbf9851c56257edfcd99447bbe5717e51bd1d922514b6f880dc109b"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/sjt-v2.compiler.ts",
+      "sha256": "1f2a52edddec9c7bfbb95ad9ed0664da108fe95228d78882bad8be179516b65f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/sjt-runtime.ts",
+      "sha256": "ea4c22cbb60b9921ff0a10040e1f8f5a0e3fc7baf4462ca740fc6aade0d5fbe2"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/builder.compiler.ts",
+      "sha256": "4dba8df79a6726f53c8dc5227e6e9b17fddcd5ee1c7a4894ca7c14d6da2cb57a"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/source.ts",
+      "sha256": "d3fa84bf15b7c6685c1613b9ef64e28fccc763aa86a87e1cfc8702269c45a725"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/media.ts",
+      "sha256": "7134c38292f25c9da17adca9ba53ac2f5eb2b53332167a2d0e112c184d0e0682"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/training-source.ts",
+      "sha256": "9984c754e376e5274a73893f48e842d561979775beee7fe3a5784d1feb55d218"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination.ts",
+      "sha256": "b263f804a7e0c3386a00469a7def74efd775cba71aa405dc562d72f9f587ad1e"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/source-snapshot.ts",
+      "sha256": "5140b2be3e744d577bf6ec45ba6a3ab1555499417b3cce2c040557d51acf13c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/library/catalog-contract.ts",
+      "sha256": "3535f015d7fe5d223136158e0eac935c614633e28b41294a28e509feebe2a3fc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/governance.ts",
+      "sha256": "41a9c69816e15e4839f6340d5cfa17c95bdb1e66d4d5611b4d4e97f1ae781c8f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/governance.ts",
+      "sha256": "9f4bdf7c050aedf77a4cd1a97be446df15aacd3ecaadf9a221004b22f48bfb90"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/governance.ts",
+      "sha256": "40754b444868d29ecfac25ac72030476ccc47408e4461ac41f465640eec1a5d6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/governance.ts",
+      "sha256": "c27f6d87e2d9495a7981c35d500fd1e93054ddba20aa845f4778f98e276a0a11"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/governance.ts",
+      "sha256": "951b6150c1ab48e5c02135481fc1583eae5fc00098aa2e5496dd1a9ee56953c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/governance.ts",
+      "sha256": "c530db96fe42cce061420dc78da2c356a51efc679ca556378401d15cbca6f410"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/governance.ts",
+      "sha256": "3800f646f4b54a9322aa6fd41e0b06f4b22a746005deb5a73a60f841727c4239"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/governance.ts",
+      "sha256": "cdb5931d55fa14ae0c3c474baa32b5e00cd9aaaa3215889ac624fc6bc585688f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/governance.ts",
+      "sha256": "0cd15bcb3ade2ec69cd4688263a0235cdb3e846e7c1f382d0a1b6f8a8f1c142d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/governance.ts",
+      "sha256": "cdfa4360253913de904e69a2e22d132680f3e0344a6fb57494b6caaf178b92b2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/governance.ts",
+      "sha256": "93e24ff637cc7ca1c44d007502924c2249f25f7d99920a7434be9c4324b050e5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/governance.ts",
+      "sha256": "d8a53f8c55bba08ab64ef8ef073c9103b14c94dcc135f2e720dcd2e6926a2d8d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/governance.ts",
+      "sha256": "bcf84f3b8fdef6ab9a7ce95b9348ff762ff1be8c6b27e5993bd2333ebe60660b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/governance.ts",
+      "sha256": "5fd462d8b7e30eb6b5538306464e03632e53db2a1262df8890fbbba91f3fbdce"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/governance.ts",
+      "sha256": "6e4151a0a25f86d8adf39eb7bc86518722bb48d17d4d349994e3f8fc1bcd2aa4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/governance.ts",
+      "sha256": "90a456fd877bf68ecdea8188c257712987302fc8d0b4eae145a56de65a9ea3af"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/governance.ts",
+      "sha256": "6c1a62dcaabfec05a90959597ed5afb4454ae45d209c58a93221d2e6ecc1bffd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/governance.ts",
+      "sha256": "2cc251f925b0bfb06695d1f380420d6fb00ad1e32c2aa35a5e255025cbca69e3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/governance.ts",
+      "sha256": "08710308ec1270f299d89ee480d90170835f2a296e227fd0149f4ed7c452b717"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/governance.ts",
+      "sha256": "91fb5e9c3dc9eb3a3c6f19a6ae9bfce8a4b20590bbb8dd011658c99286f20a01"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/governance.ts",
+      "sha256": "b25ca8a82e6420d638f663d7d0744341b591dd33196a0b362ba9f4c64757e4ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/governance.ts",
+      "sha256": "4aa2df2368131e641f40b502257670d52f928854965e57fdbd9032be21875a43"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/governance.ts",
+      "sha256": "48b530e91de211d048ab24cd712a75300c6bd86c94bc2aa173b72ab20f6baf16"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/governance.ts",
+      "sha256": "8b50e992215adcc8e38fe3b96bd198f78b39a62c1a569c120c7acb55d0d211a0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/generated/catalog.ts",
+      "sha256": "a35fddfe4d720ba332cb912a269ab5b47746b5f16973113c74574f8e88bf13ce"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/scientific-qualification.ts",
+      "sha256": "e2c67c55095aba2320c851a8a1f8a13941755ec6965888bc53ede38e83046851"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/onboarding/decision.ts",
+      "sha256": "3a021a982c35677d780bcb3530d97dbed97f946ce0010889c0d78f21c07a1570"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/onboarding/governance.ts",
+      "sha256": "600177196ad8a64bbc4ae04f04dfd70ce3527826f1c4583b9a47db4b5433edd8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/scientific.ts",
+      "sha256": "a733905b026413d999c5d201a72db8fc7d3aa3772eb360b94c09a88ed3d77dbd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/scientific.ts",
+      "sha256": "853a71ae5af9d4b4e0bf4eca2cd6e16bef5ded6fcc131b890070f63937ad1e84"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/scientific.ts",
+      "sha256": "a7c238ed87b808e6f4271d44da65b9f00a1cb3d69f25115707536f84bfacb441"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/scientific.ts",
+      "sha256": "2044d9551bcbf1c0556c5a2a5586cc6c0dcdd63bab0b402f1411445a9df9b0e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/scientific.ts",
+      "sha256": "ac159f437f0db37ead0fafcd7a085c6ffe5d77342e0d5f9a08bb84a818db8874"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/scientific.ts",
+      "sha256": "fe971ccbff130752198a6cd172867c624eb08f1b1cd499bea22db9374e34dc0a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/scientific.ts",
+      "sha256": "bbbc2cfafe6ade33b779d88d94b2ec28125d7e9184108319e787598111336021"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/scientific.ts",
+      "sha256": "f66d3a8abbaa09d3df660328bd018140d9ae65db0fa9e59ccb657b3247f8c224"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/scientific.ts",
+      "sha256": "56112832f52c09c7b3a899172388fbcdef8f26f57385bcb3e9c768aef4af3015"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/scientific.ts",
+      "sha256": "7c55cd826dc259f9730650dea155d01860c0ce74e7fc4ad6ae8d4fd6257467aa"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/scientific.ts",
+      "sha256": "e835d4f8219cec85a6ae82b7549a19637c290076a924fe2d8b828abb8873cdf1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/scientific.ts",
+      "sha256": "fb73ee40c4c525998999361e267dace600754d5c01022ebdbfd71480c3123dd8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/scientific.ts",
+      "sha256": "4d2033a6d5310bec5c2e71e4b8dfe6340129b64cd4b22a8ba933b75d722c4e74"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/scientific.ts",
+      "sha256": "5ee5734fdb60f6cdcc93fb2747ee41c1430333820d176a304e7030cbbe3bbc45"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/scientific.ts",
+      "sha256": "79718745ecc92f63573b4c01a530a3f86b2a6d6198c5c723f6775faa2ed5781e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/scientific.ts",
+      "sha256": "e6d85d7fa35d7ce7707ae764cbb9a35b2a26a5af23815643c020e10005f00792"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/scientific.ts",
+      "sha256": "06f8b308341fd7970a81edddd7f233c57df3ff421586c28c1db5623111e43d41"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/scientific.ts",
+      "sha256": "c4a802423104aeee39cccde365e2cccb840491ce940e6084bf39c7ccc9a6d255"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/scientific.ts",
+      "sha256": "0a52c520945d22e39ce76ec4a8f1a9842e0a27576d770b9ffde15844680da604"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/scientific.ts",
+      "sha256": "16cf0c339104ad9799a18f3c3dd7c4e303ac479bc72e6cc3cc81f728e51642a0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/scientific.ts",
+      "sha256": "d6d6fb74018d8c7d4f161d5e1c0f7e9e6f9c1092ed8b9367eeffd8944972c9f2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/scientific.ts",
+      "sha256": "96d8fbc894ee6f2b187252e988c3990e8f686226abaf99f42173f970fa82db0a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/scientific.ts",
+      "sha256": "73a6857e54ae59d64f5d714a0942589208c67c895afeaecbcd92f2498fcc8310"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/scientific.ts",
+      "sha256": "e9df7846cd482e67a71b220125e02968c9fe5e6389f0c5bc031237ab5a318fc1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/scientific.ts",
+      "sha256": "e205ea886fd1815a8df88940beb75f90fa0a2025d70aa9f0b8307d7de63bf68f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/generated/scientific.ts",
+      "sha256": "a47b9cdbdeb666c256c6b5997592a4f89606938cb0b919a222e9f3054a1ec27e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/library/scientific-maturity.ts",
+      "sha256": "ca26d63a1bc63812fc8e5bdfa67fe4d0fcdc8a4d6d8b2b85769edfda3b462eae"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/library/catalog.ts",
+      "sha256": "b3904cb269b005f379ebc0f1f5221109fc12c3d31e69314ca9ee96b032fe9015"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog-discovery.ts",
+      "sha256": "866555f29ed568e4baa177b5f3848a026ec6bec3fe86515606c755f1d06fd1f2"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/sjt.ts",
+      "sha256": "d3a8816c2e706416b931cf58b6bd2b3201d641306a242feae29fd6b2300dccae"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/dispatcher.ts",
+      "sha256": "b9a0e44a55364c5d026580546e294ca7dd44102f439f80f1932567604b7c4cac"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/entry-authority.ts",
+      "sha256": "b2e5ca92ddfebad7086da978deafba9f67751365d99882457d1ba722fac62772"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/grant-contract.ts",
+      "sha256": "29ed30458d7b160cee399ee92c942fe3d9e9d6e07e65340e19969aa9b53f4e7e"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/scientific-schema.ts",
+      "sha256": "4e641d95fe291f06f5b3a883122fc2dc66b1e1a2ef786d7b6c95561504593366"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/situational-runtime-snapshot.ts",
+      "sha256": "5cd837366ca515fd98365ea94ef60be57c9bded2f8133e693cb67c980075a40a"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/scientific-qualification.ts",
+      "sha256": "357addc943aa2cd8a3860593840cda85022aa5da58aad9953fe501ccc9f5bf42"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/schema.ts",
+      "sha256": "90b96741c45c3e199e4100841163a48e471294dd6d0d56a33854774c7ded6570"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/scientific-governance.ts",
+      "sha256": "c5a83dd5166d658a4ed03d0358f31fb0d907ce84311328924114d0a790e9b61e"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/instrument.json",
+      "sha256": "7422392e272c355825a1e7f854d01b037228afd3fe384321fd62b2ae87b3428c"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/publication.json",
+      "sha256": "7837b6f9de1efad261b8418833fb7567da0a7038d6380ae21e15fae3e7f8e3f3"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/scientific.json",
+      "sha256": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json",
+      "sha256": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/publication.json",
+      "sha256": "1470f0ff5394ac6e9441016a6b3b8b2dabb55b7ff684e6675a54368ec264dbed"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/scientific.json",
+      "sha256": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/instrument.json",
+      "sha256": "105b7cec8f5a5ba1937586a8d926eb56f0e1ff36b9eed8152323bd4279531d87"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/publication.json",
+      "sha256": "70b5dae8e9de65228696bedec4cc4b1678c88bbddd055417a19110176f705ff7"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/scientific.json",
+      "sha256": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts",
+      "sha256": "b6ace74afd95695dda965191de02a26ee0824bb1c6ff99849244c24dfa4cef96"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/publication-gate.ts",
+      "sha256": "52c95ea6799b84bb7cb824ce74135ad07a7abd23ced3983297e094eeb836c580"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/migration-releases.json",
+      "sha256": "31674663a2efba83521b1df981daff495831bbec18bbdb73384aaadbba88b69e"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/instrument-registry.ts",
+      "sha256": "6cb2c5d9ebad732d4a18a1ce744a2096301565b1034c2a3225109e47f885e2e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1.ts",
+      "sha256": "0b0a22960e5230ec1290c35389bb243b98ebb0c8fef289357f07c22caae7662b"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/fixtures/standardized-e2e-fixture.ts",
+      "sha256": "2a2cef4c730853d4324206d5f9bebf175870c148c1568b208109a77d06d5c386"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/packages/sjt-static-visual-e2e-fixture.ts",
+      "sha256": "2e7289530f5f33ec9bff13591b3bba9baa5a41fe8f1fc2b7bc6daa0613b900e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/packages/sjt-branching-e2e-fixture.ts",
+      "sha256": "2b3cd22dd6c0ffbfe7ea77b3d1a82f6a9857dac34f9cc49c475d8c7e61ef335e"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/packages/sjt-video-e2e-fixture.ts",
+      "sha256": "492acb1a4f1e3e49bc65fc8da0c9e6c8ee2584008bfffd376f6d85fa1a0596cb"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/fixtures/fixture-registry.ts",
+      "sha256": "ecee21b4066c35391bc1c5fde962b45546903c9e8d2363bcf6423c2e61d9dee1"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-package.registry.ts",
+      "sha256": "30db9f0a647a435dcdaac45aa7d26d21e1d5944470ea7ffc76332f7abdfbe1e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/onboarding/scientific-registry.ts",
+      "sha256": "6c9adb8c16da914f2fcc9804307766ff5f074dd13c72241a887e855685c69fcc"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/scientific-maturity.ts",
+      "sha256": "69393bd099f310d8986b9e39ffa88518127a9e7af2d0beff9d862118af07c32a"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/situational-native.contract.ts",
+      "sha256": "3c146a947421d4f2d7957115ca1bbd78e1c17fa51f636dff6c9f2a5088640e07"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/situational-native.definition.ts",
+      "sha256": "35a30e5d33c1f3ca076050f508d1a0af7c300a7c37fca3dda381fd3a575a6415"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/tool-entry-policy.ts",
+      "sha256": "2c2ba0bf441038c5ab85253c85f7c5acf89c34295b2b1bf3f27217e5ccb63877"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/collection-guard.ts",
+      "sha256": "3c4ea44cba4c62da004a0760821e96e1f2e6dea184cfc629446d5762f0b72c6d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/usage.ts",
+      "sha256": "4e541a943340149aca6f63ad33c801b71f3ce284bb0cee3e3e58fbb35f9b0a93"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/admin-role.ts",
+      "sha256": "3e0b05a9c3945d560df83cb372134cec687788a935bf4da2d710eaa0baa76b49"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-distribution-readiness.ts",
+      "sha256": "c0e429a452ef3577480b75ba093ed0f7446ed5a8d4f22503ac7ff55b9694ce97"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/catalog-adapter.ts",
+      "sha256": "18c2ce523f03e7febe4d0bad2d26df5f692e00ba5e80935ee61ce9ca28c4c0d7"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/service.ts",
+      "sha256": "34d38c7c291b1ddfa9134941391c7f43acf594addb4e209de6b5a5aa300f1ae0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/media.authorization.ts",
+      "sha256": "5e99ecefd929176c350cce0e91a410dbeccf0e7d1166dea19b95f559d59121d5"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/media.ts",
+      "sha256": "839f2e14d4a76e76b5ef02bc843c7d13514f24a57d6802cbbaf318ff441609a5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/raw-score-feedback-preview.ts",
+      "sha256": "82986e35d282a5ec4971376cc00a501094a9262c949936c7c1838f7d20a5dace"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/form/import-parser.ts",
+      "sha256": "e2d5b97fbb76c88cb385b733347f9227d468a2b96ce6233cd0e1030fb7b9baae"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/builder.import.ts",
+      "sha256": "1227535914b87184a51ec2c0b960e2238eb5fa34c10bc0e7b141426eb96e0deb"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/measurement-result.ts",
+      "sha256": "491a46c1a41b63e52bfd9b946a771f38e64ca6c0335c96d5ae7f1edb9a3349a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/report-renderer.ts",
+      "sha256": "87e23087cce692731acb8ef1795bd0a50a10196a6389c3151ffcd454a58cb259"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/participant-feedback.ts",
+      "sha256": "d785df151a06f9d4a7e3fc5e79e16c793096ce5f2d762d8147550b98eb39a418"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/flow.definition.ts",
+      "sha256": "8a8c99e724d55010bd0242006188a464a5d0fd67ab63a133c9239b6fe828db18"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/operations.definition.ts",
+      "sha256": "c230ebdafaae82cae077a0584d9ba92e3e65941307c342579a2f386ca0fb163d"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/group-ip-policy.ts",
+      "sha256": "72d2f3a43fb926d7091773633e1bc1ef8f3adddbff8fc21de16e8cd998b9889a"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/waves.service.ts",
+      "sha256": "48a5a753b0d9121990c489dbc4e4ff58990d5a6688afd4ee50f4bf9feaeec7fb"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/content-selection.ts",
+      "sha256": "e30f950851842d88b231bcc6dcaa5d1bf17ad407324917bb5a67c4eaa8a58dcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/tool-reference.ts",
+      "sha256": "ad2bfa45dd1b164a6e603ce7c9627c58ffdaa793980db664a72b4714db82bf56"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.content.ts",
+      "sha256": "3e657d4fc68be39f0ed42a2d5a240db7c678760b051e490ed13717920606bf64"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.service.ts",
+      "sha256": "f9fbd50db083b22d9c31e3edecbf0eb9250b4a36a1ddea8906ff6624d788e49a"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/tool-policy.ts",
+      "sha256": "ff1232465c45f0c004b3273b9b2cb8b78a589441af493d550e48e9eb0c826250"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.catalog.ts",
+      "sha256": "f99d3bd499fdb267b30cb0db7ca4cb405050630f86ced2abab6fdca73fac8535"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/trial-normalizer.ts",
+      "sha256": "5f88e084c1cb4a13dd55f8ba4879d3743d9d7a8e197bd11d6fa372c271920804"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/authoritative-scorer.ts",
+      "sha256": "5ba5d4d668d7a4616fce6bc73fa54d32808a482a659792ece3c16ce9ba517c66"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/task-answer-locks.ts",
+      "sha256": "69e884d98392c261e79e4fa35a9a9570e28ad6942b4de658c19c27ce7a4428bf"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.results.ts",
+      "sha256": "7d01217e22c35d63b3d8138b5a5f282292d2be233c14815ae092ca2649859644"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/measurement.result.ts",
+      "sha256": "6cc9d7ac629badd3b90eb013be407791ce96415cf4852006717332a1f01a339a"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/sjt-structure.ts",
+      "sha256": "8c91976730d071deb747b6b2e1c3a6ad494d76ee9c563108f8a544a8bcfc5bc4"
+    },
+    {
+      "path": "server-version/backend/src/modules/anonymous-study/admission-principal.ts",
+      "sha256": "c55925db1d2a4c95eafc44b03cb04bf7c88f97bf65dd1b11851b06dc24628824"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-task-satisfaction.ts",
+      "sha256": "68ab8d8a4e3f7d0d7e2214b2c73665a04b5405ef63eef600155a721f0f519c52"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-final-submit.schema.ts",
+      "sha256": "86d42ddb29620818b8c422917b9756601695dda3aa2c184d1cac1841f6e7ced9"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/narrative.ts",
+      "sha256": "8296560d0298d296b7af27baf32c8cffdd38bdf3f27189f76dd7d4002667322d"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-assignment.ts",
+      "sha256": "d3a81545d65e253c843fdef3167f226727b37313f2b95061708411669e252259"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situation-research-capture.ts",
+      "sha256": "ad39b8b1b78b56e7fd038e8730f56cb3024f8f40c01551a9df400efb461cd149"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/compact-questionnaire-report.ts",
+      "sha256": "2cf0002bfd6c3a5243a0b2ddbfbc498f585734584d74adf582358396778b71e5"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaireFormAnswerState.ts",
+      "sha256": "cedd3fba801be5578988382c18641f6cc335653e45fd84cd132b817b9287a74a"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/questionnaire-collection-report.ts",
+      "sha256": "085ce270d102a7e034a8f2b0ba710c124022f2b26a89e224e5b7a8c1084a8a2c"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaireCompletionAdmission.ts",
+      "sha256": "bc55ac8698dd357c703b96f316f085e19a37a0849009e4ae3f7d255dbb72dfda"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaireProgressService.ts",
+      "sha256": "f49dd5374ab4feb90c968ed67efe682d96b9e6d10a8e835d14956c3414c8ffcf"
+    },
+    {
+      "path": "server-version/backend/src/services/unitSubmitAdmission.ts",
+      "sha256": "ed5532f2ab49d7943b4555668fa313fcbce2e3fcfa095d450b82870ad7bcc2d0"
+    },
+    {
+      "path": "server-version/backend/src/services/reportFeedbackHints.ts",
+      "sha256": "0c19ad1202ee6b9c7f83839bc555cac766574165d5f8c1cc9cce86b23b11526f"
+    },
+    {
+      "path": "server-version/backend/src/config/assessmentReports.ts",
+      "sha256": "a36e1d41a9704b393d9cdffa9b1730b7c92489ecc52054504d697ee42e65f74b"
+    },
+    {
+      "path": "server-version/backend/src/services/scale-final-submit.schema.ts",
+      "sha256": "e80b7fdb48c504e281bf7e056493017cc8c79d26ace318b78a9bd6204a6eb1dc"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/whole-receipt-storage.ts",
+      "sha256": "04e7d2d5ed0dbd1db7ab0100db8e2ccc4fccfdbcab455e95bdc01d1a6b996223"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/whole-receipt-atomic.ts",
+      "sha256": "d2fd535feeb6b85a119293b1cd18aa47a4c627cabecb4fd0964ad3c4ab240bbe"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-aggregate.ts",
+      "sha256": "b4c96173d7fd0097f4c238d57465e72819f763117696fae087a34c12e456c783"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts",
+      "sha256": "0987e3bad56b06725edb80bb3880014f5eae016796b15ece8b8090769203f18b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unit-admission.ts",
+      "sha256": "28a7ab0d34151a47b9b44373e223616f383e0d6f8d331846feac324182623541"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/deployment/transactions.ts",
+      "sha256": "4e81dc5434ea5e196f6d5f6029a3cdb3c6d2afecc05389c0e1997486dfdb4a1b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-authorization/source-identity-lock.ts",
+      "sha256": "4bff28c3d32102e90ea1a372f4b20ad84fde5dd767392b8b59c62fe87f685316"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-use.ts",
+      "sha256": "61f3e72195a4ad02c1b67d262e5ec55fd5f1dfb9aa6212896dc0dacc330e39f1"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-combination.ts",
+      "sha256": "53615ca466511ba2a64e9f8d27e0ba000f6a06bf99783ae57fce9b8b53714cbd"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-collection.ts",
+      "sha256": "d6c80dd1cc0b16a1f01471c439b7f897513cc10c69603d9533f1fe6542d95840"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-collection-guard.ts",
+      "sha256": "35f96a991031f4dbaeb8430a11182b2e9787f842c77d2bea363292347b1fdabf"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/eligibility.ts",
+      "sha256": "a6266923493ab36ffa34da3b361cd92bf36a1ee2beda9f5e66ac75d42b92b515"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-admission.service.ts",
+      "sha256": "a50d3c4a33857d3ffbf1f95d0c8759fa18acef4b918b5ab0ab3445507d1bffb3"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/errors.ts",
+      "sha256": "1e65eb765939e5d35c5128bd41b19e2dbbeb4c0bae3a8581b9d9c5d36cc4af38"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/types.ts",
+      "sha256": "27e44118ec30c66559dd09b82c829ef0c24d64a7d6d06f0f2677a85c0c3a8e54"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/schema.ts",
+      "sha256": "46b3028eee28c2720ff6b86eab1237b2f5f03540ddf193a22590c963cc5456f0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/sources.ts",
+      "sha256": "577cfebb2fec6a5d4079f098987a256262938cd8eaaf68c72d44dce2143e20ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/unified-final-submit.service.ts",
+      "sha256": "ab7abc2dfcd0e8fdbf83d98e17690e1757cb64834ae8d4b75f4bf163e479dee3"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/errors.ts",
+      "sha256": "7dbe324871dc23dcee8f6b42bc0eccb4b80e596a35666f0cf7f3cfac5924d23b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/repository.ts",
+      "sha256": "c4ffa0896b64ae8f0384b7b7bfbbf0bab628d01b960de7dd85190e8071a10e20"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/runtime-consent.ts",
+      "sha256": "ccb8012c08d1005728e4cbf2668c1cab68695d81c76b557f78b2fcd4bb54519e"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "sha256": "b07a25411fba96aff7df049e0f214a5f2a52582f4fce647dae56b0b87d6aaf84"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/persistence.ts",
+      "sha256": "a338c9368096417f353a9fa3d4ab028fe8cc938cb75bcdc96f65a76629925e45"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-raw-submission.ts",
+      "sha256": "780f377473ace8a58f412c2edc14a08b71f12c2e198ab11aa3b18a5f30f29b53"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-persistence.policy.ts",
+      "sha256": "8ea864475cf65a06f32ca5593475a34de8217b636068b1fe06eae706eff8843b"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/grants.ts",
+      "sha256": "74a4cce725c47a5c345e26a7450ac919278a94893958b800d96060a407baca02"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-release.service.ts",
+      "sha256": "c15b742c7c72cdcfd53135e01b37aaace8db33a3c6787d3b45006c3b4ffb7382"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image-delivery.ts",
+      "sha256": "e7cebbb2e7a151d94c57d1dce1e7c1d83843204bbd2b3f4c444fd659aadd8c8f"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-asset.service.ts",
+      "sha256": "c0554afd8879fe939668a6aa3799e924b4084e125d455c07391b035f086adffe"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/disclosure.ts",
+      "sha256": "51713fcecb8567e8e60a0f4ebb5823f0b8f6659383fee6ec6e5133b33ef8073a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/training-feedback-policy.ts",
+      "sha256": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1"
+    },
+    {
+      "path": "server-version/backend/src/modules/admin-permissions/training-authority.ts",
+      "sha256": "cf00d3c24bd9ed5782fac6961e75c6fb50ee83e80a5a5d02c298a68fda9853be"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-public-round.ts",
+      "sha256": "4ef08ddeefbd6e20f6f59c4309699bcbf693735416361ed28462633c8d25bfea"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-feedback-binding.ts",
+      "sha256": "43698e90505e73c003b57efce0e0a390aff24ec811695a7d3e7cbf81f8d99ebd"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/participant-feedback.ts",
+      "sha256": "9775626d9077f4733f0b7825929bbc9386dd62f358e711a52ea37a017015105c"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/result-authority.ts",
+      "sha256": "ca59746c62e156537e02fb4cbacb47b3042c60772d7f7f282886597a6cd88f41"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+      "sha256": "1f67f68455f9f419def405e40f6a273f6ce747cebdd84aabf627064ddc849667"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-markers.ts",
+      "sha256": "387825424aaa8c085d1938e8a1e73d8b9b6c76e983d4877c5f39ea5fe43ac07c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-read-plan.ts",
+      "sha256": "a77f14297f33282873692edbac599e26507090c9e90528df6b7ba5ea33bf8dbe"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/authenticated-admission-lock.ts",
+      "sha256": "e853c34f4938be1c5190abe8ebf8e3b2377514edc431a020a9f04a280d1ffdb0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/training-materials.ts",
+      "sha256": "d8f955458bb8f86ba07897a16cc5ea651df1c255ad85ed939011dd881b377fa2"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/readers.ts",
+      "sha256": "296e2a11e6fa0c4bb8e593158a0cbaa1b30b7753d7d592daedebb88897faa701"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/evidence.ts",
+      "sha256": "3678659b18de0050e2df2d9bcebe59bd7268b257deede66fbdfbca0fac3a4160"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/context.ts",
+      "sha256": "acbe580e87611755da2924e4dfc0b11c7a4c0c34d36f8a8e92101d94e0da01c7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts",
+      "sha256": "5176813516e6aa37fba90297eb899c14efc42b9de96b28e289c86956db3db6fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/engines/mental-health-rule-v1.ts",
+      "sha256": "2912ee5a815ca65fe64e84be45b322c72ad56c304225e1b30c411bfea121f947"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/registry.ts",
+      "sha256": "757c35247e9f30abb4b7d594b046f0de77ded716bfb9476c7acf77f3aa81492b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/engine.ts",
+      "sha256": "1f960a9458a20ef3bca6de3621e165a90911ab14edc2904a3b4834fe6eee396a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/fixtures.ts",
+      "sha256": "e15d842aca9be4afdf337c001865c658eb5823486ce7186b6891c7eafcf66803"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/task-seed.types.ts",
+      "sha256": "42b9c7111814b8687c1e09e8c61e5312dcb96609008978b3d91f9378c5600986"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/fake/seeds.ts",
+      "sha256": "2b4224ec8c28b172a8304e3d6e9fc93d2bd2ce46b31884a525892d771c75c5b9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reaction/seeds.ts",
+      "sha256": "44027ab57551912c975ed37c7d8d1e4af78c4f492b9be3bd2429eaee4e44f3a4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/memory/seeds.ts",
+      "sha256": "b183eb4fd6e547a543e71dbe05a8a4703ec7c6b941ae69c1afdec5a390f4483f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/stroop/seeds.ts",
+      "sha256": "686c03e765d3b8816e6dbf491345df7cd74f899ad3641f82c5f7c7a392849c3c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/gonogo/seeds.ts",
+      "sha256": "badd4599b5b6fdc9bda7b54c12eb7ec2baa593882e1a4232a330f119beea742a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cpt/seeds.ts",
+      "sha256": "bd81aeb69c7af31f0e17fbe051f4037fd723ebba22620b9d3855dabf81b7dcd1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/nback/seeds.ts",
+      "sha256": "0ba2b4b539855ebee8b9debd98132d8c8bbdb307666510c9f4eb6779d9252d9c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/corsi/seeds.ts",
+      "sha256": "8d113cc64d8a620e8366e652b9f17d04829f82b7e6293cbc80082612ec6b2935"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/sst/seeds.ts",
+      "sha256": "f181c579e557115ac552da8db1ea21a960b26ba23616b612bed3ccbb059813d2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/taskswitch/seeds.ts",
+      "sha256": "d3450751a33727218452f1bebbdc5e27a8c29bd20023cf397ced4f51117680c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/patterncompare/seeds.ts",
+      "sha256": "281fd38af498f2f085c275810740c8f833e3f9b0dd2b7af62ea17fd3e3a65cf6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/flanker/seeds.ts",
+      "sha256": "a8878c606a5e0df0499272fccabccdf39f1868319887d25dccaba58cc0aa8d1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/cardsort/seeds.ts",
+      "sha256": "30947c91333dd950778b854700e82c69450171b879a9cb6afc325356364585fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/digitbackward/seeds.ts",
+      "sha256": "0e9d4cdb194ec283346f981d77d73e716b04dc4c1f6d44dab840a2d8a8f5da49"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/picturesequence/seeds.ts",
+      "sha256": "45e37abc24f70079d01ee36ffd4b509abdf535f8e371b51435d07ab3dbd34947"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/pairedassociate/seeds.ts",
+      "sha256": "8ddd514168f163213b56b437f51e9a60ac26f8246b41f554ee55584f28cfdb77"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/matrix/seeds.ts",
+      "sha256": "1cef4cda6f03065a8d3cb4284a98139371cbba86a9faf89b59c050d6fc4f846a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/mentalrotation/seeds.ts",
+      "sha256": "137c8c387571b17c7d9e7a2d31968ba2f04460950cb623fa67e936ecdc5073ce"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/tower/seeds.ts",
+      "sha256": "777b03d463ba487f103da3c306683135c9f624497101b1453918c4849c2c8f54"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/trailmaking/seeds.ts",
+      "sha256": "5e0f45bb8b28028f6064737e59ad8f135413d54df96ebbbaea008a9132cd5f0d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/reversallearning/seeds.ts",
+      "sha256": "5f7ff7f76cddbb095df3efa48ddf6730fd110373e9813e46952a8fed4e5e01c9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/bart/seeds.ts",
+      "sha256": "8857aef6869af28a9d28b1f5f4e859c5ef256d6d1e3d5179b33c45c7098fbf53"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/wordlist/seeds.ts",
+      "sha256": "5c2bdf8ae1e3863a80a14a7e4c1be87db7b4a7d002d6b8ae5cfe834a4cb987ea"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/lexicaldecision/seeds.ts",
+      "sha256": "df0438f8f989d04ae9716e004fc7811f264a0fe59a5137ad805bf565eff41d31"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/tasks/emotionrecognition/seeds.ts",
+      "sha256": "0d84d297258ab428c1343698f6a52a659c5117920407d36555244564462047c1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/generated/seeds.ts",
+      "sha256": "05d9e45ea1c9cdae6f022e04b68198bccec89a49d8bbc15b69d6fadb9f3e01cc"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/dependencies.ts",
+      "sha256": "44b705ca17b200f8871d8954057081014a0bb65fe8f488313352f363e542729b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/generated/packages.json",
+      "sha256": "6c134634a3c303fc2036e2c8507414729896ad07c071284ec7d4c9c3a4635c31"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/engines/cognitive-domain-v1.ts",
+      "sha256": "6f3d9b32287bed672e87ed2b03d304c6e126514ab1feffa0b1ee042bb87fb2e7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/engines/scale-evidence-v1.ts",
+      "sha256": "d463d376fbb47b9581b83230064b2daa3b0e6cf9565e07b7b5225c7010525504"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/engines/integrated-evidence-v1.ts",
+      "sha256": "22a38b871fad362419cf7bc6b5f1d1c1b96dfe8daef2c3c83e54b3c88b22ee04"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bootstrap.ts",
+      "sha256": "65bf1b2d96aba3ce3299da9056a3be38a0d1e84b85cdae00c9b95d39c55550d2"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/definition.ts",
+      "sha256": "726b76128a0558c95476ec1ac5eff0d3d6e877f92689c8559d1c0cb6fc8259a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/snapshot.ts",
+      "sha256": "2453e368d9a9aa53a155ff9bbcebbb1feb9e3c4ad99174c78ccd200eac3b3127"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/definition-provider.ts",
+      "sha256": "65386699cf4f46214f30c3fb4613db066d381c8a7f7b55469ffc194cb024c075"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/onboarding/catalog.ts",
+      "sha256": "895258144636032df3309e76f60befa1fc40f9de8579650c05d1abe23e52262e"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/report-facts.ts",
+      "sha256": "821bd7fb783f82fcc5de538b49c69e822408d27299cd30df861618e5f7c3e5b7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/compatibility.ts",
+      "sha256": "124e1c607a5f7b83239efc914b9980f6c7fece64cee13527f509d3ba9c021158"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/compile.ts",
+      "sha256": "1eef45bac02647051956c8de380fd2a8da98a40c729ff1fcd5e7fb08a39e0006"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bundles/cognitive-response-inhibition-v1.ts",
+      "sha256": "3dd41c76af0b704b8394f1fa45e59619cdfcdb82e2f233c8c8acac4647d24759"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bundles/wellbeing-who5-youth-self-zh-cn-v1.ts",
+      "sha256": "50f9124cb219412ebbde46391b028b6ad0cfd2db26bfcdac6bae9b63ccbd109f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bundles/sdq-texi-observer-stubs.ts",
+      "sha256": "9bc9dd49576c8f9bc9112b4656d58ea7e13e500a3509fecde717a69d299212ca"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bundles/integrated-gonogo-adexi-adult-zh-cn-v1.ts",
+      "sha256": "850ee1556e528afc3232b016f4191e076520da4125848af0c54e1f8029d0916c"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/bundles/integrated-adult-age-context-v1.ts",
+      "sha256": "3b3a8c78a749ca151d9428955c4f179abb5c8048b735aeb95e53cecd116f2b58"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/scientific-maturity.ts",
+      "sha256": "61970ee19a8567279f1dbe492c5a792c6412469543165abf78945ea6d8588bd6"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-bundle/index.ts",
+      "sha256": "2d5231ab5aa0e42b933a4ee272e1c0cc9fc68cd5697ad088c80f8446bbce4099"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/code-catalog.ts",
+      "sha256": "cccf5f8aa7ea08e853fcfde2838985b5a37c1a2a5da0c6f2b74a1896ca48305a"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/package-release.ts",
+      "sha256": "5d36169fedcc09ed0e4ce8018d8fafdc050e70c711060d25d454c566828c32ff"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/product-readiness.ts",
+      "sha256": "719bef74ddbf11eacbd8b6a1330771309c8ffd462fcb2b13e8919dd5be00825a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/library/product-readiness.ts",
+      "sha256": "40688df4d555349cd27b807834ad19d8228b0b2f48d65289f6115cca8c64dbfc"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/cognitive.ts",
+      "sha256": "6dce9bbc42beeefb2007324737e7e20fda18aa8d592836c2aba55c0f9d1246a8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment-measurement-release.ts",
+      "sha256": "f88e4741e5e2a4445f91776a46528c08c48c82bad80cf9855bc572928d5f0f95"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/service.ts",
+      "sha256": "08036e4bd414a1525afc461ffbe9a9aaaea6cfe9a7b5f33fb4d2e2497e4f2055"
+    },
+    {
+      "path": "server-version/backend/src/services/materialGrant.ts",
+      "sha256": "24d249654cf179472a07fc51cac4d630a54d8f2456bc1dcf92fa194580dbeccc"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-publication-guard.ts",
+      "sha256": "6f77b060e2aaedcd56f90cdd8768d7bba1592ca81395b71f1f4b23e2194e8f33"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/product-eligibility.ts",
+      "sha256": "c5bf291bc4a6b3cee1a532f004773cb5f96054f02f2a914bd40536fa552afc44"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/attempt-quota.ts",
+      "sha256": "edb1a1da3d54210b49ca9588a6a2b4d6aac05c8d2599f7e104a6ad2798f760fc"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.schema.ts",
+      "sha256": "fc57281b2c7a852eb6b66de0b0a7d735cb37a9dcfa7c2261ded5c621c41ad16d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/assignment.service.ts",
+      "sha256": "e747173e655a39c0b278a76cbe0d828c35b9b6ba9cfdc6ba7d4f9a0449a39fcf"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-flow-assignment-snapshot.ts",
+      "sha256": "ef785e28936605abc42789a7dd9d033c86ffce2e3d5f320752f1098e4f3b0c82"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/training-flow-authoring.ts",
+      "sha256": "4fced5111f2c3078946a315f5adc503fd50e8ae00b8afd89dbd8aee0d92a86c3"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/training-variant-authoring.ts",
+      "sha256": "9fb3e55b212ede6af86585bb9382ae1e86b85920026f63618b5ccda10222638f"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-image-retention.ts",
+      "sha256": "2963eaff2f1dfb9964147df51b472e0b1b264ff5c80394d6450f6dac67adfc54"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/material-delivery.ts",
+      "sha256": "50928ace57198688bbc14eb0730f3e6054776ab4a7e0545e5d32403c7fe3663c"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-image.adapter.ts",
+      "sha256": "9eb0a6515224c836ba89593a13c69c3921573242b40fe5f3e4c3462da237aafa"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-timing-report.ts",
+      "sha256": "3eff4a5d459905fcd4bc6fa7acc7acf146d17efa41573c69834f0f851037086c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-metric-disclosure.ts",
+      "sha256": "9ebc9671dab21f1847c10060daa733f83ff04b81779a12cfc1558831f68a3e68"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/final-interpretation.ts",
+      "sha256": "5b028be6f9956fd101c7634fa0a292014d43f94be23f16bbb69d9a7dab0fee1e"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-final.ts",
+      "sha256": "625c35a8511e89f2d75dc1c1958705e93d3fb03a01a99766fbd11bcdb1a97398"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-report.ts",
+      "sha256": "a40345d683834cdf4d80e561d41459e1d01577f276302bf6bc33b89dfcfb94e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/typed-form-presentation.ts",
+      "sha256": "f8a28a0ab3afe3c7f124b928f7c59c0b87b88ac43140a3b1f6391093ffacb213"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/compact-composite-report.ts",
+      "sha256": "fee8db4cd557cbcffe6eec4d56d5759fc57f55e11e1176a130debb2dd2a627f1"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-read.ts",
+      "sha256": "b335dd4a66fe19a887c79ca86e5d731a49434100282ba025791889b345e5eee1"
+    },
+    {
+      "path": "server-version/backend/src/services/reportReadyNotifications.ts",
+      "sha256": "f05e9221a947ef3c68ea81e776eb58969f720395de88d31f208266ed517254e2"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-cache.ts",
+      "sha256": "56954b4fb712470ccc574074573f706d1488e6a706a5276472509217f9901b11"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/frozen-progress.ts",
+      "sha256": "ed192051a5615fa1d8cfaa3c218161c63e8fcd16d7d0d9e13f5d2c6c5c3695cb"
+    },
+    {
+      "path": "server-version/backend/src/services/publicAccessPolicy.ts",
+      "sha256": "d3feffdc3907d6e25ce5ff27a8460863498703a345a73db8661c52f84903b4c5"
+    },
+    {
+      "path": "server-version/backend/src/services/anonymousAccess.ts",
+      "sha256": "9112bc022f5b63a60e4010a596b2121378e12a8a29274ada0f19800da110d39a"
+    },
+    {
+      "path": "server-version/backend/src/services/publicAccessTokenCrypto.ts",
+      "sha256": "56f61557a130b437eba2fa99dca9f2a1de20dabfc583f5dbb3c1c325e56c5a37"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/session-lock.ts",
+      "sha256": "51697863a4122b9a7b2615f4446e0ae14c2e3ff38872afdfbf3ed99e48bf423e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-data/simulated/sim-k12-v0.1.json",
+      "sha256": "5769c2fb0bfe05c7e4819ad5420ebfc40388c455a94b4a4b14a8afcf6df2b83a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-data/simulated/lit-sim-k12-v0.2.json",
+      "sha256": "f76ff47c389015d6288152952611ed116a3d797f1425946f08f7594c4f3a4194"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-data/generate-simulated-reference.ts",
+      "sha256": "2e7dc7383d251d2d08a2b6901eb9cadb0944c361d925241bf19d52513e25ebc1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-protocol.ts",
+      "sha256": "b6cdc61fa58acea7646d8c1eb0b7a4bef7dd78a87911568f4eae09d03b0addd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-data/generate-literature-anchored-reference.ts",
+      "sha256": "ee8675eafb5d583699b1498af39c29802200a74f0456c819a914928431fc1928"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference-data/literature/sets.ts",
+      "sha256": "25f0c57af538e853e1c51f9935d0c8a38f11a8fb45e431d1d202a5353f8502bf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/reference.ts",
+      "sha256": "a607340cbf95d5d34ddcaabb49b867da979d84aa24789960cf234ba4d6e0c847"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/legacy-protocol-presentation.ts",
+      "sha256": "936f2e4e3cefe9e4149d2a418e4541f3a68f98ed3d9df4494b0c692d952edcea"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/legacy-report-policy.ts",
+      "sha256": "79307168df98027c85b911c99f07f555311561b392e09a025eb1edc24aaf1a5c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/single-task-report.ts",
+      "sha256": "b84dee83d82177ef43fd40c9252dedb1133372f513414425c618c901d5d4c483"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts",
+      "sha256": "99f6662632e945530d7f5e9def8fe6e07c3346dafa8be943f89c73d082bd8d5d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/session.service.ts",
+      "sha256": "aef1621f328030a89ea58a5372570b21c880ab80acf927435e93ba179c759334"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-image.adapter.ts",
+      "sha256": "11644ab334325e33e40b884c6740af877b86ab6c6ce5612720211aea047b0202"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/context-preflight.ts",
+      "sha256": "004f1642393409a02b5b4061a7fc10ce233e2ac63064a2aa6da5666d1610273b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/attempt-runtime.ts",
+      "sha256": "16d1195f62a62826f5e469e551f4228b23e1049ebf4e3610ec2f42e26c431cf8"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.form-runtime-contracts.ts",
+      "sha256": "929f50cb90147e102ccb01cc43c39086d01b56cb5afca6dc5c9e6b59958bc0a8"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.form-runtime-adapter.ts",
+      "sha256": "bc131002ef1ce03fd053e1dff98f608d020b5efbfbbf835ff128912bb5d21a25"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/result-disclosure.ts",
+      "sha256": "ac83d2a4a06965b2bf33a478cbd4c91fb79cbe63c4ac3d76d92f7c7130075986"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/product-catalog.service.ts",
+      "sha256": "183700424ac0211da001b6c0068cad0889c8a6679bb7e87900e56e3f52a74478"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/journey.ts",
+      "sha256": "de2f5032aa3ded681f80a3dce028aaf72c1435ed89928c8fcb5b8f264e136f06"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/target.ts",
+      "sha256": "802d7121b6073e046a88d2d08efe0acf01f61a17a2284aea34271ce0a88ef44d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/analysis.ts",
+      "sha256": "25f29b817fb50b6deb0710a84084102472bb6971f65b8d33f100b06425cdcaca"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/contracts.ts",
+      "sha256": "c1c50bdb7e5bdc2281deb77c78046d9de65606fa17fcad08c2dffda8ee27cde5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/product-registry.ts",
+      "sha256": "ac727df576962a10562b96a0978ced1e2a489deadb63a0a6bd50abde07fb12e5"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.form-runtime-source.ts",
+      "sha256": "662be456ffd9f0712b33694df4d6a2e3434ca50c78f5043aed283da71b2f6abf"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.form-runtime-resources.ts",
+      "sha256": "78baa279e8e66119d504ee06549990b7a072b9b03219c95ae7df12f786cecf58"
+    },
+    {
+      "path": "server-version/backend/src/modules/report-privacy/schema.ts",
+      "sha256": "5ebe6bc0de7bc9b30b4481f716b5fb132529397edabb522fdcda83f97c107157"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/privacyV2.ts",
+      "sha256": "d61e4a29b1ff7b34ec6d81d87edfae7f73a074d40a1586a5a3d43b4ccaba0fd3"
+    },
+    {
+      "path": "server-version/backend/src/modules/report-privacy/registry.ts",
+      "sha256": "d6762fa54f6d73f474330eca6dfc9d0799493e5397e6bceb1a2f943b68cdeae8"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/privacyV2.ts",
+      "sha256": "993aeecae672221a56e8ea046c50469f5fa541e226cff6a054f672323c7eb7ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/formRunResource.ts",
+      "sha256": "27ad2d4d9491facba4aadda5c5710866882adfc1632cefaa5ef1a1ca614a9be2"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/studentFormResource.ts",
+      "sha256": "2b35cee2903b30653f7a1bb039494dfa64435a67ee72e8d5db6f4375230cc5a1"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.form-draft-policy.ts",
+      "sha256": "ebba1db9ea39f9d6d0bef022c5882973e8a734616e9b45041c4bf92839f77c11"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts",
+      "sha256": "4583343e76d66b055d80cbde083c131f8e38c4e4085b8d6b949cfcaa15a2be9b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-use.ts",
+      "sha256": "0b689268077d7b27cb76b70570a46a2a43c632bc70bb6f662903e93541e10705"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts",
+      "sha256": "95081ecba5ca47928f1135b940fd406f832661387c0fd5dc45823d7e41174fa2"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.runtime-policy.ts",
+      "sha256": "14f98ad6c8eb41d3dae1a9b9c9958076f0d7279b1ad117a0da05c330151e253d"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/private-tool.runtime-resources.ts",
+      "sha256": "939331749d7f975405116bb0f599cfae0e47e03081ef4d66f38c0ba1f7ba556b"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationPrivateScaleContext.ts",
+      "sha256": "3f2513edea43bd222ae53a05b55766312f7bda8c9c96274fbd10691b65cd2b22"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/resourceBoundary.ts",
+      "sha256": "7e6e666c680bf8f0087ae1e0d8f0fef5e082162601c4311bc516619217f3c5e0"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/deliveryPolicy.ts",
+      "sha256": "6bbc8cb387f273f3f5e0f9a8cf3f8f11820c3180ef8c10e69a1a406e3b9bf8be"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/types.ts",
+      "sha256": "a16a71bf2d3a5f94748bef859a060c97d943ec55caae56ecfec2190b2afbdb19"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/access.ts",
+      "sha256": "92e7fd631762684b7f7fdeb43d15e59edbafc133dceef1f242b245eaa2705a9b"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/adminInvariant.ts",
+      "sha256": "cead905fc1db3f7d74a31a5704899675fe03b3b986af654d043f68a564d53cae"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/service.ts",
+      "sha256": "e4da9d078d16f318b62213f27373d06be1c81ee9ffd8c3214e4eaaf4047adcbc"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/activity.publisher.ts",
+      "sha256": "f3015eac613d77e7599b24431c58f898213acc2fc4f63839dae888ac267c7ebb"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/activity.service.ts",
+      "sha256": "2dc0a318986f77040b68fccb2b32573603cee97339a0354a77baca7300a63bd0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+      "sha256": "2afb6dc9cdb2795f2ac7b6cc5654acf9b419a292511b5b25ce424a2a407b6dc2"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/teacherPilotContent.ts",
+      "sha256": "65cfee1f181d2ffd70e248ae2ba0991eedd1e7175720ab159e77a53c034eaea8"
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/scaleLicense.service.ts",
+      "sha256": "1dbdff755703306266f1822716a0d42a44a91d5381df42ea49d3c9f785529655"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/measurement-source.ts",
+      "sha256": "462396dea306c63446508085a4938a1cd5c28c1ed3e6105721a5436646501914"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/registeredResourceContent.ts",
+      "sha256": "a65e53667edb52cdfe7d48d6a9cba1845549a3fd6fb2743a1d2346e03f802f98"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+      "sha256": "37151798b9c3e42d67049acca2460d0b536905589cff279f9f4490ff2043fefa"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/resourceAuthority.ts",
+      "sha256": "adba8d9a6cc17a91948f4c789224c0d12071fb204de63bad879f469587c08af2"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationPrivateFormIdentitySql.ts",
+      "sha256": "b2fbff056658074ed2a467fcb477acc5233a03fc5939a58515cf4741f7d9c5ab"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationPrivateScaleIdentitySql.ts",
+      "sha256": "e738d8d1733457972eb67abcf7cd3876f9f2ea11bcfa01b38870ca9ece40daf5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/currentActorAuthority.ts",
+      "sha256": "0ea0650a5ee3230b28f3cd2273468c56664f1fd1394d6f8a8717f1a025656c23"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/currentPopulationAuthority.ts",
+      "sha256": "99e1d5f430a04a0aec098b96b7b00c04c680e243c27c6f1a67c54e49b91bb365"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-identity/types.ts",
+      "sha256": "cb316a3be7965bfef707476a2200fb64baebc67803986dbee2193fdf1763ade2"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/startAdmission.ts",
+      "sha256": "cbdd56354b1ef99e11e9b28474c1466bbf5a0637df2508a06aa467f22e98b53f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/startAuthority.ts",
+      "sha256": "846be2467dfefd04fcbfcf455e9a5198effc06765ca221ec95c14ea38e9cf782"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationScaleExecutionSource.ts",
+      "sha256": "110fc42bccebcd4a179e266fa1cc0c2cfa4fbccff178e01650ef75ff5d81ad40"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/scientificProvenance.ts",
+      "sha256": "1fd8ccf0bb036f1b20be344dae7618323910bfc97f19ae292f41a5275d5ec265"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/startClaim.ts",
+      "sha256": "813426cedb612dc1359ce81b92aa93e5e4ab7397e435b5b6ff8ba61c425e1db0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationPrivateFormExecution.ts",
+      "sha256": "4cb0da5cd202bf6238bf4ce0b9437f40c9d047de47c7bf06cb4954ffffee3c68"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts",
+      "sha256": "1747a2a278a247a05c7ee5a3c968754e8404473cd28bace7094842e1ab8c5802"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/authoring/service.ts",
+      "sha256": "96f151a07cc58eb4627955c3a262ec014ff5b284e22d616e9e918467b16b187e"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.schema.ts",
+      "sha256": "858cf4f9448aa5719c5a24219b8646dd83735b85f3aca019e93f80d2da1d6554"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/form-template-content.ts",
+      "sha256": "2d0ad5937bd8ea740d17e70e1fed731317b596c99d8a22d63f6e5bc0b29207f8"
+    },
+    {
+      "path": "server-version/backend/src/modules/training-catalog/filters.ts",
+      "sha256": "4becea24442702eb01e840563b86ef39fb33326c29c81fad2e2590c2baaba96b"
+    },
+    {
+      "path": "server-version/backend/src/modules/organization/principal.ts",
+      "sha256": "455ef26ead22ddaed4aa5eeb5427949c12ed869c288de651d22465a785708a6c"
+    },
+    {
+      "path": "server-version/backend/src/utils/accountStatus.ts",
+      "sha256": "1f290e60092c956424311db240e1c3ecbd0fc0856ef79613d4fd3bffde3c8c73"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-video.adapter.ts",
+      "sha256": "271d833af1c430ab08e2b6bf74b5e747e2c43d6579643ad80b2d389d8feb3d12"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/scale-resources.ts",
+      "sha256": "59c12a0fc5f22a4ec28cf9560d8f128c456f395b1d5c39efe7cbcac5d01954b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/service.ts",
+      "sha256": "25927e8df1bf2b123dbdad4163fc4f4c72b6e6c1093a89db36431cee4d5b452a"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/runtime.ts",
+      "sha256": "809b87947fc0f88bdc3407af66ff369b66961d4b5d0e2a17de776698ea411b51"
+    },
+    {
+      "path": "server-version/backend/src/services/aggregateFinalizationAdmission.ts",
+      "sha256": "a18ac709721998177fa3f0ee04cf53c4bd51036828b966dea09a6ef2440989eb"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts",
+      "sha256": "a636b813abb8d7d5d69c266a9d2e3dcc8063e0acf2eb10d24d5f07dd7184afc3"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/context-submission.ts",
+      "sha256": "05e78053b8c231a974529b44916f53b5642ea129f006c200b1681aaed54e90ef"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reanalysis/errors.ts",
+      "sha256": "cb411ec66b3741544a4b40639b07fe6a881ada180b634b099f145f8a2bc3d31c"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reanalysis/types.ts",
+      "sha256": "323bf6dbac0383ac0bba96a9ef96d7061725907c8ac00bf4e0521d395359d80f"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reanalysis/reanalysis.ts",
+      "sha256": "46c06f2d6ceb773d3ad032ea1ae3314efcbd6a5f952e1cd0e4e82db998911cb5"
+    },
+    {
+      "path": "server-version/backend/src/modules/bundle-product/analysis.ts",
+      "sha256": "525431e492ae72f7c9e62b53fba695668a8b5d757cee3340bba154e8010be02a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/reconcile.ts",
+      "sha256": "8588a1d0429ba0f940c245d706d610aabd1440eea13106c32d48119fc95273e9"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-relational/runtime-completion.ts",
+      "sha256": "83489fd37a80355ffe918e619f5b6291928b9c844d8b39deeb7d50c370a9b3a2"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "5af4b18a144e43147e51e7d5f798558b1b14404f8c4306e7234291951be7d24b"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-final-submit.service.ts",
+      "sha256": "34e5242e7433c1406f67b0a885a2e383567f9bbe4f8b2f49cd33ce11fc6dd8d0"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/situational-native.results.ts",
+      "sha256": "2eeb123d761eb6a92dc993e3cab65bb165e489e33b5bdd0a5e6ad0c268326b15"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.native-trial.ts",
+      "sha256": "63fdcbc7ebdbf9929d928c06e9d3e64859701d7b1cdac7707f60c8f8dbcddb6d"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-package.budget.ts",
+      "sha256": "9172ea93dafa418f1b29c08fce888ec47a33b78bd8bf15bcfef21db5c0decf41"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.reports.ts",
+      "sha256": "4f01c4234a43cf67d5b78812dcb933ff6d4adc95fe871c733ac11a335953d77d"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.trial.ts",
+      "sha256": "6d9722388d7acc635f61cea7cca31e91c5e5396e94e0ef100f23ecb5afa9669f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.summary.ts",
+      "sha256": "b3b7c10c64015f38ac6e60c2cf2635983de6b95ca921d0a6aafcd59477227e35"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.service.ts",
+      "sha256": "68775663caaa3d800c1d358d88561b76bd2a963a149ab5a98af52362db259281"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.content.ts",
+      "sha256": "c1563bf2cc4f0e6f613fc5da51c98a85060092ac677aae35922a943b28b284e1"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/measurement.notice.ts",
+      "sha256": "e43cb426094c1863e6092cdddb6f41d5b5305fdeb69142f698d072632419a843"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/publication.service.ts",
+      "sha256": "701e9cb544acf14d6c9160c470c3fb11fa4e67cbc858c5a4d1a8feb3e3fd9242"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/scale-collection-guard.ts",
+      "sha256": "bd1892014c35e250a3ef1dccdd22eab561b871a1a7bf7826ee403f35ab750240"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/flow.assignment.ts",
+      "sha256": "b4f3db7ec8a35a9a24d289392af68879262cf41dec36fcf93945603ff837c245"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/content-binding.service.ts",
+      "sha256": "6a86c020a5d128a681274c0cab913124bb8e30de4cd0738d02d72eb3e453dc56"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/final-interpretation.service.ts",
+      "sha256": "26ba0331156c9f9bb7270a7cb1dcd57de9445eddc2d8a02016acc4419f7159ae"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/timing.definition.ts",
+      "sha256": "80e35c01422d1567858fcbe3090ffa864fc17f5261ed957c2cbd6efced488884"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/flow.runtime.ts",
+      "sha256": "11cf23cc84c7cdad52d5fdf0d47b364c8ab97da1a1ed30300fff46059979712f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/final.compute.ts",
+      "sha256": "c691ebf43df6625c9fb0362fd10dd1d8fe1e0e327eefe5d26ecd9f9b202ee1ba"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/builder.service.ts",
+      "sha256": "58ecf3f049592b10aea3d6c1b6db10fef688bb380173092bb844c4e8bab90f01"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-package.service.ts",
+      "sha256": "5a2fc9e1faeb794f0396eca6935d8c7fe12083455151c8a063d3b131d8454465"
+    },
+    {
+      "path": "server-version/backend/src/services/passwordVerificationPool.ts",
+      "sha256": "4243c154b7e1d877379c073e098924edfe92cdee951c45cb06d63bc1b2a3f443"
+    },
+    {
+      "path": "server-version/backend/src/utils/password.ts",
+      "sha256": "2b531c6554cfa26f60f91068c543b58bb18ba8357d3f9b57bc3392167c5d0fe5"
+    },
+    {
+      "path": "server-version/backend/src/middleware/loginRateLimit.ts",
+      "sha256": "6943a573226e67083551e07cdc48cdf1c5585c50af7ba92ded2f17c12aaec028"
+    },
+    {
+      "path": "server-version/backend/src/utils/authCookies.ts",
+      "sha256": "94272f4f61b644329f27f1f0474ae1be1388ec205242c86ae9485998d904614e"
+    },
+    {
+      "path": "server-version/backend/src/utils/jwt.ts",
+      "sha256": "cd7e3e9d29ea840c129ea3c27be209e3df5ee6d0370cd14489a29598717c6357"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/mfa.service.ts",
+      "sha256": "3f1f4d4e7239103758adc2fd47a7f9ae4011a399114acf3869a0390acaae996b"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governance.service.ts",
+      "sha256": "0ed5c7ef32951a26f58cb672a796bfb697e4316453eca19032f477aff9222729"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.service.ts",
+      "sha256": "1774e7245876ccbbea586873cbd533dc5a90b41123064da6eecf81355ef9b12f"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog-sjt-media.authorization.ts",
+      "sha256": "678e4cce8da00a852db8884c1edebbe4bd8c7abf58bf14968de266e601c906f5"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/material-scope.ts",
+      "sha256": "e24a78c72760a6cfc013d0e6e37e289d27c93c1fa52c366e66c7dc661160cccb"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/media.references.ts",
+      "sha256": "a31588387f62a00f2e43abbf8c5cc4868746ecf6826552b8e1a5b7cfd8721f56"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.media.ts",
+      "sha256": "5c53b2a086e338b8efbea5249211bdf5a49049544f59de006c9d40768cad389c"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-tool.model.ts",
+      "sha256": "183d84e55a33d4de47ce74fb5dcc6c3338fe80c767ce4d9e5b0dadc73ac19dad"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog.sources.ts",
+      "sha256": "4bb7708496b6f6f32dd36383cd974c30a48eb99dcfc29915792988c1d2a4e888"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/catalog-scale.presentation.ts",
+      "sha256": "57aacf50fa2456e04892b3f28d86b89fe822f0ddf90cae05b9bcf48a2f34b899"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/standard-triplet.model.ts",
+      "sha256": "70076dc9b094e0075cc9f95a54c2f72fbdb3015422414d29299c0abd3330bcdc"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-source.ts",
+      "sha256": "be393ecc794a2808c62c1af23315a28381515ff573de896a9c2bc342c73509a5"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/standard-combination-content.ts",
+      "sha256": "559aa8ff4704691375aed8c64664f33333627a6c363cc33777baea789125feda"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-standard-content.ts",
+      "sha256": "455987ff0567c1ab445cf0dcc91e892254c230efb4e826cbb9522c53370f339b"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-report-selection.ts",
+      "sha256": "7b5f5f4b9fa5172e7fba327872f7c9d26aacf120904f0ebd9faa6089a7f8c8b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/formal-reference-resolver.ts",
+      "sha256": "1ffba6e32867394a251acc952481db5dd6ca8cadf6774f997485369fe9ca1955"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-selection.ts",
+      "sha256": "d50b759e9cc0d0e3fb463a67bcc1221ca29fce4597206c5527d929133b742e05"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/static-measurement-release.ts",
+      "sha256": "67a53b2401ede65ed402e2ca02c0827552dda06632dde4415bd27702a32f3dbd"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "sha256": "7fdb1513cfeb4f582b18d1fa31241ff9ce1d8ab0eadae93c06c89ecef990663c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-reference-binding.ts",
+      "sha256": "f042d6c1795854a05ba42d24d055da09cb6c1fb3b9e08f3a5c79b1b0e690c30c"
+    },
+    {
+      "path": "server-version/backend/src/services/assessmentContextService.ts",
+      "sha256": "21f22586e4c8febb29a2861e26eaa2aee5ba0a2b77515bf0572945ce6b9d9388"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-context.ts",
+      "sha256": "dc92d0ca0b8e0e3da03987f900a1a6088960cea5826ac2781e4059fe93a57f60"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaire-form-answer-batch.ts",
+      "sha256": "b1ec796e609b9a2af8b23c079410fbce94496f868bbd276941c954c319c4ad05"
+    },
+    {
+      "path": "server-version/backend/src/services/legacyQuestionnaireDatabase.ts",
+      "sha256": "a75be1cef8faee792519860218d1417f2b96b9f8c99cde4de8557667f5ccd594"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/questionnaire-scale-image-retention.ts",
+      "sha256": "8fa4f7645b17ce2c64f849bfd50a94572d441c4d5065ca56fb52f1b855b4b1a4"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaireResumeTokenService.ts",
+      "sha256": "9e1eccbd15b43a3d94a3dcffeadac88bc0bdc021cb5d8964003e6cb779acb142"
+    },
+    {
+      "path": "server-version/backend/src/services/questionnaire-form-section.service.ts",
+      "sha256": "8485b3409bd3237c8de8c14afa27278d0082e393f6c5b7f2deaa68eb44d30ff1"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts",
+      "sha256": "ed7b15636d3999ddc09cf2adcacf9c3ba2e7de86b65e9dd45f773ff3221f57c1"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/final-submit.service.ts",
+      "sha256": "0749a24c21e4a7471102e7f9894d7b67557a32640cde350384f2156444cf9b7a"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/typed-form-facts.ts",
+      "sha256": "2411f21f17474dac708a1b423f570d165ea819fb5bea7bb5a5bd50826866ce0b"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-flow-scope.ts",
+      "sha256": "02e2c0d910ba9d1dcb92a709dcf2bddd506b20116a399e9a4e89a56ae98fe4a7"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-scope.ts",
+      "sha256": "16d429c663652045d8472bfdd9200e79ec09085833ef8bf20151085447c04d52"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-child-scope.ts",
+      "sha256": "1465ffd79c2b7adc1256fa466dfc6c0a1bb13458868faa261b3a06e3e4f6e822"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/assessment-context.ts",
+      "sha256": "b63fbb773875eecd37e2dd0740fde42c099b6cbe5edbb407ecd79c497a259462"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/reference-adapter.ts",
+      "sha256": "1e18c6ce2fda6f41b7548787f6eb7bc7a5582c236d173b28571cdb993525cfe4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/report-reading.ts",
+      "sha256": "3667137d0c82fdf9894f79465d12799c9f70e922b257106945d5c9d0ed74705d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/report.ts",
+      "sha256": "2a3145cfc1a9cf957da4cada84c9a7834bdac6d266f075c350d302a738942792"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/v2/frozen-reference-applicability.ts",
+      "sha256": "5078d609e16a80cf194c9fe40867e331dcb20a242e56b9bb51b6363bff093a79"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "sha256": "a94f8aecd929c1aea34b2bfc28eef3d189410480996fd3d59fd0c946a48d7142"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/final-submit.service.ts",
+      "sha256": "310a4b570dd446e88079302c58d3742d3b9aa82b0f38ce86bda503e936a05d8c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/catalog.service.ts",
+      "sha256": "86dc6ab61134a7aec657cf36f9169f7b682c649838fa1e1ac440a3cf71e9b075"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/trial.service.ts",
+      "sha256": "7edb571d689f8cac383ac70b44b28c77ae055be3b66700b21e21f7c02239b09b"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/completion.service.ts",
+      "sha256": "b499b1f901dcf5956de7aea92d4c2a4dba0bd89e83be595d42f422fbc1085dc5"
+    },
+    {
+      "path": "server-version/backend/src/utils/pagination.ts",
+      "sha256": "e912e2a6ad84934e0ed11f49174f059596b96ecf3e7b7768872e6f2fd5472fde"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/history.service.ts",
+      "sha256": "bca78c98da28a8a3b8f7d94de487bdb7572bb44ba88490cbb4bc79241baea9cf"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/public.service.ts",
+      "sha256": "5f3b204aa9c201676868bd68dc2b695dc3572520e96f129f36bd56176b1fd98f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/collection-data.service.ts",
+      "sha256": "9c2a1b4dec277463b858865665d880317debb99d56e01dd5132621c3ab63084a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/professional-report.service.ts",
+      "sha256": "a44cfb4ab36b356f91993365c92b4bac7c841fcd3b926857895b3742bf4a09b5"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive.controller.ts",
+      "sha256": "8ab4e343dac436b4ec06d98a3727fc1d1872d37f50b74960a609d06be72948a6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/native-final-receipt.test.ts",
+      "sha256": "e8e9f16bd4d23bbd4e6dcfbd5ae701900bec09ea85bd448dd88c1537c14bd9fe"
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/mfa.service.ts",
+      "sha256": "583b87b0ce8f7c90b6b7a83e16eb9a1debfe358ed915429a76a6c549e0dd1ef9"
+    },
+    {
+      "path": "server-version/backend/src/utils/sessionRevocation.ts",
+      "sha256": "14325a31ec044a70b4555d54da6d06caef2a16fd2eb219a17b0ade69353b5518"
+    },
+    {
+      "path": "server-version/backend/src/modules/admin-permissions/security.ts",
+      "sha256": "1a4fa580de1942266cadf1b406e6940a2b08c8652ce3dd58c2d27f4519215127"
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/authority.ts",
+      "sha256": "5bce8a8789a040bf2c5dbaeb5b87ec1c2dde4ce000fcba23bf1089c94e4cb63a"
+    },
+    {
+      "path": "server-version/backend/src/middleware/auth.ts",
+      "sha256": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

@@ -1,0 +1,7 @@
+# 主线同步：真实native core保存回执与FINAL范围
+
+本步补实际FINAL controller消费者：服务端识别精确native定义，首旅程仅登录本人standalone/course MOT；手构native匿名/composite仍不能绕过START直接进未适配FINAL。旧legacy仍沿原分派，旧scorer/权限链未放宽。
+
+已授权且真实COMPLETED后，在既有关系/隐私投影后添加coreSaved/sessionId/attemptEpoch/submissionId/definitionHash，既有payloadHash保留；不增加archiveConfirmed，不复制或重算报告。不是把Promise resolve当作保存证明。父/匿名/综合未适配路径没有回执扩权。
+
+新增7项receipt正常/精确replay/错误身份/legacy及父反馈保护通过；新增4项首旅程scope通过，后者独立过滤运行，未重复先前7项。真实backend tsconfig的5个变动/实际Request增补根及导入闭包0诊断，输入hash当时与当前一致；不是全应用构建或CI。原生业务旅程PG原件在上层目录，HTTP与COS/浏览器后续另测。
