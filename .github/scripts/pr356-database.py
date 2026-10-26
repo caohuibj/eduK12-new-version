@@ -281,6 +281,11 @@ class DatabasePhase:
   self.pg('setup-migration-history','psql','-X','-v','ON_ERROR_STOP=1','-U',self.url.username,'-d',name,'-f','-',stdin=file('migration-history.sql').read_bytes())
   require(self.migrations(name) == metadata['migrations'],'Schema setup migration metadata mismatch')
   require(self.sql(name,'SELECT count(*) FROM users') == '0' and self.sql(name,'SELECT count(*) FROM composite_report_jobs') == '0','Schema-only setup unexpectedly contains application data')
+  # Schema-only dumps omit migration-seeded control rows. Recreate precisely the
+  # empty reports budget required by migration 20261015010000, never live queue state.
+  require(self.sql(name,'SELECT count(*) FROM composite_report_queue_budget') == '0','Fresh setup already contains queue budget state')
+  self.sql(name,"INSERT INTO composite_report_queue_budget (id,pending) VALUES ('reports',0)")
+  require(self.sql(name,"SELECT count(*) FROM composite_report_queue_budget WHERE id='reports' AND pending=0") == '1','Migration queue budget seed missing')
  def journey(self):
   file = self.verify_input(); env = dict(self.env)
   if self.phase == 'ordinary-harness4':

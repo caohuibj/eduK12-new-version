@@ -129,9 +129,9 @@ class Contracts(unittest.TestCase):
   d=self.driver('vertical4');files={}
   for name,data in {'setup-schema.dump':b'schema','migration-history.sql':b'migration metadata','migrations.json':json.dumps({'schemaVersion':1,'setupOnly':True,'applicationDataIncluded':False,'migrationCount':237,'migrations':['expected']}).encode()}.items():
    p=self.runner_temp/name;p.write_bytes(data);files[name]=p
-  d.create_db=Mock();d.pg=Mock();d.migrations=Mock(return_value=['expected']);d.sql=Mock(return_value='0')
+  d.create_db=Mock();d.pg=Mock();d.migrations=Mock(return_value=['expected']);d.sql=Mock(side_effect=lambda name,sql:'1' if "WHERE id='reports' AND pending=0" in sql else '0')
   d.restore_setup(files.__getitem__,'synthetic_one')
-  d.create_db.assert_called_once_with('synthetic_one');self.assertEqual(d.pg.call_count,2);self.assertIn('--schema-only',d.pg.call_args_list[0].args);self.assertFalse(any('migrate' in str(call) for call in d.pg.call_args_list));self.assertEqual(d.checks,[])
+  d.create_db.assert_called_once_with('synthetic_one');self.assertEqual(d.pg.call_count,2);self.assertIn('--schema-only',d.pg.call_args_list[0].args);self.assertFalse(any('migrate' in str(call) for call in d.pg.call_args_list));self.assertEqual(d.checks,[]);self.assertTrue(any("INSERT INTO composite_report_queue_budget (id,pending) VALUES ('reports',0)" in str(c) for c in d.sql.call_args_list))
  def test_ordinary_phase_uses_four_new_databases_and_one_unfiltered_file(self):
   d=self.driver('ordinary-harness4');d.verify_input=Mock(return_value=Mock());d.restore_setup=Mock()
   def fake_run(label,args,**kwargs):

@@ -7,6 +7,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { EventEmitter } from 'node:events';
+import { execFileSync } from 'node:child_process';
 import { apiBase, forwardApi, staticResponse, verifyDist, fixtureAction, browserLaunchOptions, createBrowserPhase, scenarioIds, statusBrowserResources, readVerifiedUpstream } from './pr356-product-browser.mjs';
 import { inputsSHA256 } from './pr356-artifacts.mjs';
 const require = createRequire(import.meta.url);
@@ -257,4 +258,34 @@ test('status browser launch failure closes only the listening stub server and ne
   assert.equal(calls.length, 3);
   await assert.rejects(resources.start(), /cannot be repeated/);
   assert.equal(server.listenerCount('error'), 0);
+});
+
+test('actual workflow reads tmpfs private fixture through exec into exclusive 0600 file',()=>{
+ const workflow=fs.readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const start=workflow.indexOf('        # docker cp cannot read tmpfs mounts.');assert(start>=0);
+ const segment=workflow.slice(start),begin=segment.indexOf("        python3 - <<'PYCODE'\n")+"        python3 - <<'PYCODE'\n".length,end=segment.indexOf('        PYCODE',begin);assert(end>begin);
+ const code=segment.slice(begin,end).split('\n').map(l=>l.startsWith('        ')?l.slice(8):l).join('\n');
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'pr356-private-transfer-'));
+ try{
+  const file=path.join(temp,'fixture.json'),harness=`import os,subprocess,stat
+os.environ.update(PR356_FIXTURE_FILE=${JSON.stringify(file)},PR356_RUNTIME_CONTAINER='owned-synthetic-container',DOCKER_HOST='forbidden')
+count=[]
+def run(argv,env,stdout,check):
+ assert argv[:5]==['docker','--host=unix:///var/run/docker.sock','exec','owned-synthetic-container','node']
+ assert argv[5]=='-e' and '/qualification-private/fixture.json' in argv[6]
+ assert 'DOCKER_HOST' not in env and check is True
+ count.append(1);stdout.write(b'{"synthetic":true}')
+subprocess.run=run
+code=${JSON.stringify(code)}
+exec(compile(code,'actual-workflow-private-transfer','exec'))
+assert stat.S_IMODE(os.stat(os.environ['PR356_FIXTURE_FILE']).st_mode)==0o600
+assert open(os.environ['PR356_FIXTURE_FILE'],'rb').read()==b'{"synthetic":true}'
+try:exec(compile(code,'repeat','exec'))
+except FileExistsError:pass
+else:raise AssertionError('Existing private file was overwritten')
+assert len(count)==1
+print('actual-inline-private-transfer-control PASS; not a real Docker execution')
+`;
+  const result=execFileSync('python3',['-c',harness],{encoding:'utf8'});assert(result.includes('PASS'));assert(!result.includes('synthetic":true'));
+ }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });

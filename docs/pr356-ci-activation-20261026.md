@@ -594,3 +594,16 @@ reader调用点及未变控制绿项没有重跑。旧HTTP5原PASS、catalog2原
 - 原本两项被拒的接纳写入保留拒绝历史；随后用户在原任务精确确认了后台类型映射和四组原件接纳。dot 未改变分支保护、权限、扫描阈值或任何生产部署。
 
 原业务、NFC/OPT 内容验收、356-01 基线及未执行产品旅程不因这些记录自动完成。此处仅完成实际适用 CI 的准备。正式 Actions 与 SARIF 处置仍待运行、核读；没有伪造成功检查。最终完整 HEAD/base/tree 由 GitHub 回读后冻结，真实 CI 失败须先记录并回写 Notion 再定向重试。
+
+### 首轮正式 CI 归因与定向修复（2026-10-26 16:05 UTC）
+
+原 run `40352903164` / attempt `1` / HEAD `0f044cbf0`：两个 image、audit、scan，schema upgrade/restore、ordinary4、exact lazy 共10个phase实际通过。失败下游不据此通过。
+
+- 两个 CodeQL init 拒绝 RUNNER_TEMP 内、workspace 外的配置。仅将同一冻结配置写入 workspace 新建目录 `.pr356-codeql/`，同一 security-extended/query、30分钟、CLI/SARIF原件要求不变。实际 YAML 消费者2 PASS。
+- vertical4 首轮3P1F及worker首轮0P1F：schema-only setup漏掉迁移生成的空 `composite_report_queue_budget('reports',0)`。修复只恢复这一固定系统控制行，先断言空、后核恰有该行，不复制旧业务队列、不改限额。实际修后 `DatabasePhase.restore_setup` 配合真实PG17.11执行完整vertical4=4P0F0skip/worker=1P0F0skip；18个控制PASS。原迁移/恢复已通过，不冒称重新在Actions通过。
+- product browser实际runtime ready且fixture PREPARED后，docker cp无法读取tmpfs。按Docker官方corner-cases改为owned container内exec读取，私有stdout直入独占0600文件，不打印token、不上传fixture；内联协议控制PASS，真实Docker消费仍待Actions。
+- status browser被Azure Ubuntu字体包下载反复等待耗尽12分钟，页面未执行。只切换至Ubuntu官方HTTPS archive，同一签名验证/依赖/预算保留，不绕过安装或增加全平台检查。
+
+原始失败artifact：vertical4 `12665610271`，SHA256 `7723cdda630737d587184c4d1a9bf86c41e766020f869789cc517cfc252497a5`；worker `12664781948`，SHA256 `783a178742909378692a24e47fc9a576303ab280f52a57372e48b4184d35a3d4`。原件已核对并留存dot工作区。公开Actions日志与原有7天artifact保留期限不变。
+
+用户明确批准修后一次限定CI重跑，并追加授权同类配置/fixture/必要限定重跑。当前严格recipe包含共享workflow字节，跨提交未实现可用的自动复用；不伪装旧产物的新资格，也不为此扩建框架。这里只处理本轮首错和同根因消费者，应用源码、schema、锁文件、两组件tree均未变；不部署。累计同一目标第一轮失败，不随新SHA归零。Notion同页已写回四类根因及下轮checking list，激活前需回读。

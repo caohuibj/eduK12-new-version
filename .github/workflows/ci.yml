@@ -3894,6 +3894,8 @@ jobs:
       run: |
         set -euo pipefail
         npm ci --ignore-scripts --prefix .github/release-tools --registry=https://registry.npmjs.org
+        # Keep signed official Ubuntu packages, but avoid the stalled Azure mirror.
+        sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
         node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
     - name: Run original four synthetic status views from verified production dist
       run: node .github/scripts/pr356-browser.mjs
@@ -4045,6 +4047,8 @@ jobs:
       run: |
         set -euo pipefail
         npm ci --ignore-scripts --prefix .github/release-tools --registry=https://registry.npmjs.org
+        # Keep signed official Ubuntu packages, but avoid the stalled Azure mirror.
+        sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
         node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
     - name: Restore verified schema-only setup and migration history into owned empty DB
       env:
@@ -4124,8 +4128,16 @@ jobs:
             time.sleep(1)
         PYCODE
         docker --host=unix:///var/run/docker.sock exec "$PR356_RUNTIME_CONTAINER" node /qualification/pr356-browser-fixture.cjs prepare
-        docker --host=unix:///var/run/docker.sock cp "$PR356_RUNTIME_CONTAINER:/qualification-private/fixture.json" "$PR356_FIXTURE_FILE"
-        chmod 600 "$PR356_FIXTURE_FILE"
+        # docker cp cannot read tmpfs mounts. Read inside the owned container;
+        # private bytes go directly to an exclusive 0600 file, never to the log.
+        python3 - <<'PYCODE'
+        import os,subprocess
+        e=os.environ
+        clean={k:v for k,v in e.items() if k not in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']}
+        fd=os.open(e['PR356_FIXTURE_FILE'],os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+        with os.fdopen(fd,'wb') as output:
+            subprocess.run(['docker','--host=unix:///var/run/docker.sock','exec',e['PR356_RUNTIME_CONTAINER'],'node','-e','process.stdout.write(require("node:fs").readFileSync("/qualification-private/fixture.json"))'],env=clean,stdout=output,check=True)
+        PYCODE
     - name: Run four real HTTP product journeys without rebuilding or mocking successful APIs
       run: node .github/scripts/pr356-product-browser.mjs
     - name: Remove only this run owned runtime and private fixture material
@@ -4213,9 +4225,13 @@ jobs:
       shell: node {0}
       run: |
         const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-javascript-typescript","PR356_PHASE_SPEC":"/pr356/specs/codeql-javascript-typescript/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-javascript-typescript/phase-inputs.json","PR356_CODEQL_CONFIG":"/pr356/specs/codeql-javascript-typescript/codeql-config.json"};
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-javascript-typescript","PR356_PHASE_SPEC":"/pr356/specs/codeql-javascript-typescript/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-javascript-typescript/phase-inputs.json"};
         const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
         fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+        const workspace=fs.realpathSync(process.env.GITHUB_WORKSPACE),configDir=path.join(workspace,'.pr356-codeql');
+        fs.mkdirSync(configDir,{recursive:false});
+        const config=path.join(configDir,'javascript-typescript.json');assert(!/[\r\n]/.test(config));
+        fs.appendFileSync(process.env.GITHUB_ENV,'PR356_CODEQL_CONFIG='+config+'\n');
     - name: Bind exact source inputs before actual CodeQL Action
       env:
         PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/codeql-javascript-typescript
@@ -4236,7 +4252,7 @@ jobs:
         languages: javascript-typescript
         build-mode: none
         queries: security-extended
-        config-file: ${{ runner.temp }}/pr356/specs/codeql-javascript-typescript/codeql-config.json
+        config-file: ./.pr356-codeql/javascript-typescript.json
         ram: '3500'
         threads: '2'
     - name: Capture actual initialized CLI, packs and source metadata
@@ -4325,9 +4341,13 @@ jobs:
       shell: node {0}
       run: |
         const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-python","PR356_PHASE_SPEC":"/pr356/specs/codeql-python/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-python/phase-inputs.json","PR356_CODEQL_CONFIG":"/pr356/specs/codeql-python/codeql-config.json"};
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-python","PR356_PHASE_SPEC":"/pr356/specs/codeql-python/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-python/phase-inputs.json"};
         const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
         fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+        const workspace=fs.realpathSync(process.env.GITHUB_WORKSPACE),configDir=path.join(workspace,'.pr356-codeql');
+        fs.mkdirSync(configDir,{recursive:false});
+        const config=path.join(configDir,'python.json');assert(!/[\r\n]/.test(config));
+        fs.appendFileSync(process.env.GITHUB_ENV,'PR356_CODEQL_CONFIG='+config+'\n');
     - name: Bind exact source inputs before actual CodeQL Action
       env:
         PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/codeql-python
@@ -4348,7 +4368,7 @@ jobs:
         languages: python
         build-mode: none
         queries: security-extended
-        config-file: ${{ runner.temp }}/pr356/specs/codeql-python/codeql-config.json
+        config-file: ./.pr356-codeql/python.json
         ram: '3500'
         threads: '2'
     - name: Capture actual initialized CLI, packs and source metadata
