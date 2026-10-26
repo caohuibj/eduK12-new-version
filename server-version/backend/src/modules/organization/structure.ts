@@ -72,6 +72,18 @@ export async function createOrganizationUnitInTransaction(tx:Prisma.TransactionC
       }
     }
 
+    // All production structural inserts share the organization advisory lock.
+    // Recheck after taking it, including earlier rows in the same transaction;
+    // do not create a unique index over unreviewed historical duplicate data.
+    const duplicate = await tx.$queryRaw<Array<{id:string}>>`
+      SELECT id FROM organization_units
+      WHERE organization_id=${input.organizationId} AND unit_kind=${input.unitKind}
+        AND parent_unit_id IS NOT DISTINCT FROM ${input.parentUnitId ?? null}
+        AND btrim(name)=${name}
+      LIMIT 1
+    `
+    if(duplicate.length)throw new OrganizationDomainError('UNIT_NAME_EXISTS','同一级下已有同名项，请刷新后核对',409)
+
     const id = randomUUID()
     const rows = await tx.$queryRaw<OrganizationUnitRecord[]>`
       INSERT INTO "organization_units" (

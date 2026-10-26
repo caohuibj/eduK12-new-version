@@ -49,6 +49,7 @@ export async function createRosterJob(s:Scope,p:{requestId:string;input:RosterJo
  const digest=personnelHash(input),sourceDigest=personnelHash(p.source),parts=rosterParts(input)
  return txRead(async tx=>{
   await assertRosterJobAuthority(tx,s,input.kind)
+  await validateResolvedClassRoster(tx,s,input)
   await tx.$executeRaw`INSERT INTO education_roster_import_jobs(id,organization_id,actor_user_id,entry,kind,input_digest,source_digest,row_count,part_count) VALUES(${p.requestId},${s.organizationId},${s.actor.userId},${s.entry},${input.kind},${digest},${sourceDigest},${input.rows.length},${parts.length}) ON CONFLICT(id) DO NOTHING`
   const job=await findJob(tx,s,p.requestId,true)
   if(job.inputDigest!==digest||job.sourceDigest!==sourceDigest||job.kind!==input.kind)fail('ROSTER_REQUEST_CONFLICT','此任务编号已用于其他名单，请重新准备。')
@@ -71,6 +72,7 @@ export async function listRosterJobs(s:Scope,before?:string){return txRead(async
 export async function matchRosterJob(s:Scope,id:string,p:{input:RosterJobInput;source:RosterSource}){return txRead(async tx=>{
  const job=await findJob(tx,s,id),input=rosterJobInput.parse(p.input);validateWholeRoster(input)
  if(personnelHash(input)!==job.inputDigest||personnelHash(p.source)!==job.sourceDigest)fail('ROSTER_SOURCE_MISMATCH','与原任务的文件、类型或映射不一致；已保存记录保持不变。',400)
+ await validateResolvedClassRoster(tx,s,input)
  return {...publicJob(job,await partsFor(tx,id)),proof:proofFor(job)}
 })}
 async function checkedPart(tx:Tx,s:Scope,job:Job,index:number,input:RosterJobInput){
@@ -94,6 +96,21 @@ async function previewStructure(tx:Tx,s:Scope,input:Extract<RosterJobInput,{kind
   return {line:row.line,name:row.name,parentId,state,message}
  })
  return {rows,token:personnelHash([s.organizationId,input,rows]),add:rows.filter(r=>r.state==='add').length,skip:rows.filter(r=>r.state==='skip').length,errors:rows.filter(r=>r.state==='error').length}
+}
+// Textual grade names and the default grade ID can denote the same parent.
+// Resolve against this school's structure before persisting any whole-file plan;
+// keep the original input/digest unchanged for resumable source matching.
+async function validateResolvedClassRoster(tx:Tx,s:Scope,input:RosterJobInput){
+ if(input.kind!=='CLASS')return
+ const checked=await previewStructure(tx,s,input),seen=new Map<string,number>(),issues:RosterIssue[]=[]
+ for(const row of checked.rows){
+  if(!row.parentId)continue // Unresolved parents still fail the ordinary preview.
+  const key=JSON.stringify([row.parentId,row.name])
+  const previous=seen.get(key)
+  if(previous!==undefined)issues.push({line:row.line,message:`与第 ${previous} 行属于同一年级下的同名班级，请先去重。`})
+  else seen.set(key,row.line)
+ }
+ if(issues.length)throw new RosterJobError('ROSTER_WHOLE_FILE_INVALID','整份名单有重复班级，尚未开始导入。',400,issues)
 }
 export async function previewRosterPart(s:Scope,id:string,index:number,p:{proof:string;input:RosterJobInput}){return txRead(async tx=>{
  const job=await findJob(tx,s,id,true);verifyProof(job,p.proof)

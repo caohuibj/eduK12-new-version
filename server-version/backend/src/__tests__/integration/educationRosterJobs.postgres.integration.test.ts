@@ -23,8 +23,8 @@ async function fixture(){
  const teacher=await prisma.educationProductRoleGrant.create({data:{id:randomUUID(),organizationId:org.id,membershipId:member.id,product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:user.id}})
  const call=async(path:string,body?:unknown,entry:'SCHOOL'|'TEACHER'='SCHOOL',options:{age?:number;csrf?:boolean;origin?:string;actor?:typeof user;org?:string}={})=>{
   const principal=options.actor??user,te=entry==='TEACHER',cookie=te?'huiteacher':'huischool',token=generateToken({userId:principal.id,username:principal.username,role:'TEACHER',accountDomain:'SCHOOL',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000)-(options.age??0),...(te?{sessionProduct:'HUITEACHER' as const}:{})})
-  const res=await fetch(`${base}/api/${te?'huiteacher':'campus'}/organizations/${options.org??org.id}/roster-imports${path}`,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',Origin:options.origin??`http://${te?'teacher':'school'}.localhost:5197`,'X-CSRF-Token':options.csrf===false?'':csrf,Cookie:`${cookie}_csrf=${csrf}; ${cookie}_session=${token}`},...(body?{body:JSON.stringify(body)}:{})})
-  return {status:res.status,body:await res.json(),cache:res.headers.get('cache-control')}
+  const res=await fetch(`${base}/api/${te?'huiteacher':'campus'}/organizations/${options.org??org.id}/roster-imports${path}`,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',Origin:options.origin??(process.env.NODE_ENV==='production'?`https://${te?'teacher':'school'}.eduk12.top`:`http://${te?'teacher':'school'}.localhost:5197`),'X-CSRF-Token':options.csrf===false?'':csrf,Cookie:`${cookie}_csrf=${csrf}; ${cookie}_session=${token}`},...(body?{body:JSON.stringify(body)}:{})})
+  return {status:res.status,body:await res.json(),cache:res.headers.get('cache-control'),retryAfter:res.headers.get('retry-after')}
  }
  const count=async()=> (await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM campus_personnel WHERE organization_id=${org.id}`)[0].n
  return {user,org,member,teacher,call,count}
@@ -43,6 +43,32 @@ const save=(f:Awaited<ReturnType<typeof fixture>>,p:Awaited<ReturnType<typeof pr
 suite('whole roster jobs over real HTTP and isolated PostgreSQL',()=>{
  beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);process.env.CAMPUS_ELIGIBILITY_HMAC_KEY='ab'.repeat(32);const app=express();app.use(express.json({limit:'2mb'}));app.use('/api',csrfProtection);app.use('/api/campus',schoolOriginGuard,educationRosterJobRouter('SCHOOL'));app.use('/api/huiteacher',huiteacherOriginGuard,educationRosterJobRouter('TEACHER'));app.use((err:any,_req:any,res:any,_next:any)=>res.status(500).json({code:'TEST_SERVER_ERROR',message:err.message}));server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));base=`http://127.0.0.1:${(server.address() as any).port}`})
  afterAll(async()=>{server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));await prisma.$disconnect()})
+ it.each([2,101])('rejects resolved class aliases across a %i-row file before creating any job',async count=>{
+  const f=await fixture(),grade=await unit({id:randomUUID(),organizationId:f.org.id,unitKind:'GRADE',name:'一年级'})
+  const input={kind:'CLASS',defaultGradeId:grade.id,rows:Array.from({length:count},(_,i)=>({line:i+1,name:'班级'+i,grade:'一年级'}))}
+  input.rows[count-1]={line:count,name:input.rows[0].name,grade:''}
+  const response=await f.call('',{requestId:randomUUID(),input,source})
+  expect(response.status).toBe(400);expect(response.body.code).toBe('ROSTER_WHOLE_FILE_INVALID')
+  const [jobs]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM education_roster_import_jobs WHERE organization_id=${f.org.id}`
+  expect(jobs.n).toBe(0)
+ })
+ it('serializes same-parent duplicate unit creation without touching legacy rows',async()=>{
+  const {createOrganizationUnit}=await import('../../modules/organization/structure')
+  const f=await fixture(),grade=await unit({id:randomUUID(),organizationId:f.org.id,unitKind:'GRADE',name:'并发年级'})
+  for(let i=0;i<2;i++)await unit({id:randomUUID(),organizationId:f.org.id,unitKind:'CLASS',name:'历史同名班',parentUnitId:grade.id})
+  const input={organizationId:f.org.id,unitKind:'CLASS' as const,name:'并发班',parentUnitId:grade.id}
+  const results=await Promise.allSettled([createOrganizationUnit(input),createOrganizationUnit(input)])
+  expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1)
+  expect(results.filter(r=>r.status==='rejected')).toHaveLength(1)
+  expect((results.find(r=>r.status==='rejected') as PromiseRejectedResult).reason.code).toBe('UNIT_NAME_EXISTS')
+  const [classes]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM organization_units WHERE organization_id=${f.org.id} AND parent_unit_id=${grade.id} AND name='并发班'`
+  expect(classes.n).toBe(1)
+  const [legacy]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM organization_units WHERE organization_id=${f.org.id} AND name='历史同名班'`
+  expect(legacy.n).toBe(2)
+  await expect(prisma.$transaction(async tx=>{await (await import('../../modules/organization/structure')).createOrganizationUnitInTransaction(tx,{...input,name:'同批班'});await (await import('../../modules/organization/structure')).createOrganizationUnitInTransaction(tx,{...input,name:'同批班'})})).rejects.toMatchObject({code:'UNIT_NAME_EXISTS'})
+  const [rolledBack]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM organization_units WHERE organization_id=${f.org.id} AND name='同批班'`
+  expect(rolledBack.n).toBe(0)
+ })
  it('validates cross-part duplicate numbers and accounts before persisting a plan',async()=>{
   const f=await fixture(),input=staff(101);input.rows[100].number=input.rows[0].number.toLowerCase()
   expect(await f.call('',{requestId:randomUUID(),input,source})).toMatchObject({status:400,body:{code:'ROSTER_WHOLE_FILE_INVALID',data:{issues:[{line:102}]}}})

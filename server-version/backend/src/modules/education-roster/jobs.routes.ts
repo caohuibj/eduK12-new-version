@@ -4,6 +4,7 @@ import {authenticateSchool,authenticateHuiteacher} from '../../middleware/auth'
 import {requireOrganizationGovernance} from '../organization/access'
 import {requireRecentSchoolMfa} from '../campus/mfa.middleware'
 import {requireTeacherProductAdmin,requireRecentTeacherMfa} from '../huiteacher/authority'
+import {OrganizationDomainError} from '../organization/types'
 import {CampusAdmissionError} from '../campus/admission.error'
 import {asyncHandler} from '../../middleware/asyncHandler'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
@@ -25,6 +26,7 @@ export function educationRosterJobRouter(entry:RosterEntry){
   catch(error){
    if(error instanceof ZodError)return res.status(400).json({code:'ROSTER_INPUT_INVALID',message:'名单格式不正确：整份最多5000行，每批最多100行，请核对模板。',data:null})
    if(error instanceof RosterJobError)return res.status(error.statusCode).json({code:error.code,message:error.message,data:{issues:error.issues}})
+   if(error instanceof OrganizationDomainError)return res.status(error.statusCode).json({code:error.code,message:error.message,data:null})
    if(error instanceof CampusAdmissionError)return res.status(error.statusCode).json({code:error.code,message:error.code==='PERSONNEL_PREVIEW_CHANGED'?'名单或班级状态已变化，请重新核对剩余内容。':'人员操作未取得当前授权或不符合原有激活、班级规则。',data:null})
    if((error as any)?.code==='P2034'||['23505','40001','40P01'].includes((error as any)?.meta?.code))return res.status(409).json({code:'ROSTER_CONCURRENT_CHANGE',message:'名单或权限同时发生变化。请先核对服务器进度，再明确继续。',data:null})
    throw error
