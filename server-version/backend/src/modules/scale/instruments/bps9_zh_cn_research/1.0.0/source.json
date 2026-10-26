@@ -1,0 +1,933 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bps9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "上床拖延问卷（BPS成人9题，中文工作稿）",
+      "abbreviation": "BPS-9-ZH",
+      "instrumentFamily": "Bedtime Procrastination Scale (original adult 9-item version)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "一般情况下比原先打算更晚上床的自报倾向，关注开始上床休息的时间，不是入睡潜伏期、睡眠障碍诊断或道德/自律评价。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "bps9_zh_cn_research",
+        "domain:self_regulation",
+        "domain:sleep_behavior",
+        "domain:everyday_life",
+        "construct:bedtime_procrastination",
+        "construct:intention_action_gap",
+        "construct:bedtime_transition",
+        "orientation:self_regulation_perspective",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:source_mturk_adults",
+        "population:not_k12_validated",
+        "response:9_items",
+        "response:four_reverse_items",
+        "response:endpoint_labels_only",
+        "use:sleep_habit_reflection",
+        "language_validation:original_en",
+        "上床拖延",
+        "睡前拖延",
+        "上床时间",
+        "睡前收尾",
+        "作息习惯",
+        "意图与行动",
+        "成人自评",
+        "population:self_report",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:fixed_order",
+        "response:five_point_frequency",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_validated_cutoff",
+        "license:cc_by_3_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established",
+        "中文工作译稿",
+        "个人反思",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "MTurk社区成人有效样本177人，平均37.9岁；剔除自报睡眠障碍或夜班的参与者；不推定中国人群或K12验证。本平台年龄是暂设使用边界，不是已验证中文版声明。 原文未明确报告样本国家，不以MTurk自动推定US。原始研究与样本事实留在来源档案；当前证据schema强制国家代码，故不制造结构化国别记录。"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般平时习惯；原来源未指定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留原作者附录全部9题，尤其第3题关灯行为；不得误用2020青少年8题或其反向题号。",
+        "原附录只规定两端文字，保留2/3/4数字，不借用2020的Neutral等中间锚点。",
+        "采用9题反向后均分1–5，与2014结果M=2.8的计分尺度一致；原论文没有独立计分手册，不能把均分与后续9–45求和研究或其他译本阈值混用。",
+        "缺失规则未在原论文明确，本平台保守要求全题齐答，不插补、不按比例外推。",
+        "原研究排除睡眠障碍/夜班是证据边界，不是本工具新增的计分门题；本包不声称诊断或适用于相关特殊场景。",
+        "独立指导语见研究档案及PR356接入草案，不拼进第一题。",
+        "完成时间为平台估计，非原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究可追溯；当前中文稿不自动继承原语言研究结论。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "用于回顾睡前习惯，结合实际处境理解，不贴自律或疾病标签。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立中文工作稿，原版、其他译本、改编版和本平台版本各自管理；未借用青少年8题版或其他译本的验证/阈值。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "bps9_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "bps9_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "bps9_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。",
+      "许可和人群标签用于分类检索，不自动授予系统权限；本包不激活或授权任何产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "Bedtime Procrastination Scale (original adult 9-item version); independently prepared Chinese working version",
+        "citation": "Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2014.00611/full",
+        "publicationYear": 2014
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2014 Kroese, De Ridder, Evers and Adriaanse. Kroese, F. M., De Ridder, D. T. D., Evers, C., & Adriaanse, M. A. (2014). Bedtime procrastination: introducing a new area of procrastination. Frontiers in Psychology, 5, 611. https://doi.org/10.3389/fpsyg.2014.00611. 复制源：2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0。CC BY 3.0（https://creativecommons.org/licenses/by/3.0/），允许署名再分发与翻译改编，须保留原作者、原始论文、许可链接和修改说明。平台由作者公开英文题文独立译为中文并另写反馈，未获作者中文认可或中国人群验证，不继承其他译本/短版的版本或阈值。作者PDF SHA-256：7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "bps9_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "（几乎）从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "（几乎）总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BPS_01",
+          "content": "我上床的时间比原先打算的晚。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_02",
+          "content": "如果早上需要早起，我会早点上床。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_03",
+          "content": "晚上到了该关灯的时间，我会马上关灯。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_04",
+          "content": "到了该上床的时间，我常常还在做其他事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_05",
+          "content": "当我其实想上床时，我很容易被其他事情分散注意。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_06",
+          "content": "我没有按时上床。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_07",
+          "content": "我有固定的上床时间，也会照着这个时间做。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_08",
+          "content": "我想按时上床，但就是没有做到。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BPS_09",
+          "content": "到了该上床的时间，我能轻松停下手头的活动。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "bps9_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "BPS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPS_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BPS_03",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BPS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPS_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPS_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BPS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BPS_09",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "bedtime_procrastination",
+            "type": "total",
+            "label": "上床前的收尾习惯",
+            "description": "9题反向后等权均分1–5，更多表示自述更常拖延上床。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BPS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BPS_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "bedtime_procrastination"
+        ],
+        "scoreOrder": [
+          "bedtime_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "bedtime_procrastination",
+            "headline": "上床前的收尾习惯",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答关注的是从“还想再做一会儿”到“准备上床”之间的那段时间。有时我们已经想休息，却被一件小事接着另一件小事拖住。它不是在给自律打分，也不能说明睡不着的原因。工作、照护责任和生活安排都可能影响上床时间。可以回想一个常见的晚上，找出最容易让自己停不下来的环节，再选一个负担很小的收尾动作。一次回答不必变成对自己的评价。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次比打算更晚上床，拖住你的是必须完成的事，还是可以留到明天的事？"
+              },
+              {
+                "category": "strategy",
+                "text": "今晚试着设一个收尾信号：把还想做的事记下来，再开始原本打算的睡前准备。"
+              },
+              {
+                "category": "environment",
+                "text": "让收尾动作尽量省事，例如提前准备好明早要用的物品；是否有帮助，过后再看。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果整理的是你对平时习惯的描述，不能代替对实际生活安排的了解。",
+          "不能仅凭回答判断失眠、身体健康、自律程度或一个人的价值。",
+          "中文题目为平台工作译稿，目前不适合用来给人与人之间排高低。",
+          "没有回答的题目不会算成最低分；题目不完整时，本次结果不作解释。"
+        ],
+        "disclaimer": "供成年人回顾上床习惯；不是睡眠疾病检查，也不是自律考试。中文为平台工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+            "reviewedAt": "2026-10-26T04:56:09.986Z",
+            "basis": "2014作者论文附录（PDF第8页），完整9题；网页实际许可链接为CC BY 3.0；年龄与语言证据独立约束，报告不套用常模或临床阈值。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "bps9",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 1
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 5
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 3
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_one",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 2.7777777777777777
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_five",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 3.2222222222222223
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "bedtime_procrastination": 2.3333333333333335
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "bedtime_procrastination": null
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_last",
+        "answers": [
+          {
+            "itemCode": "BPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BPS_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "bedtime_procrastination": null
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "bedtime_procrastination": null
+          },
+          "totalScoreKeys": [
+            "bedtime_procrastination"
+          ]
+        }
+      }
+    ]
+  }
+}
