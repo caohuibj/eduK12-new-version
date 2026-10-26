@@ -32,3 +32,15 @@ test('actual workflow connects qualification and required gate without full plat
  const outputs=post356Outputs({postMerge:false});for(const key of ['frontend','frontend_build','run_performance_tests','ui_required'])assert.equal(outputs[key],false);
  assert.equal(outputs.codeql,true);assert.equal(outputs.application_route,'post356');
 });
+
+test('control-only repair forbids application changes and shallow post-merge fetch binds exact parents',async()=>{
+ const {controlBase,controlBranch,controlFiles}=await import('./post356-scope.mjs');
+ const controlEntries=controlFiles.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644'}));
+ const e={...env,CI_HEAD_REF:controlBranch};
+ assert.equal(post356Plan(controlEntries,controlBase,head,read,e).controlOnly,true);
+ assert.throws(()=>post356Plan([...controlEntries,entries[0]],controlBase,head,read,e));
+ assert.throws(()=>post356Plan(controlEntries,controlBase,head,(...a)=>a[1]===head+':server-version/backend'?'e'.repeat(40):read(),e));
+ const calls=[];const mergeRead=(...a)=>{calls.push(a);return a[0]==='cat-file'?`tree ${'c'.repeat(40)}\nparent ${controlBase}\nparent ${source}\n\nmerge`:read()};
+ const plan=post356Plan(controlEntries,controlBase,head,mergeRead,{CI_EVENT:'push',GITHUB_REF_NAME:'main'});
+ assert.equal(plan.postMerge,true);assert(calls.some(a=>JSON.stringify(a)===JSON.stringify(['fetch','--no-tags','--depth=2','origin',head])));
+})
