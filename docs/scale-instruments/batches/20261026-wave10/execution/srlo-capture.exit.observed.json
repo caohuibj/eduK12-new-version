@@ -1,0 +1,12 @@
+{
+  "exitCode": 0,
+  "observedFrom": "exec_command tool result, chunk 945d6a",
+  "recordedAfterExecution": true,
+  "command": [
+    "node",
+    "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/capture-before.cjs"
+  ],
+  "stdoutFile": "capture.stdout.log",
+  "stderrFile": "capture.stderr.log",
+  "atUtc": "2026-10-26T10:28:54.363290+00:00"
+}

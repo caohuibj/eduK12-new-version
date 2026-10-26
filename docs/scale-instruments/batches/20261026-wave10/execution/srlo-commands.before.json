@@ -1,0 +1,34 @@
+{
+  "kind": "ORIGINAL_COMMAND_RECEIPT",
+  "preparedAtUtc": "2026-10-26T10:26:54.889629+00:00",
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "inputManifestSha256": "363e874ac90ac9ffc4961e3d57f2b49df483d178ac4a48bbe6b50702d47590d9",
+  "commands": [
+    {
+      "name": "unit",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+        "--maxWorkers=1",
+        "--reporter=json",
+        "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/unit.reporter.json"
+      ]
+    },
+    {
+      "name": "types",
+      "argv": [
+        "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/tsconfig.srlo44.json",
+        "--pretty",
+        "false"
+      ]
+    }
+  ],
+  "declaredNonSecretEnvironment": {
+    "SRLO44_REPORT_EVIDENCE_PATH": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/actual-reports.synthetic.json"
+  }
+}

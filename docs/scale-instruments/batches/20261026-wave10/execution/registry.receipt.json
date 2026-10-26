@@ -1,0 +1,15 @@
+{
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/registry-review.cjs"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:28:08.273020+00:00",
+  "finishedAt": "2026-10-26T10:28:08.915704+00:00",
+  "exitCode": 0,
+  "inputsManifestSha256": "a48aa72eb203a6033df8c425d1bab22f8bc3b975940caa4a0133bda3c3d37c74",
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

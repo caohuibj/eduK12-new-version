@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "registryIdentities": 117,
+  "unique": true,
+  "oldSourceFilesUnchanged": 95,
+  "selected": [
+    {
+      "identity": {
+        "instrumentKey": "srlo44_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "status": "PASS",
+      "tagCount": 81,
+      "axisTagCounts": {
+        "domain": 6,
+        "construct": 13,
+        "orientation": 4,
+        "population": 9,
+        "response": 11,
+        "use": 7,
+        "license": 6,
+        "language_validation": 7
+      },
+      "reportVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "independentParameterVersion": null,
+      "activation": "NOTRUN"
+    }
+  ],
+  "ciExecuted": false
+}

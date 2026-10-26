@@ -1,0 +1,13 @@
+{
+  "reviewedAt": "2026-10-26T10:34:52.949752+00:00",
+  "status": "COORDINATOR_CONTENT_REPORT_REVIEW_PASS_FOR_DRAFT_ONLY",
+  "sourceSha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c",
+  "sourceCarrier": "Corrected published Table8, exact44 originalEnglish strings compared with frozen official XML and Chinese strings compared with actual source",
+  "carrierDifferences": 8,
+  "math": "Ten equal means1–7;4/5/3/5/5/5/3/4/5/5;no reversals,total or automatic superordinate sums",
+  "interpretation": "Negative emotion higher=more uncomfortable experiences; extrinsic motivation not universal good/bad; no under4 risk trigger",
+  "translation": "Independent platform Chinese working draft, not official/local validated/K12",
+  "eligibility": "AdultSELF and explicit current university online/blended course project context; UI transmission not proved",
+  "evidenceCountry": "Unverified; no invented structured territory; full source/docs evidence preserved",
+  "noBPSourceOrTestChanges": true
+}

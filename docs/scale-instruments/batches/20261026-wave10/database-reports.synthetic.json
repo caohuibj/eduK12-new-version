@@ -1,0 +1,5111 @@
+[
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "minimum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "online_academic_self_efficacy",
+          "headline": "面对这门课程的信心",
+          "label": null,
+          "interpretation": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_intrinsic_motivation",
+          "headline": "学习本身带来的兴趣",
+          "label": null,
+          "interpretation": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+            },
+            {
+              "category": "strategy",
+              "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_extrinsic_motivation",
+          "headline": "成绩与他人期待的推动",
+          "label": null,
+          "interpretation": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+            },
+            {
+              "category": "strategy",
+              "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_negative_achievement_emotion",
+          "headline": "学习时的难受与压力",
+          "label": null,
+          "interpretation": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+            },
+            {
+              "category": "strategy",
+              "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "planning_time_management",
+          "headline": "安排目标和时间",
+          "label": null,
+          "interpretation": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "metacognition",
+          "headline": "检查与调整学习方法",
+          "label": null,
+          "interpretation": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "study_environment",
+          "headline": "可用的学习环境",
+          "label": null,
+          "interpretation": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_effort_regulation",
+          "headline": "遇到干扰时继续投入",
+          "label": null,
+          "interpretation": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_social_support",
+          "headline": "通过网络互相支持",
+          "label": null,
+          "interpretation": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_task_strategies",
+          "headline": "理解和联系课程内容",
+          "label": null,
+          "interpretation": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "maximum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "online_academic_self_efficacy",
+          "headline": "面对这门课程的信心",
+          "label": null,
+          "interpretation": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_intrinsic_motivation",
+          "headline": "学习本身带来的兴趣",
+          "label": null,
+          "interpretation": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+            },
+            {
+              "category": "strategy",
+              "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_extrinsic_motivation",
+          "headline": "成绩与他人期待的推动",
+          "label": null,
+          "interpretation": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+            },
+            {
+              "category": "strategy",
+              "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_negative_achievement_emotion",
+          "headline": "学习时的难受与压力",
+          "label": null,
+          "interpretation": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+            },
+            {
+              "category": "strategy",
+              "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "planning_time_management",
+          "headline": "安排目标和时间",
+          "label": null,
+          "interpretation": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "metacognition",
+          "headline": "检查与调整学习方法",
+          "label": null,
+          "interpretation": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "study_environment",
+          "headline": "可用的学习环境",
+          "label": null,
+          "interpretation": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_effort_regulation",
+          "headline": "遇到干扰时继续投入",
+          "label": null,
+          "interpretation": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_social_support",
+          "headline": "通过网络互相支持",
+          "label": null,
+          "interpretation": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_task_strategies",
+          "headline": "理解和联系课程内容",
+          "label": null,
+          "interpretation": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "midpoint",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "online_academic_self_efficacy",
+          "headline": "面对这门课程的信心",
+          "label": null,
+          "interpretation": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_intrinsic_motivation",
+          "headline": "学习本身带来的兴趣",
+          "label": null,
+          "interpretation": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+            },
+            {
+              "category": "strategy",
+              "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_extrinsic_motivation",
+          "headline": "成绩与他人期待的推动",
+          "label": null,
+          "interpretation": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+            },
+            {
+              "category": "strategy",
+              "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_negative_achievement_emotion",
+          "headline": "学习时的难受与压力",
+          "label": null,
+          "interpretation": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+            },
+            {
+              "category": "strategy",
+              "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "planning_time_management",
+          "headline": "安排目标和时间",
+          "label": null,
+          "interpretation": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "metacognition",
+          "headline": "检查与调整学习方法",
+          "label": null,
+          "interpretation": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "study_environment",
+          "headline": "可用的学习环境",
+          "label": null,
+          "interpretation": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_effort_regulation",
+          "headline": "遇到干扰时继续投入",
+          "label": null,
+          "interpretation": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_social_support",
+          "headline": "通过网络互相支持",
+          "label": null,
+          "interpretation": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_task_strategies",
+          "headline": "理解和联系课程内容",
+          "label": null,
+          "interpretation": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "ascending_cycle",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 2.5,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4.2,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3.8,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4.6,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3.3333333333333335,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4.5,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3.4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4.2,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "online_academic_self_efficacy",
+          "headline": "面对这门课程的信心",
+          "label": null,
+          "interpretation": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_intrinsic_motivation",
+          "headline": "学习本身带来的兴趣",
+          "label": null,
+          "interpretation": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+            },
+            {
+              "category": "strategy",
+              "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_extrinsic_motivation",
+          "headline": "成绩与他人期待的推动",
+          "label": null,
+          "interpretation": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+            },
+            {
+              "category": "strategy",
+              "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_negative_achievement_emotion",
+          "headline": "学习时的难受与压力",
+          "label": null,
+          "interpretation": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+            },
+            {
+              "category": "strategy",
+              "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "planning_time_management",
+          "headline": "安排目标和时间",
+          "label": null,
+          "interpretation": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "metacognition",
+          "headline": "检查与调整学习方法",
+          "label": null,
+          "interpretation": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "study_environment",
+          "headline": "可用的学习环境",
+          "label": null,
+          "interpretation": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_effort_regulation",
+          "headline": "遇到干扰时继续投入",
+          "label": null,
+          "interpretation": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_social_support",
+          "headline": "通过网络互相支持",
+          "label": null,
+          "interpretation": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_task_strategies",
+          "headline": "理解和联系课程内容",
+          "label": null,
+          "interpretation": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "facet_constants",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "6",
+          "baseScore": 6,
+          "score": 6
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "7",
+          "baseScore": 7,
+          "score": 7
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 2,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 5,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 6,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 7,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 1,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 2,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 3,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "online_academic_self_efficacy",
+          "headline": "面对这门课程的信心",
+          "label": null,
+          "interpretation": "这一部分关注你对这门在线课程的信心：是否相信自己能理解内容、完成作业、投入所需努力，以及弄清任务要求。分数越大，表示本次回答中这类信心越多，并不证明已经掌握课程，也不能判断一个人的能力。不同课程、任务说明是否清楚、过去的学习经验和眼前可用的支持，都可能影响这份信心。可以回想一次比较有把握的学习经历，找出当时哪些做法或帮助现在仍然用得上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，你对哪项任务比较有把握？哪一步还需要更清楚的说明或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个十分钟左右能开始的小任务，做完后记下一处已弄清的内容和一个仍需询问的问题。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_intrinsic_motivation",
+          "headline": "学习本身带来的兴趣",
+          "label": null,
+          "interpretation": "这一部分关注学习本身是否吸引你，包括好奇、愉快、学会新东西的满足和成就感。分数越大，表示本次回答更认同这些体验，并不要求你随时热爱学习，也不代表所有课程都同样有趣。课程内容、授课方式、疲劳和现实压力都可能影响兴趣。可以留意哪一个问题让你稍微想多看一眼，再从那个具体问题开始探索；暂时缺乏兴趣也可以先了解原因，无须据此评价自己。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近哪个课程问题让你产生过一点好奇？是什么使它吸引你？"
+            },
+            {
+              "category": "strategy",
+              "text": "从课程里挑一个想了解的问题，花十分钟找一个例子或解释，再用一句话记下新发现。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_extrinsic_motivation",
+          "headline": "成绩与他人期待的推动",
+          "label": null,
+          "interpretation": "这一部分关注成绩、与同学比较，以及家人朋友的期待怎样推动你学习。分数越大，表示本次回答更认同这些外在推动，并不统一表示学习更好或更差。它们有时帮助人确定目标，有时也可能带来压力；还可以与对内容本身的兴趣同时存在。可以分别想一想，哪些期待是自己认同的，哪些主要来自比较或担心让别人失望，再决定怎样为这门课程设定一个自己愿意承担的目标。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你希望达到的成绩对自己有什么意义？其中哪些期待来自你认同的方向？"
+            },
+            {
+              "category": "strategy",
+              "text": "写下一个自己认同的课程目标和一个可完成的小步骤；若比较带来压力，试着先按这个目标安排一次学习。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_negative_achievement_emotion",
+          "headline": "学习时的难受与压力",
+          "label": null,
+          "interpretation": "这一部分关注在线学习时的无助、焦虑、难受，以及想分散注意力或退出学习的体验。分数越大，表示本次回答中这些不舒服的感受更多；高分不是更好的学习表现，也不是疾病诊断。任务负担、课程安排、身体状态和支持是否及时，都可能影响回答。可以先辨认眼下最难承受的是哪一步，再考虑减小这一步的要求，或向课程老师、同学及学校支持服务说明具体困难。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次不想开始学习时，最难的是任务本身、紧迫时间，还是其他压力？"
+            },
+            {
+              "category": "strategy",
+              "text": "把眼前任务拆成只需几分钟的第一步；如果仍难以承受，把具体困难写给老师或学校支持服务。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "planning_time_management",
+          "headline": "安排目标和时间",
+          "label": null,
+          "interpretation": "这一部分关注你怎样把学习目标变成可安排的行动，包括设定近期目标、合理期限、拆分任务和预留每周学习时间。分数越大，表示本次回答更认同这些安排方式，不等于计划一定实现，也不是自律程度的排名。课程任务的清晰度、工作照顾责任及可支配时间都会影响安排。可以看看最近一次没赶上的计划，是任务太大、时间估少了，还是出现了必须处理的事情，再给下一次留一点调整余地。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "下次学习最需要完成的一件事是什么？现有时间是否足够？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习只列一件优先任务和可用时间，另留一小段缓冲；结束后看看估计与实际有何不同。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "metacognition",
+          "headline": "检查与调整学习方法",
+          "label": null,
+          "interpretation": "这一部分关注你会不会停下来检查怎样学、任务究竟要求什么，以及完成后怎样利用评分标准和反馈调整做法。分数越大，表示本次回答更认同这些检查与调整，不表示已经找到了唯一正确的学习方法，也不能据此判断聪明与否。不同任务可能需要不同办法，老师是否提供清楚反馈也很重要。可以从一次具体作业出发，比较自己原先的理解和实际要求，挑一个能够在下一次试着改变的小地方。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "上一次作业的反馈中，哪一条能帮助你改变下一次的做法？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次交作业前，对照一条评分标准检查一小段内容，并根据过去一条反馈作一次具体修改。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "study_environment",
+          "headline": "可用的学习环境",
+          "label": null,
+          "interpretation": "这一部分关注你是否有安静、干扰较少的学习地点，以及是否知道在哪儿学习这门课程比较有效率。分数越大，表示本次回答中这类环境条件更充足，不代表一个人更努力或更有能力。居住空间、设备共享、家庭责任和可用场所都可能影响回答。环境不理想时，先找一个可以改变的小条件就有意义；也可以了解学校是否提供自习空间或其他资源，不必把客观限制全部归到自己身上。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "学习时最常打断你的是什么？哪些限制需要外部资源帮助？"
+            },
+            {
+              "category": "strategy",
+              "text": "下次学习前先试一个小调整，例如关闭一类通知，或预约一段安静的自习时间，再观察是否有帮助。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_effort_regulation",
+          "headline": "遇到干扰时继续投入",
+          "label": null,
+          "interpretation": "这一部分关注在线学习遇到困难、走神或其他更有趣的事情时，你怎样继续投入。分数越大，表示本次回答更认同坚持和重新集中注意力的做法，不代表必须一直学习或忽略疲劳。休息、调整任务和求助也可能是继续学习所需的条件。可以留意自己通常在哪一步开始分心，分辨是内容不清楚、任务太大，还是已经需要休息，再为下一次学习准备一个可执行的安排。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "你一般何时开始走神或想停下？当时更需要澄清、减小任务，还是休息？"
+            },
+            {
+              "category": "strategy",
+              "text": "为下一次学习设置一段可承受的专注时间，并预先安排休息；分心时先记下干扰，再决定下一步。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_social_support",
+          "headline": "通过网络互相支持",
+          "label": null,
+          "interpretation": "这一部分关注你怎样通过网络向老师或同学求助、澄清信息，也包括在能回答时帮助其他同学。分数越大，表示本次回答更认同这些联系与互助，不等于身边支持一定充足，更不能说明人缘好坏。课程是否有方便的联系渠道、回应是否及时以及你是否感到安全，都可能影响回答。可以想一想最近一个没弄懂的问题，选一个合适的渠道，把背景和已经尝试的办法一起写清楚，让别人更容易理解你的需要。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "这门课程里，有哪个具体问题你希望找人讨论？哪个渠道让你比较安心？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个真实疑问，附上课程位置和已尝试的步骤，通过讨论区或电子邮件向一位合适的人询问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        },
+        {
+          "scoreKey": "online_task_strategies",
+          "headline": "理解和联系课程内容",
+          "label": null,
+          "interpretation": "这一部分关注你是否用自己的例子、总结和已有知识来理解在线课程，并通过额外练习或阅读加深理解。分数越大，表示本次回答更认同这些做法，不证明理解一定准确，也不意味着额外学习越多越好。不同内容适合不同方法，时间和精力也有限。可以挑一小段刚学过的内容，用自己的话解释，再找一个例子检查解释是否说得通；如果卡住，那一处就可以成为下次提问或练习的起点。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "刚学的内容能否用自己的话解释？它与你已知道的哪件事有关？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个概念，写两三句总结并自拟一个例子；核对材料后，把仍不明白的一点留作提问。"
+            }
+          ],
+          "limitations": [
+            "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+            "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+            "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+            "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+            "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+            "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "missing_self_efficacy_item",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [
+        {
+          "itemCode": "SRLO_02",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_03",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_05",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_06",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_07",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_08",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_09",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_10",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_11",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_12",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_13",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_14",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_15",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_16",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_17",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_18",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_19",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_20",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_21",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_22",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_23",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_24",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_25",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_26",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_27",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_28",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_29",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_30",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_31",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_32",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_33",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_34",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_35",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_36",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_37",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_38",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_39",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_40",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_41",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_42",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_43",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "SRLO_44",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        }
+      ],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "status": "calculated",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": 4,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  },
+  {
+    "instrumentKey": "srlo44_zh_cn_research",
+    "fixture": "empty",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "code": "srlo44_zh_cn_research",
+        "name": "在线学习自我调节问卷（SRL-O44，独立中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [],
+      "scores": [
+        {
+          "key": "online_academic_self_efficacy",
+          "type": "dimension",
+          "label": "面对这门课程的信心",
+          "description": "4题原分均分1–7，无反向；更多表示对这门课程学习与完成任务的信心，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_01",
+            "SRLO_02",
+            "SRLO_03",
+            "SRLO_04"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_intrinsic_motivation",
+          "type": "dimension",
+          "label": "学习本身带来的兴趣",
+          "description": "5题原分均分1–7，无反向；更多表示对学习本身的兴趣、愉快与成就体验，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_05",
+            "SRLO_06",
+            "SRLO_07",
+            "SRLO_08",
+            "SRLO_09"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_extrinsic_motivation",
+          "type": "dimension",
+          "label": "成绩与他人期待的推动",
+          "description": "3题原分均分1–7，无反向；更多表示由成绩、比较与他人期待推动学习的自述，不统一表示好坏，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_10",
+            "SRLO_11",
+            "SRLO_12"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_negative_achievement_emotion",
+          "type": "dimension",
+          "label": "学习时的难受与压力",
+          "description": "5题原分均分1–7，无反向；更多表示学习时的无助、焦虑与难受等负性体验；不反向，不表示更好，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_13",
+            "SRLO_14",
+            "SRLO_15",
+            "SRLO_16",
+            "SRLO_17"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "planning_time_management",
+          "type": "dimension",
+          "label": "安排目标和时间",
+          "description": "5题原分均分1–7，无反向；更多表示安排目标、行动和学习时间的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_18",
+            "SRLO_19",
+            "SRLO_20",
+            "SRLO_21",
+            "SRLO_22"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "metacognition",
+          "type": "dimension",
+          "label": "检查与调整学习方法",
+          "description": "5题原分均分1–7，无反向；更多表示检查任务理解、学习方法与反馈并作调整的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_23",
+            "SRLO_24",
+            "SRLO_25",
+            "SRLO_26",
+            "SRLO_27"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "study_environment",
+          "type": "dimension",
+          "label": "可用的学习环境",
+          "description": "3题原分均分1–7，无反向；更多表示可获得安静少干扰学习条件的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_28",
+            "SRLO_29",
+            "SRLO_30"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_effort_regulation",
+          "type": "dimension",
+          "label": "遇到干扰时继续投入",
+          "description": "4题原分均分1–7，无反向；更多表示在困难或分心时继续投入的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_31",
+            "SRLO_32",
+            "SRLO_33",
+            "SRLO_34"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_social_support",
+          "type": "dimension",
+          "label": "通过网络互相支持",
+          "description": "5题原分均分1–7，无反向；更多表示通过网络求助、澄清与帮助同学的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_35",
+            "SRLO_36",
+            "SRLO_37",
+            "SRLO_38",
+            "SRLO_39"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        },
+        {
+          "key": "online_task_strategies",
+          "type": "dimension",
+          "label": "理解和联系课程内容",
+          "description": "5题原分均分1–7，无反向；更多表示用例子、总结、知识联系和额外练习理解内容的自述，不作人群高低、能力或临床判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 2,
+          "value": null,
+          "range": {
+            "min": 1,
+            "max": 7
+          },
+          "expectedItems": [
+            "SRLO_40",
+            "SRLO_41",
+            "SRLO_42",
+            "SRLO_43",
+            "SRLO_44"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "结果只反映本次对一门课程的自述，课程条件、时间资源和身心状态会影响回答。",
+        "十维分别解释，不加总为学习好坏、人格、能力或诊断结论，也不用于选拔和排名。",
+        "中文为独立工作译稿，人工译审、认知访谈和中国人群验证尚未完成。",
+        "十段均为一般反思文字，没有按分数生成个性化分档或预测学习效果。",
+        "没有中国常模或分档；作者4分经验参考不用于本包评级。",
+        "题目缺失时相应维度不计算，不补零、不改变分母；整体回答不完整时不生成解释。",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供18岁及以上、当前修读大学在线或混合课程的本人研究与反思使用；不用于诊断、选拔或排名。"
+    }
+  }
+]

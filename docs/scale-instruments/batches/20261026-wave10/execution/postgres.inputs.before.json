@@ -1,0 +1,1397 @@
+[
+  {
+    "path": "/workspace/eduk12-scale-content/docs/scale-instruments/batches/20261026-wave10/manifest.json",
+    "sha256": "39a5aebe2b02e2ed5d0a37568991895b22613accde885095e22d5f605fec9073",
+    "bytes": 276
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/package-lock.json",
+    "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "bytes": 245999
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/package.json",
+    "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "bytes": 7246
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/scripts/scale-content-batch.ts",
+    "sha256": "fc35c785c11dfceea9682325b5a80ef13171fc57d43b6a8bd3da1afef5dc9783",
+    "bytes": 9898
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+    "sha256": "3b97d0bb2848f3b6576047201c27cb464d7002206899ae4d0c322cedc31c3c70",
+    "bytes": 8288
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-authorization/errors.ts",
+    "sha256": "7a0b4eaae4335467a8583b67d6ac6068c04e35ed3b66a2f938d24e9b01166aae",
+    "bytes": 352
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-authorization/publish-gates.ts",
+    "sha256": "354e5f1e4cd32185faea1955c2c9ac469aee7aa48de8ebb7825a8ac22a74d5a8",
+    "bytes": 14769
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-authorization/records-schema.ts",
+    "sha256": "81eaaa29dd58a82874181159ff1f308a0bf0c9912ac89d24f60972b76290a4c1",
+    "bytes": 3956
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-authorization/types.ts",
+    "sha256": "7763082031274dd8cbcde6660b2c5b1a22ce5ef48dc02c492f14dc76760698db",
+    "bytes": 2668
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-bundle/types.ts",
+    "sha256": "27e44118ec30c66559dd09b82c829ef0c24d64a7d6d06f0f2677a85c0c3a8e54",
+    "bytes": 7642
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/context.ts",
+    "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d",
+    "bytes": 10187
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/form-answer.ts",
+    "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a",
+    "bytes": 1815
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/index.ts",
+    "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d",
+    "bytes": 83
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/security.ts",
+    "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d",
+    "bytes": 908
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-governance/scientific-maturity.ts",
+    "sha256": "cadef7312021a52de9f1caadf5557b6bf51e6a9e361dcfbfac75659b19a0ef09",
+    "bytes": 1669
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+    "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1",
+    "bytes": 632
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+    "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38",
+    "bytes": 1410
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-image.ts",
+    "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1",
+    "bytes": 667
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-video.ts",
+    "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5",
+    "bytes": 2544
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/material.ts",
+    "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92",
+    "bytes": 1653
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-reference/governance.ts",
+    "sha256": "d27143b08c36220bcb618f8d3b35fee1a680e2aadd0e75163a669384f7ff59b7",
+    "bytes": 5631
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-reference/reference.ts",
+    "sha256": "c0ed72ec9f1a31fea8de882bede1201a9e76cb5c9c7ec9fb668227f5790efbc2",
+    "bytes": 34694
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/canonical.ts",
+    "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066",
+    "bytes": 4718
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+    "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7",
+    "bytes": 3918
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+    "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38",
+    "bytes": 8342
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/reference-binding.ts",
+    "sha256": "534c5f1da84756bdf25827d086fe403fe524d982169a0aeece38c6f6718bc77d",
+    "bytes": 8060
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/types.ts",
+    "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55",
+    "bytes": 2118
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/content-locale.ts",
+    "sha256": "4e163c26096d1b35815b5a5a9d468837095c98f4e706527ab8ffbde98edc1ec2",
+    "bytes": 915
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/deployment/repository.ts",
+    "sha256": "534c1bca8fa3b5d1c854a386faac6dd1b847eb2c748e2f760b4ee1018e62ee16",
+    "bytes": 9743
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/deployment/transactions.ts",
+    "sha256": "4e81dc5434ea5e196f6d5f6029a3cdb3c6d2afecc05389c0e1997486dfdb4a1b",
+    "bytes": 803
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/source.json",
+    "sha256": "9a000e8f178e5d46f90f64246435c134c334e90a1c3fb3dc0f4b306468e49f09",
+    "bytes": 29349
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "56d1d9e706293a9c40f16f9c06c58616922882a0e4bc50e724d401dea49170af",
+    "bytes": 36727
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "10144f2df6dc0fd9bdfc5f6791c644a4c80dc20cdc50790002a84056fda3d9b7",
+    "bytes": 29385
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_english_zh_cn/1.0.0/source.json",
+    "sha256": "d43321eae1ed27f0a352f08cc4b94d2699e504eedbced3776365ca01a1617c8a",
+    "bytes": 29385
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "0f35c2ebf4a5e754a86db66bd3b14dbca68efef9d8d27feb6a845ae0094773ca",
+    "bytes": 36946
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_concept_physics_zh_cn/1.0.0/source.json",
+    "sha256": "12db78a3bf011440a027746d93346e3942725a9d358c90efb6d56f4a723151ec",
+    "bytes": 29259
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_biology_zh_cn/1.0.0/source.json",
+    "sha256": "907f458efa3cdf574e29c1b1f07aff35d46f3c84e38d26bc36a0dffb1a744b1b",
+    "bytes": 29451
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "c36f746218436f160529a79d362db8c9349f6217d87176da2d3c577d302910d0",
+    "bytes": 38050
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "608fad411828dded57c09cb14bb7928b8d75b45de543e51dbb060c51af669441",
+    "bytes": 29487
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_english_zh_cn/1.0.0/source.json",
+    "sha256": "5d1fb5791ae6e67ba684c483eeb1635625a404d35a2eac568fd59ba422743111",
+    "bytes": 29487
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "e20d2c6c267732d125ba9cbfa663b6181993d2d9eb2146c54e9b4b035338544f",
+    "bytes": 29437
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/academic_self_efficacy_physics_zh_cn/1.0.0/source.json",
+    "sha256": "91d5b021bad4145d6bdfdba21d16ed7d6d9604fcca15b170827507aa987ca2b0",
+    "bytes": 29361
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/source.json",
+    "sha256": "8fb4a923d155da3c6209f9898b3f35e91c49030098d8730ab11d0c0f22ad49d0",
+    "bytes": 29149
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/adexi_v1/2.0.0/instrument.ts",
+    "sha256": "74366b1a1043feb791b827c5a9620372c5921b87006b1e934231600f838d05bb",
+    "bytes": 3597
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/source.json",
+    "sha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f",
+    "bytes": 68844
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bps9_zh_cn_research/1.0.0/source.json",
+    "sha256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510",
+    "bytes": 28651
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+    "sha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+    "bytes": 27689
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/brcs4_zh_cn_research/1.0.0/source.json",
+    "sha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66",
+    "bytes": 22469
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/bscs_zh_cn/1.0.0/instrument.ts",
+    "sha256": "2e22fcb19a12dbc63b89eacb2d60d8d8d828fbcf15103d9db7d3780375ee481d",
+    "bytes": 18535
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/catalog-defaults.ts",
+    "sha256": "1e8c71d2729da0db7a59b6175a6054f459fca33129062b6998df18aacd8fe7f1",
+    "bytes": 2055
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cbi_en/1.0.0/instrument.ts",
+    "sha256": "cf75d68c70610f337d011b1eb06b4cc211e8b8e1ce32c4209f6d96bc4da305df",
+    "bytes": 40675
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+    "sha256": "0980f8e86e840623e151cde0af06365ddd30f7b765854285100093d106ca9902",
+    "bytes": 38130
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/instrument.ts",
+    "sha256": "3377f617ada9915282a8e8c781809461030d3302be33c45564d3577e4a533085",
+    "bytes": 276
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json",
+    "sha256": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103",
+    "bytes": 47851
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cdrisc2_zh_cn/1.0.0/instrument.ts",
+    "sha256": "f0b21040f634fc9e8db3aea2cefb40c22796a52d257e423256a1745639f54144",
+    "bytes": 11825
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+    "sha256": "5c2cd9214a45ed735d058f9617418ef4dc1ccc6e27f999d38d2512c3d26ff476",
+    "bytes": 22250
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/source.json",
+    "sha256": "09337dac6463e43e8840542e301a2885c0637293a0d6c06261aef0932996cce4",
+    "bytes": 37706
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+    "sha256": "7953e7125b692d33721a2dc1ad54ef07c95df781c08ec63e7f1813d9c8b9a796",
+    "bytes": 37351
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/source.json",
+    "sha256": "6917748d9ac9a5c32f0deebd4c8793f2eda5b976269ac14cecaae1afadc0eb64",
+    "bytes": 71720
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.1/source.json",
+    "sha256": "1c5de416222b8ae41574e28239959220affaabb51ddfbec939aaac9ba33e2bfe",
+    "bytes": 71792
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/copsoq3_job_satisfaction_en/1.0.0/instrument.ts",
+    "sha256": "104562aaeb9c563d290b6b047a62fe66e02aab04482f99f059a812d61e6a959d",
+    "bytes": 17760
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/cross_domain_talent_beliefs_zh_cn/1.0.0/instrument.ts",
+    "sha256": "aa82e7f3a4cdb894cc21d38e18e5ab74e6e9c9ffc7f67c75d744902bf1eb3462",
+    "bytes": 13121
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+    "sha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf",
+    "bytes": 30019
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/dass21_zh_cn/1.0.0/instrument.ts",
+    "sha256": "503e91b60dae40800624f95c3bad6364751916b5d0cfb56f14d7a66a79ef44d7",
+    "bytes": 9604
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+    "sha256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46",
+    "bytes": 26866
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_biology_zh_cn/1.0.0/source.json",
+    "sha256": "c4c3fdd9b41e661934fdbce96ffd28afaf87cedd104ddcba582dc18d26504c3b",
+    "bytes": 27797
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "f6c27af1c66b9f987c95d55016b7a3bbce764efdfc3a06b59b9548f6b4cdb2b8",
+    "bytes": 35707
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "2d6082cb997d224e95ffbb8d9174965deaf025e03a1581fe7b94b44e49366db6",
+    "bytes": 27797
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_english_zh_cn/1.0.0/source.json",
+    "sha256": "01490e004c8cd3e09c9e0d9a13205dbebaf8b5b9c8e30ccb369168e3052313f9",
+    "bytes": 27797
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "16b603afc0bf5c145951c9a410bd7e91d747f0d3b7d992256c4271416d84097d",
+    "bytes": 35500
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_physics_zh_cn/1.0.0/source.json",
+    "sha256": "bd7be8c91c4a88528c9b7e59dc18a09532210522ebc2bcc4e5907ca3e44d711d",
+    "bytes": 27797
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/source.json",
+    "sha256": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f",
+    "bytes": 51085
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+    "sha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834",
+    "bytes": 51662
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/erss19_zh_cn_research/1.0.0/source.json",
+    "sha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e",
+    "bytes": 58024
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/source.json",
+    "sha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff",
+    "bytes": 54139
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.1/source.json",
+    "sha256": "3faa7bab6250e6aaf1e6ab109416a8f6f2a10f4016e7e3141a65904787267962",
+    "bytes": 54244
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+    "sha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e",
+    "bytes": 19484
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/general_fixed_mindset_zh_cn/1.0.0/instrument.ts",
+    "sha256": "3148c75ab7566debaa25b1b9dde085d70265cabd1fe5ee23a12903ce93508fe8",
+    "bytes": 12287
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/grit_s_zh_cn/1.0.0/instrument.ts",
+    "sha256": "5fd0f0a16fd4b70699f16b12be228f86d5eafc73dcef2f23f9726cf0f83afca9",
+    "bytes": 17981
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+    "sha256": "bb5214bb0b123cd2ee4ed4187af226e17ec4e3169b98a9771052adc3b9bf9451",
+    "bytes": 17361
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/gse_zh_cn/1.0.0/instrument.ts",
+    "sha256": "347a9acd17dea5b1a1c9a505af08d5c85395c042b5da7fd7d07b4ec2354a3349",
+    "bytes": 5401
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/hse_msit_en/1.0.0/instrument.ts",
+    "sha256": "977d126d59cb84b2d5a37a66e98136c0d1122f84013e08b46ae9b350d04859ff",
+    "bytes": 61525
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+    "sha256": "7e5021f4c8031f2d20650b04342e0025e785ac08f912a4520972f564f6122ef9",
+    "bytes": 59656
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+    "sha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3",
+    "bytes": 21698
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+    "sha256": "6cc56383060babff5d7774c313063e71769fd62c46fdf3709cf80c7f65e6dc45",
+    "bytes": 60676
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+    "sha256": "79c1977eec784fed5fd974a7c55a2a4fe5f5b9ceee99b7fa4f0ca58aec41a555",
+    "bytes": 21652
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+    "sha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+    "bytes": 24025
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+    "sha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef",
+    "bytes": 24641
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+    "sha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+    "bytes": 25386
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+    "sha256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9",
+    "bytes": 21871
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+    "sha256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa",
+    "bytes": 22034
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+    "sha256": "fd6b9f4a40cd10729e339d01eacaa0c9b2a64ff13b9413856a888eeb7f59fb5f",
+    "bytes": 20880
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+    "sha256": "1327accb2a02d8909fbac4512e7cc8323f4388073256f7e9e9a23d6f77f97cf0",
+    "bytes": 20370
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+    "sha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+    "bytes": 23807
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+    "sha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+    "bytes": 25177
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+    "sha256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c",
+    "bytes": 21576
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/instrument.ts",
+    "sha256": "aaa30b052fb5917e6b49b49468cfa3b6f2f52ba438ae38d84362dc427e913fd2",
+    "bytes": 182
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/source.json",
+    "sha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c",
+    "bytes": 32061
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/jcq_en/1.0.0/instrument.ts",
+    "sha256": "a4b20ff69f130a8fd0fe34fc8c4ca57ce18f8b09734a598858b6a915bf59dfc4",
+    "bytes": 34296
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+    "sha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db",
+    "bytes": 28936
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+    "sha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640",
+    "bytes": 19110
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+    "sha256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc",
+    "bytes": 22279
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+    "sha256": "fb8189a4d0c422f6f4c231cef0a1a5c6e8edf664eff4cb921dba3f3bb0f708f2",
+    "bytes": 16278
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+    "sha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833",
+    "bytes": 13834
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/maia2_37_zh_cn_research/1.0.0/source.json",
+    "sha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb",
+    "bytes": 82088
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mpfi24_zh_cn/1.0.0/instrument.ts",
+    "sha256": "33121852d8d79369d35f8d4fbf7ed65515eadbf6b0fd58639e2bf1f293ce6018",
+    "bytes": 5112
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+    "sha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879",
+    "bytes": 58500
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+    "sha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c",
+    "bytes": 19777
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+    "sha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749",
+    "bytes": 18156
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json",
+    "sha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f",
+    "bytes": 34263
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+    "sha256": "ca75edacb9eed515ea7fe6cc273df26c9b311f9f495c8eadfec71ef86f86dcf5",
+    "bytes": 110868
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+    "sha256": "e0ccedb0e8f368362cac1d0901fd21f16fd295a449d0ebdf1c316e53026353a4",
+    "bytes": 51376
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+    "sha256": "3ec151119973c2349d90f001d265f6d868b959517bef5fa8f0103f9bb870d531",
+    "bytes": 19636
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/pss10_zh_cn/1.0.0/instrument.ts",
+    "sha256": "b00bc67ac9fa34316c53922d1975c2ecf30673d0a409d62b4b134aba8d65021b",
+    "bytes": 4798
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json",
+    "sha256": "97e209e223ddae28fd81ce0b9727b3ab0c85c972d7db7b0b7cc288f3a9e0221b",
+    "bytes": 28586
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+    "sha256": "82e4e486da2ead626d28e3bc34a74616618c82b2a5bd4e024dc16195faf9cc45",
+    "bytes": 20388
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+    "sha256": "db270c80d2a1086f0adce5ef0005c6acad294aeb396ad05f9d70987e251fe0a1",
+    "bytes": 24381
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+    "sha256": "9a8e7c669cd1df9b9a6279de208029555bafa8a1c5e939187e0a64780cb7a540",
+    "bytes": 25694
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sdq_parent_zh_cn/1.0.0/instrument.ts",
+    "sha256": "300f7a7198bcc7a9c13ffbb7018a5b51350d09bf4af956ce89b12e1621a15dc2",
+    "bytes": 5068
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sdq_teacher_zh_cn/1.0.0/instrument.ts",
+    "sha256": "1af379a99ec383907fbe14a1fb25e629857e8c56b9354c594d20a87753748823",
+    "bytes": 5509
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/socs_s20_2023_zh_cn/1.0.0/source.json",
+    "sha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe",
+    "bytes": 57931
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+    "sha256": "944906cd932b4b60c43508bb106c8c539b4c86e69da543cb614428c9616ff41a",
+    "bytes": 17032
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/source.json",
+    "sha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c",
+    "bytes": 91720
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+    "sha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d",
+    "bytes": 84581
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+    "sha256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7",
+    "bytes": 37410
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_biology_zh_cn/1.0.0/source.json",
+    "sha256": "f61a63544f52da903621854d75c78e67f03057665f046042db1da4bc7abb6cd2",
+    "bytes": 28156
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "88813ef10a8c434b04b618ac55400a468bc07ebdd26702cc834c30730bda12c7",
+    "bytes": 35122
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "6c99486b67b8b1be4b44b454ddae9e98bbef17b03b0e826939bc1e5fbfdd695c",
+    "bytes": 28156
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_english_zh_cn/1.0.0/source.json",
+    "sha256": "3be0f3bc93dc8b48c06422d870483a9fe2af089429265055147ec450f9bc4942",
+    "bytes": 28156
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "280d76277530ac0d8fc0a83db840ea74f1648175ab1a394ae54776bdd3ac600e",
+    "bytes": 28196
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/teacher_subject_liking_physics_zh_cn/1.0.0/source.json",
+    "sha256": "27ccccacc51be9c328a0afd382eca923e83255abbecb262d56fe3d971d45f8cc",
+    "bytes": 28156
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/texi_parent_zh_cn/1.0.0/instrument.ts",
+    "sha256": "187123ea3b66537311da664011859c6c714f50a457b53bd5e372f9233b934033",
+    "bytes": 3922
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/texi_teacher_zh_cn/1.0.0/instrument.ts",
+    "sha256": "bc472484324fc159ff271a2b0d54432ea7cb493362905c4c90ab251bce0e9447",
+    "bytes": 3934
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tipi_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d8e839bc60f2ebbf9660b302bfb44928ab3727eea0e202de001eb6514957ef0",
+    "bytes": 22623
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tswq_en/1.0.0/instrument.ts",
+    "sha256": "25ec3ef94c006e2ad5d40e67c8a30a3554ea51dfffac1dea46e76d21c4650778",
+    "bytes": 26571
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/instrument.ts",
+    "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+    "bytes": 192
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+    "sha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62",
+    "bytes": 27420
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_biology_zh_cn/1.0.0/source.json",
+    "sha256": "766d70d8b9fbd02a70eb4522488c0caf30bde2f3a59eaa6f8d8dec282dba0563",
+    "bytes": 27944
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "99c7ee82f105c5dfd1e12b1889a5b0ea5df07ce1c2f57f7878d0573b310e8f90",
+    "bytes": 35692
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "82dd8858cee42fc8d0ea05810ba9b5936d123ef460b6a7ab7efd150ce6c5a2d4",
+    "bytes": 27944
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_english_zh_cn/1.0.0/source.json",
+    "sha256": "ccbe1ea2257fa5d901b1a4c837e0b5ea41b92c6c545c0f99f46755bfa95957dd",
+    "bytes": 27944
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "7c7bdd738a75948d746604241bc7d4b5ce3dacba83d8394399e73070c69d17b3",
+    "bytes": 35722
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/tutoring_necessity_physics_zh_cn/1.0.0/source.json",
+    "sha256": "4936319f66e22cdd5ffb7d652ed571422297aab092abf91de6457024b1acf91d",
+    "bytes": 27944
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_biology_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_biology_zh_cn/1.0.0/source.json",
+    "sha256": "6df68ea60b6eaa49935b26d40c8f311efc24435f9c03882e161ae934e57dd2f0",
+    "bytes": 46052
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_chemistry_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_chemistry_zh_cn/1.0.0/source.json",
+    "sha256": "1740abc69cc3a1ead3a4ed27b9d4dfc34624d63e27a0283f3cc1ca58898ca7a4",
+    "bytes": 63204
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_chinese_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_chinese_zh_cn/1.0.0/source.json",
+    "sha256": "5aca5a797085f0d2396a15f3efbcb3a1e29710656cbef6c5f9ae43d7836227b0",
+    "bytes": 46052
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_english_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_english_zh_cn/1.0.0/source.json",
+    "sha256": "e5cc45d12215dd6ab83b253eb63c630cf39665b4c7f627338a4a9a010660c65c",
+    "bytes": 46052
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_mathematics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_mathematics_zh_cn/1.0.0/source.json",
+    "sha256": "83a03356a6bb91d7cde4682b16d4ad87d266b59c28439cae71d0ed9d60eb9be2",
+    "bytes": 62601
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_physics_zh_cn/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/value_cost_physics_zh_cn/1.0.0/source.json",
+    "sha256": "b22771d545e0e45c437740bae4fc596f044569c1b6d83ea24822dae2b66b1c5e",
+    "bytes": 46052
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/who5/1.0.0/instrument.ts",
+    "sha256": "063037130a17a5a5da5e6c1548abd08bdcd702f133086d76fcd7667b5939f138",
+    "bytes": 4827
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument.ts",
+    "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+    "bytes": 193
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/source.json",
+    "sha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98",
+    "bytes": 28097
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+    "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6",
+    "bytes": 1730
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/catalog-manifest.ts",
+    "sha256": "b041a4196f3fdaef889d2e4d5be548639a7a89198be9ea55e6018127c151e154",
+    "bytes": 16697
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/localization-manifest.ts",
+    "sha256": "2efa77c7f2c7962a3f23f7ff20fa43bca22379d176a4e1c3dfabf704553d5c17",
+    "bytes": 4533
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts",
+    "sha256": "94d0939c01371be6bde23a2326c65a771019aed6f5076f1e5ce9fd9c354881e0",
+    "bytes": 2980
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/define-instrument.ts",
+    "sha256": "e6ade3db43e3945d7a33f7426cfe7056c6aae42e54cdc01d442450f628c52a93",
+    "bytes": 1146
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/install.ts",
+    "sha256": "05fff62ee521c4fa81810bdfc591d6d9c74433fb3ad49894f7d31bbd6250230a",
+    "bytes": 7980
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/instrument-registry.ts",
+    "sha256": "55c9be87179e100fee5d34b8fde1f70ec04f137212dc750d142f2fea147cb2e7",
+    "bytes": 3781
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+    "sha256": "6f7b03050793c77f569de97a9e8049ac3ebff5cd060a7fea1e45e00af7b5128f",
+    "bytes": 15086
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/materialize.ts",
+    "sha256": "05d433bd13e7433d70afe89a595471d704486047c2854334c952835f8ef47d7b",
+    "bytes": 4644
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/schema.ts",
+    "sha256": "2f75dad2215f598b329a751f3d91f347caf4b5b39315b783a4a617256056f19a",
+    "bytes": 4798
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/types.ts",
+    "sha256": "382e4788967c8986848b829af63ca84590b53c476ae8edc4478b337286fa2f09",
+    "bytes": 3364
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+    "sha256": "23653dfe9da8518ede036d8afd2d7c57588b70c21f9c58004a0805cbed477a9a",
+    "bytes": 8344
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/adexi-v2.ts",
+    "sha256": "2eca9f499e976d8f1e123fd4ee5edc968040db5dca5dcc03ab8a71bbd335f71e",
+    "bytes": 7328
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/sdq-parent-zh-cn-v1.ts",
+    "sha256": "954acd115b9e53fe271bd5165be5a9d5061d2aed4d03f5f7c5d9175e2913180a",
+    "bytes": 13139
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/sdq-shared.ts",
+    "sha256": "a71f0376b3f458e35e0cc7ccc490a0e683239adea6798a01502de986d13e5ea4",
+    "bytes": 2361
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/sdq-teacher-en-t4-10-v1.ts",
+    "sha256": "2a98bf9a72ab30544cb239937863558f3f5c24390074555cba71115f10e3132c",
+    "bytes": 17840
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/sdq-teacher-impact-scorer.ts",
+    "sha256": "1966ada4007cc6383b669dd5797144c7a722109cabc0eb217452889b8c2d982a",
+    "bytes": 4750
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/texi-en-v1.ts",
+    "sha256": "15a602452b18d1146fbb9bcd8a43bb0bc8deefe6c1f59bf31ee01c8416e6e705",
+    "bytes": 12291
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/packages/who5-zh-cn-v1.ts",
+    "sha256": "054d947a408e94fde7dfa6fb9bed0923611dc13155ad4260a6f7fe0cbc073946",
+    "bytes": 6928
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/compile.ts",
+    "sha256": "34ffb8e5536ea09b509e28cace6042e07e935145fb8388e85665877fe3a07610",
+    "bytes": 4650
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/deployment.ts",
+    "sha256": "429dfa68efc632b3c92f31e419f444b0911916bc8a6dc3bdd7e34a53fc8f2e7d",
+    "bytes": 7319
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/disclosure.ts",
+    "sha256": "281b533e81015d82a8387e02b1347bab1c894df373211abd80e00a086f694436",
+    "bytes": 2026
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/localization.ts",
+    "sha256": "a14de237e52e2c0e970f438d49541d28abb871b4b30ae68fc8dba1b524743f97",
+    "bytes": 879
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/schema.ts",
+    "sha256": "f3039e91b4b44e9d8f84191f2d15e8605194d2845ca643d7d0623de515ab8286",
+    "bytes": 3808
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/types.ts",
+    "sha256": "30a25b201b6ad1149425d1c7f162f0bf838e6ceffc9b9bb731048459d52d8d9f",
+    "bytes": 3167
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/raw-score-feedback.ts",
+    "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4",
+    "bytes": 4020
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-definition.ts",
+    "sha256": "8136925d8a6b99827da7abd68683d2f7de7cd06353105a246216eab920cfdaba",
+    "bytes": 29219
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-result.ts",
+    "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+    "bytes": 14023
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-scoring.ts",
+    "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+    "bytes": 25883
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/utils/encryption.ts",
+    "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+    "bytes": 5773
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/utils/logger.ts",
+    "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15",
+    "bytes": 3090
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/tsconfig.json",
+    "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "bytes": 809
+  },
+  {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/vitest.config.ts",
+    "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "bytes": 521
+  },
+  {
+    "path": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/launch-pg.py",
+    "sha256": "bd5d419ddff57f746b2aa67c88b02ffedf075c67728d8495223bfdbc72855247",
+    "bytes": 629
+  },
+  {
+    "path": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/run-check.py",
+    "sha256": "1445ab6ff64bccd1e4929001d6f3bf81d28f08eb6e047da67bb3f46ef0fbf4f1",
+    "bytes": 2140
+  }
+]

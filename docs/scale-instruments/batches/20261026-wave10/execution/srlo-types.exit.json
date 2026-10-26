@@ -1,0 +1,15 @@
+{
+  "name": "types",
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/tsconfig.srlo44.json",
+    "--pretty",
+    "false"
+  ],
+  "startedAtUtc": "2026-10-26T10:26:56.052667+00:00",
+  "finishedAtUtc": "2026-10-26T10:26:57.817701+00:00",
+  "exitCode": 0,
+  "originalExecutionSigned": false
+}

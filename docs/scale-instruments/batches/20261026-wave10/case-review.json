@@ -1,0 +1,150 @@
+{
+  "unitsUnique": 19,
+  "postgresUnique": 7,
+  "caseSets": [
+    {
+      "file": "execution/srlo-unit.reporter.json",
+      "passed": 19,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation validates only this complete DRAFT source with independent version axes and no fabricated scientific approval",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation preserves all 44 corrected published English items, original order and independent Chinese working text",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation labels only the two endpoint anchors and keeps both instruction blocks outside questions as unconnected prepared content",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation defines precisely ten direct means with the author denominators and no reverse, total or inferred higher-order score",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: minimum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: maximum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: midpoint",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: ascending_cycle",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: facet_constants",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: missing_self_efficacy_item",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation matches independently pinned arithmetic: empty",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation checks every legal answer moves only its own facet by its direct fraction of the facet denominator",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation never fills zero or changes the denominator for any omitted item and suppresses interpretation for incomplete results",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation rejects illegal, duplicate and unknown responses instead of coercing them into legal scores",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation requires adult SELF and explicit current university online or blended course context without inferring missing facts",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation builds five actual ten-part score-only reports with consistent versions and no score-contingent bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation explains negative emotion and extrinsic motivation in their actual directions rather than universally better or worse",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation keeps report, catalog and measurement identities separate without altering prior definitions",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+          "SRL-O44 corrected Table 8 independent Chinese research working translation retains exact CC BY4 scope, eight carrier differences and the correction without fabricating Chinese validation or a country",
+          "passed"
+        ]
+      ]
+    },
+    {
+      "file": "execution/postgres.reporter.json",
+      "passed": 7,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL starts with fifteen prior synthetic definitions and seventeen frozen snapshots under a non-owner role",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL srlo44_zh_cn_research rolls back new draft and frozen snapshot together",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL srlo44_zh_cn_research materializes pinned content once with exact axes and rich catalog snapshot",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL srlo44_zh_cn_research generates exact real result samples from persisted definition without reference or invented bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL srlo44_zh_cn_research freezes its complete source against mutation or deletion",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL srlo44_zh_cn_research refuses activation of its unpublished DRAFT despite open source rights",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave10-srlo-content.postgres.integration.test.ts",
+          "Wave10 independently reviewed SRLO44 Chinese draft in task-owned PostgreSQL preserves all previous definitions and snapshots and adds only one DRAFT/HIDDEN row without references or deployment",
+          "passed"
+        ]
+      ]
+    }
+  ]
+}

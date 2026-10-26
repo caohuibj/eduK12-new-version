@@ -1,0 +1,98 @@
+{
+  "kind": "UNSIGNED_LOCAL_DEVELOPMENT_EVIDENCE",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "inputBinding": "PRE_EXECUTION; raw byte snapshots remain task-private; no ZIP upload",
+  "files": [
+    {
+      "path": "execution/srlo-unit.reporter.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/unit.reporter.json",
+      "bytes": 9511,
+      "sha256": "96e9b948b30aa263ef9818f1e43360b4784b20b0bb29ba3ac6445885a816d3f9"
+    },
+    {
+      "path": "execution/srlo-commands.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/commands.before.json",
+      "bytes": 1149,
+      "sha256": "35238c624184d95261a1348f852d50b95cceece158ab8c6f0e4cd285780fbdd0"
+    },
+    {
+      "path": "execution/srlo-inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/inputs.before.json",
+      "bytes": 129249,
+      "sha256": "363e874ac90ac9ffc4961e3d57f2b49df483d178ac4a48bbe6b50702d47590d9"
+    },
+    {
+      "path": "execution/srlo-capture.exit.observed.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/capture.exit.observed.json",
+      "bytes": 350,
+      "sha256": "4883bf62749990c5f6206080676a4426d9a4c38b8268919cc9d5c652f06ce0b7"
+    },
+    {
+      "path": "execution/srlo-unit.exit.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/unit.exit.json",
+      "bytes": 517,
+      "sha256": "7787bd48b89f21e029213e42d822494e4475be4f78b8773b3af1b7b6588563b2"
+    },
+    {
+      "path": "execution/srlo-types.exit.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/types.exit.json",
+      "bytes": 422,
+      "sha256": "fdc56d3def48ac984946af55c908092c3ffa71caf6090253cb0027f33708c140"
+    },
+    {
+      "path": "execution/postgres.reporter.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/database-first/reporter.json",
+      "bytes": 4103,
+      "sha256": "a7e8e3a665be75176c82aac594c113baeaee39fda1580247fc457a9ff7ee53ae"
+    },
+    {
+      "path": "execution/postgres.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/database-first/receipt.json",
+      "bytes": 457,
+      "sha256": "df363d201c2dc0b59d8c9ce84903c588b44f8fe3d8185488ec89721f6957642c"
+    },
+    {
+      "path": "execution/postgres.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/database-first/inputs.json",
+      "bytes": 68917,
+      "sha256": "7ccd3d581360fcad90bc1fd79df4f70ef7ced76698a67ef00adafc274916de65"
+    },
+    {
+      "path": "execution/final-types.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/types-final/receipt.json",
+      "bytes": 541,
+      "sha256": "4eccdd34e49e21cbe0c1c43df3d996fffd946440ef9bc9d816215dafd6e9af01"
+    },
+    {
+      "path": "execution/final-types.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/types-final/inputs.json",
+      "bytes": 68925,
+      "sha256": "345b05ed5c1ce8c9ef28841785896f4a94f52fbb9243b4e7d4e8ed2de27bf5d9"
+    },
+    {
+      "path": "execution/registry-review.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/registry-final/stdout.log",
+      "bytes": 712,
+      "sha256": "3ccb640b34af5ae003792a2a3d5dc22b3e52b92c548ba757d835ebc0f64553e0"
+    },
+    {
+      "path": "execution/registry.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/registry-final/receipt.json",
+      "bytes": 489,
+      "sha256": "ae17cf8514c3b2ce70c8f0b11bca9897a42f978fa959d7961e1076f67636d47f"
+    },
+    {
+      "path": "execution/generator-check.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/generator-check/receipt.json",
+      "bytes": 461,
+      "sha256": "dcea755565a472a320e0b77ea4ea8c7a2ae8d5324a56cee597274637a9ebe3a4"
+    },
+    {
+      "path": "execution/generator-check.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave10/coordinator/generator-check/inputs.json",
+      "bytes": 63770,
+      "sha256": "94bb08ac9b84e2208e57e1d73ebc5c3a3cbc231f776d2c10a1db004a2942d388"
+    }
+  ]
+}

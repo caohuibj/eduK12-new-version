@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "kind": "SRLO_ONLY_LOCAL_DRAFT_DEVELOPMENT_NOT_CI",
+  "baseline": "1176b7a14cf023d7f7b07b1dcb44f13085a38322",
+  "newFirstCategoryTools": 1,
+  "newFirstCategorySourceVersions": 1,
+  "newSecondThirdCategoryArchives": 0,
+  "sourceSha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c",
+  "unit": {
+    "status": "PASS",
+    "uniqueCases": 19,
+    "preExecutionInputFiles": 387,
+    "originals": "execution-index.json"
+  },
+  "types": "PASS_AFFECTED_CLOSURES",
+  "database": {
+    "status": "PASS",
+    "uniqueCases": 7,
+    "perToolCases": 5,
+    "sharedStateCases": 2,
+    "nonOwnerRole": "scale_app",
+    "oldDefinitions": 15,
+    "oldSnapshots": 17,
+    "finalDefinitions": 16,
+    "finalSnapshots": 18,
+    "allDraftHidden": true,
+    "references": 0,
+    "deployments": 0,
+    "productionTouched": false
+  },
+  "report": {
+    "configs": 1,
+    "distinctGoldenSamples": 7,
+    "complete": 5,
+    "invalidMissingEmpty": 2,
+    "interpretationSections": 50,
+    "scoreDependentBands": false,
+    "agentCopiesNotDoubleCounted": true
+  },
+  "registry": {
+    "identities": 117,
+    "oldSourcesPreserved": 95,
+    "newTags": 81,
+    "eightAxes": true
+  },
+  "independentNoneParameterVersion": "NOT_SUPPORTED_RUNTIME; documentation plan only",
+  "standardCatalogEvidenceRows": 0,
+  "scientificEvidenceNote": "Original English single-university634 random-split313/321 research retained source/docs; schema requires territory but country unverified, not invented",
+  "instructions": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "currentUniversityCourseContext": "Declared applicability; missing context INDETERMINATE, actual UI facts consumer NOTRUN",
+  "authorFourPointGuidance": "Preserved as practical author reference only, not applied diagnostic/Chinese norm cutoff; negative-emotion under4 heading conflict explicit",
+  "browser": "NOTRUN",
+  "dualEntryUse": "NOTRUN",
+  "formalActivation": 0,
+  "CI": "NOTRUN",
+  "deployment": "NOTRUN",
+  "BPSESChecksRepeated": false,
+  "finalIndependentReview": "PENDING_EXACT_COMMIT_REVIEW",
+  "sourceCommit": "acf7ee77792192de2b11bd80f11d289516c9e4a6",
+  "inventory": {
+    "addedExecutableSourceVersions": 60,
+    "toolIdentities": 56,
+    "notIndependentConstructOrLiveToolCount": true
+  },
+  "twoStepRollup": {
+    "BPSESsourceCommit": "a13a405b9852513b372cd622536aca45170735a7",
+    "BPSESevidenceCommit": "1176b7a14cf023d7f7b07b1dcb44f13085a38322",
+    "SRLOsourceCommit": "acf7ee77792192de2b11bd80f11d289516c9e4a6",
+    "unitCasesByTool": {
+      "BPSES": 18,
+      "SRLO": 19
+    },
+    "uniqueUnitCases": 37,
+    "separatePGcases": {
+      "BPSES": 7,
+      "SRLO": 7
+    },
+    "uniquePGcases": 14,
+    "actualUniqueGoldenReports": 14,
+    "complete": 10,
+    "invalidMissingEmpty": 4,
+    "actualExplanationSections": 55,
+    "newSourceRegistryPackages": 2,
+    "newReportConfigs": 2,
+    "newSecondThirdArchives": 0,
+    "formalActivations": 0,
+    "doubleEntryUse": "NOTRUN",
+    "existingPassedCasesRepeated": false
+  }
+}

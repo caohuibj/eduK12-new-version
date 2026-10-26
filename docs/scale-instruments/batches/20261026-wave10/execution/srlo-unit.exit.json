@@ -1,0 +1,16 @@
+{
+  "name": "unit",
+  "argv": [
+    "/workspace/eduk12-cloud/tools/node_modules/.bin/node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave10/srlo44/unit.reporter.json"
+  ],
+  "startedAtUtc": "2026-10-26T10:26:54.889996+00:00",
+  "finishedAtUtc": "2026-10-26T10:26:56.052277+00:00",
+  "exitCode": 0,
+  "originalExecutionSigned": false
+}

@@ -1,0 +1,40 @@
+{
+  "kind": "FINAL_BYTE_COMPARISON_NOT_HISTORICAL_SIGNATURE",
+  "scope": "Before-execution input manifest included three report/validation output docs, later filled with actual outcomes. Actual unit reads bilingual-content, administration-sidecar, parameter-plan, cross-carrier-differences, scoring-and-parameters; those and source/test unchanged. Final279-input actual registry/type/PG closure unchanged.",
+  "comparisons": [
+    {
+      "label": "SRLO-pre",
+      "files": 387,
+      "changed": [
+        {
+          "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/srlo44/1.0.0/report-draft.md",
+          "executedSha256": "29299576922cbe97ee790034734ee9e5f95c0898454b7d89af45b57f1a465f39",
+          "finalSha256": "f60049c7833fb48247a1965f60482cbcecb5cab12ce57f53c77bc446974d576d",
+          "classification": "Non-consumed output documentation; not among test readFileSync inputs"
+        },
+        {
+          "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/srlo44/1.0.0/validation.json",
+          "executedSha256": "8fddb2374b15153a2347b37002e48636639764f9bda89ccbcb5873c77104255f",
+          "finalSha256": "5fae411e8f8c935eaaa266a8fcd2cba06e8ca7fa7072561d4f554ce5905d703c",
+          "classification": "Non-consumed output documentation; not among test readFileSync inputs"
+        },
+        {
+          "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/srlo44/1.0.0/validation.md",
+          "executedSha256": "f214b0aacf1fadf316a0f1fdacbdb3475483781bf18d2bedf9073a32567dca0b",
+          "finalSha256": "355c91008f5ebe150057dc751e466cf01c5748e3c9b13515d34e16b20424e47b",
+          "classification": "Non-consumed output documentation; not among test readFileSync inputs"
+        }
+      ]
+    },
+    {
+      "label": "PG-pre",
+      "files": 279,
+      "changed": []
+    },
+    {
+      "label": "final-types-pre",
+      "files": 279,
+      "changed": []
+    }
+  ]
+}

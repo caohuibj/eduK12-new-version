@@ -1,0 +1,12 @@
+{
+  "scope": "Only this task-owned loopback synthetic database",
+  "container": "eduk12-scale-wave10-20261026",
+  "containerId": "e4549cc4ad4c7b6f4fdddb703b9f3a8da739d4c12cab1bcfe954dc7e2ea5e0d9",
+  "idAndTaskLabelChecked": true,
+  "dumpBytes": 1594243,
+  "dumpSha256": "f867111c5f758dabab21590ae997d9c3115cd5b16f502bba7cac72c326da1f49",
+  "containerAndOwnAnonymousVolumeRemoved": true,
+  "futureRestore": "NOTRUN pending future batch authorization",
+  "productionTouched": false,
+  "atUtc": "2026-10-26T10:33:10.767637+00:00"
+}

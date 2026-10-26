@@ -1,0 +1,29 @@
+{
+  "status": "PASS_STATIC_DIFF_AND_BYTES",
+  "baseline": "1176b7a14cf023d7f7b07b1dcb44f13085a38322",
+  "sourceCommit": "acf7ee77792192de2b11bd80f11d289516c9e4a6",
+  "oldSourceFilesByteUnchanged": 95,
+  "BPSESAllTrackedFilesUnchanged": true,
+  "engineSchemaDependenciesOtherInstrumentsChanged": false,
+  "changedPaths": [
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/README.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration-sidecar.prepared.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/administration.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/bilingual-content.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/cross-carrier-differences.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/parameter-plan.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/references.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/report-draft.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/scoring-and-parameters.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/source-manifest.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/tags.md",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/validation.json",
+    "docs/scale-instruments/research-drafts/srlo44/1.0.0/validation.md",
+    "server-version/backend/src/__tests__/scale/instruments/srlo44_zh_cn_research.test.ts",
+    "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/srlo44_zh_cn_research/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
+  ],
+  "original37InventoryByteUnchanged": true
+}

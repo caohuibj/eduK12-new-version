@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave10-srlo-reviewed-20261026",
+  "sources": [
+    {
+      "instrumentKey": "srlo44_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "1ed7b85f6bb2478bf7b63046440abdec823989364d77d73678c8f6847f79b59c"
+    }
+  ]
+}

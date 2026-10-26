@@ -1,0 +1,470 @@
+{
+  "kind": "ACTUAL_TASK_OWNED_SYNTHETIC_DATABASE_READBACK",
+  "productionTouched": false,
+  "rows": [
+    {
+      "id": "77d535f1-dcf0-4e1f-a25b-ecbccb2f66b3",
+      "code": "bat23_2020_en",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+      "itemCount": 23,
+      "dimensionCount": 4,
+      "tags": [
+        "WELL_BEING"
+      ]
+    },
+    {
+      "id": "f9754f69-ee4b-4266-9b6a-a01e9b153160",
+      "code": "bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+      "itemCount": 9,
+      "dimensionCount": 0,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+      "code": "bpses5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+      "itemCount": 5,
+      "dimensionCount": 0,
+      "tags": [
+        "SELF_EFFICACY"
+      ]
+    },
+    {
+      "id": "c9d62a39-d5c3-4c99-b2e8-a1c348ba1535",
+      "code": "brcs4_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "b9298f5b505c0246e341e8370bddb5f79a562e869ca021360fb55da87d93d80f",
+      "itemCount": 4,
+      "dimensionCount": 0,
+      "tags": [
+        "RESILIENCE"
+      ]
+    },
+    {
+      "id": "5279edf8-1af7-489f-8410-415f8e29802c",
+      "code": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+      "itemCount": 12,
+      "dimensionCount": 3,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "864ef3b7-ecef-4257-9173-8ce49cfb1ae9",
+      "code": "chime_s24_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "c4f6c68f944a45fe2c4c79073accfd1e67ddec0b5dac610d6b24c17be519358f",
+      "itemCount": 24,
+      "dimensionCount": 8,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "e07209b1-d103-43c3-9909-bed54539ddc6",
+      "code": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+      "itemCount": 16,
+      "dimensionCount": 6,
+      "tags": [
+        "SOCIAL_EMOTIONAL"
+      ]
+    },
+    {
+      "id": "80a06ead-ba30-4072-bc3e-d29aefeede83",
+      "code": "erss19_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+      "itemCount": 19,
+      "dimensionCount": 4,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "262e4b79-51e5-4adc-be34-f2d3c9bba4dd",
+      "code": "ffmq15_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "d95a1a9bbe3499ef0b654ddc97997f3f50f84829a8ba4e558e43033b6330c9ce",
+      "itemCount": 15,
+      "dimensionCount": 5,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "5f1a9844-fc90-4dc1-a8a6-2a04467de373",
+      "code": "ips9_2021_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+      "itemCount": 9,
+      "dimensionCount": 0,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "cf32da36-f735-4f16-a918-8aa95b669e6f",
+      "code": "maia2_37_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "3c5c551f2b9a7f5b45b6af44ea75269272913134f40f2956a3231d1dd1652b41",
+      "itemCount": 37,
+      "dimensionCount": 8,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "222e096c-73de-46fe-acbf-eae0a01f194b",
+      "code": "mpmi_s22_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+      "itemCount": 22,
+      "dimensionCount": 3,
+      "tags": [
+        "EXECUTIVE_FUNCTION"
+      ]
+    },
+    {
+      "id": "9d1fd4ad-2d14-4fea-b05f-5dcf53ed6872",
+      "code": "ofs10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+      "itemCount": 10,
+      "dimensionCount": 0,
+      "tags": [
+        "WELL_BEING"
+      ]
+    },
+    {
+      "id": "c17e5f50-67c0-4d7e-b1e5-e60bdabd1371",
+      "code": "socs_s20_2023_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+      "itemCount": 20,
+      "dimensionCount": 5,
+      "tags": [
+        "WELL_BEING"
+      ]
+    },
+    {
+      "id": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+      "code": "srlo44_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+      "itemCount": 44,
+      "dimensionCount": 10,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    },
+    {
+      "id": "444a303e-c1b5-434d-8b75-af5aaa4d0360",
+      "code": "wibps7_adolescent_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+      "itemCount": 7,
+      "dimensionCount": 0,
+      "tags": [
+        "SELF_REGULATION"
+      ]
+    }
+  ],
+  "snapshots": [
+    {
+      "scale_id": "222e096c-73de-46fe-acbf-eae0a01f194b",
+      "axis_hash": "94b02a213fb3986ba82bb237ea04f0b589551942d58d0ce52a60958782dfe423",
+      "source_hash": "3537c7de4f9b262d96b00b5ba181ae1ef9e94307856dca6d7a5cd4467447341c",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "262e4b79-51e5-4adc-be34-f2d3c9bba4dd",
+      "axis_hash": "752a212e8908ca8c69e866619d4ae53fca27a77c816def8e785649529a0c5c2b",
+      "source_hash": "305f4d0930aebc5134c1a87cfdeb069f5b28664faa9217117a4c442c4727a1d8",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "d95a1a9bbe3499ef0b654ddc97997f3f50f84829a8ba4e558e43033b6330c9ce",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+      "axis_hash": "6d5a92ab38a5106c29ec9bfb23690e276dff6fce5344ab13998b1dad9c2d4cb3",
+      "source_hash": "33df6f714326938c097539d9da6b217cd574478d574ab51250240d8bc69efe33",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "444a303e-c1b5-434d-8b75-af5aaa4d0360",
+      "axis_hash": "f3a943667199b9aa07ccb91d34a5ce0069204e405c7923cdc2ac388a86e2eace",
+      "source_hash": "3587b0f15154ba77e8f14475068507442499d1069ba5dc63a07042b3537e09ca",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "5279edf8-1af7-489f-8410-415f8e29802c",
+      "axis_hash": "a2c597f37f3fc64b5021b91b4e4b98cae581faeca0b9dea5f0f864cefb360a2c",
+      "source_hash": "7172516ccae3ba9b4a6494a28fa1f6a31c68f6fc636c1b87c5fcd496063896b3",
+      "axes": {
+        "reportVersion": "1.0.1",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "5279edf8-1af7-489f-8410-415f8e29802c",
+      "axis_hash": "ee64f046b1aac10589644b04425da1c93af2def5b594ba7e4759bfa3604cd772",
+      "source_hash": "dc50b15674545a0618e567f25eb573c0305e16f4a7fb485f058a91ecf5da9666",
+      "axes": {
+        "reportVersion": "1.0.2",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 2
+      }
+    },
+    {
+      "scale_id": "58b75283-1685-4bdf-a1fa-5536ff33980a",
+      "axis_hash": "aa50ef13b941ad4eb3017239cc7a0b18965a5581f2e83e0848059b6fd9aa8268",
+      "source_hash": "f2afb8cca4f7aa432d10b0bf58c779e3775bc1893355bb084f16b3ed6b66f4ab",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "f1609634ec802728c8c87dc573d30a4e8b77021ad5d2dadc039b01a29b055388",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "5f1a9844-fc90-4dc1-a8a6-2a04467de373",
+      "axis_hash": "d17337612b867aeeb71898dac378eacaf8a8a54e8a8bf588b897c03c2902da47",
+      "source_hash": "84283a9b8e2914e70b0a29156b22efcdbe9bcc96b6acc3a716f698b7fc7253e7",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "77d535f1-dcf0-4e1f-a25b-ecbccb2f66b3",
+      "axis_hash": "a61a8493c802ebf6aced4ed44018a40f1a349c86219a926e552c983e63f7eb2f",
+      "source_hash": "b9e465f714303e974aa538bb3ce40fb9a4f3458ff3681dfe94f4bc6ba3052ef8",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "80a06ead-ba30-4072-bc3e-d29aefeede83",
+      "axis_hash": "033c3d52701b87dc3ab7b0d0278741183adb02cc6ac37e8abe03d2966b7bfca8",
+      "source_hash": "c403e229378c050b393fdc9e602fc91e878dd1f236616d9b26427825e1b3d81b",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "d200e5e58c8c831c28abe034ee14064ba2982bce7813f79cbbda7200f1074186",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "864ef3b7-ecef-4257-9173-8ce49cfb1ae9",
+      "axis_hash": "466244bf82aea1c99e66505962261c78b87812167efc0223ac534c0f6dac5bdf",
+      "source_hash": "81440776dd71189fecdd3c3654b324a446cc7319b184e496012ef999a810cd60",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "c4f6c68f944a45fe2c4c79073accfd1e67ddec0b5dac610d6b24c17be519358f",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "9d1fd4ad-2d14-4fea-b05f-5dcf53ed6872",
+      "axis_hash": "b511446f07c49484242bb45340ba97c81141032a6b7fee1a172a6f88a2ba07e5",
+      "source_hash": "7c3713ce49267c5d53f630a0cf387fe4632fd5a74d59dc72253d2a5e4d8fc7e1",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "c17e5f50-67c0-4d7e-b1e5-e60bdabd1371",
+      "axis_hash": "16479656b98f693ee52a896e695e9202df21ca6552b86a524a7746ffedaaecfb",
+      "source_hash": "36910adbbc98fa8a7719ef4d3f060dd2473241454c364c7ba10fb485b612daab",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "c9d62a39-d5c3-4c99-b2e8-a1c348ba1535",
+      "axis_hash": "1cfdd090359bc9b87fc88ee6cd7a9f09ec31bb516669172d9b3fa92b1f36a088",
+      "source_hash": "4704cd522271d53d7f0ea7ac4b1634ec16439d4f0162fa50b274c0ca1256a53e",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "b9298f5b505c0246e341e8370bddb5f79a562e869ca021360fb55da87d93d80f",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "cf32da36-f735-4f16-a918-8aa95b669e6f",
+      "axis_hash": "b0ec768c4e4541bd623d751fd8b834c84e40ddf1e762faa3fc654a0bb3788cf2",
+      "source_hash": "b707aa68a9e940a7ee32a3d2d441819379e882f96a11deae5aa19e5b57956a6b",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "3c5c551f2b9a7f5b45b6af44ea75269272913134f40f2956a3231d1dd1652b41",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "e07209b1-d103-43c3-9909-bed54539ddc6",
+      "axis_hash": "be26c95801dde728d4bdaac09998c6d82e53a8ea0115d11851ee6bde9ea4b286",
+      "source_hash": "da1d771b26653914677973e9daa8c096b836ec641affe5f8176a25985052b50d",
+      "axes": {
+        "reportVersion": "1.0.3",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 2
+      }
+    },
+    {
+      "scale_id": "e07209b1-d103-43c3-9909-bed54539ddc6",
+      "axis_hash": "c3b6b3a03f6c3d29502554ab7d3ce4b9115369262bf405780d35ec5cf2ae2aca",
+      "source_hash": "b075ccf02b28796d27de4ff692029f5859061de23dab897b27992b3d2faac897",
+      "axes": {
+        "reportVersion": "1.0.2",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "f9754f69-ee4b-4266-9b6a-a01e9b153160",
+      "axis_hash": "0a07b3263640663fdb7a919a49add90bfd07fd76428086c8cca4a0b92f10c8fb",
+      "source_hash": "5494d9f32061c44c00554b0741314e553560a035e1b080ae2a439cfa9ec964aa",
+      "axes": {
+        "reportVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 1
+      }
+    }
+  ],
+  "referenceSetCount": 0,
+  "deploymentPolicyCount": 0
+}
