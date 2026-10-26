@@ -28,19 +28,19 @@ const parseBoolean=(s:string,defaultValue:boolean):boolean|null=>{
 }
 export const parseText=(input:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
   const rows:ImportRow[]=[],issues:ImportIssue[]=[]
-  const blocks=input.replace(/\r\n?/g,'\n').trim().split(/\n\s*\n/)
-  let startLine=1
-  for(let i=0;i<blocks.length;i++){
-    const lines=blocks[i].split('\n').map(clean).filter(Boolean)
-    if(!lines.length)continue
+  const physical=input.replace(/\r\n?/g,'\n').split('\n')
+  let block:string[]=[],startLine=1
+  const flush=()=>{
+    const lines=block.map(clean).filter(Boolean)
+    if(!lines.length)return
     const prompt=lines[0]
     const options=lines.slice(1).map(x=>x.replace(/^(?:[A-Za-z0-9]{1,3}[.．)、:]\s*)/,'').trim())
-    if(!prompt){issues.push({line:i+1,message:'缺少题干'});continue}
-    const type=options.length?'SINGLE':'SHORT_TEXT'
-    if(options.length===1)issues.push({line:i+1,message:'选择题至少需要两个选项'})
-    rows.push({type,prompt,required:true,options,rows:[],reverse:false,sourceLine:startLine})
-    startLine+=blocks[i].split('\n').length+1
+    if(options.length===1)issues.push({line:startLine,message:'选择题至少需要两个选项'})
+    rows.push({type:options.length?'SINGLE':'SHORT_TEXT',prompt,required:true,options,rows:[],reverse:false,sourceLine:startLine})
+    block=[]
   }
+  physical.forEach((line,index)=>{if(line.trim()){if(!block.length)startLine=index+1;block.push(line)}else flush()})
+  flush()
   if(!rows.length)issues.push({line:1,message:'没有识别到可导入题目'})
   return {rows,issues}
 }
