@@ -7,17 +7,39 @@ import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-i
 import {readCurrentStandardCombination} from './standard-combination-source'
 import {standardCombinationPointerSchema} from './standard-combination'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
+import {canonicalHash} from '../assessment-runtime/canonical'
 export {standardCombinationPointerSchema} from './standard-combination'
 
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
-const issueSchema=z.object({requestId:uuid,userId:uuid,combinationHash:hash,grantId:uuid,
+const issueSchema=z.object({requestId:uuid,userId:uuid,combinationHash:hash,grantId:uuid.optional(),
  expectedGrantVersion:z.number().int().positive().optional(),expectedUseVersion:z.number().int().positive().optional()}).strict()
 const revokeSchema=z.object({expectedVersion:z.number().int().positive(),reason:z.string().trim().min(1).max(1000)}).strict()
-const receiptSchema=z.object({grantId:uuid,userId:uuid,combinationHash:hash,authorityGrantId:uuid,
- useVersion:z.number().int().positive(),product:z.literal('TRAINING')}).strict()
+const positive=z.number().int().positive()
+const useAuthority={useGrantId:uuid,useGrantVersion:positive,issuerId:z.string().min(1).max(240)}
+// The first branch is byte-compatible with already-frozen delegated references.
+export const trainingStandardUseAuthoritySchema=z.union([
+ z.object({...useAuthority,authorityGrantId:uuid}).strict(),
+ z.object({...useAuthority,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
+])
+const receipt={grantId:uuid,userId:uuid,combinationHash:hash,useVersion:positive,product:z.literal('TRAINING')}
+const receiptSchema=z.union([
+ z.object({...receipt,authorityGrantId:uuid}).strict(),
+ z.object({...receipt,authorityEntryGrantId:uuid,authorityEntryGrantVersion:positive}).strict(),
+])
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:15000}
-type UseRow={id:string;teacher_id:string;resource_id:string;granted_by:string;standard_combination_hash:string;authority_grant_id:string;version:number;revoked_at:Date|null}
+type UseRow={id:string;teacher_id:string;resource_id:string;granted_by:string;standard_combination_hash:string;authority_grant_id:string|null;authority_entry_grant_id:string|null;authority_entry_grant_version:number|null;version:number;revoked_at:Date|null}
 function deny(message='该精确组合的 Training 使用授权不可用'):never{throw new AdminPermissionError(403,message)}
+type AuthorityBinding={authorityGrantId:string}|{authorityEntryGrantId:string;authorityEntryGrantVersion:number}
+function binding(value:{authorityGrantId?:string|null;authorityEntryGrantId?:string|null;authorityEntryGrantVersion?:number|null}):AuthorityBinding{
+ if(value.authorityGrantId&&!value.authorityEntryGrantId&&value.authorityEntryGrantVersion==null)return {authorityGrantId:value.authorityGrantId}
+ if(!value.authorityGrantId&&value.authorityEntryGrantId&&Number.isInteger(value.authorityEntryGrantVersion)&&(value.authorityEntryGrantVersion??0)>0)
+  return {authorityEntryGrantId:value.authorityEntryGrantId,authorityEntryGrantVersion:value.authorityEntryGrantVersion!}
+ return deny('使用权分配依据不完整或混合')
+}
+const rowBinding=(row:UseRow)=>binding({authorityGrantId:row.authority_grant_id,authorityEntryGrantId:row.authority_entry_grant_id,authorityEntryGrantVersion:row.authority_entry_grant_version})
+const columns=(value:AuthorityBinding)=>'authorityGrantId'in value
+ ?{authorityGrantId:value.authorityGrantId,authorityEntryGrantId:null,authorityEntryGrantVersion:null}
+ :{authorityGrantId:null,authorityEntryGrantId:value.authorityEntryGrantId,authorityEntryGrantVersion:value.authorityEntryGrantVersion}
 
 export async function assertTrainingStandardRecipient(tx:Prisma.TransactionClient,userId:string){
  const actor=await libraryActor(tx,userId)
@@ -30,20 +52,27 @@ export async function assertTrainingStandardRecipient(tx:Prisma.TransactionClien
 export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,input:{userId:string;combination:{releaseId:string;combinationHash:string};
  measurementReleaseId:string;useGrantId?:string;useGrantVersion?:number}){
  await assertTrainingStandardRecipient(tx,input.userId)
- const [header]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,version,revoked_at
+ const [header]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version,version,revoked_at
  FROM material_grants WHERE teacher_id=${input.userId} AND resource_type='STANDARD_COMBINATION'
  AND resource_id=${input.combination.releaseId} ${input.useGrantId?Prisma.sql`AND id=${input.useGrantId}`:Prisma.empty}`)
- if(!header||header.revoked_at||header.standard_combination_hash!==input.combination.combinationHash||!header.authority_grant_id
+ if(!header||header.revoked_at||header.teacher_id!==input.userId||header.resource_id!==input.combination.releaseId||header.standard_combination_hash!==input.combination.combinationHash
   ||input.useGrantVersion!==undefined&&header.version!==input.useGrantVersion)deny()
- // The original root, never a replacement/latest root. This also checks the
- // issuer's CURRENT TRAINING entry eligibility and forbids SYSTEM distribution.
- await assertLibraryAuthority(tx,header.granted_by,input.measurementReleaseId,'material.distribute','TRAINING',header.authority_grant_id)
- const [locked]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,version,revoked_at
+ const original=rowBinding(header)
+ if('authorityEntryGrantId'in original){
+  // Never substitute a different/reissued entry role for the recorded basis.
+  const current=await assertEntryAdmin(tx,header.granted_by,'TRAINING')
+  if(current.grantId!==original.authorityEntryGrantId||current.grantVersion!==original.authorityEntryGrantVersion)deny('入口分配依据已变化')
+ }else{
+  // Keep the established legacy rule: a current formal entry admin needs no
+  // per-content approval; without that role the original exact 21B root must pass.
+  await assertLibraryAuthority(tx,header.granted_by,input.measurementReleaseId,'material.distribute','TRAINING',original.authorityGrantId)
+ }
+ const [locked]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version,version,revoked_at
  FROM material_grants WHERE id=${header.id} FOR SHARE`)
  if(!locked||locked.revoked_at||locked.version!==header.version||locked.teacher_id!==input.userId||locked.resource_id!==input.combination.releaseId
   ||locked.standard_combination_hash!==input.combination.combinationHash||locked.granted_by!==header.granted_by
-  ||locked.authority_grant_id!==header.authority_grant_id)deny()
- return {useGrantId:locked.id,useGrantVersion:locked.version,issuerId:locked.granted_by,authorityGrantId:locked.authority_grant_id}
+  ||canonicalHash(rowBinding(locked))!==canonicalHash(original))deny()
+ return {useGrantId:locked.id,useGrantVersion:locked.version,issuerId:locked.granted_by,...original}
 }
 
 export async function grantTrainingStandardCombinationUse(actorId:string,combinationId:string,raw:unknown){
@@ -54,7 +83,9 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   if(!header?.measurement_release)deny()
   await lockInstrumentSourceIdentity(tx,{instrumentKey:header.tool_key,instrumentVersion:header.instrument_version},'READ')
   const authority=await assertLibraryAuthority(tx,actorId,header.measurement_release.releaseId,'material.distribute','TRAINING',input.grantId)
-  if(!authority.grantId)deny()
+  const selected:AuthorityBinding='entryAuthority'in authority&&authority.entryAuthority
+   ?binding({authorityEntryGrantId:authority.entryAuthority.grantId,authorityEntryGrantVersion:authority.entryAuthority.version})
+   :binding({authorityGrantId:authority.grantId})
   if(input.expectedGrantVersion!==undefined&&input.expectedGrantVersion!==authority.version)deny('入口分配权限已变化')
   await assertTrainingStandardRecipient(tx,input.userId)
   const source=await readCurrentStandardCombination(tx,{releaseId:id,combinationHash:input.combinationHash})
@@ -69,7 +100,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   if(recorded){
    const receipt=receiptSchema.safeParse(recorded.metadata)
    if(recorded.actorId!==actorId||recorded.resourceId!==id||recorded.action!=='STANDARD_COMBINATION_USE_GRANTED'||!receipt.success
-    ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||receipt.data.authorityGrantId!==authority.grantId
+    ||receipt.data.userId!==input.userId||receipt.data.combinationHash!==input.combinationHash||canonicalHash(binding(receipt.data))!==canonicalHash(selected)
     ||prior?.id!==receipt.data.grantId)deny('请求编号已用于其他授权')
    return {id:prior.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
     version:receipt.data.useVersion,currentVersion:prior.version,revoked:prior.revokedAt!==null,changed:false,replayed:true}
@@ -77,17 +108,17 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   const request=await tx.materialGrant.findUnique({where:{id:input.requestId}})
   if(request&&request.id!==prior?.id)deny('请求编号已用于其他授权')
   if(prior&&!prior.revokedAt){
-   if(prior.grantedBy!==actorId||prior.authorityGrantId!==authority.grantId||prior.standardCombinationHash!==input.combinationHash)deny('已有使用权不能被其他分配身份接管')
+   if(prior.grantedBy!==actorId||canonicalHash(binding(prior))!==canonicalHash(selected)||prior.standardCombinationHash!==input.combinationHash)deny('已有使用权不能被其他分配身份接管')
    if(input.expectedUseVersion!==undefined&&input.expectedUseVersion!==prior.version)deny('使用权版本已变化')
   }
   if(prior?.revokedAt&&(input.expectedUseVersion!==prior.version||prior.standardCombinationHash!==input.combinationHash))deny('重新分配须确认已撤销的使用权版本')
   if(!prior&&input.expectedUseVersion!==undefined)deny('使用权版本已变化')
   const use=prior?prior.revokedAt?await tx.materialGrant.update({where:{id:prior.id,version:prior.version,revokedAt:{not:null}},
-   data:{revokedAt:null,version:{increment:1},grantedBy:actorId,authorityGrantId:authority.grantId}}):prior
+   data:{revokedAt:null,version:{increment:1},grantedBy:actorId,...columns(selected)}}):prior
    :await tx.materialGrant.create({data:{id:input.requestId,teacherId:input.userId,resourceType:MaterialResourceType.STANDARD_COMBINATION,
-    resourceId:id,grantedBy:actorId,authorityGrantId:authority.grantId,standardCombinationHash:input.combinationHash}})
+    resourceId:id,grantedBy:actorId,...columns(selected),standardCombinationHash:input.combinationHash}})
   await tx.assessmentManagementEvent.create({data:{id:input.requestId,actorId,resourceId:id,action:'STANDARD_COMBINATION_USE_GRANTED',
-   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,authorityGrantId:authority.grantId,useVersion:use.version,product:'TRAINING'}}})
+   metadata:{grantId:use.id,userId:input.userId,combinationHash:input.combinationHash,...selected,useVersion:use.version,product:'TRAINING'}}})
   await assertTrainingStandardUse(tx,{userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},
    measurementReleaseId:source.measurement.releaseId,useGrantId:use.id,useGrantVersion:use.version})
   return {id:use.id,userId:input.userId,combination:{releaseId:id,combinationHash:input.combinationHash},version:use.version,

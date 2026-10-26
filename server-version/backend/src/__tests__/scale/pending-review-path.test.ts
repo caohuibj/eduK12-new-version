@@ -3,6 +3,7 @@ import {prisma} from '../../config/database'
 import {localizationManifestV1Schema, parseLocalizationManifest} from '../../modules/scale/library/localization-manifest'
 import {scaleLocalizationReasons} from '../../modules/scale/policy/localization'
 import {previewScaleInstrument} from '../../modules/scale/onboarding/preview'
+import {getScaleInstrumentSource} from '../../modules/scale/onboarding/instrument-registry'
 import type {ScaleInstrumentSourceV1} from '../../modules/scale/onboarding/types'
 
 const policy = { schemaVersion: 2, revision: 1, locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE' as const], runtimePolicyHash: 'a'.repeat(64), localizationVersion: '1.0.0', inFlightCompletion: 'FROZEN_DEADLINE' as const }
@@ -95,7 +96,7 @@ describe('standard onboarding status view', () => {
     const { list } = await listStandardOnboardingStatus(prisma)
     expect(list.length).toBeGreaterThan(0)
     for (const entry of list) {
-      expect(entry.states.imported).toBe(true)
+      expect(entry.states.imported).toBe(Boolean(getScaleInstrumentSource(entry.instrumentKey, entry.instrumentVersion)?.executable))
       expect(typeof entry.stage).toBe('string')
       // Every blocker carries a located next action or is explicitly listed.
       for (const code of entry.blockers) {
@@ -105,7 +106,7 @@ describe('standard onboarding status view', () => {
       }
       // 已导入待部署 is distinct from 已发布; a published row without an
       // active deployment still reads as published, never as merely imported.
-      if (!entry.states.deployed && !entry.states.published) expect(entry.stage).toBe('已导入待部署')
+      if (!entry.states.deployed && !entry.states.published) expect(entry.stage).toBe(entry.states.imported ? '已导入待部署' : '仅目录候选')
     }
   })
 })

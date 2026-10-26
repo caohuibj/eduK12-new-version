@@ -172,6 +172,7 @@ model AdminEntryGrant {
   grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
   revokedBy String? @map("revoked_by")
   revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  standardCombinationUses MaterialGrant[] @relation("StandardCombinationEntryAuthority")
   @@unique([userId, entry], map: "admin_entry_grants_user_entry_key")
   @@map("admin_entry_grants")
 }
@@ -775,6 +776,9 @@ model MaterialGrant {
   standardCombinationHash String? @map("standard_combination_hash")
   authorityGrantId String? @map("authority_grant_id")
   standardCombinationAuthority ContentCapabilityGrant? @relation("StandardCombinationMaterialAuthority",fields:[authorityGrantId],references:[id],onDelete:Restrict)
+  authorityEntryGrantId String? @map("authority_entry_grant_id")
+  authorityEntryGrantVersion Int? @map("authority_entry_grant_version")
+  standardCombinationEntryAuthority AdminEntryGrant? @relation("StandardCombinationEntryAuthority",fields:[authorityEntryGrantId],references:[id],onDelete:Restrict)
   legacyScaleGrant Boolean @default(false) @map("legacy_scale_grant")
   id           String               @id @default(uuid())
   teacherId    String               @map("teacher_id")

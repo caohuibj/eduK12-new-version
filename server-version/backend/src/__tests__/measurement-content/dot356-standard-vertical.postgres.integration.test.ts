@@ -17,18 +17,22 @@ import {createServer,type Server} from 'node:http'
 import {writeFile} from 'node:fs/promises'
 import {describe,it,expect,beforeAll,afterAll} from 'vitest'
 const enabled=process.env.DOT356_STANDARD_VERTICAL==='1',suite=enabled?describe:describe.skip
+// Explicit continuation runs only the previously failed authority case against
+// retained synthetic ONLINE facts; it never counts the skipped main flow as new.
+const authorityContinuation=process.env.DOT356_STANDARD_AUTHORITY_CONTINUE==='1'
 const KEY='academic_self_concept_biology_zh_cn',VERSION='1.0.0'
 /** Fence runs before importing any application module. No acceptance DB access. */
 export function assertDot356VerticalIsolation(){
  const u=new URL(process.env.DATABASE_URL??'invalid:')
  if(process.env.NODE_ENV!=='test'||!enabled||!['127.0.0.1','localhost'].includes(u.hostname)||u.port!=='55439'
-  ||!['/eduk12_dot356_vertical_20261025','/eduk12_dot356_vertical_20261025_v2'].includes(u.pathname)||u.searchParams.has('host')||u.searchParams.has('schema'))throw new Error('Dedicated dot356 vertical DB and explicit opt-in required')
+  ||(!['/eduk12_dot356_vertical_20261025','/eduk12_dot356_vertical_20261025_v2'].includes(u.pathname)&&!/^\/eduk12_dot356_vertical_\d{8}_[a-f0-9]{10}$/.test(u.pathname))||u.searchParams.has('host')||u.searchParams.has('schema'))throw new Error('Dedicated dot356 vertical DB and explicit opt-in required')
  if(process.env.ADMIN_AUTH_ORIGIN!=='http://localhost:5173')throw new Error('Explicit test origin http://localhost:5173 required')
  if(process.env.ASSESSMENT_REPORT_ASYNC_ENABLED!=='false')throw new Error('Bounded vertical test requires the real synchronous report path')
 }
 suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
  let db:any,server:Server|undefined,base='',system:any,issuer:any,teacher:any,student:any,outsider:any,generateToken:any,stage='setup'
  const events:any[]=[],summary:any={sourceKey:KEY,sourceVersion:VERSION,status:'NOT_RUN',observation:'single cold synthetic run; table access is not proven redundancy'}
+ let completedCases=0
  const startedAt=performance.now(),cpuStart=process.cpuUsage(),memoryStart=process.memoryUsage()
  const proof={adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()}
  async function request(user:any,path:string,body?:unknown,expected=200){
@@ -50,10 +54,20 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
    if(!matched)v.tableAccess.other=(v.tableAccess.other??0)+1
   })
   generateToken=(await import('../../utils/jwt')).generateToken
-  if(await db.user.count()!==0||await db.scale.count()!==0)throw new Error('Fresh schema-only DB required; do not reuse a previous attempt')
-  const create=(name:string,role='STUDENT',platformRole='STANDARD')=>db.user.create({data:{username:'dot356-'+name+'-'+randomUUID(),passwordHash:'SYNTHETIC TEST ONLY',role,platformRole,accountDomain:'TRAINING',teacherApproved:role==='TEACHER'}})
-  system=await create('system','STUDENT','SYSTEM_ADMIN');issuer=await create('issuer');teacher=await create('teacher','TEACHER');student=await create('student');outsider=await create('outsider')
-  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:issuer.id,entry:'TRAINING',grantedBy:system.id}})
+  if(authorityContinuation){
+   const users=await db.user.findMany();if(users.length!==5)throw new Error('Continuation requires the retained five-user synthetic fixture')
+   const exact=(name:string)=>{const matches=users.filter((u:any)=>u.username.startsWith('dot356-'+name+'-'));if(matches.length!==1)throw new Error('Missing unique retained fixture actor');return matches[0]}
+   system=exact('system');issuer=exact('issuer');teacher=exact('teacher');student=exact('student');outsider=exact('outsider')
+   const rows=await db.$queryRaw`SELECT id,combination_hash FROM survey_standard_releases WHERE tool_key=${KEY} AND state='ONLINE'`
+   if(rows.length!==1||system.platformRole!=='SYSTEM_ADMIN'||teacher.role!=='TEACHER')throw new Error('Retained synthetic ONLINE fixture required')
+   summary.combination={releaseId:rows[0].id,combinationHash:rows[0].combination_hash}
+   summary.scope='Authority continuation only; main flow and constraints are not reexecuted or requalified here'
+  }else{
+   if(await db.user.count()!==0||await db.scale.count()!==0)throw new Error('Fresh schema-only DB required; do not reuse a previous attempt')
+   const create=(name:string,role='STUDENT',platformRole='STANDARD')=>db.user.create({data:{username:'dot356-'+name+'-'+randomUUID(),passwordHash:'SYNTHETIC TEST ONLY',role,platformRole,accountDomain:'TRAINING',teacherApproved:role==='TEACHER'}})
+   system=await create('system','STUDENT','SYSTEM_ADMIN');issuer=await create('issuer');teacher=await create('teacher','TEACHER');student=await create('student');outsider=await create('outsider')
+   await db.adminEntryGrant.create({data:{id:randomUUID(),userId:issuer.id,entry:'TRAINING',grantedBy:system.id}})
+  }
   const express=(await import('express')).default,app=express();app.use(express.json());app.use('/api',(await import('../../middleware/csrf')).csrfProtection)
   app.use('/api/platform',(await import('../../modules/survey/originGuard')).platformSurveyOriginGuard)
   app.use('/api/platform/survey-standard',(await import('../../modules/survey/standard-triplet.routes')).surveyStandardTripletRouter)
@@ -64,13 +78,14 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   server=createServer(app);await new Promise<void>(r=>server!.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+(server.address() as {port:number}).port
  },60000)
  afterAll(async()=>{
+  summary.status=completedCases===(authorityContinuation?1:3)?'PASS':'FAIL';summary.passedCases=completedCases
   summary.lastStage=stage;summary.http=events
   summary.processObservation={elapsedMs:performance.now()-startedAt,cpuMicroseconds:process.cpuUsage(cpuStart),memoryStart,memoryEnd:process.memoryUsage(),maxRssKiB:process.resourceUsage().maxRSS,scope:'whole test process, not per-request performance'}
   await writeFile(process.env.DOT356_VERTICAL_OUTPUT??'/tmp/dot356-standard-vertical-result.json',JSON.stringify(summary,null,2),{mode:0o600})
   if(server)await new Promise<void>(r=>server!.close(()=>r()))
   if(db){await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()}
  })
- it('real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R',async()=>{
+ it.skipIf(authorityContinuation)('real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R',async()=>{
   summary.status='IN_PROGRESS';stage='install-hidden-publish'
   const registry=await import('../../modules/scale/onboarding/instrument-registry')
   const onboarding=await import('../../modules/scale/onboarding/install'),publication=await import('../../modules/scale/onboarding/publish')
@@ -80,13 +95,13 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
    runtimePolicyHash:runtime.runtimePolicyHash,localizationVersion:VERSION,inFlightCompletion:'FROZEN_DEADLINE' as const}}
   expect((await onboarding.planScaleInstrumentInstall(db,install)).blockers).toEqual([])
   const installed=await onboarding.installScaleInstrument(db,install);expect(installed.scaleId).toBeTruthy()
-  const pub={instrumentKey:KEY,instrumentVersion:VERSION,actorUserId:system.id,visibility:'HIDDEN' as const}
+  const pub={instrumentKey:KEY,instrumentVersion:VERSION,actorUserId:system.id,visibility:'HIDDEN' as const,allowedProducts:['TRAINING' as const]}
   const pp=await publication.planStandardScalePublication(db,pub);expect(pp.blockers).toEqual([])
   await publication.publishStandardScale(db,{...pub,expectedProofHash:pp.proofHash})
   stage='real-three-trial-approval'
   const candidate=await request(system,`/api/platform/survey-standard/candidate/${KEY}/${VERSION}`)
   const preview=await request(system,'/api/platform/survey-standard/preview',candidate.selection)
-  const approve={...candidate.selection,expectedCombinationHash:preview.combinationHash,requestId:randomUUID(),reason:'Dedicated dot356 synthetic vertical test'}
+  const approve={...candidate.selection,expectedCombinationHash:preview.combinationHash,requestId:randomUUID(),reason:'Dedicated dot356 synthetic vertical test',allowedProducts:['TRAINING']}
   const online=await request(system,'/api/platform/survey-standard/approve',approve);expect(online.state).toBe('ONLINE')
   const pointer={releaseId:online.id,combinationHash:online.combinationHash}
   const trials=await db.$queryRaw`SELECT id,report,scores FROM survey_standard_trials WHERE release_id=${online.id}`
@@ -151,6 +166,53 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   }
   // Teacher individualInterpretations=false remains authoritative, not elevated for this test.
   await request(outsider,path,undefined,403)
-  Object.assign(summary,{status:'PASS',combination:pointer,trials:3,...stored.safe,parentStatus:parent.status,teacherReportStatus:report.contentReports[0].status,httpRequestCount:events.length})
+  Object.assign(summary,{combination:pointer,trials:3,...stored.safe,parentStatus:parent.status,teacherReportStatus:report.contentReports[0].status,httpRequestCount:events.length})
+  completedCases++
  },180000)
+ it.skipIf(authorityContinuation)('stores exactly one role/delegation basis and protects active use identity in PostgreSQL',async()=>{
+  stage='persisted-use-authority-constraints'
+  expect(summary.combination).toBeTruthy()
+  const use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:summary.combination.releaseId}}})
+  expect(use.authorityGrantId).toBeNull();expect(use.authorityEntryGrantId).toBeTruthy();expect(use.authorityEntryGrantVersion).toBe(1)
+  const root=await db.contentCapabilityGrant.findFirstOrThrow({where:{subjectId:issuer.id}})
+  for(const [delegated,entry,version]of [[null,null,null],[null,use.authorityEntryGrantId,null],[root.id,use.authorityEntryGrantId,1]]){
+   await expect(db.$executeRaw`INSERT INTO material_grants(id,teacher_id,resource_type,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version)
+    VALUES(${randomUUID()},${outsider.id},'STANDARD_COMBINATION',${use.resourceId},${issuer.id},${use.standardCombinationHash},${delegated},${entry},${version})`).rejects.toThrow('standard_combination_use_identity')
+  }
+  await expect(db.$executeRaw`UPDATE material_grants SET version=version+1,authority_entry_grant_version=authority_entry_grant_version+1 WHERE id=${use.id}`).rejects.toThrow('Exact use must transition')
+  await expect(db.$executeRaw`DELETE FROM material_grants WHERE id=${use.id}`).rejects.toThrow('history must be retained')
+  expect(await db.materialGrant.findUniqueOrThrow({where:{id:use.id}})).toEqual(use)
+  completedCases++
+ })
+ it('keeps entry-role revocation separate from explicit reissue through the original exact 21B root',async()=>{
+  stage='entry-role-and-delegation-lifecycle'
+  expect(summary.combination).toBeTruthy()
+  const pointer=summary.combination,use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:pointer.releaseId}}})
+  const standard=await (await import('../../modules/survey/standard-triplet.service')).standardReleaseRow(db,pointer.releaseId)
+  const root=await db.contentCapabilityGrant.findFirstOrThrow({where:{subjectId:issuer.id}})
+  const assertUse=()=>db.$transaction((tx:any)=>(import('../../modules/measurement-content/standard-combination-use')).then(m=>m.assertTrainingStandardUse(tx,{userId:teacher.id,combination:pointer,measurementReleaseId:standard.measurement_release!.releaseId})))
+  // Formal role alone is sufficient; no content root is sent or fabricated.
+  const replay=await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:use.id,userId:teacher.id,combinationHash:pointer.combinationHash})
+  expect(replay.replayed).toBe(true);expect(replay.version).toBe(1)
+  await request(system,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,grantId:root.id},403)
+  const changeRole=async(active:boolean,expectedVersion:number)=>{
+   const {changeEntryGrant}=await import('../../modules/admin-permissions/service')
+   await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active,expectedVersion,reason:'Isolated authority lifecycle check',actorSession:{...proof,tokenVersion:system.tokenVersion}})
+   issuer=await db.user.findUniqueOrThrow({where:{id:issuer.id}})
+  }
+  await changeRole(false,1)
+  await expect(assertUse()).rejects.toMatchObject({statusCode:403})
+  await changeRole(true,2)
+  await expect(assertUse()).rejects.toThrow('入口分配依据已变化')
+  await changeRole(false,3)
+  await request(system,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:1,reason:'Explicit synthetic reissue under delegated authority'})
+  const reissue=await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,grantId:root.id,expectedUseVersion:2})
+  expect(reissue.id).toBe(use.id);expect(reissue.version).toBe(3)
+  expect(await assertUse()).toMatchObject({authorityGrantId:root.id,useGrantVersion:3})
+  const stored=await db.materialGrant.findUniqueOrThrow({where:{id:use.id}})
+  expect(stored.authorityGrantId).toBe(root.id);expect(stored.authorityEntryGrantId).toBeNull();expect(stored.authorityEntryGrantVersion).toBeNull()
+  await request(system,`/api/admin/permissions/content-grants/${root.id}/revoke`,{expectedVersion:root.version,reason:'Synthetic delegated root withdrawal'})
+  await expect(assertUse()).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+  completedCases++
+ })
 })

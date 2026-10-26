@@ -7,4 +7,11 @@ export type StandardState={id:string;state:'APPROVED'|'TRIAL_RUNNING'|'TRIAL_FAI
 export type StandardItem={toolKey:string;instrumentVersion:string;title:string;versions:Array<Pick<VersionPart,'axis'|'version'|'hash'>>;combinationHash:string|null;blockers:string[];releases:StandardState[];tags:string[];classificationTags?:CatalogClassificationTag[]}
 export type StandardDetail={available:VersionPart[];selection:Selection;history:StandardState[];trials:Array<{releaseId:string;runId:string;caseIndex:number;recordHash:string;createdAt:string;scores?:unknown;report?:unknown}>;reference:unknown}
 export type StandardPreview={combinationHash:string;blockers:string[];title:string;parts:Record<Axis,VersionPart>;template:unknown;reference:unknown}
+export type StandardOnboardingEntry={
+ scaleId:string|null;instrumentKey:string;instrumentVersion:string;name:string;
+ measurementReleaseId:string|null;runtimePolicyHash:string|null;
+ states:{imported:boolean;localizationReview:string;expertReview:string;scientificMaturity:string|null;scientificQualified:boolean;deployed:boolean;published:boolean;visible:boolean;trainingEntry:string;surveyEntry:string;trainingEntryPaused:boolean;surveyEntryPaused:boolean};
+ stage:string;allowActivation:boolean;blockers:string[];
+ nextActions:Array<{code:string;stage:string;owner:string;next:string}>
+}
 export async function standardRequest<T>(path:string,body?:unknown):Promise<T>{const r=body===undefined?await api.get<T>('/platform/survey-standard'+path):await api.post<T>('/platform/survey-standard'+path,body);if(r.code!==0||r.data==null)throw new Error(r.message||'操作未完成');return r.data}

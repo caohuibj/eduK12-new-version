@@ -40,7 +40,7 @@ export function trainingSourceHarness(){
   const deployment:any={id:ids.deployment,scaleId:ids.scale,revision:1,status:'ACTIVE',policyJson:policy,policyHash:hashScaleDeploymentPolicy(policy),authorizationRefs:[ids.auth],createdByUserId:ids.system,
     createdAt:new Date('2020-01-01'),activatedAt:new Date('2020-01-01'),retiredAt:null}
   const h={row,release,scale,composite,principal,grants,use,auth,policy,deployment,rows:new Map([[row.id,row]]),now:new Date('2026-10-25T06:00:00Z'),
-    materialActive:true,entryActive:true,entryProduct:'TRAINING',entryRole:'STANDARD',owned:true,courseOwner:ids.owner,courseType:'TRAINING_COURSE',courseLibrary:false,
+    materialActive:true,entryActive:true,entryProduct:'TRAINING',entryRole:'STANDARD',entryGrantId:tid(90),entryGrantVersion:1,owned:true,courseOwner:ids.owner,courseType:'TRAINING_COURSE',courseLibrary:false,
     emergency:false,scaleStop:false,missingMeasurement:false,expireDuringStop:false,expireLicenseDuringStop:false,sourceChanged:false,writes:[] as string[],calls:[] as string[]}
   const db:any={
     compositeAssessment:{findUnique:vi.fn(async()=>({...structuredClone(h.composite),...(!h.owned?{createdBy:'foreign'}:{})}))},
@@ -69,7 +69,7 @@ export function trainingSourceHarness(){
       if(sql.includes('FROM material_grants WHERE id='))return h.use?.id===values[0]?[structuredClone(h.use)]:[]
       if(sql.includes('FROM content_capability_grants leaf'))return values[0]===ids.root?structuredClone(h.grants):[]
       if(sql.includes('SELECT issuer_id FROM content_capability_grants'))return [{issuer_id:h.grants.find(g=>g.id===ids.leaf)?.issuer_id??'missing'}]
-      if(sql.includes('JOIN "admin_entry_grants"'))return h.entryActive&&h.entryProduct==='TRAINING'&&h.entryRole==='STANDARD'&&values.includes(ids.issuer)?[{id:ids.issuer}]:[]
+      if(sql.includes('JOIN "admin_entry_grants"'))return h.entryActive&&h.entryProduct==='TRAINING'&&h.entryRole==='STANDARD'&&values.includes(ids.issuer)?[{id:ids.issuer,grantId:h.entryGrantId,grantVersion:h.entryGrantVersion}]:[]
       if(sql.includes('SELECT id FROM scale_deployment_policies'))return h.deployment?.status==='ACTIVE'?[{id:ids.deployment}]:[]
       if(sql.includes('FROM "scale_deployment_policies"'))return h.deployment?.status==='ACTIVE'?[structuredClone(h.deployment)]:[]
       if(sql.includes('FROM survey_standard_releases')){

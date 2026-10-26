@@ -1,0 +1,120 @@
+{
+  "kind": "recorded-local-development-results",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "base": "9e682f4dc14a1039c3d3f4d480123b316f3380c5",
+  "recordedAt": "2026-10-26T01:50:25.566005+00:00",
+  "reports": [
+    {
+      "file": "backend-status.json",
+      "sha256": "d8b5c6f0eefe3862db99b8b45a75b2305890daa60d641de81f8315cba2d207ec",
+      "success": true,
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "training-authority-unit.json",
+      "sha256": "431c8391bb80b9e0cbd9d653241220fb84caa91d56182b189bc39fc8fcfdc412",
+      "success": true,
+      "numPassedTests": 64,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "survey-integration.json",
+      "sha256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+      "success": true,
+      "numPassedTests": 10,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "pending-status-recheck.json",
+      "sha256": "4ca845348649c63e369b26ed22049953857e44a3544789b68c5b46d66716ade5",
+      "success": true,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 5
+    },
+    {
+      "file": "frontend-status-recheck.json",
+      "sha256": "020a5506b53bd274d8d171d3a9d943d1bf78fd5e7380714a10983f84e7286369",
+      "success": true,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3
+    },
+    {
+      "file": "frontend-final-affected.json",
+      "sha256": "9e2c54d14f5849d2f6f49c28434c17d36159ebb8e3fe5cba55b926e7069fdc82",
+      "success": true,
+      "numPassedTests": 9,
+      "numFailedTests": 0,
+      "numPendingTests": 12
+    },
+    {
+      "file": "training-integration.json",
+      "sha256": "8b631da17632bf4ae9f0a56a8bccb082662ca1baf09154fb2c65514527776188",
+      "success": false,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    {
+      "file": "training-integration-2.json",
+      "sha256": "936fba41b3d1c4585f97551fb3449704b52358342511c31a55ba0431611ad36f",
+      "success": false,
+      "numPassedTests": 0,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    {
+      "file": "training-integration-3.json",
+      "sha256": "85934f278eedf43ece861de57435e29732ef142f5b3f0ad1724f4763e39196f0",
+      "success": false,
+      "numPassedTests": 2,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    {
+      "file": "training-integration-4.json",
+      "sha256": "ae5b0bae2380f5411da647125d7b69496d2d4273ddee82dcbed464afad3b50a5",
+      "success": true,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 2
+    },
+    {
+      "file": "authority-migration-upgrade.json",
+      "sha256": "e436e5a7de838dc6189ea32d5b020f5e81967df0281ec598cfabfd612d73b880",
+      "status": "PASS",
+      "oldDelegatedRowUnchanged": true,
+      "newRoleFieldsNull": true
+    }
+  ],
+  "sourceSnapshotRecordedAfterExecution": {
+    "server-version/backend/prisma/migrations/20261026010000_standard_combination_entry_authority/migration.sql": "eb0e9c94b0d13c39cb8e5284cf19d939c28c2d76c6207a44747ef6e79138d9d7",
+    "server-version/backend/prisma/schema.prisma": "6533527006c1fb08ef30f779d007c5be6e1a5f212dce0fd1e567056b558393a2",
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts": "cefd0b713bb5d4053e662c64a1248eef0831544bead4c69da758fc20ec014411",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": "e48805f840e101b64ef38a27db878688e7dca8206851fca6c4eb3ff855694775",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": "0cedf64bc638f064f086eaf1e31d9596a6aa5e5b0cdbf1fc975af9d06885d279",
+    "server-version/backend/src/__tests__/scale/onboarding-status.test.ts": "61f64331dd829bc75b268f7b0ff5f5bc3630a1ffa8ab597b9889a9cccaae97c2",
+    "server-version/backend/src/__tests__/scale/pending-review-path.test.ts": "b9a95e94aa96cba296a91dda08cb7e0189ab5ff5b8ca4d3506baa0e0f74342ef",
+    "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts": "bb59fe986d02ef6c240796ef3f77d36969b89c3b72d4216130d40850bc5ed2c1",
+    "server-version/backend/src/modules/composite/training-standard-combination.ts": "53615ca466511ba2a64e9f8d27e0ba000f6a06bf99783ae57fce9b8b53714cbd",
+    "server-version/backend/src/modules/measurement-content/standard-combination-use.ts": "696447ca4702f28c81f09d1aeedfd26edff9f81a8db61347b9581703f7d27f1c",
+    "server-version/backend/src/modules/scale/onboarding/status.ts": "c8fc83bb3fe5f6209b4139acb2c81891eb56bee92f71b3037804ea332f1163f3",
+    "server-version/frontend/src/api/surveyStandard.ts": "7b6c9d480d81f08b3c82eeee54a064e12d9cfad3cdfbf9229eacbb0d032f8210",
+    "server-version/frontend/src/pages/admin/StandardOnboardingStatus.test.tsx": "ca195504993c81636c680b7952037f334273f03a732518424813c6464c9a292c",
+    "server-version/frontend/src/pages/admin/StandardOnboardingStatus.tsx": "2d92d433b2bee4b7db631d5c21bc94a561002400b6ec84d1d9798dd5b48b37d6",
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": "718efff4846795bda5282f4328e4b99263ea11b97e86e8b3df4bf75d6429e51f",
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": "cd7451a5faede30f8e96bb9be14f60e65f5820b96bf45dc6d3469fe882ce8295"
+  },
+  "limits": [
+    "Reports preserve failed invocations and filtered/skipped cases.",
+    "Training report 3 supplies two passes; report 4 supplies only the disjoint authority-lifecycle pass.",
+    "Frontend initial reporter was terminal output (19 passed, 1 failed), not a saved JSON report; 12 unchanged assertions were not repeated.",
+    "Source hashes were recorded after execution, not contemporaneously signed. No formal CI qualification, full regression, performance, production upgrade, recovery or deployment is claimed."
+  ]
+}

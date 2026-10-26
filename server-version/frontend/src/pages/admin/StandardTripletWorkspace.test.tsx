@@ -12,7 +12,7 @@ async function open(){render(<StandardTripletWorkspace authored={<p>旧入库页
 describe('standard workflow and unified management design UI',()=>{
  it('loads only read-only catalog and defers details until expansion',async()=>{render(<StandardTripletWorkspace authored={null}/>);await screen.findByText('示例量表');expect(mock.api).toHaveBeenCalledTimes(1);expect(screen.getByText('示例量表').closest('details')).not.toHaveAttribute('open');expect(mock.api.mock.calls.every(c=>c[1]===undefined)).toBe(true)})
  it('allows explicit no-report selection and invalidates prior preview',async()=>{await open();fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对');fireEvent.change(screen.getByLabelText('文字报告版本'),{target:{value:'empty-report'}});expect(screen.queryByText('三份版本对应关系已核对')).not.toBeInTheDocument();expect(screen.getByRole('button',{name:'批准并试运行，通过后上线'})).toBeDisabled();expect(mock.api.mock.calls.some(c=>String(c[0]).includes('approve'))).toBe(false)})
- it('requires explicit approval confirmation and never grants researcher use',async()=>{await open();fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'核对三份版本'}});fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对');vi.spyOn(window,'confirm').mockReturnValueOnce(false);fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await waitFor(()=>expect(window.confirm).toHaveBeenCalled());expect(mock.api.mock.calls.some(c=>/approve|grants/.test(String(c[0])))).toBe(false)})
+ it('requires explicit approval confirmation and never grants researcher use',async()=>{await open();fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'核对三份版本'}});fireEvent.click(screen.getByRole('checkbox',{name:'Survey'}));fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对');vi.spyOn(window,'confirm').mockReturnValueOnce(false);fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await waitFor(()=>expect(window.confirm).toHaveBeenCalled());expect(mock.api.mock.calls.some(c=>/approve|grants/.test(String(c[0])))).toBe(false)})
  it('displays unified roles and both composition types without mutation',async()=>{render(<StandardTripletWorkspace authored={null}/>);await screen.findByText('示例量表');fireEvent.click(screen.getByRole('button',{name:'权限与授权'}));expect(await screen.findByRole('heading',{name:'系统与四个入口管理员的权限边界'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'School 管理员'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'Teacher 管理员'})).toBeVisible();expect(screen.getByText('单纯组合')).toBeVisible();expect(screen.getByText('组合包')).toBeVisible();expect(screen.getByText('规则已确认，运行入口尚未接通')).toBeVisible();expect(mock.api.mock.calls.every(c=>c[1]===undefined)).toBe(true)})
 })
 
@@ -208,4 +208,58 @@ describe('standard catalog server-side classification search',()=>{
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect(screen.getByRole('button',{name:'刷新'})).toBeEnabled()
  })
+})
+
+describe('explicit standard product entry selection',()=>{
+ it.each([['TRAINING'],['SURVEY'],['TRAINING','SURVEY']])('submits exactly the selected entry scope %j without assigning use',async(...products)=>{
+  // it.each passes row elements as arguments; each row is one explicit scope.
+  const selected=products.filter((value):value is string=>typeof value==='string')
+  await open()
+  fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'审核精确入口'}})
+  fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对')
+  const approve=screen.getByRole('button',{name:'批准并试运行，通过后上线'})
+  expect(approve).toBeDisabled()
+  for(const product of selected)fireEvent.click(screen.getByRole('checkbox',{name:product==='TRAINING'?'Training':'Survey'}))
+  expect(approve).toBeEnabled()
+  vi.spyOn(window,'confirm').mockReturnValue(true)
+  mock.api.mockImplementation(async(path:string)=>{
+   if(path==='/approve')return {state:'ONLINE'}
+   if(path.startsWith('/catalog'))return {list:[row],hasMore:false}
+   if(path.startsWith('/candidate'))return detail
+   throw new Error('Unexpected request '+path)
+  })
+  fireEvent.click(approve)
+  await waitFor(()=>expect(mock.api.mock.calls.some(call=>call[0]==='/approve')).toBe(true))
+  const body=mock.api.mock.calls.find(call=>call[0]==='/approve')![1]
+  expect(body.allowedProducts).toEqual([...selected].sort())
+  expect(mock.api.mock.calls.some(call=>String(call[0]).includes('grant'))).toBe(false)
+  await screen.findByText('已上线；未创建研究者授权。')
+ })
+ it('fetches onboarding status only after selecting the read-only tab',async()=>{
+  await open();expect(mock.api).not.toHaveBeenCalledWith('/onboarding-status')
+  mock.api.mockImplementation(async(path:string)=>{if(path==='/onboarding-status')return {list:[]};throw new Error('Unexpected request '+path)})
+  fireEvent.click(screen.getByRole('button',{name:'接入状态'}))
+  expect(await screen.findByRole('heading',{name:'标准量表接入状态'})).toBeVisible()
+  expect(await screen.findByText('尚无标准量表接入记录。')).toBeVisible()
+  expect(mock.api.mock.calls.filter(call=>call[0]==='/onboarding-status')).toEqual([['/onboarding-status']])
+ })
+})
+
+it('keeps one approval intent after an uncertain result and refuses a changed entry scope',async()=>{
+ await open()
+ fireEvent.change(screen.getByLabelText('本次操作原因'),{target:{value:'核对入口'}})
+ fireEvent.click(screen.getByRole('checkbox',{name:'Training'}))
+ fireEvent.click(screen.getByRole('button',{name:'核对三份版本'}));await screen.findByText('三份版本对应关系已核对')
+ vi.spyOn(window,'confirm').mockReturnValue(true)
+ const original=mock.api.getMockImplementation()!
+ let firstBody:any
+ mock.api.mockImplementation(async(path:string,body?:unknown)=>{if(path==='/approve'){firstBody=body;throw new Error('网络结果未知')}return original(path,body)})
+ fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await screen.findByText(/网络结果未知/)
+ fireEvent.click(screen.getByRole('checkbox',{name:'Survey'}))
+ fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await screen.findByText(/不能更换入口范围/)
+ expect(mock.api.mock.calls.filter(call=>call[0]==='/approve')).toHaveLength(1)
+ fireEvent.click(screen.getByRole('checkbox',{name:'Survey'}))
+ mock.api.mockImplementation(async(path:string,body?:unknown)=>{if(path==='/approve'){expect(body).toEqual(firstBody);return {state:'ONLINE'}}return original(path,body)})
+ fireEvent.click(screen.getByRole('button',{name:'批准并试运行，通过后上线'}));await screen.findByText('已上线；未创建研究者授权。')
+ expect(sessionStorage.getItem('survey-triplet-approval:combo')).toBeNull()
 })

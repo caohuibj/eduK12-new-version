@@ -145,6 +145,30 @@ describe('Training consumes one exact shared combination through one user Materi
 })
 
 describe('the persisted Training source is exact, while live use remains current',()=>{
+ it('freezes formal entry authority without inventing a delegated content root',async()=>{
+  const f=trainingSourceHarness()
+  f.h.grants=[];f.h.use.authority_grant_id=null
+  Object.assign(f.h.use,{authority_entry_grant_id:f.h.entryGrantId,authority_entry_grant_version:1})
+  const source=await run(f)
+  expect(source.reference.authority).toEqual({useGrantId:ids.leaf,useGrantVersion:1,issuerId:ids.issuer,authorityEntryGrantId:f.h.entryGrantId,authorityEntryGrantVersion:1})
+  expect(source.reference.authority).not.toHaveProperty('authorityGrantId')
+  expect(decodeTrainingStandardItemSource(source)).toEqual(source)
+  expect(f.h.calls.some(sql=>sql.includes('FROM content_capability_grants leaf'))).toBe(false)
+ })
+ it.each(['missing-role','wrong-entry','system-issuer','replaced-role','reissued-role','mixed-bases','partial-basis'])(
+  'does not substitute a changed or malformed formal entry basis: %s',async field=>{
+   const f=trainingSourceHarness();f.h.use.authority_grant_id=null
+   Object.assign(f.h.use,{authority_entry_grant_id:f.h.entryGrantId,authority_entry_grant_version:1})
+   if(field==='missing-role')f.h.entryActive=false
+   if(field==='wrong-entry')f.h.entryProduct='SURVEY'
+   if(field==='system-issuer')f.h.entryRole='SYSTEM_ADMIN'
+   if(field==='replaced-role')f.h.entryGrantId=tid(99)
+   if(field==='reissued-role')f.h.entryGrantVersion=3
+   if(field==='mixed-bases')f.h.use.authority_grant_id=ids.root
+   if(field==='partial-basis')f.h.use.authority_entry_grant_version=null
+   await expect(run(f)).rejects.toMatchObject({statusCode:403})
+   expect(f.h.writes).toEqual([])
+  })
  it.each(['compositeId','itemId','scaleId','ownerId'] as const)('refuses a changed %s context before SQL',async field=>{
   const f=trainingSourceHarness(),source=await run(f),context={compositeId:ids.composite,itemId:ids.item,scaleId:ids.scale,ownerId:ids.owner,[field]:tid(99)}
   f.h.calls=[]

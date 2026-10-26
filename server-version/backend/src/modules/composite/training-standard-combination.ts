@@ -5,7 +5,7 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import {ContentReleaseError,prepareRelease} from '../measurement-content/release'
 import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {standardAxisHashes,standardCombinationHash} from '../measurement-content/standard-combination'
-import {assertTrainingStandardUse,standardCombinationPointerSchema} from '../measurement-content/standard-combination-use'
+import {assertTrainingStandardUse,standardCombinationPointerSchema,trainingStandardUseAuthoritySchema} from '../measurement-content/standard-combination-use'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
@@ -22,7 +22,7 @@ const axis=z.object({version:text,axisHash:hash,sourceVersion:text}).strict()
 export const trainingStandardReferenceSchema=z.object({schemaVersion:z.literal(1),compositeId:uuid,itemId:uuid,ownerId:text,scaleId:uuid,
  combination:standardCombinationPointerSchema.extend({toolKey:text,instrumentVersion:text,axes:z.object({CONTENT:axis,PARAMETERS:axis,REPORT:axis}).strict()}).strict(),
  measurement:z.object({releaseId:uuid,contentHash:hash,measurementHash:hash}).strict(),
- authority:z.object({useGrantId:uuid,useGrantVersion:z.number().int().positive(),issuerId:text,authorityGrantId:uuid}).strict(),reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
+ authority:trainingStandardUseAuthoritySchema,reportDisclosure:z.literal('EXISTING_TRAINING_POLICY'),
 }).strict()
 export const trainingStandardItemSourceSchema=z.object({reference:trainingStandardReferenceSchema,referenceHash:hash}).strict()
 export type TrainingStandardReference=z.infer<typeof trainingStandardReferenceSchema>

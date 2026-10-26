@@ -1,6 +1,6 @@
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { readToolPolicies } from '../../assessment-governance/tool-entry-policy'
-import { getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentSource, listScaleInstrumentSources } from './instrument-registry'
 import { previewScaleInstrument } from './preview'
 import { scaleSourcePolicyIdentity } from './source-snapshot'
 import { localizationNextActions } from '../policy/localization'
@@ -31,7 +31,7 @@ const blockerNextAction = (code: string): { stage: string; owner: string; next: 
   localizationNextActions[code] ?? admissionNextActions[code]
 
 export interface StandardOnboardingEntry {
-  scaleId: string
+  scaleId: string | null
   instrumentKey: string
   name: string
   instrumentVersion: string
@@ -49,6 +49,8 @@ export interface StandardOnboardingEntry {
     visible: boolean
     trainingEntry: string
     surveyEntry: string
+    trainingEntryPaused: boolean
+    surveyEntryPaused: boolean
   }
   stage: string
   allowActivation: boolean
@@ -61,10 +63,22 @@ export interface StandardOnboardingEntry {
  * deployment / publication / product entry); the page explains where each
  * blocker lives and what the next action is. */
 export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: StandardOnboardingEntry[] }> => {
-  const rows = await db.$queryRaw<Array<{ id: string; code: string; name: string; instrument_version: string; status: string; visibility: string; measurement_release_id: string | null }>>(
+  type Row = { id: string | null; code: string; name: string; instrument_version: string; status: string; visibility: string; measurement_release_id: string | null }
+  const installed = await db.$queryRaw<Row[]>(
     Prisma.sql`SELECT id, code, name, instrument_version, status::text, visibility::text, measurement_release_id FROM scales WHERE instrument_class='STANDARD' ORDER BY code, instrument_version`)
+  // Pending translations cannot be installed yet. They still need a row in the
+  // governance view; an installed-only query hides precisely those blockers.
+  const byVersion = new Map(installed.map(row => [JSON.stringify([row.code, row.instrument_version]), row]))
+  for (const source of listScaleInstrumentSources()) {
+    const key = JSON.stringify([source.identity.instrumentKey, source.identity.instrumentVersion])
+    if (!byVersion.has(key)) byVersion.set(key, {
+      id: null, code: source.identity.instrumentKey, instrument_version: source.identity.instrumentVersion,
+      name: source.catalog.identity.canonicalName, status: 'NOT_INSTALLED', visibility: 'HIDDEN', measurement_release_id: null,
+    })
+  }
+  const rows = [...byVersion.values()].sort((a, b) => a.code.localeCompare(b.code) || a.instrument_version.localeCompare(b.instrument_version))
   const deployments = new Map<string, Awaited<ReturnType<typeof readActiveScaleDeployment>>>()
-  for (const row of rows) deployments.set(row.id, await readActiveScaleDeployment(db, row.id))
+  for (const row of rows) if (row.id) deployments.set(row.id, await readActiveScaleDeployment(db, row.id))
   const identities = rows.flatMap(row => {
     const source = getScaleInstrumentSource(row.code, row.instrument_version)
     return source ? [scaleSourcePolicyIdentity(source)] : []
@@ -73,11 +87,11 @@ export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: Stan
   const surveyPolicies = await readToolPolicies(db, identities, 'SURVEY')
   const list = rows.map(row => {
     const source = getScaleInstrumentSource(row.code, row.instrument_version)
-    const deployment = deployments.get(row.id) ?? null
-    const preview = source && source.executable ? previewScaleInstrument({
+    const deployment = row.id ? deployments.get(row.id) ?? null : null
+    const preview = source ? previewScaleInstrument({
       source,
-      locale: deployment?.policy.locale ?? 'zh-CN',
-      territory: deployment?.policy.territory ?? 'CN',
+      locale: deployment?.policy.locale ?? source.localization?.targetLocale ?? 'zh-CN',
+      territory: deployment?.policy.territory ?? source.scientificReview?.territory ?? 'CN',
       deploymentModes: deployment?.policy.deploymentModes ?? ['STANDALONE'],
     }) : null
     const identity = source ? scaleSourcePolicyIdentity(source) : null
@@ -86,9 +100,13 @@ export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: Stan
       return (product === 'TRAINING' ? trainingPolicies : surveyPolicies).get(identity.resourceKey + ':' + identity.fingerprint)
     }
     const qualification = source ? evaluateScaleSourceScientificQualification(source) : null
-    const blockers = preview?.blockers ?? (source ? [] : ['EXECUTABLE_SOURCE_MISSING'])
+    const blockers = [...new Set([
+      ...(preview?.blockers ?? ['EXECUTABLE_SOURCE_MISSING']),
+      ...(!row.id ? ['SCALE_NOT_INSTALLED'] : !deployment ? ['DEPLOYMENT_BINDING_MISSING'] : []),
+    ])]
+    const trainingPolicy = policyFor('TRAINING'), surveyPolicy = policyFor('SURVEY')
     const states = {
-      imported: Boolean(source),
+      imported: Boolean(source?.executable),
       localizationReview: source?.localization?.reviewStatus ?? 'LOCALIZATION_MISSING',
       expertReview: source?.localization?.expertReviewStatus ?? 'NOT_ESTABLISHED',
       scientificMaturity: source?.catalog.scientificMaturity ?? null,
@@ -96,8 +114,10 @@ export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: Stan
       deployed: Boolean(deployment),
       published: row.status === 'PUBLISHED',
       visible: row.visibility !== 'HIDDEN',
-      trainingEntry: policyFor('TRAINING')?.decision ?? 'PENDING',
-      surveyEntry: policyFor('SURVEY')?.decision ?? 'PENDING',
+      trainingEntry: trainingPolicy?.decision ?? 'PENDING',
+      surveyEntry: surveyPolicy?.decision ?? 'PENDING',
+      trainingEntryPaused: trainingPolicy?.paused ?? false,
+      surveyEntryPaused: surveyPolicy?.paused ?? false,
     }
     return {
       scaleId: row.id, instrumentKey: row.code, name: row.name, instrumentVersion: row.instrument_version,
@@ -106,10 +126,10 @@ export const listStandardOnboardingStatus = async (db: Db): Promise<{ list: Stan
       states,
       stage: states.published && states.visible ? '已发布'
         : states.published ? '已发布（隐藏）'
-        : states.deployed ? '可部署（未发布）'
+        : states.deployed ? '已配置部署（未发布）'
         : states.imported ? '已导入待部署'
         : '仅目录候选',
-      allowActivation: preview?.allowActivation ?? false,
+      allowActivation: Boolean(deployment && preview?.allowActivation),
       blockers,
       nextActions: blockers.flatMap(code => {
         const action = blockerNextAction(code)
