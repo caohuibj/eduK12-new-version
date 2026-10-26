@@ -2235,15 +2235,28 @@ jobs:
   pr356-images:
     name: PR356 / build each affected production component once
     needs: pr356-source
+    outputs:
+      images_artifact_id: ${{ steps.images-upload.outputs.artifact-id }}
+      dist_artifact_id: ${{ steps.dist-upload.outputs.artifact-id }}
+      images_artifact_name: ${{ steps.producer.outputs.images }}
+      dist_artifact_name: ${{ steps.producer.outputs.dist }}
+      producer_attempt: ${{ steps.producer.outputs.attempt }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
+      - name: bind the actual producer attempt
+        id: producer
+        run: |
+          echo "attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+          echo "images=pr356-images-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+          echo "dist=pr356-dist-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
       - name: compile and retain backend worker and frontend images
         run: python3 .github/scripts/pr356-qualification.py images
       - uses: actions/upload-artifact@v4
+        id: images-upload
         if: always()
         with:
           name: pr356-images-${{ github.run_id }}-${{ github.run_attempt }}
@@ -2254,6 +2267,7 @@ jobs:
           compression-level: 0
           retention-days: 3
       - uses: actions/upload-artifact@v4
+        id: dist-upload
         if: success()
         with:
           name: pr356-dist-${{ github.run_id }}-${{ github.run_attempt }}
@@ -2271,11 +2285,12 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: pr356-images-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.pr356-images.outputs.images_artifact_name }}
           path: pr356-evidence
       - name: load original producer bytes without rebuilding
         env:
           SOURCE_HEAD: ${{ github.sha }}
+          PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
         run: |
           python3 - <<'PYCODE'
           import json,hashlib,os
@@ -2284,6 +2299,7 @@ jobs:
               proof=json.loads(Path('pr356-evidence/'+c+'-archive.json').read_text())
               assert proof['sourceHead']==os.environ['SOURCE_HEAD'] and proof['run']==os.environ['GITHUB_RUN_ID']
               assert proof['tag']=='pr356-'+c+':'+os.environ['SOURCE_HEAD']
+              assert proof['attempt']==os.environ['PRODUCER_ATTEMPT']
               with Path('pr356-evidence/'+c+'.tar').open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==proof['sha256']
           PYCODE
           docker load --input pr356-evidence/backend.tar
@@ -2331,6 +2347,7 @@ jobs:
     env:
       PR356_EVIDENCE_DIR: pr356-evidence
       CI_SOURCE_HEAD: ${{ github.sha }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -2340,7 +2357,7 @@ jobs:
           node-version: '24.21.0'
       - uses: actions/download-artifact@v4
         with:
-          name: pr356-dist-${{ github.run_id }}-${{ github.run_attempt }}
+          name: ${{ needs.pr356-images.outputs.dist_artifact_name }}
           path: pr356-evidence
       - name: prepare pinned browser tools from official sources
         run: |

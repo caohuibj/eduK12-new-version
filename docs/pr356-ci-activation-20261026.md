@@ -34,3 +34,7 @@ Source 5 分钟、audit 8 分钟、隔离 DB 20 分钟、两镜像 25 分钟、r
 候选拒绝契约 4/4；受修改分类器的直接消费者 29/29；固定官方 actionlint 1.7.7 在修正 job 上下文后无错误；新增 Node 文件与 Python AST 可解析。主 CI reusable 引用集合未增加。原始开发 reporter 25 份 digest 读回一致，其中 10 份含原失败，均原样保留。
 
 main 旧数据夹具在现有独立本地 PG 的新库中准备。提前发现并保留：旧 fixture 缺 allowedProducts、重复写入已获批准的入口策略、两个 Survey 开关未完整接线；已按实际 main 源合同修正。仅继续未完成的公开准入→FINAL，真实生成了一份旧格式加密组合报告，并恢复当前 Prisma client。此为 setup 预检，不宣称 CI/230→237 升级还原已经通过；升级还原留到 Actions 唯一执行。失败库及各轮日志均保留，未删除或重写生命周期状态。没有把这些本地准备问题伪称 Actions 失败，因此没有创建 Notion CI 事故。
+
+## 2026-10-26 独立复核后的产物 attempt 修正
+
+成立：仅重跑失败的扫描/浏览器时，consumer 的 run_attempt 会变化；原先由 consumer 拼接 attempt 名称会找不到首次成功构建的产物。现由成功的 images producer 输出两个不可变 artifact ID、唯一名称和其实际 producer_attempt；consumer 只按 needs 中的 producer 原名称下载同 run 的不可变产物，核对原 head/run/producer attempt、镜像 tar SHA 或 frontend 文件清单。producer 第 1 次成功、consumer 第 2 次重跑仍指向第 1 次产物；不重编译。失败 producer 的输出不能使消费者或汇总成功。没有为了演示重跑而故意启动失败 CI，也不宣称已做过真实 retry。

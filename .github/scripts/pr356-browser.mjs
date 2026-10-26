@@ -1,7 +1,7 @@
 const binding={browserOrigin:'https://training.eduk12.top'};
 import assert from 'node:assert/strict';import {createServer} from 'node:http';import {readFileSync,existsSync,mkdirSync,writeFileSync} from 'node:fs';import {resolve,extname} from 'node:path';import {chromium} from '../release-tools/node_modules/playwright-core/index.mjs';import {createHash} from 'node:crypto';const sha=b=>createHash('sha256').update(b).digest('hex'),out=process.env.PR356_EVIDENCE_DIR||'pr356-evidence';
 
-const root=resolve(out+'/dist'),manifest=JSON.parse(readFileSync(out+'/frontend-dist.json'));assert.equal(manifest.head,process.env.GITHUB_SHA);assert.equal(manifest.sourceHead,process.env.GITHUB_SHA);assert.equal(manifest.run,process.env.GITHUB_RUN_ID);
+const root=resolve(out+'/dist'),manifest=JSON.parse(readFileSync(out+'/frontend-dist.json'));assert.equal(manifest.head,process.env.GITHUB_SHA);assert.equal(manifest.sourceHead,process.env.GITHUB_SHA);assert.equal(manifest.run,process.env.GITHUB_RUN_ID);assert.equal(manifest.attempt,process.env.PR356_PRODUCER_ATTEMPT);
 for(const[p,h]of Object.entries(manifest.files)){const bytes=readFileSync(root+'/'+p);assert.equal(sha(bytes),h.sha256);assert.equal(bytes.length,h.bytes);}
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.json':'application/json'};
 const server=createServer((req,res)=>{const p=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!p.startsWith(root+'/')&&p!==root){res.writeHead(403).end();return}const file=existsSync(p)&&extname(p)?p:root+'/index.html';try{res.setHeader('content-type',mime[extname(file)]||'application/octet-stream');res.end(readFileSync(file))}catch{res.writeHead(404).end()}});
