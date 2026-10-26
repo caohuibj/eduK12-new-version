@@ -4,23 +4,23 @@ import {RecognitionCapture} from './capture'
 import {RecognitionSaveQueue} from './save-queue'
 import {RecognitionSession} from './session'
 import {validateContext,decodeAssets} from './assets'
-import type {RecognitionContext,RecognitionPorts,CapturedRecord} from './contracts'
+import type {RecognitionContext,RecognitionPorts,CapturedRecord,LocalReceipt} from './contracts'
 import {sealDigest} from './digest'
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve()}
 function context():RecognitionContext {
  const request={profile:'experience' as const,seed:'recognition-golden',formalAssetIds:Array.from({length:184},(_,i)=>'logic-'+i),practiceAssetIds:Array.from({length:6},(_,i)=>'practice-'+i)}
  const f=freezeCandidate(request)
  return {contextKey:'attempt-one',configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),manifestHash:f.snapshotHash,randomSeed:request.seed,
-  config:{...request,imageMs:750,isiMs:800,responseRule:'image-and-following-isi-half-open-0.1.0',generatorVersion:'seeded-blocks-0.1.0'} as any,
+  config:{...request,imageMs:750,isiMs:800,responseRule:'image-and-following-isi-half-open-0.1.0',generatorVersion:'seeded-blocks-0.1.0',qualityRule:'product-session-descriptive-0.2.0',assetManifestBinding:{status:'authorized',manifestHash:'c'.repeat(64),evidenceRef:'synthetic-test-evidence'}} as any,
   manifest:f.manifest,presentationApproval:'recognition-300-css-single-seen-20261026',
   assetManifest:{status:'authorized',manifestHash:'c'.repeat(64),evidenceRef:'synthetic-test-evidence',assets:[...new Set([...f.manifest.formal.map(x=>x.assetId),...request.practiceAssetIds])].map(assetId=>({assetId,sha256:'d'.repeat(64),url:'data:image/svg+xml,fixture',width:512,height:512}))}}
 }
 function ports():RecognitionPorts {return {prepareLocalAttempt:vi.fn(async c=>({contextKey:c.contextKey,bindingDigest:sealDigest(c),fresh:true as const})),
  persistLocalDraft:vi.fn(async r=>({contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true as const})),
- finalize:vi.fn(async i=>({contextKey:i.contextKey,manifestHash:i.manifestHash,finalPayloadDigest:i.finalPayloadDigest,formalCount:i.formalCount,practiceCount:i.practiceCount,finalSaved:true as const,receiptId:'synthetic-final',report:{state:'limited' as const,
+ finalize:vi.fn(async i=>({contextKey:i.contextKey,manifestHash:i.manifestHash,finalPayloadDigest:i.finalPayloadDigest,formalCount:i.formalCount,practiceCount:i.practiceCount,finalSaved:true as const,receiptId:'synthetic-final',report:{state:'limited' as const,profile:'experience' as const,reportVersion:'0.2.0' as const,scoringVersion:'0.2.0' as const,qualityRule:'product-session-descriptive-0.2.0' as const,configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),assetManifestHash:'c'.repeat(64),interpretationScope:'this-session-descriptive-only' as const,
  hitRate:null,falseAlarmRate:null,correctedRecognitionRate:null,targetHits:null,targetFalseAlarms:null,denominator:null,
  completeTargetPairs:20,plannedTargetPairs:20,receivedTrialCount:i.formalCount,expectedTrialCount:100,
- reasons:['quality-review-required'],canGenerateTakeHomeImage:false,logo:'EDUK12.TOP'}}))}}
+ reasons:['quality-review-required'],canGenerateTakeHomeImage:false as const,logo:'EDUK12.TOP' as const}}))}}
 function record(i=0):CapturedRecord {const c=new RecognitionCapture(i,'id-'+i,'target-first',100+i*1550);c.tick(850+i*1550);c.tick(1650+i*1550)
  return {contextKey:'attempt-one',recordKey:'formal:'+i,binding:{configHash:'a'.repeat(64),protocolSignature:'b'.repeat(64),manifestHash:'c'.repeat(64),assetManifestHash:'d'.repeat(64),randomSeed:'test'},phase:'formal',envelope:c.envelope(),note:{stopReason:null,synthetic:true,unassignedBoundaryEvents:[],allEvents:[],actualExposure:{imageOnsetMs:100+i*1550,imageOffsetMs:850+i*1550,windowEndMs:1650+i*1550},realm:{timeOriginMs:1000,pageInstanceId:'test-page'}}}}
 describe('recognition actual capture',()=>{
@@ -69,7 +69,7 @@ describe('recognition bound assets',()=>{
   expect(()=>validateContext(c)).toThrow()
  })
  it('synthetic rights never unlock formal mode, but explicit review mode remains marked',()=>{
-  const c=context();c.assetManifest.status='synthetic-review-only';expect(()=>validateContext(c)).toThrow();expect(validateContext(c,true).assetManifest.status).toBe('synthetic-review-only')
+  const c=context();c.assetManifest.status='synthetic-review-only';c.config.assetManifestBinding.status='synthetic-review-only';expect(()=>validateContext(c)).toThrow();expect(validateContext(c,true).assetManifest.status).toBe('synthetic-review-only')
  })
  it('decode failure blocks all exposure, with no fallback image',async()=>{
   const c=context();await expect(decodeAssets(c,()=>({set src(_s:string){},decode:async()=>{throw Error('bad image')}} as unknown as HTMLImageElement))).rejects.toThrow()
@@ -78,12 +78,12 @@ describe('recognition bound assets',()=>{
 describe('recognition local durability queue',()=>{
  it('serializes local writes, requires matching receipt, retains identical failed record for retry',async()=>{
   const seen:CapturedRecord[]=[],failure=vi.fn();let fail=true
-  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);if(fail)throw Error('local failed');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true}},failure)
+  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);if(fail)throw Error('local failed');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true as const}},failure)
   q.enqueue(record());q.enqueue(record(1));await flush();expect(q.pendingCount).toBe(2);expect(failure).toHaveBeenCalledTimes(1)
   fail=false;await q.retry();await q.idle();expect(q.retained).toHaveLength(2);expect(seen[0]).toEqual(seen[1]);expect(seen.map(r=>r.recordKey)).toEqual(['formal:0','formal:0','formal:1'])
  })
  it('bounds pending drafts, detects replaced exposure/context and rejects false durable receipts',async()=>{
-  const q=new RecognitionSaveQueue('attempt-one',async()=>({contextKey:'other',recordKey:'wrong',recordDigest:'wrong',retained:true}),()=>{})
+  const q=new RecognitionSaveQueue('attempt-one',async()=>({contextKey:'other',recordKey:'wrong',recordDigest:'wrong',retained:true as const}),()=>{})
   for(let i=0;i<5;i++)q.enqueue(record(i));expect(q.pendingCount).toBe(5);expect(q.failed).not.toBeNull();expect(()=>q.enqueue(record(5))).toThrow()
   const changed=record();changed.envelope.payload.events.push({id:'change',atMs:101,action:'seen',input:'touch',key:null,isRepeat:false})
   expect(()=>q.enqueue(changed)).toThrow();expect(()=>q.enqueue({...record(),contextKey:'other'})).toThrow()
@@ -99,13 +99,13 @@ describe('recognition session boundaries and final save',()=>{
   s.begin(20000);expect(s.phase).toBe('formal');expect(s.capture?.payload.startedAtPerfMs).toBe(20000)
  })
  it('stops on local save failure, retries exact records and never re-exposes failed practice',async()=>{
-  const p=ports();let fail=true;p.persistLocalDraft=vi.fn(async r=>{if(fail)throw Error('local');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true}})
+  const p=ports();let fail=true;p.persistLocalDraft=vi.fn(async r=>{if(fail)throw Error('local');return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true as const}})
   let now=1651;const s=new RecognitionSession(context(),p,true,()=>{},()=>now);await s.prepare();s.begin(100);s.tick(850);s.tick(1650);await flush()
   expect(s.view).toBe('retry');expect(s.capture).toBeNull();const pending=s.queue.pendingCount
   fail=false;await s.retry();expect(s.queue.retained).toHaveLength(pending);expect(s.view).toBe('blocked');expect(p.finalize).not.toHaveBeenCalled()
  })
  it('stops on bounded backlog instead of waiting for each image save or inventing catch-up',async()=>{
-  const p=ports();let release:()=>void=()=>{};p.persistLocalDraft=vi.fn(r=>new Promise(resolve=>{release=()=>resolve({contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true})}))
+  const p=ports();let release:()=>void=()=>{};p.persistLocalDraft=vi.fn(r=>new Promise<LocalReceipt>(resolve=>{release=()=>resolve({contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:('recordDigest' in r?r.recordDigest:sealDigest(r)) as string,retained:true as const})}))
   const {s}=await prepared(p);let now=100
   for(let i=0;i<4;i++){s.tick(now+750);s.tick(now+1550);now+=1550}
   expect(s.view).toBe('retry');expect(s.queue.pendingCount).toBe(4);expect(s.capture).toBeNull();await flush();release()
@@ -120,9 +120,9 @@ describe('recognition session boundaries and final save',()=>{
  it('isolates asynchronous old context on dispose and never starts an uncertain/opened attempt',async()=>{
   const p=ports();let resolve:(r:{contextKey:string;bindingDigest:string;fresh:true})=>void=()=>{}
   p.prepareLocalAttempt=()=>new Promise(r=>{resolve=r})
-  const s=new RecognitionSession(context(),p,true,()=>{});const work=s.prepare();s.dispose();resolve({contextKey:'attempt-one',bindingDigest:sealDigest(context()),fresh:true});await work
+  const s=new RecognitionSession(context(),p,true,()=>{});const work=s.prepare();s.dispose();resolve({contextKey:'attempt-one',bindingDigest:sealDigest(context()),fresh:true as const});await work
   s.begin(100);expect(s.capture).toBeNull()
-  const bad=ports();bad.prepareLocalAttempt=async()=>({contextKey:'wrong',bindingDigest:'wrong',fresh:true})
+  const bad=ports();bad.prepareLocalAttempt=async()=>({contextKey:'wrong',bindingDigest:'wrong',fresh:true as const})
   const t=new RecognitionSession(context(),bad,true,()=>{});await t.prepare();expect(t.view).toBe('blocked')
  })
 })
@@ -130,7 +130,7 @@ describe('recognition session boundaries and final save',()=>{
 describe('recognition sealed receipt boundaries',()=>{
  it('rejects stale ACK digest even when context and record keys match, then retries identical sealed content',async()=>{
   const seen:any[]=[],failure=vi.fn();let wrong=true
-  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:wrong?'0'.repeat(64):r.recordDigest,retained:true}},failure)
+  const q=new RecognitionSaveQueue('attempt-one',async r=>{seen.push(r);return {contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:wrong?'0'.repeat(64):r.recordDigest,retained:true as const}},failure)
   q.enqueue(record());await flush();expect(q.failed).not.toBeNull();expect(q.retained).toEqual([])
   wrong=false;await q.retry();expect(seen[0]).toEqual(seen[1]);const history=q.retained;history[0].envelope.payload.record.assetId='tampered'
   expect(q.retained[0].envelope.payload.record.assetId).toBe('id-0')
@@ -145,7 +145,7 @@ describe('recognition sealed receipt boundaries',()=>{
   const {recordDigest,...core}=r;expect(recordDigest).toBe(sealDigest(core))
  })
  it('rejects stale prepare ACK with matching context but different frozen-content digest',async()=>{
-  const p=ports();p.prepareLocalAttempt=async c=>({contextKey:c.contextKey,bindingDigest:'0'.repeat(64),fresh:true})
+  const p=ports();p.prepareLocalAttempt=async c=>({contextKey:c.contextKey,bindingDigest:'0'.repeat(64),fresh:true as const})
   const s=new RecognitionSession(context(),p,true,()=>{});await s.prepare();expect(s.view).toBe('blocked');s.begin(100);expect(s.capture).toBeNull()
  })
  it.each(['context','manifest','digest','formal-count','practice-count','projection-count','performance'])('rejects final %s ACK instead of showing saved report',async problem=>{

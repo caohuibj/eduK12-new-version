@@ -179,7 +179,7 @@ describe('continuous recognition native adapter',()=>{
     const a=nativeFixture(profile),s=scoreNativeRecognition(a)
     expect(scoreNativeRecognition(clone(a))).toEqual(s)
     expect(s.metrics).toMatchObject({hitRate:.8,falseAlarmRate:.25,correctedRecognitionRate:.55})
-    expect(s.quality.state).toBe('limited');expect(s.quality.flags.researchReviewRequired).toBe(true)
+    expect(s.quality.state).toBe('limited');expect(s.quality.flags.assetAuthorizationMissing).toBe(true)
     expect(s.audit.trialCount).toBe(profile==='research'?260:100);expect(s).not.toHaveProperty('score')
   })
   it('exports only research/experience with no reference or publication authority and requires asset pools',()=>{

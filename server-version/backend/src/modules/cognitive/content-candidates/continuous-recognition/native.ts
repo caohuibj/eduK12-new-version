@@ -7,22 +7,31 @@ import { freezeCandidate, IDENTITY, type Profile } from './protocol'
 import { scoreRecognition, type RawRecord, type RawEvent } from './scorer'
 
 export const NATIVE_IDENTITY = Object.freeze({ testType:'continuous-recognition',engineVersion:'0.1.0',
-  scoringVersion:'0.1.0',configVersion:'0.1.0' } as const)
-export const NATIVE_PROTOCOL:ProtocolDefinition={schemaVersion:1,key:'continuous-recognition/0.1.0/0.1.0',
+  scoringVersion:'0.2.0',configVersion:'0.2.0' } as const)
+export const NATIVE_PROTOCOL:ProtocolDefinition={schemaVersion:1,key:'continuous-recognition/0.1.0/0.2.0',
   version:'0.1.0',clock:'performance',randomizationAlgorithmVersion:IDENTITY.generatorVersion,trialEnvelopeVersion:1,
   phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*']}
+export const NATIVE_QUALITY_RULE='product-session-descriptive-0.2.0' as const
+export const NATIVE_REPORT_VERSION='0.2.0' as const
+export const assetManifestBindingSchema=z.object({status:z.enum(['authorized','pending','synthetic-review-only']),
+  manifestHash:z.string().regex(/^[a-f0-9]{64}$/).nullable(),evidenceRef:z.string().min(1).max(2000).nullable()}).strict().superRefine((v,ctx)=>{
+  if(v.status==='authorized'&&(!v.manifestHash||!v.evidenceRef))ctx.addIssue({code:'custom',message:'Authorized assets require a real manifest hash and evidence reference'})
+})
+export type AssetManifestBinding=z.infer<typeof assetManifestBindingSchema>
 const time=z.number().finite().nonnegative(), asset=z.string().min(1).max(80).regex(/^[A-Za-z0-9_-]+$/)
 export const nativeConfigSchema=z.object({profile:z.enum(['research','experience']),formalAssetIds:z.array(asset).min(1).max(4096),
   practiceAssetIds:z.array(asset).length(6),imageMs:z.literal(750),isiMs:z.literal(800),
-  responseRule:z.literal(IDENTITY.responseRule),generatorVersion:z.literal(IDENTITY.generatorVersion)}).strict().superRefine((v,ctx)=>{
+  responseRule:z.literal(IDENTITY.responseRule),generatorVersion:z.literal(IDENTITY.generatorVersion),
+  qualityRule:z.literal(NATIVE_QUALITY_RULE),assetManifestBinding:assetManifestBindingSchema}).strict().superRefine((v,ctx)=>{
   const all=[...v.formalAssetIds,...v.practiceAssetIds]
   if(new Set(all).size!==all.length) ctx.addIssue({code:'custom',message:'Formal/practice asset pools must be unique and isolated'})
   if(v.formalAssetIds.length<(v.profile==='research'?184:74))ctx.addIssue({code:'custom',message:'Insufficient formal asset identities'})
 })
 export type NativeConfig=z.infer<typeof nativeConfigSchema>
-export function nativeConfig(profile:Profile,formalAssetIds:string[],practiceAssetIds:string[]):NativeConfig {
+export function nativeConfig(profile:Profile,formalAssetIds:string[],practiceAssetIds:string[],
+  assetManifestBinding:AssetManifestBinding={status:'pending',manifestHash:null,evidenceRef:null}):NativeConfig {
   return nativeConfigSchema.parse({profile,formalAssetIds,practiceAssetIds,imageMs:750,isiMs:800,
-    responseRule:IDENTITY.responseRule,generatorVersion:IDENTITY.generatorVersion})
+    responseRule:IDENTITY.responseRule,generatorVersion:IDENTITY.generatorVersion,qualityRule:NATIVE_QUALITY_RULE,assetManifestBinding})
 }
 const recordSchema=z.object({index:z.number().int().min(0).max(259),assetId:asset,
   kind:z.enum(['target-first','target-repeat','filler-first','vigilance-repeat']),imageOnsetMs:time.nullable(),
@@ -75,14 +84,18 @@ export function scoreNativeRecognition(input:AuthoritativeScorerInput<NativeConf
   // Never accepts a ResearchReview from raw or any other client-owned invocation field.
   const result=scoreRecognition(frozen,{snapshotHash:frozen.snapshotHash,phase:'formal',records,events,
     termination:records.length===frozen.manifest.counts.total?'completed':'aborted'})
-  const flags={researchReviewRequired:true,noValidTargetPairs:result.metrics.completeTargetPairs===0,
+  const flags={assetAuthorizationMissing:config.assetManifestBinding.status!=='authorized',noValidTargetPairs:result.metrics.completeTargetPairs===0,
     incompleteRecords:records.length!==frozen.manifest.counts.total,
     technicalLoss:Object.keys(exclusions).length>0||result.audit.validPresentations!==records.length,
     incompleteTargetPairs:result.metrics.completeTargetPairs!==result.metrics.plannedTargetPairs}
-  return {metrics:{...result.metrics,receivedTrialCount:records.length,expectedTrialCount:frozen.manifest.counts.total,
+  const reasons=result.quality.reasons.filter(reason=>reason!=='quality-and-timing-review-required')
+  if(flags.assetAuthorizationMissing)reasons.push('asset-authorization-not-confirmed')
+  if(Object.keys(exclusions).length)reasons.push('native-envelope-technical-exclusions')
+  const state=flags.noValidTargetPairs?'invalid':Object.values(flags).some(Boolean)?'limited':'interpretable'
+  return {metrics:{...result.metrics,reportPolicy:{qualityRule:NATIVE_QUALITY_RULE,reportVersion:NATIVE_REPORT_VERSION,
+    configHash:session.configHash,protocolSignature:session.protocolSignature,assetManifestBinding:config.assetManifestBinding},receivedTrialCount:records.length,expectedTrialCount:frozen.manifest.counts.total,
     validTrialCount:result.audit.validPresentations,nativeExclusionReasons:exclusions,candidateAudit:result.audit},
-    quality:{state:result.quality.state,flags,reasons:[...result.quality.reasons,
-      ...(Object.keys(exclusions).length?['native-envelope-technical-exclusions']:[])]},
+    quality:{state,flags,reasons},
     audit:{trialCount:records.length,scorerVersion:NATIVE_IDENTITY.scoringVersion}}
 }
 /** Structural constructor only; authority/truth and cross-trial checks still run in the scorer. */
@@ -93,13 +106,38 @@ export function recognitionTrialEnvelope(value:unknown,flags={timeout:false,prem
     startedAtPerfMs:p.startedAtPerfMs,endedAtPerfMs:p.endedAtPerfMs,durationMs:p.endedAtPerfMs-p.startedAtPerfMs,
     flags,qualityEvents,payload:p})
 }
-/** No research-review authority exists on this native candidate path, including for forged state/flags. */
-export function projectNativeRecognitionReport(result:CognitiveScoreResult) {
-  const safeCount=(value:unknown)=>typeof value==='number'&&Number.isInteger(value)&&value>=0&&value<=260?value:null
-  return {state:result.quality.state==='invalid'?'invalid' as const:'limited' as const,
-    hitRate:null,falseAlarmRate:null,correctedRecognitionRate:null,targetHits:null,targetFalseAlarms:null,denominator:null,
-    completeTargetPairs:safeCount(result.metrics.completeTargetPairs),plannedTargetPairs:safeCount(result.metrics.plannedTargetPairs),
-    receivedTrialCount:safeCount(result.metrics.receivedTrialCount),expectedTrialCount:safeCount(result.metrics.expectedTrialCount),
-    reasons:[...new Set([...result.quality.reasons,'native-research-review-authority-not-enabled'])],
-    canGenerateTakeHomeImage:false,logo:'EDUK12.TOP' as const}
+export interface NativeRecognitionReport {
+  state:'interpretable'|'limited'|'invalid';profile:'experience'|'research'|null;
+  reportVersion:typeof NATIVE_REPORT_VERSION;scoringVersion:typeof NATIVE_IDENTITY.scoringVersion;qualityRule:typeof NATIVE_QUALITY_RULE;
+  configHash:string|null;protocolSignature:string|null;assetManifestHash:string|null;
+  hitRate:number|null;falseAlarmRate:number|null;correctedRecognitionRate:number|null;
+  targetHits:number|null;targetFalseAlarms:number|null;denominator:number|null;
+  completeTargetPairs:number|null;plannedTargetPairs:number|null;receivedTrialCount:number|null;expectedTrialCount:number|null;
+  reasons:string[];canGenerateTakeHomeImage:false;logo:'EDUK12.TOP';interpretationScope:'this-session-descriptive-only'
+}
+/** Public/export projection: no norms or physical timing certificate needed for an honest description of this run. */
+export function projectNativeRecognitionReport(result:CognitiveScoreResult):NativeRecognitionReport {
+  const count=(v:unknown)=>typeof v==='number'&&Number.isInteger(v)&&v>=0&&v<=260?v:null
+  const m=result.metrics,q=result.quality,p=m.reportPolicy as {qualityRule?:unknown;reportVersion?:unknown;configHash?:unknown;protocolSignature?:unknown;assetManifestBinding?:AssetManifestBinding}|undefined
+  const hex=(s:unknown):s is string=>typeof s==='string'&&/^[a-f0-9]{64}$/.test(s)
+  const n=count(m.completeTargetPairs),planned=count(m.plannedTargetPairs),received=count(m.receivedTrialCount),expected=count(m.expectedTrialCount)
+  const hits=count(m.targetHits),fa=count(m.targetFalseAlarms),rate=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=1
+  const profile=planned===20?'experience':planned===60?'research':null
+  const permitted=result.audit.scorerVersion===NATIVE_IDENTITY.scoringVersion&&q.state==='interpretable'&&q.reasons.length===0
+    &&['assetAuthorizationMissing','noValidTargetPairs','incompleteRecords','technicalLoss','incompleteTargetPairs'].every(key=>q.flags[key]===false)
+    &&p?.qualityRule===NATIVE_QUALITY_RULE&&p.reportVersion===NATIVE_REPORT_VERSION&&hex(p.configHash)&&hex(p.protocolSignature)
+    &&p.assetManifestBinding?.status==='authorized'&&hex(p.assetManifestBinding.manifestHash)&&!!p.assetManifestBinding.evidenceRef
+    &&profile!==null&&n!==null&&n>0&&n===planned&&expected===(profile==='experience'?100:260)&&received===expected
+    &&m.validTrialCount===expected&&result.audit.trialCount===received&&hits!==null&&fa!==null&&hits<=n&&fa<=n
+    &&rate(m.hitRate)&&rate(m.falseAlarmRate)&&m.hitRate===hits/n&&m.falseAlarmRate===fa/n
+    &&m.correctedRecognitionRate===m.hitRate-m.falseAlarmRate
+  return {state:permitted?'interpretable':q.state==='invalid'?'invalid':'limited',profile,
+    reportVersion:NATIVE_REPORT_VERSION,scoringVersion:NATIVE_IDENTITY.scoringVersion,qualityRule:NATIVE_QUALITY_RULE,
+    configHash:hex(p?.configHash)?p.configHash:null,protocolSignature:hex(p?.protocolSignature)?p.protocolSignature:null,
+    assetManifestHash:hex(p?.assetManifestBinding?.manifestHash)?p!.assetManifestBinding!.manifestHash:null,
+    hitRate:permitted?m.hitRate as number:null,falseAlarmRate:permitted?m.falseAlarmRate as number:null,
+    correctedRecognitionRate:permitted?m.correctedRecognitionRate as number:null,targetHits:permitted?hits:null,
+    targetFalseAlarms:permitted?fa:null,denominator:permitted?n:null,completeTargetPairs:n,plannedTargetPairs:planned,
+    receivedTrialCount:received,expectedTrialCount:expected,reasons:[...q.reasons,...(!permitted&&q.state==='interpretable'?['report-binding-or-metric-inconsistent']:[])],
+    canGenerateTakeHomeImage:false,logo:'EDUK12.TOP',interpretationScope:'this-session-descriptive-only'}
 }

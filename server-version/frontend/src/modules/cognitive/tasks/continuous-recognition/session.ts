@@ -2,6 +2,7 @@ import {clone,type RecognitionContext,type RecognitionPorts,type CapturedRecord,
 import {RecognitionCapture} from './capture'
 import {RecognitionSaveQueue} from './save-queue'
 import {sealDigest} from './digest'
+import {isNativeRecognitionProjection} from './report-projection'
 export type SessionView='intro'|'preparing'|'ready-practice'|'practice'|'practice-saving'|'ready-formal'|'formal'|'saving'|'retry'|'report'|'blocked'
 /** Task-owned orchestration only. Host owns verified freeze, durable local draft and authoritative final/archive save. */
 export class RecognitionSession {
@@ -92,10 +93,9 @@ export class RecognitionSession {
       if(this.disposed)return
       if(receipt?.contextKey!==this.context.contextKey||receipt.finalSaved!==true||!receipt.receiptId||receipt.finalPayloadDigest!==finalPayloadDigest
         ||receipt.manifestHash!==this.context.manifestHash||receipt.formalCount!==formalCount||receipt.practiceCount!==claim.practiceCount
-        ||!receipt.report||receipt.report.receivedTrialCount!==formalCount||!['limited','invalid'].includes(receipt.report.state)||receipt.report.hitRate!==null
-        ||receipt.report.falseAlarmRate!==null||receipt.report.correctedRecognitionRate!==null||receipt.report.targetHits!==null
-        ||receipt.report.targetFalseAlarms!==null||receipt.report.denominator!==null||receipt.report.canGenerateTakeHomeImage!==false)
-        throw Error('Final platform/archive receipt and hidden native projection required')
+        ||!isNativeRecognitionProjection(receipt.report,{configHash:this.context.configHash,protocolSignature:this.context.protocolSignature,
+          assetManifestHash:this.context.assetManifest.manifestHash,formalCount,assetStatus:this.context.assetManifest.status,synthetic:this.synthetic}))
+        throw Error('Final platform/archive receipt and matching native projection required')
       this.receipt=clone(receipt);this.view='report';this.changed()
     }catch{if(!this.disposed){this.view='retry';this.error='saving-not-confirmed';this.changed()}}
     finally{this.finishing=false}

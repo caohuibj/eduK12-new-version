@@ -26,6 +26,8 @@ export function validateContext(value:RecognitionContext,syntheticReview=false):
   const practiceOrder=[0,1,2,0,3,1,4,5]
   if(m.practice.some((r,i)=>r.index!==i||r.assetId!==p.practiceAssetIds[practiceOrder[i]]||r.seenBefore!==(practiceOrder.indexOf(practiceOrder[i])<i)))throw Error('Frozen independent practice mismatch')
   const a=c.assetManifest
+  if(p.qualityRule!=='product-session-descriptive-0.2.0'||p.assetManifestBinding?.status!==a.status
+    ||p.assetManifestBinding.manifestHash!==a.manifestHash||p.assetManifestBinding.evidenceRef!==a.evidenceRef)throw Error('Frozen asset/report policy binding does not match host evidence')
   if((a.status!=='authorized'&&!(syntheticReview&&a.status==='synthetic-review-only'))||!hex(a.manifestHash)||!a.evidenceRef)throw Error('No explicit authorized asset manifest')
   const byId=new Map<string,Asset>()
   for(const item of a.assets){if(byId.has(item.assetId)||!hex(item.sha256)||!item.url||item.width<=0||item.width>1024||item.width!==item.height)throw Error('Missing/ambiguous or unapproved image geometry');byId.set(item.assetId,item)}

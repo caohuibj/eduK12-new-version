@@ -1,6 +1,6 @@
 /** Research metadata only. Not a second platform domain registry or searchable persisted catalog. */
 export const RECOGNITION_METADATA = {
-  candidateId: 'continuous-recognition', status: 'DESIGN_PROPOSAL',
+  candidateId: 'continuous-recognition', status: 'CANDIDATE_DEVELOPMENT',
   name: { zh: '连续图像再认', en: 'Continuous image recognition' },
   languages: ['zh', 'en'], ages: null,
   upstreamResearchCommit: '22721e5c63dd78819e8c58921adf20157cdaa08c',
@@ -82,6 +82,7 @@ export const RECOGNITION_METADATA = {
   assetStatus: 'NO_FORMAL_LICENSED_ASSET_BANK',
   sourceCodeLicense: 'MIT', exampleImageLicense: 'CC-BY-NC-SA-4.0; NOT imported',
   implementationRoute: 'independent-logical-implementation',
-  protocolApproval: 'User approved three previews and 260/100 profile count proposals; assets/timing/validity not approved',
+  protocolApproval: 'User approved three previews and 260/100 profiles; 2026-10-26 product policy permits this-session descriptions without research timing certification. Formal asset rights remain pending; no population validity claim.',
+  productPolicyUrl: 'https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3',
   registration: false
 } as const
