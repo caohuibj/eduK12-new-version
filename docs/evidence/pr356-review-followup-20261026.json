@@ -568,5 +568,124 @@
       }
     ],
     "noChecksRepeated": true
+  },
+  "independentReviewFollowup": {
+    "recordedAtUTC": "2026-10-26T07:25:03.852423+00:00",
+    "reviewedParent": "a65cca258d0c70933cf2378c64b0ef189617b6fe",
+    "kind": "scalar-parent-and-ordinary-current-flow-materialization",
+    "changedSourceSHA256AtCollection": {
+      "server-version/backend/src/modules/composite/composite.service.ts": "cc5fc7ca314aa7723d20a22ff1e6a36c75a2042f93acfa1ce7877fa689f715eb",
+      "server-version/backend/src/modules/composite/training-flow-scope.ts": "5cbc2019f91125896885e3e117c0ea40ea0194e9ad77ef603bcaa20760d71f5b",
+      "server-version/backend/src/modules/scale/scale-collection-guard.ts": "2ffcebb42891c139af5500034580f7b950b406fab880f0420e8904e524ca4825",
+      "server-version/backend/src/__tests__/composite/pr356-child-parent-shape.postgres.integration.test.ts": "4b7a6f2bdc849441ea7a66ecd0a564804043ee22f9f90cfc04657d867790b0d6",
+      "server-version/backend/src/__tests__/composite/training-flow-materialization-reuse.test.ts": "1b0dee70f7908dd4b1544b5b00a5dc26753d10e19acc512d1a59240593a1f9ac",
+      "server-version/backend/src/__tests__/scale/training-flow-materialization-guard.test.ts": "6b494ea4e142cf96716a4044b610fb03c29570714a4963760eadfd405dd10a56"
+    },
+    "reporters": [
+      {
+        "path": "/workspace/scratch/pr356-review-followup/child-parent-shape-green.json",
+        "sha256": "edaa8e8e2ca76815df75b491a3a9d8689076fd84075fb2fe5a7c63b5934a6351",
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "pendingOrFiltered": 0,
+        "success": true,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/child-parent-shape-red.json",
+        "sha256": "82a8ca973c4455abce9614649e6766e6dbda91483da3fdb06f0a2f0af60455aa",
+        "total": 2,
+        "passed": 0,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "success": false,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/child-parent-shape-setup-completed-red.json",
+        "sha256": "74d9e873ab3d4404c76e88f627964bbac875b2f399d80db2179abd5f377fda08",
+        "total": 2,
+        "passed": 0,
+        "failed": 2,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-actual-child-consumers-fixture-fixed.json",
+        "sha256": "603072a4d5fd9de7b9aa1e2cceee907c37c7cb8dfa0e04388f236aa34fd88d14",
+        "total": 10,
+        "passed": 6,
+        "failed": 0,
+        "pendingOrFiltered": 4,
+        "success": true,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-actual-child-consumers.json",
+        "sha256": "15a412aa60d1be544b0518b2fcae6016a33dcfdd3d3827799b669deb115cae67",
+        "total": 10,
+        "passed": 5,
+        "failed": 5,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-native-guard-green.json",
+        "sha256": "890344367d3ca83b72d26513b489218351f43954fcbcd083e39e09ec9c524b41",
+        "total": 12,
+        "passed": 11,
+        "failed": 0,
+        "pendingOrFiltered": 1,
+        "success": true,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-native-guard-red.json",
+        "sha256": "2c0aa53a693bf5c75219ea5ba291a4ba77ccb500994480b2b67ca610d59c26be",
+        "total": 12,
+        "passed": 2,
+        "failed": 10,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Original invocation; setup/filtered not PASS, disjoint reruns never relabel the original result."
+      }
+    ],
+    "receipts": [
+      {
+        "path": "/workspace/scratch/pr356-review-followup/child-parent-shape-green.receipt.json",
+        "sha256": "4c1fdc0cbb45c8e47e70d5d5f89286a6ef4f196ea18b7c6377d0d2b21ff0c09f",
+        "kind": "Actual command/exit or selected static inputs, no historical execution signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-actual-child-consumers.receipt.json",
+        "sha256": "80b6fb2afda20083428b1f5952cc9fc87f7a5d9a31196ff60bd993e8cdcfe287",
+        "kind": "Actual command/exit or selected static inputs, no historical execution signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/flow-actual-child-consumers-fixture-fixed.receipt.json",
+        "sha256": "bf0678744559257a2d4f58eae9ff51fcac21ace1d7acb0a3715c64256d099d57",
+        "kind": "Actual command/exit or selected static inputs, no historical execution signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/child-materialization-diagnostics.receipt.json",
+        "sha256": "e694396d8f3f64659e25816801405548e9d836737159fb410274c1730d139ff8",
+        "kind": "Actual command/exit or selected static inputs, no historical execution signature"
+      }
+    ],
+    "sourceAssociation": "Finite per-execution source hashes where recorded; collection hashes are not a complete contemporaneous execution manifest. No retrospective signatures.",
+    "currentThreeProductionDiagnosticsMatch": true,
+    "ciExecuted": false,
+    "formalCIFailureRounds": 0,
+    "qualificationClaim": false,
+    "notClaimed": [
+      "full lazy public projection/HTTP",
+      "new STANDARD ONLINE acceptance from descriptive fixture",
+      "unmaterialized exact STANDARD flow acceptance",
+      "merge-ready",
+      "CI executed"
+    ]
   }
 }

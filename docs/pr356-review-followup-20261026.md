@@ -41,3 +41,17 @@
 下一唯一执行位置为计划中的限定 Actions：完整 source 身份、锁依赖审计、旧 230→237 升级/还原与真实旧 FINAL/报告读取、正常 fresh Training vertical 4 例与真实 worker 1 例、backend/frontend 各一次 runtime 生产构建、同产物镜像扫描/状态页 Chromium、JS/TS+Python security-extended。它不自动授予 merge eligibility；现有 required `merge gate / ready PR` 与 strict up-to-date 保持，不能将 skipped 汇总变为成功，也不自动回退全平台 CI。
 
 原承诺 NFC10 正反内容验收、PHQ 家族 HOLD、完整 Training 纵向、356-01 cold/hot 基线以及其余 opt-in 的正式资格仍分别保留 NOTRUN/BLOCKED/HOLD。来源与缺口见 `docs/pr356-ci-preparation-20261026.md`、`docs/pr356-standard-dual-entry-20261026.md` 及原 PR 计划，最终由独立接管方核对实际合并范围和证据链，不静默删项、不新增 MOT。本记录完成 review 修复与候选准备；不声称完整功能验收、正式 CI、可合并、已合并或上线。
+
+## a65 独立复核后的 child 物化修复
+
+独立接管方在已推送 `a65cca258d0c70933cf2378c64b0ef189617b6fe` 发现新的确定阻塞：`createChildRecords` 读取 `attempt.compositeAssessment.productKind`，但真实 Prisma `create({data})` 和 `findUnique({where})` 都只返回 scalar。此前 standalone 的两个边界用例未覆盖这两条组合调用，旧 lazy 测试又在 runtime sentinel 提前结束，不能证明 child 创建。
+
+现以调用者已加载的 server-owned composite 显式传入两个真实消费者，不添加 include、默认产品判断或重复数据库读取。新本地 PostgreSQL 回归用真实 ordinary course START 和教育内部 relational START 验证 scalar 父返回、真实 child 持久化、runtime hash 与冻结槽位。它使用明确的既存历史描述性发布夹具，不冒称新 STANDARD 审批或完整教育资源分发验收。补齐首次未完成的教育夹具后，修复前两个消费者均真实 TypeError；修后 2 PASS、零 skip，成功库保留不重置。
+
+普通 Training flow 在父 START 已冻结全部候选，未物化的当前 SCALE 不能因后来普通准入撤回而重新走新入场。专用 materialization resolver 现把它原已验证的返回对象绑定到同事务、父 id/epoch、唯一当前 item/Scale；guard 只接受这个原对象，把当前普通候选视为 entered，仍执行真实共享紧急停用。复制、伪造、错事务/父/epoch/item、未来 Scale 或扩大 item 集均拒绝，不添加 SQL、第二次解密或第二次 resolve。精确 STANDARD 的独立合同未改，也没有把此证明用于未验证的其他候选。
+
+新增真实 resolver→真实共享 guard 的报告为修前 10 FAIL/2 PASS；修后只执行受影响 11 PASS，1 项过滤并复用原通过，不冒称整次 12/12。实际 lazy 消费者夹具去掉 transaction parent 的伪关系，新增两例越过 runtime 加载进入真实 guard/child 创建；成功例仅在物化事务完成后的公开投影读取边界停止，不宣称整个 HTTP 响应已验收。紧急停用例在实际 child 创建前 409。原“停用后物化成功”的旧测试名改为实际验证的“runtime 不可读时未触及采集守卫”，原断言保留。
+
+该消费者文件首轮 5 PASS/5 FAIL：四个负例是 scalar 夹具过早复制未反映后续变更，一个新正例是手写槽位缺生产 `scaleCode`。仅修夹具并复验相关 6 例，6 PASS/4 filtered；其余原通过保留，不改原 invocation 为全绿。单独检查本轮三个生产文件 TypeScript diagnostics 为 0；前端、其它后端文件和旧 PostgreSQL 成功未重跑。
+
+原件仍在本目录索引，新增 reporter、实际命令/退出与有限输入 SHA receipt 将随控制证据中的 `followupReports` / `followupAttachments` 原始字节移交，不能要求独审节点访问这里的绝对路径。a65 曾已本地 apply 的 CI 清单随新业务修复明确失效，尚未提交为最终冻结、未触发 CI。最终新候选仍须独立放行。

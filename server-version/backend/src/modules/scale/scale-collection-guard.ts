@@ -6,6 +6,7 @@ import {ContentReleaseError} from '../measurement-content/release'
 import { Prisma } from '@prisma/client'
 import { assertScaleLibraryCollectionAllowed } from '../scale-library-governance/collection-guard'
 import type {WholeReceiptExecution} from '../composite/whole-questionnaire.service'
+import type {VerifiedTrainingFlowMaterialization} from '../composite/training-flow-scope'
 /** Server-selected Training sources: new entry requires current admission;
  * current-epoch collection keeps the shared emergency-stop boundary. Verified
  * exact STANDARD sources retain their separate frozen completion contract.
@@ -16,6 +17,9 @@ export type TrainingCollectionScope={
   /** Frozen parent attempt for standard-combination exact binding. */
   compositeAttemptId?:string|null
   compositeItemIds?:readonly string[]
+  /** Request-local verified pending flow unit, consumed under the parent lock. */
+  verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization
+  compositeAttemptEpoch?:number
   acceptedReceipt?:WholeReceiptExecution
 }
 export async function assertTrainingScaleCollectionAllowed(tx:Prisma.TransactionClient,scaleIds:string[],scope:TrainingCollectionScope={}){
@@ -23,14 +27,19 @@ export async function assertTrainingScaleCollectionAllowed(tx:Prisma.Transaction
   if(!ids.length)return
   let exactStandardIds=new Set<string>()
   const enteredIds=new Set<string>()
+  if(scope.verifiedFlowMaterialization){
+    const {assertVerifiedTrainingFlowScaleMaterialization}=await import('../composite/training-flow-scope')
+    enteredIds.add(assertVerifiedTrainingFlowScaleMaterialization(tx,scope.verifiedFlowMaterialization,{...scope,scaleIds:ids}))
+  }
   if(scope.compositeAttemptId){
     const {assertTrainingStandardCollectionAllowed}=await import('../composite/training-standard-collection')
     exactStandardIds=await assertTrainingStandardCollectionAllowed(tx,scope.compositeAttemptId,ids,scope.compositeItemIds,scope.acceptedReceipt)
     // Current-epoch children have already passed product admission. This
     // avoids repeating mutable entry policy, but is not an emergency-stop
     // exemption. Only verified exact STANDARD sources retain that separate
-    // frozen completion contract. New children and restarted epochs cannot
-    // borrow current-epoch admission.
+    // frozen completion contract. An unmaterialized flow unit may use only
+    // the exact current candidate verified above under this same parent lock;
+    // caller parent/item claims and restarted epochs cannot borrow admission.
     const bound=await tx.$queryRaw<Array<{scale_id:string}>>(Prisma.sql`SELECT a.scale_id FROM assessments a
       JOIN composite_assessment_attempts p ON p.id=a.composite_attempt_id
       WHERE a.composite_attempt_id=${scope.compositeAttemptId} AND a.attempt_epoch=p.attempt_epoch
