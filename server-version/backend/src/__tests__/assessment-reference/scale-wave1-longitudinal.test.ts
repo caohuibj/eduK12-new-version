@@ -1,7 +1,7 @@
 import { describe,it,expect } from 'vitest'
 import { testReference } from './wave1-reference.fixture'
 import { referenceSetHash } from '../../modules/assessment-runtime/reference-binding'
-import { buildLongitudinalReferenceSnapshot, type ScaleReferenceIdentityV1 } from '../../modules/assessment-reference/longitudinal'
+import { buildLongitudinalReferenceSnapshot, type ScaleReferenceIdentityV1, type LongitudinalReferencePoint } from '../../modules/assessment-reference/longitudinal'
 const refs=[1,2,3,4].map(n=>{const r=testReference();r.referenceVersion=`v${n}`;r.entries[0].governance!.effectiveFrom=`2026-0${n}-01T00:00:00Z`;return r})
 const identity=(n:number):ScaleReferenceIdentityV1=>({instrumentKey:'test_physics',instrumentVersion:'1.0.0',scoringVersion:'1.0.0',measurementHash:'a'.repeat(64),subjectKey:'physics',locale:'zh-CN',schoolStage:'junior_secondary',frozenContext:{gradeLevel:'8'},scoreKey:'wellbeing',direction:'higher_is_more',range:{min:1,max:5},reportVersion:'1.0.0',originalReferenceVersion:`v${n}`,originalReferenceHash:referenceSetHash(refs[n-1])})
 const points=[1,2,3].map(n=>({resultVersion:`T${n}`,at:`2026-0${n}-10T00:00:00Z`,value:n,identity:identity(n)}))
@@ -57,7 +57,7 @@ describe('actual frozen adult demographics, never candidate population midpoints
   r.entries[0].population={language:'zh-CN',match:{minAgeMonthsInclusive:min,maxAgeMonthsExclusive:max}}
   return r}
  const build=(ages:Array<number|undefined>,sets=[adult('adult-v1')])=>{
-  const ps=ages.map((age,i)=>({resultVersion:'A'+i,at:'2026-05-01T00:00:00Z',value:3,identity:{...identity(1),schoolStage:'adult' as const,originalReferenceVersion:sets[0].referenceVersion,originalReferenceHash:referenceSetHash(sets[0]),frozenContext:age===undefined?undefined:{ageMonthsAtFreeze:age}}}))
+  const ps:LongitudinalReferencePoint[]=ages.map((age,i)=>({resultVersion:'A'+i,at:'2026-05-01T00:00:00Z',value:3,identity:{...identity(1),schoolStage:'adult' as const,originalReferenceVersion:sets[0].referenceVersion,originalReferenceHash:referenceSetHash(sets[0]),frozenContext:age===undefined?undefined:{ageMonthsAtFreeze:age}}}))
   return {ps,input:{points:ps,references:sets,generatedAt:'2026-10-01T00:00:00Z',explicitLatest:true}}
  }
  it('uses each real age including exact lower and upper-exclusive boundaries',()=>{
@@ -81,4 +81,25 @@ describe('actual frozen adult demographics, never candidate population midpoints
   const result=buildLongitudinalReferenceSnapshot(input)
   expect(result.points.every(p=>p.reference?.referenceVersion===(direction==='adult-to-school'?'adult-v1':'school-v2'))).toBe(true)
  })
+ it.each(['ORIGINAL','TIME_MATCHED','LATER_REFERENCE'] as const)('does not escape an adult entry into a school stratum of the same set in %s',mode=>{
+  const mixed=adult('mixed-adult-school')
+  mixed.entries[0].population.match!.sexAtBirth=['female']
+  const school=structuredClone(testReference().entries[0])
+  school.governance!.crossStageReReferenceAllowed=true
+  school.population={language:'zh-CN',match:{sexAtBirth:['male'],gradeLevels:['8']}}
+  mixed.entries.push(school)
+  const {input}=build([300,320],[mixed])
+  for(const point of input.points)point.identity.frozenContext={ageMonthsAtFreeze:300,sexAtBirth:'male',gradeLevel:'8'}
+  const hash=referenceSetHash(mixed)
+  const result=buildLongitudinalReferenceSnapshot({...input,mode})
+  expect(result.points.map(p=>p.reference)).toEqual([
+   expect.objectContaining({status:'unavailable',unavailableReason:'no_population_match'}),
+   expect.objectContaining({status:'unavailable',unavailableReason:'no_population_match'}),
+  ])
+  expect(referenceSetHash(mixed)).toBe(hash)
+  for(const point of input.points)point.identity.frozenContext!.sexAtBirth='female'
+  const allowed=buildLongitudinalReferenceSnapshot({...input,mode})
+  expect(allowed.points.every(p=>p.reference?.status==='available'&&p.reference.bandProvenance?.schoolStage==='adult')).toBe(true)
+ })
+
 })
