@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "catalogDocumentVersion": "1.0.0",
+  "status": "DOCUMENTATION_ONLY_NOT_INDEXED",
+  "axes": {
+    "domain": [
+      "domain:motivation_learning",
+      "domain:wellbeing_strength",
+      "domain:selfreg_executive",
+      "domain:academic_resilience"
+    ],
+    "construct": [
+      "construct:academic_resilience",
+      "construct:perseverance",
+      "construct:adaptive_help_seeking",
+      "construct:learning_self_reflection",
+      "construct:emotional_response_to_setback",
+      "construct:hypothetical_adversity_response",
+      "construct:not_objective_ability"
+    ],
+    "orientation": [
+      "orientation:educational_psychology",
+      "orientation:self_regulated_learning",
+      "orientation:self_efficacy_theory",
+      "orientation:not_therapy_specific"
+    ],
+    "population": [
+      "population:adult_university_students",
+      "population:project_18_plus",
+      "population:original_british_undergraduates",
+      "population:original_personal_vignette_n321",
+      "population:comparison_other_vignette_n211",
+      "population:not_k12_validated",
+      "population:not_chinese_validated"
+    ],
+    "response": [
+      "response:self",
+      "response:30_items",
+      "response:required_personal_adversity_vignette",
+      "response:fixed_table2_order",
+      "response:five_point_1_to_5",
+      "response:likely_to_unlikely",
+      "response:20_positive_items_reversed",
+      "response:one_total_three_facets",
+      "response:no_recall_window",
+      "response:complete_required_project_proposal",
+      "response:mandatory_vignette_runtime_blocked"
+    ],
+    "use": [
+      "use:research",
+      "use:individual_reflection",
+      "use:score_only_planned",
+      "use:not_diagnostic",
+      "use:not_selection",
+      "use:no_chinese_norms",
+      "use:no_empirical_cutoffs",
+      "use:documentation_only"
+    ],
+    "license": [
+      "license:cc_by_4_0_article_carrier_only",
+      "license:attribution_required",
+      "license:changes_indicated",
+      "license:2015_standalone_form_separate_terms",
+      "license:no_author_endorsement"
+    ],
+    "language_validation": [
+      "language_validation:source_en",
+      "language_validation:content_zh-CN",
+      "language_validation:independent_work_translation",
+      "language_validation:expert_translation_review_pending",
+      "language_validation:cognitive_interviews_pending",
+      "language_validation:local_validation_pending",
+      "language_validation:documentation_draft"
+    ]
+  },
+  "chineseSearchTerms": [
+    "学业韧性",
+    "大学生",
+    "学业受挫",
+    "作业反馈",
+    "坚持尝试",
+    "反思学习方法",
+    "主动求助",
+    "生气与失望",
+    "假设情境",
+    "本人情境",
+    "中文工作译稿",
+    "非诊断"
+  ],
+  "evidence": "Methods original UK sample/vignette/anchors/scoring; theory introduction; explicit license and current implementation limits",
+  "controlledDictionary": "Reuse existing domain IDs; other exact-version factual tags are documented proposals, not added shared vocabulary",
+  "consumption": "Not written to registry/source/database; search/authorization/analysis tag indexing NOTRUN; tags do not grant permission or establish clinical applicability"
+}

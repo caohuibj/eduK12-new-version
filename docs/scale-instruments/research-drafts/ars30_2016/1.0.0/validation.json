@@ -1,0 +1,185 @@
+{
+  "kind": "DOCUMENT_STATIC_REVIEW_ONLY",
+  "baseHead": "ebbf389bb9812189f06987038b6a0859c8cea72b",
+  "observedAtUtc": "2026-10-26T11:44:23.676907+00:00",
+  "checks": {
+    "officialEnglishItems30AndOrder": "PASS_FIRST_ATTEMPT_REUSED",
+    "officialPersonalVignetteExactAndSeparate": "PASS_FIRST_ATTEMPT_REUSED",
+    "translationAndInterpretationSemanticRead": "PASS_COORDINATOR_WORK_REVIEW_NOT_EXPERT_APPROVAL",
+    "thirtyNumberedRulesAndExhaustiveThreeGroups": "PASS_FIRST_ATTEMPT_REUSED",
+    "fiveDocumentArithmeticVectors": "PASS_FIRST_ATTEMPT_REUSED",
+    "jsonAndRelativeDocLinks": "PASS_TARGETED_AFTER_MISSING_PAGE_FIX",
+    "eightAxes53FactTags": "PASS_FIRST_ATTEMPT_REUSED",
+    "noNormOrThresholdInvented": "PASS_FIRST_ATTEMPT_REUSED",
+    "runtimeSupportPathsStaticRead": "PASS_READ_ONLY_NO_BROWSER",
+    "sourceAndRegistryUnmodified": "PASS_REMAINING_BOUNDARY_CHECK"
+  },
+  "arithmeticSamples": [
+    {
+      "name": "minimum",
+      "facetSums": [
+        14,
+        9,
+        7
+      ],
+      "total": 30,
+      "kind": "Document arithmetic result from completed assertions before initial link failure; not engine golden case"
+    },
+    {
+      "name": "maximum",
+      "facetSums": [
+        70,
+        45,
+        35
+      ],
+      "total": 150,
+      "kind": "Document arithmetic result from completed assertions before initial link failure; not engine golden case"
+    },
+    {
+      "name": "raw_all_1",
+      "facetSums": [
+        54,
+        45,
+        11
+      ],
+      "total": 110,
+      "kind": "Document arithmetic result from completed assertions before initial link failure; not engine golden case"
+    },
+    {
+      "name": "raw_all_5",
+      "facetSums": [
+        30,
+        9,
+        31
+      ],
+      "total": 70,
+      "kind": "Document arithmetic result from completed assertions before initial link failure; not engine golden case"
+    },
+    {
+      "name": "raw_all_3",
+      "facetSums": [
+        42,
+        27,
+        21
+      ],
+      "total": 90,
+      "kind": "Document arithmetic result from completed assertions before initial link failure; not engine golden case"
+    }
+  ],
+  "firstFailure": {
+    "kind": "OBSERVED_TOOL_EXECUTION_FAILURE_NOT_RECONSTRUCTED_RECEIPT",
+    "toolChunkId": "46db32",
+    "exitCode": 1,
+    "error": "AssertionError: ('/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ars30_2016/1.0.0/README.md', 'validation.md')",
+    "stage": "relative documentation link check before writing validation outputs",
+    "priorAssertionsCompleted": [
+      "official30English/order exact",
+      "officialPersonalVignette exact and separate",
+      "unique30itemCodes",
+      "threeGroupsExhaustive",
+      "reverseKeyAndOptions",
+      "fiveArithmeticVectors",
+      "noInventedNormsThresholds",
+      "eightAxes",
+      "reportPlainTextStructure"
+    ],
+    "remediation": "Create missing validation output pages, run only JSON/links and remaining unexecuted source/registry-boundary checks; do not replay prior content or arithmetic checks.",
+    "ciExecuted": false,
+    "originalExecutionSigned": false
+  },
+  "inputDocumentFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/README.md",
+      "bytes": 1763,
+      "sha256": "7c1a5f12ff3c6962c211392237045864deab4d9a12a0cf70aee5f61dae02e06a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/THIRD_PARTY_LICENSE.md",
+      "bytes": 1680,
+      "sha256": "0ca5adf6f02f46037bec3c918354bd5f52b65392de514f2de00ecb5412efe8e4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/administration.md",
+      "bytes": 2561,
+      "sha256": "d6e1383eab94b80ca53499dd54ab0a26d2b759c64881970732bea12392eb1dc2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/bilingual-content.json",
+      "bytes": 16606,
+      "sha256": "09500f801faf632ef0b8e73218b8b1df4cc732402e745b790600e6d400a3f436"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/parameter-plan.json",
+      "bytes": 1814,
+      "sha256": "e2c01ece08c08b9c31e22f192f5b0a6f713235e86fb09a41a768c6fc4f5d8871"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-draft.md",
+      "bytes": 2813,
+      "sha256": "dcc143580d444845f6fc9bb6b629d0400506fa5889c378535153abe3ff9fd3db"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/report-plan.json",
+      "bytes": 4018,
+      "sha256": "ab9e1137ecaa2c0b4b007b23d4a8263a341ab59df0fa0ac59b4fd70f2a208bde"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-source-inputs.json",
+      "bytes": 2989,
+      "sha256": "0942dea748acd87d882b9a4b135f962687c2e9f0249c42e938979d0b78247595"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/runtime-support-review.md",
+      "bytes": 6023,
+      "sha256": "10c1a37174f88ce40414f76b0732de900e05d15a307c0ea208995369429dc1e8"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/scoring-and-parameters.md",
+      "bytes": 5157,
+      "sha256": "b162574fe7fb3bee4afd6801b40f9e80b1ed44b1bd8011bb14bad7dcf0a28921"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/source-manifest.json",
+      "bytes": 3486,
+      "sha256": "973788739de0e8ddde79244fa9daf916565714f8730a2ca7c0a988bc5aeaaeda"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ars30_2016/1.0.0/tags.json",
+      "bytes": 3253,
+      "sha256": "d515744859e0509e9aa854e07b439e2ceb244e29dd104acf8a591a6c13cb6cc3"
+    }
+  ],
+  "runtimeSourceInputsManifest": "runtime-source-inputs.json",
+  "blocked": {
+    "mandatoryVignetteFrozenDelivery": "No complete formal source-to-versioned-frozen-display path established; keep documentation only"
+  },
+  "notrun": [
+    "Executable source schema/type/registry generation: no executable package created",
+    "Unit tests and buildScaleResult: no registered content, no synthetic actual report",
+    "PostgreSQL/HTTP/import/activation: no DB change",
+    "Browser and dual-entry delivery: no complete frozen scenario path",
+    "Tag search/authorization/analysis consumption",
+    "Expert translation review/cognitive interviews/Chinese validation",
+    "CI and deployment"
+  ],
+  "counts": {
+    "newExecutableSourceVersions": 0,
+    "newDistinctExecutableTools": 0,
+    "newDocumentationDrafts": 1,
+    "unitCasesExecuted": 0,
+    "postgresCasesExecuted": 0,
+    "actualBuildScaleResultExamples": 0,
+    "activatedTools": 0
+  },
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "note": "12 documentation inputs captured before first static check. Original successful assertions are reused on unchanged input. Initial missing validation-page link failure retained. This is not historical unit/runtime qualification; previous37unit14PG not rerun.",
+  "relativeLinksChecked": 13,
+  "jsonFilesChecked": 7,
+  "finalObservedAtUtc": "2026-10-26T11:44:53.656594+00:00",
+  "targetedContinuation": {
+    "exitCode": 0,
+    "scope": "JSON/doc links; original12 input equality;14 source hash equality;96 sources and no tracked edits; no repeated English/scoring assertions",
+    "priorFailurePreserved": true
+  }
+}

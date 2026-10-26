@@ -1,0 +1,34 @@
+{
+  "documentStatus": "DOCUMENTATION_ONLY_NOT_RUNTIME_PARAMETER",
+  "parameterPlanVersion": "1.0.0",
+  "linkedInstrument": "ars30_2016_zh_cn_research@1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "plannedPolicy": "score_only",
+  "thresholds": [],
+  "norms": [],
+  "percentiles": [],
+  "referenceSetCreated": false,
+  "referenceSetActivated": false,
+  "referenceSetBound": false,
+  "reason": "2016 study descriptive statistics are UK undergraduate sample data, not Chinese norms; no applicable empirical cutoffs established. No midpoint-created grades. A separately evidenced experiential preset may receive a later parameter version; none is invented here.",
+  "independentNoneRuntimeIdentitySupported": false,
+  "futureMissingPolicy": {
+    "type": "complete_required",
+    "origin": "Platform proposed policy, not a source-author published imputation rule",
+    "imputation": false,
+    "missingAnswerResult": "No total or subscale scores if any item unanswered under this strict proposed policy"
+  },
+  "applicability": {
+    "respondent": "Adult university student SELF; hypothetical original personal vignette",
+    "projectMinAgeYears": 18,
+    "minimumIsProjectPolicyNotValidatedAgeCutoff": true,
+    "missingAge": "INDETERMINATE; no automatic permission",
+    "missingUniversityContext": "INDETERMINATE; no automatic K12 inference",
+    "populationEvidence": "UK n532 total; original vignette321 / alternative211; original group mean22.4 SD6.4; no invented minimum/maximum observed age",
+    "territory": "GB",
+    "contentLocale": "zh-CN",
+    "validatedChinese": false
+  },
+  "publicationNote": "No ReferenceSet gate is added for absence of norms. Current blocker is missing mandatory measurement scenario delivery/freeze; no executable package is created by this document."
+}
