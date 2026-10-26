@@ -1,0 +1,115 @@
+{
+  "parent": "d2d55bdf6d7053f43f2f9b17f839395f89c65770",
+  "commit": "20210dfe235039871b1919a84954e2c263a52247",
+  "tree": "8f547f4a006cee17560e0787a6cd9d0c1c41a94b",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T04:39:33.267579+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/README.md",
+      "remoteBlob": "4736f4a03cf943444f00c2b2370ed7ddb8409c24",
+      "sha256": "825e1e83bb95eeb51ac72f326423ba5f7e2927b9fccf8519821d6b9e230a971a",
+      "bytes": 1184
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/administration.md",
+      "remoteBlob": "1f7a943089836196626855db654844dd3a0b0b63",
+      "sha256": "c38d5d14ff7965864fb253cfd27ca4a71fcf7c35b72154031f5aa5858136d801",
+      "bytes": 588
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/assets/take-home-v1.png",
+      "remoteBlob": "17a3fe8f119687717dadfa9dfb3f158c614543ce",
+      "sha256": "eed3128d7aa5031d5735d4c6b3d9ebe9fa6b9e56a63f8c2863e48b27fd83c9e2",
+      "bytes": 1506576
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/bilingual-content.json",
+      "remoteBlob": "51cd6605e98aab0108d753538baceaf26b724ebe",
+      "sha256": "0ae78f9651662d0e61658610ea23116ca506130b05b82b56da8eaa5309647ccd",
+      "bytes": 8815
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/instruction.for-pr356.json",
+      "remoteBlob": "6c9b27da7b8b0792c130bc841b1563cafb9f22c9",
+      "sha256": "ad67109bde02a2b49437385a84e8300788f0d440452f427eb067cd5a8b88526d",
+      "bytes": 432
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/references.md",
+      "remoteBlob": "c2047b8ce28991addaece9f82996ce234a8fe13a",
+      "sha256": "1b697fdd31d0428616f54de56db9d46517392c77df3f67c3bc53c38cdfde1454",
+      "bytes": 1342
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/report-example.md",
+      "remoteBlob": "713b52724381b11f5cb17909269c1096eb12d47c",
+      "sha256": "ab5d797517fd7fddd7280d252721f6e88b968633e19b5aa4d8303b92e70e8d27",
+      "bytes": 2926
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/report-result.synthetic.json",
+      "remoteBlob": "20e844ab5b43fc2f20a3ad1d0f980ce836831a3d",
+      "sha256": "c85b88ca624601cd1bffc8f9d837bfde7e27dbb5a021e8ae815891b3cfcf5dc1",
+      "bytes": 11200
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "dbed3afc1947de81706179ff7d458703f397d10f",
+      "sha256": "6b38267cbcff5bd2d25daaa36ec4e99f5808f6b6daf3e3907f0851fb8e0dbec2",
+      "bytes": 1080
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/take-home-card.json",
+      "remoteBlob": "bf40fb1431f71915ef0f1af112aea46d076a1f80",
+      "sha256": "8ebfd86d36f2d3ffd6a245b231a25b6dab20981e4bd843de292e372f9ac7d608",
+      "bytes": 953
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/take-home-message.md",
+      "remoteBlob": "c4a0de223ea9b65cb0b6c13372398c5dfcf441f0",
+      "sha256": "8c651e02126f73e4b7786f8ee22283a27b02b030e090c53665950b9a1e4918a1",
+      "bytes": 613
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/mpmi_s22/1.0.0/validation.md",
+      "remoteBlob": "f956f91a4e4134e215828f1a0b747a595b0eee96",
+      "sha256": "f401b610a3379cac43c6ef02abc2a1db4037bfed4caacd554ba00d64886900c4",
+      "bytes": 1849
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/mpmi_s22_zh_cn_research.test.ts",
+      "remoteBlob": "c41cfb1292084fd197d6405c428a577e8035ada8",
+      "sha256": "b4ea058c78a1426563f83bd821391918124cc222dbf1ad9ef071d59dc07efbce",
+      "bytes": 6669
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "28f00b964b3563793395c222380b72738c66c60e",
+      "sha256": "ab58d3ec8e6f67c51ce4a3cdd51e9f4227a2cf620b6beeba2eacfb8f7d408141",
+      "bytes": 1226
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/instrument.ts",
+      "remoteBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "bytes": 192
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+      "remoteBlob": "573a618b8a609632391df4f1e60663d71cd2adb9",
+      "sha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879",
+      "bytes": 58500
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "d62236eabd3cf4c2f365644b8af02a87426870c5",
+      "sha256": "d68d06515d1fc61039fad51660ca9f1e8f04c360b6565a3bdc9f6861612b21d4",
+      "bytes": 13257
+    }
+  ]
+}

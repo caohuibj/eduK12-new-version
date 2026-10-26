@@ -1,0 +1,49 @@
+{
+  "checkedAtUtc": "2026-10-26T04:36:17.115180+00:00",
+  "checks": [
+    {
+      "check": "original 37 source bytes match fixed 20261025 inventory",
+      "status": "PASS",
+      "count": 37
+    },
+    {
+      "check": "RES catalog v2 unchanged",
+      "status": "PASS"
+    },
+    {
+      "check": "CFS-R/EBQ original 1.0.0 bytes unchanged",
+      "status": "PASS"
+    },
+    {
+      "check": "all three source hashes match manifest and actual capture receipt",
+      "status": "PASS",
+      "count": 3
+    },
+    {
+      "check": "original registry generator --check",
+      "status": "PASS",
+      "command": "node --import tsx scripts/generate-scale-instruments.ts --check",
+      "exitCode": 0
+    },
+    {
+      "check": "git diff --check",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "check": "optional single native image integrity",
+      "status": "PASS",
+      "sha256": "eed3128d7aa5031d5735d4c6b3d9ebe9fa6b9e56a63f8c2863e48b27fd83c9e2",
+      "runtimeConnected": false
+    }
+  ],
+  "initialRegistryInvocation": {
+    "exitCode": 1,
+    "status": "BLOCKED",
+    "reason": "tsx CLI IPC pipe refused by read-only sandbox before check; same generator passed with node --import tsx, no IPC; not a product failure"
+  },
+  "initialStaticEvidenceAttempt": {
+    "status": "FAIL",
+    "reason": "evidence script used entries instead of sources manifest key; corrected only that lookup; product tests not repeated"
+  }
+}

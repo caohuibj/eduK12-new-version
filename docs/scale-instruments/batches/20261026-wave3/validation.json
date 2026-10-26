@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DEVELOPMENT_EVIDENCE_NOT_CI_OR_PUBLICATION_ACCEPTANCE",
+  "baselineCommit": "c84f616876163363d66fdc9b41a1cd8b76b0a70d",
+  "scope": "two catalog/report-only revisions and one new MPMI-s22 package",
+  "checks": [
+    {
+      "reporter": "unit-first.json",
+      "kind": "initial no-test-files invocation",
+      "sha256": "38fba086fc81759844e9771ecc3e8d2e87b5dee43b3651ab22f9ee8cec593e0a",
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0,
+      "status": "NOTRUN",
+      "exitCode": 1,
+      "note": "Initial wrong working-directory path; no test executed, corrected before actual run"
+    },
+    {
+      "reporter": "unit-actual.json",
+      "kind": "new unit contracts",
+      "sha256": "cc656dd22caf61d158e6eba7d5bec3aa347959ada76aa5b68011fdff69142482",
+      "passed": 29,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS",
+      "exitCode": 0,
+      "note": "Actual retained JSON reporter; not GitHub CI"
+    },
+    {
+      "reporter": "affected-report.json",
+      "kind": "affected previous report contracts only",
+      "sha256": "28c2a4f824f9391455f40d963faafd4af725ad455b2d3f06aacf7cf3a7a6a58e",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 25,
+      "status": "PASS",
+      "exitCode": 0,
+      "note": "Actual retained JSON reporter; not GitHub CI"
+    },
+    {
+      "reporter": "postgres-first.json",
+      "kind": "restored isolated PostgreSQL contracts",
+      "sha256": "cc2de69e59a7222679484e535dfdd915b2a5d6d0de88c2154d19fa68a671f94f",
+      "passed": 7,
+      "failed": 0,
+      "skipped": 0,
+      "status": "PASS",
+      "exitCode": 0,
+      "note": "Actual retained JSON reporter; not GitHub CI"
+    }
+  ],
+  "uniqueNewUnitAssertionsPassed": 36,
+  "isolatedDatabaseAssertionsPassed": 7,
+  "databaseScope": "restored previous task-owned synthetic dump; 3 DRAFT/HIDDEN rows; 5 snapshots; no production or historical real DB",
+  "actualResultSamples": 25,
+  "actualReportToolVersions": 3,
+  "reportSampleGeneration": "buildScaleResult + parseScaleResultV2 in batch runner; persisted-definition checks separately in DB assertions",
+  "strictTypes": {
+    "status": "PASS",
+    "observedExitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "configSha256": "699c7f0d986fef01539dd09f09a20a82eb0830c70106cb9d847cb3e289a66c33",
+    "scope": "five changed/current test files and their transitive imports; not entire backend build"
+  },
+  "registry": "PASS (original generator; final check recorded in source-checks.json)",
+  "discovery": {
+    "status": "PASS",
+    "prHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+    "positiveKeywords": 4,
+    "unknownTagNegatives": 4,
+    "scope": "pure function only; no DB/UI/authority qualification"
+  },
+  "inputs": {
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/scripts/generate-scale-instruments.ts": "7f779e56f6ab244117e1812baeb7bdb77b02b036b804c6925fe81ee2208be1b5",
+    "server-version/backend/scripts/scale-content-batch.ts": "fc35c785c11dfceea9682325b5a80ef13171fc57d43b6a8bd3da1afef5dc9783",
+    "server-version/backend/src/__tests__/scale/instruments/cfsr12_zh_cn_research.revision.test.ts": "604b39f7357397ddd41172862409af9610318692cf7fa9d0c495ed6c9c981245",
+    "server-version/backend/src/__tests__/scale/instruments/ebq16_zh_cn_research.revision.test.ts": "6486e9ca2179bacf5132978adf4d15df367ef8a58d85d53e5bbb17f111bc0ac5",
+    "server-version/backend/src/__tests__/scale/instruments/mpmi_s22_zh_cn_research.test.ts": "b4ea058c78a1426563f83bd821391918124cc222dbf1ad9ef071d59dc07efbce",
+    "server-version/backend/src/__tests__/scale/instruments/wave3-metadata.postgres.integration.test.ts": "2c1026c226544b5c9f5ee06babbbb9acbaf2a136792c05e59fd670ba001e6ccb",
+    "server-version/backend/src/__tests__/scale/instruments/wave3-tags-reports.test.ts": "7ad11bfa286fb07075f8da85766b41f7c95be59cb54a4bbc6f62fa343bc4d5bf",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "d68d06515d1fc61039fad51660ca9f1e8f04c360b6565a3bdc9f6861612b21d4",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "05d433bd13e7433d70afe89a595471d704486047c2854334c952835f8ef47d7b",
+    "server-version/backend/src/modules/scale/scale-result.ts": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac"
+  },
+  "environment": {
+    "dependencyEvidence": "installed current package-lock with official npm registry; tool versions recorded in original execution; entire historical node_modules bytes not attested",
+    "execution": "cloud content worktree",
+    "originalExecutionSigned": false,
+    "ciExecuted": false
+  },
+  "notRun": [
+    "product HTTP/browser",
+    "actual dual-entry use",
+    "activation",
+    "GitHub CI",
+    "production",
+    "expert translation review",
+    "Chinese population validation"
+  ],
+  "preparedOnly": [
+    "optional one-card report illustration",
+    "instruction.for-pr356.json",
+    "tag-labels.for-pr356.json"
+  ],
+  "sourceVersionsAdded": 1,
+  "existingVersionsMetadataRevised": 2,
+  "newThirdCategoryArchive": "https://app.notion.com/p/405d27635a38815a9fccf8af6451f841",
+  "newSecondCategoryArchives": 0,
+  "candidateResearchNote": "MPMI-s/AAQ-US/WIBPS were known leads, not three newly discovered instruments. WIBPS blocked by primary retrieval; no public item-text package."
+}

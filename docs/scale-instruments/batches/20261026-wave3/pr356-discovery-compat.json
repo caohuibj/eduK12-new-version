@@ -1,0 +1,39 @@
+{
+  "prHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "scope": "pure discovery function only; not UI/DB/permission acceptance",
+  "cases": [
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "query": "压力应对",
+      "match": true,
+      "unknownTagMatch": false,
+      "tagCount": 53
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "query": "情绪信念",
+      "match": true,
+      "unknownTagMatch": false,
+      "tagCount": 53
+    },
+    {
+      "instrumentKey": "mpmi_s22_zh_cn_research",
+      "query": "待办清单",
+      "match": true,
+      "unknownTagMatch": false,
+      "tagCount": 57
+    },
+    {
+      "instrumentKey": "res9_zh_cn",
+      "query": "非商业",
+      "match": true,
+      "unknownTagMatch": false,
+      "tagCount": 32
+    }
+  ],
+  "inputs": {
+    "catalog-discovery.ts": "69650416187e87a1114969c6d954b545f32cb0d36767379114eb088dcb632210",
+    "catalog-tag-labels.json": "4078cfedffc6591017e83c479cf346bdc4b239f19adc3ed0606bbee97b213dd2",
+    "compatibility.ts": "42b944b63c48544029ffa76396c01ee6ce1a6eafb1c85ebb9eeaafa0c08a06d2"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave3-tags-report-mpmi-20261026",
+  "startedAt": "2026-10-26T04:26:38.848Z",
+  "updatedAt": "2026-10-26T04:26:39.401Z",
+  "mode": "ISOLATED_DRAFT_MATERIALIZE",
+  "manifestSha256": "84435009fc61b1f82e50a66cc14d784a29092e4d7149565591d8632a3e4b2754",
+  "entries": [
+    {
+      "id": "cfsr12_zh_cn_research@1.0.1",
+      "status": "PASS",
+      "sourceSha256": "7953e7125b692d33721a2dc1ad54ef07c95df781c08ec63e7f1813d9c8b9a796",
+      "reportFile": "cfsr12_zh_cn_research@1.0.1.reports.json",
+      "materialization": {
+        "scaleId": "5279edf8-1af7-489f-8410-415f8e29802c",
+        "created": false,
+        "definitionHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    },
+    {
+      "id": "ebq16_zh_cn_research@1.0.1",
+      "status": "PASS",
+      "sourceSha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834",
+      "reportFile": "ebq16_zh_cn_research@1.0.1.reports.json",
+      "materialization": {
+        "scaleId": "e07209b1-d103-43c3-9909-bed54539ddc6",
+        "created": false,
+        "definitionHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    },
+    {
+      "id": "mpmi_s22_zh_cn_research@1.0.0",
+      "status": "PASS",
+      "sourceSha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879",
+      "reportFile": "mpmi_s22_zh_cn_research@1.0.0.reports.json",
+      "materialization": {
+        "scaleId": "222e096c-73de-46fe-acbf-eae0a01f194b",
+        "created": false,
+        "definitionHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    }
+  ],
+  "activation": "NOTRUN",
+  "production": "NOTRUN",
+  "browser": "NOTRUN"
+}

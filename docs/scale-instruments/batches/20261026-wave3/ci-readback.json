@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "ciTriggered": false,
+  "commits": [
+    {
+      "sha": "f6f66211e2a7f6f3fd375d5d8dbd610070870744",
+      "actionsRunCount": 0
+    },
+    {
+      "sha": "d2d55bdf6d7053f43f2f9b17f839395f89c65770",
+      "actionsRunCount": 0
+    },
+    {
+      "sha": "20210dfe235039871b1919a84954e2c263a52247",
+      "actionsRunCount": 0
+    }
+  ],
+  "scope": "GitHub Actions API readback; no readiness event or manual activation"
+}

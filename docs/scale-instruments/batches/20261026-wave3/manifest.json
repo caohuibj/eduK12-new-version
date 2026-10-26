@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave3-tags-report-mpmi-20261026",
+  "sources": [
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourceSha256": "7953e7125b692d33721a2dc1ad54ef07c95df781c08ec63e7f1813d9c8b9a796"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourceSha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834"
+    },
+    {
+      "instrumentKey": "mpmi_s22_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879"
+    }
+  ]
+}

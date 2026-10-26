@@ -1,0 +1,20 @@
+{
+  "checkedAtUtc": "2026-10-26T04:34:55.082802+00:00",
+  "pr": 356,
+  "head": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "title": "feat: STANDARD 双入口接入、审核与冻结版本治理",
+  "updatedAt": "2026-10-26T03:58:43Z",
+  "commits": 60,
+  "changedFiles": 317,
+  "state": "open",
+  "draft": true,
+  "newCommitsSincePreviousRead": 0,
+  "change": "PR title/body updated; code HEAD unchanged",
+  "verification": [
+    "GitHub pull API",
+    "git ls-remote three branch refs",
+    "pinned PR discovery function four positive/four unknown-tag negative cases"
+  ],
+  "action": "reuse six implemented platform capabilities; D1-D8 are incremental integration/development; no PR modification/merge/CI"
+}

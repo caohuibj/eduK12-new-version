@@ -1,0 +1,12 @@
+{
+  "scope": "only task-created synthetic container",
+  "container": "eduk12-scale-wave3-20261026",
+  "identityChecked": true,
+  "taskLabelChecked": true,
+  "dumpBytes": 1451510,
+  "dumpSha256": "404a841180f7c5c4db26d8941d29f1c8b81ca3f279a34ca2927f017d0432b988",
+  "newDumpRestoreQualification": "NOTRUN; this dump retained only for later incremental task; prior dump restore was actually exercised in current tests",
+  "containerRemoved": true,
+  "productionTouched": false,
+  "recordedAtUtc": "2026-10-26T04:39:55.841964+00:00"
+}

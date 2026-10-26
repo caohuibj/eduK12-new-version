@@ -1,0 +1,49 @@
+{
+  "parent": "f6f66211e2a7f6f3fd375d5d8dbd610070870744",
+  "commit": "d2d55bdf6d7053f43f2f9b17f839395f89c65770",
+  "tree": "fb591c1a5abbc61b439085077861bf557564df40",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T04:38:36.135691+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/README.md",
+      "remoteBlob": "79d0bf6860ab47d1b519c0cd5eedf8862dbc5820",
+      "sha256": "5b3676d87d2916f527dc446ec2e2bb610761cde8eff8c5404f87ed18019e9d96",
+      "bytes": 1465
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-example.md",
+      "remoteBlob": "46601706618c00c9658065602c4860a56fc352e2",
+      "sha256": "ac4b0ed451a19cf88004ce2e24306484d761f5fda936199523601398032702a5",
+      "bytes": 5289
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/report-result.synthetic.json",
+      "remoteBlob": "ed2381eb7fb131b6fa82971d260ce554ab9f9165",
+      "sha256": "36f13a25cdefd4fca07eb15099fc07b690d0e172e82c365b33fd2c412a80284f",
+      "bytes": 20159
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ebq16/1.0.1/validation.md",
+      "remoteBlob": "a04f9779baee4d3d2cacacf90c70fcab4fa68c7e",
+      "sha256": "cfe524ab359b461a9cd13f3ed2c49ef3084cb9b6285fcf713112cbea7434bc43",
+      "bytes": 2332
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/ebq16_zh_cn_research.revision.test.ts",
+      "remoteBlob": "33850fbd2d3afcc77f15859322a3652194791c2f",
+      "sha256": "6486e9ca2179bacf5132978adf4d15df367ef8a58d85d53e5bbb17f111bc0ac5",
+      "bytes": 5948
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "remoteBlob": "7ad049de7927582b3e036d833cb0e2e7258b70f6",
+      "sha256": "b2b7bb41355511aaf2e5599155dd60d113177da5136649c28fd20f041a733834",
+      "bytes": 51662
+    }
+  ]
+}

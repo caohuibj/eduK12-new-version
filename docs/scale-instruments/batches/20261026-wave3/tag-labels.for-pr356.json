@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "status": "PREPARED_CONTENT_LABEL_INCREMENT_NOT_APPLIED_TO_PR356",
+  "targetPrHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "labels": {
+    "domain:everyday_life": {
+      "label": "日常生活",
+      "axis": "domain"
+    },
+    "domain:everyday_memory": {
+      "label": "日常记事",
+      "axis": "domain"
+    },
+    "construct:prospective_memory": {
+      "label": "记住要做的事",
+      "axis": "construct"
+    },
+    "construct:metamemory": {
+      "label": "对记事习惯的了解",
+      "axis": "construct"
+    },
+    "construct:prospective_memory_ability": {
+      "label": "自述日常记事",
+      "axis": "construct"
+    },
+    "construct:internal_memory_strategies": {
+      "label": "脑中的记事办法",
+      "axis": "construct"
+    },
+    "construct:external_memory_aids": {
+      "label": "清单与外部提醒",
+      "axis": "construct"
+    },
+    "construct:intention_remembering": {
+      "label": "记住原定计划",
+      "axis": "construct"
+    },
+    "construct:coping_strategy_switching": {
+      "label": "调整应对办法",
+      "axis": "construct"
+    },
+    "construct:positive_emotion_beliefs": {
+      "label": "对积极情绪的看法",
+      "axis": "construct"
+    },
+    "construct:negative_emotion_beliefs": {
+      "label": "对不舒服情绪的看法",
+      "axis": "construct"
+    },
+    "orientation:prospective_memory_framework": {
+      "label": "日常记事研究",
+      "axis": "orientation"
+    },
+    "orientation:not_therapy_specific": {
+      "label": "非特定疗法专用",
+      "axis": "orientation"
+    },
+    "population:adult_19_to_71": {
+      "label": "19–71岁成人",
+      "axis": "population"
+    },
+    "population:adult_self_report": {
+      "label": "成人自评",
+      "axis": "population"
+    },
+    "population:source_german_adults": {
+      "label": "原研究德国成人",
+      "axis": "population"
+    },
+    "population:self_report": {
+      "label": "本人作答",
+      "axis": "population"
+    },
+    "response:fixed_order": {
+      "label": "固定题序",
+      "axis": "response"
+    },
+    "response:no_reverse_items": {
+      "label": "无反向题",
+      "axis": "response"
+    },
+    "response:12_items": {
+      "label": "12题",
+      "axis": "response"
+    },
+    "response:16_items": {
+      "label": "16题",
+      "axis": "response"
+    },
+    "response:22_items": {
+      "label": "22题",
+      "axis": "response"
+    },
+    "response:five_point_frequency": {
+      "label": "五档频率",
+      "axis": "response"
+    },
+    "response:four_reverse_items": {
+      "label": "四个反向题",
+      "axis": "response"
+    },
+    "response:optional_items_with_dimension_missing_limit": {
+      "label": "按维度限制漏答",
+      "axis": "response"
+    },
+    "use:not_high_stakes_selection": {
+      "label": "不用于高风险选拔",
+      "axis": "use"
+    },
+    "use:everyday_planning": {
+      "label": "日常安排与反思",
+      "axis": "use"
+    },
+    "use:not_cognitive_performance_test": {
+      "label": "非客观记忆测验",
+      "axis": "use"
+    },
+    "license:changes_indicated": {
+      "label": "需注明改动",
+      "axis": "license"
+    },
+    "license:source_allows_redistribution": {
+      "label": "原版许可允许署名再分发",
+      "axis": "license"
+    },
+    "license:source_allows_adaptation": {
+      "label": "原版许可允许改编",
+      "axis": "license"
+    },
+    "license:source_allows_commercial_use": {
+      "label": "原版许可允许商业使用（须遵守条件）",
+      "axis": "license"
+    },
+    "language_validation:source_administration_de": {
+      "label": "原研究德语施测",
+      "axis": "language_validation"
+    },
+    "language_validation:author_published_english_translation": {
+      "label": "作者公布英文译文",
+      "axis": "language_validation"
+    },
+    "language_validation:zh_cn_working_translation": {
+      "label": "平台简体中文工作稿",
+      "axis": "language_validation"
+    }
+  },
+  "note": "Copy reviewed labels into the existing PR356 dictionary in a feature patch; no new schema, no tag-derived system grant, no claim of current frontend deployment."
+}

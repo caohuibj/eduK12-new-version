@@ -1,0 +1,970 @@
+{
+  "schemaVersion": 1,
+  "scope": "Latest versions of the 42 prior content identities plus MPMI-s22; current working source bytes, not production data",
+  "status": "EDITORIAL_REVIEW_QUEUE_NOT_PUBLICATION_GATE",
+  "count": 43,
+  "records": [
+    {
+      "instrumentKey": "act_sq6_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 33,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "cbi_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 19,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ccfq18_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 21,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "cesd10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 25,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 49,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "应对灵活性",
+        "压力应对",
+        "换个办法",
+        "停止无效办法",
+        "重新应对",
+        "回看行动效果",
+        "成人自评",
+        "个人反思",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
+      ],
+      "reportVersion": "1.0.2",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "csacs9_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 18,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "djgls6_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "孤独感",
+        "社会联结",
+        "情感联结",
+        "成人",
+        "老年人",
+        "自评",
+        "非商业",
+        "独立中译待验证",
+        "非诊断"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 49,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "情绪信念",
+        "情绪能否改变",
+        "情绪有什么用",
+        "积极情绪",
+        "不舒服的情绪",
+        "情绪调节相关看法",
+        "成人自评",
+        "个人反思",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
+      ],
+      "reportVersion": "1.0.3",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "gad7_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 16,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "gse3_asku_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 28,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "非商业"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "hse_msit_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ie4_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 17,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip50_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 31,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 26,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 25,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 25,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_nfc10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 27,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_opt10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 26,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 26,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "jss8_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 16,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "k6_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 16,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "kseg6_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 27,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "自我呈现",
+        "社会期许",
+        "成人",
+        "研究用途",
+        "中文工作译稿"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "kusiv3_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 28,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "人际关系",
+        "人际信任",
+        "自我了解",
+        "成人",
+        "研究用途",
+        "中文工作译稿"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "l1_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 18,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "非商业"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "mpmi_s22_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mpmi_s22_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 53,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "日常记事",
+        "记住要做的事",
+        "前瞻记忆",
+        "待办清单",
+        "备忘录",
+        "日历提醒",
+        "购物清单",
+        "记事策略",
+        "成人自评",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 16,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "mwq5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 17,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "orvis92_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 25,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "pba23_2018_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 24,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "phq4_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 28,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "res9_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 28,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "orientation",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "非商业"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "rses10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 25,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "sas_sv10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 23,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "数字使用",
+        "智能手机",
+        "行为习惯",
+        "青少年原始验证",
+        "自评",
+        "10题",
+        "中文工作稿",
+        "非诊断",
+        "外部阈值未启用"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "sci8_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 23,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "睡眠",
+        "失眠筛查",
+        "成人",
+        "自评",
+        "过去一个月",
+        "非商业",
+        "独立中译待验证",
+        "非诊断"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "sop2_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 27,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.1",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "srq63_brown_miller_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 15,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "sswq16_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+      "catalogManifestVersion": 2,
+      "tagCount": 32,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [
+        "学校幸福感",
+        "学习乐趣",
+        "学校归属",
+        "学习意义",
+        "学习表现体验",
+        "青少年",
+        "自评",
+        "独立中译待验证",
+        "非诊断"
+      ],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    },
+    {
+      "instrumentKey": "tswq_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+      "catalogManifestVersion": 1,
+      "tagCount": 19,
+      "axesCovered": [
+        "domain",
+        "construct",
+        "population",
+        "response",
+        "use",
+        "license",
+        "language_validation"
+      ],
+      "chineseFreeSearchTerms": [],
+      "reportVersion": "1.0.0",
+      "primaryReportTechnicalWordHints": [],
+      "reviewNote": "Static hints only; no inference that a tool is unusable, unsearchable or unpublished."
+    }
+  ]
+}
