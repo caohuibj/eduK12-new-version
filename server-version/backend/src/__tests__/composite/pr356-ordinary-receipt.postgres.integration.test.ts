@@ -1,31 +1,42 @@
 import {randomUUID} from 'node:crypto'
-import {readFileSync,writeFileSync,existsSync} from 'node:fs'
-import {join} from 'node:path'
-import {afterAll,beforeAll,describe,expect,it,vi} from 'vitest'
-const suite=process.env.PR356_ORDINARY_RECEIPT_ISOLATED==='1'?describe:describe.skip
+import {beforeAll,describe,expect,it,vi} from 'vitest'
+import {assertOrdinaryReceiptQueue,createOrdinaryReceiptRunner,readOrdinaryReceiptPlan,writeOrdinaryReceiptLedger,type OrdinaryReceiptJourney,type OrdinaryReceiptPlan} from './pr356-ordinary-receipt-harness'
+const suite=process.env.PR356_ORDINARY_RECEIPT_ISOLATED==='1'?describe.sequential:describe.skip
 suite('ordinary durable whole receipt collection boundary',()=>{
- let db:any,whole:typeof import('../../modules/composite/whole-questionnaire.service'),outbox:typeof import('../../modules/assessment-runtime/report-outbox.service'),systemId:string,ledger:string
- beforeAll(async()=>{
-  const url=new URL(process.env.DATABASE_URL!)
-  if(process.env.NODE_ENV!=='test'||!['localhost','127.0.0.1'].includes(url.hostname)||url.port!=='55439'||!/^\/pr356_ordinary_receipt_test_[a-f0-9]{10}$/.test(url.pathname))throw new Error('Dedicated ordinary receipt synthetic DB required')
-  if(process.env.PR356_ORDINARY_RECEIPT_OUT!=='/workspace/scratch/pr356-review-followup')throw new Error('Explicit synthetic fixture evidence directory required')
-  for(const [key,value]of Object.entries({ASSESSMENT_REPORT_ASYNC_ENABLED:'true',ASSESSMENT_WHOLE_SUBMIT_ENABLED:'true',ASSESSMENT_REPORT_MAX_ATTEMPTS:'1',ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED:'true',ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED:'true',ASSESSMENT_REPORT_ASYNC_COURSE_IDS:''}))vi.stubEnv(key,value)
-  db=(await import('../../config/database')).prisma;whole=await import('../../modules/composite/whole-questionnaire.service');outbox=await import('../../modules/assessment-runtime/report-outbox.service')
-  const name=url.pathname.slice(1)+'-system';systemId=(await db.user.upsert({where:{username:name},update:{},create:{username:name,passwordHash:'SYNTHETIC NONLOGIN',accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN'}})).id
-  ledger=join(process.env.PR356_ORDINARY_RECEIPT_OUT!,url.pathname.slice(1)+'.fixture.json')
- },120000)
- afterAll(async()=>{vi.unstubAllEnvs();if(db){await(await import('../../config/queue')).closeQueues(true);await db.$disconnect()}})
+ let db:any,whole:typeof import('../../modules/composite/whole-questionnaire.service'),outbox:typeof import('../../modules/assessment-runtime/report-outbox.service'),systemId:string,plan:OrdinaryReceiptPlan
+ let runJourney:ReturnType<typeof createOrdinaryReceiptRunner<{whole:typeof whole;outbox:typeof outbox}>>
+ beforeAll(()=>{
+  plan=readOrdinaryReceiptPlan(process.env)
+  runJourney=createOrdinaryReceiptRunner(plan,{
+   resetModules:()=>vi.resetModules(),
+   loadClient:async()=>(await import('../../config/database')).prisma,
+   loadQueues:()=>import('../../config/queue'),
+   loadServices:async()=>({whole:await import('../../modules/composite/whole-questionnaire.service'),outbox:await import('../../modules/assessment-runtime/report-outbox.service')}),
+  })
+ })
+ async function withJourney(journey:OrdinaryReceiptJourney,work:(saved:any)=>Promise<void>){
+  await runJourney(journey,async context=>{
+   db=context.db;whole=context.services.whole;outbox=context.services.outbox
+   if(plan.mode==='fresh'){
+    const name=context.target.databaseName+'-system'
+    systemId=(await db.user.upsert({where:{username:name},update:{},create:{username:name,passwordHash:'SYNTHETIC NONLOGIN',accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN'}})).id
+   }
+   await work(context.saved)
+  })
+ }
+ async function claimFor(parentId:string,attemptEpoch:number){
+  assertOrdinaryReceiptQueue(await db.compositeReportJob.findMany({select:{attemptId:true,attemptEpoch:true,status:true}}),{parentId,attemptEpoch})
+  return outbox.claimCompositeReportJob()
+ }
  const stop=async(scaleIds:string[])=>db.$transaction(async(tx:any)=>{for(const id of scaleIds)await(await import('../../modules/scale-library-governance/service')).stopCollection(tx,systemId,'TRAINING_SCALE',id,'Synthetic ordinary ACK phase boundary')})
  async function fresh(){return(await import('../integration/report-outbox-fixture')).createReportOutboxFixture(db,2)}
  async function payload(f:any){
   const definition=await whole.getWholeQuestionnaireDefinition(f.parent.id,{userId:f.participant.id})
   return {submissionId:randomUUID(),attemptEpoch:definition.attemptEpoch,slotSetHash:definition.slotSetHash!,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map(u=>({itemId:u.itemId,definitionHash:u.definitionHash,answers:f.inputs.find((i:any)=>i.assessmentId===u.scaleAssessmentId)!.answers}))}
  }
- it.each(['single','batch']as const)('processes accepted %s units after emergency stop while retaining receipt and lease identity',async mode=>{
-  vi.stubEnv('ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED',mode==='batch'?'true':'false')
-  let saved:any
-  if(existsSync(ledger))saved=JSON.parse(readFileSync(ledger,'utf8'))
-  else{
+ it.each(['single','batch']as const)('processes accepted %s units after emergency stop while retaining receipt and lease identity',async mode=>withJourney(mode,async replay=>{
+  let saved:any=replay
+  if(!saved){
    const f=await fresh(),input=await payload(f)
    // A detached durable ACK must not wait for the unrelated legacy counter.
    let unlock!:()=>void,locked!:()=>void;const ready=new Promise<void>(r=>{locked=r}),release=new Promise<void>(r=>{unlock=r})
@@ -36,15 +47,15 @@ suite('ordinary durable whole receipt collection boundary',()=>{
    const receipt=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:f.parent.id,attemptEpoch:input.attemptEpoch}}})
    expect(receipt.budgetHeld).toBe(false)
    saved={parentId:f.parent.id,participantId:f.participant.id,scaleIds:f.scaleIds,input,wholePayloadHash:receipt.wholePayloadHash,wholeAnswersEncrypted:receipt.wholeAnswersEncrypted}
-   writeFileSync(ledger,JSON.stringify(saved,null,2)+'\n',{flag:'wx'})
+   writeOrdinaryReceiptLedger(plan,mode,saved)
    await stop(f.scaleIds)
   }
   const prior=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:saved.parentId,attemptEpoch:saved.input.attemptEpoch}}})
   expect(prior.status,'Settled READY fixtures are never rerun').not.toBe('READY')
   if(prior.status==='FAILED')await outbox.retryCompositeReport(await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:saved.parentId}}))
-  vi.stubEnv('ASSESSMENT_REPORT_LEASE_MS','1');const expired=await outbox.claimCompositeReportJob();expect(expired?.id).toBe(prior.id)
+  process.env.ASSESSMENT_REPORT_LEASE_MS='1';const expired=await claimFor(saved.parentId,saved.input.attemptEpoch);expect(expired?.id).toBe(prior.id)
   await db.$queryRaw`SELECT 1 AS tick FROM pg_sleep(0.01)`
-  vi.stubEnv('ASSESSMENT_REPORT_LEASE_MS','60000');const job=await outbox.claimCompositeReportJob();expect(job?.id).toBe(prior.id);expect(job!.leaseToken).not.toBe(expired!.leaseToken)
+  process.env.ASSESSMENT_REPORT_LEASE_MS='60000';const job=await claimFor(saved.parentId,saved.input.attemptEpoch);expect(job?.id).toBe(prior.id);expect(job!.leaseToken).not.toBe(expired!.leaseToken)
   const guard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
   const receipt={submissionId:job!.wholeSubmissionId!,payloadHash:job!.wholePayloadHash!,acceptedAtMs:job!.wholeAcceptedAt!.getTime(),leaseToken:job!.leaseToken!}
   const scope={compositeAttemptId:saved.parentId,compositeAttemptEpoch:job!.attemptEpoch,compositeItemIds:saved.input.units.map((u:any)=>u.itemId),acceptedReceipt:receipt}
@@ -60,10 +71,12 @@ suite('ordinary durable whole receipt collection boundary',()=>{
   const snapshots=await db.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:parent.id,unitType:'SCALE',terminalState:'COMPLETED'}});expect(snapshots).toHaveLength(2)
   expect(await whole.submitWholeQuestionnaire(parent.id,saved.input,{userId:saved.participantId})).toMatchObject({replayed:true,payloadHash:saved.wholePayloadHash})
   expect(await db.assessmentUnitSnapshot.count({where:{compositeAttemptId:parent.id,unitType:'SCALE'}})).toBe(2)
- },120000)
- it('rechecks wall-clock lease after a real job-lock wait rather than transaction start',async()=>{
+ }),120000)
+ it('rechecks wall-clock lease after a real job-lock wait rather than transaction start',async()=>withJourney('lockwait',async()=>{
   const f=await fresh(),input=await payload(f);await whole.submitWholeQuestionnaire(f.parent.id,input,{userId:f.participant.id})
-  vi.stubEnv('ASSESSMENT_REPORT_LEASE_MS','500');const job=await outbox.claimCompositeReportJob();expect(job?.attemptId).toBe(f.parent.id)
+  const accepted=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:f.parent.id,attemptEpoch:input.attemptEpoch}}})
+  writeOrdinaryReceiptLedger(plan,'lockwait',{parentId:f.parent.id,participantId:f.participant.id,scaleIds:f.scaleIds,input,wholePayloadHash:accepted.wholePayloadHash,wholeAnswersEncrypted:accepted.wholeAnswersEncrypted})
+  process.env.ASSESSMENT_REPORT_LEASE_MS='500';const job=await claimFor(f.parent.id,input.attemptEpoch);expect(job?.attemptId).toBe(f.parent.id)
   let unlock!:()=>void,locked!:()=>void;const ready=new Promise<void>(r=>{locked=r}),release=new Promise<void>(r=>{unlock=r})
   const holding=db.$transaction(async(tx:any)=>{await tx.$queryRaw`SELECT id FROM composite_report_jobs WHERE id=${job!.id} FOR UPDATE`;locked();await release},{timeout:5000})
   await ready
@@ -82,12 +95,13 @@ suite('ordinary durable whole receipt collection boundary',()=>{
   }finally{unlock();await holding}
   expect((await pending).error).toMatchObject({message:'REPORT_PROCESSING_LEASE_LOST'})
   expect(await db.assessment.count({where:{compositeAttemptId:f.parent.id,status:'COMPLETED'}})).toBe(0)
- },15000)
- it('rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction',async()=>{
+ }),15000)
+ it('rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction',async()=>withJourney('prestop',async()=>{
   const f=await fresh(),input=await payload(f);await stop(f.scaleIds)
   await expect(whole.submitWholeQuestionnaire(f.parent.id,input,{userId:f.participant.id})).rejects.toThrow('紧急停用')
   const job=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:f.parent.id,attemptEpoch:input.attemptEpoch}}})
+  writeOrdinaryReceiptLedger(plan,'prestop',{parentId:f.parent.id,participantId:f.participant.id,scaleIds:f.scaleIds,input,wholePayloadHash:job.wholePayloadHash,wholeAnswersEncrypted:job.wholeAnswersEncrypted})
   expect(job.wholeSubmissionId).toBeNull();expect(job.wholeAnswersEncrypted).toBeNull();expect(job.status).toBe('WAITING')
   expect(await db.assessment.count({where:{compositeAttemptId:f.parent.id,status:'COMPLETED'}})).toBe(0)
- },120000)
+ }),120000)
 })
