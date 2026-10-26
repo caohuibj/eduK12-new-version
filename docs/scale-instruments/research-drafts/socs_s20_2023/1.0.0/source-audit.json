@@ -1,0 +1,199 @@
+{
+  "instrumentKey": "socs_s20_2023_zh_cn",
+  "version": "1.0.0",
+  "fixedCarrier": {
+    "doi": "10.3389/fpsyg.2023.1110076.s001",
+    "articleId": 22807865,
+    "fileId": 40547723,
+    "url": "https://ndownloader.figshare.com/files/40547723",
+    "table": "Supplementary Table1",
+    "instruction": "*请为每个条目选择合适的一项。",
+    "responseLabels": [
+      "完全不符合",
+      "基本不符合",
+      "不确定",
+      "基本符合",
+      "完全符合"
+    ],
+    "items": [
+      {
+        "number": 1,
+        "text": "我很善于识别我痛苦时的感受",
+        "facet": "recognizing_suffering",
+        "reverse": false
+      },
+      {
+        "number": 2,
+        "text": "我知道每个人都会在生命中的某些阶段经历痛苦",
+        "facet": "understanding_universality",
+        "reverse": false
+      },
+      {
+        "number": 3,
+        "text": "当我经历困难时，我会善待自己",
+        "facet": "feeling_for_self",
+        "reverse": false
+      },
+      {
+        "number": 4,
+        "text": "当我情绪低落时，我试着敞开心扉接受自己的感受，而不是回避它们",
+        "facet": "tolerating_feelings",
+        "reverse": false
+      },
+      {
+        "number": 5,
+        "text": "当我苦恼时，我尽量让自己感觉好一点，即使我对此无能为力",
+        "facet": "acting_to_alleviate",
+        "reverse": false
+      },
+      {
+        "number": 6,
+        "text": "我会注意到我正在经历的痛苦",
+        "facet": "recognizing_suffering",
+        "reverse": false
+      },
+      {
+        "number": 7,
+        "text": "我明白偶尔感到不安是人生常态",
+        "facet": "understanding_universality",
+        "reverse": false
+      },
+      {
+        "number": 8,
+        "text": "当我遭遇不幸时，我会关心自己",
+        "facet": "feeling_for_self",
+        "reverse": false
+      },
+      {
+        "number": 9,
+        "text": "我与自己的痛苦持联结，而不是让它压倒我。",
+        "facet": "tolerating_feelings",
+        "reverse": false
+      },
+      {
+        "number": 10,
+        "text": "遇到困难时，我会尽量照顾好自己",
+        "facet": "acting_to_alleviate",
+        "reverse": false
+      },
+      {
+        "number": 11,
+        "text": "我很快就注意到自己痛苦的早期迹象",
+        "facet": "recognizing_suffering",
+        "reverse": false
+      },
+      {
+        "number": 12,
+        "text": "我知道其他人也像我一样在生活中会经历挣扎",
+        "facet": "understanding_universality",
+        "reverse": false
+      },
+      {
+        "number": 13,
+        "text": "当我心烦意乱时，我试着调整我的感受",
+        "facet": "feeling_for_self",
+        "reverse": false
+      },
+      {
+        "number": 14,
+        "text": "我与自己的痛苦保持联结，而不是批判自己",
+        "facet": "tolerating_feelings",
+        "reverse": false
+      },
+      {
+        "number": 15,
+        "text": "当我感到不安时，我尽量做对自己最有利的事",
+        "facet": "acting_to_alleviate",
+        "reverse": false
+      },
+      {
+        "number": 16,
+        "text": "我能识别自己的痛苦迹象",
+        "facet": "recognizing_suffering",
+        "reverse": false
+      },
+      {
+        "number": 17,
+        "text": "我知道当生活中的事情进展不顺利时，我们都会感到痛苦",
+        "facet": "understanding_universality",
+        "reverse": false
+      },
+      {
+        "number": 18,
+        "text": "即使我对自己很失望，我也能在困境中善待自己",
+        "facet": "feeling_for_self",
+        "reverse": false
+      },
+      {
+        "number": 19,
+        "text": "当我心烦意乱时，我会让情绪顺其自然而不受它控制",
+        "facet": "tolerating_feelings",
+        "reverse": false
+      },
+      {
+        "number": 20,
+        "text": "当情绪低落时，我尽力照顾好自己",
+        "facet": "acting_to_alleviate",
+        "reverse": false
+      }
+    ]
+  },
+  "rights": {
+    "originalGu": "CC BY 4.0",
+    "publishedChineseMeng": "CC BY 4.0",
+    "standaloneSupplementMetadata": "CC BY 4.0",
+    "exclusionFound": false,
+    "attribution": "© 2023 Meng, Wang and Liu. Meng, H., Wang, X., & Liu, H. (2023). The Sussex Oxford Compassion for the Self Scale validity in a working sample using classical test theory, item response theory and network analysis. Frontiers in Psychology, 14, 1110076. https://doi.org/10.3389/fpsyg.2023.1110076. 中文题文、独立指导语、五个选项逐字取自正式Supplementary Table1；附件DOI 10.3389/fpsyg.2023.1110076.s001，Figshare article 22807865、file 40547723，附件明确CC BY 4.0（https://creativecommons.org/licenses/by/4.0/），未发现题本单独排除。原SOCS由Gu、Baer、Cavanagh、Kuyken、Strauss开发，© The Authors 2019，2020卷期；原论文及开放附件亦CC BY 4.0。保留原作者、中文作者、两篇来源和许可链接。平台未新译或润色题文；改动为数字化编排、中文原创反馈、成人下限与完整作答约定、1–5等权均分计算。均分是基于2023 Table5量尺的显式平台决策，正文未逐字给公式；非声称原手册指示。未获作者背书。CC署名与改动说明随公开再分发保留；系统启用仍需真实授权与治理。"
+  },
+  "sources": [
+    {
+      "filename": "meng2023-official-supplement.docx",
+      "bytes": 48371,
+      "sha256": "9090b2258922e1cc9664766c8e2bc060fd14065a7b4322aed0a784d624fb573f",
+      "url": "https://ndownloader.figshare.com/files/40547723"
+    },
+    {
+      "filename": "meng2023-figshare-metadata.json",
+      "bytes": 22476,
+      "sha256": "c0216aff080cf5933e2fd6248d1940009ccb5d9b3ef6b59b50620c2ae527ae2e",
+      "url": "https://api.figshare.com/v2/articles/22807865"
+    },
+    {
+      "filename": "meng2023-original.xml",
+      "bytes": 140315,
+      "sha256": "ed85468d9964b77157b295e20de38dcb75641269442a3a56d38dc247a16baf21",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10213251/fullTextXML"
+    },
+    {
+      "filename": "original-2019-2020.xml",
+      "bytes": 212494,
+      "sha256": "90bddae3f6a9277af2ed8edb9f365a1ff144165b53073ebac3b5f68e1a839ce5",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6906538/fullTextXML"
+    }
+  ],
+  "scoringDecision": {
+    "version": "1.0.0",
+    "basis": "2023 Table5 1–5 descriptive scale; formula not literally specified in 2023 prose",
+    "platformDecision": "equal-weight mean of all20 and each4; complete_required",
+    "originalGuRule": "既有文献求和口径：总和20–100、各维和4–20。此前浏览工具回读SAGE附录p15求和段；当前私有PDF下载未成功冻结，不把HTML误作原PDF或冒称2023手册公式。",
+    "linearConversion": "original sum = platform mean × item count (20 total,4 facet) for complete valid responses; no thresholds transferred"
+  },
+  "agePolicy": "18+ project boundary; missing age INDETERMINATE; actual source grouped ≤20 and ≥50 without exact bounds",
+  "sampleFlowCaution": "2023正文1302初始/1132最终同时称1.3% attrition，数值不一致；不自行修正或将其作为覆盖率依据。",
+  "classification": "CLASS_1_OPEN_FIXED_PUBLISHED_CHINESE_DRAFT",
+  "excludedVersions": [
+    "SOCS-O20",
+    "later short forms",
+    "Neff SCS-SF12",
+    "new Chinese translations"
+  ],
+  "status": "DRAFT/CANDIDATE; human expert/governance PENDING; no scientificReview claim",
+  "unqualifiedRetrieval": {
+    "filename": "official-supplement-pmc.pdf",
+    "actualFormat": "HTML",
+    "actualPdf": false,
+    "bytes": 21469,
+    "sha256": "428c1934a731affa8e9bb6e0f205346b12a593ad94abf8a9b9ec32671a059944",
+    "status": "NOT_A_PDF_DO_NOT_USE_AS_ITEM_OR_SCORING_CARRIER"
+  }
+}

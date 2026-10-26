@@ -1,0 +1,15 @@
+{
+  "parameterVersion": "1.0.0",
+  "status": "NONE_NO_NORMS",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentVersionField": "NOT_SUPPORTED_FOR_NONE",
+  "referenceBindings": [],
+  "thresholds": [],
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "reportVersion": "1.0.0",
+  "axesNotes": "内容含冻结题文/选项/计分和本地化；参数独立无常模；报告独立原创中文。此语言序列与原Gu英文及其他中文版本独立。"
+}

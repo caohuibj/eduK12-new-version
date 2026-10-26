@@ -1,0 +1,12 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instrumentKey": "socs_s20_2023_zh_cn",
+  "instrumentVersion": "1.0.0",
+  "locale": "zh-CN",
+  "instructions": [
+    "*请为每个条目选择合适的一项。"
+  ],
+  "recallPeriod": null,
+  "itemOrderLocked": true,
+  "consumerStatus": "旧schema无instruction字段；指导语待消费者独立接入，未放入第一题。"
+}

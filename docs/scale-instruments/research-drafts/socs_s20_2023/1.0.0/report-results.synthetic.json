@@ -1,0 +1,2209 @@
+{
+  "status": "SYNTHETIC_ENGINE_OUTPUT_NOT_REAL_PARTICIPANTS",
+  "generatedAt": "2026-10-26T09:06:13.951Z",
+  "reports": [
+    {
+      "case": "minimum",
+      "answers": [
+        {
+          "itemCode": "SOCSS_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_09",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_10",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_11",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_12",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_13",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_14",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_15",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_16",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_17",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_18",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_19",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_20",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-socs-s20-minimum",
+          "code": "socs_s20_2023_zh_cn",
+          "name": "苏塞克斯—牛津自我关怀量表（SOCS-S，2023正式中文20题）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-socs-s20-minimum",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "SOCSS_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_10",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_11",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_12",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_13",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_14",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_15",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_16",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_17",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_18",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_19",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_20",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "recognizing_suffering",
+            "type": "dimension",
+            "label": "识别自己的痛苦",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "understanding_universality",
+            "type": "dimension",
+            "label": "理解痛苦是共同经历",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "answeredItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "feeling_for_self",
+            "type": "dimension",
+            "label": "关怀受苦的自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "answeredItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "tolerating_feelings",
+            "type": "dimension",
+            "label": "容纳不舒服的感受",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "answeredItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "acting_to_alleviate",
+            "type": "dimension",
+            "label": "采取行动照顾自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "自我关怀整体描述",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "recognizing_suffering",
+            "headline": "识别自己的痛苦",
+            "label": null,
+            "interpretation": "这部分关注你是否能留意到自己的痛苦，例如察觉情绪变沉、发现自己正在勉强支撑，或认出不舒服刚出现时的迹象。能否注意到这些变化会受到当时的忙碌程度和处境影响，回答并不评价你是否足够敏感或坚强。你可以回想最近一个不太顺利的时刻，看看自己是在什么时候发现难受的。下次有类似感觉时，先用一个简单的词描述它，给自己留一点辨认需要的时间。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近你在什么时候注意到自己有些难受？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个简单的词描述当时的感受。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "understanding_universality",
+            "headline": "理解痛苦是共同经历",
+            "label": null,
+            "interpretation": "这部分关注你是否理解，痛苦、失落与不顺利也是许多人会经历的事情。想到这一点，有时能让人少一些孤立感，但每个人的处境和所需支持仍然不同，不必用“别人也这样”来压下自己的感受。可以回想一次你觉得只有自己遇到困难的时候，看看有没有可信任的人也分享过相似经历。下一次感到孤单时，试着对自己说一句承认困难的话，再决定是否愿意向合适的人寻求理解。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一种经历让你觉得自己并不孤单？"
+              },
+              {
+                "category": "strategy",
+                "text": "先承认困难，再考虑向合适的人寻求理解。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "feeling_for_self",
+            "headline": "关怀受苦的自己",
+            "label": null,
+            "interpretation": "这部分关注当你遇到困难或对自己失望时，是否仍愿意以关心和温和的态度回应自己。有时善待自己很自然，有时却很难做到，这些回答只是整理你描述的回应方式，不是给你的品格打分。你可以想一想，如果一个你关心的人正经历类似处境，你会怎样和他说话。下次发现自己责备自己时，试着换一句既承认问题、又给自己留有照顾空间的话，看看这样的说法是否适合当时的你。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果是你关心的人遇到同样的事，你会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试用一句温和而实际的话回应自己。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "tolerating_feelings",
+            "headline": "容纳不舒服的感受",
+            "label": null,
+            "interpretation": "这部分关注面对难受的情绪时，你是否愿意让感受存在，同时保留一点选择怎样回应的空间。容纳情绪并不要求你独自忍耐所有困难，也不代表情绪应该马上消失。不同情境下，暂停、休息或寻求支持都可能合适。可以回想一次情绪出现却没有完全带着你走的经历，看看当时什么帮助了你。下一次有轻微不安时，先辨认感受，再选择一件眼前能够做到的、照顾自己的小事。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么帮助你在情绪出现时保留一点选择空间？"
+              },
+              {
+                "category": "strategy",
+                "text": "辨认感受后，选择一件能照顾自己的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "acting_to_alleviate",
+            "headline": "采取行动照顾自己",
+            "label": null,
+            "interpretation": "这部分关注当自己痛苦或遇到困难时，你是否尝试采取行动照顾自己。这样的行动可以很小，例如休息片刻、减少一个不必要的负担，或向合适的人说明自己的需要，不要求你立刻解决困难的原因。回答会受到现实条件影响，并不衡量你是否已经把一切处理好。可以想一想，最近什么事情让你稍微好受一点。下次遇到相似处境时，选一个可行的小行动，做完后再看看是否需要调整或求助。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一件小事让你稍微好受一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个可行的小行动，做完后看看是否需要调整。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "total",
+            "headline": "自我关怀整体描述",
+            "label": null,
+            "interpretation": "整体描述将二十个回答放在一起，帮助你回顾自己面对痛苦时如何留意感受、理解共同经历、表达关怀、容纳情绪和采取行动。它不能替代五个方面各自的体验，也不是评价你是否值得被关心的标准。不同生活处境可能让同一个人的回答发生变化，不需要把结果当作固定标签。你可以从五个方面中选一个最想了解的地方，回想一个具体场景，再尝试一件适合当前条件的小事，观察自己真正需要什么。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "五个方面里，你现在最愿意了解哪一个？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个具体场景，尝试一件当前做得到的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+          "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+          "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+          "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+          "平台专家与治理审核仍待完成；草稿不能据此激活施测。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。"
+      }
+    },
+    {
+      "case": "maximum",
+      "answers": [
+        {
+          "itemCode": "SOCSS_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_09",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_10",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_11",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_12",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_13",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_14",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_15",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_16",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_17",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_18",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_19",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_20",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-socs-s20-maximum",
+          "code": "socs_s20_2023_zh_cn",
+          "name": "苏塞克斯—牛津自我关怀量表（SOCS-S，2023正式中文20题）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-socs-s20-maximum",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "SOCSS_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_10",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_11",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_12",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_13",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_14",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_15",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_16",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_17",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_18",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_19",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_20",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "recognizing_suffering",
+            "type": "dimension",
+            "label": "识别自己的痛苦",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "understanding_universality",
+            "type": "dimension",
+            "label": "理解痛苦是共同经历",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "answeredItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "feeling_for_self",
+            "type": "dimension",
+            "label": "关怀受苦的自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "answeredItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "tolerating_feelings",
+            "type": "dimension",
+            "label": "容纳不舒服的感受",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "answeredItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "acting_to_alleviate",
+            "type": "dimension",
+            "label": "采取行动照顾自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "自我关怀整体描述",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "recognizing_suffering",
+            "headline": "识别自己的痛苦",
+            "label": null,
+            "interpretation": "这部分关注你是否能留意到自己的痛苦，例如察觉情绪变沉、发现自己正在勉强支撑，或认出不舒服刚出现时的迹象。能否注意到这些变化会受到当时的忙碌程度和处境影响，回答并不评价你是否足够敏感或坚强。你可以回想最近一个不太顺利的时刻，看看自己是在什么时候发现难受的。下次有类似感觉时，先用一个简单的词描述它，给自己留一点辨认需要的时间。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近你在什么时候注意到自己有些难受？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个简单的词描述当时的感受。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "understanding_universality",
+            "headline": "理解痛苦是共同经历",
+            "label": null,
+            "interpretation": "这部分关注你是否理解，痛苦、失落与不顺利也是许多人会经历的事情。想到这一点，有时能让人少一些孤立感，但每个人的处境和所需支持仍然不同，不必用“别人也这样”来压下自己的感受。可以回想一次你觉得只有自己遇到困难的时候，看看有没有可信任的人也分享过相似经历。下一次感到孤单时，试着对自己说一句承认困难的话，再决定是否愿意向合适的人寻求理解。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一种经历让你觉得自己并不孤单？"
+              },
+              {
+                "category": "strategy",
+                "text": "先承认困难，再考虑向合适的人寻求理解。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "feeling_for_self",
+            "headline": "关怀受苦的自己",
+            "label": null,
+            "interpretation": "这部分关注当你遇到困难或对自己失望时，是否仍愿意以关心和温和的态度回应自己。有时善待自己很自然，有时却很难做到，这些回答只是整理你描述的回应方式，不是给你的品格打分。你可以想一想，如果一个你关心的人正经历类似处境，你会怎样和他说话。下次发现自己责备自己时，试着换一句既承认问题、又给自己留有照顾空间的话，看看这样的说法是否适合当时的你。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果是你关心的人遇到同样的事，你会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试用一句温和而实际的话回应自己。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "tolerating_feelings",
+            "headline": "容纳不舒服的感受",
+            "label": null,
+            "interpretation": "这部分关注面对难受的情绪时，你是否愿意让感受存在，同时保留一点选择怎样回应的空间。容纳情绪并不要求你独自忍耐所有困难，也不代表情绪应该马上消失。不同情境下，暂停、休息或寻求支持都可能合适。可以回想一次情绪出现却没有完全带着你走的经历，看看当时什么帮助了你。下一次有轻微不安时，先辨认感受，再选择一件眼前能够做到的、照顾自己的小事。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么帮助你在情绪出现时保留一点选择空间？"
+              },
+              {
+                "category": "strategy",
+                "text": "辨认感受后，选择一件能照顾自己的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "acting_to_alleviate",
+            "headline": "采取行动照顾自己",
+            "label": null,
+            "interpretation": "这部分关注当自己痛苦或遇到困难时，你是否尝试采取行动照顾自己。这样的行动可以很小，例如休息片刻、减少一个不必要的负担，或向合适的人说明自己的需要，不要求你立刻解决困难的原因。回答会受到现实条件影响，并不衡量你是否已经把一切处理好。可以想一想，最近什么事情让你稍微好受一点。下次遇到相似处境时，选一个可行的小行动，做完后再看看是否需要调整或求助。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一件小事让你稍微好受一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个可行的小行动，做完后看看是否需要调整。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "total",
+            "headline": "自我关怀整体描述",
+            "label": null,
+            "interpretation": "整体描述将二十个回答放在一起，帮助你回顾自己面对痛苦时如何留意感受、理解共同经历、表达关怀、容纳情绪和采取行动。它不能替代五个方面各自的体验，也不是评价你是否值得被关心的标准。不同生活处境可能让同一个人的回答发生变化，不需要把结果当作固定标签。你可以从五个方面中选一个最想了解的地方，回想一个具体场景，再尝试一件适合当前条件的小事，观察自己真正需要什么。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "五个方面里，你现在最愿意了解哪一个？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个具体场景，尝试一件当前做得到的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+          "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+          "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+          "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+          "平台专家与治理审核仍待完成；草稿不能据此激活施测。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。"
+      }
+    },
+    {
+      "case": "mixed",
+      "answers": [
+        {
+          "itemCode": "SOCSS_01",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SOCSS_02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SOCSS_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_06",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SOCSS_07",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SOCSS_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_10",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_11",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SOCSS_12",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SOCSS_13",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_14",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_15",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "SOCSS_16",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "SOCSS_17",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "SOCSS_18",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "SOCSS_19",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_20",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-socs-s20-mixed",
+          "code": "socs_s20_2023_zh_cn",
+          "name": "苏塞克斯—牛津自我关怀量表（SOCS-S，2023正式中文20题）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-socs-s20-mixed",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "SOCSS_01",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "SOCSS_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "SOCSS_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_06",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "SOCSS_07",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "SOCSS_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_10",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_11",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "SOCSS_12",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "SOCSS_13",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_14",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_15",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "SOCSS_16",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "SOCSS_17",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "SOCSS_18",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "SOCSS_19",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_20",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "recognizing_suffering",
+            "type": "dimension",
+            "label": "识别自己的痛苦",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 4,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "understanding_universality",
+            "type": "dimension",
+            "label": "理解痛苦是共同经历",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 2,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "answeredItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "feeling_for_self",
+            "type": "dimension",
+            "label": "关怀受苦的自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "answeredItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "tolerating_feelings",
+            "type": "dimension",
+            "label": "容纳不舒服的感受",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "answeredItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "acting_to_alleviate",
+            "type": "dimension",
+            "label": "采取行动照顾自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "自我关怀整体描述",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "recognizing_suffering",
+            "headline": "识别自己的痛苦",
+            "label": null,
+            "interpretation": "这部分关注你是否能留意到自己的痛苦，例如察觉情绪变沉、发现自己正在勉强支撑，或认出不舒服刚出现时的迹象。能否注意到这些变化会受到当时的忙碌程度和处境影响，回答并不评价你是否足够敏感或坚强。你可以回想最近一个不太顺利的时刻，看看自己是在什么时候发现难受的。下次有类似感觉时，先用一个简单的词描述它，给自己留一点辨认需要的时间。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近你在什么时候注意到自己有些难受？"
+              },
+              {
+                "category": "strategy",
+                "text": "用一个简单的词描述当时的感受。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "understanding_universality",
+            "headline": "理解痛苦是共同经历",
+            "label": null,
+            "interpretation": "这部分关注你是否理解，痛苦、失落与不顺利也是许多人会经历的事情。想到这一点，有时能让人少一些孤立感，但每个人的处境和所需支持仍然不同，不必用“别人也这样”来压下自己的感受。可以回想一次你觉得只有自己遇到困难的时候，看看有没有可信任的人也分享过相似经历。下一次感到孤单时，试着对自己说一句承认困难的话，再决定是否愿意向合适的人寻求理解。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一种经历让你觉得自己并不孤单？"
+              },
+              {
+                "category": "strategy",
+                "text": "先承认困难，再考虑向合适的人寻求理解。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "feeling_for_self",
+            "headline": "关怀受苦的自己",
+            "label": null,
+            "interpretation": "这部分关注当你遇到困难或对自己失望时，是否仍愿意以关心和温和的态度回应自己。有时善待自己很自然，有时却很难做到，这些回答只是整理你描述的回应方式，不是给你的品格打分。你可以想一想，如果一个你关心的人正经历类似处境，你会怎样和他说话。下次发现自己责备自己时，试着换一句既承认问题、又给自己留有照顾空间的话，看看这样的说法是否适合当时的你。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "如果是你关心的人遇到同样的事，你会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "尝试用一句温和而实际的话回应自己。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "tolerating_feelings",
+            "headline": "容纳不舒服的感受",
+            "label": null,
+            "interpretation": "这部分关注面对难受的情绪时，你是否愿意让感受存在，同时保留一点选择怎样回应的空间。容纳情绪并不要求你独自忍耐所有困难，也不代表情绪应该马上消失。不同情境下，暂停、休息或寻求支持都可能合适。可以回想一次情绪出现却没有完全带着你走的经历，看看当时什么帮助了你。下一次有轻微不安时，先辨认感受，再选择一件眼前能够做到的、照顾自己的小事。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么帮助你在情绪出现时保留一点选择空间？"
+              },
+              {
+                "category": "strategy",
+                "text": "辨认感受后，选择一件能照顾自己的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "acting_to_alleviate",
+            "headline": "采取行动照顾自己",
+            "label": null,
+            "interpretation": "这部分关注当自己痛苦或遇到困难时，你是否尝试采取行动照顾自己。这样的行动可以很小，例如休息片刻、减少一个不必要的负担，或向合适的人说明自己的需要，不要求你立刻解决困难的原因。回答会受到现实条件影响，并不衡量你是否已经把一切处理好。可以想一想，最近什么事情让你稍微好受一点。下次遇到相似处境时，选一个可行的小行动，做完后再看看是否需要调整或求助。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一件小事让你稍微好受一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个可行的小行动，做完后看看是否需要调整。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "total",
+            "headline": "自我关怀整体描述",
+            "label": null,
+            "interpretation": "整体描述将二十个回答放在一起，帮助你回顾自己面对痛苦时如何留意感受、理解共同经历、表达关怀、容纳情绪和采取行动。它不能替代五个方面各自的体验，也不是评价你是否值得被关心的标准。不同生活处境可能让同一个人的回答发生变化，不需要把结果当作固定标签。你可以从五个方面中选一个最想了解的地方，回想一个具体场景，再尝试一件适合当前条件的小事，观察自己真正需要什么。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "五个方面里，你现在最愿意了解哪一个？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个具体场景，尝试一件当前做得到的小事。"
+              }
+            ],
+            "limitations": [
+              "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+              "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+              "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+              "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+              "平台专家与治理审核仍待完成；草稿不能据此激活施测。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+          "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+          "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+          "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+          "平台专家与治理审核仍待完成；草稿不能据此激活施测。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。"
+      }
+    },
+    {
+      "case": "missing_first",
+      "answers": [
+        {
+          "itemCode": "SOCSS_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_10",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_11",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_12",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_13",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_14",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_15",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_16",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_17",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_18",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_19",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "SOCSS_20",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-socs-s20-missing_first",
+          "code": "socs_s20_2023_zh_cn",
+          "name": "苏塞克斯—牛津自我关怀量表（SOCS-S，2023正式中文20题）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-socs-s20-missing_first",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "7fba26c1e24156494be876bcaa401605345f85ece4da7a5f955df92b2e8913c9",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [
+          {
+            "itemCode": "SOCSS_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_11",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_12",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_13",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_14",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_15",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_16",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_17",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_18",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_19",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "SOCSS_20",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "recognizing_suffering",
+            "type": "dimension",
+            "label": "识别自己的痛苦",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "answeredItems": [
+              "SOCSS_06",
+              "SOCSS_11",
+              "SOCSS_16"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          },
+          {
+            "key": "understanding_universality",
+            "type": "dimension",
+            "label": "理解痛苦是共同经历",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "answeredItems": [
+              "SOCSS_02",
+              "SOCSS_07",
+              "SOCSS_12",
+              "SOCSS_17"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "feeling_for_self",
+            "type": "dimension",
+            "label": "关怀受苦的自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "answeredItems": [
+              "SOCSS_03",
+              "SOCSS_08",
+              "SOCSS_13",
+              "SOCSS_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "tolerating_feelings",
+            "type": "dimension",
+            "label": "容纳不舒服的感受",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "answeredItems": [
+              "SOCSS_04",
+              "SOCSS_09",
+              "SOCSS_14",
+              "SOCSS_19"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "acting_to_alleviate",
+            "type": "dimension",
+            "label": "采取行动照顾自己",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_05",
+              "SOCSS_10",
+              "SOCSS_15",
+              "SOCSS_20"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "自我关怀整体描述",
+            "description": "平台按完整作答等权均分1–5整理；较大表示本次自述更符合相关关怀方式，不对应等级、诊断或人群排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "SOCSS_01",
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "answeredItems": [
+              "SOCSS_02",
+              "SOCSS_03",
+              "SOCSS_04",
+              "SOCSS_05",
+              "SOCSS_06",
+              "SOCSS_07",
+              "SOCSS_08",
+              "SOCSS_09",
+              "SOCSS_10",
+              "SOCSS_11",
+              "SOCSS_12",
+              "SOCSS_13",
+              "SOCSS_14",
+              "SOCSS_15",
+              "SOCSS_16",
+              "SOCSS_17",
+              "SOCSS_18",
+              "SOCSS_19",
+              "SOCSS_20"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "这是一份成人自我关怀方式的自我描述，不是心理诊断或能力考试。",
+          "已有中文证据来自1132名职场人士的便利样本，不代表所有成人或未成年人。",
+          "1–5均分是平台明确采用的整理方式，分数没有高低分段、临床界值或人群排名。",
+          "一个输出所需的题目必须完整作答；漏答不补零，也不以较少题目改变分母。",
+          "平台专家与治理审核仍待完成；草稿不能据此激活施测。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "用于成人回顾面对痛苦时的自我关怀方式；不是诊断、筛查或疗效判断。"
+      }
+    }
+  ]
+}

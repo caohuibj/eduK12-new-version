@@ -1,0 +1,69 @@
+{
+  "instrumentKey": "socs_s20_2023_zh_cn",
+  "version": "1.0.0",
+  "status": "LOCAL_RESEARCH_DRAFT_CHECKS_PASSED_NOT_ACTIVATED",
+  "source": {
+    "bytes": 57931,
+    "sha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe"
+  },
+  "test": {
+    "bytes": 12491,
+    "sha256": "ad7c4a7b1f1dd4ab3b4e3730dcecff9b132514dc812590b7f20db8b67e8a4c1d"
+  },
+  "unit": {
+    "passed": 18,
+    "failed": 0,
+    "total": 18,
+    "exitCode": 0,
+    "reporter": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.vitest.json",
+    "commandReceipt": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.invocation.json"
+  },
+  "types": {
+    "exitCode": 0,
+    "scope": "Dedicated test static transitive closure; no all-backend invocation",
+    "inputCount": 566,
+    "listing": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.types-inputs.txt"
+  },
+  "inputBinding": {
+    "phase": "BEFORE_UNIT_AND_TYPE_EXECUTION",
+    "capturedAt": "2026-10-26T09:05:31.362168+00:00",
+    "manifest": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.inputs-before.json",
+    "inputChangedDuringExecution": [],
+    "originalInputBytes": "PRIVATE; no post-hoc signature; static closure and named tool entrypoints, not a full installed dependency byte attestation"
+  },
+  "reports": {
+    "commandReceipt": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/reports.receipt.json",
+    "exitCode": 0,
+    "cases": [
+      "minimum",
+      "maximum",
+      "mixed",
+      "missing_first"
+    ],
+    "completeReports": 3,
+    "interpretations": 18,
+    "missingInterpretations": 0,
+    "inputChangedDuringExecution": []
+  },
+  "expertReview": "PENDING",
+  "platformGovernance": "PENDING",
+  "existingLanguageEvidence": "Exact published 2023 Chinese; working convenience sample N1132 only",
+  "database": "NOTRUN_BY_THIS_AGENT_ROOT_INTEGRATION",
+  "browser": "NOTRUN",
+  "ci": "NOTRUN",
+  "deployment": "NOTRUN",
+  "activation": "DRAFT_REFUSED_BY_EXECUTED_UNIT_TEST",
+  "coordinatorIntegration": {
+    "scope": "Two-tool combined suite; not an agent rerun",
+    "database": "PASS_NON_OWNER_SYNTHETIC_POSTGRES",
+    "perToolCases": 5,
+    "sharedSuiteCases": 2,
+    "newDraftHiddenRows": 2,
+    "referenceSets": 0,
+    "deployments": 0,
+    "evidence": "../../../batches/20261026-wave8/validation.json",
+    "instructions": "PREPARED_NOT_RUNTIME_CONNECTED",
+    "ciExecuted": false,
+    "productionTouched": false
+  }
+}
