@@ -18,6 +18,8 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
  const [history,setHistory]=useState<RosterJob[]>([]),[historyLoaded,setHistoryLoaded]=useState(false),[historyNext,setHistoryNext]=useState<string|null>(null)
  const lock=useRef(false),stop=useRef(false),alive=useRef(true),generation=useRef(0),requestId=useRef(''),callbacks=useRef({onBusy,onChanged,onUnits})
  callbacks.current={onBusy,onChanged,onUnits}
+ const updateJob=(value:RosterJob|null)=>{setJob(value);if(value)setHistory(old=>old.some(item=>item.id===value.id)?old.map(item=>item.id===value.id?value:item):historyLoaded?[value,...old]:old)}
+ const dateLabel=(value:string)=>new Date(value).toLocaleString(undefined,{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false})
  const base=`/organizations/${organizationId}/roster-imports`
  useEffect(()=>{
   const scope=generation;scope.current++;alive.current=true;stop.current=false;lock.current=false;setBusy('');callbacks.current.onBusy?.(false)
@@ -48,7 +50,7 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
    if(stop.current||!valid(g))break
    current=await api<RosterJob>(`${base}/${current.id}/parts/${part.index}/preview`,'POST',{proof:matchingProof,input:parts[part.index]})
    if(!valid(g))return
-   setJob(current)
+   updateJob(current)
   }
   if(valid(g))setNotice(stop.current?'校验已暂停，已完成的校验记录保留。':current.status==='PREVIEW_ERROR'?'整份名单存在错误，尚未开始保存。':'校验记录已更新，请核对后确认。')
  }
@@ -59,37 +61,37 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
   if(!requestId.current)requestId.current=crypto.randomUUID()
   const result=job?await api<RosterJob>(`${base}/${job.id}/match`,'POST',{input,source:meta}):await api<RosterJob>(base,'POST',{requestId:requestId.current,input,source:meta})
   if(!valid(g))return
-  setJob(result);setProof(result.proof??'');setPrepared(input);setNeedsProgress(false)
+  updateJob(result);setProof(result.proof??'');setPrepared(input);setNeedsProgress(false)
   if(!result.confirmed)await previewRemaining(result,input,result.proof!,g)
   else setNotice('原文件已匹配，服务器批次回执已核对。请明确继续未完成的部分。')
  })
  const refreshProgress=()=>run('read',async g=>{
   if(!job)return
   const result=await api<RosterJob>(`${base}/${job.id}`)
-  if(valid(g)){setJob(result);setNeedsProgress(false);setNotice(result.status==='COMPLETED'?'服务器已确认全部完成。':'服务器进度已核对；继续前会重新验证当前权限。')}
+  if(valid(g)){updateJob(result);setNeedsProgress(false);setNotice(result.status==='COMPLETED'?'服务器已确认全部完成。':'服务器进度已核对；继续前会重新验证当前权限。')}
  })
  const recheck=()=>run('preview',async g=>{
   if(!job||!proof||!prepared)return
   const result=await api<RosterJob>(`${base}/${job.id}/recheck`,'POST',{proof})
   if(!valid(g))return
-  setJob(result);setVerified(false);setNeedsProgress(false);await previewRemaining(result,prepared,proof,g)
+  updateJob(result);setVerified(false);setNeedsProgress(false);await previewRemaining(result,prepared,proof,g)
  })
  const save=()=>run('save',async g=>{
   if(!job||!proof||!prepared||needsProgress)return
   let current=await api<RosterJob>(`${base}/${job.id}/${job.confirmed?'resume':'confirm'}`,'POST',{proof,planToken:job.planToken,...(!job.confirmed?{verifiedOffline:verified}:{})})
   if(!valid(g))return
-  setJob(current)
+  updateJob(current)
   const runToken=current.runToken,parts=jobParts(prepared)
   for(const part of current.parts){
    if(part.state==='COMMITTED')continue
    if(stop.current||!valid(g))break
    current=await api<RosterJob>(`${base}/${current.id}/parts/${part.index}/commit`,'POST',{proof,runToken,input:parts[part.index]})
    if(!valid(g))return
-   setJob(current)
+   updateJob(current)
   }
   if(!valid(g))return
   if(stop.current&&current.status!=='COMPLETED'){
-   current=await api<RosterJob>(`${base}/${current.id}/pause`,'POST',{proof});if(!valid(g))return;setJob(current);setNotice('已暂停。当前批次已核对，未保存部分不会继续执行。')
+   current=await api<RosterJob>(`${base}/${current.id}/pause`,'POST',{proof});if(!valid(g))return;updateJob(current);setNotice('已暂停。当前批次已核对，未保存部分不会继续执行。')
   }else if(current.status==='COMPLETED'){
    setNotice(`已完成：新增 ${current.added} 条，跳过 ${current.skipped} 条。账号激活和班级审批仍须分别处理。`)
    callbacks.current.onChanged?.()
@@ -105,28 +107,31 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
   if(valid(g)){setHistory(old=>more?Array.from(new Map([...old,...result.list].map(j=>[j.id,j])).values()):result.list);setHistoryNext(result.next);setHistoryLoaded(true)}
  })
  const chooseHistory=(value:RosterJob)=>{
-  setJob(value);setProof('');setPrepared(null);setVerified(false);setNeedsProgress(false);setError('');setNotice('请重新选择该任务的原文件、工作表和列映射，再核对继续。');setText('');setSource(null);requestId.current=''
+  updateJob(value);setProof('');setPrepared(null);setVerified(false);setNeedsProgress(false);setError('');setNotice(value.status==='COMPLETED'?'已读取完整回执，无需重新选择文件。':'请重新选择该任务的原文件、工作表和列映射，再核对继续。');setText('');setSource(null);requestId.current=''
  }
- const newImport=()=>{setJob(null);setNeedsProgress(false);invalidate();setNotice('当前输入已保留，请重新校验建立新任务；已有人员仍只会跳过或提示冲突。')}
+ const newImport=()=>{updateJob(null);setNeedsProgress(false);invalidate();setNotice('当前输入已保留，请重新校验建立新任务；已有人员仍只会跳过或提示冲突。')}
  const jobIssues=job?.parts.flatMap(p=>p.issues)??[],allIssues=[...issues,...jobIssues]
  const pending=job?.parts.filter(p=>p.state!=='COMMITTED')??[]
+ const plannedAdd=pending.reduce((n,p)=>n+p.add,0),plannedSkip=pending.reduce((n,p)=>n+p.skip,0)
  const reviewed=!!job&&pending.every(p=>p.state==='PREVIEWED'&&!p.errors)
  const ready=!!job&&job.status!=='COMPLETED'&&!job.expired&&!!proof&&!!prepared&&reviewed&&!needsProgress&&!mfa
  const wait=Math.max(0,Math.ceil((retryAt-clock)/1000))
  const countReviewed=job?.parts.filter(p=>p.state!=='PLANNED').length??0
  return <section className="er-job" aria-label="整份名单分批导入" aria-busy={!!busy}>
+  <div className="er-job-input" hidden={job?.status==='COMPLETED'}>
   {kind==='CLASS'&&<label className="hs-field"><span>单列班级的所属年级</span><select value={gradeId} disabled={!!busy||disabled} onChange={e=>{setGradeId(e.target.value);invalidate()}}><option value="">两列文件按行指定年级</option>{units.filter(u=>u.unitKind==='GRADE').map(u=><option key={u.id} value={u.id}>{u.name}</option>)}</select></label>}
   <EducationRosterSource api={api} organizationId={organizationId} kind={kind} text={text} limits={jobRosterLimits} disabled={!!busy||disabled} onText={edit} onPrepared={useSource} onBlocked={setSourceBlocked} onInvalidate={invalidate} onError={sourceError} fileLabel="CSV／Excel 文件（整份最多5000行）"/>
   <label className="hs-field"><span>{kind==='GRADE'||kind==='CLASS'?'粘贴年级／班级内容':'粘贴名单（含表头）'}</span><textarea value={text} rows={5} disabled={!!busy||disabled} onChange={e=>edit(e.target.value)} placeholder="选择文件并核对映射，或直接粘贴完整名单"/></label>
-  <div className="er-job-prepare"><span>整份先校验，每100行一个事务。只新增，不覆盖。</span><button type="button" className="hs-primary" disabled={!!busy||disabled||sourceBlocked||!text.trim()||wait>0} onClick={()=>void prepare()}>{busy==='preview'?`正在校验 ${countReviewed}/${job?.partCount??'…'} 批` :job?'核对原文件并继续':'整份校验预览'}</button></div>
+  <div className="er-job-prepare"><span>整份先校验，每100行一个事务。只新增，不覆盖。</span><button type="button" className="hs-primary" disabled={!!busy||disabled||sourceBlocked||!text.trim()||wait>0||job?.status==='COMPLETED'||job?.expired} onClick={()=>void prepare()}>{job?.status==='COMPLETED'?'已完成':busy==='preview'?`正在校验 ${countReviewed}/${job?.partCount??'…'} 批` :job?'核对原文件并继续':'整份校验预览'}</button></div>
+  </div>
   {error&&<p className="er-job-message" role="alert">{error}</p>}{notice&&<p className="er-job-message" role="status">{notice}</p>}
   {wait>0&&<p className="er-job-message" role="status">触发原有频率保护，约 {wait} 秒后可明确重试；已保存进度保留。</p>}
   {mfa&&<form className="er-job-mfa" aria-label="导入身份验证" onSubmit={e=>{e.preventDefault();void verify()}}><strong><ShieldCheck size={16}/>验证后继续</strong><label className="hs-field"><span>6位动态验证码</span><input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} disabled={!!busy} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/></label><button className="hs-primary" disabled={!!busy||!/^\d{6}$/.test(code)}>验证身份</button></form>}
   {job&&<section className="er-job-progress" aria-label="导入任务进度">
-   <div className="er-job-heading"><h3>{busy==='save'?'正在保存':jobLabels[job.status]??'导入任务'}</h3><span>{rosterLabels[job.kind]} · {new Date(job.createdAt).toLocaleString()}</span></div>
+   <div className="er-job-heading"><h3>{busy==='save'?'正在保存':jobLabels[job.status]??'导入任务'}</h3><span>{rosterLabels[job.kind]} · {dateLabel(job.createdAt)}</span></div>
    <div className="er-job-counts"><span><strong>{job.rows}</strong>整份记录</span><span><strong>{job.savedRows}</strong>已处理</span><span><strong>{allIssues.length}</strong>需修正</span></div>
    <progress max={job.rows} value={job.savedRows} aria-label="名单保存进度"/>
-   <p>校验 {countReviewed}/{job.partCount} 批 · 已保存 {job.parts.filter(p=>p.state==='COMMITTED').length}/{job.partCount} 批 · 新增 {job.added} · 跳过 {job.skipped}</p>
+   <p>{!job.confirmed&&job.status!=='COMPLETED'?`校验 ${countReviewed}/${job.partCount} 批 · 预计新增 ${plannedAdd} · 预计跳过 ${plannedSkip}`:`已保存 ${job.parts.filter(p=>p.state==='COMMITTED').length}/${job.partCount} 批 · 已新增 ${job.added} · 已跳过 ${job.skipped}`}</p>
    {!proof&&job.status!=='COMPLETED'&&<p>重新打开后需核对原文件；服务器不保存原始整表。</p>}
    {job.expired&&<p>任务已过期；已保存记录保留，请用新任务重新校验未完成内容。</p>}
    {needsProgress&&<p>响应中断后先核对服务器回执，确认前不会继续下一批。</p>}
@@ -141,6 +146,6 @@ function JobSession({api,organizationId,kind,units,disabled,onBusy,onChanged,onU
    </div>
   </section>}
   {allIssues.length>0&&<section className="er-job-issues" aria-label="整份名单错误"><div className="er-job-heading"><h3>{allIssues.length}处需要修正</h3><button type="button" onClick={()=>downloadRosterErrors(allIssues)}>下载全部问题</button></div><ol>{allIssues.slice(0,30).map((issue,i)=><li key={i}><span>第 {issue.line} 行</span>{issue.message}</li>)}</ol>{allIssues.length>30&&<p>仅显示前30处，完整内容请下载。</p>}</section>}
-  <details className="er-job-history" onToggle={e=>{if(e.currentTarget.open&&!historyLoaded&&!lock.current)void loadHistory()}}><summary><History size={16}/>导入历史</summary><div className="er-actions"><button type="button" disabled={!!busy||disabled} onClick={()=>void loadHistory()}>刷新历史</button></div>{historyLoaded&&!history.length&&<p>当前学校和入口下尚无你的导入记录。</p>}<ul>{history.map(j=><li key={j.id}><div><strong>{rosterLabels[j.kind]}</strong><span>{new Date(j.createdAt).toLocaleString()} · {jobLabels[j.status]??j.status}</span><span>{j.savedRows}/{j.rows}条 · 新增{j.added} · 跳过{j.skipped}</span></div><button type="button" disabled={!!busy||disabled||j.kind!==kind} onClick={()=>chooseHistory(j)}>{j.status==='COMPLETED'?'查看回执':'选择续办'}</button></li>)}</ul>{historyNext&&<button type="button" disabled={!!busy||disabled} onClick={()=>void loadHistory(true)}>加载更早记录</button>}<p>只展示本人在当前学校、当前入口的任务；续办需重新选择原文件。任务7天内可续办，已成功的批次回执保持不变。</p></details>
+  <details className="er-job-history" onToggle={e=>{if(e.currentTarget.open&&!historyLoaded&&!lock.current)void loadHistory()}}><summary><History size={16}/>导入历史</summary><div className="er-actions"><button type="button" disabled={!!busy||disabled} onClick={()=>void loadHistory()}>刷新历史</button></div>{historyLoaded&&!history.length&&<p>当前学校和入口下尚无你的导入记录。</p>}<ul>{history.map(j=><li key={j.id}><div><strong>{rosterLabels[j.kind]}</strong><span>{dateLabel(j.createdAt)} · {jobLabels[j.status]??j.status}</span><span>{j.savedRows}/{j.rows}条 · 新增{j.added} · 跳过{j.skipped}</span></div><button type="button" disabled={!!busy||disabled||j.kind!==kind} onClick={()=>chooseHistory(j)}>{j.status==='COMPLETED'?'查看回执':'选择续办'}</button></li>)}</ul>{historyNext&&<button type="button" disabled={!!busy||disabled} onClick={()=>void loadHistory(true)}>加载更早记录</button>}<p>只展示本人在当前学校、当前入口的任务；续办需重新选择原文件。任务7天内可续办，已成功的批次回执保持不变。</p></details>
  </section>
 }

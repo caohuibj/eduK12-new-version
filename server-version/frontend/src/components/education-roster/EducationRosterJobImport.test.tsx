@@ -39,7 +39,7 @@ describe('controlled whole-file import interaction',()=>{
  afterEach(()=>{vi.unstubAllGlobals();vi.useRealTimers()})
  it('previews all 201 rows before any explicit write and saves ordered chunks of 100',async()=>{
   const s=server(),changed=vi.fn();renderImport(s,{onChanged:changed});await preview(201)
-  expect(commits(s)).toHaveLength(0);expect(s.api.mock.calls.filter(c=>c[0].endsWith('/preview'))).toHaveLength(3)
+  expect(screen.getByRole('region',{name:'导入任务进度'})).toHaveTextContent('预计新增 201');expect(commits(s)).toHaveLength(0);expect(s.api.mock.calls.filter(c=>c[0].endsWith('/preview'))).toHaveLength(3)
   fireEvent.click(button('确认保存全部批次'));await screen.findByText(/已完成：新增 201 条/)
   expect(commits(s).map(c=>c[2].input.rows.length)).toEqual([100,100,1]);expect(changed).toHaveBeenCalledOnce()
  })
@@ -81,6 +81,9 @@ describe('controlled whole-file import interaction',()=>{
   const s=server();renderImport(s);await preview(2);fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});expect(commits(s)).toHaveLength(0)
   fireEvent.click(button('选择续办'));expect(screen.getByRole('textbox',{name:'粘贴名单（含表头）'})).toHaveValue('');expect(button('确认保存全部批次')).toBeDisabled();expect(button('核对原文件并继续')).toBeDisabled()
  })
+ it('updates a visible history receipt when saving finishes and removes the misleading resume action',async()=>{
+  const s=server();renderImport(s);await preview(2);fireEvent.click(screen.getByText('导入历史'));await screen.findByRole('button',{name:'选择续办'});fireEvent.click(button('确认保存全部批次'));await screen.findByRole('button',{name:'查看回执'});expect(screen.queryByRole('button',{name:'选择续办'})).toBeNull();expect(screen.queryByRole('button',{name:'核对原文件并继续'})).toBeNull();expect(screen.queryByRole('textbox',{name:'粘贴名单（含表头）'})).toBeNull();fireEvent.click(button('查看回执'));expect(screen.getByText('已读取完整回执，无需重新选择文件。')).toBeInTheDocument()
+ })
  it('keeps corrected text when explicitly starting a new preview',async()=>{
   const s=server();renderImport(s);await preview(1);fireEvent.change(screen.getByRole('textbox',{name:'粘贴名单（含表头）'}),{target:{value:text(3)}})
   expect(button('确认保存全部批次')).toBeDisabled();fireEvent.click(button('新建另一份导入'));expect(screen.getByRole('textbox',{name:'粘贴名单（含表头）'})).toHaveValue(text(3));expect(button('整份校验预览')).toBeEnabled();expect(commits(s)).toHaveLength(0)
@@ -93,5 +96,18 @@ describe('controlled whole-file import interaction',()=>{
  it('normalizes a full 5000-row file while preserving textual leading zeroes and bounded chunks',async()=>{
   const input=parseJobInput('学号,年级,班级\n'+Array.from({length:5000},(_,i)=>`${String(i).padStart(5,'0')},一年级,一班`).join('\n'),'STUDENT','');expect(input.rows).toHaveLength(5000);expect('number'in input.rows[0]&&input.rows[0].number).toBe('00000');expect(jobParts(input)).toHaveLength(50)
   expect(()=>parseJobInput(text(5001),'STAFF','')).toThrow('5000');expect(await rosterDigest('abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
+ })
+})
+
+describe('whole-file source selection',()=>{
+ beforeEach(()=>{vi.stubGlobal('crypto',{subtle:webcrypto.subtle,randomUUID})})
+ afterEach(()=>{vi.unstubAllGlobals()})
+ it('requests the explicit workbook job profile and fingerprints the selected sheet and mapping',async()=>{
+  const {EducationRosterSource}=await import('./EducationRosterSource'),{jobRosterLimits}=await import('./preparation')
+  const api=vi.fn().mockResolvedValue({sheets:[{name:'示例',rows:[{line:1,cells:['工号','姓名']},{line:2,cells:['09999','样例']}]},{name:'完整名单',rows:[{line:1,cells:['工号','姓名']},...Array.from({length:101},(_,i)=>({line:i+2,cells:[String(i).padStart(5,'0'),'示例'+i]}))]}]}),prepared=vi.fn()
+  render(<EducationRosterSource api={api as EducationRosterApi} organizationId="org" kind="STAFF" text="" limits={jobRosterLimits} onText={vi.fn()} onPrepared={prepared} onInvalidate={vi.fn()} onBlocked={vi.fn()}/>);
+  fireEvent.change(screen.getByLabelText('CSV／Excel 文件'),{target:{files:[{size:3,name:'名单.xlsx',arrayBuffer:async()=>new Uint8Array([1,2,3]).buffer}]}})
+  await screen.findByRole('region',{name:'表头映射与样例'});fireEvent.change(screen.getByLabelText('选择工作表'),{target:{value:'1'}});fireEvent.click(button('使用这份名单'))
+  await waitFor(()=>expect(prepared).toHaveBeenCalledOnce());expect(api.mock.calls[0]).toEqual(['/organizations/org/roster-files/read','POST',{content:'AQID',mode:'job'}]);expect(prepared.mock.calls[0][0]).toContain('00000');expect(prepared.mock.calls[0][0].split('\n')).toHaveLength(102);expect(prepared.mock.calls[0][1]).toMatchObject({rawDigest:expect.stringMatching(/^[a-f0-9]{64}$/),sheetDigest:await rosterDigest('完整名单')})
  })
 })
