@@ -1,0 +1,674 @@
+{
+  "construct:academic_self_concept": {
+    "label": "学科自我概念",
+    "axis": "construct"
+  },
+  "construct:academic_self_efficacy": {
+    "label": "学科学习自我效能",
+    "axis": "construct"
+  },
+  "construct:activity_preferences": {
+    "label": "活动偏好",
+    "axis": "construct"
+  },
+  "construct:anxiety_experience": {
+    "label": "焦虑相关体验",
+    "axis": "construct"
+  },
+  "construct:behavioral_self_regulation": {
+    "label": "行为自我调节过程",
+    "axis": "construct"
+  },
+  "construct:big_five": {
+    "label": "大五人格",
+    "axis": "construct"
+  },
+  "construct:burnout": {
+    "label": "倦怠",
+    "axis": "construct"
+  },
+  "construct:centering": {
+    "label": "保持观察视角",
+    "axis": "construct"
+  },
+  "construct:change": {
+    "label": "组织变化管理",
+    "axis": "construct"
+  },
+  "construct:child_behavior_emotion": {
+    "label": "儿童情绪与行为困难",
+    "axis": "construct"
+  },
+  "construct:client_related_burnout": {
+    "label": "服务对象相关疲惫",
+    "axis": "construct"
+  },
+  "construct:control": {
+    "label": "工作自主控制",
+    "axis": "construct"
+  },
+  "construct:course_critical_thinking_strategy": {
+    "label": "特定课程中的批判性思考策略",
+    "axis": "construct"
+  },
+  "construct:cross_domain_talent_beliefs": {
+    "label": "跨学科天赋信念",
+    "axis": "construct"
+  },
+  "construct:demands": {
+    "label": "工作要求",
+    "axis": "construct"
+  },
+  "construct:depressive_experience": {
+    "label": "抑郁相关体验",
+    "axis": "construct"
+  },
+  "construct:domain_fixed_mindset": {
+    "label": "学科固定心态",
+    "axis": "construct"
+  },
+  "construct:emotion_attention": {
+    "label": "情绪关注",
+    "axis": "construct"
+  },
+  "construct:emotion_based_decision": {
+    "label": "情绪影响决策倾向",
+    "axis": "construct"
+  },
+  "construct:empathic_concern": {
+    "label": "共情关怀",
+    "axis": "construct"
+  },
+  "construct:executive_function": {
+    "label": "执行功能",
+    "axis": "construct"
+  },
+  "construct:general_fixed_mindset": {
+    "label": "一般固定心态",
+    "axis": "construct"
+  },
+  "construct:general_self_efficacy": {
+    "label": "一般自我效能",
+    "axis": "construct"
+  },
+  "construct:grit": {
+    "label": "长期目标坚持",
+    "axis": "construct"
+  },
+  "construct:interpersonal_trust": {
+    "label": "人际信任",
+    "axis": "construct"
+  },
+  "construct:job_crafting": {
+    "label": "工作重塑",
+    "axis": "construct"
+  },
+  "construct:job_satisfaction": {
+    "label": "工作满意度",
+    "axis": "construct"
+  },
+  "construct:justice_sensitivity": {
+    "label": "公正敏感性",
+    "axis": "construct"
+  },
+  "construct:life_satisfaction": {
+    "label": "生活满意度",
+    "axis": "construct"
+  },
+  "construct:loneliness": {
+    "label": "孤独与联结不足",
+    "axis": "construct"
+  },
+  "construct:managerial_support": {
+    "label": "管理者支持",
+    "axis": "construct"
+  },
+  "construct:mind_wandering": {
+    "label": "走神倾向",
+    "axis": "construct"
+  },
+  "construct:need_for_cognition": {
+    "label": "认知需求",
+    "axis": "construct"
+  },
+  "construct:negative_expressivity": {
+    "label": "负向情绪表达倾向",
+    "axis": "construct"
+  },
+  "construct:optimism": {
+    "label": "乐观倾向",
+    "axis": "construct"
+  },
+  "construct:optimism_pessimism": {
+    "label": "乐观与悲观",
+    "axis": "construct"
+  },
+  "construct:orvis_adventure": {
+    "label": "ORVIS 探险活动兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_altruism": {
+    "label": "ORVIS 助人活动兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_analysis": {
+    "label": "ORVIS 分析活动兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_creativity": {
+    "label": "ORVIS 创造活动兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_erudition": {
+    "label": "ORVIS 博学求知兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_leadership": {
+    "label": "ORVIS 领导活动兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_organization": {
+    "label": "ORVIS 组织事务兴趣",
+    "axis": "construct"
+  },
+  "construct:orvis_production": {
+    "label": "ORVIS 制作生产兴趣",
+    "axis": "construct"
+  },
+  "construct:peer_support": {
+    "label": "同事支持",
+    "axis": "construct"
+  },
+  "construct:perceived_stress": {
+    "label": "感知压力",
+    "axis": "construct"
+  },
+  "construct:perceived_teacher_subject_liking": {
+    "label": "学生感知的教师学科喜爱",
+    "axis": "construct"
+  },
+  "construct:personal_burnout": {
+    "label": "个人疲惫体验",
+    "axis": "construct"
+  },
+  "construct:positive_expressivity": {
+    "label": "正向情绪表达倾向",
+    "axis": "construct"
+  },
+  "construct:prosocial": {
+    "label": "亲社会行为",
+    "axis": "construct"
+  },
+  "construct:psychological_distress": {
+    "label": "非特异性心理困扰",
+    "axis": "construct"
+  },
+  "construct:psychological_flexibility": {
+    "label": "心理灵活性",
+    "axis": "construct"
+  },
+  "construct:psychological_inflexibility": {
+    "label": "心理不灵活性",
+    "axis": "construct"
+  },
+  "construct:psychosocial_work_environment": {
+    "label": "工作场所心理社会环境",
+    "axis": "construct"
+  },
+  "construct:relationships": {
+    "label": "工作人际关系",
+    "axis": "construct"
+  },
+  "construct:resilience": {
+    "label": "韧性",
+    "axis": "construct"
+  },
+  "construct:responsive_distress": {
+    "label": "回应他人困扰的情绪倾向",
+    "axis": "construct"
+  },
+  "construct:responsive_joy": {
+    "label": "共感愉悦",
+    "axis": "construct"
+  },
+  "construct:role": {
+    "label": "工作角色清晰度",
+    "axis": "construct"
+  },
+  "construct:school_connectedness": {
+    "label": "学校归属",
+    "axis": "construct"
+  },
+  "construct:self_as_context": {
+    "label": "以己为景",
+    "axis": "construct"
+  },
+  "construct:self_control": {
+    "label": "自我控制",
+    "axis": "construct"
+  },
+  "construct:self_discipline": {
+    "label": "任务自律",
+    "axis": "construct"
+  },
+  "construct:self_esteem": {
+    "label": "自尊",
+    "axis": "construct"
+  },
+  "construct:self_presentation": {
+    "label": "自我呈现/社会期许",
+    "axis": "construct"
+  },
+  "construct:sleep_condition": {
+    "label": "睡眠状况",
+    "axis": "construct"
+  },
+  "construct:smartphone_use_difficulties": {
+    "label": "手机使用相关困扰",
+    "axis": "construct"
+  },
+  "construct:stress": {
+    "label": "压力感受",
+    "axis": "construct"
+  },
+  "construct:student_school_wellbeing": {
+    "label": "学生学校幸福感",
+    "axis": "construct"
+  },
+  "construct:subject_value_cost": {
+    "label": "学科价值与时间代价",
+    "axis": "construct"
+  },
+  "construct:task_self_efficacy": {
+    "label": "任务自我效能",
+    "axis": "construct"
+  },
+  "construct:teacher_school_wellbeing": {
+    "label": "教师学校幸福感",
+    "axis": "construct"
+  },
+  "construct:teacher_subjective_wellbeing": {
+    "label": "教师主观幸福感",
+    "axis": "construct"
+  },
+  "construct:teaching_efficacy": {
+    "label": "教学效能体验",
+    "axis": "construct"
+  },
+  "construct:transcending": {
+    "label": "超越当下体验",
+    "axis": "construct"
+  },
+  "construct:tutoring_necessity": {
+    "label": "补习必要性信念",
+    "axis": "construct"
+  },
+  "construct:wellbeing": {
+    "label": "幸福感",
+    "axis": "construct"
+  },
+  "construct:work_related_burnout": {
+    "label": "工作相关疲惫",
+    "axis": "construct"
+  },
+  "construct:work_stressors": {
+    "label": "工作压力源",
+    "axis": "construct"
+  },
+  "domain:attention_cognition": {
+    "label": "注意与认知体验",
+    "axis": "domain"
+  },
+  "domain:digital_behavior": {
+    "label": "数字使用与生活行为",
+    "axis": "domain"
+  },
+  "domain:digital_lifestyle": {
+    "label": "数字使用与生活行为",
+    "axis": "domain"
+  },
+  "domain:distress_behavior": {
+    "label": "情绪困扰与行为困难",
+    "axis": "domain"
+  },
+  "domain:family_relationships": {
+    "label": "家庭、亲子与亲密关系",
+    "axis": "domain"
+  },
+  "domain:interests_career_exploration": {
+    "label": "活动兴趣与职业探索",
+    "axis": "domain"
+  },
+  "domain:learning_self_management": {
+    "label": "学习策略与自我管理",
+    "axis": "domain"
+  },
+  "domain:motivation_learning": {
+    "label": "学习动机、信念与学业体验",
+    "axis": "domain"
+  },
+  "domain:personality_self": {
+    "label": "人格、自我认识与应答特征",
+    "axis": "domain"
+  },
+  "domain:psychological_flexibility": {
+    "label": "心理灵活性相关过程",
+    "axis": "domain"
+  },
+  "domain:self_regulation": {
+    "label": "行为自我调节",
+    "axis": "domain"
+  },
+  "domain:selfreg_executive": {
+    "label": "自我调节与执行功能",
+    "axis": "domain"
+  },
+  "domain:sleep_recovery": {
+    "label": "睡眠与身心恢复",
+    "axis": "domain"
+  },
+  "domain:social_emotional": {
+    "label": "人际、社会支持与社会情感",
+    "axis": "domain"
+  },
+  "domain:stress_work": {
+    "label": "压力、职业环境与倦怠",
+    "axis": "domain"
+  },
+  "domain:teacher_workplace": {
+    "label": "教师与成人工作场域",
+    "axis": "domain"
+  },
+  "domain:well_being": {
+    "label": "幸福感相关体验",
+    "axis": "domain"
+  },
+  "domain:wellbeing_strength": {
+    "label": "幸福感、韧性与积极心理",
+    "axis": "domain"
+  },
+  "language_validation:catalog_only": {
+    "label": "仅目录/未形成可执行题本",
+    "axis": "language_validation"
+  },
+  "language_validation:chinese_source": {
+    "label": "中文原始/项目适配文本",
+    "axis": "language_validation"
+  },
+  "language_validation:content_en": {
+    "label": "实际题本：en",
+    "axis": "language_validation"
+  },
+  "language_validation:content_en-GB": {
+    "label": "实际题本：en-GB",
+    "axis": "language_validation"
+  },
+  "language_validation:content_zh-CN": {
+    "label": "实际题本：zh-CN",
+    "axis": "language_validation"
+  },
+  "language_validation:digital_presentation_review_pending": {
+    "label": "本次数字呈现审核待完成",
+    "axis": "language_validation"
+  },
+  "language_validation:local_validation_pending": {
+    "label": "本地适用性验证待完成",
+    "axis": "language_validation"
+  },
+  "language_validation:localization_record_approved": {
+    "label": "本地化记录已审",
+    "axis": "language_validation"
+  },
+  "language_validation:maturity_pilot": {
+    "label": "目录证据阶段：PILOT",
+    "axis": "language_validation"
+  },
+  "language_validation:maturity_research_ready": {
+    "label": "目录证据阶段：RESEARCH_READY",
+    "axis": "language_validation"
+  },
+  "language_validation:official_author_hosted_translation": {
+    "label": "作者官网托管的译文",
+    "axis": "language_validation"
+  },
+  "language_validation:presentation_review_pending": {
+    "label": "本次呈现审核待完成",
+    "axis": "language_validation"
+  },
+  "language_validation:published_chinese_items": {
+    "label": "采用已发表中文题文",
+    "axis": "language_validation"
+  },
+  "language_validation:target_zh-CN": {
+    "label": "拟本地化：zh-CN",
+    "axis": "language_validation"
+  },
+  "language_validation:translation_review_pending": {
+    "label": "译审待完成",
+    "axis": "language_validation"
+  },
+  "language_validation:working_translation": {
+    "label": "中文工作译稿",
+    "axis": "language_validation"
+  },
+  "license:author_free_use": {
+    "label": "作者允许免费使用（详见具体许可）",
+    "axis": "license"
+  },
+  "license:author_unrestricted_use": {
+    "label": "作者声明不限制使用（保留版权及署名要求）",
+    "axis": "license"
+  },
+  "license:cc_by": {
+    "label": "CC Attribution署名许可",
+    "axis": "license"
+  },
+  "license:cc_by_3_0": {
+    "label": "CC BY 3.0 署名",
+    "axis": "license"
+  },
+  "license:cc_by_4_0": {
+    "label": "CC BY 4.0署名",
+    "axis": "license"
+  },
+  "license:cc_by_nc_2_0": {
+    "label": "CC BY-NC 2.0署名非商业",
+    "axis": "license"
+  },
+  "license:cc_by_nc_4_0": {
+    "label": "CC BY-NC 4.0署名非商业",
+    "axis": "license"
+  },
+  "license:cc_by_nc_sa_4_0": {
+    "label": "CC BY-NC-SA 4.0 署名、非商业、相同方式共享",
+    "axis": "license"
+  },
+  "license:fulltext_pending": {
+    "label": "全文/数字使用许可待核",
+    "axis": "license"
+  },
+  "license:no_derivatives": {
+    "label": "禁止演绎/改编",
+    "axis": "license"
+  },
+  "license:noncommercial": {
+    "label": "非商业",
+    "axis": "license"
+  },
+  "license:ogl": {
+    "label": "开放政府许可",
+    "axis": "license"
+  },
+  "license:ogl_3_0": {
+    "label": "开放政府许可 OGL 3.0",
+    "axis": "license"
+  },
+  "license:project_authorization": {
+    "label": "项目授权范围使用",
+    "axis": "license"
+  },
+  "license:public_domain": {
+    "label": "公共领域",
+    "axis": "license"
+  },
+  "license:redistribution_restricted": {
+    "label": "再分发受限/须遵守条件",
+    "axis": "license"
+  },
+  "license:self_authored": {
+    "label": "项目自编",
+    "axis": "license"
+  },
+  "license:share_alike": {
+    "label": "相同方式共享",
+    "axis": "license"
+  },
+  "orientation:ACT": {
+    "label": "接纳承诺疗法相关过程",
+    "axis": "orientation"
+  },
+  "orientation:CBT": {
+    "label": "认知行为疗法相关",
+    "axis": "orientation"
+  },
+  "orientation:DBT": {
+    "label": "辩证行为疗法相关",
+    "axis": "orientation"
+  },
+  "population:adolescent_source_evidence_only": {
+    "label": "仅有原版青少年来源证据（非本版本施测范围）",
+    "axis": "population"
+  },
+  "population:adult": {
+    "label": "成人（目录范围）",
+    "axis": "population"
+  },
+  "population:adult_college_research": {
+    "label": "成人大学生课程研究（目录范围）",
+    "axis": "population"
+  },
+  "population:adult_research": {
+    "label": "成人研究",
+    "axis": "population"
+  },
+  "population:adult_university_student": {
+    "label": "成年在校大学生（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_13_19": {
+    "label": "13—19岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_14_100": {
+    "label": "14—100岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_17_20": {
+    "label": "17—20岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_18_100": {
+    "label": "18—100岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_18_unspecified": {
+    "label": "18—未定岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_4_10": {
+    "label": "4—10岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_4_17": {
+    "label": "4—17岁（目录范围）",
+    "axis": "population"
+  },
+  "population:ages_9_18": {
+    "label": "9—18岁（目录范围）",
+    "axis": "population"
+  },
+  "population:chinese_university_source_evidence": {
+    "label": "中国大学生来源样本证据（非额外施测许可）",
+    "axis": "population"
+  },
+  "population:consult_scope": {
+    "label": "人群范围详见说明",
+    "axis": "population"
+  },
+  "population:grade_8_research": {
+    "label": "八年级学生研究",
+    "axis": "population"
+  },
+  "population:grades_3_12": {
+    "label": "3—12年级（目录范围）",
+    "axis": "population"
+  },
+  "population:grades_6_8": {
+    "label": "6—8年级（目录范围）",
+    "axis": "population"
+  },
+  "population:grades_7_12": {
+    "label": "7—12年级（目录范围）",
+    "axis": "population"
+  },
+  "population:teacher": {
+    "label": "教师本人（目录范围）",
+    "axis": "population"
+  },
+  "response:digital_self": {
+    "label": "数字自助作答",
+    "axis": "response"
+  },
+  "response:digital_supervised": {
+    "label": "数字指导作答",
+    "axis": "response"
+  },
+  "response:paper": {
+    "label": "纸笔作答",
+    "axis": "response"
+  },
+  "response:parent_report": {
+    "label": "家长他评",
+    "axis": "response"
+  },
+  "response:self": {
+    "label": "本人自评",
+    "axis": "response"
+  },
+  "response:teacher_report": {
+    "label": "教师他评",
+    "axis": "response"
+  },
+  "use:course_research": {
+    "label": "特定课程研究",
+    "axis": "use"
+  },
+  "use:not_diagnostic": {
+    "label": "非诊断用途",
+    "axis": "use"
+  },
+  "use:not_selection": {
+    "label": "不用于甄选或录取决策",
+    "axis": "use"
+  },
+  "use:professional_research": {
+    "label": "专业人员组织的研究",
+    "axis": "use"
+  },
+  "use:program_evaluation": {
+    "label": "PROGRAM_EVALUATION",
+    "axis": "use"
+  },
+  "use:progress_monitoring": {
+    "label": "变化观察",
+    "axis": "use"
+  },
+  "use:reflection": {
+    "label": "自我了解/反思",
+    "axis": "use"
+  },
+  "use:research": {
+    "label": "研究用途",
+    "axis": "use"
+  }
+}

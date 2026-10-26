@@ -5,6 +5,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { getContentRelease } from '../measurement-content/repository'
 import { ContentReleaseError, prepareRelease } from '../measurement-content/release'
 import type { TrainingContentSnapshot } from './training-content-binding'
+import {validateTrainingStandardDerivedContent} from './training-standard-content'
 
 type Stored = NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
 export const trainingReportSelectionSchema = z.object({schemaVersion:z.literal(1),units:z.array(z.object({
@@ -22,6 +23,11 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
 }) {
   let report=input.releases.get(input.reportReleaseId)
   if(!report){const loaded=await getContentRelease(db,input.reportReleaseId,true);if(!loaded)fail();report=loaded;input.releases.set(report.releaseId,report)}
+  if(input.unit.source.standardCombination){
+    if(report.layer!=='REPORT'||input.contentHash!==undefined&&report.contentHash!==input.contentHash||input.publication&&report.status!=='PUBLISHED')fail()
+    await validateTrainingStandardDerivedContent(db,input.unit,report,{compositeId:input.compositeId,ownerId:input.ownerId})
+    return {releaseId:report.releaseId,contentHash:report.contentHash}
+  }
   const scope=report.scope
   if(report.layer!=='REPORT'||report.family!==input.unit.family||scope.kind!=='PRIVATE'||scope.product!=='TRAINING'
     ||scope.ownerId!==input.ownerId||scope.resourceId!==input.compositeId||input.publication&&report.status!=='PUBLISHED'

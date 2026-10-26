@@ -8,6 +8,8 @@ import { prepareCompactScaleFacts } from '../assessment-runtime/compact-scale-fa
 import { makeCanonicalFactsReference } from '../assessment-runtime/compact-assessment-storage'
 import { makeScaleFactsReference, makeScaleRawReference, persistScaleFactRecords, attachCommittedScaleFacts, type ScaleFactRecord } from '../assessment-runtime/scale-fact-records'
 import { ReportProcessingLeaseLostError } from '../assessment-runtime/report-outbox.service'
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
+import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { createHash } from 'node:crypto'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
@@ -283,6 +285,7 @@ const prepareUnifiedScaleWrite = async (
         result,
         runtime: snapshot.compiledRuntime,
         contextHash: admission.contextSnapshotHash,
+        participantContext:admission.contextValues??undefined,
         referenceBindings: snapshot.referenceBindings,
       })
     : null
@@ -363,6 +366,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
       return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
+    // Current epoch and frozen runtime/admission are locked and checked above.
+    // Existing standalone FINAL keeps emergency collection policy, not new-entry policy.
+    if(child.compositeAttemptId){
+      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeAttemptEpoch:input.attemptEpoch,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
+    }else await assertScaleLibraryCollectionAllowed(tx,[],[child.scaleId])
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
@@ -560,6 +568,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
+      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],{compositeAttemptId:unit.child.compositeAttemptId,compositeAttemptEpoch:unit.input.attemptEpoch,compositeItemIds:unit.child.compositeItemId?[unit.child.compositeItemId]:[],acceptedReceipt:execution})
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())

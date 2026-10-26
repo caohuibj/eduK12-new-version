@@ -1,3 +1,4 @@
+import {requiredPr356Checks,failedPr356Checks} from './pr356-gate-contract.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
@@ -61,6 +62,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='pr356')return requiredPr356Checks();
   if(scope.application_route==='survey-governance')return ['scope','survey-governance','codeql'];
   if(scope.application_route==='training-polish')return ['scope','training-polish','codeql'];
   if(scope.application_route==='sjt-native')return ['scope','sjt-native','codeql'];
@@ -139,6 +141,7 @@ export function requiredChecks(needs, draft) {
 
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='pr356')return failedPr356Checks(needs,draft);
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
   if(scope.application_route==='survey-governance'){
     try{const p=JSON.parse(scope.survey_governance_plan);if(draft||p.postMerge!==false||p.route!=='survey-governance'||Object.entries(surveyGovernanceOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
@@ -436,6 +439,12 @@ export function failedChecks(needs, draft) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const needs = readNeeds();
+  if(needs.scope?.outputs?.application_route==='pr356'||process.env.CI_HEAD_REF==='fix/runtime-time-and-validation-20261025'||process.env.CI_PR_NUMBER==='356'){
+    const {runPr356StableGate}=await import('./pr356-stable-gate.mjs');
+    const receipt=await runPr356StableGate({needs});
+    console.log(JSON.stringify({route:'pr356',head:receipt.head,base:receipt.base,tree:receipt.tree,role:receipt.role,externalDotApprovalRequired:true,releaseAuthorized:false}));
+    process.exit(0);
+  }
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
   if(needs.scope?.outputs?.application_route==='survey-governance'){

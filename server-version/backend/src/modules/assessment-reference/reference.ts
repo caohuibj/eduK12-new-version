@@ -118,11 +118,18 @@ const populationsOverlap = (left: ReferencePopulation, right: ReferencePopulatio
   return true
 }
 
+// Literature dossiers are documentation, not executable parameter contracts.
+// Reject their explicit envelope even when spread over an otherwise valid set
+// or entry. Converting reviewed evidence requires a new explicit reference.
+const isExternalDossier = (value: object): boolean =>
+  ['activationStatus', 'runtimeSelected', 'sourceParameters', 'currentTranslationValidated'].some(key => Object.prototype.hasOwnProperty.call(value, key))
+
 export const validateReferenceSetDefinition = (
   input: unknown,
 ): { definition?: AssessmentReferenceSetDefinition; issues: ReferenceDefinitionIssue[] } => {
   const issues: ReferenceDefinitionIssue[] = []
   if (!input || typeof input !== 'object') return { issues: [{ path: 'definition', message: 'reference definition 必须是对象', severity: 'error' }] }
+  if (isExternalDossier(input)) issues.push({ path: 'definition', message: 'EXTERNAL_REFERENCE_DOSSIER_NOT_EXECUTABLE', severity: 'error' })
   const value = input as Partial<AssessmentReferenceSetDefinition>
   if (value.schemaVersion !== 1) issues.push({ path: 'schemaVersion', message: 'reference schemaVersion 必须为 1', severity: 'error' })
   if (value.instrumentType !== 'scale' && value.instrumentType !== 'cognitive' && value.instrumentType !== 'sjt') issues.push({ path: 'instrumentType', message: 'instrumentType 必须为 scale、cognitive 或 sjt', severity: 'error' })
@@ -140,6 +147,7 @@ export const validateReferenceSetDefinition = (
       return
     }
     const candidate = entry as Partial<AssessmentReferenceEntry>
+    if (isExternalDossier(candidate)) issues.push({ path, message: 'EXTERNAL_REFERENCE_DOSSIER_NOT_EXECUTABLE', severity: 'error' })
     validateReferenceGovernance(candidate).forEach(message => issues.push({ path: path + '.governance', message, severity: 'error' }))
     const population = candidate.population as ReferencePopulation | undefined
     const uniqueKey = `${candidate.scoreKey}:${candidate.referenceKind}:${JSON.stringify(population?.match ?? population ?? {})}`

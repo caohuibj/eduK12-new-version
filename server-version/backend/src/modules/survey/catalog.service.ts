@@ -1,3 +1,4 @@
+import type {CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {packageBoundCatalogSnapshots,assertNotTechnicalPackageGrant} from './governed-package.service'
 import {isGovernedSource} from './governed-tool.model'
 import {assertGovernedEntryAllowed} from './governed-tool.service'
@@ -19,7 +20,7 @@ type Grant={id:string;createdBy:string;userId:string;status:string;snapshot:Cata
 const view=(r:Grant)=>({id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,status:r.status,
   sourceRef:r.snapshot.ref,sourceProvenance:{...r.snapshot.provenance,originalSource:r.snapshot.provenance.source??null,source:r.snapshot.ref,
     definitionDigest:r.snapshot.definitionDigest,adapterVersion:r.snapshot.adapterVersion},createdAt:r.createdAt,revokedAt:r.revokedAt})
-export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number}){
+export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number;discovery?:CatalogDiscoveryFilters}){
   await assertSurveyManager(prisma,actorUserId)
   const result=await listCatalogSources({actorUserId,...input},prisma)
   const list=[]
@@ -126,6 +127,7 @@ export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:st
   return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind:snapshot.ref.kind,title:draft.title,
     draftRevision:draft.revision,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,
     compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,
+    ...(snapshot.instruction?{instruction:snapshot.instruction}:{}),
     ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,
       nativeSituational:snapshot.nativeSituational}:{}),
     sourceProvenance:{...snapshot.provenance,...(draft.catalogGrantId?{sourceGrantId:draft.catalogGrantId}:{}),originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,

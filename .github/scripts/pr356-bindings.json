@@ -1,0 +1,2465 @@
+{
+  "schemaVersion": 1,
+  "repository": "caohuibj/eduK12-new-version",
+  "pr": 356,
+  "branch": "fix/runtime-time-and-validation-20261025",
+  "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "product": "feb5f12d678af008dcc2397ba752889c0f4350cd",
+  "source": {
+    "AGENTS.md": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+      "after": "27d6849de6d3461941a2772b008a28347e933e03"
+    },
+    "docs/cognitive-library/survey-cognitive-protocol-integration-plan-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9377abbac71a752b882c440471b4cefdbf528490"
+    },
+    "docs/content-capability-time-contract.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "90bf6267c03e01737ac0650b73924e0f138f81cd"
+    },
+    "docs/dot-356-integration-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "76598b0eb7a1f8aec58693e96121116e4c490e7d"
+    },
+    "docs/dot356-pause-handoff-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "58bd355d8542661db9ed75c69918eff6e5abbf61"
+    },
+    "docs/evidence/dot-356-integration-20261025/integration.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9e9a8f184b8b486d63a4f5b2274b0b6b104e87f0"
+    },
+    "docs/evidence/library-management-next-20261025/check-receipts.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "621be6f237ea49ffc1c0ff7304536e03025ce7f1"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f58d6d8498a1da63dcd2b723e701d60c80b7c2b9"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-1.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "863a992542696d292b6002e6737d9f21aaff9708"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-2.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ada90e77dd60054c6e420e045bab5b03b1b83fb2"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-before-nonnull.txt": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "07dd4151161578a3adb6e96fdbc26e8dab6b13b4"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-final-inputs.sha256": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a6854216610c4fbf564c82f2da06a33a25096de1"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-final-readback.txt": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "495daa368d93e67559babc14e74cbeaa564f3f9a"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-final.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "901295a21ef5563a6b2e0390df1ce8bfc38dd13a"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-final.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f2e71d672dcb2e09a4107f9af8520d6d3a04c5ef"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-journal-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dfe10c8eea83a23bdf2ceae23f52338d525ff108"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-journal-2.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9ea08869e6e71c47a8106b57ff0bb9e29d0eec23"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-journal-final.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "30c38f6e961b582167878e08af3041abd6e0d700"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-type-only-equivalence.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9a2854621948c6c936da2ece0e979b7d24a37850"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-types-confirmed.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-types-final.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fd92e280d02afe0fd76db3129f26bb8783c7a6ed"
+    },
+    "docs/evidence/library-management-next-20261025/followup/http-types.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fe117c3796a86a66b98a366ef5dbd97baaf3f067"
+    },
+    "docs/evidence/library-management-next-20261025/followup/original-39-paths.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "edcefe052986fb41a62f210f7b7a9e7fc1d58d7c"
+    },
+    "docs/evidence/library-management-next-20261025/followup/rendering-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1b63d36a769013ad5a5412d60ab10a97fdad8f05"
+    },
+    "docs/evidence/library-management-next-20261025/followup/rendering-lint.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7fccf7e42776cc7cbbd6994cbe05a9160af38bd7"
+    },
+    "docs/evidence/library-management-next-20261025/followup/rendering-types.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/followup/selection-boundary.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "edc8c1ccadc5a729616f0a7258f01de0870d7313"
+    },
+    "docs/evidence/library-management-next-20261025/followup/selection-lint.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/followup/selection-types.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/followup/summary.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "badb80e7d50a0574114c9929ad23111a6413f586"
+    },
+    "docs/evidence/library-management-next-20261025/integration.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "56ab65531101a967702da406c7d780a8af157432"
+    },
+    "docs/evidence/library-management-next-20261025/logs/backend-install-pinned.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1a84b24df9c2ca8cd791897a008de0428dbf2d63"
+    },
+    "docs/evidence/library-management-next-20261025/logs/backend-types-final.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/logs/frontend-install-pinned.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7a12e2094fc4db81e3773d6f8777de7bb9cac616"
+    },
+    "docs/evidence/library-management-next-20261025/logs/frontend-lint-final.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7fccf7e42776cc7cbbd6994cbe05a9160af38bd7"
+    },
+    "docs/evidence/library-management-next-20261025/logs/frontend-lint-last-file.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7fccf7e42776cc7cbbd6994cbe05a9160af38bd7"
+    },
+    "docs/evidence/library-management-next-20261025/logs/frontend-types-confirmed.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    "docs/evidence/library-management-next-20261025/logs/prisma-generate.log": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "10a0603b2dbcc7700aa448ea52469cf64f3fe977"
+    },
+    "docs/evidence/library-management-next-20261025/protected-inputs.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e2fe114307cb0883ada7528228942044828dea4d"
+    },
+    "docs/evidence/library-management-next-20261025/remote-drift.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0f5eb00bc7e4b44e1ec17cb207c57cebef8fd9d4"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-baseline-unified.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "92a8bc079d7b11c8d7b7b94a59aeae69aebf0af5"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-consumers-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "77e6f5a79e7d2cb576e3d2c87c17efc0b9566b04"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-consumers-retry.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "60d9106d4e705c4afe245e61d8abe15a49e32dc7"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-discovery-2.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0c857778bea0b126fe81516dd99d397ab21c1b1a"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-discovery-existing.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6b24ba3d82810a62390c91d039a1e053d1664c8e"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-install-sdq.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "51a5e3b9d5ce15fc9630701c33151e2da314d25e"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-new-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6c9df83de1a04688e75c637f4fa0d19375c37248"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-new-retry.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b68f1b6a40fac047d099f8924699bb218d46c71c"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-unified-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "854a90fe3c8c1786826a862f3945773f79871541"
+    },
+    "docs/evidence/library-management-next-20261025/reports/backend-unified-retry.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2eba5367a817ffd1ffb8f1cd33bf59ce225b6db4"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-baseline-rendering.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d0e8e8d144cafd3033d6c3c911a0bdf02be7e35a"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-consumers-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c5a1835ad5e169c565e1b9c47c4eb5221e482f16"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-consumers-retry.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "de232ad0996cc3cce7a8ba6ded5788681869ccbe"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-discovery-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d90f8f01f7055a9c8f0fd24785fb4376957f79e6"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-final-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dfd9ea84b2009762324883c30a8559e9fb38b79b"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-new-1.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9f396afed2ef9b8c9bb53439eff9ea443ceaa00b"
+    },
+    "docs/evidence/library-management-next-20261025/reports/frontend-unified-retry.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "37c1dea8130c2939a91069e4bc92363d75192caf"
+    },
+    "docs/evidence/library-management-next-20261025/validation.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f1c412fbbc9ae671c218108b144a5254a5a29c51"
+    },
+    "docs/evidence/pr356-adult-reference-boundary-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f2bdfec92cca59dfecf435e514554e723a0f6e54"
+    },
+    "docs/evidence/pr356-bibliography-axes-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "edf488b9e9c7a30f7f0feec73a9a89bdf78d10e4"
+    },
+    "docs/evidence/pr356-ci-preparation-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "33826c7eda44d213d28104dea56ba970af8aacc0"
+    },
+    "docs/evidence/pr356-eight-axis-discovery-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4476889fdc953c6df453d5323ba9bc9d3bdb3230"
+    },
+    "docs/evidence/pr356-review-fixes-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "42b0ae6ace167760956d671e014412f35ba75b2c"
+    },
+    "docs/evidence/pr356-review-followup-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a227807eda34ab1f10dad07e69e7869e85d297d6"
+    },
+    "docs/evidence/pr356-standard-dual-entry-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "367ab01849a246b2046a5f4230960b2f266474b6"
+    },
+    "docs/evidence/runtime-time-20261025/frontend-validation-summary.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e936889fafd333d3ba4a567a5ab6638b9025b827"
+    },
+    "docs/evidence/runtime-time-20261025/validation-summary.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8fc99a10be762bb5f6f1b79cd299b35d38141c09"
+    },
+    "docs/evidence/tool-onboarding-next-20261025/common-mapping-validation.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6ecf8a948b1a2647324d4b4d6ea57a0b035d9b3c"
+    },
+    "docs/evidence/tool-onboarding-next-20261025/integration.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5afeabc4f024f7778772cfe4c3b627bf105bf38b"
+    },
+    "docs/evidence/tool-onboarding-next-20261025/preflight-validation.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "640a21c863da178dba2452d86988bba0b6ca9ea5"
+    },
+    "docs/evidence/tool-onboarding-next-20261025/training-standard-flow-validation.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1eb07d779249e808293e85603b256e1ed3663a6d"
+    },
+    "docs/evidence/tool-onboarding-next-20261025/training-standard-source-validation.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "707c45c4df27fbbdbbc78e98c9834192b4020483"
+    },
+    "docs/library-management-next-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "30192e3ceb77eba6385688c7d558ea1d5a14f792"
+    },
+    "docs/local-survey-development-entry.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c2afd58254e2397c142717147a6dd24c9847043e"
+    },
+    "docs/pr356-adult-reference-boundary-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd666f9fa7a678e2867c5d1fab66cff62e471167"
+    },
+    "docs/pr356-bibliography-axes-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "aef6d487d512adb9c7d6d202ce2f8b76e232a80d"
+    },
+    "docs/pr356-ci-preparation-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d4b13eb32a48b7865f7f5c9af90ce051dc96eb4f"
+    },
+    "docs/pr356-eight-axis-discovery-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "39824d479016a90a6d32211d0e1fc2170c06f547"
+    },
+    "docs/pr356-review-adult-longitudinal-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fc2996423fbee6afc05466627c90beea47eddbb1"
+    },
+    "docs/pr356-review-approval-scope-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ad3d82fe443783a845392e5a953bbb051d308a8b"
+    },
+    "docs/pr356-review-fixes-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bdab3a35a67cbebfc65531b3df35a85ab38e7897"
+    },
+    "docs/pr356-review-followup-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "aa7cd20667c93c45a176fb494a2d57df1fff8125"
+    },
+    "docs/pr356-review-instructions-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "04fbb2074258998caee58cfbfa37f790d82430f0"
+    },
+    "docs/pr356-review-library-utc-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8cf7cdefadd5824c7b4d5c6acc2d673a1a671bf9"
+    },
+    "docs/pr356-review-onboarding-pagination-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6cee2f39398010b5eee670b2dcb6ea2eb60a4e6e"
+    },
+    "docs/pr356-review-receipts-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "26d5f850e0a507a930b036cd530d07743f177a37"
+    },
+    "docs/pr356-review-report-budget-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9ae7078760f250dc0324d2fc468252892ebd7f54"
+    },
+    "docs/pr356-standard-dual-entry-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "514f438fb4983640cce45eed15093cf264b135ee"
+    },
+    "docs/public-version-workflow-analysis-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5a3ea69152ab5e37bb8c25415c2dc8259eaffd3e"
+    },
+    "docs/runtime-validation-contracts.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e807a520423c5bdda8b38b4673f199516fb4e048"
+    },
+    "docs/scale-import/instruction-content-contract.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "976eb7c7990d9d6ef0b0c35277fb44068ff8c199"
+    },
+    "docs/scale-onboarding/self-authored-release-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "71fff74dac91adcd0290df5bc132e7f48c79d24b"
+    },
+    "docs/shared-standard-combination-mapping-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3fb0dd1f7c0bf072eddbd0efaaa80d1fb519d006"
+    },
+    "docs/tool-onboarding-next-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b3d55f040f808988ed1c32d376f00106dd104c86"
+    },
+    "docs/training-standard-backup-pause-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fed1244c1b2d60f79dda4957f7558d2189f13de1"
+    },
+    "docs/training-standard-combination-checkpoint-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "41e74504ee366a072bd6df94393faeaf67b0e4a6"
+    },
+    "docs/training-standard-flow-checkpoint-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e91a8ec44187a24de25f855a90f38d3fbb5b158f"
+    },
+    "docs/training-standard-vertical-validation-20261025.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a67a119c8531860c760491af4f95c3df3e995967"
+    },
+    "server-version/backend/prisma/migrations/20261025040000_content_grant_utc_time/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e95203b676a8184fd01ee2b28c018bf72b50f7c6"
+    },
+    "server-version/backend/prisma/migrations/20261025070000_standard_combination_material_kind/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5692fae21c61512e34ed7eb6d4c3b06d3348624e"
+    },
+    "server-version/backend/prisma/migrations/20261025070100_standard_combination_user_use/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9ce789d88f17ccccc0481222f260d5578362cfe7"
+    },
+    "server-version/backend/prisma/migrations/20261025070200_standard_combination_hash_required/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "374bc40fe356765deba3b199c30b0d14d5df6bc7"
+    },
+    "server-version/backend/prisma/migrations/20261025070300_standard_combination_use_revision/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2bcbbe1af3f3efeecfde954d4b4d110a7a8cacc9"
+    },
+    "server-version/backend/prisma/migrations/20261026010000_standard_combination_entry_authority/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "477a9e7a008418024048b7c781785fb6e38d063c"
+    },
+    "server-version/backend/prisma/migrations/20261026020000_package_report_budget_version/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6a2963a44a4d416de119acd76c50ab4a723a8b60"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a30f925de8f8415a296439927dee6b2cec1e0fe3",
+      "after": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb"
+    },
+    "server-version/backend/scripts/learning-motivation-wave1/generate-packages.py": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8cab140e41855aa2b15430fe4352cb8d52e9f8f1",
+      "after": "244099e9d3d515ca6eb099e90f6742edda1c1006"
+    },
+    "server-version/backend/scripts/learning-motivation-wave1/student_reports.py": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "924861cf543169413eb143da94b38466a659a16d",
+      "after": "3b86d017b31f4bf577140137c9b9337aa214ea28"
+    },
+    "server-version/backend/src/__tests__/assessment-reference/scale-wave1-governance.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5989880d7df8625d0a23872719871413887d979f",
+      "after": "6d2738d6e84a556dd2c116a7a77114d50c122862"
+    },
+    "server-version/backend/src/__tests__/assessment-reference/scale-wave1-longitudinal.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3d9ddf86f231bd3c42b907c87684992129a6cf9f",
+      "after": "f2456e2a8e3d6f40e479ae95ce019899ade047a6"
+    },
+    "server-version/backend/src/__tests__/assessment-runtime/report-outbox-whole-receipt-boundary.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bf86f4493967e38c73f2c8545f5d1b50b488d1d6"
+    },
+    "server-version/backend/src/__tests__/assessment-runtime/v32-1.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "df02e1feb7ca7d4cb3db985ac6441c1d9ad812cd",
+      "after": "d3b4e83fa274822e7b2f37bc128795c001c974bb"
+    },
+    "server-version/backend/src/__tests__/composite/current-unit-child-summary.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "08a189072922a4f271325293e1c5d4ca90c31d49",
+      "after": "07ec8f0f804a752fa0c7d7cd062f8592cd25b744"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-child-parent-shape.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "814e9db14008c6db9b39fbf3eff7be5f57334b79"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bd2e57655805cb2e2561c603c35ee4fea702d0ab"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d95dad51c6054323fc0daf74b55adb3a43552522"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2641fd107147602ef1b2430e88dcf5abe9807c39"
+    },
+    "server-version/backend/src/__tests__/composite/training-content-service.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0fd01f862f925f64ae94a9c8be9ac123217afc98",
+      "after": "639ec8e1af5bbd7e73bf7981a521421f0f782e20"
+    },
+    "server-version/backend/src/__tests__/composite/training-flow-materialization-reuse.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae9ab28f1a4f297f98b11d83d07d73b81add5c04",
+      "after": "bb044f7e10d954d4af9e799c62961fabfddfbfbf"
+    },
+    "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e890a194d99c8737cf0e1036da0fd4f15ada4a77",
+      "after": "642f98a288d4fc592d7e5c7b8b99e9be931ed0c9"
+    },
+    "server-version/backend/src/__tests__/measurement-content/content-authority.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "008844004ae343b3f0c7dbf621ff10b629d4870b",
+      "after": "ba2b0cb580309b9c69db3a84706e24ca978cda65"
+    },
+    "server-version/backend/src/__tests__/measurement-content/content-grant-time-contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "325311b551272dee3209716ab50cd77cea9f714e"
+    },
+    "server-version/backend/src/__tests__/measurement-content/content-grant-time.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "35b9dee44617f4a063d05cfc920a03066a0f78c0"
+    },
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical-admission.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f2f729f9ff84ed75ec1ab2d5498b2fc1584399cf"
+    },
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical-readonly-probe.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2d26a2f9c651d4565d318528e4b0d1c9b0a57b25"
+    },
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical-storage.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "eba6c062044f939134f1d02d6105f9751db5411a"
+    },
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7464f1578f5020ae06115fcad462a071e4f84728"
+    },
+    "server-version/backend/src/__tests__/measurement-content/reference-governance.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed8b54dc5ca459bfd94b5db42cd3856539decfb3",
+      "after": "90793feef05aa4414bf3532a34997780af043c28"
+    },
+    "server-version/backend/src/__tests__/measurement-content/standard-combination-compatibility.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ae7ebef3e37e644fd6a67f2a4a640cc546e62395"
+    },
+    "server-version/backend/src/__tests__/measurement-content/standard-combination-legacy.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f9426c0d48076c16bc0cf8d982bebaafded7a985"
+    },
+    "server-version/backend/src/__tests__/measurement-content/standard-combination.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "68f43432883831bebacd3fdca96ca0c2044fe9a7"
+    },
+    "server-version/backend/src/__tests__/measurement-content/standard-combination.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9f2ca3b96f574863fff6797cc91bc90488a7f345"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-exact-flow-materialization-guard.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6cc90146579a81af33e97e9c4a14c227513121b0"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-receipt-recovery.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "49121a087aceb259d510c5e394600986bfa141e1"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "36d453ce38bb245ab238607e2cf7c55147850edd"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-connected.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5659e26f945e0c26ed902e0320310481d790e57a"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-issuance-boundary.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c56c0fc202f0acd64250655914b563d4eeff5cbd"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "864bee4ed8754b81e4c24db02fa2deafc4516353"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6f39dfc2081e4596d266165b3e5e2582418042ec"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-standard-sql.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f03e71274d1a327901399d39a6e3833278ae6d4c"
+    },
+    "server-version/backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c954b861989ddb14a5e2ad72150885bd1885e187"
+    },
+    "server-version/backend/src/__tests__/scale/adult-reference-onboarding.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d0ce402028f9cfcbfa494decec88a2bcfdeb3f6a"
+    },
+    "server-version/backend/src/__tests__/scale/bibliography-axis.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ca0f5330e5427f1d58d438ccd610bef998108254"
+    },
+    "server-version/backend/src/__tests__/scale/catalog-discovery.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "07b825127911bdd8ef2bc6d83f2c195507dc15f1"
+    },
+    "server-version/backend/src/__tests__/scale/eight-axis-discovery.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "de22964480ccb2b80c39d4ab0790d58d0360af6a"
+    },
+    "server-version/backend/src/__tests__/scale/instruction-freeze.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "96f9f24a180c81e0331aa01e4f2d6dfe3cbe9798"
+    },
+    "server-version/backend/src/__tests__/scale/instruments/fixtures/learning-motivation-v1-facts.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "487c91047d021f40ea566b11e614d360e5e82340"
+    },
+    "server-version/backend/src/__tests__/scale/instruments/learning-motivation-axis-revisions.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9e7bc8ce6f21dc1b815451e6e8d4ee7cce8ddc72",
+      "after": "1d2cfa4c83323290afd28de576f964b1daa38e69"
+    },
+    "server-version/backend/src/__tests__/scale/instruments/learning-motivation-report-semantics.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "227cc37870b1155e48ffd30a6f7ff16c63b41cd2"
+    },
+    "server-version/backend/src/__tests__/scale/instruments/learning-motivation-wave1.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e54be857ec43698cec0e3c41cdf184e62df5f300",
+      "after": "1f721069ecc41270a32159ea70cc1b0e5ece7a42"
+    },
+    "server-version/backend/src/__tests__/scale/onboarding-status.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1c318221dc615cab570d06b9a1e1a0afcf7e4ca1"
+    },
+    "server-version/backend/src/__tests__/scale/pending-review-path.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd11dc301b1acdef6135ef5e9929f57f75e4cc89"
+    },
+    "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05"
+    },
+    "server-version/backend/src/__tests__/scale/pr356-entry-lifecycle.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "711a5eeefd2c979979988c78d224253b8b4189d0"
+    },
+    "server-version/backend/src/__tests__/scale/scale-governance-boundaries.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67e90b50ba10eceb6f7f6c78c018118e9a5f4609",
+      "after": "6d1eae5a6c23d93d2dd659f29171e8debc796f94"
+    },
+    "server-version/backend/src/__tests__/scale/scale-library-discovery-controller.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "53c7b14a6f0879aa9ab24f8c2bb5d075f1abf596"
+    },
+    "server-version/backend/src/__tests__/scale/scale-publication-guard.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7c12e655641788fd7fc12ccaedf5224b7c2e44fd",
+      "after": "a5d2b6b5986e639736913ce21eb0113aa47d5f4f"
+    },
+    "server-version/backend/src/__tests__/scale/self-authored-onboarding.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "60a08a886703a4410ab9b6e99a3890c18e469382"
+    },
+    "server-version/backend/src/__tests__/scale/self-authored-source.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f28f49c91192d7c98b0a001060651e96f086a779"
+    },
+    "server-version/backend/src/__tests__/scale/standalone-instruction-envelope.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a1b4f48e4df3a08b58d64eb84b4395c2da93b1da"
+    },
+    "server-version/backend/src/__tests__/scale/training-flow-materialization-guard.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "535e0c5eed36e7a85ed681d6f3c8d3eed0e1932b"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-classification.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3a30dcdd544e2116f521639795eab53805c87de1"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1e83f28c5c991fa4466fe6ad353187642ef408e0"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-instruction.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fd20ddf46046a55b42a798954eee451239a44bba"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-scale-instruction.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d243b36010a5e91f9f21cc9d0ccff9f31829a17f"
+    },
+    "server-version/backend/src/__tests__/survey/governed-package-read-budget.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b1f13556e39e943b634934a958b673df1147e5c0",
+      "after": "664b12210ff4a60a7c1b93cc4c6f2ba11ae8c5ef"
+    },
+    "server-version/backend/src/__tests__/survey/library-discovery.pagination.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "04c487bdd9c7c3aa9bf92eef4188225e26887534"
+    },
+    "server-version/backend/src/__tests__/survey/library-management.http.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "14009ed542a6a67edc31a28a02595bfaac721c14"
+    },
+    "server-version/backend/src/__tests__/survey/library-preflight.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "faa3275e8ee58e42c3f2f1b44f2d555216d32ac6"
+    },
+    "server-version/backend/src/__tests__/survey/onboarding-pagination.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "994417cd7d55de121493712abfff59e6cf4b9253"
+    },
+    "server-version/backend/src/__tests__/survey/standard-approval-intent.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7e2ac6a39db7ce9a6b71f8cd601e639428dfab06"
+    },
+    "server-version/backend/src/__tests__/survey/standard-approval-scope.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7dc63abc24b040b8e865c627355e81e620073c68"
+    },
+    "server-version/backend/src/__tests__/survey/standard-combination-mapping.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c0d97196963a2ea489376c4ee3ae06c5d50e666e"
+    },
+    "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ef81235d6e8ac21996516f3ccc8059e1e73bdc2e",
+      "after": "c27c67050468adb4c5d82bd28eb75c0aa1ed2007"
+    },
+    "server-version/backend/src/__tests__/survey/wave-measurement-preflight.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5c484c04e592e3d25e6f9e544206bb0da41f2358"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "19dc85021812c42c17e5560bfead6ae591e46856",
+      "after": "5633cff587cf2eee14cdb0e8b86f4e6b0cebcbd5"
+    },
+    "server-version/backend/src/controllers/questionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae96977617ced60417060fbdf67ff018cfa7e80a",
+      "after": "8f9681e6a34310f832e5161c66367696213aa509"
+    },
+    "server-version/backend/src/controllers/scaleController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9988739f36dec29b478301d80103c50a92f64a34",
+      "after": "dd670ed292d383ee99212be449e5c464c38c503e"
+    },
+    "server-version/backend/src/controllers/scaleLibraryController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "271960de9252c678aca1f89a0a9044ab922fe33a",
+      "after": "3c00ef3ab12ed82468e446e177e425becae1c398"
+    },
+    "server-version/backend/src/modules/assessment-reference/governance.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b3e4e7fd349bd2d23f73ccd53e4cac373fa7c141",
+      "after": "135dbb655e027e437ae9e5dbc8e6cfe3a658d557"
+    },
+    "server-version/backend/src/modules/assessment-reference/longitudinal.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a799a392a0390abda19c90585f495c73b4582dcf",
+      "after": "8ff2bec833d22e3a3b7d123306e2b56339882166"
+    },
+    "server-version/backend/src/modules/assessment-reference/reference.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1c8a7255c9a7bcac2897f6b5c5abef1515008de4",
+      "after": "376c9673d33be5f4987c3ad1e033f81a4ce647c0"
+    },
+    "server-version/backend/src/modules/assessment-runtime/frozen-scale-instruction.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1b30b4281a99a52d90dae08a27b28d02dae2bebc"
+    },
+    "server-version/backend/src/modules/assessment-runtime/reference-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eace34aaf33340f168fc44c7e887272a6c6f7a36",
+      "after": "2df216a8c73b681d6dfa9f775ee1625aa91b265c"
+    },
+    "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "116407b030545936ba24b74fc4403b1d4ff9b762",
+      "after": "b40595ab461fca8c08c1efbe81ea969184691528"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3e971112a976ddbdbd690b138c07bdb16f75faca",
+      "after": "c47895db811ddbe8dc0f907103b3df8092075b60"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fdb7d81dbe121186db796b6bc4aa3826bcddf177",
+      "after": "86df862ef5db6bd02ed150763dd13e22bdda7abb"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unit-result.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "dc78e9a79edb179d1bcd608f08e898c9c9ade28d",
+      "after": "b1b26c0ca88abf839394b158c5bcd5a12251bc48"
+    },
+    "server-version/backend/src/modules/composite/composite.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "be098efce42df38da5f621c93aaaec74b76c3ec9",
+      "after": "374a7627c062194b23353dce5e07f910790a3d2b"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0830c392a1d243f4acf89fb902ee4b9e1b0c536",
+      "after": "dc8bde2502e05527293c39731b03757586c4aba4"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9244d2297efa62ca56841a020fed82c5f0c82df0",
+      "after": "1f657f2132f797b9455375c640b2f1e6400c3aa6"
+    },
+    "server-version/backend/src/modules/composite/training-content-final.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9664b7016436e9bf2a7f90cdd422e9f4d6bbbf9e",
+      "after": "7b39ad8a985e0cdb8c1b97cf990a8aa67859d359"
+    },
+    "server-version/backend/src/modules/composite/training-content-report.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f026d701e70916e26853866cd92d6b75a72de2aa",
+      "after": "646a13684869f060fc053f44145772f05f4c7dcb"
+    },
+    "server-version/backend/src/modules/composite/training-flow-scope.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0f90c9173b51582c97bba2f570b881b5055e902",
+      "after": "2265226ca6ecf776d14fbf5c0c1ca2c365267e76"
+    },
+    "server-version/backend/src/modules/composite/training-reference-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "10c23237204ace6647508dfcee2bbb036b9304b4",
+      "after": "b9c1c93513162af00ecd0e86f1edee5687c008ca"
+    },
+    "server-version/backend/src/modules/composite/training-report-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5e2382ef083a5281e32ce213b68908c1b7194e3e",
+      "after": "1d3b27d78366fca33d942cb6b9084f3c24d9c330"
+    },
+    "server-version/backend/src/modules/composite/training-standard-collection.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5b59b9feb7edea9b334c9fcedb0b2e3d24361346"
+    },
+    "server-version/backend/src/modules/composite/training-standard-combination.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e45b0aa4d7a11929000c74f53bda9beac8afaecb"
+    },
+    "server-version/backend/src/modules/composite/training-standard-content.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "19355a73f140517ce5807d94b93e674c1ba3b4df"
+    },
+    "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "95b053332a2bf7aba6abfa146e882ee0336ad649",
+      "after": "59c9834b601719a892174eaec9b3703b4a392f15"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9fde059b686325cce23e868766dd9521939a11a0",
+      "after": "60c518dbcc7de9ee548d20a2236de33e8c676195"
+    },
+    "server-version/backend/src/modules/measurement-content/content-authority.repository.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "00ffa2ea9e94a7fa31f7a15f98e0940b9c5e2aba",
+      "after": "bda772b4295342aac6f39228efd6d960002a8854"
+    },
+    "server-version/backend/src/modules/measurement-content/formal-reference-authority.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "46b1d30b8ab2df0a9afb6e3b45e9c5b8c4f0ddbb",
+      "after": "7dd35536a1b263cbe4dd76bcf28a22874ceee48b"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination-content.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dea5209fd8640becbba506d06c989dad425e4970"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination-source.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "557852077fdc66b467c3c051757555395af2bc0a"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination-use.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ce8ebabc61e7eef7413145a65e33159e80db26dc"
+    },
+    "server-version/backend/src/modules/measurement-content/standard-combination.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "397190bca6905a19caaa62ec2eb642ca733f09f3"
+    },
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "04bd4daaf5e97261b17baa03921e9a456037d6af",
+      "after": "bafa43f4864293d431e4051ef382a70923aeb210"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c0dff760878cb568584c6305321662e39eee493c",
+      "after": "0ac4ac853bc99a08b57a7b21f0feb92ee9afeb62"
+    },
+    "server-version/backend/src/modules/scale-library-governance/authority.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "364ccecd653de415a9ae41bb0bc33c78f1fdacce",
+      "after": "283bee076da8a0ec3a0ada197085be8fb8a9932e"
+    },
+    "server-version/backend/src/modules/scale-library-governance/catalog-adapter.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ad9987b66be0e451cf960b17fab8d3d675a4fffb",
+      "after": "cc502717536adaf769cd4dea5b76aaf4d8f2070a"
+    },
+    "server-version/backend/src/modules/scale-library-governance/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "586662acfa1ee41033b8be65a17dfaf0a06593f3",
+      "after": "6a457e84912cefe9f957fc9804cf78f68afa6d92"
+    },
+    "server-version/backend/src/modules/scale-library-governance/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8e3c7f369567f61213a9d197776b28bab5fe74e3",
+      "after": "b5202cc1ecea9d276a17792e90163520cf5cea78"
+    },
+    "server-version/backend/src/modules/scale-library-governance/source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "44526289a97db20167e39ad565692e4e01d07205",
+      "after": "a93badd3712f4378eb162de10b284fffac5e6125"
+    },
+    "server-version/backend/src/modules/scale-library-governance/unified-catalog-model.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67b10dea6e0011574ef12fd051f195c0ce486b6e",
+      "after": "3ad91cfa51ce1495c005fb3ae3a33b3af90cb4ad"
+    },
+    "server-version/backend/src/modules/scale-library-governance/unified-catalog.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b58b899fa9cd153ef7a23a82d519a30f49111c3a",
+      "after": "a9955bce2095727f50d2b524728ae07d18454ee2"
+    },
+    "server-version/backend/src/modules/scale-library-governance/usage.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c7bd13aecacf7f6345d79b977a81a5009b4f109e",
+      "after": "ae26956d72880139d3833cd125f37142d738c8a8"
+    },
+    "server-version/backend/src/modules/scale/deployment/repository.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bbff8782e0642e7db615e3fa01ed53570bdb1ff0",
+      "after": "497e39136a07e88b3d7ba259c0658839a677b55a"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b17b8f3859bb0534792443fc45d8601d6091ed5e",
+      "after": "215a9492aefdda59790bf1fa306a482119157ae3"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "52e9a8f7b885f00f2ea13bf9b59608d2ce22c32f",
+      "after": "a0a623456c9e0bc4a3659ce1a5676519a3754ceb"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f4058b7f49885438ea163178cd497656401c621c",
+      "after": "705450918af170f7990650eed3d8521247d6a62b"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9ffa7dbb10600ba856127e56d80dd897149eb2f2",
+      "after": "0fecefcc41c23f3ebc676da0d709aaa49da39ac3"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1a29a13cde4e9d1b08216cce8174ff001bfaec5a",
+      "after": "715441d81521b9bf53130d429b219873e31aec2d"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_concept_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3c4a482cf6aebed17674689ce4c61af9b4516091",
+      "after": "53abd3141045d868bd15f83e15d4435bfdbf1c33"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a726fefaa7dba4599438d3c7f78081c615abf184",
+      "after": "51ce750fff77687a848140ac997a37539b989eda"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d4528f46dd77e4f7a74b95bfa86d4ac9b1ec343a",
+      "after": "220144f7f72ff8f95ddcea01ed7f0d3e96b2ed37"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7dba09f4f3df718d10d0baa63b8e337c07e06640",
+      "after": "484f48ea6c147d7b169f3ee427f85f05ae11ab19"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "63e2d2aaa92ac51435e3bd993bcee5b993a338ce",
+      "after": "15f32c6160a878bfb8cfb63baddd962c3b01e6db"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4eddd5898a30dc2f18b663d4e4284adc2c733699",
+      "after": "a5f02168ad4135d3c13a2740d391d2043770cb8b"
+    },
+    "server-version/backend/src/modules/scale/instruments/academic_self_efficacy_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a1b20aea48863604dcaad9e175c205a0a43d558d",
+      "after": "af957f6915668d40c11d9abad95bdeb1c8f3b395"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4a1863cc7d96ec473a110d8ac0477ce6e4173002",
+      "after": "e8a5c13f465c334ad95d122dae2b8f274d1afe26"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b25ce5d9dbbdeca6e03d43d9465b10f03bac48bd",
+      "after": "f2bb9a2579156e8f29d8101bb89c060f539ab40a"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3b23d73229828054be9de807fc2004545fb631ec",
+      "after": "c95ab69a9b5cbdd77129a13ff9aec6e3f07f9913"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c4b8e7e0d6426090dfba77a2ea87ab750047cdf5",
+      "after": "d05fb428261047ed2a4fdf956911e8499d3d9162"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4501e4f02004fa4e83925b908b6dacfa649d6720",
+      "after": "8515825f3db3626c69ea5d0fb37256b48ed8fa69"
+    },
+    "server-version/backend/src/modules/scale/instruments/domain_fixed_mindset_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c74e93c4fc602dacd46848e2bf3912601a0a57ac",
+      "after": "d505a3dd5ea9ea7b9bb15fa29c19aa61309875e1"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a5d2b3ecc10d2e65ed5e652f5174be875b40ec6b",
+      "after": "a4a82a10cf28bdf1b5e891319fa2df138aa30469"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a97c1791529dd115742fef66508724c970c0a3db",
+      "after": "45bd608c5a7082f084c15f4b7470bb5577467f54"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1ee25f20f6ebda98e4161dd7efebc0088d9e7d46",
+      "after": "0dd4aa7bede510dcaa8112d25b29925350aa8367"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "57631a70bbe1f02bbb5cacba920c48387ce4932b",
+      "after": "a7075e5012d380a62fec5b9171e5bd2994d20ffb"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "66b9dfaccb74d1af19e4b2b41802133b62a7189f",
+      "after": "f081ab06f232aa2ce438464a57d745b4a29a9965"
+    },
+    "server-version/backend/src/modules/scale/instruments/teacher_subject_liking_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "db82ef75faf52baaa8fcfff40d8a73a66c96c6b9",
+      "after": "a7a5471195215628505f8ae1a60036cfbf4409ea"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e89dc87d4efead6feb120b3022f2aa2060e15633",
+      "after": "6d87bdd8416f83e02735f00aef1e31c0730a0b84"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "722830636db425621678768cb38b1f64d4aaad4e",
+      "after": "b3ca42c41302525e8a2bd9b67392ded5b7013360"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b7f9c7349b84de35b0bc095b5a9fe58f02f897a7",
+      "after": "5b03f8c1b3b06ee420ca89fa6c55428bdf3ad4be"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9c4e84e34784a0ef434f5d0ffbbf543822d92fcf",
+      "after": "3241ba8d5b17587b16974241cceb175648f9cc38"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d6baff4c267723cbc711c8b49362da49654532cb",
+      "after": "df978be1689022a49fb3698dc8f4422955fbad2d"
+    },
+    "server-version/backend/src/modules/scale/instruments/tutoring_necessity_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9668c683aa67c6e02581c4bd98f080836f8c2a9b",
+      "after": "0a82a88a2da5e65dc03999cbacba9d0abc9bb5dc"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_biology_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aa0cef1dca4137b60cc948ba9635dd80d1041d4d",
+      "after": "2882d762c90fc21c2756a76b3136aaa1e95748ef"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_chemistry_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2bd8a0691c3685ad4574c4f7bf41db2b34aef4de",
+      "after": "b0528fa9b7d007e23de1e43bbd69b1c4bd59de74"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_chinese_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c11a29c8b7c9197ddb7df563a205575fd17494e2",
+      "after": "ca1910815e3c6120ba9eb29469b7bf8f66eef326"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_english_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a0a9f96d5c1bfd39a5e8b0226d934e758cb054ef",
+      "after": "ea080b823d189d1acac6342e5c1603870220ed7d"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_mathematics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b2701fe331b64db3784b50b3c7275a4a02ec9da1",
+      "after": "8db7d7822006b919e03b33d0543e37f81b79f426"
+    },
+    "server-version/backend/src/modules/scale/instruments/value_cost_physics_zh_cn/1.0.0/source.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c682712e687228e4781ad6348d559bda2ff10e88",
+      "after": "34e30da10830623efdf19e7276b7d893f5044eb1"
+    },
+    "server-version/backend/src/modules/scale/library/catalog-discovery.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7bd81af3428254a788eb55f75b9222a7e0167914"
+    },
+    "server-version/backend/src/modules/scale/library/catalog-tag-labels.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "85b4fbaf5c0dbc463c6a99f5e3a5c6d2edc55cbd"
+    },
+    "server-version/backend/src/modules/scale/library/localization-manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "05d92b765fc00d9a5c2a732559585a1f3aeb9c6c",
+      "after": "d598ddcd08f1e56bdb968e688d6dd07635242fc4"
+    },
+    "server-version/backend/src/modules/scale/library/scale-library-read-model.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "60db8c0b0c4f8af679b27a75693147a8cc269a28",
+      "after": "bb49104e6e4dbfc3427ae942439d15c67ce022fd"
+    },
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "74f756b37f2b975007f872cbd15ff9b4144f1ae6",
+      "after": "384c3aa92bb476e1ef2a6677809657603c9fc5b9"
+    },
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1662ff39ac6d1fc32e411b23ec8de55ffa8f641c",
+      "after": "97528fb467ae38bf52f9d7a2f816f7342f92b82a"
+    },
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c29dbde6652623262bd75485a3329910a1b35d72",
+      "after": "1fa9e896065d97e317dc987fd3091fcc00805fed"
+    },
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "58df5fea1f93c80cb50ebca7d73249e1a401f1de",
+      "after": "7092e834dbae5b4315b3c3a3edbf5b71a07d96c9"
+    },
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45121ba51dd694ad003873278dac476cd989d29e",
+      "after": "a4a2e493e5fa246a213583bf5a641ed64b7f427e"
+    },
+    "server-version/backend/src/modules/scale/onboarding/self-authored.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2fe9f9f90e3e48a95204dabdf597ac9277e08bda"
+    },
+    "server-version/backend/src/modules/scale/onboarding/status.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ad807700f45d6d9959a73124c41eff40d35a2cc4"
+    },
+    "server-version/backend/src/modules/scale/onboarding/types.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "13a668c065d99c724d7d1e820e7f55f253ed9a82",
+      "after": "ceed5febc6b2e67496ff4b47a87aeba5d289132b"
+    },
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "338d4504a1f7136fdb7132669a154bfafde9af48",
+      "after": "2581c7c116bd9b43746e4e34a3beddc76e315f8a"
+    },
+    "server-version/backend/src/modules/scale/policy/localization.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "faffca1c86ec43a5c338c94684eb120dfee74e88",
+      "after": "f4c5bc896adacd9bfb4ba0e2d0bb6cb0ec0f0453"
+    },
+    "server-version/backend/src/modules/scale/projection/scale-attempt.projector.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cbca84d3150b62a7136d3527fd485b363ecf4f0d",
+      "after": "69a9118e5538cf8579b6427888b879984ff129c0"
+    },
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "448d98a4a8a972a097973931cb817ab155153858",
+      "after": "cb927b0ec31851dc307a0ba1075e4cb1f8e4854c"
+    },
+    "server-version/backend/src/modules/scale/scale-collection-guard.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ff33e018dc15b9a5edee7da6deab2afe52309570",
+      "after": "04c2e757a9edf2178bf12a3f49455fb38469d703"
+    },
+    "server-version/backend/src/modules/scale/scale-definition.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c0c3ac1bc2a5c4f71eb3c15d28ae61f5379a578d",
+      "after": "4131d844d4c29d3813a5c5d1b55709825e1c437b"
+    },
+    "server-version/backend/src/modules/scale/scale-publication-guard.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "de1ac0bfd2584c265ead1d9b29ef9e2606e0cbb4",
+      "after": "61902f066814f52c79967c9c1bf8b8167b12a7cd"
+    },
+    "server-version/backend/src/modules/scale/scale-restart.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e78ae1250d8bbe88312439770ae3f407bfc10c2c",
+      "after": "9b8f252095068544a57624c9943830b06eff3784"
+    },
+    "server-version/backend/src/modules/scale/scale-start.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9b483cae2b44c210057984816fb85d1d18a78c7",
+      "after": "ed3a7020e54b843117094421b738cdc236c833ef"
+    },
+    "server-version/backend/src/modules/scale/scale-workflow.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5d5e57e489eff39cec70e7491ffbb620c51533d9",
+      "after": "77a2398ab8bae997308652e969f6d5fd5ccac6d9"
+    },
+    "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "95282ce7a82becf8feec9dd663ace923906c230f",
+      "after": "d853dcaeee37f392aff2d88616ff951453b85f67"
+    },
+    "server-version/backend/src/modules/situational/entry-authority.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9f96c6b5d6a34a0df896ffaa6740ebe3860e29c9",
+      "after": "4f6736a4400585de3663c73f44748c2bf96bb3d8"
+    },
+    "server-version/backend/src/modules/survey/catalog-discovery.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0097bfd2f27b11046ae0d32504796b07a32f0a19"
+    },
+    "server-version/backend/src/modules/survey/catalog.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3c404d47765cf46ed25de526899d7329692f7238",
+      "after": "2daec79a26c55e5a01269028845c24bcfa00bb11"
+    },
+    "server-version/backend/src/modules/survey/catalog.sources.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "63f9b76c220a3717249211bf27e5d853964b7453",
+      "after": "4ca1ec148f777221fabb04ff3681377d7ba5aa69"
+    },
+    "server-version/backend/src/modules/survey/governed-package.budget.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "14633287d321bc853516b722067b8f928e1146da",
+      "after": "be1f7713ca66709e0c73c9d813c70af0d80747a3"
+    },
+    "server-version/backend/src/modules/survey/governed-package.reports.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae521fadf4a562635ddb6f662e74a737681e6a78",
+      "after": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.model.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e5157f31616dace92d3ad10f66477648538020cb",
+      "after": "a3874eff856a627183d4c0be4bde0e4d2c243c77"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3625e57f5ef24af6cf9ce0fce5788a41753c2116",
+      "after": "b1f70ee2391c2fe36a86718f4d23835a75a152d3"
+    },
+    "server-version/backend/src/modules/survey/governed-tool.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5fc25f19123dc2473daf811837e1548130c6b83c",
+      "after": "721484b1328ac81d1bd5be6be34f915df0bb14d8"
+    },
+    "server-version/backend/src/modules/survey/library-admin.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "819d50eebd8b7d6428eb0f227d85911cec2cd51d",
+      "after": "aa560a9313d2609a8a7164f5551c07278705d8d1"
+    },
+    "server-version/backend/src/modules/survey/library-admin.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "987c430382f9bad1e92f3d7f22e6eb9f5104dbb3",
+      "after": "66b7d09ac0ff15dcd9e6573d85c1d1ca464e7df9"
+    },
+    "server-version/backend/src/modules/survey/library-preflight.service.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1d91df49dd9c20e9fa3e1694358623e75944bfdf"
+    },
+    "server-version/backend/src/modules/survey/platform.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "af531d33b898e1066cf1d7c77ffa7a52f803c413",
+      "after": "a83c62b96ebf1d27fede3082bcd6a3d73ed065e8"
+    },
+    "server-version/backend/src/modules/survey/publication.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f01d01aad33b44c7c3a6690c7ebb52913ae60480",
+      "after": "993495aebd79defb10d75b99401dcdd4b568287d"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "91b15e0e3c7da634e9e21df9272036c5f3d44f5f",
+      "after": "373ddecfc1f017070dcd577a78c7a566d66f8f0a"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "235ee88a633ff63f91883ee1a00ad4ba26b09065",
+      "after": "f571ccabebcd3914c1858cee0b87c53ff8619894"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed166c8880363ef9fd4067d1b20100cb309ca98a",
+      "after": "4f6eecd86cec9595488218f751a1d5e26cec1bb4"
+    },
+    "server-version/backend/src/modules/survey/task.public.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ebbb884020fd3696670f93f6b5514f9ee1ca8be1",
+      "after": "d3466034c0f6c8cdc2d0a45732cb92f1fcc06a1b"
+    },
+    "server-version/backend/src/modules/survey/waves.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "737a19165407528538e5732a77f1d2860d80895f",
+      "after": "77037a1de0b89e9d1832c13c0de291f6b2e53f96"
+    },
+    "server-version/backend/src/scripts/install-scale-instrument.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9630226385823afb2843e36bd22c9e8dd3a8b135",
+      "after": "35e95a363c964930e2ba1b000831721de1f3793b"
+    },
+    "server-version/backend/src/services/materialGrant.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c214de17d3ba939bbc07d6998473082578a271ad",
+      "after": "525ab08fbaec46ea073ea77fd5ff273ae01fba0a"
+    },
+    "server-version/backend/src/services/questionnaire-form-section.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2ac38515768e3a80d7bde15887b18413c9e05905",
+      "after": "30577ddd1544d90737a4fa194ff710451c1d1be8"
+    },
+    "server-version/frontend/src/api/__tests__/scaleLibrary.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "222b6a6ea74ef2b5420fc4d670705fea99e0ac5d",
+      "after": "9f203c5a56cbcde6e1d89270bc52482590d4c4ff"
+    },
+    "server-version/frontend/src/api/catalogDiscovery.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dfd5859478d457f48927202a5352c03d712a266e"
+    },
+    "server-version/frontend/src/api/catalogDiscovery.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d54acb8015687a6e4edc7b39d461dc33384770a1"
+    },
+    "server-version/frontend/src/api/scaleLibrary.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "57e33c5ad5066a8e57ba00049abe8e2b8c9c227b",
+      "after": "ba7818885cd5aa1b4af823bec031ef3e37526191"
+    },
+    "server-version/frontend/src/api/scaleLibraryGovernance.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e9a2e85f32c1823f7e411da919cd7aa5fc8bfed1",
+      "after": "85359a007ea6180c4baaac676b59210e0a27f5bf"
+    },
+    "server-version/frontend/src/api/surveyGovernance.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "55dae3ca9d8a83921d110de441c13210b434ef0b",
+      "after": "fe5b52841d058cd80f9f7254361198a0c60a517c"
+    },
+    "server-version/frontend/src/api/surveyStandard.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7435594899bdc2be9144e977d3b7a0d67e9abe48",
+      "after": "5786f107c81a1170fefdc57bf75b177bcd289edc"
+    },
+    "server-version/frontend/src/components/scale-governance/CatalogClassificationTags.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "be1f20d9e5ecec1a97d33a85125d12a42d232821"
+    },
+    "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c879c8db375958e63c9bb0ebef499f4f72bb68fc"
+    },
+    "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f526cbd2c32c2a9bf2745d5ff6dee17342cbd5fd"
+    },
+    "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9fdcb84a0b73c18e356924acf5990e4396c9fb52"
+    },
+    "server-version/frontend/src/components/scale-governance/LibraryPreflightPanel.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8aa87103711cf97f7d22244ff2da01ba7b644922"
+    },
+    "server-version/frontend/src/components/scale-governance/catalog-discovery.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3ebea0bbae422a7ffaace28e9f9a4a17345d2c3b"
+    },
+    "server-version/frontend/src/modules/scale/rightsPresentation.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c963ec88aeac02f68ed9184e2712432dd75ebaa5",
+      "after": "4d1c7850872e796b9a85cc850367a3f41fdaafca"
+    },
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67e09ac4ef2e3d335cbba94a046ed874bb4a82e4",
+      "after": "9d57a686706d73abd73f04df666bbbd77da04d28"
+    },
+    "server-version/frontend/src/pages/ScaleLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9cc677a3128efdcd9530e770b391cb6aeb8ee7d4",
+      "after": "1a2360765c52b464d5659f788e69609811af0774"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleLibrary.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d7375368664ce733a21cf5e17ee90b74f3dff4db",
+      "after": "673ded20d0a42c9e6921e5ee89d536452eaf587a"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolLibrary.discovery.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8414bd820ae29ea8a06d60fdafed3312b1c5fe5b"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d842ff34dd328533d63ea5ae6d0281b15ac13922",
+      "after": "b220e3a7ef212aa75c59bc826732619a72913ccf"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f4f565f59d70f2a82b1fdbcb2bd2c1b1d163dc22",
+      "after": "15700ce38e1709a503955dc64517b49d7defeaba"
+    },
+    "server-version/frontend/src/pages/admin/GovernedToolsWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f672ab4afacda85cc7c0f9f08899f89961e7da99",
+      "after": "12fe9d998cbb9e1fd1054014ce53166c211a78ac"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.discovery.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b866bd6f2892a97bf8fe48ffb7f57593d9fccca5"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.legacy-rendering.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d2f55badd44e3b0926e9a0239f476a7b5dd0b3e3"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e561839b4e03c7296cf0000ee0d1baf8b5bda7a3",
+      "after": "b0d3f52c3e7af809a3301bb85de15fbba2fc7441"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9300b7f20eeff6a87eaf574f6ef6a3426afe5404",
+      "after": "aca8ffd8933ffaf0229c8b303ff4ca7050da41ff"
+    },
+    "server-version/frontend/src/pages/admin/StandardOnboardingStatus.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "917f05e3d5870c39a52dc6a07ae7897553703261"
+    },
+    "server-version/frontend/src/pages/admin/StandardOnboardingStatus.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "375d7463f0055b759986a021c3a403ddd7c589f3"
+    },
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1fcaa1b53445c6d639500e48ecbd51012d2be956",
+      "after": "5dabfd32d0b7a34a22853b76e6f4ed952f148307"
+    },
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0cc7e562e20aca988b23bef80d5cb1ec52b8b808",
+      "after": "9ff8e262d095088b769bac770c462b34b897d2cd"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.discovery.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "67057f26ec727d2e4be721ffe24c88bb562d547f"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ff96c7e659d477fea3459261602b0890df66c0fd",
+      "after": "8526dcb0294b1cb3f26019f8bf24202db29283c7"
+    },
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0285d0d9127a3f51278f5d8a7ec6b45a2c2e67e1",
+      "after": "72c64e843d334ec3f35f1542af6bfaa8907a8fad"
+    },
+    "server-version/frontend/src/pages/admin/SurveyLibraryAdmin.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "54d60c2e9907639a340a8a1e8075e341475c0e8b",
+      "after": "7bb00477b7d6a24a8f77eb1273757cb1166b2207"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b0cd1e3d1daf4ae67296e7d719980bafa931c01",
+      "after": "af8e61c47ea3329107e40fd396a41132ca4080e4"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ad91bf491662bb719e08700a7c893a4a1fa2caf1",
+      "after": "a6956cde3649f62eb02db3616fa0ac464416ead1"
+    },
+    "server-version/frontend/src/product-entry.development.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f0839632dea31c1291c6e3ced57edd57e48a581b"
+    },
+    "server-version/frontend/src/product-entry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5ecea6cee850fa943f0bf1343abf017e51595f3a",
+      "after": "97d854d62f65aba24bb36a3cd5c042f6f32fb409"
+    },
+    "server-version/frontend/src/products/development-entry.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "57e0643f029e3648ad3dccac23dd63a9f2fd2d01"
+    },
+    "server-version/frontend/src/products/origins.development.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9d2593055ad4f6186560199d55763192657af197"
+    },
+    "server-version/frontend/src/products/origins.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e1cf93562c1802da57f26af987a1e4b669580a71",
+      "after": "b3f152369c0a39b68875dfd9d86655ce15f7430a"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0d09ab90e39b2f629cf567d4ff0b540bd23ecb0e",
+      "after": "f536e86ad257cd81a13f83e6485dc7753590cb02"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "64f2b9efab4951d3fe5cd1360d7cf17157c1e213",
+      "after": "6d04b2baa0c9bec2d1075728608655e81ef314d0"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aa219d53091998f6406217384952914c6475f744",
+      "after": "c33594be8c37fb26427c58b7708a5535a6e3edca"
+    }
+  },
+  "controls": [
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/scripts/pr356-acceptance.json",
+    ".github/scripts/pr356-admission.mjs",
+    ".github/scripts/pr356-admission.test.mjs",
+    ".github/scripts/pr356-artifacts.mjs",
+    ".github/scripts/pr356-artifacts.test.mjs",
+    ".github/scripts/pr356-bindings.json",
+    ".github/scripts/pr356-browser-fixture.cjs",
+    ".github/scripts/pr356-browser.mjs",
+    ".github/scripts/pr356-codeql.mjs",
+    ".github/scripts/pr356-codeql.test.mjs",
+    ".github/scripts/pr356-database.py",
+    ".github/scripts/pr356-database.test.py",
+    ".github/scripts/pr356-entry.mjs",
+    ".github/scripts/pr356-entry.test.mjs",
+    ".github/scripts/pr356-evidence.mjs",
+    ".github/scripts/pr356-exact-lazy-fixture.cjs",
+    ".github/scripts/pr356-exact-lazy-fixture.test.cjs",
+    ".github/scripts/pr356-gate-contract.mjs",
+    ".github/scripts/pr356-gate-contract.test.mjs",
+    ".github/scripts/pr356-local-evidence.json",
+    ".github/scripts/pr356-metadata-reuse.mjs",
+    ".github/scripts/pr356-metadata-reuse.test.mjs",
+    ".github/scripts/pr356-plan.mjs",
+    ".github/scripts/pr356-product-browser.mjs",
+    ".github/scripts/pr356-product-browser.test.mjs",
+    ".github/scripts/pr356-qualification.py",
+    ".github/scripts/pr356-qualification.test.py",
+    ".github/scripts/pr356-restore-fixture.cjs",
+    ".github/scripts/pr356-runtime-scan.mjs",
+    ".github/scripts/pr356-runtime-scan.test.mjs",
+    ".github/scripts/pr356-sarif.mjs",
+    ".github/scripts/pr356-sarif.test.mjs",
+    ".github/scripts/pr356-scope.mjs",
+    ".github/scripts/pr356-scope.test.mjs",
+    ".github/scripts/pr356-stable-gate.mjs",
+    ".github/scripts/pr356-stable-gate.test.mjs",
+    "docs/pr356-ci-activation-20261026.md",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "5ca40b23e43117aa45eef80b2bf54b6f8641bfbb",
+    ".github/scripts/merge-gate.mjs": "7cab6ae17bee90dfafc25a21e97f93ed79a40f1a",
+    ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522",
+    "docs/release/README.md": "70bd4031b5ac1ec23bff6650ba825d9b9d9e5a37"
+  },
+  "components": {
+    "backend": "8b2b7892401efac7cbdcddad8c73acacf5eb424d",
+    "frontend": "87590586f2902baf14f0a94e8d444ac9e4b2e7e8"
+  },
+  "protectedInputs": {
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/backend/prisma/schema.prisma": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb"
+  },
+  "scope": "Platform onboarding and supplied correctness fixes; held content stays inactive. Qualification is not merge/deployment authorization."
+}

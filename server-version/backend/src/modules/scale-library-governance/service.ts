@@ -1,3 +1,4 @@
+import {catalogKeywordTerms} from '../scale/library/catalog-discovery'
 import {approveToolEntryPolicies,type ToolEntryProduct,type ToolPolicy} from '../assessment-governance/tool-entry-policy'
 import {assertSurveyLibraryManager} from '../survey/admin-role'
 import {compileEducationApplicability,readFrozenEducationApplicability} from './education-applicability'
@@ -162,12 +163,13 @@ export async function changeEntryProducts(actorId:string,id:string,raw:unknown){
   return entryView(updated.entry,updated.submission)
  })
 }
-export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number},product?:LegacyLibraryProduct){
+export async function listEntries(actorId:string,entryId?:string,pagination?:{offset:number;limit:number;keyword?:string},product?:LegacyLibraryProduct){
   const limit=pagination?.limit??100,offset=pagination?.offset??0
   if(!Number.isInteger(limit)||limit<0||limit>100||!Number.isSafeInteger(offset)||offset<0)fail('目录分页参数无效',400)
   return prisma.$transaction(async tx=>{
     const capabilities=await libraryCapabilities(tx,actorId)
     const ids=[...capabilities.reviewGrants.flatMap(g=>g.releaseIds),...capabilities.distributionGrants.filter(g=>!product||g.product===product).flatMap(g=>g.releaseIds)]
+    const terms=catalogKeywordTerms(pagination?.keyword),discovery=terms.length?Prisma.sql`AND ${Prisma.join(terms.map(term=>Prisma.sql`strpos(lower(concat_ws(' ',s.metadata->>'title',s.metadata->>'author',s.metadata->>'applicability',e.release_id)),${term})>0`),' AND ')}`:Prisma.empty
     // Filter authoritative visibility before OFFSET/LIMIT, not after a page.
     const entries=await tx.$queryRaw<EntryRow[]>(Prisma.sql`SELECT e.* FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id
       JOIN measurement_content_releases r ON r.id=e.release_id
@@ -178,7 +180,7 @@ export async function listEntries(actorId:string,entryId?:string,pagination?:{of
       OR EXISTS(SELECT 1 FROM scale_library_use_grants g JOIN survey_tool_policies p ON p.resource_key='release:'||e.release_id
         AND p.fingerprint=r.content_hash AND p.product=g.product AND p.decision='APPROVED' AND NOT p.paused
         WHERE g.entry_id=e.id AND g.user_id=${actorId} AND g.status='ACTIVE' AND e.status='ACTIVE'
-          AND (${product??null}::text IS NULL OR g.product=${product??null})))
+          AND (${product??null}::text IS NULL OR g.product=${product??null}))) ${discovery}
       ORDER BY e.created_at DESC,e.id LIMIT ${limit+1} OFFSET ${offset}`)
     const list=[]
     for(const e of entries.slice(0,limit)){const {entry,submission}=await loadEntry(tx,e.id);list.push(entryView(entry,submission))}

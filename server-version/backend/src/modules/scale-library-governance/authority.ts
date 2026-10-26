@@ -32,6 +32,15 @@ export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId
     scope:{product,scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:capability==='catalog.manage'?'catalog':'material',resourceKeys:[releaseId]}})
   return result
 }
+/** Revalidate a recorded delegated basis. A later entry-admin appointment
+ * never substitutes for this exact content root; issuance keeps its separate
+ * existing entry-admin path in assertLibraryAuthority. */
+export async function assertExactTrainingDistributionDelegation(tx:Prisma.TransactionClient,actorId:string,releaseId:string,grantId:string){
+ const user=await libraryActor(tx,actorId)
+ if(!['TRAINING','LEGACY'].includes(user.account_domain))fail('平台内容管理需使用平台账号',403)
+ if(user.systemAdmin)fail('系统管理员不能代替入口管理员分配使用权',403)
+ return assertContentAuthority(tx,{actorId,grantId,capability:'material.distribute',scope:{product:'TRAINING',scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:'material',resourceKeys:[releaseId]}})
+}
 export async function libraryCapabilities(tx:Prisma.TransactionClient,actorId:string){
   const actor=await libraryActor(tx,actorId)
   const entryGrants=actor.platform_role==='STANDARD'&&['TRAINING','LEGACY'].includes(actor.account_domain)?await tx.$queryRaw<Array<{entry:'TRAINING'|'SURVEY'}>>`SELECT entry FROM admin_entry_grants WHERE user_id=${actorId} AND entry IN ('TRAINING','SURVEY') AND revoked_at IS NULL`:[]
@@ -39,7 +48,7 @@ export async function libraryCapabilities(tx:Prisma.TransactionClient,actorId:st
   const rows=await tx.$queryRaw<Array<{id:string;product:LibraryProduct;resource_keys:string[];capabilities:string[]}>>(Prisma.sql`
     SELECT id,product,resource_keys,capabilities FROM content_capability_grants WHERE subject_id=${actorId}
       AND scope_kind='PLATFORM' AND scope_id=${LIBRARY_SCOPE} AND revoked_at IS NULL
-      AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp() ORDER BY id LIMIT 100`)
+      AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC') ORDER BY id LIMIT 100`)
   const reviewGrants:Array<{grantId:string;releaseIds:string[]}>=[],distributionGrants:Array<{grantId:string;product:LibraryProduct;releaseIds:string[]}>=[]
   for(const row of rows){
     const capability=row.capabilities.includes('catalog.manage')?'catalog.manage':row.capabilities.includes('material.distribute')?'material.distribute':null

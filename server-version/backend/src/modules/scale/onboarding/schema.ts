@@ -63,6 +63,11 @@ export const scaleInstrumentSourceV1Schema = z.object({
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),
   educationalFeedback: educationalFeedbackDefinitionV1Schema.optional(),
+  instruction: z.object({
+    schemaVersion: z.literal(1), text: z.string().trim().min(1), language: z.string().trim().min(2),
+    version: z.string().trim().min(1), source: z.string().trim().min(1),
+  }).strict().optional(),
+  authorship: z.object({ revision: z.number().int().positive(), confirmedBy: z.string().trim().min(1), confirmedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), basis: z.string().trim().min(1) }).strict().optional(),
   scientificReview: z.object({
     schemaVersion: z.literal(1), reviewer: z.string().trim().min(1), reviewedAt: z.string().datetime({ offset: true }),
     approvedMaturity: z.enum(['RESEARCH_READY', 'RESEARCH_GRADE']), territory: z.string().regex(/^[A-Z]{2}$/),

@@ -6,7 +6,7 @@ import {
   scaleDeploymentModeSchema,
   type ScaleDeploymentModeV1,
 } from '../policy/deployment'
-import { scaleLocalizationReasons } from '../policy/localization'
+import { localizationNextActions, scaleLocalizationReasons } from '../policy/localization'
 import { getScaleInstrumentSource } from './instrument-registry'
 import { scaleInstrumentSourceV1Schema } from './schema'
 import { validateScaleInstrumentSource, materializeCatalogManifest, materializeLocalizationManifest } from './validate-instrument'
@@ -84,5 +84,9 @@ export const previewScaleInstrument = (input: {
     admission: { requestedModes: modes, decisions },
     allowActivation: source.executable ? [...new Set(blockers)].length === 0 : false,
     blockers: [...new Set(blockers)].sort(),
+    nextActions: [...new Set(blockers)].sort().flatMap(code => {
+      const action = localizationNextActions[code]
+      return action ? [{ code, stage: action.stage, owner: action.owner, next: action.next }] : []
+    }),
   }
 }

@@ -35,7 +35,7 @@ export const clone=<T>(value:T):T=>JSON.parse(JSON.stringify(value))
 export const packageFamily=(family:GovernedFamily)=>family==='COMBINATION'||family==='BUNDLE'
 export function snapshotUnit(snapshot:CatalogSourceSnapshot,id='trial-unit',key='tool'):ResearchFrozenUnit{
  return {draftId:id,instrumentKey:key,kind:snapshot.ref.kind,title:snapshot.title,draftRevision:1,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,
- compiledDefinition:clone(snapshot.compiledDefinition),displayDefinition:clone(snapshot.displayDefinition),...(snapshot.answerMapping?{sourceAnswerMapping:clone(snapshot.answerMapping)}:{}),
+ compiledDefinition:clone(snapshot.compiledDefinition),displayDefinition:clone(snapshot.displayDefinition),...(snapshot.answerMapping?{sourceAnswerMapping:clone(snapshot.answerMapping)}:{}),...(snapshot.instruction?{instruction:snapshot.instruction}:{}),
  ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,nativeSituational:clone(snapshot.nativeSituational)}:{}),
  sourceProvenance:{...clone(snapshot.provenance),source:clone(snapshot.ref)}}
 }

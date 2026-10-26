@@ -437,3 +437,17 @@ describe('V32-1 Cognitive trial normalizer', () => {
     })).toThrow()
   })
 })
+
+
+it('binds real frozen demographic context into Scale reference identity and leaves legacy identities absent',()=>{
+ const runtime=scaleRuntime();runtime.aggregateProjection.allowedReferenceClassifications=['theoretical_range']
+ const result={method:{scoringVersion:'1.0.0',reportVersion:'1.0.0'},quality:{status:'interpretable',flags:[]},scores:[{key:'total',value:3,status:'calculated',direction:'higher_is_more'}],references:[{scoreKey:'total',referenceVersion:'adult-v1',referenceKind:'theoretical_range',status:'available',bandProvenance:{subjectKey:'general',locale:'zh-CN',schoolStage:'adult',scoreRange:{min:0,max:20}}}]} as unknown as ScaleResultV2
+ const input={runtime,result,contextHash:'a'.repeat(64),referenceBindings:[{referenceKey:'adult',referenceVersion:'adult-v1',referenceHash:'b'.repeat(64)}]}
+ const legacy=projectScaleCanonicalUnitResult(input)
+ expect(legacy.metrics[0].scaleReference).not.toHaveProperty('frozenContext')
+ const core=projectScaleCanonicalUnitResult({...input,participantContext:{ageMonthsAtFreeze:240,ageYearsAtFreeze:20,birthYearMonth:'2006-01',primaryLanguage:'zh-CN'}})
+ expect(core.metrics[0].scaleReference?.frozenContext).toEqual({ageMonthsAtFreeze:240,primaryLanguage:'zh-CN'})
+ const envelope=createCanonicalUnitResultEnvelope({core,completedAt:'2026-10-01T00:00:00Z',persistenceProvenance:{sourceType:'ASSESSMENT',sourceAttemptId:'frozen-age'}})
+ expect(parseCanonicalUnitResultEnvelope(envelope).resultHash).toBe(envelope.resultHash)
+ expect(core.contextHash).toBe(input.contextHash)
+})

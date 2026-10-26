@@ -1,0 +1,186 @@
+{
+  "sourceCommit": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "note": "Pre-revision exact measurement hashes and reference content excluding only referenceVersion and governance band display labels. All numeric facts, provenance, maturity and missingness remain covered.",
+  "rows": [
+    {
+      "key": "academic_self_concept_biology_zh_cn",
+      "measurementHash": "98d83b219dbc609d7317c9bfb08b57a9878c3b971b0b3e3bf8b56f4471ffbe96",
+      "referenceFactsHash": "80f243485e9943b93590b3b2b67377c0c5c9fffb87dbc492e2275142cdad8c1e"
+    },
+    {
+      "key": "academic_self_concept_chemistry_zh_cn",
+      "measurementHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+      "referenceFactsHash": "b4c79e1366f600fa5bbdfdfaccd30dca1efdb08e4b3a497e7818d9fa4b6b6ca3"
+    },
+    {
+      "key": "academic_self_concept_chinese_zh_cn",
+      "measurementHash": "10cef65ad9eb89761ea5c6806fdf9c707951d798ac0c34b185ea849ae15f9367",
+      "referenceFactsHash": "742c042ca3b4b0fd2c8e1df7f238f648006bfcedadef9b24f66a2632ad54ba1b"
+    },
+    {
+      "key": "academic_self_concept_english_zh_cn",
+      "measurementHash": "816a47d3ceaa97b47da4afdb7660c10eedd59611a28059899bbe915456f8d1ec",
+      "referenceFactsHash": "0b45b33015ed8e599e9036a3afb87e08342eac5c9107145ce8a5d87602765e38"
+    },
+    {
+      "key": "academic_self_concept_mathematics_zh_cn",
+      "measurementHash": "784b122cb4f55f11762f2d6aab4d01e58b615d4ff0bfdc91b13db8eb9458a1e1",
+      "referenceFactsHash": "f511bcbc5bcc9270fa376b61dec43807431973feb36c186ca1531820497817fd"
+    },
+    {
+      "key": "academic_self_concept_physics_zh_cn",
+      "measurementHash": "02f8ac857a992dbb6eadcb2f7c6ebef94e99fa384eb891ee5ce118cd18807022",
+      "referenceFactsHash": "fc52037548b53a8bbd0a867640581cfe86c3d0a91f229dd01a4fad1d4c85f781"
+    },
+    {
+      "key": "academic_self_efficacy_biology_zh_cn",
+      "measurementHash": "2a9cfde67d533c05da8c0f4d8d4f5fe1f559827f71c6c2f7a3f276f2fa44adbb",
+      "referenceFactsHash": "90d5394805c2f02748478cbf26ebaf86b78d6440f5e710126e4e56c957055228"
+    },
+    {
+      "key": "academic_self_efficacy_chemistry_zh_cn",
+      "measurementHash": "2c3aab1ea0d1b45ff20929025ed07b7fbadc446a9dba5a42f14c423b92711cb9",
+      "referenceFactsHash": "90ec674346f10950c726c7c076d9a20e08ab4b92296c0050dc93aa3f7417285f"
+    },
+    {
+      "key": "academic_self_efficacy_chinese_zh_cn",
+      "measurementHash": "bcf1b2a45103ab0b42a8a791a8e99a1e537673c384791cfda1a7d0e7feb8cbfd",
+      "referenceFactsHash": "faec8dce84c87e2bf49a1f40473a8e8b569d6e48a1cd39b60a52a5547e8961a6"
+    },
+    {
+      "key": "academic_self_efficacy_english_zh_cn",
+      "measurementHash": "668a9bcd7a0ef62b5d35c4ef84e6e8d15d388c2f4dbc4616434133fe5af205aa",
+      "referenceFactsHash": "79e5ccdf66b04df70344b93aa09275611b38dcbbf5bbbf89838a179f7d2f44ab"
+    },
+    {
+      "key": "academic_self_efficacy_mathematics_zh_cn",
+      "measurementHash": "ea8cd4535b0c80c64bf6c93e538f2d33b282860136bcb153ac053b06d9f9da2d",
+      "referenceFactsHash": "0d59f3bbc48308ee7b93c8c91ca251417210b901274ffad4ce8f87072b0300ff"
+    },
+    {
+      "key": "academic_self_efficacy_physics_zh_cn",
+      "measurementHash": "add3240f3c792a9f323cc1efea1357eb44586d215537a72fd4140d3b630f3ed5",
+      "referenceFactsHash": "11823b6301c6f21bec1064083fe8c97358326f7e4a6aefe9c87a26a7a931bfb8"
+    },
+    {
+      "key": "domain_fixed_mindset_biology_zh_cn",
+      "measurementHash": "cc94205bbb70ec0e8ffa14453cee6ea14fec13df238a7dcd7c95cf374b5089c2",
+      "referenceFactsHash": "6816d7553fa11951d8a297686583359b253c9a766f48281ce2460d7eca3c3cec"
+    },
+    {
+      "key": "domain_fixed_mindset_chemistry_zh_cn",
+      "measurementHash": "e0a2212e8ca7b2eecd612fdccc8461f3b410d9e846b13ef026e5c156cf6ad298",
+      "referenceFactsHash": "b1498149920a1a29c491c489ae522adb604d554508b5ce1b03b7f627c0269995"
+    },
+    {
+      "key": "domain_fixed_mindset_chinese_zh_cn",
+      "measurementHash": "0dded2157272a34eedf1ebb07e78605076aa778badb930336f31a84cdc4f11cb",
+      "referenceFactsHash": "bc4dcd51c0509147bca6022976795084b7759835d94d6f2b672f0c2557b52f93"
+    },
+    {
+      "key": "domain_fixed_mindset_english_zh_cn",
+      "measurementHash": "d98f7cbb4d512641472cc567736bb1d9f7267d9bcc8007889d0eca6e7f062dbc",
+      "referenceFactsHash": "27963dbe4f75df73b8891927c4d7904658b82ef471fba59b08dd8e1aacb6591c"
+    },
+    {
+      "key": "domain_fixed_mindset_mathematics_zh_cn",
+      "measurementHash": "debb364b92b5bee93bbf4941971231440576b1837ffa575db882dad99de2abf4",
+      "referenceFactsHash": "b3e6f611129cc4d14398a32c815768bf152f996caf1d951fc90e8fa9278c7c1f"
+    },
+    {
+      "key": "domain_fixed_mindset_physics_zh_cn",
+      "measurementHash": "cf092c21d5676c6c0f51a809018072720c90e43bae0a47c7d1c7e8f59fda493a",
+      "referenceFactsHash": "cf410a163da7be119b91d0c815656ba9ed82a839d70d984729e7dfe0390cda64"
+    },
+    {
+      "key": "teacher_subject_liking_biology_zh_cn",
+      "measurementHash": "32cd97159d94c830e1aa1b31e28fb96d1ecafca52431092413ad68be4ac99e7e",
+      "referenceFactsHash": "4bbdd0a824534501982ee5da2858edfe76a0e5e7166f90ba61a1dd6549abe2b2"
+    },
+    {
+      "key": "teacher_subject_liking_chemistry_zh_cn",
+      "measurementHash": "f932aa07de3bbcda2b700d2fe288f91d38966b216f9a01fdb4e711ee9cace3e2",
+      "referenceFactsHash": "c8be4ff621db9a01fe9c62ab359d0f4d4fe3010bf50c553d512b7e3ea68ddbe6"
+    },
+    {
+      "key": "teacher_subject_liking_chinese_zh_cn",
+      "measurementHash": "d041f8cf33fa0751a16906cea4b67ed22100a375562f36866d1461530d88aef8",
+      "referenceFactsHash": "b993073f34ce453a7403b27b786812c195fa83aabc589bc6724d36002932be1b"
+    },
+    {
+      "key": "teacher_subject_liking_english_zh_cn",
+      "measurementHash": "7018e5618555b14b3bb7a9862f7a4860260aad96f9e56753436f6efc08fa5dd0",
+      "referenceFactsHash": "a7e257be4109eb037930488da018bd010175c7f21a2380dde2908e033ccff652"
+    },
+    {
+      "key": "teacher_subject_liking_mathematics_zh_cn",
+      "measurementHash": "e2c337372b60a929f33e077d38703e81664026780b34764674fa371424346600",
+      "referenceFactsHash": "c497448c3ef1c5061d5800d772e690cdf548443459e436435ebb0c7401311f86"
+    },
+    {
+      "key": "teacher_subject_liking_physics_zh_cn",
+      "measurementHash": "2ce8d06e5a98953c2f96c3dc297745d8f55c7eb613594a5ff5bb09dcd3af54c2",
+      "referenceFactsHash": "6162f92c396f216b9d897242d71b03caa745c6511744ed62359142036d01bf9e"
+    },
+    {
+      "key": "tutoring_necessity_biology_zh_cn",
+      "measurementHash": "b35468111e48a83a0179ea495b591d381d5253415be24a2691f8e217b74d96f6",
+      "referenceFactsHash": "f21792021105ed280564711850e4c087e6e999a9dc4155abe25e4a365269e62c"
+    },
+    {
+      "key": "tutoring_necessity_chemistry_zh_cn",
+      "measurementHash": "b818912688e513dcb8ffe30ab12492cf47b2dc849940e7bc0e546c9b1e2f3cd7",
+      "referenceFactsHash": "48db78b3f7937b349c96b71f9cfcc32887c83b70a80e65d962751be72118afff"
+    },
+    {
+      "key": "tutoring_necessity_chinese_zh_cn",
+      "measurementHash": "7fe642eb5df38111b2939fabc37271d21a9775030cd4fb7bde53f6b820364aad",
+      "referenceFactsHash": "a3624c28cb38270c261fb70d677ec4de7dcf926cf31c759b0777fa2286e4e650"
+    },
+    {
+      "key": "tutoring_necessity_english_zh_cn",
+      "measurementHash": "afcedd82924a0d93efaf50c9ef8145f916bbbcc34f468e8604518be09c2e28e8",
+      "referenceFactsHash": "6b658c853fd0e10ac3bb814a2ad86722090cb09d35aa20f8cfd1be011443b2de"
+    },
+    {
+      "key": "tutoring_necessity_mathematics_zh_cn",
+      "measurementHash": "520d5451175a91caf0a1ca4766a696cef636cc4346ea1953824f1fc0e1cb6cae",
+      "referenceFactsHash": "20c2e32bc6fcf2656cf49ba705471e2cbe0e1ca5e8653b3e299a15fb4cd33b29"
+    },
+    {
+      "key": "tutoring_necessity_physics_zh_cn",
+      "measurementHash": "292c61f633d460355ab26d93822cecb783b78321c37fd7620c19408a160a16b6",
+      "referenceFactsHash": "56e4d0ff8917cf06072f69aa81fc36b10beec0affdb42e4296e258650c1b0e2c"
+    },
+    {
+      "key": "value_cost_biology_zh_cn",
+      "measurementHash": "ecb4fec162e35ec8227c11d473ff0da3449d55164198989d8018a4476023fc47",
+      "referenceFactsHash": "1b27df6f3ca950a950f10ef433971b3e00c7ebc8c0d2f7d3fd61f98e6a2fa6c0"
+    },
+    {
+      "key": "value_cost_chemistry_zh_cn",
+      "measurementHash": "64c2453e61a46a3768030fb7eddd532eb52101e1a2dd710aca6397dda4987fb3",
+      "referenceFactsHash": "164946aa41b4390c7b978dec9aa01f6af2251962f7369a387b455e3c320c5d75"
+    },
+    {
+      "key": "value_cost_chinese_zh_cn",
+      "measurementHash": "a1bb19d7a6074420dc4d888b2e1764fa04986434042b7c3e854e44b2dbd613cd",
+      "referenceFactsHash": "e20b245ecdfdba2dfd40f1316863934f71e9f53495122f4726f65d852d65d6d0"
+    },
+    {
+      "key": "value_cost_english_zh_cn",
+      "measurementHash": "a8c2ca0a73f98145295a52b91c9c0d4c98987e40e5dac80c73d33625c0f9cb28",
+      "referenceFactsHash": "1ed30ae769b9fc023501732c6470bfbee5f78dfa0399f38dcdb04887e56ec121"
+    },
+    {
+      "key": "value_cost_mathematics_zh_cn",
+      "measurementHash": "931040631cfcb3c02b7d7116374537b1a2aff5805cbf0e22258e18b43d158ff3",
+      "referenceFactsHash": "99ddf6fd63379d1db380a93a22a330ab0a941a2a93604254742534d53223714d"
+    },
+    {
+      "key": "value_cost_physics_zh_cn",
+      "measurementHash": "0cd6e46289e67086677f7fdfea61307acd444a5adae272e4ff6224f25447c54f",
+      "referenceFactsHash": "517ced78dce3d02fa2878e6778d364e1f43c5ee957ee537a579e585f7f1abb33"
+    }
+  ]
+}

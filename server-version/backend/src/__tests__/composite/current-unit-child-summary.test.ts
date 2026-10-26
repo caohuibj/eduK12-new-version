@@ -67,6 +67,22 @@ describe('identity-only current-unit child summaries', () => {
     expect(header.scaleAssessments).toEqual([{ id: 'child', compositeItemId: 'item' }]); expect(graph).toBeUndefined()
     expect(mocks.scale).not.toHaveBeenCalled()
   })
+  it('does not let an unauthorized reload finalize an already submitted scale', async () => {
+    fixture('SCALE', true)
+    await expect(getAttemptState('attempt', { userId: 'other' }, undefined, 'current-unit')).rejects.toMatchObject({ statusCode: 403 })
+    expect(mocks.headers).not.toHaveBeenCalled()
+    expect(mocks.finalize).not.toHaveBeenCalled()
+    expect(mocks.scale).not.toHaveBeenCalled()
+  })
+  it('keeps an authorized reload in progress when the aggregate is not ready', async () => {
+    fixture('SCALE', true)
+    mocks.finalize.mockResolvedValueOnce({ status: 'IN_PROGRESS', progress: 90, completedAt: null })
+    const result = await getAttemptState('attempt', { userId: 'student' }, undefined, 'current-unit')
+    expect(mocks.finalize).toHaveBeenCalledTimes(1)
+    expect(result).toMatchObject({ status: 'IN_PROGRESS', progress: 90, completedAt: null })
+    // This fixture verifies the GET contract, not durable FINAL/P-R consumption.
+    expect(mocks.scale).not.toHaveBeenCalled()
+  })
   it('rejects another participant before any child runtime is loaded', async () => {
     fixture('SCALE')
     await expect(getAttemptState('attempt', { userId: 'other' }, undefined, 'current-unit')).rejects.toMatchObject({ statusCode: 403 })

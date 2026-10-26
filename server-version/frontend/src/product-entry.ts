@@ -1,3 +1,4 @@
+import { isLoopbackSurveyDevelopment } from './products/development-entry'
 import { isSurveyHost } from './survey/context'
 import { isSchoolHost } from './school/context'
 import { isHuiteacherHost } from './huiteacher/context'
@@ -10,7 +11,11 @@ export function loadProductApp(
 ) {
   if (isHuiteacherHost(hostname)) return import('./huiteacher/HuiteacherApp')
   if (isSchoolHost(hostname)) return import('./school/SchoolApp')
-  if (isSurveyHost(hostname)) {
+  // Opt-in local UI entry only. Never reinterpret production hosts or admin routes.
+  // Link presentation shares this opt-in; server authentication remains unchanged.
+  const localSurvey = isLoopbackSurveyDevelopment(hostname)
+    && pathname !== '/admin' && !pathname.startsWith('/admin/')
+  if (isSurveyHost(hostname) || localSurvey) {
     return pathname.startsWith('/r/') ? import('./survey/SurveyPublicApp') : import('./survey/SurveyApp')
   }
   return import('./App')

@@ -1,5 +1,5 @@
 import { prisma } from '../config/database'
-import { getScaleInstrumentRuntimePolicy } from '../modules/scale/onboarding/instrument-registry'
+import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from '../modules/scale/onboarding/instrument-registry'
 import { installScaleInstrument, planScaleInstrumentInstall } from '../modules/scale/onboarding/install'
 import { scaleDeploymentModeSchema, type ScaleDeploymentModeV1 } from '../modules/scale/policy/deployment'
 
@@ -19,8 +19,10 @@ const required = (name: string): string => {
 const main = async () => {
   const instrumentKey = required('instrument-key')
   const instrumentVersion = required('instrument-version')
+  if (has('authorization') || has('commercial')) throw new Error('License-record arguments are retired; deploy operational/scientific identity only')
+  const source = getScaleInstrumentSource(instrumentKey, instrumentVersion)
   const locale = required('locale')
-  const territory = required('territory').toUpperCase()
+  const territory = (flag('territory') ?? source?.scientificReview?.territory ?? 'ZZ').toUpperCase()
   const revision = Number(required('revision'))
   if (!Number.isInteger(revision) || revision <= 0) throw new Error('--revision must be a positive integer')
   const deploymentModes = required('modes').split(',').filter(Boolean).map((mode) => scaleDeploymentModeSchema.parse(mode)) as ScaleDeploymentModeV1[]

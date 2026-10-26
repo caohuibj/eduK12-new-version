@@ -129,10 +129,42 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   return (await resolveTrainingFlowScopeAndCandidate(attempt,composite,options))?.scope??null
 }
 
+export type VerifiedTrainingFlowMaterialization=NonNullable<Awaited<ReturnType<typeof resolveTrainingFlowScopeAndCandidate>>>
+const materializationBindings=new WeakMap<VerifiedTrainingFlowMaterialization,Readonly<{
+  db:unknown;parentId:string;attemptEpoch:number;itemId:string;scaleId:string
+}>>()
+
 /** Internal child materializer only: consume immediately under the same parent
- * lock. Candidate identity/hash/epoch/publication were checked above. No cache,
- * caller-supplied proof, or candidate field on the ordinary scope/DTO path. */
-export const resolveTrainingFlowScopeForMaterialization=resolveTrainingFlowScopeAndCandidate
+ * lock and transaction. The original verified result is a request-local proof;
+ * no new DB read, candidate decrypt/hash, or caller-provided admission flag. */
+export async function resolveTrainingFlowScopeForMaterialization(attempt:any,composite:any=attempt.compositeAssessment,options:TrainingFlowScopeOptions={}) {
+  const verified=await resolveTrainingFlowScopeAndCandidate(attempt,composite,options)
+  if(verified&&attempt.status==='IN_PROGRESS'&&!verified.scope.terminal){
+    const current=(composite.items??[]).find((item:any)=>trainingFlowItemKey(item.id)===verified.scope.path.currentInstrumentKey)
+    // Parent START froze every candidate. This proof authenticates only the
+    // pending SCALE selected now; exact STANDARD content still validates its
+    // separate immutable binding in the collection guard.
+    if(current?.type==='SCALE'&&current.scaleId
+      &&verified.scope.itemIds.has(current.id)&&typeof verified.candidate.references?.[current.id]==='string'){
+      materializationBindings.set(verified,Object.freeze({db:options.db??prisma,parentId:attempt.id,attemptEpoch:attempt.attemptEpoch,itemId:current.id,scaleId:current.scaleId}))
+    }
+  }
+  return verified
+}
+
+/** Authenticate the original producer object against this transaction and the
+ * precise current unit. Copies, client claims and future candidates cannot
+ * borrow parent admission. This proof alone never exempts emergency stops;
+ * exact STANDARD consumers must also verify their frozen content identity. */
+export function assertVerifiedTrainingFlowScaleMaterialization(db:unknown,verified:VerifiedTrainingFlowMaterialization,expected:{
+  compositeAttemptId?:string|null;compositeAttemptEpoch?:number;compositeItemIds?:readonly string[];scaleIds:readonly string[]
+}):string {
+  const binding=materializationBindings.get(verified)
+  if(!binding||binding.db!==db||binding.parentId!==expected.compositeAttemptId||binding.attemptEpoch!==expected.compositeAttemptEpoch
+    ||expected.compositeItemIds?.length!==1||expected.compositeItemIds[0]!==binding.itemId
+    ||expected.scaleIds.length!==1||expected.scaleIds[0]!==binding.scaleId)throw compositeForbidden('流程物化准入绑定无效')
+  return binding.scaleId
+}
 
 /** Safe report provenance; never exposes future candidate identities or conditions. */
 export const trainingFlowProvenance=(flow:NonNullable<Awaited<ReturnType<typeof resolveTrainingFlowScope>>>)=>({schemaVersion:1,...(flow.materialAssignment?{materialAssignment:{assignmentHash:flow.materialAssignment.assignmentHash,configDigest:flow.materialAssignment.configDigest,groupKey:flow.materialAssignment.groupKey,materialDigest:flow.materialAssignment.materialDigest}}:{}),configDigest:flow.config.flowDigest,pathHash:flow.pathHash,termination:flow.path.termination,taskSatisfaction:flow.path.taskSatisfaction,executedUnitCount:flow.executedSlotKeys.size,skippedUnitCount:flow.skippedSlotKeys.size})

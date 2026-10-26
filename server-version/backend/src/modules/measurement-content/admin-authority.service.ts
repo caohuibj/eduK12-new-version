@@ -183,12 +183,13 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
     assertProof(proof)
     if(!clock||grant.expiresAt<=clock.now||target!.expires_at&&target!.expires_at<=clock.now)deny()
+    // TIMESTAMP(3) stores UTC wall time; never let the session zone cast an instant.
     const inserted=await tx.$queryRaw<GrantRow[]>(Prisma.sql`INSERT INTO content_capability_grants
       (id,subject_id,issuer_id,product,scope_kind,scope_id,resource_kind,resource_keys,capabilities,
        delegable_capabilities,remaining_delegation_depth,valid_from,expires_at,ancestry)
       VALUES (${input.requestId},${grant.subjectId},${actorId},${scope.product},${scope.scopeKind},${scope.scopeId},${scope.resourceKind},
        ${scope.resourceKeys}::text[],${grant.capabilities}::text[],${grant.delegableCapabilities}::text[],${grant.remainingDelegationDepth},
-       ${grant.validFrom},${grant.expiresAt},${[input.requestId]}::text[]) ON CONFLICT (id) DO NOTHING RETURNING *`)
+       (${grant.validFrom}::timestamptz AT TIME ZONE 'UTC'),(${grant.expiresAt}::timestamptz AT TIME ZONE 'UTC'),${[input.requestId]}::text[]) ON CONFLICT (id) DO NOTHING RETURNING *`)
     if(!inserted.length){
       const [existing]=await tx.$queryRaw<GrantRow[]>(Prisma.sql`SELECT * FROM content_capability_grants WHERE id=${input.requestId} FOR SHARE`)
       await recheckAfterWait(tx,proof,users)
@@ -220,7 +221,7 @@ export async function revokeAdminContentGrant(actorId:string,proof:AdminSessionP
     }
     if(grant.version!==input.expectedVersion)throw new AdminPermissionError(409,'授权版本已变化')
     const count=await tx.$executeRaw(Prisma.sql`UPDATE content_capability_grants
-      SET revoked_at=clock_timestamp(),revoked_by=${actorId},revoke_reason=${input.reason},version=version+1
+      SET revoked_at=(clock_timestamp() AT TIME ZONE 'UTC'),revoked_by=${actorId},revoke_reason=${input.reason},version=version+1
       WHERE id=${grantId} AND version=${input.expectedVersion} AND revoked_at IS NULL`)
     if(count!==1)throw new AdminPermissionError(409,'授权版本已变化')
     await tx.adminAuthorizationAudit.create({data:{id:randomUUID(),actorUserId:actorId,targetUserId:grant.subject_id,

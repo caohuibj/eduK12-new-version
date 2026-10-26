@@ -1,3 +1,4 @@
+import {scaleEntryClassificationTags,type CatalogClassificationTag} from '../scale/library/catalog-discovery'
 import type { UnifiedScaleLibraryEntry } from '../scale/library/catalog-only-read-model'
 import type { LibraryProduct } from './contracts'
 import type { entryView } from './service'
@@ -11,6 +12,7 @@ export type CatalogExactVersion =
 type CatalogAvailability = { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] }
 export interface StandardCatalogRecord {
   catalogId: string
+  classificationTags?: CatalogClassificationTag[]
   origin: 'STANDARD_REGISTRY'
   instrumentClass: 'STANDARD'
   title: string
@@ -26,6 +28,7 @@ export interface StandardCatalogRecord {
 }
 export interface AuthoredCatalogRecord {
   catalogId: string
+  classificationTags?: CatalogClassificationTag[]
   origin: 'AUTHORED'
   instrumentClass: 'CUSTOM_DESCRIPTIVE'
   title: string
@@ -47,6 +50,7 @@ export function standardCatalogRecord(entry: UnifiedScaleLibraryEntry, product: 
   const { launch: _launch, ...availability } = entry.availability
   const standard = { ...entry, availability }
   return {
+    classificationTags: scaleEntryClassificationTags(entry),
     catalogId: `standard:${entry.identity.instrumentKey}:${entry.identity.instrumentVersion}`,
     origin: 'STANDARD_REGISTRY', instrumentClass: 'STANDARD', title: entry.identity.canonicalName,
     exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: entry.identity.instrumentKey, instrumentVersion: entry.identity.instrumentVersion },

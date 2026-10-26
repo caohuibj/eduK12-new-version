@@ -46,6 +46,17 @@ suite('Survey standard workflow on schema-only isolated PostgreSQL',()=>{
   const response=await fetch(base+'/api/platform/survey-standard'+path,{method:body===undefined?'GET':'POST',headers:{Cookie:'ptool_session='+token+'; ptool_csrf=synthetic-csrf','X-CSRF-Token':csrf?'synthetic-csrf':'wrong',Origin:origin,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,body:await response.json() as any}
  }
  it('allows the highest platform role irrespective of business role and rejects both entry admins',async()=>{expect((await call(system,'/management-design')).status).toBe(200);expect((await call(manager,'/catalog')).status).toBe(403);expect((await call(training,'/catalog')).status).toBe(403);await expect(assertStandardSystem(db,manager.id)).rejects.toMatchObject({statusCode:403})})
+ it('exposes uninstalled onboarding versions read-only only to the current system administrator',async()=>{
+  const before=await db.scale.count(),response=await call(system,'/onboarding-status')
+  expect(response.status).toBe(200)
+  const executable=sources[0]
+  expect(response.body.data.list).toEqual(expect.arrayContaining([expect.objectContaining({instrumentKey:executable.identity.instrumentKey,instrumentVersion:executable.identity.instrumentVersion,scaleId:null,states:expect.objectContaining({imported:true,deployed:false,published:false,visible:false,trainingEntry:'PENDING',surveyEntry:'PENDING'})})]))
+  expect((await call(manager,'/onboarding-status')).status).toBe(403)
+  expect((await call(training,'/onboarding-status')).status).toBe(403)
+  expect((await call(system,'/onboarding-status',undefined,{tokenVersion:99})).status).toBe(401)
+  expect((await call(system,'/onboarding-status',undefined,{},true,'http://training.localhost:5173')).status).toBe(403)
+  expect(await db.scale.count()).toBe(before)
+ })
  it('rechecks session revocation inside transactional authorization',async()=>{await db.user.update({where:{id:system.id},data:{tokenVersion:1}});try{await expect(db.$transaction(tx=>assertStandardSystem(tx,system.id,{...proof,tokenVersion:0}))).rejects.toMatchObject({statusCode:403})}finally{await db.user.update({where:{id:system.id},data:{tokenVersion:0}})}})
  it('keeps preview read only and rejects stale sessions, stale MFA, CSRF and foreign origins',async()=>{
   const request=input(0),before=await db.$queryRaw`SELECT id FROM survey_standard_releases`

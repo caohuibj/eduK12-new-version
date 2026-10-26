@@ -79,6 +79,16 @@ const firstSuccess=(overrides:Record<string,unknown>={})=>({
 const generalCalls=()=>vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))
 
 describe('Survey first-success GENERAL receipt consumption',()=>{
+  it('shows frozen instructions on the default one-by-one recovery path without adding an answer field',async()=>{
+    taskOverrides={units:[{...task.units[0],instruction:'请依据本次施测时的实际情况回答。'}]}
+    await openTask()
+    expect(screen.getByRole('note')).toHaveTextContent('请依据本次施测时的实际情况回答。')
+    expect(screen.getByRole('region',{name:'逐题施测：计时量表'})).toContainElement(screen.getByRole('note'))
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await waitFor(()=>expect(finalCalls).toHaveLength(1))
+    expect(finalCalls[0].answers).toEqual({scale:{q1:'yes'}})
+  })
+
   it('blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry',async()=>{
     const image={asset:{assetId:'stimulus',contentHash:'b'.repeat(64),mimeType:'image/png'},altText:'Required stimulus'}
     taskOverrides={units:[{...task.units[0],presentationMode:'ALL_AT_ONCE',items:[{...task.units[0].items[0],images:[image]}]}]}

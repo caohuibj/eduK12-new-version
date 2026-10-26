@@ -1,0 +1,9 @@
+{
+  "change": "Only two non-null type assertions on already asserted required stages after the final HTTP run",
+  "oldSha256": "7d38a5b26befc1c0881625802f2582c188b47f2cd7cb0aad0f863f0497daf9da",
+  "currentSha256": "68f14961f897d05df5d215be38d189691627fe5a9a88db69ecafc701b7da12d1",
+  "typescriptEmittedEqual": true,
+  "typescriptEmittedSha256": "da230c9deac003ecdab2497fb0eba25e8a9c80e36c58ddcb4ca2606e9b57f6e2",
+  "esbuildEmittedEqual": true,
+  "esbuildEmittedSha256": "788b4c0bddb48662e8a97a6c1498927bcbb690d34e0b9eee77738d7f9fb7e0da"
+}

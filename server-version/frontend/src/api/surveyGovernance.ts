@@ -1,3 +1,4 @@
+import type {CatalogClassificationTag} from './catalogDiscovery'
 import {toolLibraryApi} from '../survey/tool-library-api'
 import api from './client'
 export type ToolFamily='SCALE'|'COGNITIVE'|'SJT'|'FORM'|'COMBINATION'|'BUNDLE'
@@ -6,7 +7,7 @@ export type PackageComponent={slotKey:string;source:{type:'STANDARD'|'GOVERNED';
 export type VersionAxes={content:string;parameters:string|null;report:string|null}
 export type ComponentSummary={slotKey:string;title:string;kind:string;source?:PackageComponent['source'];versions?:VersionAxes|null}
 export type ComponentOption={source:PackageComponent['source'];title:string;kind:ToolFamily;versions?:VersionAxes;metrics:Array<{metricKey:string;unit:string}>;fields:Array<{itemKey:string;label:string}>}
-export type GovernedItem={id:string;family:ToolFamily;title:string;toolKey:string;toolVersion:string;hash:string;state:string;version:number;blockers:string[];submittedBy:string;approvedBy:string|null;approvedAt:string|null;reason:string;versions:VersionAxes;metrics:Array<{metricKey:string;unit:string}>;components:ComponentSummary[];policyIdentity:{resourceKey:string;fingerprint:string};policy?:{decision:'APPROVED'|'RETURNED'|'PENDING';paused:boolean;version:number;reason:string};states?:{content:{ready:boolean;reasons:string[]};assignment:{ready:boolean;reasons:string[]};deployment:{ready:boolean;reasons:string[]}}}
+export type GovernedItem={classificationTags?:CatalogClassificationTag[];id:string;family:ToolFamily;title:string;toolKey:string;toolVersion:string;hash:string;state:string;version:number;blockers:string[];submittedBy:string;approvedBy:string|null;approvedAt:string|null;reason:string;versions:VersionAxes;metrics:Array<{metricKey:string;unit:string}>;components:ComponentSummary[];policyIdentity:{resourceKey:string;fingerprint:string};policy?:{decision:'APPROVED'|'RETURNED'|'PENDING';paused:boolean;version:number;reason:string};states?:{content:{ready:boolean;reasons:string[]};assignment:{ready:boolean;reasons:string[]};deployment:{ready:boolean;reasons:string[]}}}
 export type PackageGrant={id:string;title:string;family:ToolFamily;hash:string;status:string;version:number;expiresAt:string|null;versions?:VersionAxes;components?:ComponentSummary[];availability?:{ready:boolean;reasons:string[];requiresFreshCheck:boolean}}
 export type PackageReport={version:string;title:string;introduction:string;disclaimer:string;blocks:Array<{type:'METRIC';slotKey:string;metricKey:string;label:string}|{type:'FORM_FIELD';slotKey:string;itemKey:string;label:string}|{type:'TEXT';text:string}>}
 export const toolFamilyLabels:Record<ToolFamily,string>={SCALE:'量表',COGNITIVE:'认知测验',SJT:'情境判断测验',FORM:'表单',COMBINATION:'单纯组合',BUNDLE:'组合包'}

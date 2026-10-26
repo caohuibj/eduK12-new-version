@@ -64,13 +64,14 @@ export async function delegateContentAuthority(db: Prisma.TransactionClient, inp
   if (parent.version !== input.expectedParentVersion) throw new ContentAuthorityError('CONTENT_AUTHORITY_STALE')
   assertContentDelegation(parent, grant, input.actorId)
   const id = randomUUID(), scope = grant.scope
+  // Same UTC TIMESTAMP(3) contract as administrator root issuance.
   await db.$executeRaw(Prisma.sql`INSERT INTO content_capability_grants
     (id,subject_id,issuer_id,parent_grant_id,product,scope_kind,scope_id,resource_kind,resource_keys,
      capabilities,delegable_capabilities,remaining_delegation_depth,valid_from,expires_at,ancestry)
     VALUES (${id},${grant.subjectId},${input.actorId},${parent.id},${scope.product},${scope.scopeKind},
       ${scope.scopeId},${scope.resourceKind},${scope.resourceKeys}::text[],${grant.capabilities}::text[],
-      ${grant.delegableCapabilities}::text[],${grant.remainingDelegationDepth},${grant.validFrom},
-      ${grant.expiresAt},${[...parent.ancestry, id]}::text[])`)
+      ${grant.delegableCapabilities}::text[],${grant.remainingDelegationDepth},(${grant.validFrom}::timestamptz AT TIME ZONE 'UTC'),
+      (${grant.expiresAt}::timestamptz AT TIME ZONE 'UTC'),${[...parent.ancestry, id]}::text[])`)
   return id
 }
 /** An issuer or recipient may withdraw their own grant, even after it expires.
@@ -81,7 +82,7 @@ export async function revokeContentAuthority(db: Prisma.TransactionClient, input
   const reason = input.reason.trim()
   if (!reason || reason.length > 1000) throw new ContentAuthorityError('CONTENT_AUTHORITY_REASON_REQUIRED')
   const changed = await db.$executeRaw(Prisma.sql`UPDATE content_capability_grants
-    SET revoked_at=clock_timestamp(), revoked_by=${input.actorId}, revoke_reason=${reason}, version=version+1
+    SET revoked_at=(clock_timestamp() AT TIME ZONE 'UTC'), revoked_by=${input.actorId}, revoke_reason=${reason}, version=version+1
     WHERE id=${input.grantId} AND version=${input.expectedVersion} AND revoked_at IS NULL
       AND (issuer_id=${input.actorId} OR subject_id=${input.actorId})`)
   if (changed !== 1) throw new ContentAuthorityError('CONTENT_AUTHORITY_STALE_OR_DENIED')

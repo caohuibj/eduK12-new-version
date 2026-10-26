@@ -1,3 +1,4 @@
+import {catalogTagFacets,matchesCatalogDiscovery,scaleEntryClassificationTags,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {standardPolicyIdentity} from '../survey/tool-policy'
 /** Unified directory only. Mutation and execution stay with the source-owned
  * STANDARD authorization/runtime and approved authored exact-release services. */
@@ -29,18 +30,19 @@ async function readStandard(actorId: string,product:LegacyLibraryProduct) {
     ||visible.keys.has('standard:'+row.identity.instrumentKey+':'+row.identity.instrumentVersion+':'+standardPolicyIdentity(row.identity.instrumentKey,row.identity.instrumentVersion).fingerprint))}
 }
 
-export async function readUnifiedCatalog(actorId: string, product: LegacyLibraryProduct, pagination = { page: 1, pageSize: 25 }) {
+export async function readUnifiedCatalog(actorId: string, product: LegacyLibraryProduct, pagination: {page:number;pageSize:number;origin?:'ALL'|'STANDARD_REGISTRY'|'AUTHORED'} & CatalogDiscoveryFilters = { page: 1, pageSize: 25 }) {
   if (!Number.isSafeInteger(pagination.page) || pagination.page < 1 || pagination.page > Math.floor(Number.MAX_SAFE_INTEGER / 100)
     || !Number.isInteger(pagination.pageSize) || pagination.pageSize < 1 || pagination.pageSize > 100) {
     return fail('量表库分页参数不合法', 400)
   }
   const standard = await readStandard(actorId,product)
-  const plan = platformCatalogPagePlan(standard.entries, pagination.page, pagination.pageSize)
-  const authored = await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit },product)
+  const filtered=(pagination.origin==='AUTHORED'?[]:standard.entries).filter(row=>matchesCatalogDiscovery([row.identity.canonicalName,row.identity.instrumentKey,row.identity.instrumentVersion,row.construct.constructDefinition],scaleEntryClassificationTags(row),pagination))
+  const plan = platformCatalogPagePlan(filtered, pagination.page, pagination.pageSize)
+  const authored = pagination.origin==='STANDARD_REGISTRY'||pagination.tags?.length?{list:[],hasMore:false}:await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit, ...(pagination.keyword?{keyword:pagination.keyword}:{}) },product)
   return {
     ...combinePlatformCatalog(plan.standardPage, authored.list, product),
     generatedAt: standard.generatedAt, page: pagination.page, pageSize: pagination.pageSize,
-    hasMore: plan.standardHasMore || authored.hasMore,
+    hasMore: plan.standardHasMore || authored.hasMore, tagFacets:catalogTagFacets(standard.entries.map(scaleEntryClassificationTags)),
   }
 }
 
