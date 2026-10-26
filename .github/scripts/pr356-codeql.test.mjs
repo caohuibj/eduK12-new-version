@@ -200,3 +200,27 @@ for(const language of ['javascript-typescript','python'])test('actual YAML CodeQ
   const outputBefore=readFileSync(env.GITHUB_OUTPUT),configBefore=readFileSync(env.PR356_CODEQL_CONFIG);assert.throws(run,error=>error.code==='EEXIST');assert.deepEqual(readFileSync(env.GITHUB_OUTPUT),outputBefore);assert.deepEqual(readFileSync(env.PR356_CODEQL_CONFIG),configBefore);
  }finally{rmSync(temp,{recursive:true,force:true});}
 });
+
+test('real starting-pack shape retains suite helpers and selects only the query-local dependency closure',()=>{
+ const f=fixture();try{
+  const vendor=path.join(f.packRoot,'.codeql/libraries/codeql/util/1.0.0');f.put(path.join(vendor,'qlpack.yml'),'name: codeql/util\nversion: 1.0.0\nlibrary: true\n');f.put(path.join(vendor,'Library.qll'),'// synthetic local library\n');
+  const response=value=>({status:0,signal:null,stdout:Buffer.from(JSON.stringify(value)),stderr:Buffer.alloc(0)});
+  f.responses['resolve qlpacks --format=json']=response({'codeql/javascript-queries':[f.packRoot],'codeql/util':[f.libraryRoot,vendor]});
+  f.responses['resolve queries --format=startingpacks codeql/javascript-queries:codeql-suites/javascript-security-extended.qls']=response([f.packRoot,vendor]);
+  const state=f.collector().begin('javascript-typescript');assert.equal(state.status,'begun');const saved=JSON.parse(readFileSync(path.join(f.env.PR356_EVIDENCE_DIR,'begin-state.json')));assert.equal(saved.selectedPacks.find(p=>p.name==='codeql/util').root,vendor);assert.equal(saved.selectedPacks.length,2);
+ }finally{f.clean();}
+ const bad=fixture();try{bad.responses['resolve queries --format=startingpacks codeql/javascript-queries:codeql-suites/javascript-security-extended.qls']={status:0,signal:null,stdout:Buffer.from(JSON.stringify([bad.packRoot,bad.packRoot])),stderr:Buffer.alloc(0)};assert.throws(()=>bad.collector().begin('javascript-typescript'),/DUPLICATE_STARTING_PACK/);}finally{bad.clean();}
+});
+
+test('native CodeQL SARIF uses finalized database language and exact pack build identity, not an invented required hint',()=>{
+ for(const kind of ['valid','wrong-hint','wrong-build','wrong-database']){const f=fixture();try{
+  const build='a'.repeat(40),pack=path.join(f.packRoot,'qlpack.yml');f.put(pack,readFileSync(pack,'utf8')+'buildMetadata:\n  sha: '+build+'\n');
+  delete f.sarif.runs[0].properties['semmle.sourceLanguage'];f.sarif.runs[0].tool.extensions[0].semanticVersion='1.2.3+'+build;
+  if(kind==='wrong-hint')f.sarif.runs[0].properties['semmle.sourceLanguage']='python';
+  if(kind==='wrong-build')f.sarif.runs[0].tool.extensions[0].semanticVersion='1.2.3+'+'b'.repeat(40);
+  if(kind==='wrong-database')f.put(path.join(f.database,'codeql-database.yml'),'primaryLanguage: python\ncreationMetadata:\n  cliVersion: '+VERSION+'\n');
+  f.put(f.sarifFile,f.sarif);f.collector().begin('javascript-typescript');
+  if(kind==='valid')assert.equal(f.collector().finish('javascript-typescript').status,'success');
+  else assert.throws(()=>f.collector().finish('javascript-typescript'),/SARIF_LANGUAGE|SARIF_QUERY_PACK_IDENTITY|ACTION_DATABASE_LANGUAGE/);
+ }finally{f.clean();}}
+});

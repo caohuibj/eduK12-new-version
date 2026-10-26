@@ -551,7 +551,8 @@ async function main(receipt) {
         await currentPage.waitForFunction(({ name, value }) => Number(document.querySelector(`progress[aria-label="${name}"]`)?.value) > value, { name: '量表作答进度', value: before });
       }
       await currentPage.getByRole('button', { name: '提交本轮正式回答', exact: true }).click();
-      await currentPage.getByText('你已完成问卷，可以关闭此页面。', { exact: true }).first().waitFor();
+      await currentPage.getByRole('heading', { name: '感谢参与，问卷已提交', level: 2, exact: true }).waitFor();
+      await currentPage.getByText('Synthetic browser receipt.', { exact: true }).waitFor();
       const submitted = session.state.calls.filter(call => call.path.endsWith('/final'));
       assert.equal(submitted.length, 1);
       assert.equal(submitted[0].payload.data.status, 'COMPLETED');
@@ -560,7 +561,8 @@ async function main(receipt) {
       assert(!JSON.stringify(submitted[0].body.answers).includes(fixture.scale.expectedBefore));
       await currentPage.reload();
       await currentPage.getByRole('button', { name: '恢复本次作答／查看已完成回执', exact: true }).click();
-      await currentPage.getByText('你已完成问卷，可以关闭此页面。', { exact: true }).first().waitFor();
+      await currentPage.getByRole('heading', { name: '感谢参与，问卷已提交', level: 2, exact: true }).waitFor();
+      await currentPage.getByText('Synthetic browser receipt.', { exact: true }).waitFor();
       assert.equal(session.state.calls.filter(call => call.path.endsWith('/start-unlinked')).length, 1);
       assert.equal(session.state.calls.filter(call => call.path.endsWith('/final')).length, 1);
       await stable(currentPage, session.state, id);

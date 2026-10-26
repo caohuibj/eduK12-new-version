@@ -32,7 +32,32 @@ function packHeader(root){
     if(!inDependencies||!line.trim()||line.trim().startsWith('#'))continue;
     const match=/^  ([\w.-]+\/[\w.-]+):\s*(.+)$/.exec(line);need(match,'UNSUPPORTED_PACK_DEPENDENCIES');dependencies.push({name:match[1],version:scalar(match[2])});
   }
-  return {name,version,dependencies};
+  const buildBlock=/^buildMetadata:\s*\n((?:[ \t].*\n)*)/m.exec(raw),buildSHA=buildBlock?/^  sha:\s*([a-f0-9]{40})\s*$/m.exec(buildBlock[1])?.[1]:undefined;need(!buildBlock||buildSHA,'PACK_BUILD_METADATA');
+  return {name,version,dependencies,...(buildSHA?{buildSHA}:{} )};
+}
+// Resolve the actual compiled query pack and its vendored dependency closure.
+// startingpacks includes suite helpers; it is not a singleton query-pack API.
+export function resolveActualQueryPacks(sourceLanguage,queries,starts,resolved){
+  need(Array.isArray(queries)&&queries.length>0&&Array.isArray(starts)&&starts.length>0,'ACTUAL_RESOLUTION');
+  const roots=starts.map(p=>realpathSync(p));need(new Set(roots).size===roots.length,'DUPLICATE_STARTING_PACK');
+  const directRoots=roots.filter(p=>packHeader(p).name==='codeql/'+sourceLanguage+'-queries');need(directRoots.length===1,'DIRECT_QUERY_PACK');
+  const directRoot=directRoots[0],direct=packHeader(directRoot);
+  need(Array.isArray(resolved[direct.name])&&resolved[direct.name].some(p=>realpathSync(p)===directRoot),'STARTING_PACK_RESOLUTION');
+  const selected=new Map();
+  function select(packRoot){
+    const real=realpathSync(packRoot),header=packHeader(real);if(selected.has(header.name)){need(selected.get(header.name).root===real,'PACK_RESOLUTION_AMBIGUOUS');return;}
+    selected.set(header.name,{...header,root:real});
+    for(const dependency of header.dependencies){
+      const candidates=resolved[dependency.name];need(Array.isArray(candidates)&&candidates.length>0,'DEPENDENCY_RESOLUTION');
+      const matching=[...new Set(candidates.map(p=>realpathSync(p)))].filter(p=>{const h=packHeader(p);return h.name===dependency.name&&(dependency.version==='*'||h.version===dependency.version);});
+      const vendored=matching.filter(p=>p.startsWith(path.join(directRoot,'.codeql','libraries')+path.sep));
+      const applicable=vendored.length?vendored:matching;need(applicable.length===1,'DEPENDENCY_RESOLUTION_AMBIGUOUS');select(applicable[0]);
+    }
+  }
+  select(directRoot);
+  need(roots.every(p=>[...selected.values()].some(v=>v.root===p)),'STARTING_PACK_OUTSIDE_CLOSURE');
+  for(const query of queries){need(typeof query==='string'&&query.endsWith('.ql'),'QUERY_PATH');const real=realpathSync(query);need(real.startsWith(directRoot+path.sep),'QUERY_OUTSIDE_SELECTED_PACK');regular(real);}
+  return {directRoot,selected};
 }
 const defaultExecutor=(command,options)=>spawnSync(command[0],command.slice(1),{cwd:options.cwd,env:options.env,encoding:null,maxBuffer:64*1024*1024,timeout:60000});
 
@@ -84,13 +109,9 @@ export function createCodeqlCollector({env=process.env,cwd=env.GITHUB_WORKSPACE|
       const installation=inventory(toolRoot),installationInventory=save('cli-installation.json',{schemaVersion:1,kind:'actual-installed-codeql-tree',files:installation});
       const records=[capture('version',[tool,'version','--format=json']),capture('resolve-packs',[tool,'resolve','qlpacks','--format=json']),capture('resolve-queries',[tool,'resolve','queries','--format=json',selector]),capture('starting-packs',[tool,'resolve','queries','--format=startingpacks',selector])];
       const version=parse(regular(path.join(out,records[0].stdout.path))).version,queries=parse(regular(path.join(out,records[2].stdout.path))),starts=parse(regular(path.join(out,records[3].stdout.path))),resolved=parse(regular(path.join(out,records[1].stdout.path)));
-      need(typeof version==='string'&&Array.isArray(queries)&&queries.length>0&&Array.isArray(starts)&&starts.length===1,'ACTUAL_RESOLUTION');
-      const directRoot=realpathSync(starts[0]),direct=packHeader(directRoot);need(direct.name==='codeql/'+sourceLanguage+'-queries','DIRECT_QUERY_PACK');need(Array.isArray(resolved[direct.name])&&resolved[direct.name].some(p=>realpathSync(p)===directRoot),'STARTING_PACK_RESOLUTION');
-      const selected=new Map();
-      function select(packRoot){const real=realpathSync(packRoot),header=packHeader(real);if(selected.has(header.name)){need(selected.get(header.name).root===real,'PACK_RESOLUTION_AMBIGUOUS');return;}selected.set(header.name,{...header,root:real});for(const dependency of header.dependencies){const candidates=resolved[dependency.name];need(Array.isArray(candidates)&&candidates.length>0,'DEPENDENCY_RESOLUTION');const matching=candidates.map(p=>realpathSync(p)).filter(p=>{const h=packHeader(p);return h.name===dependency.name&&(candidates.length===1||h.version===dependency.version);});need(matching.length===1,'DEPENDENCY_RESOLUTION_AMBIGUOUS');select(matching[0]);}}
-      select(directRoot);
-      for(const query of queries){need(typeof query==='string'&&query.endsWith('.ql'),'QUERY_PATH');const real=realpathSync(query);need(real.startsWith(directRoot+path.sep),'QUERY_OUTSIDE_SELECTED_PACK');regular(real);}
-      const packs=[...selected.values()].sort((a,b)=>a.name<b.name?-1:1).map((p,i)=>{const files=inventory(p.root),descriptor=save('packs/'+i+'-inventory.json',{schemaVersion:1,name:p.name,version:p.version,files});return {name:p.name,version:p.version,treeSHA256:canonicalSHA256(files),inventory:descriptor};});
+      need(typeof version==='string','ACTUAL_VERSION');
+      const {directRoot,selected}=resolveActualQueryPacks(sourceLanguage,queries,starts,resolved);
+      const packs=[...selected.values()].sort((a,b)=>a.name<b.name?-1:1).map((p,i)=>{const files=inventory(p.root),sarifSemanticVersion=p.buildSHA?p.version+'+'+p.buildSHA:p.version,descriptor=save('packs/'+i+'-inventory.json',{schemaVersion:1,name:p.name,version:p.version,sarifSemanticVersion,files});return {name:p.name,version:p.version,sarifSemanticVersion,treeSHA256:canonicalSHA256(files),inventory:descriptor};});
       const packPath='codeql-suites/'+sourceLanguage+'-security-extended.qls';
       const expected={schemaVersion:1,executionProfile:'codeql-action-v3',sourceHead:c.source.head,sourceTree:source.sourceTree,language,
         sourceInputs:save('source-inputs.json',source),config:save('codeql-config.json',c.configBytes),

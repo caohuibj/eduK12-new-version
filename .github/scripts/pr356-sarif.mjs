@@ -34,7 +34,7 @@ function readArtifact(artifact,descriptor){
   const bytes=Buffer.from(value);check(sha256(bytes)===descriptor.sha256,'ARTIFACT_DIGEST:'+name);return bytes;
 }
 function date(value){return text(value)&&Number.isFinite(Date.parse(value));}
-function packIdentity(pack){return {name:pack.name,version:pack.version,treeSHA256:pack.treeSHA256,inventorySHA256:pack.inventory.sha256};}
+function packIdentity(pack){return {name:pack.name,version:pack.version,...(pack.sarifSemanticVersion?{sarifSemanticVersion:pack.sarifSemanticVersion}:{}),treeSHA256:pack.treeSHA256,inventorySHA256:pack.inventory.sha256};}
 export function sarifIdentity(expected){
   return {...(expected.executionProfile?{executionProfile:expected.executionProfile}:{}),sourceHead:expected.sourceHead,sourceTree:expected.sourceTree,language:expected.language,category:expected.category,
     cli:{version:expected.cli.version,bundleSHA256:expected.cli.bundleSHA256,versionOutputSHA256:expected.cli.versionOutput.sha256,...(expected.cli.bundleKind?{bundleKind:expected.cli.bundleKind,installationInventorySHA256:expected.cli.installationInventory.sha256}:{})},
@@ -47,6 +47,7 @@ function validateExpected(e){
   check(object(e.cli)&&text(e.cli.version)&&hex64.test(e.cli.bundleSHA256),'EXPECTED_CLI');
   check(Array.isArray(e.queryPacks)&&e.queryPacks.length>0&&new Set(e.queryPacks.map(p=>p.name)).size===e.queryPacks.length,'EXPECTED_PACKS');
   for(const p of e.queryPacks)check(text(p.name)&&text(p.version)&&hex64.test(p.treeSHA256)&&object(p.inventory),'EXPECTED_PACK_IDENTITY');
+  for(const p of e.queryPacks)if(p.sarifSemanticVersion!==undefined)check(p.sarifSemanticVersion===p.version||(p.sarifSemanticVersion.startsWith(p.version+'+')&&hex40.test(p.sarifSemanticVersion.slice(p.version.length+1))),'EXPECTED_PACK_BUILD_IDENTITY');
   check(e.queryPacks.some(p=>p.name===languageInfo[e.language].pack),'LANGUAGE_QUERY_PACK');
   check(e.querySuite?.name==='security-extended'&&e.querySuite.packPath==='codeql-suites/'+languageInfo[e.language].suite,'SECURITY_EXTENDED_SUITE');
   check(object(e.commands)&&Object.keys(e.commands).length>=2,'EXPECTED_COMMANDS');
@@ -55,6 +56,7 @@ function validateInventory(expected,artifact){
   for(const pack of expected.queryPacks){
     const inventory=json(readArtifact(artifact,pack.inventory),'PACK_INVENTORY_JSON');
     check(inventory.schemaVersion===1&&inventory.name===pack.name&&inventory.version===pack.version&&Array.isArray(inventory.files)&&inventory.files.length>0,'PACK_INVENTORY_IDENTITY');
+    if(pack.sarifSemanticVersion!==undefined)check(inventory.sarifSemanticVersion===pack.sarifSemanticVersion,'PACK_BUILD_IDENTITY');
     const names=[];
     for(const f of inventory.files){names.push(relativeFile(f.path));check(hex64.test(f.sha256)&&Number.isSafeInteger(f.bytes)&&f.bytes>=0,'PACK_FILE_IDENTITY');}
     check(new Set(names).size===names.length&&names.includes('qlpack.yml'),'PACK_INVENTORY_FILES');
@@ -169,14 +171,17 @@ function fingerprints(value){
 function findingsForRun(run,expected,runIndex){
   check(object(run.tool)&&object(run.tool.driver)&&/^CodeQL(?: command-line toolchain)?$/.test(run.tool.driver.name),'SARIF_TOOL');
   check(run.tool.driver.semanticVersion===expected.cli.version,'SARIF_CLI_VERSION');
-  check(run.properties?.['semmle.sourceLanguage']===languageInfo[expected.language].source,'SARIF_LANGUAGE');
+  // Native CodeQL 2.27 SARIF omits this nonstandard hint. The Action profile
+  // already requires finalized DB primaryLanguage plus the exact language pack.
+  // A present contradictory hint remains an error; legacy CLI profiles retain it.
+  if(expected.executionProfile!=='codeql-action-v3'||run.properties?.['semmle.sourceLanguage']!==undefined)check(run.properties?.['semmle.sourceLanguage']===languageInfo[expected.language].source,'SARIF_LANGUAGE');
   check(run.automationDetails?.id===expected.category,'SARIF_CATEGORY');
   check(!incompleteProperties(run.properties),'SARIF_PARTIAL');
   check(!run.externalPropertyFileReferences,'SARIF_EXTERNAL_RESULTS');
   check(Array.isArray(run.tool.extensions)&&run.tool.extensions.length>0,'SARIF_QUERY_PACK_METADATA');
   for(const extension of run.tool.extensions){
     const pack=expected.queryPacks.find(p=>p.name===extension.name);
-    check(pack&&extension.semanticVersion===pack.version,'SARIF_QUERY_PACK_IDENTITY');
+    check(pack&&extension.semanticVersion===(pack.sarifSemanticVersion??pack.version),'SARIF_QUERY_PACK_IDENTITY');
   }
   check(run.tool.extensions.some(x=>x.name===languageInfo[expected.language].pack),'SARIF_LANGUAGE_PACK_MISSING');
   for(const component of [run.tool.driver,...run.tool.extensions]){

@@ -153,15 +153,25 @@ with zipfile.ZipFile(sys.argv[1]) as archive:
    if target.is_symlink() or not target.is_file() or target.stat().st_size!=item.file_size:raise ValueError('ZIP and local payload differ')
  if sorted(names)!=sorted(p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()):raise ValueError('ZIP and local file lists differ')
  if hashlib.sha256(archive.read('phase-receipt.json')).digest()!=hashlib.sha256((root/'phase-receipt.json').read_bytes()).digest():raise ValueError('Original ZIP proof bytes changed')`;
-export async function downloadArchive(expected,meta,zipPath,token,fetcher=fetch){
+export async function downloadArchive(expected,meta,zipPath,token,fetcher=fetch,delay=ms=>new Promise(resolve=>setTimeout(resolve,ms))){
  assert(!existsSync(zipPath),'Existing ZIP must be verified locally, never downloaded again');
- const response=await fetcher(`https://api.github.com/repos/${REPOSITORY}/actions/artifacts/${expected.artifactId}/zip`,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},redirect:'manual'});
- let body=response;
- if(response.status===302){
-  const url=new URL(response.headers.get('location')??'invalid:');assert.equal(url.protocol,'https:');assert(!url.username&&!url.password&&(/^[a-z0-9-]+\.blob\.core\.windows\.net$/i.test(url.hostname)||/^[a-z0-9.-]+\.actions\.githubusercontent\.com$/i.test(url.hostname)),'Unexpected artifact storage redirect');
-  // Never forward the GitHub bearer token to the signed blob URL.
-  body=await fetcher(url.href,{redirect:'error'});
- }else assert.equal(response.status,200,`Artifact download unavailable (${response.status}); no fallback`);
+ let body;
+ for(let attempt=1;attempt<=3;attempt++){
+  const response=await fetcher(`https://api.github.com/repos/${REPOSITORY}/actions/artifacts/${expected.artifactId}/zip`,{headers:{Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},redirect:'manual'});
+  body=response;
+  if(response.status===302){
+   const url=new URL(response.headers.get('location')??'invalid:');assert.equal(url.protocol,'https:');assert(!url.username&&!url.password&&(/^[a-z0-9-]+\.blob\.core\.windows\.net$/i.test(url.hostname)||/^[a-z0-9.-]+\.actions\.githubusercontent\.com$/i.test(url.hostname)),'Unexpected artifact storage redirect');
+   // Never forward the GitHub bearer token to the signed blob URL.
+   body=await fetcher(url.href,{redirect:'error'});
+  }
+  if(![429,502,503,504].includes(body.status)||attempt===3)break;
+  const retryAfter=body.headers?.get('retry-after');const seconds=retryAfter?Number(retryAfter):attempt;
+  // Only an idempotent pre-body GET may retry. Auth, corrupt bytes, partial
+  // files and excessive server Retry-After values remain hard failures.
+  if(!Number.isFinite(seconds)||seconds<0||seconds>10)break;
+  await body.body?.cancel?.();console.warn('PR356 artifact '+expected.artifactId+' transient HTTP '+body.status+'; bounded GET retry '+attempt+'/2');
+  await delay(Math.max(seconds,1)*1000);
+ }
  assert.equal(body.status,200,'Official artifact bytes unavailable');assert(body.body,'Missing official ZIP body');let bytes=0;
  const count=new Transform({transform(chunk,encoding,callback){bytes+=chunk.length;if(bytes>meta.size_in_bytes||bytes>MAX_ZIP)callback(new Error('Artifact ZIP size exceeded'));else callback(null,chunk);}});
  await pipeline(Readable.fromWeb(body.body),count,createWriteStream(zipPath,{flags:'wx',mode:0o600}));

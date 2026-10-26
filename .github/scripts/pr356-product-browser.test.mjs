@@ -289,3 +289,11 @@ print('actual-inline-private-transfer-control PASS; not a real Docker execution'
   const result=execFileSync('python3',['-c',harness],{encoding:'utf8'});assert(result.includes('PASS'));assert(!result.includes('synthetic":true'));
  }finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
+
+test('Survey completion consumer uses stable heading and published feedback, retaining FINAL and persistence checks',()=>{
+ const source=fs.readFileSync(new URL('./pr356-product-browser.mjs',import.meta.url),'utf8'),app=fs.readFileSync(new URL('../../server-version/frontend/src/survey/SurveyPublicApp.tsx',import.meta.url),'utf8');
+ assert.equal((source.match(/name: '感谢参与，问卷已提交', level: 2, exact: true/g)||[]).length,2);
+ assert.equal((source.match(/getByText\('Synthetic browser receipt\.'/g)||[]).length,2);
+ assert(app.includes("{general.text||'你已完成问卷，可以关闭此页面。'}"));
+ assert(source.includes("assert.equal(submitted[0].payload.data.status, 'COMPLETED')"));assert(source.includes("assert.equal(evidence.persistedVerification.status, 'PASS')"));
+});

@@ -607,3 +607,17 @@ reader调用点及未变控制绿项没有重跑。旧HTTP5原PASS、catalog2原
 原始失败artifact：vertical4 `12665610271`，SHA256 `7723cdda630737d587184c4d1a9bf86c41e766020f869789cc517cfc252497a5`；worker `12664781948`，SHA256 `783a178742909378692a24e47fc9a576303ab280f52a57372e48b4184d35a3d4`。原件已核对并留存dot工作区。公开Actions日志与原有7天artifact保留期限不变。
 
 用户明确批准修后一次限定CI重跑，并追加授权同类配置/fixture/必要限定重跑。当前严格recipe包含共享workflow字节，跨提交未实现可用的自动复用；不伪装旧产物的新资格，也不为此扩建框架。这里只处理本轮首错和同根因消费者，应用源码、schema、锁文件、两组件tree均未变；不部署。累计同一目标第一轮失败，不随新SHA归零。Notion同页已写回四类根因及下轮checking list，激活前需回读。
+
+### 两轮失败后暂停、真实接口验证与恢复候选（2026-10-26 16:42 UTC）
+
+第二轮 `40356541249` 保留原失败。CodeQL init 已成功，collector 把真实 startingpacks 的 query pack＋suite-helper 当作非法，且后续存在原生 SARIF 字段/版本格式误设。dot 未直接开第三轮试错，而是取得同版官方 CLI2.27.3并对原Actions清单35045文件逐项哈希核实，零差异。真实CLI：JS105queries/16packs、Python52queries/15packs；解析唯一语言query pack和其vendored固定依赖闭包，保留所有helper/元数据，不删查询。
+
+实际微型合成程序的原生CLI create/analyze/collector已验证：正常程序两语言成功；另外静态注入样例分别保留js/code-injection、py/code-injection各1 finding，zeroFindings=false。它们仅检验收集协议，不是平台扫描或正式Actions，不产生合并资格。真实SARIF可缺少非标准sourceLanguage提示；Action profile仍必须核finalized DB.primaryLanguage和精确语言包，矛盾提示仍拒绝。原生version+buildSHA被完整绑定在清单/身份内，不忽略build差异。36个受影响安全协议控制PASS，失败/矛盾/未完成负例仍拒绝。
+
+第二轮产品原件证明Teacher两例PASS、Survey普通FINAL已200且截图显示完成；浏览器脚本误等被自定义GENERAL替代的fallback文案。改等稳定完成heading＋实际自定义回执，既有FINAL状态/计数、恢复、指导语不混答、数据库验证全部保留；未跑的后续仍NOTRUN，下一正式候选补完整路径。
+
+两次HTTP503发生在官方artifact读取、扫描/ordinary旅程之前。frontend-scan同SHA单job重试成功（job121702689957），producer新jobID返回原16:11–16:12日志，未重建。下载只增加最多3次pre-body可信GET瞬态重试，大小/hash/redirect/auth及半文件拒绝保持，无新凭据/权限/复用框架。普通四库503原失败保留，未因传输故障冒称业务失败或成功。
+
+原件：CodeQL JS artifact12666470555 SHA1e1252c381216a6debd18d2a01dd7ece460f61884593b0bf42643c6c199972a5；Python12664484978 SHAa47abe92639128e2d34a60a8bde53b748f29cf50ed8444de077c1956ff9750aa；产品浏览器12666068990 SHAfa87ba829ac395ee945e6c0dddc37dcab9188da78882dad812bb4a7144c500ce。官方CLI包SHA5e7607e1b721728955e31f5402d460ad227cbd2ffed0d4cc610116755796150e。原日志/截图/CLI元数据/样例原SARIF留存dot工作区，不改写原FAIL。
+
+Notion同页已回写详细根因、实际验证和恢复条件。仅在最终HEAD/tree/base与完整输入复核后，由dot独立恢复既有16阶段限定qualify。前两轮失败不清零；不运行无关全平台检查、不部署，不把真实CLI样例的分析完成误称平台零发现。用户已明确授权同类CI/fixture修复及必要限定重跑。
