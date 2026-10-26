@@ -1,0 +1,13 @@
+{
+  "parameterPlanVersion": "1.0.0",
+  "status": "NONE_SCORE_ONLY",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentParameterVersionSupported": false,
+  "reason": "此中文稿没有常模；西语原ROC37.5/38不移用。none参数独立版本尚未被引擎表达，计划版本仅文档追踪。",
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "reportVersion": "1.0.0"
+}

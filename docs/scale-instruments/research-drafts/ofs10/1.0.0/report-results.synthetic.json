@@ -1,0 +1,1493 @@
+[
+  {
+    "fixture": "minimum",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "1"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 10,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "maximum",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "5"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 50,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "midpoint",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "3"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 30,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "raw_all_one",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "1"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 14,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "raw_all_five",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "5"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 46,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "mixed_independent",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "2"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "4"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "2"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "4"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "5"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 34,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  },
+  {
+    "fixture": "mixed_reverse_high",
+    "answers": [
+      {
+        "itemCode": "OFS_01",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_02",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_03",
+        "responseValue": "4"
+      },
+      {
+        "itemCode": "OFS_04",
+        "responseValue": "2"
+      },
+      {
+        "itemCode": "OFS_05",
+        "responseValue": "3"
+      },
+      {
+        "itemCode": "OFS_06",
+        "responseValue": "5"
+      },
+      {
+        "itemCode": "OFS_07",
+        "responseValue": "4"
+      },
+      {
+        "itemCode": "OFS_08",
+        "responseValue": "2"
+      },
+      {
+        "itemCode": "OFS_09",
+        "responseValue": "1"
+      },
+      {
+        "itemCode": "OFS_10",
+        "responseValue": "3"
+      }
+    ],
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ofs10",
+        "code": "ofs10_zh_cn_research",
+        "name": "面向未来开放性量表（OFS成人10题，平台中文研究工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ofs10",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "af941abfafd88b5b6ac4af5b2d4e68bf4166105a9eb7aff7d09ecd1715072d33",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "OFS_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "OFS_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_03",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "OFS_04",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "OFS_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "OFS_06",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_07",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "OFS_08",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "OFS_09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "OFS_10",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "openness_to_future",
+          "type": "total",
+          "label": "此刻怎样面向未来",
+          "description": "第6题按6−原答分转换后，10题等权求和10–50；更多表示本次自述较积极地面向未来，不是未来结果、临床健康或固定能力判断。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 26,
+          "range": {
+            "min": 10,
+            "max": 50
+          },
+          "expectedItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "answeredItems": [
+            "OFS_01",
+            "OFS_02",
+            "OFS_03",
+            "OFS_04",
+            "OFS_05",
+            "OFS_06",
+            "OFS_07",
+            "OFS_08",
+            "OFS_09",
+            "OFS_10"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "openness_to_future",
+          "headline": "此刻怎样面向未来",
+          "label": null,
+          "interpretation": "这份回答关注你怎样看待尚未发生的生活：是否对未来保留一些期待，能否设想计划、相信自己可以面对障碍，以及怎样容纳好事和坏事都可能发生的不确定。它把这些体验汇在一起，供你回顾自己的想法，而不能预言未来会怎样。现实中的压力、资源、健康状况和身边的支持，都可能影响你的回答。暂时没有方向、担心失控或不想立刻做计划，也可能与眼前的处境有关。可以从一件仍有一点在意的小事开始，看看现在有什么是自己能做、也愿意做的；不必要求自己马上乐观起来。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "想到接下来的一件小事，你期待什么，又担心什么？哪些部分能由自己稍作准备，哪些需要时间或支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "选一个不太费力的小计划，写下明天能做的第一步，例如了解一条信息、准备一件物品，或找人商量；再给自己留一个可以调整计划的余地。"
+            },
+            {
+              "category": "support",
+              "text": "如果眼前的压力让你很难设想未来，可以先处理最需要照顾的一件事，或与信任的人谈一谈，不必独自承担。"
+            }
+          ],
+          "limitations": [
+            "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+            "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+            "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+            "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+            "题目不完整时不计算总分或给出解释，未答题不会补成最低分。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果反映本次对未来想法的自述，现实处境和可用支持会影响回答。",
+        "不能据此预言将来、判断人格或诊断疾病，也不能据分数安排人与人之间的排名。",
+        "中文为独立研究工作稿，尚未完成人工译审、认知访谈和中国人群验证。",
+        "本工具采用同一套一般反思文字，没有按分数生成个性化分段建议。",
+        "题目不完整时不计算总分或给出解释，未答题不会补成最低分。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供成年人研究和日常反思使用，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+    }
+  }
+]

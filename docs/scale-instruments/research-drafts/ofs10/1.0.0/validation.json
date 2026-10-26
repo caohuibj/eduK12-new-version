@@ -1,0 +1,48 @@
+{
+  "instrumentKey": "ofs10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "unit": {
+    "total": 20,
+    "passed": 20,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "types": {
+    "runs": 1,
+    "exitCode": 0,
+    "scope": "new test closure only"
+  },
+  "actualReports": 7,
+  "actualInterpretations": 7,
+  "inputBinding": "POST_EXECUTION_UNSIGNED_NOT_PREBOUND; original pre-capture failed",
+  "sourceAndTestChangedAfterSuccess": false,
+  "checksRepeated": false,
+  "notRun": [
+    "database",
+    "browser",
+    "CI",
+    "build",
+    "deploy",
+    "activate",
+    "Notion"
+  ],
+  "limitations": [
+    "human translation review PENDING",
+    "China validation not established",
+    "instruction PREPARED not runtime-connected",
+    "none parameter identity/version not represented by engine"
+  ],
+  "coordinatorIntegration": {
+    "scope": "Two-tool combined suite; not an agent rerun",
+    "database": "PASS_NON_OWNER_SYNTHETIC_POSTGRES",
+    "perToolCases": 5,
+    "sharedSuiteCases": 2,
+    "newDraftHiddenRows": 2,
+    "referenceSets": 0,
+    "deployments": 0,
+    "evidence": "../../../batches/20261026-wave8/validation.json",
+    "instructions": "PREPARED_NOT_RUNTIME_CONNECTED",
+    "ciExecuted": false,
+    "productionTouched": false
+  }
+}

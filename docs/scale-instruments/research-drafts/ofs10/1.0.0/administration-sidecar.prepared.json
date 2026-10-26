@@ -1,0 +1,16 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instrumentKey": "ofs10_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "contentVersion": "1.0.0",
+  "locale": "zh-CN",
+  "instructions": [
+    "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。",
+    "选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。",
+    "答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。"
+  ],
+  "recallPeriod": null,
+  "timeFrameNote": "原件无固定回顾时间；完整英文/西语指导语见bilingual-content.json",
+  "itemOrderLocked": true,
+  "consumerStatus": "旧source schema不支持独立指导语，本sidecar尚未接入运行时，不伪称完整指导语已可展示"
+}

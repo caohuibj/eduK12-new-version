@@ -1,0 +1,157 @@
+{
+  "instrumentKey": "ofs10_zh_cn_research",
+  "contentVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "status": "INDEPENDENT_CHINESE_WORKING_TRANSLATION_HUMAN_REVIEW_PENDING",
+  "primaryTextLocale": "en",
+  "validatedSourceLocale": "es",
+  "englishForm": {
+    "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1186%2Fs12955-018-0889-8/MediaObjects/12955_2018_889_MOESM1_ESM.docx",
+    "sha256": "305d93d48fbf5c40d59dff2e8a977ca46b10be5e435dde73f47cc2d0c0aad500"
+  },
+  "spanishForm": {
+    "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1186%2Fs12955-018-0889-8/MediaObjects/12955_2018_889_MOESM2_ESM.docx",
+    "sha256": "13e525cc17b8336d53001605f14472a007915d8ac5328ad3321569098ca90f52"
+  },
+  "instructions": {
+    "originalEnglish": [
+      "Below, you will find different statements that you can identify with to a greater or lesser degree. Please, indicate your level of agreement or disagreement with each of them, based on the following scale:",
+      "There are no right or wrong answers. The important thing is what you think. Do not spend a long time thinking about the exact meaning of the statements. Just give the first answer that best fits your way of thinking."
+    ],
+    "originalSpanish": [
+      "A continuación, encontrarás diferentes frases con las que te puedes sentir identificado en mayor o menor medida. Por favor, indica el grado de acuerdo o de desacuerdo que tienes con cada una de ellas según la siguiente escala:",
+      "No hay respuestas correctas ni incorrectas. Lo importante es lo que tú opines. No te detengas mucho a pensar en el significado exacto de las afirmaciones, contesta lo primero que creas que se ajusta más a tu forma de pensar."
+    ],
+    "platformChinese": [
+      "下面是一些陈述，你可能会在不同程度上认同它们。请根据以下选项，选择你对每项陈述的同意或不同意程度。",
+      "选项为：1＝非常不同意，2＝有些不同意，3＝既不同意也不反对，4＝有些同意，5＝非常同意。",
+      "答案没有对错，重要的是你的想法。不必花很长时间琢磨句子的确切意思，请选择第一时间最符合你想法的答案。"
+    ]
+  },
+  "options": [
+    {
+      "value": "1",
+      "originalEnglish": "Strongly disagree",
+      "originalSpanish": "Totalmente en desacuerdo",
+      "platformChinese": "非常不同意",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "originalEnglish": "Somewhat disagree",
+      "originalSpanish": "Algo en desacuerdo",
+      "platformChinese": "有些不同意",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "originalEnglish": "Neither agree nor disagree",
+      "originalSpanish": "Ni de acuerdo, ni en desacuerdo",
+      "platformChinese": "既不同意也不反对",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "originalEnglish": "Somewhat agree",
+      "originalSpanish": "Algo de acuerdo",
+      "platformChinese": "有些同意",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "originalEnglish": "Strongly agree",
+      "originalSpanish": "Totalmente de acuerdo",
+      "platformChinese": "非常同意",
+      "score": 5
+    }
+  ],
+  "questions": [
+    {
+      "itemCode": "OFS_01",
+      "originalEnglish": "When I make plans, I am sure I will be able to carry them out.",
+      "originalSpanish": "Cuando hago planes, estoy seguro de que conseguiré llevarlos a cabo.",
+      "platformChinese": "制定计划时，我确信自己能够完成这些计划。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_02",
+      "originalEnglish": "I usually trust that things will work out",
+      "originalSpanish": "Suelo confiar en que las cosas saldrán bien.",
+      "platformChinese": "我通常相信事情会有好的结果。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_03",
+      "originalEnglish": "I think I have enough control over the direction my life takes.",
+      "originalSpanish": "Creo que tengo bastante control sobre el rumbo que toma mi vida.",
+      "platformChinese": "我觉得自己对人生的走向有足够的掌控。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_04",
+      "originalEnglish": "I am very excited about future opportunities and challenges",
+      "originalSpanish": "Los desafíos y los retos hacia el futuro me resultan muy estimulantes.",
+      "platformChinese": "未来的机会和挑战让我很振奋。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_05",
+      "originalEnglish": "I have a lot of illusions and future plans.",
+      "originalSpanish": "Tengo un montón de planes y de ilusiones.",
+      "platformChinese": "我对未来有许多憧憬和计划。",
+      "reverse": false,
+      "sourceChoice": "Official English with Spanish ilusiones disambiguation"
+    },
+    {
+      "itemCode": "OFS_06",
+      "originalEnglish": "Sometimes I get scared and feel that I’m losing control when I think about what life may bring",
+      "originalSpanish": "A veces me asusto y siento que pierdo el control cuando pienso en lo que podrá depararme la vida.",
+      "platformChinese": "有时，一想到生活可能带来什么，我就会害怕，觉得自己正在失去掌控。",
+      "reverse": true,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_07",
+      "originalEnglish": "I calmly accept that good and bad things will happen to me in life",
+      "originalSpanish": "Acepto con tranquilidad que en la vida me van a ocurrir cosas buenas y malas.",
+      "platformChinese": "我能平静地接受生活中会有好事，也会有坏事。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_08",
+      "originalEnglish": "I know I can overcome the obstacles I encounter in life.",
+      "originalSpanish": "Sé que la vida me presentará obstáculos, pero confío en que podré superarlos.",
+      "platformChinese": "我知道自己能克服生活中遇到的障碍。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_09",
+      "originalEnglish": "For me: every day is a new day.",
+      "originalSpanish": "Estoy de acuerdo con la afirmación: cada día es un nuevo día.",
+      "platformChinese": "对我来说，每一天都是新的一天。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    },
+    {
+      "itemCode": "OFS_10",
+      "originalEnglish": "I feel hopeful about what the future may bring.",
+      "originalSpanish": "Tengo esperanza por lo que pueda traer el futuro.",
+      "platformChinese": "对于未来可能带来的事情，我心怀希望。",
+      "reverse": false,
+      "sourceChoice": "Official English Additional file 1"
+    }
+  ],
+  "translationDecisions": {
+    "OFS_05": "illusiones消歧为对未来的憧憬/期待，不把英文illusions译为病理性幻觉；本稿固定为“憧憬”。",
+    "OFS_08": "英文是“知道能克服生活中遇到的障碍”，西语先承认生活会出现障碍再表达相信能克服；本稿冻结英文题意，不拼接西语前半句。",
+    "OFS_04": "英文包含future opportunities and challenges，采用英文的机会和挑战；西语仅强调未来挑战/考验。",
+    "OFS_09": "保留英文For me: every day is a new day，不把平台行动建议加入题意。"
+  },
+  "creditLine": "Permission of Botella et al. (2017). Reproducido con permiso de Botella et al. (2017)."
+}
