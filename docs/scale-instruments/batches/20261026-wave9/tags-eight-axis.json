@@ -1,0 +1,89 @@
+{
+  "sourceSha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+  "tagCount": 64,
+  "axes": {
+    "domain": [
+      "domain:parental_self_efficacy",
+      "domain:self_efficacy",
+      "domain:family_interaction",
+      "domain:social_emotional"
+    ],
+    "construct": [
+      "construct:domain_specific_parental_belief",
+      "construct:supportive_disciplining_confidence",
+      "construct:effective_disciplining_confidence",
+      "construct:perceived_knowledge_ability_outcome",
+      "construct:single_factor_final_scale",
+      "construct:not_observed_parenting_skill",
+      "construct:not_child_trait_proxy",
+      "construct:distinct_from_parental_burnout",
+      "construct:distinct_from_psoc"
+    ],
+    "orientation": [
+      "orientation:self_efficacy_research",
+      "orientation:parenting_intervention_research",
+      "orientation:domain_specific_efficacy",
+      "orientation:not_therapy_specific",
+      "orientation:not_act_specific",
+      "orientation:not_dbt_specific"
+    ],
+    "population": [
+      "population:adult_project_18_plus",
+      "population:parents_and_carers",
+      "population:respondent_is_subject",
+      "population:source_uk_intervention_samples",
+      "population:source_child_ages_2_1_to_18",
+      "population:parent_age_bounds_unreported",
+      "population:not_child_self_report",
+      "population:not_general_parent_validation"
+    ],
+    "response": [
+      "response:self",
+      "response:five_items",
+      "response:five_point_agreement_1_to_5",
+      "response:fixed_order",
+      "response:no_reverse_items",
+      "response:single_total_sum_5_to_25",
+      "response:no_subscales",
+      "response:no_fixed_recall_period",
+      "response:complete_required_project_policy"
+    ],
+    "use": [
+      "use:research",
+      "use:individual_reflection",
+      "use:not_diagnostic",
+      "use:not_parent_blame",
+      "use:no_child_change_guarantee",
+      "use:no_cutoffs",
+      "use:no_population_ranking"
+    ],
+    "license": [
+      "license:cc_by_4_0",
+      "license:attribution_required",
+      "license:adaptation_allowed",
+      "license:commercial_reuse_allowed",
+      "license:changes_indicated",
+      "license:article_carrier_not_corc_layout"
+    ],
+    "language_validation": [
+      "language_validation:source_english",
+      "language_validation:independent_zh_cn_working_translation",
+      "language_validation:distinct_from_2026_bpses_c",
+      "language_validation:china_validation_not_established",
+      "language_validation:expert_review_pending"
+    ]
+  },
+  "keywords": [
+    "BPSES",
+    "Brief Parental Self Efficacy Scale",
+    "父母自我效能",
+    "育儿信心",
+    "管教信心",
+    "照顾者自评",
+    "成人自评",
+    "独立中文工作译稿",
+    "单一总分",
+    "非诊断"
+  ],
+  "consumerNote": "Rich source catalog/snapshot tags verified. Existing materializer row.tags only primaryDomain; discovery/authorization/analysis indexing consumer NOTRUN."
+}

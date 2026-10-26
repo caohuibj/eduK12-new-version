@@ -1,0 +1,27 @@
+{
+  "status": "PASS_STATIC_DIFF_AND_BYTES",
+  "baseline": "2cfa23fba07c1f1dfbeac92c9e40d74f4dabda43",
+  "sourceCommit": "a13a405b9852513b372cd622536aca45170735a7",
+  "oldSourceFilesByteUnchanged": 94,
+  "engineSchemaDependenciesOtherInstrumentsChanged": false,
+  "changedPaths": [
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/README.md",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration.md",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/bilingual-content.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/parameter-plan.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/references.md",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-example.md",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-results.synthetic.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/scoring-and-parameters.md",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/source-audit.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.json",
+    "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.md",
+    "server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+    "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+    "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+    "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts"
+  ],
+  "original37InventoryByteUnchanged": true
+}

@@ -1,0 +1,115 @@
+{
+  "parent": "2cfa23fba07c1f1dfbeac92c9e40d74f4dabda43",
+  "commit": "a13a405b9852513b372cd622536aca45170735a7",
+  "tree": "8ec735639921315462207243e387f6bda4aa2e6a",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T10:20:53.213214+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/README.md",
+      "remoteBlob": "a3c99bfa62e715249a62e053efc1c4d333ba493c",
+      "sha256": "4428f5acc64ba8d734c636e2732f462a257f8f682d91538ae1171d00cdfb6724",
+      "bytes": 1375
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration-sidecar.prepared.json",
+      "remoteBlob": "6d455b8be237da392752e0b6c50a31a8047121a8",
+      "sha256": "4327a93d42349cc958e2c059a3a4411f8b6b833b54820be976f908acc9860f8b",
+      "bytes": 728
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/administration.md",
+      "remoteBlob": "a9982ced1265e59ee43212a03a59318136707325",
+      "sha256": "42f4110481181983478def8a0f884f1e42039edfa2551c018fb959a60d51e553",
+      "bytes": 1053
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/bilingual-content.json",
+      "remoteBlob": "16795ba626955358005558ea7e6e1f5644e1e940",
+      "sha256": "5abd2b64636bb4da65d08172b72335cb7b6f37a6e0ad1bd12f0761d28ebc0186",
+      "bytes": 3385
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/parameter-plan.json",
+      "remoteBlob": "7f7debbd3fe771493347d8b9f9b34fa7d29e42c6",
+      "sha256": "eb5de64ce360af884c67e9e8a3e01db3ecd31d68127686f8a4b48040ec6239a1",
+      "bytes": 554
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/references.md",
+      "remoteBlob": "57f30ebaabf6124ead1afda9544572522b3b2453",
+      "sha256": "d616ffb412a2b2870bff55a98371cbc75a1affb562f646c40888904a501748d5",
+      "bytes": 1356
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-example.md",
+      "remoteBlob": "7f2af0e8072cfc60368419832b331c7f9e088dc9",
+      "sha256": "5798313f62d9e19c1cd1bbc838a74a3e072ac1150f65f1f30d08751f384fa529",
+      "bytes": 1431
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/report-results.synthetic.json",
+      "remoteBlob": "97b4d3906d5f0af09d6773bac3a969e0716e4e57",
+      "sha256": "9dd373bc10085aaa4bfeb6b54933f27d95ba3991f96de399ed8253ddf9b3dd5d",
+      "bytes": 22051
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "e98634b3b08c8744552ea3c5c5ad87cf2a8e0327",
+      "sha256": "0214593594c64001b48979b9936ffa961a0f0553a32c2e53473accb6e6b7b387",
+      "bytes": 1048
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/source-audit.json",
+      "remoteBlob": "75efc8db369b1cbc375967fef8e5ab7cb10bc244",
+      "sha256": "03c177e4b4e5ca12c3cefb58dcabe74cb5daddbc7293f73c0c151817f2d211be",
+      "bytes": 5396
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.json",
+      "remoteBlob": "09edbd0331117b4d1cd6a6ed2bd466087742da2e",
+      "sha256": "8141ac79478b2f4203de2830bf06eb5f030be53d909ea18448a2db0a235fa727",
+      "bytes": 3185
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bpses5/1.0.0/validation.md",
+      "remoteBlob": "72866803de47f92fd39fa9d92cfce8ee24c5a05b",
+      "sha256": "2edd2d5a0b344e814a0aac38f4b03cde916208de7379954667dbfbe6491ae87c",
+      "bytes": 2194
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+      "remoteBlob": "0c3a1fb3574d3fe70f2614f1ac6d65a07ed51d5f",
+      "sha256": "0e30656184d18f52e478e23e8feac90cb4e94bba41fa92957bcc02850d097f55",
+      "bytes": 12158
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "e1dceed81be5834c48852e88cf5b10b2f79a203c",
+      "sha256": "9e1c1a925bc860a6ad3245954b139fcf7e2193f34891ccb76cbd8b6fac13bed8",
+      "bytes": 1644
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/instrument.ts",
+      "remoteBlob": "79e49477cef891213a7b8c81e8bbe1429fe12cda",
+      "sha256": "47ab5f4601d09c6939028f9304a5a90e350410cdbeb24c0f458c6daa1323136f",
+      "bytes": 192
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bpses5_zh_cn_research/1.0.0/source.json",
+      "remoteBlob": "6f6f52ddb27e23dde3d5b02f731842ed2fcfabb6",
+      "sha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+      "bytes": 27689
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "1e018bbebe5c56b1b19fa0a258a8088e4b04e437",
+      "sha256": "1b81bfa5c4a1b19554e8941dc5cadfcad507ffd10bdaa6183bec903c343fba61",
+      "bytes": 14964
+    }
+  ]
+}

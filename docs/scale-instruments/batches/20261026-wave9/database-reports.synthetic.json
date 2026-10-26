@@ -1,0 +1,812 @@
+[
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "minimum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 5,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "total",
+          "headline": "理解自己引导孩子行为的信心",
+          "label": null,
+          "interpretation": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+            }
+          ],
+          "limitations": [
+            "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+            "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+            "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+            "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+            "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "maximum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 25,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "total",
+          "headline": "理解自己引导孩子行为的信心",
+          "label": null,
+          "interpretation": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+            }
+          ],
+          "limitations": [
+            "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+            "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+            "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+            "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+            "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "middle",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 15,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "total",
+          "headline": "理解自己引导孩子行为的信心",
+          "label": null,
+          "interpretation": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+            }
+          ],
+          "limitations": [
+            "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+            "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+            "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+            "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+            "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "mixed",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 15,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "total",
+          "headline": "理解自己引导孩子行为的信心",
+          "label": null,
+          "interpretation": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+            }
+          ],
+          "limitations": [
+            "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+            "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+            "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+            "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+            "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "asymmetric",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 9,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "total",
+          "headline": "理解自己引导孩子行为的信心",
+          "label": null,
+          "interpretation": "这五个回答整理你对引导孩子行为的信心，包括是否觉得自己知道该怎么做、能否付诸行动，以及相信自己的做法能够带来影响。这是你对自身的描述，不能凭此判断实际教养能力，也不能把孩子的表现归因于家长是否足够有信心。压力、支持条件和孩子当时的需要，都可能影响回答。可以回想一次相处较顺利的场景，留意当时你做了什么、有哪些支持。若你愿意，下次选一件可掌握的小事，例如在平静时用一句简短的话说明一项约定，再观察它是否适合你们；遇到困难时也可以和可信任的人商量。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "回想一次相处较顺利的场景：当时你做了什么，又得到了哪些支持？"
+            },
+            {
+              "category": "strategy",
+              "text": "若你愿意，在平静时用一句简短的话说明一项约定，之后看看是否适合你们。"
+            }
+          ],
+          "limitations": [
+            "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+            "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+            "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+            "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+            "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "missing_first",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [
+        {
+          "itemCode": "BPSES_02",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_03",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_04",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "BPSES_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        }
+      ],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  },
+  {
+    "instrumentKey": "bpses5_zh_cn_research",
+    "fixture": "empty",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "code": "bpses5_zh_cn_research",
+        "name": "简明父母自我效能量表（BPSES，5题独立中文工作稿）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "3e9453e3-eb90-4fb5-92af-cf23e29c00b7",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "7b3bf47cb1e9d46f39233041456c64558df239dd14765a73bcb248cbf1fe8ca7",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "invalid",
+        "flags": [
+          "missing_items",
+          "score_not_calculable"
+        ]
+      },
+      "itemScores": [],
+      "scores": [
+        {
+          "key": "total",
+          "type": "total",
+          "label": "引导孩子行为的自述信心",
+          "description": "总和越大表示本次更认同自身管教效能信念，不等于实际教养能力或孩子一定改变；不分高低等级。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": null,
+          "range": {
+            "min": 5,
+            "max": 25
+          },
+          "expectedItems": [
+            "BPSES_01",
+            "BPSES_02",
+            "BPSES_03",
+            "BPSES_04",
+            "BPSES_05"
+          ],
+          "answeredItems": [],
+          "status": "not_calculable",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [],
+      "caveats": [
+        "回答描述父母或照顾者对自身的信心，不能判断实际教养能力，也不能把孩子的表现归咎于家长。",
+        "原英语证据来自英国育儿及家庭干预情境，目标子女年龄不等于作答家长年龄，也不代表所有育儿能力。",
+        "中文为独立工作译稿，尚未完成专家审校或中国人群验证，不继承2026现成中文译本的证据。",
+        "总分仅整理五个回答，没有常模、临床界值、高低分段或人群排名。",
+        "五题需完整作答才计算总分；漏答不补零，不用其余题目代替。",
+        "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "用于成人父母或照顾者回顾自身引导孩子行为的信心，不作诊断、家长评价或孩子改变的保证。"
+    }
+  }
+]

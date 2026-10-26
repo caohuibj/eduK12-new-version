@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/launch-pg.py"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:14:15.883323+00:00",
+  "finishedAt": "2026-10-26T10:14:18.553813+00:00",
+  "exitCode": 0,
+  "inputsManifestSha256": "a8f53772037d62b59f50a6cda817d0014278b9e2393e445dfdb975141a1adbca",
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

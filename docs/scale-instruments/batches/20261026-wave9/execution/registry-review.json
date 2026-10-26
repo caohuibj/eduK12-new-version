@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "registryIdentities": 116,
+  "unique": true,
+  "oldSourceFilesUnchanged": 94,
+  "selected": [
+    {
+      "identity": {
+        "instrumentKey": "bpses5_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "status": "PASS",
+      "tagCount": 64,
+      "axisTagCounts": {
+        "domain": 4,
+        "construct": 9,
+        "orientation": 6,
+        "population": 8,
+        "response": 9,
+        "use": 7,
+        "license": 6,
+        "language_validation": 5
+      },
+      "reportVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "independentParameterVersion": null,
+      "activation": "NOTRUN"
+    }
+  ],
+  "ciExecuted": false
+}

@@ -1,0 +1,145 @@
+{
+  "unitsUnique": 18,
+  "postgresUnique": 7,
+  "caseSets": [
+    {
+      "file": "execution/bpses-unit.reporter.json",
+      "passed": 18,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT validates distinct DRAFT/CANDIDATE with five ordered Chinese working stems and agreement values",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT retains author final original 1/4/5/8/9 mapping and separately prepared Methods-based instructions",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT allows just one all-item total sum 5–25 with no reverse or original three-triad scores",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: minimum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: maximum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: middle",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: mixed",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: asymmetric",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: missing_first",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT independent arithmetic: empty",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT gives each of all five items an independent positive unit contribution without converting sum to mean",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT leaves every incomplete total null without zero fill, imputation, changing denominator or invalid prose",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT rejects out-of-range/wrong-type responses, unknown items and duplicates",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT treats adult parent/carer as SELF subject, rejects proxy types and never substitutes child age or lets missing age pass",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT refuses DRAFT activation despite open-source rights labels",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT builds actual plain-language score-only Chinese reflection without diagnosis, rank, child-change promises or parent blame",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT keeps content/localization, no-norm parameter strategy and report axes independent without catalog hash pollution",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+          "BPSES original final-five independent Chinese adult self-report DRAFT records original English evidence and CC attribution while keeping Chinese, expert review and all eight tag axes honest",
+          "passed"
+        ]
+      ]
+    },
+    {
+      "file": "execution/postgres.reporter.json",
+      "passed": 7,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL starts with fourteen prior synthetic definitions and sixteen frozen snapshots under a non-owner role",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL bpses5_zh_cn_research rolls back new draft and frozen snapshot together",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL bpses5_zh_cn_research materializes pinned content once with exact axes and rich catalog snapshot",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL bpses5_zh_cn_research generates exact real result samples from persisted definition without reference or invented bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL bpses5_zh_cn_research freezes its complete source against mutation or deletion",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL bpses5_zh_cn_research refuses activation of its unpublished DRAFT despite open source rights",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave9-bpses-content.postgres.integration.test.ts",
+          "Wave9 independently reviewed BPSES5 Chinese draft in task-owned PostgreSQL preserves all previous definitions and snapshots and adds only one DRAFT/HIDDEN row without references or deployment",
+          "passed"
+        ]
+      ]
+    }
+  ]
+}

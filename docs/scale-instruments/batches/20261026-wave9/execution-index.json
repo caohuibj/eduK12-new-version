@@ -1,0 +1,104 @@
+{
+  "kind": "UNSIGNED_LOCAL_DEVELOPMENT_EVIDENCE",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "inputBinding": "Before execution; original source/input bytes retained task-private; no historical ZIP transfer",
+  "files": [
+    {
+      "path": "execution/bpses-unit.reporter.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.vitest.json",
+      "bytes": 8311,
+      "sha256": "8105e8d2b3a78d9f5db31726c65a2c2549a20ee588e96b42b34aa032e50fa3a5"
+    },
+    {
+      "path": "execution/bpses-invocation.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.invocation.json",
+      "bytes": 1027,
+      "sha256": "b942118b26eb2aa8facbf6cc992a136b98d68e228ef95a3b56f1a35b3cbc8ce1"
+    },
+    {
+      "path": "execution/bpses-inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.inputs-before.json",
+      "bytes": 160005,
+      "sha256": "6ab96947293c0bbab348dd6854471cad04ffe92766f2f087174436905d76cdcd"
+    },
+    {
+      "path": "execution/bpses-unit.result.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.unit.result.json",
+      "bytes": 729,
+      "sha256": "ecc422d5ac419c185e8eb25eed5a8309d66a49b8c716cdee1ffaaf8888b6eb9b"
+    },
+    {
+      "path": "execution/bpses-types.result.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.types.result.json",
+      "bytes": 577,
+      "sha256": "5d1c714976e5c3d5e364fbbb2731e78ce7dc48b96006139fd4d692226d29bcba"
+    },
+    {
+      "path": "execution/bpses-reports.result.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.reports.result.json",
+      "bytes": 550,
+      "sha256": "36e5f4d49afd6a681e29ce465ed38ec00f1f89871b2bc22b5b9c237acc6b9119"
+    },
+    {
+      "path": "execution/bpses-execution.summary.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.summary.json",
+      "bytes": 2138,
+      "sha256": "c1d214f2fef2ed9a0e0a7ffe4c36ac1e6a33b1be686ea02d05d3e64c740fead0"
+    },
+    {
+      "path": "execution/postgres.reporter.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/database-first/reporter.json",
+      "bytes": 4080,
+      "sha256": "680e123b32e896aaa2666e18420aecaa0bf67491e7502542750e34ef78b6dfa8"
+    },
+    {
+      "path": "execution/postgres.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/database-first/receipt.json",
+      "bytes": 456,
+      "sha256": "d69689c3159dc16c03634bef3efc14ef59702df522672431137cc9cf09846e33"
+    },
+    {
+      "path": "execution/postgres.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/database-first/inputs.json",
+      "bytes": 68414,
+      "sha256": "a8f53772037d62b59f50a6cda817d0014278b9e2393e445dfdb975141a1adbca"
+    },
+    {
+      "path": "execution/final-types.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/types-final/receipt.json",
+      "bytes": 539,
+      "sha256": "de35173a9fde0e457bc1e41089eb2d1a921471b566ab935761dcec417745ca78"
+    },
+    {
+      "path": "execution/final-types.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/types-final/inputs.json",
+      "bytes": 68421,
+      "sha256": "51fd95c87f118f66a77a220745267ae95015afbd1ebebdb806708bf08a0460f8"
+    },
+    {
+      "path": "execution/registry-review.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/registry-final/stdout.log",
+      "bytes": 710,
+      "sha256": "79ec1ec25b4cd7a51d500dc3f2ac2e1f399c69186120672218d1ff44c7ed4299"
+    },
+    {
+      "path": "execution/registry.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/registry-final/receipt.json",
+      "bytes": 488,
+      "sha256": "9ff9e60910df6533f79d4156f2ac2f7075b9df3311336db5adcd6f0f0bd9a7dd"
+    },
+    {
+      "path": "execution/generator-check.receipt.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/generator-check/receipt.json",
+      "bytes": 461,
+      "sha256": "4b8e0c88d93cb3d2f7808776f4cb7dfb39bba9cd7d5348a4d1f6856582f71484"
+    },
+    {
+      "path": "execution/generator-check.inputs.before.json",
+      "originalPath": "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/generator-check/inputs.json",
+      "bytes": 63268,
+      "sha256": "9fef20f5e51b6f50be0aa6a9811e885f3f96b581a6c17e4c05fc27c6a93b42d6"
+    }
+  ]
+}

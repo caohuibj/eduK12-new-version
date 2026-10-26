@@ -1,0 +1,15 @@
+{
+  "check": "types",
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--project",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/tsconfig.bpses5.json"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:11:13.610323+00:00",
+  "endedAt": "2026-10-26T10:11:16.855473+00:00",
+  "exitCode": 0,
+  "stdout": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.types.stdout",
+  "stderr": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.types.stderr"
+}

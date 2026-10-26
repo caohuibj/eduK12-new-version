@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave9-bpses-reviewed-20261026",
+  "sources": [
+    {
+      "instrumentKey": "bpses5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755"
+    }
+  ]
+}

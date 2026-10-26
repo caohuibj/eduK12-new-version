@@ -1,0 +1,22 @@
+{
+  "reviewedAt": "2026-10-26T10:20:02.768044+00:00",
+  "status": "COORDINATOR_REVIEW_PASS_RESEARCH_DRAFT_ONLY",
+  "sourceSha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+  "originalSelectedItemNumbers": [
+    1,
+    4,
+    5,
+    8,
+    9
+  ],
+  "scoring": "one total sum5–25;1–5 agreement; no reverse or subscales",
+  "respondent": "adult SELF; caregiver domain descriptive only, no claimed role verification",
+  "report": "plain Chinese confidence reflection, not observed skill, no parent blame or guaranteed child change; uniform score_only",
+  "originalCarriers": "Original development Table1/Methods plus CORC explicit final-five sum fact; standalone CORC layout not copied",
+  "parameters": "none; independent runtime parameter identity absent; no diagnostic/normative bands",
+  "translation": "independent working Chinese; human/local validation pending; not 2026Chinese",
+  "sourceAndTestUnchangedSincePassedChecks": true,
+  "newTags": 64,
+  "oldSourcesPreserved": 94,
+  "scientificApprovalOrActivation": "NOT_GRANTED_BY_THIS_RECORD"
+}

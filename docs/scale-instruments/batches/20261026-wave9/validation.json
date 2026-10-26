@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "kind": "BPSES_ONLY_LOCAL_DRAFT_DEVELOPMENT_NOT_CI",
+  "baseline": "2cfa23fba07c1f1dfbeac92c9e40d74f4dabda43",
+  "newFirstCategoryTools": 1,
+  "newFirstCategorySourceVersions": 1,
+  "newSecondThirdCategoryArchives": 0,
+  "sourceSha256": "8fa89e6acfcd1041940f5b502fce0f0b19436eab7fb39bb1ac9df751f06e7755",
+  "unit": {
+    "status": "PASS",
+    "uniqueCases": 18,
+    "inputBindings": 573,
+    "originals": "execution-index.json"
+  },
+  "types": "PASS_AFFECTED_CLOSURES",
+  "database": {
+    "status": "PASS",
+    "uniqueCases": 7,
+    "perToolCases": 5,
+    "sharedStateCases": 2,
+    "nonOwnerRole": "scale_app",
+    "oldDefinitions": 14,
+    "oldSnapshots": 16,
+    "finalDefinitions": 15,
+    "finalSnapshots": 17,
+    "allDraftHidden": true,
+    "references": 0,
+    "deployments": 0,
+    "productionTouched": false
+  },
+  "report": {
+    "configCount": 1,
+    "distinctGoldenSamples": 7,
+    "complete": 5,
+    "invalidMissingEmpty": 2,
+    "interpretationSections": 5,
+    "scoreDependentBands": false,
+    "agentCopiesNotDoubleCounted": true
+  },
+  "registry": {
+    "identities": 116,
+    "oldSourcesUnchanged": 94,
+    "newTags": 64,
+    "eightAxes": true
+  },
+  "scope": "SRL-O separately authorized next step, private preparation only; not part of this manifest or tests",
+  "independentNoneParameterVersion": "NOT_SUPPORTED_RUNTIME; document plan only",
+  "instructions": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "caregiverRole": "Descriptive scope only, not automatically verified",
+  "browser": "NOTRUN",
+  "dualEntryUse": "NOTRUN",
+  "formalActivation": 0,
+  "CI": "NOTRUN",
+  "deployment": "NOTRUN",
+  "finalIndependentReview": "PENDING_EXACT_COMMIT_REVIEW",
+  "sourceCommit": "a13a405b9852513b372cd622536aca45170735a7",
+  "inventory": {
+    "addedExecutableSourceVersions": 59,
+    "toolIdentities": 55,
+    "notLiveToolCount": true
+  }
+}

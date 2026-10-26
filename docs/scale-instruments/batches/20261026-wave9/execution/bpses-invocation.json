@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-26T10:11:13.262717+00:00",
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "commands": {
+    "reports": [
+      "node",
+      "--import",
+      "tsx",
+      "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/build-reports.ts"
+    ],
+    "unit": [
+      "node",
+      "--import",
+      "tsx",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+      "--reporter=json",
+      "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.vitest.json",
+      "--maxWorkers=1"
+    ],
+    "types": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--project",
+      "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/tsconfig.bpses5.json"
+    ]
+  },
+  "node": "v24.21.0",
+  "listingExitCode": 0,
+  "captureCompleted": true,
+  "manifestSha256": "6ab96947293c0bbab348dd6854471cad04ffe92766f2f087174436905d76cdcd",
+  "failFast": "No commands run if capture fails"
+}

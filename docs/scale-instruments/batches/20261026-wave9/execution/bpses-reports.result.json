@@ -1,0 +1,15 @@
+{
+  "check": "reports",
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/build-reports.ts"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:11:13.263016+00:00",
+  "endedAt": "2026-10-26T10:11:13.592921+00:00",
+  "exitCode": 0,
+  "stdout": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.reports.stdout",
+  "stderr": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.reports.stderr"
+}

@@ -1,0 +1,17 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "/workspace/eduk12-scale-evidence/20261026-wave9/coordinator/tsconfig.wave9.json",
+    "--pretty",
+    "false"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:13:41.772068+00:00",
+  "finishedAt": "2026-10-26T10:13:46.603274+00:00",
+  "exitCode": 0,
+  "inputsManifestSha256": "51fd95c87f118f66a77a220745267ae95015afbd1ebebdb806708bf08a0460f8",
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

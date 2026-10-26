@@ -1,0 +1,20 @@
+{
+  "check": "unit",
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/scale/instruments/bpses5_zh_cn_research.test.ts",
+    "--reporter=json",
+    "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.vitest.json",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T10:11:13.609793+00:00",
+  "endedAt": "2026-10-26T10:11:15.703166+00:00",
+  "exitCode": 0,
+  "stdout": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.unit.stdout",
+  "stderr": "/workspace/eduk12-scale-evidence/20261026-wave9/bpses5/20261026T101112Z.unit.stderr"
+}

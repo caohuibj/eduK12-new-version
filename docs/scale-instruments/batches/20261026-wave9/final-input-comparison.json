@@ -1,0 +1,27 @@
+{
+  "kind": "FINAL_BYTE_COMPARISON_NOT_HISTORICAL_SIGNATURE",
+  "note": "Unit runtime mocks registry. Only generated registry increment may differ from pre-unit/type input; separate final116-entry registry/type/PG inputs retained. No passed BPSES case rerun.",
+  "comparisons": [
+    {
+      "label": "BPSES-pre",
+      "files": 573,
+      "changed": [
+        {
+          "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+          "executedSha256": "42145e2c855f7cc693d3ba8c8e0fab153171f14f8a653358e3d8f3304be88204",
+          "finalSha256": "1b81bfa5c4a1b19554e8941dc5cadfcad507ffd10bdaa6183bec903c343fba61"
+        }
+      ]
+    },
+    {
+      "label": "PG-pre",
+      "files": 277,
+      "changed": []
+    },
+    {
+      "label": "final-types-pre",
+      "files": 277,
+      "changed": []
+    }
+  ]
+}
