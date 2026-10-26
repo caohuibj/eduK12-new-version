@@ -1,0 +1,74 @@
+{
+  "identity": {
+    "instrumentKey": "ips9_2021_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "sourceTable": "Shaw & Zhang (2021) Table 1, PDF page 2",
+  "sourcePdfSha256": "fbc15f46f84bddf437b3c3ac687cd30ee43a93cec8f464614a5897ba0c39f3ec",
+  "normalization": "仅移除排版断行，保留原表中文ASCII逗号及空格，无新译题干",
+  "questions": [
+    {
+      "itemCode": "IPS_01",
+      "sourceEnglish": "I put things off so long that my well-being or efficiency unnecessarily suffers",
+      "publishedChinese": "我把事情拖得太久, 以至于我的幸福感或效率受到了不必要的负面影响",
+      "platformChinese": "我把事情拖得太久, 以至于我的幸福感或效率受到了不必要的负面影响",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_02",
+      "sourceEnglish": "If there is something I should do, I get to it before attending to lesser tasks",
+      "publishedChinese": "如果有我该做的事情, 我会先去做这件事, 然后再去处理其它次要的任务",
+      "platformChinese": "如果有我该做的事情, 我会先去做这件事, 然后再去处理其它次要的任务",
+      "reverse": true
+    },
+    {
+      "itemCode": "IPS_03",
+      "sourceEnglish": "My life would be better if I did some activities or tasks earlier",
+      "publishedChinese": "如果我早点儿开始做某些活动或任务的话, 我的生活会更好",
+      "platformChinese": "如果我早点儿开始做某些活动或任务的话, 我的生活会更好",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_04",
+      "sourceEnglish": "When I should be doing one thing, I will do another",
+      "publishedChinese": "当我应该做某件事情时, 我反而会去做另一件事",
+      "platformChinese": "当我应该做某件事情时, 我反而会去做另一件事",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_05",
+      "sourceEnglish": "At the end of the day, I know I could have spent the time better",
+      "publishedChinese": "回顾当天, 我知道我本可以更好地使用我的时间",
+      "platformChinese": "回顾当天, 我知道我本可以更好地使用我的时间",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_06",
+      "sourceEnglish": "I spend my time wisely",
+      "publishedChinese": "我明智地利用我的时间",
+      "platformChinese": "我明智地利用我的时间",
+      "reverse": true
+    },
+    {
+      "itemCode": "IPS_07",
+      "sourceEnglish": "I delay tasks beyond what is reasonable",
+      "publishedChinese": "我拖延任务的时间超出了合理范围",
+      "platformChinese": "我拖延任务的时间超出了合理范围",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_08",
+      "sourceEnglish": "I procrastinate",
+      "publishedChinese": "我拖延",
+      "platformChinese": "我拖延",
+      "reverse": false
+    },
+    {
+      "itemCode": "IPS_09",
+      "sourceEnglish": "I do everything when I believe it needs to be done",
+      "publishedChinese": "只要我认为某件事情需要完成, 我就会去做它",
+      "platformChinese": "只要我认为某件事情需要完成, 我就会去做它",
+      "reverse": true
+    }
+  ]
+}

@@ -1,0 +1,497 @@
+[
+  {
+    "fixture": "minimum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ips9-2021-minimum",
+        "code": "ips9_2021_zh_cn",
+        "name": "日常任务拖延问卷（IPS，2021论文发表中文版9题）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ips9-2021-minimum",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "IPS_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_02",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_03",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_04",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_05",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_06",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_07",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_08",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_09",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "irrational_procrastination",
+          "type": "total",
+          "label": "日常任务的启动与拖延",
+          "description": "完整9题，2/6/9反向后等权求和9–45；更多表示本人描述的拖延更多。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 9,
+          "range": {
+            "min": 9,
+            "max": 45
+          },
+          "expectedItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "answeredItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "irrational_procrastination",
+          "headline": "回看从打算到开始的那一步",
+          "label": null,
+          "interpretation": "这份回答整理的是你在日常任务中，从“知道该做”到“实际开始”之间的体验。有时我们本想处理一件重要的事，却先刷了一会儿消息、整理桌面，回头才发现时间已经过去。也有些推迟来自任务不清楚、精力不足或必须照顾别的事情。可以先选一个最近发生的例子，看看当时卡在了哪里，再想一个更容易开始的小动作。分数只对应这次自述，不能替你解释所有原因，也不需要把它变成对自己的责备。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次推迟原本打算做的事，当时是不知道第一步、担心做不好，还是有更紧急的安排？"
+            },
+            {
+              "category": "strategy",
+              "text": "挑一件还想完成的事，把“做完它”改写成一个马上能开始的小动作，例如打开文件并写下一句提纲。"
+            },
+            {
+              "category": "environment",
+              "text": "开始前把最容易分心的提示暂时收起来，并给这个小动作留一个明确的位置和时段；之后看看是否适合你。"
+            },
+            {
+              "category": "support",
+              "text": "如果拖延反复让你难受或影响生活，可以和可信任的人讨论具体困难，需要时寻求专业支持。"
+            }
+          ],
+          "limitations": [
+            "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+            "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+            "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+            "没有回答的题不会算作最低分，题目不完整时不作本次解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+        "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+        "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+        "没有回答的题不会算作最低分，题目不完整时不作本次解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。"
+    }
+  },
+  {
+    "fixture": "maximum",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ips9-2021-maximum",
+        "code": "ips9_2021_zh_cn",
+        "name": "日常任务拖延问卷（IPS，2021论文发表中文版9题）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ips9-2021-maximum",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "IPS_01",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_02",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_03",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_04",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_05",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_07",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_08",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_09",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        }
+      ],
+      "scores": [
+        {
+          "key": "irrational_procrastination",
+          "type": "total",
+          "label": "日常任务的启动与拖延",
+          "description": "完整9题，2/6/9反向后等权求和9–45；更多表示本人描述的拖延更多。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 45,
+          "range": {
+            "min": 9,
+            "max": 45
+          },
+          "expectedItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "answeredItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "irrational_procrastination",
+          "headline": "回看从打算到开始的那一步",
+          "label": null,
+          "interpretation": "这份回答整理的是你在日常任务中，从“知道该做”到“实际开始”之间的体验。有时我们本想处理一件重要的事，却先刷了一会儿消息、整理桌面，回头才发现时间已经过去。也有些推迟来自任务不清楚、精力不足或必须照顾别的事情。可以先选一个最近发生的例子，看看当时卡在了哪里，再想一个更容易开始的小动作。分数只对应这次自述，不能替你解释所有原因，也不需要把它变成对自己的责备。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次推迟原本打算做的事，当时是不知道第一步、担心做不好，还是有更紧急的安排？"
+            },
+            {
+              "category": "strategy",
+              "text": "挑一件还想完成的事，把“做完它”改写成一个马上能开始的小动作，例如打开文件并写下一句提纲。"
+            },
+            {
+              "category": "environment",
+              "text": "开始前把最容易分心的提示暂时收起来，并给这个小动作留一个明确的位置和时段；之后看看是否适合你。"
+            },
+            {
+              "category": "support",
+              "text": "如果拖延反复让你难受或影响生活，可以和可信任的人讨论具体困难，需要时寻求专业支持。"
+            }
+          ],
+          "limitations": [
+            "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+            "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+            "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+            "没有回答的题不会算作最低分，题目不完整时不作本次解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+        "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+        "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+        "没有回答的题不会算作最低分，题目不完整时不作本次解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。"
+    }
+  },
+  {
+    "fixture": "mixed_independent",
+    "result": {
+      "schemaVersion": 2,
+      "instrument": {
+        "scaleId": "synthetic-ips9-2021-mixed_independent",
+        "code": "ips9_2021_zh_cn",
+        "name": "日常任务拖延问卷（IPS，2021论文发表中文版9题）",
+        "instrumentVersion": "1.0.0"
+      },
+      "method": {
+        "scaleId": "synthetic-ips9-2021-mixed_independent",
+        "instrumentVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "reportVersion": "1.0.0",
+        "definitionHash": "8ea23acea7db2c58eb2d40f31182ce2b0711cc3cd93f62ac123b75c377160009",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "quality": {
+        "status": "interpretable",
+        "flags": []
+      },
+      "itemScores": [
+        {
+          "itemCode": "IPS_01",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 1
+        },
+        {
+          "itemCode": "IPS_02",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 2
+        },
+        {
+          "itemCode": "IPS_03",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "IPS_04",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_05",
+          "responseValue": "3",
+          "baseScore": 3,
+          "score": 3
+        },
+        {
+          "itemCode": "IPS_06",
+          "responseValue": "1",
+          "baseScore": 1,
+          "score": 5
+        },
+        {
+          "itemCode": "IPS_07",
+          "responseValue": "4",
+          "baseScore": 4,
+          "score": 4
+        },
+        {
+          "itemCode": "IPS_08",
+          "responseValue": "2",
+          "baseScore": 2,
+          "score": 2
+        },
+        {
+          "itemCode": "IPS_09",
+          "responseValue": "5",
+          "baseScore": 5,
+          "score": 1
+        }
+      ],
+      "scores": [
+        {
+          "key": "irrational_procrastination",
+          "type": "total",
+          "label": "日常任务的启动与拖延",
+          "description": "完整9题，2/6/9反向后等权求和9–45；更多表示本人描述的拖延更多。",
+          "direction": "higher_is_more",
+          "canonical": true,
+          "displayPrecision": 0,
+          "value": 25,
+          "range": {
+            "min": 9,
+            "max": 45
+          },
+          "expectedItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "answeredItems": [
+            "IPS_01",
+            "IPS_02",
+            "IPS_03",
+            "IPS_04",
+            "IPS_05",
+            "IPS_06",
+            "IPS_07",
+            "IPS_08",
+            "IPS_09"
+          ],
+          "status": "calculated",
+          "prorated": false
+        }
+      ],
+      "references": [],
+      "interpretations": [
+        {
+          "scoreKey": "irrational_procrastination",
+          "headline": "回看从打算到开始的那一步",
+          "label": null,
+          "interpretation": "这份回答整理的是你在日常任务中，从“知道该做”到“实际开始”之间的体验。有时我们本想处理一件重要的事，却先刷了一会儿消息、整理桌面，回头才发现时间已经过去。也有些推迟来自任务不清楚、精力不足或必须照顾别的事情。可以先选一个最近发生的例子，看看当时卡在了哪里，再想一个更容易开始的小动作。分数只对应这次自述，不能替你解释所有原因，也不需要把它变成对自己的责备。",
+          "guidance": [
+            {
+              "category": "reflection",
+              "text": "最近一次推迟原本打算做的事，当时是不知道第一步、担心做不好，还是有更紧急的安排？"
+            },
+            {
+              "category": "strategy",
+              "text": "挑一件还想完成的事，把“做完它”改写成一个马上能开始的小动作，例如打开文件并写下一句提纲。"
+            },
+            {
+              "category": "environment",
+              "text": "开始前把最容易分心的提示暂时收起来，并给这个小动作留一个明确的位置和时段；之后看看是否适合你。"
+            },
+            {
+              "category": "support",
+              "text": "如果拖延反复让你难受或影响生活，可以和可信任的人讨论具体困难，需要时寻求专业支持。"
+            }
+          ],
+          "limitations": [
+            "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+            "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+            "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+            "没有回答的题不会算作最低分，题目不完整时不作本次解释。"
+          ],
+          "referenceVersion": null
+        }
+      ],
+      "caveats": [
+        "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+        "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+        "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+        "没有回答的题不会算作最低分，题目不完整时不作本次解释。",
+        "未提供群体参考。"
+      ],
+      "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。"
+    }
+  }
+]

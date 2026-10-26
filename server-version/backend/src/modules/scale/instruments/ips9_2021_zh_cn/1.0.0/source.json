@@ -1,0 +1,975 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ips9_2021_zh_cn",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "日常任务拖延问卷（IPS，2021论文发表中文版9题）",
+      "abbreviation": "IPS-9-2021-ZH",
+      "instrumentFamily": "Irrational Procrastination Scale (Shaw & Zhang 2021 published Chinese 9-item form)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [],
+      "constructDefinition": "自愿推迟原本打算进行的行动，即使预见推迟可能给自己带来不利；以本人对日常任务启动、时间使用和拖延的描述为主。不是懒惰、人格或能力评价，也不衡量所有合理延期。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "ips9_2021_zh_cn",
+        "domain:self_regulation",
+        "domain:task_behavior",
+        "domain:everyday_life",
+        "construct:irrational_procrastination",
+        "construct:implemental_delay",
+        "construct:intention_action_gap",
+        "construct:voluntary_delay",
+        "construct:anticipated_disadvantage",
+        "orientation:self_regulation_perspective",
+        "orientation:single_construct",
+        "orientation:not_therapy_specific",
+        "population:college_students",
+        "population:age_18_to_22",
+        "population:mainland_china_study",
+        "population:self_report",
+        "population:not_k12_validated",
+        "response:9_items",
+        "response:three_reverse_items",
+        "response:five_point_likert",
+        "response:endpoint_labels_only",
+        "response:fixed_order",
+        "response:digital_self",
+        "response:paper",
+        "response:complete_required",
+        "response:sum_9_to_45",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:no_validated_cutoff",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_chinese_norms_bound",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "language_validation:published_zh_cn_2021",
+        "language_validation:no_new_item_translation",
+        "language_validation:source_china_college_evidence",
+        "language_validation:platform_review_pending",
+        "language_validation:platform_endpoints_prepared",
+        "日常任务拖延",
+        "明知不利仍推迟",
+        "意图与行动",
+        "大陆大学生",
+        "十八至二十二岁",
+        "原文中文题干",
+        "原始总分",
+        "个人反思",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "maxAge": 22,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "2021论文发表中文版；验证仅来自2361名中国大陆大学生，18–22岁，平均19.89岁（SD=0.56），54.8%男性，课堂施测，无缺失。非全国常模，不能外推K12、全体成人或临床人群。本平台年龄暂按18岁至未满23岁限制，年龄缺失不能放行；大学生范围须由使用者确认。"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般情况；源论文未规定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留2021 Table 1全部9题原样中文和题序，R2/6/9；不得混入官网2018 PDF的R2/5/8或PPS12。",
+        "原论文仅公开英文两端锚点；中文两端为平台工作翻译，2/3/4保持数字，不补造中间标签。",
+        "反向后等权求和9–45；不混成均分、六题删反向版或第三方阈值。",
+        "论文无缺失而未提供插补规则；平台保守要求完整9题。",
+        "独立指导语为PREPARED sidecar，不塞进第一题；当前source schema未承载instruction。",
+        "完成时间为平台估计；来源课堂纸笔结果不能直接证明电子施测等效。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "2021原样中文题干在限定大学生样本有初步验证，平台响应端点/指导语/电子呈现尚待复核。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅供结合具体处境回顾行动习惯；不作临床或人员比较结论。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ips9-shaw2021-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "中国大陆大学生，课堂施测、额外课程学分参与；同一便利样本",
+        "ageRange": "18–22岁",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 2361,
+        "studyDesign": "单因子CFA；源文CFI=.990、TLI=.988、SRMR=.048、RMSEA=.060；有性别强/标量不变性，不能据此外推其他年龄/群体。",
+        "rating": "MIXED",
+        "citation": "Shaw, A., & Zhang, J. J. (2021). Psychometric Properties of the Chinese Irrational Procrastination Scale: Factor Structure and Measurement Invariance Across Gender. Frontiers in Psychology, 12, 768581. https://doi.org/10.3389/fpsyg.2021.768581.",
+        "doi": "10.3389/fpsyg.2021.768581",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.768581/full",
+        "notes": "仅对应2021已发表中文题干和来源样本，非全国常模；新增指导语、响应端点工作译文及电子呈现未有本平台验证。"
+      },
+      {
+        "evidenceId": "ips9-shaw2021-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "中国大陆大学生，课堂施测、额外课程学分参与；同一便利样本",
+        "ageRange": "18–22岁",
+        "locale": "zh-CN",
+        "territory": "CN",
+        "sampleSize": 2361,
+        "studyDesign": "同一2361人，非独立复制样本；alpha=.91、omega=.92。不是重测/诊断准确性或变化阈值。",
+        "rating": "MIXED",
+        "citation": "Shaw, A., & Zhang, J. J. (2021). Psychometric Properties of the Chinese Irrational Procrastination Scale: Factor Structure and Measurement Invariance Across Gender. Frontiers in Psychology, 12, 768581. https://doi.org/10.3389/fpsyg.2021.768581.",
+        "doi": "10.3389/fpsyg.2021.768581",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.768581/full",
+        "notes": "仅对应2021已发表中文题干和来源样本，非全国常模；新增指导语、响应端点工作译文及电子呈现未有本平台验证。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "zh-CN",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Shaw & Zhang (2021) Table 1发表简体中文9题，原样承接；没有新译题干。两端英文响应锚点另译为中文，独立指导语/报告为平台新增。",
+    "adaptationMethod": "ORIGINAL_SOURCE",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [
+      "ips9-shaw2021-structure",
+      "ips9-shaw2021-reliability"
+    ],
+    "reviewStatus": "PENDING",
+    "notes": "源研究已有两名双语者独立正译、讨论、盲回译、对照原义和专家讨论修订；此处PENDING仅指平台呈现/响应端点/指导语/报告复核，没有新译且没有平台译审或作者背书。已发表中文、2017英文、官网2018 PDF和平台版本各自管理；源文验证不自动覆盖本平台新增内容。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ips9_2021_zh_cn-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216,
+        "maxExclusive": 276
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ips9_2021_zh_cn-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ips9_2021_zh_cn-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2021 Shaw and Zhang. Shaw, A., & Zhang, J. J. (2021). Psychometric Properties of the Chinese Irrational Procrastination Scale: Factor Structure and Measurement Invariance Across Gender. Frontiers in Psychology, 12, 768581. https://doi.org/10.3389/fpsyg.2021.768581. 复制源为论文Table 1完整英/简中9题，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；题表无另列第三方排除，允许署名再分发、改编和商业使用。本包中文题干原样承接，未新译，保留原表ASCII逗号及空格；仅移除排版断行。指导语、中文响应端点和报告为平台新增，未获作者背书或平台专家审批。英文IPS家族原作者Piers Steel；联系2017 Svartdal与Steel论文，不与官网2018不同题序/措辞PDF共用精确版本。论文PDF SHA-256=fbc15f46f84bddf437b3c3ac687cd30ee43a93cec8f464614a5897ba0c39f3ec。",
+      "许可/人群标签仅分类检索，不授予系统权限；本包仍DRAFT/CANDIDATE且不激活任何入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "IPS-China Form (Shaw & Zhang 2021 published Chinese 9-item form)",
+        "citation": "Shaw, A., & Zhang, J. J. (2021). Psychometric Properties of the Chinese Irrational Procrastination Scale: Factor Structure and Measurement Invariance Across Gender. Frontiers in Psychology, 12, 768581. https://doi.org/10.3389/fpsyg.2021.768581.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2021.768581/full",
+        "publicationYear": 2021
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2021 Shaw and Zhang. Shaw, A., & Zhang, J. J. (2021). Psychometric Properties of the Chinese Irrational Procrastination Scale: Factor Structure and Measurement Invariance Across Gender. Frontiers in Psychology, 12, 768581. https://doi.org/10.3389/fpsyg.2021.768581. 复制源为论文Table 1完整英/简中9题，CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；题表无另列第三方排除，允许署名再分发、改编和商业使用。本包中文题干原样承接，未新译，保留原表ASCII逗号及空格；仅移除排版断行。指导语、中文响应端点和报告为平台新增，未获作者背书或平台专家审批。英文IPS家族原作者Piers Steel；联系2017 Svartdal与Steel论文，不与官网2018不同题序/措辞PDF共用精确版本。论文PDF SHA-256=fbc15f46f84bddf437b3c3ac687cd30ee43a93cec8f464614a5897ba0c39f3ec。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ips9_2021_true_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "极少如此／不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常经常如此／符合我",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "IPS_01",
+          "content": "我把事情拖得太久, 以至于我的幸福感或效率受到了不必要的负面影响",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_02",
+          "content": "如果有我该做的事情, 我会先去做这件事, 然后再去处理其它次要的任务",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_03",
+          "content": "如果我早点儿开始做某些活动或任务的话, 我的生活会更好",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_04",
+          "content": "当我应该做某件事情时, 我反而会去做另一件事",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_05",
+          "content": "回顾当天, 我知道我本可以更好地使用我的时间",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_06",
+          "content": "我明智地利用我的时间",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_07",
+          "content": "我拖延任务的时间超出了合理范围",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_08",
+          "content": "我拖延",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "IPS_09",
+          "content": "只要我认为某件事情需要完成, 我就会去做它",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "ips9_2021_true_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "IPS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_02",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "IPS_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "IPS_09",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "irrational_procrastination",
+            "type": "total",
+            "label": "日常任务的启动与拖延",
+            "description": "完整9题，2/6/9反向后等权求和9–45；更多表示本人描述的拖延更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "IPS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "IPS_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "irrational_procrastination"
+        ],
+        "scoreOrder": [
+          "irrational_procrastination"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "irrational_procrastination",
+            "headline": "回看从打算到开始的那一步",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答整理的是你在日常任务中，从“知道该做”到“实际开始”之间的体验。有时我们本想处理一件重要的事，却先刷了一会儿消息、整理桌面，回头才发现时间已经过去。也有些推迟来自任务不清楚、精力不足或必须照顾别的事情。可以先选一个最近发生的例子，看看当时卡在了哪里，再想一个更容易开始的小动作。分数只对应这次自述，不能替你解释所有原因，也不需要把它变成对自己的责备。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次推迟原本打算做的事，当时是不知道第一步、担心做不好，还是有更紧急的安排？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一件还想完成的事，把“做完它”改写成一个马上能开始的小动作，例如打开文件并写下一句提纲。"
+              },
+              {
+                "category": "environment",
+                "text": "开始前把最容易分心的提示暂时收起来，并给这个小动作留一个明确的位置和时段；之后看看是否适合你。"
+              },
+              {
+                "category": "support",
+                "text": "如果拖延反复让你难受或影响生活，可以和可信任的人讨论具体困难，需要时寻求专业支持。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份结果只整理你对一般情况的描述，不说明每次推迟都是不合理的。",
+          "2021中文题干的证据来自十八至二十二岁大陆大学生；新增平台指导语、响应端点和电子呈现仍待复核。",
+          "本包不绑定中国常模或诊断切点，不能凭总分给人贴懒惰、人格、能力或轻中重标签。",
+          "没有回答的题不会算作最低分，题目不完整时不作本次解释。"
+        ],
+        "disclaimer": "供限定年龄大学生回顾日常任务习惯；不能用于诊断、排名或评价个人价值。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted primary-source and plain-language editorial check; not human expert approval",
+            "reviewedAt": "2026-10-26T06:00:54.999476Z",
+            "basis": "Shaw & Zhang 2021 Table1已发表中文9题；平台新增说明和报告尚待人工复核；不套用常模或临床阈值。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ips9_2021",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 9
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 45
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 27
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_one",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 21
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_raw_five",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 33
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "irrational_procrastination": 25
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_first",
+        "answers": [
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "irrational_procrastination": null
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "missing_last",
+        "answers": [
+          {
+            "itemCode": "IPS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "IPS_08",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "irrational_procrastination": null
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "irrational_procrastination": null
+          },
+          "totalScoreKeys": [
+            "irrational_procrastination"
+          ]
+        }
+      }
+    ]
+  }
+}
