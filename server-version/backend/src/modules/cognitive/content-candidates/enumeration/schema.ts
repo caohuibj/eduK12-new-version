@@ -7,7 +7,9 @@ export const enumerationConfigSchema = z.object({
   status: z.literal('DESIGN_PROPOSAL'), profile: z.enum(['research', 'experience']),
   sequenceKey: z.enum(['research100', 'experience25']), totalTrials: z.union([z.literal(100), z.literal(25)]),
   blocks: z.union([z.literal(4), z.literal(1)]), repetitionsPerQuantityPerBlock: z.literal(5),
-  responseMin: z.literal(1), responseMax: z.literal(15), interpretationPolicy: z.literal('research_provisional'),
+  responseMin: z.literal(1), responseMax: z.literal(15), interpretationPolicy: z.literal('session_descriptive_v1'),
+  metricDefinitionVersion: z.literal('0.2.0'), qualityDefinitionVersion: z.literal('0.2.0'),
+  reportDefinitionVersion: z.literal('0.2.0'), presentationVersion: z.literal('0.1.0'),
   minimumValidPerCondition: z.null(), timingToleranceMs: z.null(), stimulusRecipe: z.null(),
 }).strict().superRefine((config, context) => {
   const research = config.profile === 'research'

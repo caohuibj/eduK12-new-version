@@ -36,6 +36,9 @@ export const enumerationContent = {
       { key: 'learning_evaluation_support', status: 'unvalidated_not_diagnostic' },
       { key: 'recruitment_support', status: 'unvalidated_not_selection_predictor' },
     ], currentInputContract: 'integer_slider_1_to_15_plus_explicit_confirm',
-    maturity: 'pure_logic_candidate_unregistered', backendTagsConnected: false },
+    maturity: 'candidate_runner_unregistered', backendTagsConnected: false },
+  productPolicy: { effectiveDate: '2026-10-26', interpretation: 'session_descriptive_v1',
+    source: 'https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3',
+    occasionalFrameDeviationAloneInvalidates: false, physicalTimingValidated: false },
   notInferred: ['IQ', 'mathematical_ability', 'dyscalculia', 'subitizing_span', 'age_percentile', 'stable_attention_capacity'],
 } as const

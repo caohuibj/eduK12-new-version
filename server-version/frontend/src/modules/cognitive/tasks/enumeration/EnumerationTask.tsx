@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { enumerationPlan, type EnumerationInput } from './generated/protocol'
-import { projectEnumerationReport, type EnumerationPublicResult } from './generated/report'
+import type { EnumerationPublicResult, EnumerationStoredSnapshot } from './generated/report'
+import { EnumerationReport } from './EnumerationReport'
 import { enumerationArtifact, enumerationDigest, enumerationGeometry, enumerationStartBlock,
   readEnumerationViewport, validateEnumerationContext, type EnumerationContext } from './display'
 import { EnumerationCapture, drawEnumerationFrame, type EnumerationRecord, type EnumerationStage } from './capture'
@@ -9,8 +10,9 @@ import './enumeration.css'
 export interface EnumerationTaskProps {
   context: EnumerationContext
   persistence: EnumerationPersistencePort
-  /** Optional frozen host result. The generated report projection still suppresses all research metrics. */
+  /** Optional frozen host result. The generated report projection permits only version-compatible session descriptions. */
   result?: EnumerationPublicResult
+  storedResult?: EnumerationStoredSnapshot
 }
 const blockedText: Record<string, [string, string]> = {
   missing_calibration: ['请先完成屏幕与观看距离设置。', 'Please complete the screen and viewing-distance setup first.'],
@@ -32,7 +34,7 @@ export function EnumerationTask(props: EnumerationTaskProps) {
   const key = enumerationDigest({ context: props.context, portId: props.persistence.id })
   return <EnumerationSession key={key} {...props} />
 }
-function EnumerationSession({ context: incoming, persistence: incomingPort, result }: EnumerationTaskProps) {
+function EnumerationSession({ context: incoming, persistence: incomingPort, result, storedResult }: EnumerationTaskProps) {
   const persistence = useMemo<EnumerationPersistencePort>(() => ({
     id: incomingPort.id, durability: { ...incomingPort.durability },
     openAttempt: incomingPort.openAttempt.bind(incomingPort), endAttempt: incomingPort.endAttempt.bind(incomingPort),
@@ -168,7 +170,6 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
       window.removeEventListener('blur', blur); window.removeEventListener('pagehide', pagehide); window.removeEventListener('resize', resize); window.visualViewport?.removeEventListener('resize', resize) }
   }, [view, artifact])
   const practiceConfirmed = lastPractice?.raw.completion === 'confirmed' && lastPractice.core.responseValue !== null
-  const report = projectEnumerationReport(result ?? { metrics: {}, quality: { state: 'invalid', flags: {}, reasons: [] } })
   const issue = block && (blockedText[block] ?? blockedText.invalid_context)
   const premature = (input: EnumerationInput) => {
     const value = capture.current
@@ -186,7 +187,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
       <p>{en ? `First complete 3 practice trials. This ${context.config.profile} version has ${context.config.totalTrials} assessment trials. You will not receive correctness feedback during the assessment.`
         : `先完成3次练习。本次${formal ? '测验' : context.config.profile === 'research' ? '文献对照版' : '体验版'}共${context.config.totalTrials}轮作答，作答阶段不提示对错。`}</p>
       <details><summary>{en ? 'Keyboard and screen setup' : '键盘操作与屏幕设置'}</summary><p>{en ? 'Arrow keys adjust the slider; Home and End select 1 and 15. Tab to Confirm and press Enter or Space. Keep the screen and viewing distance consistent with your setup. This internal review version still needs further validation.' : '方向键调整滑杆，Home/End选择1/15；Tab切到确认后按回车或空格。请保持设置时的屏幕和观看距离。本内部审阅版仍待进一步验证。'}</p></details>
-      <p className="enum-notice">{en ? 'This version is for internal review only, not formal assessment. Its screen presentation and result interpretation still need validation.' : '仅供内部审阅，暂不用于正式施测；呈现效果与结果解释仍待验证。'}</p>
+      <p className="enum-notice">{en ? 'This version is for internal review only, not formal assessment. It describes this attempt only; physical timing and population validity are unverified.' : '仅供内部审阅，暂不用于正式施测；仅描述本次作答，物理时序与人群效度尚未验证。'}</p>
       <div className="enum-actions"><button onClick={() => setView('ready')}>{en ? 'Review readiness' : '查看准备状态'}</button></div></section>}
     {view === 'ready' && <section className="enum-reading"><h1>{formal ? ((formalIndex > 0 && formalIndex % 25 === 0) ? (en ? 'Take a short break' : '休息一下') : (en ? 'Ready for the next trial' : '准备开始下一轮')) : (en ? 'Try the practice' : '先来练习')}</h1>
       <p>{formal ? `${formalIndex + 1} / ${context.config.totalTrials}` : `${practiceIndex + 1} / 3`}</p>
@@ -221,7 +222,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     {view === 'error' && <section><p role="alert">{error}</p>{retry.current && <button onClick={() => { if (!busy.current) void retry.current?.() }}>{en ? 'Retry submission' : '重试提交'}</button>}</section>}
     {view === 'report' && <section className="enum-reading"><h1>{en ? 'Your record' : '这次的记录'}</h1>
       <p>{synthetic ? (en ? 'This is a synthetic demonstration. It does not confirm submission of a real assessment.' : '当前为合成演示，不代表真实作答已提交。') : (en ? 'Your submission is confirmed.' : '本次作答已确认提交。')}</p>
-      <div className="enum-state" data-report-state={report.state}><h2>{en ? 'No performance conclusion yet' : '本次不提供表现结论'}</h2><p>{en ? 'This attempt has no performance interpretation yet. Screen presentation and result interpretation still need validation.' : '这次暂不解释作答表现。测验的呈现方式和结果解释还需要进一步验证。'}</p></div>
+      <EnumerationReport result={result} storedResult={storedResult} config={context.config} randomSeed={context.randomSeed} language={context.language} />
       <p>{en ? 'For next time: keep the device still, reduce interruptions and maintain your viewing position.' : '下次可把设备放稳，减少通知干扰，并保持观看位置。'}</p>
       <p className="enum-muted">{en ? 'No applicable norms, rankings, ability grades or diagnostic conclusions are available.' : '目前没有适用常模，不提供排名、能力等级或诊断结论。'}</p></section>}
   </div>

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { parseCognitiveResultSnapshot } from '../../modules/cognitive/v2/result-snapshot'
+import { projectStoredEnumerationReport } from '../../modules/cognitive/content-candidates/enumeration/report'
 import { runAuthoritativeScorer } from '../../modules/cognitive/v2/authoritative-scorer'
 import { computeConfigSnapshotHash, computeProtocolSignature } from '../../modules/cognitive/v2/canonical'
 import type { CognitiveScoreResult, TrialEnvelope } from '../../modules/cognitive/v2/types'
@@ -41,12 +43,14 @@ describe('enumeration internal pure logic candidate', () => {
   it('uses real native identities and explicit frozen config/protocol hashes without a fabricated score or norm', () => {
     const research = createEnumerationSnapshot('research'), experience = createEnumerationSnapshot('experience')
     expect(research.testType).toBe('enumeration')
-    expect(research.configVersion).toBe('0.1.0')
+    expect(research.configVersion).toBe('0.2.0')
     expect(research.configHash).not.toBe(experience.configHash)
     expect(research.protocolSignature).toBe(experience.protocolSignature)
     expect(Object.keys(enumerationDefinition.profiles)).toEqual(['research', 'experience'])
     expect(enumerationDefinition.references).toEqual([])
-    expect(enumerationDefinition.report.headlineMetrics).toEqual([])
+    expect(enumerationDefinition.report.headlineMetrics).toEqual(['correctTrialCount', 'includedTrialCount'])
+    expect(enumerationDefinition.metrics.correctTrialCount).toMatchObject({ visibility: 'headline', label: '判断正确次数' })
+    expect(enumerationDefinition.metrics.reportBinding.visibility).toBe('research_only')
     expect(enumerationContent.approval.formalCounts).toEqual({ research: 100, experience: 25 })
     expect(enumerationContent.extensions.age.min).toBeNull()
     expect(Object.keys(enumerationContent.inheritedResearchTags)).toHaveLength(18)
@@ -84,7 +88,7 @@ describe('enumeration internal pure logic candidate', () => {
     expect(() => enumerationPlan(config, '', 0)).toThrow()
     expect(() => enumerationPlan(config, 'x'.repeat(257), 0)).toThrow()
   })
-  it.each(['research', 'experience'] as const)('computes independently known exact-match golden arithmetic for %s but keeps every report closed', profile => {
+  it.each(['research', 'experience'] as const)('session descriptive policy: releases known exact-match arithmetic for %s', profile => {
     const result = score(fixture(profile), profile), n = profile === 'research' ? 100 : 25
     expect(result.metrics.includedTrialCount).toBe(n)
     expect(result.metrics.overallAccuracy).toBe(1)
@@ -93,9 +97,9 @@ describe('enumeration internal pure logic candidate', () => {
     expect(result.metrics.medianReportOperationMs).toBe(200)
     for (const row of rows(result)) expect(row).toMatchObject({ expected: n / 5, observed: n / 5, included: n / 5, correct: n / 5, accuracy: 1 })
     expect(result).not.toHaveProperty('score')
-    expect(result.quality.state).toBe('invalid')
-    expect(result.quality.flags.protocolValidationPending).toBe(true)
-    expect(projectEnumerationReport(result)).toMatchObject({ state: 'invalid', headline: null, rows: [] })
+    expect(result.quality.state).toBe('interpretable')
+    expect(result.quality.flags).not.toHaveProperty('protocolValidationPending')
+    expect(projectEnumerationReport(result)).toMatchObject({ state: 'interpretable', headline: { correct: n, denominator: n }, summary: { overReported: 0, underReported: 0 } })
   })
   it('preserves negative signed error, real zero accuracy and both end responses', () => {
     const trials = fixture()
@@ -128,7 +132,7 @@ describe('enumeration internal pure logic candidate', () => {
     expect(result.metrics.excludedTrialCount).toBe(0)
     expect(result.quality.flags.incompleteRecords).toBe(true)
     expect(rows(result).filter(row => row.accuracy === null)).toHaveLength(4)
-    expect(projectEnumerationReport(result).rows).toEqual([])
+    expect(projectEnumerationReport(result)).toMatchObject({ state: 'limited', headline: { correct: 1, denominator: 1 }, summary: { received: 1, expected: 25 } })
   })
   it('excludes factual timeout, premature input, interruption, recovery and incomplete evidence while retaining raw records', () => {
     const trials = fixture()
@@ -239,14 +243,123 @@ describe('enumeration internal pure logic candidate', () => {
     for (const state of ['interpretable', 'limited', 'invalid'] as const) {
       const report = projectEnumerationReport({ quality: { state, flags: {}, reasons: [] },
         metrics: { overallAccuracy: 1, signedMeanError: -2, byQuantity: [{ accuracy: 1, included: 100 }] } })
-      expect(report).toMatchObject({ state: 'invalid', headline: null, rows: [], interpretationPolicy: 'research_provisional' })
+      expect(report).toMatchObject({ state: 'invalid', headline: null, rows: [], interpretationPolicy: 'session_descriptive_v1' })
       expect(report).not.toHaveProperty('metrics')
     }
     for (const metric of Object.values(enumerationDefinition.metrics)) {
-      expect(metric.visibility).toBe('research_only')
       expect(metric.referenceEligible).toBe(false)
-      expect(metric.export.summary).toBe(false)
     }
     expect(ENUMERATION_IDENTITY.candidateId).toBe('attention-enumeration-flower')
+  })
+})
+
+
+describe('enumeration product policy update', () => {
+  it('keeps a synthetic occasional four-frame/66.6ms exposure descriptive without adding a timing gate', () => {
+    const trials = fixture()
+    const trial = trials[0].payload
+    trial.maskOnsetPerfMs = trial.stimulusOnsetPerfMs! + 66.6
+    trial.timingFacts.stimulusFrameCount = 4
+    const before = JSON.stringify(trials), result = score(trials)
+    expect(result.quality.state).toBe('interpretable')
+    expect(projectEnumerationReport(result).headline).toEqual({ correct: 25, denominator: 25 })
+    expect(JSON.stringify(trials)).toBe(before)
+    expect(enumerationConfig('experience').timingToleranceMs).toBeNull()
+  })
+  it('reports real zero correctness and preserves negative mean error plus over/under counts', () => {
+    const trials = fixture()
+    trials.forEach(envelope => setAnswer(envelope.payload, envelope.payload.plan.targetValue - 1))
+    setAnswer(trials[0].payload, trials[0].payload.plan.targetValue + 2)
+    const result = score(trials), report = projectEnumerationReport(result)
+    expect(report).toMatchObject({ state: 'interpretable', headline: { correct: 0, denominator: 25 },
+      summary: { overReported: 1, underReported: 24, signedMeanError: -22 / 25, meanAbsoluteError: 26 / 25 } })
+  })
+  it('keeps empty and all-unanswered attempts invalid with hidden null summaries', () => {
+    const unanswered = fixture()
+    unanswered.forEach(({ payload }) => Object.assign(payload,
+      { responseValue: null, confirmedAtPerfMs: null, responseInput: null, sliderChanges: [] }))
+    for (const trials of [[], unanswered]) {
+      const result = score(trials)
+      expect(result.metrics.overallAccuracy).toBeNull()
+      expect(result.quality.state).toBe('invalid')
+      expect(projectEnumerationReport(result)).toMatchObject({ state: 'invalid', headline: null, summary: null, rows: [] })
+    }
+  })
+  it('marks incomplete or interrupted records limited, excluding the affected record without inventing completion', () => {
+    const partial = score(fixture().slice(0, 1))
+    expect(projectEnumerationReport(partial)).toMatchObject({ state: 'limited', summary: { expected: 25, received: 1, included: 1, excluded: 0 } })
+    const trials = fixture(); trials[0].payload.interruptions = ['window_blur']
+    const result = score(trials)
+    expect(projectEnumerationReport(result)).toMatchObject({ state: 'limited', headline: { correct: 24, denominator: 24 },
+      summary: { received: 25, included: 24, excluded: 1 } })
+    trials.forEach(({ payload }) => { payload.interruptions = ['window_blur'] })
+    expect(projectEnumerationReport(score(trials)).state).toBe('invalid')
+  })
+  it('freezes independent scorer/config/metric/quality/report versions and rejects the old identity and mixed dependencies', () => {
+    const session = createEnumerationSnapshot('experience'), trials = fixture()
+    expect(session).toMatchObject({ engineVersion: '0.1.0', scoringVersion: '0.2.0', configVersion: '0.2.0',
+      protocol: { key: 'enumeration/0.1.0/0.1.0', version: '0.1.0' },
+      config: { metricDefinitionVersion: '0.2.0', qualityDefinitionVersion: '0.2.0', reportDefinitionVersion: '0.2.0', presentationVersion: '0.1.0' } })
+    expect(enumerationDefinition.report.version).toBe('0.2.0')
+    const frozenResult = score(trials)
+    expect(runAuthoritativeScorer({ definition: enumerationDefinition, session: JSON.parse(JSON.stringify(session)),
+      trials: JSON.parse(JSON.stringify(trials)), randomSeed: seed })).toEqual(frozenResult)
+    const legacy = structuredClone(session)
+    legacy.scoringVersion = '0.1.0'; legacy.configVersion = '0.1.0'
+    expect(() => runAuthoritativeScorer({ definition: enumerationDefinition, session: legacy, trials, randomSeed: seed })).toThrow()
+    for (const key of ['metricDefinitionVersion', 'qualityDefinitionVersion', 'reportDefinitionVersion'] as const) {
+      const mixed = structuredClone(session)
+      ;(mixed.config as unknown as Record<string, unknown>)[key] = '0.1.0'
+      mixed.configHash = computeConfigSnapshotHash(mixed.config)
+      expect(() => runAuthoritativeScorer({ definition: enumerationDefinition, session: mixed, trials, randomSeed: seed })).toThrow()
+    }
+    const oldResult = structuredClone(frozenResult)
+    ;(oldResult.metrics.reportBinding as Record<string, unknown>).scoringVersion = '0.1.0'
+    expect(projectEnumerationReport(oldResult).state).toBe('invalid')
+  })
+  it('does not trust forged quality states, inconsistent denominators, missing bindings or incompatible context', () => {
+    const baseline = score(fixture())
+    for (const mutate of [
+      (r: CognitiveScoreResult) => { r.quality.state = 'limited' },
+      (r: CognitiveScoreResult) => { r.metrics.includedTrialCount = 26 },
+      (r: CognitiveScoreResult) => { r.metrics.correctTrialCount = 24 },
+      (r: CognitiveScoreResult) => { r.metrics.signedMeanError = NaN },
+      (r: CognitiveScoreResult) => { delete r.metrics.reportBinding },
+      (r: CognitiveScoreResult) => { r.audit.scorerVersion = '0.1.0' },
+    ]) {
+      const result = structuredClone(baseline); mutate(result)
+      expect(projectEnumerationReport(result)).toMatchObject({ state: 'invalid', headline: null, summary: null })
+    }
+    expect(projectEnumerationReport(baseline, { config: enumerationConfig('experience'), randomSeed: seed + ':wrong' }).state).toBe('invalid')
+    expect(projectEnumerationReport(baseline, { config: enumerationConfig('research'), randomSeed: seed }).state).toBe('invalid')
+    const partial = score(fixture().slice(0, 1)); partial.quality.state = 'interpretable'
+    expect(projectEnumerationReport(partial).state).toBe('invalid')
+  })
+})
+
+
+describe('enumeration product stored snapshot adapter', () => {
+  it('accepts the actual v2 stored schema without audit and rejects mixed outer identities or config bindings', () => {
+    const session = createEnumerationSnapshot('experience'), result = score(fixture())
+    const snapshot = parseCognitiveResultSnapshot({ schemaVersion: 1, completedAt: '2026-10-26T09:20:00.000Z',
+      testType: session.testType, configVersion: session.configVersion, engineVersion: session.engineVersion,
+      scoringVersion: session.scoringVersion, protocolSignature: session.protocolSignature,
+      profile: 'experience', metrics: result.metrics, quality: result.quality, references: [],
+      report: { definitionVersion: enumerationDefinition.report.version }, assessmentContext: null })
+    expect(snapshot).not.toHaveProperty('audit')
+    const before = JSON.stringify(snapshot)
+    expect(projectStoredEnumerationReport(snapshot)).toEqual(projectEnumerationReport(result))
+    expect(projectStoredEnumerationReport(snapshot)).toMatchObject({ state: 'interpretable', headline: { correct: 25, denominator: 25 } })
+    for (const key of ['engineVersion', 'scoringVersion', 'configVersion', 'protocolSignature', 'testType'] as const) {
+      const mixed = structuredClone(snapshot); mixed[key] = key === 'protocolSignature' ? '0'.repeat(64) : 'old-or-other'
+      expect(projectStoredEnumerationReport(mixed).state).toBe('invalid')
+    }
+    const old = structuredClone(snapshot); old.scoringVersion = '0.1.0'; old.configVersion = '0.1.0'
+    expect(projectStoredEnumerationReport(old).state).toBe('invalid')
+    const wrongProfile = structuredClone(snapshot); wrongProfile.profile = 'research'
+    expect(projectStoredEnumerationReport(wrongProfile).state).toBe('invalid')
+    expect(projectStoredEnumerationReport(snapshot, { config: enumerationConfig('experience'), randomSeed: seed + ':other' }).state).toBe('invalid')
+    expect(projectEnumerationReport({ metrics: snapshot.metrics, quality: snapshot.quality }).state).toBe('invalid')
+    expect(JSON.stringify(snapshot)).toBe(before)
   })
 })

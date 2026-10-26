@@ -12,17 +12,14 @@ if (process.argv.includes('--check')) {
 } else {
   fs.mkdirSync(path.dirname(target), { recursive: true }); fs.writeFileSync(target, output)
 }
-const reportSource = path.join(root, 'server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts')
+const reportSource = path.join(root, 'server-version/backend/src/modules/cognitive/content-candidates/enumeration/report.ts')
 const reportText = fs.readFileSync(reportSource, 'utf8')
-const marker = 'export function projectEnumerationReport('
-if (reportText.indexOf(marker) < 0) throw Error('Missing closed enumeration report projection')
-const projection = reportText.slice(reportText.indexOf(marker)).replace("Pick<CognitiveScoreResult, 'metrics' | 'quality'>", 'EnumerationPublicResult')
-if (projection.includes('CognitiveScoreResult')) throw Error('Unexpected report dependency')
+if (!reportText.includes('export function projectEnumerationReport(')) throw Error('Missing enumeration report projection')
 const reportHash = crypto.createHash('sha256').update(reportText).digest('hex')
-const reportOutput = '// Generated closed projection from scorer SHA256: ' + reportHash + '\n'
-  + "export interface EnumerationPublicResult { metrics: Record<string, unknown>; quality: { state: 'interpretable'|'limited'|'invalid'; flags: Record<string,boolean>; reasons:string[] } }\n" + projection
+// Report module is browser-pure and imports only the sibling generated pure protocol.
+const reportOutput = '// Generated report projection. Source SHA256: ' + reportHash + '\n' + reportText
 const reportTarget = path.join(path.dirname(target), 'report.ts')
 if (process.argv.includes('--check')) {
   if (!fs.existsSync(reportTarget) || fs.readFileSync(reportTarget,'utf8') !== reportOutput) throw Error('Enumeration report projection drift')
 } else fs.writeFileSync(reportTarget, reportOutput)
-console.log('Enumeration pure protocol projection: ' + hash + '; closed report: ' + reportHash)
+console.log('Enumeration pure protocol projection: ' + hash + '; report: ' + reportHash)

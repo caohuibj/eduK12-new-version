@@ -16,7 +16,7 @@ function median(values: number[]): number | null {
   const sorted = [...values].sort((a, b) => a - b), middle = Math.floor(sorted.length / 2)
   return sorted.length % 2 ? sorted[middle] : sorted[middle - 1] + (sorted[middle] - sorted[middle - 1]) / 2
 }
-/** Internal descriptive arithmetic only. This candidate never authorizes an individual performance conclusion. */
+/** Session-only descriptive arithmetic. No timing tolerance, norm or diagnostic inference. */
 export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConfig, EnumerationTrial>): CognitiveScoreResult {
   const id = ENUMERATION_IDENTITY, config = parseEnumerationConfig(input.config)
   const session = parseSessionConfigSnapshot<EnumerationConfig>(input.session)
@@ -30,7 +30,7 @@ export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConf
     throw new Error('Unsupported frozen enumeration identity, protocol or config')
   if (input.trials.length > config.totalTrials) throw new Error('Enumeration formal trial budget exceeded')
   const stats = ENUMERATION_QUANTITIES.map(targetValue => ({ targetValue, observed: 0, included: 0,
-    correct: 0, signedSum: 0, absoluteSum: 0, operationMs: [] as number[] }))
+    correct: 0, overReported: 0, underReported: 0, signedSum: 0, absoluteSum: 0, operationMs: [] as number[] }))
   const excludedTrialReasons: Record<string, string[]> = {}, excludedTrialIndices: number[] = []
   let previousEnd = 0
   for (let index = 0; index < input.trials.length; index++) {
@@ -70,17 +70,26 @@ export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConf
     }
     const response = trial.responseValue!, error = response - expected.targetValue
     condition.included++; condition.correct += Number(error === 0)
+    condition.overReported += Number(error > 0); condition.underReported += Number(error < 0)
     condition.signedSum += error; condition.absoluteSum += Math.abs(error)
     condition.operationMs.push(trial.confirmedAtPerfMs! - trial.responseStartedAtPerfMs!)
   }
   const included = stats.reduce((sum, row) => sum + row.included, 0)
   const correct = stats.reduce((sum, row) => sum + row.correct, 0)
   const metrics = {
+    reportBinding: { candidateId: id.candidateId, engineVersion: id.engineVersion,
+      scoringVersion: id.scoringVersion, configVersion: id.configVersion,
+      config, randomSeed: input.randomSeed, configHash: session.configHash,
+      protocolSignature: session.protocolSignature },
+    correctTrialCount: correct,
+    overReportedTrialCount: stats.reduce((sum, row) => sum + row.overReported, 0),
+    underReportedTrialCount: stats.reduce((sum, row) => sum + row.underReported, 0),
     expectedTrialCount: config.totalTrials, receivedTrialCount: input.trials.length,
     includedTrialCount: included, excludedTrialCount: excludedTrialIndices.length,
     excludedTrialIndices, excludedTrialReasons,
     byQuantity: stats.map(row => ({ targetValue: row.targetValue, expected: config.totalTrials / 5,
       observed: row.observed, included: row.included, correct: row.correct,
+      overReported: row.overReported, underReported: row.underReported,
       accuracy: row.included ? row.correct / row.included : null,
       signedMeanError: row.included ? row.signedSum / row.included : null,
       meanAbsoluteError: row.included ? row.absoluteSum / row.included : null,
@@ -90,16 +99,14 @@ export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConf
     meanAbsoluteError: included ? stats.reduce((sum, row) => sum + row.absoluteSum, 0) / included : null,
     medianReportOperationMs: median(stats.flatMap(row => row.operationMs)),
   }
-  return { metrics, quality: { state: 'invalid', flags: {
-    protocolValidationPending: true, individualInterpretationBlocked: true,
-    noIncludedRecords: included === 0, incompleteRecords: input.trials.length !== config.totalTrials,
-    technicalExclusions: excludedTrialIndices.length > 0,
-  }, reasons: ['本候选的呈现、校准和解释质量规则尚未完成验证，本次不输出表现结论。'] },
+  const incompleteRecords = input.trials.length !== config.totalTrials
+  const technicalExclusions = excludedTrialIndices.length > 0
+  const state = included === 0 ? 'invalid' : incompleteRecords || technicalExclusions ? 'limited' : 'interpretable'
+  return { metrics, quality: { state, flags: {
+    descriptiveOnly: true, noIncludedRecords: included === 0, incompleteRecords, technicalExclusions,
+  }, reasons: included === 0 ? ['没有可用于描述本次表现的有效作答记录。']
+    : [...(incompleteRecords ? ['本次记录未完成，只描述已记录的有效作答。'] : []),
+      ...(technicalExclusions ? ['部分记录因中断、缺失或其他技术问题未纳入，分母已注明。'] : [])] },
   audit: { trialCount: input.trials.length, scorerVersion: id.scoringVersion } }
 }
-/** Fail-closed projection: even a caller-supplied interpretable flag cannot release draft research metrics. */
-export function projectEnumerationReport(result: Pick<CognitiveScoreResult, 'metrics' | 'quality'>) {
-  return { state: 'invalid' as const, headline: null, rows: [] as never[],
-    interpretationPolicy: 'research_provisional' as const,
-    reasons: [...new Set(['本候选尚未获准生成个人表现结论。', ...result.quality.reasons])] }
-}
+export { projectEnumerationReport } from './report'

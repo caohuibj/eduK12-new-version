@@ -1,8 +1,10 @@
-// Generated from frozen pure enumeration protocol. Source SHA256: ff2215ae31ae280dbec19d582ab0aead2608445706bf5c4f403a4887472faed4
+// Generated from frozen pure enumeration protocol. Source SHA256: b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69
 /** Internal pure logic candidate. This file renders no stimuli and establishes no timing tolerance. */
 export const ENUMERATION_IDENTITY = Object.freeze({
   candidateId: 'attention-enumeration-flower', testType: 'enumeration',
-  engineVersion: '0.1.0', scoringVersion: '0.1.0', configVersion: '0.1.0',
+  engineVersion: '0.1.0', scoringVersion: '0.2.0', configVersion: '0.2.0',
+  metricDefinitionVersion: '0.2.0', qualityDefinitionVersion: '0.2.0',
+  reportDefinitionVersion: '0.2.0', presentationVersion: '0.1.0',
   protocolKey: 'enumeration/0.1.0/0.1.0',
   randomizationAlgorithmVersion: 'enumeration-fnv1a-utf16-mulberry32-fisher-yates-v1',
 })
@@ -19,8 +21,12 @@ export interface EnumerationConfig {
   repetitionsPerQuantityPerBlock: 5
   responseMin: 1
   responseMax: 15
-  interpretationPolicy: 'research_provisional'
-  /** No numerical individual interpretation criterion has been approved. */
+  interpretationPolicy: 'session_descriptive_v1'
+  metricDefinitionVersion: '0.2.0'
+  qualityDefinitionVersion: '0.2.0'
+  reportDefinitionVersion: '0.2.0'
+  presentationVersion: '0.1.0'
+  /** No normative or minimum-valid-count inference is made. */
   minimumValidPerCondition: null
   timingToleranceMs: null
   stimulusRecipe: null
@@ -31,7 +37,11 @@ export function enumerationConfig(profile: EnumerationProfile): EnumerationConfi
     sequenceKey: profile === 'research' ? 'research100' : 'experience25',
     totalTrials: profile === 'research' ? 100 : 25, blocks: profile === 'research' ? 4 : 1,
     repetitionsPerQuantityPerBlock: 5, responseMin: 1, responseMax: 15,
-    interpretationPolicy: 'research_provisional', minimumValidPerCondition: null,
+    interpretationPolicy: 'session_descriptive_v1',
+    metricDefinitionVersion: ENUMERATION_IDENTITY.metricDefinitionVersion,
+    qualityDefinitionVersion: ENUMERATION_IDENTITY.qualityDefinitionVersion,
+    reportDefinitionVersion: ENUMERATION_IDENTITY.reportDefinitionVersion,
+    presentationVersion: ENUMERATION_IDENTITY.presentationVersion, minimumValidPerCondition: null,
     timingToleranceMs: null, stimulusRecipe: null }
 }
 export interface EnumerationPlan {

@@ -270,7 +270,7 @@ describe('enumeration candidate frontend closed loop', () => {
     expect(port.reserve).not.toHaveBeenCalled(); expect(requestAnimationFrame).not.toHaveBeenCalled()
     expect(screen.getByRole('heading', { name: '刚才有几个点？' })).toBeTruthy()
   })
-  it('completes the actual three-practice/25-formal component loop, waits final ACK and keeps the report closed', async () => {
+  it('completes the actual three-practice/25-formal component loop, waits final ACK and hides a missing host result', async () => {
     const { port } = fixturePort(), final = pending<Awaited<ReturnType<typeof port.complete>>>()
     vi.mocked(port.complete).mockReturnValueOnce(final.promise)
     await startUI(port)
@@ -290,7 +290,7 @@ describe('enumeration candidate frontend closed loop', () => {
     expect(screen.queryByRole('heading', { name: '这次的记录' })).toBeNull()
     const request = vi.mocked(port.complete).mock.calls[0][0]
     await act(async () => final.resolve({ ...request, confirmed: true }))
-    expect(await screen.findByRole('heading', { name: '本次不提供表现结论' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: '暂时没有可描述的作答结果' })).toBeTruthy()
     expect(document.querySelector('[data-report-state="invalid"]')).not.toBeNull()
     expect(port.onTrialComplete).toHaveBeenCalledTimes(25)
     expect(port.onPracticeComplete).toHaveBeenCalledTimes(3)
