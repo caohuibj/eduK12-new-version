@@ -1613,6 +1613,16 @@
       "path": "/workspace/scratch/pr356-ci-closure-20261026/source-862-selected-contracts.receipt.json",
       "sha256": "61aeece6dedd4807a7f0c53f4cf199d760d01aef2969c73b7f6f976d08c88e1c",
       "rawBase64": "ewogICJzdGFydGVkQXRVVEMiOiAiMjAyNi0xMC0yNlQwODo1OToxNi44MDIwNzgrMDA6MDAiLAogICJjb21tYW5kIjogWwogICAgIi93b3Jrc3BhY2UvZWR1azEyLWNsb3VkL3Rvb2xzL25vZGVfbW9kdWxlcy8uYmluL25vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LW5hbWUtcGF0dGVybj1jb21wbGV0ZSBpbW11dGFibGUgYXBwbGljYXRpb258bWlzc2luZywgZHVwbGljYXRlLCB1bmtub3duIiwKICAgICIvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbi8uZ2l0aHViL3NjcmlwdHMvcHIzNTYtc2NvcGUudGVzdC5tanMiCiAgXSwKICAiY3dkIjogIi93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uIiwKICAibm9kZVZlcnNpb24iOiAidjI0LjIxLjAiLAogICJub2RlQmluYXJ5U0hBMjU2IjogIjdmZGU3YjhhZmExOThkYTY2MjU3ZjQyZWUyMDAxZDg3NGM3MzU1NjMxZTZkMTU3OWE1ZmI1ZWYxZjI0NmRmNGMiLAogICJpbnB1dFNIQTI1NkJlZm9yZSI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYmluZGluZ3MuanNvbiI6ICIyNzQ1ODc2NTllOGZmZGI1ODYzYzI1MmM5YzcyZmQ3ZGJkYjMxYzk4ZWI4NWM0ODI2ZDVkNDQwZWVmMmI5YjE5IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtc2NvcGUubWpzIjogIjg4OTVmMTY3YWQ2OGE4ZTc3Zjg3OWFhNjEyMWU1OWRmYTdiODA2N2ViODhlZmE0YTMwNDQ0ZDJmNmUxMDc1NWUiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1zY29wZS50ZXN0Lm1qcyI6ICJiNzUxOGFlMTIxODQ1OWViMWMzMTQ3ZTk5ZjRmOTU4MzgwNjE1Yjk3MDNlZjlhZWYyYjM2MWJkYjA3OWI5ZTZiIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvY29udGVudC1zY29wZS5tanMiOiAiMzUwYTVmNmU1ODRhMGQzZDczYTk2OGU2MmZiZTY3MGZiMDdhNDA4Mzc5MWJjNTEwZTczMTQ2MTZmMWUxYjRjNCIKICB9LAogICJzZWxlY3Rpb24iOiAiT25seSB0d28gYWZmZWN0ZWQgaW1tdXRhYmxlIGNhbmRpZGF0ZSBhbmQgbWlzc2luZy91bmtub3duL21vZGUvYmxvYi9iYXNlIHJlamVjdGlvbiBjb250cmFjdHM7IHNpeCB1bmNoYW5nZWQgY29udHJhY3RzIGRlbGliZXJhdGVseSB1bnNlbGVjdGVkIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiZXhpdENvZGUiOiAwLAogICJmaW5pc2hlZEF0VVRDIjogIjIwMjYtMTAtMjZUMDg6NTk6MTkuMDk2MzczKzAwOjAwIiwKICAiaW5wdXRTSEEyNTZBZnRlciI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYmluZGluZ3MuanNvbiI6ICIyNzQ1ODc2NTllOGZmZGI1ODYzYzI1MmM5YzcyZmQ3ZGJkYjMxYzk4ZWI4NWM0ODI2ZDVkNDQwZWVmMmI5YjE5IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtc2NvcGUubWpzIjogIjg4OTVmMTY3YWQ2OGE4ZTc3Zjg3OWFhNjEyMWU1OWRmYTdiODA2N2ViODhlZmE0YTMwNDQ0ZDJmNmUxMDc1NWUiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1zY29wZS50ZXN0Lm1qcyI6ICJiNzUxOGFlMTIxODQ1OWViMWMzMTQ3ZTk5ZjRmOTU4MzgwNjE1Yjk3MDNlZjlhZWYyYjM2MWJkYjA3OWI5ZTZiIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvY29udGVudC1zY29wZS5tanMiOiAiMzUwYTVmNmU1ODRhMGQzZDczYTk2OGU2MmZiZTY3MGZiMDdhNDA4Mzc5MWJjNTEwZTczMTQ2MTZmMWUxYjRjNCIKICB9LAogICJpbnB1dHNVbmNoYW5nZWQiOiB0cnVlLAogICJsb2dTSEEyNTYiOiAiODA0M2M0ODY5Njg4MDE0MGZjMDUxODU2NDQ2MTZmOWMyZWJmNzU5OWMxZTY0Nzg0ZWViNThmZTUyOGYzN2ZiYSIsCiAgImxvZ0J5dGVzIjogMjk5Cn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.tap",
+      "sha256": "fc5f57538fbd615881b7dd87448d3f38782cb6c961536481e3967d150372c0e1",
+      "rawBase64": "VEFQIHZlcnNpb24gMTMKIyBTdWJ0ZXN0OiBEcmFmdCBhbmQgUmVhZHkgUFIzNTYgZXZlbnRzIHNlbGVjdCBvbmx5IHRoZSBmaXhlZCBuYXJyb3cgZW50cnkKb2sgMSAtIERyYWZ0IGFuZCBSZWFkeSBQUjM1NiBldmVudHMgc2VsZWN0IG9ubHkgdGhlIGZpeGVkIG5hcnJvdyBlbnRyeQogIC0tLQogIGR1cmF0aW9uX21zOiA1LjcxNjE5CiAgdHlwZTogJ3Rlc3QnCiAgLi4uCiMgU3VidGVzdDogbWFudWFsIHBoYXNlLCBmdWxsL3Byb2JlIGZsYWdzIGNhbm5vdCByZXN0b3JlIGEgbGVnYWN5IHJvdXRlIG9uIHRoZSBmaXhlZCBicmFuY2gKb2sgMiAtIG1hbnVhbCBwaGFzZSwgZnVsbC9wcm9iZSBmbGFncyBjYW5ub3QgcmVzdG9yZSBhIGxlZ2FjeSByb3V0ZSBvbiB0aGUgZml4ZWQgYnJhbmNoCiAgLS0tCiAgZHVyYXRpb25fbXM6IDYuMzI4Mjc2CiAgdHlwZTogJ3Rlc3QnCiAgLi4uCiMgU3VidGVzdDogbWFpbiBjb21wbGV0ZSByYXcgbWFya2VyIHJvdXRlcyB0byBleGFjdCB2ZXJpZmljYXRpb24gZXZlbiB3aXRoIHVua25vd24gZXh0cmEgZmlsZXMKb2sgMyAtIG1haW4gY29tcGxldGUgcmF3IG1hcmtlciByb3V0ZXMgdG8gZXhhY3QgdmVyaWZpY2F0aW9uIGV2ZW4gd2l0aCB1bmtub3duIGV4dHJhIGZpbGVzCiAgLS0tCiAgZHVyYXRpb25fbXM6IDIuODEyOTMxCiAgdHlwZTogJ3Rlc3QnCiAgLi4uCiMgU3VidGVzdDogb3RoZXIgbWFpbiBkZWx0YXMgZG8gbm90IGFjY2lkZW50YWxseSBlbnRlciBvciBzdXBwcmVzcyB0aGVpciBleGlzdGluZyByb3V0ZXMKb2sgNCAtIG90aGVyIG1haW4gZGVsdGFzIGRvIG5vdCBhY2NpZGVudGFsbHkgZW50ZXIgb3Igc3VwcHJlc3MgdGhlaXIgZXhpc3Rpbmcgcm91dGVzCiAgLS0tCiAgZHVyYXRpb25fbXM6IDAuNzI3NzU2CiAgdHlwZTogJ3Rlc3QnCiAgLi4uCiMgU3VidGVzdDogbWlzc2luZyBtYWluIGlkZW50aXRpZXMgYW5kIHVuYXZhaWxhYmxlIHJhdyBkaWZmcyBzdG9wIGNsYXNzaWZpY2F0aW9uCm9rIDUgLSBtaXNzaW5nIG1haW4gaWRlbnRpdGllcyBhbmQgdW5hdmFpbGFibGUgcmF3IGRpZmZzIHN0b3AgY2xhc3NpZmljYXRpb24KICAtLS0KICBkdXJhdGlvbl9tczogMi45NTc4MTcKICB0eXBlOiAndGVzdCcKICAuLi4KIyBTdWJ0ZXN0OiBhY3R1YWwgbGVnYWN5IENMSSByZWplY3RzIFJlYWR5IFBSMzU2IGJlZm9yZSBjbGFzc2lmaWNhdGlvbgpvayA2IC0gYWN0dWFsIGxlZ2FjeSBDTEkgcmVqZWN0cyBSZWFkeSBQUjM1NiBiZWZvcmUgY2xhc3NpZmljYXRpb24KICAtLS0KICBkdXJhdGlvbl9tczogMjYzLjE2MzcyNgogIHR5cGU6ICd0ZXN0JwogIC4uLgojIFN1YnRlc3Q6IGFjdHVhbCBsZWdhY3kgQ0xJIHJlamVjdHMgdGhlIGNvbXBsZXRlIFBSMzU2IG1haW4gZGVsdGEgYmVmb3JlIGJyb2FkIHJvdXRpbmcKb2sgNyAtIGFjdHVhbCBsZWdhY3kgQ0xJIHJlamVjdHMgdGhlIGNvbXBsZXRlIFBSMzU2IG1haW4gZGVsdGEgYmVmb3JlIGJyb2FkIHJvdXRpbmcKICAtLS0KICBkdXJhdGlvbl9tczogNTI0LjMzNTI0OQogIHR5cGU6ICd0ZXN0JwogIC4uLgoxLi43CiMgdGVzdHMgNwojIHN1aXRlcyAwCiMgcGFzcyA3CiMgZmFpbCAwCiMgY2FuY2VsbGVkIDAKIyBza2lwcGVkIDAKIyB0b2RvIDAKIyBkdXJhdGlvbl9tcyAxMDg3Ljk2MzYzMgo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.receipt.json",
+      "sha256": "fe664b9524a16fb31e86c887caf0f7d3d9b334c4b76fc2634c53d17f3bd6ed5f",
+      "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5LnRlc3QubWpzIgogIF0sCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjUwOjA5LjcxMjY2NSswMDowMCIsCiAgImlucHV0U0hBMjU2QmVmb3JlIjogewogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1lbnRyeS5tanMiOiAiMjVkMGFiZmFjNDdhMjY0MGUzODM2MzEwNTVkNTFkZmQzNTMyNGM1NzA4MDk0MzNiNDNlYWM2NWM1M2QxOTIwZCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5LnRlc3QubWpzIjogIjA5MGE3Mjc3ODE1NjEwZDI1MjlhZGZkZTkwM2ZmYmRmZjdhNTM2NGRmY2Y5NTliOTEyMTg1OThjZTBiZmM1N2QiLAogICAgIi5naXRodWIvc2NyaXB0cy9jb250ZW50LXNjb3BlLm1qcyI6ICJlZmM1ZTUwMmFjMzBjMTY0YTU1ODMxZDAxOTdlY2Q4YWExMDAwOTZmZWY0MmQ1YjdmYWZhMWEyNDU0ZjhkYmY0IgogIH0sCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJjaUV4ZWN1dGVkIjogZmFsc2UsCiAgImFwcGxpY2F0aW9uQ2hlY2tzRXhlY3V0ZWQiOiBmYWxzZSwKICAiZXhpdENvZGUiOiAwLAogICJjb21wbGV0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjUwOjEwLjk0MTQ5OCswMDowMCIsCiAgImlucHV0U0hBMjU2QWZ0ZXIiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5Lm1qcyI6ICIyNWQwYWJmYWM0N2EyNjQwZTM4MzYzMTA1NWQ1MWRmZDM1MzI0YzU3MDgwOTQzM2I0M2VhYzY1YzUzZDE5MjBkIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtZW50cnkudGVzdC5tanMiOiAiMDkwYTcyNzc4MTU2MTBkMjUyOWFkZmRlOTAzZmZiZGZmN2E1MzY0ZGZjZjk1OWI5MTIxODU5OGNlMGJmYzU3ZCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL2NvbnRlbnQtc2NvcGUubWpzIjogImVmYzVlNTAyYWMzMGMxNjRhNTU4MzFkMDE5N2VjZDhhYTEwMDA5NmZlZjQyZDViN2ZhZmExYTI0NTRmOGRiZjQiCiAgfSwKICAibG9nU0hBMjU2IjogImZjNWY1NzUzOGZiZDYxNTg4MWI3ZGQ4NzQ0OGQzZjM4NzgyY2I2Yzk2MTUzNjQ4MWUzOTY3ZDE1MDM3MmMwZTEiLAogICJpbnB1dHNVbmNoYW5nZWQiOiB0cnVlCn0K"
     }
   ],
   "portableRawIndexVersion": 1,
@@ -3568,6 +3578,22 @@
       "originalPath": "/workspace/scratch/pr356-ci-closure-20261026/source-862-selected-contracts.receipt.json",
       "sha256": "61aeece6dedd4807a7f0c53f4cf199d760d01aef2969c73b7f6f976d08c88e1c",
       "bytes": 1821
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/157",
+      "rawBase64Pointer": "/followupAttachments/157/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.tap",
+      "sha256": "fc5f57538fbd615881b7dd87448d3f38782cb6c961536481e3967d150372c0e1",
+      "bytes": 1634
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/158",
+      "rawBase64Pointer": "/followupAttachments/158/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.receipt.json",
+      "sha256": "fe664b9524a16fb31e86c887caf0f7d3d9b334c4b76fc2634c53d17f3bd6ed5f",
+      "bytes": 1146
     }
   ],
   "additionalRawRecovery": {
@@ -3805,5 +3831,38 @@
         "bytes": 1821
       }
     ]
-  }
+  },
+  "controlImplementationSteps": [
+    {
+      "id": "narrow-entry-refusal",
+      "kind": "direct-control-contracts",
+      "records": [
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/157",
+          "rawBase64Pointer": "/followupAttachments/157/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.tap",
+          "sha256": "fc5f57538fbd615881b7dd87448d3f38782cb6c961536481e3967d150372c0e1",
+          "bytes": 1634
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/158",
+          "rawBase64Pointer": "/followupAttachments/158/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.receipt.json",
+          "sha256": "fe664b9524a16fb31e86c887caf0f7d3d9b334c4b76fc2634c53d17f3bd6ed5f",
+          "bytes": 1146
+        }
+      ],
+      "actualTests": {
+        "passed": 7,
+        "failed": 0,
+        "skipped": 0
+      },
+      "applicationChecksExecuted": false,
+      "ciExecuted": false,
+      "qualificationClaim": false,
+      "candidateState": "intermediate; final new control allowlist and complete qualification/admission wiring pending"
+    }
+  ]
 }
