@@ -189,7 +189,7 @@ it.each(['ADMIN','TEACHER'])('retains existing grade and class controls for scho
   await screen.findByRole('button',{name:'增加年级'})
   expect(screen.getByRole('button',{name:'增加班级'})).toBeInTheDocument()
   expect(screen.getByLabelText('当前学校和班级')).toBeInTheDocument()
-  expect(screen.queryByRole('region',{name:'学校与班级选择'})).not.toBeInTheDocument()
+  expect(screen.getByRole('region',{name:'学校与班级选择'})).toContainElement(screen.getByLabelText('当前学校和班级'))
  }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
 

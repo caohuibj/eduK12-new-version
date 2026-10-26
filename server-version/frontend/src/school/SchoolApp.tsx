@@ -9,7 +9,9 @@ import { ProductThemeControl } from '../components/product-theme/ProductThemeCon
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
-import {SchoolProfessionalAdmission} from './SchoolProfessionalAdmission'
+import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
+import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
 import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
@@ -39,6 +41,7 @@ import './school-task-detail.css'
 import './school-educator.css'
 import './school-parent.css'
 import './school-professional.css'
+import './school-administrator.css'
 import '../components/education-tools/education-entry-layout.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
@@ -374,8 +377,10 @@ export default function SchoolApp(){
 
   const professionalClassPage=professionalWorkspace&&!schoolAdmin&&page==='classes'
   const professionalAdmissionPage=professionalWorkspace&&!schoolAdmin&&page==='admission'
-  const professionalRecoveryPage=professionalWorkspace&&!schoolAdmin&&page==='recovery'
-  const professionalScopePage=professionalClassPage||professionalAdmissionPage||professionalRecoveryPage
+  const professionalRecoveryPage=groupedWorkspace&&page==='recovery'
+  const administratorClassPage=administratorWorkspace&&page==='classes'
+  const administratorAdmissionPage=administratorWorkspace&&page==='admission'
+  const professionalScopePage=professionalClassPage||professionalAdmissionPage||professionalRecoveryPage||administratorClassPage||administratorAdmissionPage
   const classApprovalDisabled=working||!summary||summary.status!=='CLOSED'
     ||summary.rosterExpectedCount!==summary.eligibleCount||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0
   const contextSecurity=(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>
@@ -475,18 +480,17 @@ export default function SchoolApp(){
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(professionalWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||groupedWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
+      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(groupedWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||groupedWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
         {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&groupedWorkspace&&<SchoolProfessionalHome administrator={administratorWorkspace} items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
         {page==='overview'&&!groupedWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
-        {page==='account'&&<section className={'hs-panel hs-account-panel'+(user.role==='STUDENT'?' hs-student-account':'')}><div><h2>校园账号</h2><p>用户名：{user.username}</p>
-          <p>你使用的是独立校园账号。可用功能由学校授权决定。</p></div>
+        {page==='account'&&<section className={'hs-panel hs-account-panel'+(user.role==='STUDENT'?' hs-student-account':'')+(administratorWorkspace?' hs-admin-panel hs-admin-account':'')}><div>{administratorWorkspace?<SchoolReportHeader compact title="校园账号" label="校园账号使用说明"><p>你使用的是独立校园账号。可用功能由学校授权决定。</p></SchoolReportHeader>:<h2>校园账号</h2>}<p>用户名：{user.username}</p>
+          {!administratorWorkspace&&<p>你使用的是独立校园账号。可用功能由学校授权决定。</p>}</div>
           <div><h3>修改密码</h3>
           <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/></div>
         </section>}
-        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className="hs-panel">
-          <h2>敏感操作二次验证</h2>
-          <p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p>
+        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className={'hs-panel'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
+          <SchoolReportHeader compact={administratorWorkspace} title="敏感操作二次验证" label="二次验证使用说明"><p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p></SchoolReportHeader>
           <div className="hs-actions">
             <label className="hs-field"><span>验证器 6 位动态验证码</span>
               <input value={stepUpCode} onChange={event=>setStepUpCode(event.target.value)}
@@ -506,16 +510,23 @@ export default function SchoolApp(){
           </>:
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
+          {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></SchoolAdminPanel></div>}
           {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
-          {page==='classes'&&!professionalClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
+          {page==='classes'&&!professionalClassPage&&!administratorClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
             <div>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}>
               <option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>
               <button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></div></div>}
             {!schoolAdmin&&<p>选择学校和班级后，可进入你已获授权的校园功能。</p>}
           </section>}
+          {administratorAdmissionPage&&<div className="hs-professional-admission"><SchoolProfessionalClassScope admission>{workspaceContext}</SchoolProfessionalClassScope>{!schoolId||!classId?<section className="hs-panel hs-recovery-empty"><h2>选择要管理的班级</h2><p>选择班级后，可查看进度并管理资格名册、激活码与注册窗口。</p></section>:<SchoolAdminSections key={classPath} label="班级注册管理" busy={working} panes={[
+            {id:'progress',title:'注册进度',content:<SchoolAdmissionProgress classSelected summary={summary} working={working} approvalDisabled={classApprovalDisabled} onRefresh={()=>void loadSummary()} onApprove={()=>void approve()} showApproval={psychologyStaff}/>},
+            {id:'roster',title:'资格名册',content:<SchoolAdminPanel title="更新资格名册" label="资格名册使用说明" help={<p>每行填写一个学号，仅上传时用于计算受保护索引。</p>}><label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span><textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label><button disabled={working||!roster.trim()} onClick={()=>void saveRoster()}>更新资格名册</button></SchoolAdminPanel>},
+            {id:'codes',title:'激活码',content:<SchoolAdminPanel title="一次性激活码" label="激活码使用说明" help={<p>以下注册码只在本次操作显示，请分别安全交付给学生。</p>}><button disabled={working} onClick={()=>void issueCodes()}>批量生成一次性激活码</button>{issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}</SchoolAdminPanel>},
+            {id:'window',title:'注册窗口',content:<SchoolAdminPanel title="班级注册窗口" label="注册窗口使用说明" help={<p>设置注册截止时间后开启注册；注册状态与整班身份审批分别核验。</p>}><label className="hs-field"><span>注册截止时间</span><input type="datetime-local" value={windowEnd} onChange={e=>setWindowEnd(e.target.value)}/></label><div className="hs-actions"><button disabled={working||!windowEnd} onClick={()=>void actionWindow('OPEN')}>开启注册</button><button disabled={working} onClick={()=>void actionWindow('CLOSE')}>关闭注册</button></div><details className="hs-admin-registration-link"><summary>查看注册链接</summary><code className="hs-break">{joinUrl}</code></details></SchoolAdminPanel>},
+          ]}/>}</div>}
           {professionalAdmissionPage&&<SchoolProfessionalAdmission classSelected={!!schoolId&&!!classId} summary={summary} working={working} approvalDisabled={classApprovalDisabled} onRefresh={()=>void loadSummary()} onApprove={()=>void approve()}>{workspaceContext}</SchoolProfessionalAdmission>}
-          {page==='admission'&&!professionalAdmissionPage&&schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
+          {page==='admission'&&!professionalAdmissionPage&&!administratorAdmissionPage&&schoolId&&classId&&<section className="hs-panel"><h2>班级注册与审批</h2>
             {schoolAdmin&&<p>注册链接：<code className="hs-break">{joinUrl}</code></p>}
             {summary&&<p>状态：{summary.status} · 名册预期 {summary.rosterExpectedCount} · 当前资格 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
             <button onClick={()=>void loadSummary()} disabled={working}>刷新班级状态</button>
@@ -539,7 +550,7 @@ export default function SchoolApp(){
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
-          {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
+          {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships compact={administratorWorkspace} key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
           {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
             &&page==='activities'&&schoolId
             &&canManageSchoolActivities(access)
@@ -549,13 +560,13 @@ export default function SchoolApp(){
             </details>}
           {page==='activities'&&schoolId&&access&&canManageSchoolActivities(access)&&<SchoolActivityManager
             key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
-            compact={ordinaryTeacher||professionalWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
+            compact={ordinaryTeacher||groupedWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupReports compact={professionalWorkspace} key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolGroupReports compact={groupedWorkspace} key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='group-trends'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupLongitudinal compact={professionalWorkspace} key={'SchoolGroupLongitudinal:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolGroupLongitudinal compact={groupedWorkspace} key={'SchoolGroupLongitudinal:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='protected-reports'&&psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
             &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_PROTECTED_FEEDBACK_V1'].includes(x))
             &&<SchoolProtectedReportStudio compact={professionalWorkspace} key={'SchoolProtectedReportStudio:'+schoolId} api={api} organizationId={schoolId}/>}
@@ -569,21 +580,21 @@ export default function SchoolApp(){
             &&<SchoolReportOfficer key={'SchoolReportOfficer:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='report-officers'&&campusParentReportEnabled&&schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={'SchoolDisclosureOfficers:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='report-review'&&!campusParentReportEnabled&&(schoolAdmin||psychologyStaff)&&<p>家长版报告披露尚未正式开放，需完成逐资源科学审核后单独启用。</p>}
-          {page==='staff'&&schoolAdmin&&schoolId&&<section className="hs-panel"><h2>邀请校园教职员工</h2>
-            <div className="hs-actions"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
+          {page==='staff'&&schoolAdmin&&schoolId&&<SchoolAdminPanel className="hs-admin-staff" title="邀请校园教职员工" label="人员邀请使用说明" help={<p>岗位、心理专业权限和学校管理员权限分别设置。邀请码仅显示一次，请安全交付给受邀人员。</p>}>
+            <div className="hs-admin-staff-fields"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
               <label><input type="checkbox" checked={staffPsych} onChange={e=>setStaffPsych(e.target.checked)}/> 心理专业权限</label>
               <label><input type="checkbox" checked={staffAdmin} onChange={e=>setStaffAdmin(e.target.checked)}/> 学校管理员</label>
               <button disabled={working} onClick={()=>void invite()}>生成邀请</button></div>
             {newInvite&&<div className="hs-secret"><p>仅显示一次的邀请码：</p><code>{newInvite}</code></div>}
-          </section>}
+          </SchoolAdminPanel>}
         </>:<div>
           {page==='family'&&<SchoolParentLinks api={api} role="PARENT"/>}
           {page==='peer'&&<SchoolPeerConsent api={api} role="PARENT"/>}
           {page==='tasks'&&<SchoolParentTasks api={api}/>}
           {page==='parent-reports'&&campusParentReportEnabled&&<SchoolParentReports api={api}/>}
         </div>}
-        {['admission','recovery'].includes(page)&&!professionalAdmissionPage&&!professionalRecoveryPage&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
+        {['admission','recovery'].includes(page)&&!professionalAdmissionPage&&!administratorAdmissionPage&&!professionalRecoveryPage&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
       </SchoolWorkspaceShell>}
     </main>
     <footer className="hs-footer">School · 科学支持 · 专业陪伴 · 健康成长</footer>

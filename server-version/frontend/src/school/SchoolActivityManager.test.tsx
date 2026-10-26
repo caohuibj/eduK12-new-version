@@ -24,7 +24,7 @@ describe('Huischool Activity peer allocation after reopen',()=>{
     const originalConfirm=window.confirm
     window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolActivityManager api={api as unknown as SchoolApi}
+      render(<SchoolActivityManager compact api={api as unknown as SchoolApi}
         organizationId={org} isAdmin classes={[{id:classUnit,name:'五年级一班',unitKind:'CLASS'}]}/>)
       fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
       expect(await screen.findByText(/状态：已开放/)).toBeInTheDocument()

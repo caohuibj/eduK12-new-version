@@ -86,10 +86,14 @@ it('retains school governor roster and registration controls',async()=>{
  setup(ready,true)
  try{
   render(<SchoolApp/>)
-  await screen.findByRole('button',{name:'更新资格名册'})
+  await screen.findByRole('navigation',{name:'班级注册管理'})
+  fireEvent.click(screen.getByRole('button',{name:'资格名册'}))
+  expect(screen.getByRole('button',{name:'更新资格名册'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'激活码'}))
   expect(screen.getByRole('button',{name:'批量生成一次性激活码'})).toBeInTheDocument()
-  expect(screen.getByRole('button',{name:'开启注册'})).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'注册窗口'}))
+  expect(screen.getByRole('button',{name:'开启注册'})).toBeDisabled()
   expect(screen.getByRole('button',{name:'关闭注册'})).toBeInTheDocument()
-  expect(screen.queryByRole('region',{name:'审批班级选择'})).not.toBeInTheDocument()
+  expect(screen.getByRole('region',{name:'审批班级选择'})).toBeInTheDocument()
  }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
