@@ -136,8 +136,8 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
   })
   return <section className="ht-panel ht-personal-workbench" aria-label="教师个人自主发展测评">
     <header className="ht-section-heading">
-      <h2>组织测评</h2>
-      <AssessmentHelp label="组织测评说明" buttonText=""><p>选择已授权给本人的工具，发起个人测评；此处仅供本人作答，不向其他人发布。个人反馈仅由本人查看。</p></AssessmentHelp>
+      <h2>个人测评</h2>
+      <AssessmentHelp label="个人测评说明" buttonText=""><p>选择已授权给本人的工具，发起个人测评；此处仅供本人作答，不向其他人发布。个人反馈仅由本人查看。</p></AssessmentHelp>
     </header>
     {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>

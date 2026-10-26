@@ -1,0 +1,34 @@
+/* Teacher management layout; shared roster/editor behavior stays in its own components. */
+.ht-workspace-admin .ht-management-context{margin:0;color:var(--ht-quiet);font-size:13px}
+.ht-management-context strong{font-weight:500;color:var(--ht-ink)}
+.ht-workspace-admin .ht-admin{margin-top:14px;padding-top:0;border:0}
+.ht-workspace-admin .ht-count{font-size:12px;font-weight:400;color:var(--ht-quiet)}
+.ht-workspace-admin .ht-admin-action{margin:12px 0;border:1px solid var(--ht-line);border-radius:10px;padding:0 14px;background:transparent}
+.ht-admin-action>summary{display:list-item;min-height:46px;padding:12px 0;color:var(--ht-ink);font-size:14px;font-weight:600;line-height:1.6;cursor:pointer}
+.ht-admin-action>summary:focus-visible{outline:2px solid var(--ht-copper);outline-offset:3px}
+.ht-admin-action[open]{padding-bottom:14px}
+.ht-workspace-admin .ht-admin-action>.ht-inline{margin:6px 0 0;gap:12px}
+.ht-workspace-admin .ht-admin-action>.ht-field{margin:10px 0}
+.ht-workspace-admin .ht-admin-action>p{font-size:13px;color:var(--ht-quiet);margin:4px 0 12px}
+.ht-workspace-admin .ht-admin-action :is(button,label){font-size:14px}
+.ht-workspace-admin .ht-admin-mfa>.ht-field{flex:0 1 280px}
+.ht-workspace-admin .ht-inline>button{margin-bottom:0}
+.ht-workspace-admin :is(.ht-admin-action>.ht-inline,.ht-form-create-row)>.ht-field{margin-block:0}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event>.ht-inline{margin:10px 0 0}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event>.ht-muted{margin:8px 0}
+.ht-admin-panel>section+section{margin-top:22px;padding-top:6px;border-top:1px solid var(--ht-line)}
+.ht-admin-list-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:22px 0 12px}
+.ht-workspace .ht-admin-list-heading h3{margin:0}
+.ht-workspace-admin .ht-admin-list-heading>button{font-size:13px}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list{display:grid;gap:12px}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event{margin:0;padding:18px}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event>strong{font-size:15px;font-weight:600;margin-right:10px}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event>.ht-tag{font-size:12px;padding:3px 8px}
+.ht-workspace-admin .ht-evaluation-workbench>.ht-event-list>.ht-event button{font-size:14px}
+.ht-workspace-admin .ht-form-create-row>.ht-field{flex:0 1 480px}
+.ht-school-form-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0}
+.ht-app .ht-school-form-list>button{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;min-height:54px;padding:12px 14px;text-align:left}
+.ht-school-form-list strong{min-width:0;font-size:14px;font-weight:600;line-height:1.6;overflow-wrap:anywhere}
+.ht-school-form-list .ht-tag{flex:none;font-size:12px;font-weight:400;padding:3px 8px}
+.ht-app .ht-school-form-list>button[aria-pressed=true]{border-color:var(--ht-copper);box-shadow:inset 3px 0 var(--ht-copper)}
+@media(max-width:700px){.ht-school-form-list{grid-template-columns:minmax(0,1fr)}.ht-workspace-admin .ht-admin-action{padding-inline:12px}.ht-workspace-admin .ht-admin-action .ht-inline>.ht-field{flex-basis:100%}.ht-admin-list-heading{align-items:flex-start}.ht-workspace-admin .ht-admin-mfa{align-items:stretch}}

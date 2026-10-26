@@ -1,3 +1,4 @@
+import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {EducationRosterManagement} from '../components/education-roster/EducationRosterManagement'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
@@ -28,6 +29,7 @@ import { ProductThemeControl } from '../components/product-theme/ProductThemeCon
 import './huiteacher-theme.css'
 import './teacher-home-refresh.css'
 import './huiteacher-workspace-layout.css'
+import './huiteacher-admin-layout.css'
 import '../components/education-tools/education-entry-layout.css'
 
 type Envelope<T>={code:string|number;message:string;data:T}
@@ -95,7 +97,9 @@ function AccountDialog({open,onClose,children}:{open:boolean;onClose:()=>void;ch
   </dialog>
 }
 function WorkspaceJump({id,children,selected,onSelect}:{id:string;children:React.ReactNode;selected:string;onSelect:(id:string)=>void}){
-  return <a href={`#${id}`} aria-current={selected===id?'location':undefined} onClick={event=>{
+  const link=useRef<HTMLAnchorElement>(null)
+  useEffect(()=>{if(selected===id)link.current?.scrollIntoView?.({block:'nearest',inline:'nearest'})},[selected,id])
+  return <a ref={link} href={`#${id}`} aria-current={selected===id?'location':undefined} onClick={event=>{
     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
     flushSync(()=>onSelect(id))
     const target=document.getElementById(id)
@@ -470,7 +474,7 @@ export default function HuiteacherApp(){
       <h1>首次登录 · 修改教育账号密码</h1>
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
-    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:'other'}><div className="ht-workspace" hidden={assessmentPageOpen}>
+    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:'other'}><div className={'ht-workspace'+(workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
       <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
@@ -486,12 +490,12 @@ export default function HuiteacherApp(){
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
           <span className="ht-workspace-nav-label">我的任务</span>
           <WorkspaceJump id="ht-personal-tasks" selected={personalSection} onSelect={setPersonalSection}><ClipboardList size={18} aria-hidden="true"/>参与测评</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>组织测评</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}><Sprout size={18} aria-hidden="true"/>个人测评</WorkspaceJump>
           {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}><MessageSquare size={18} aria-hidden="true"/>学生反馈</WorkspaceJump>}
           {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}><TrendingUp size={18} aria-hidden="true"/>我的成长</WorkspaceJump>}
         </nav>
         <div className="ht-workspace-sections">
-        <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="组织测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
+        <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="个人测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
         <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
@@ -500,7 +504,7 @@ export default function HuiteacherApp(){
         </div></div>
       </>}
       {workspaceTab==='school'&&org?.productAdmin&&<>
-      <p className="ht-notice">当前学校管理范围：{org.organizationName}。此处仅管理本校已授权的成员、工具与活动。</p>
+      <div className="ht-management-context ht-section-heading"><span>管理范围：<strong>{org.organizationName}</strong></span><ManagementHelp label="学校管理范围说明" buttonText=""><p>此处仅管理本校已授权的成员、工具与活动。</p><p>Teacher 管理授权和 School 人员管理授权分别校验，测评发布不会自动开放个人报告。</p></ManagementHelp></div>
       <div className="ht-workspace-body">
       <nav className="ht-workspace-jumps" aria-label="学校管理分区">
         <WorkspaceJump id="ht-school-settings" selected={schoolSection} onSelect={setSchoolSection}>学校设置与成员</WorkspaceJump>
@@ -516,15 +520,16 @@ export default function HuiteacherApp(){
       </details>}
       {org&&<section id="ht-school-settings" hidden={schoolSection!=='ht-school-settings'} className="ht-panel ht-workspace-section" tabIndex={-1} aria-label="学校设置与成员">
         <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Teacher 管理权限':'已获得本校 Teacher 参与权限'}</p>
-        {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
+        {me.role!=='STUDENT'&&<><h3>年级与班级 <span className="ht-count">{units.length}</span></h3>{!units.length&&<p className="ht-muted">暂无年级和班级，可通过批量导入或手动创建添加。</p>}<div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
         {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
-          <div className="ht-inline"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>
-            <button disabled={working||!mfaCode} onClick={stepUp}>重新验证敏感操作</button></div>
+          <details className="ht-admin-action"><summary>敏感操作验证</summary><div className="ht-inline ht-admin-mfa"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>
+            <button disabled={working||!mfaCode} onClick={stepUp}>重新验证敏感操作</button></div></details>
           <EducationRosterManagement api={teacherApi} organizationId={org.organizationId} units={units} onUnits={setUnits} disabled={working} entry="TEACHER"/>
-          <h3>学校成员邀请</h3>
+          <details className="ht-admin-action"><summary>学校成员邀请</summary>
           <button disabled={working} onClick={invite}>签发教师邀请</button>
           {issuedInvite&&<p className="ht-secret">一次性邀请码：<code className="ht-wrap">{issuedInvite}</code></p>}
-          <h3>创建年级或班级</h3>
+          </details>
+          <details className="ht-admin-action"><summary>手动创建年级或班级</summary>
           <div className="ht-inline"><label className="ht-field"><span>类型</span><select value={newUnitType} onChange={e=>setNewUnitType(e.target.value as 'GRADE'|'CLASS')}>
             <option value="GRADE">年级</option><option value="CLASS">班级</option></select></label>
             <Field label="名称" value={newUnitName} set={setNewUnitName}/>
@@ -532,7 +537,8 @@ export default function HuiteacherApp(){
               <option value="">请选择</option>{units.filter(u=>u.unitKind==='GRADE').map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
             </select></label>}
             <button disabled={working||!newUnitName||newUnitType==='CLASS'&&!newUnitParent} onClick={createUnit}>创建</button></div>
-          <h3>学生身份与班级关系</h3>
+          </details>
+          <details className="ht-admin-action"><summary>学生身份与班级关系</summary>
           <p>Teacher 学生加入是共享教育身份的基础成员授权；不会产生 School 心理健康的班级审批。</p>
           <label className="ht-field"><span>班级</span><select value={classId} onChange={e=>setClassId(e.target.value)}>
             <option value="">请选择班级</option>{units.filter(u=>u.unitKind==='CLASS').map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
@@ -544,7 +550,8 @@ export default function HuiteacherApp(){
             <div className="ht-members">{issuedStudentInvites.map(item=><p key={item.inviteCode}>
               学号 {item.studentNumber}：<code className="ht-wrap">{item.inviteCode}</code>
             </p>)}</div></div>}
-          <details><summary>Teacher 当前已授权成员（{members.length}）</summary><div className="ht-members">{members.map(m=><span key={m.membershipId} className="ht-tag">{m.loginName} · {m.role}</span>)}</div></details>
+          </details>
+          <details className="ht-admin-action"><summary>Teacher 当前已授权成员（{members.length}）</summary><div className="ht-members">{members.map(m=><span key={m.membershipId} className="ht-tag">{m.loginName} · {m.role}</span>)}</div></details>
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}

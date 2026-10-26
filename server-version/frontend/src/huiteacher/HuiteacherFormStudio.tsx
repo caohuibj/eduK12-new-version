@@ -1,3 +1,4 @@
+import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { ResearchFormEditor } from '../survey/ResearchFormEditor'
 import type { FormDraft } from '../survey/builder.types'
@@ -102,19 +103,18 @@ export function HuiteacherFormStudio({organizationId,api,onDraftStateChange}:{
       await refresh();setNotice('表单已发布并冻结。请在评价活动中配置并发布正式任务。')
     },true)
   }
-  return <section className="ht-panel" aria-label="Huiteacher Form 工具编制">
-    <h2>评价表单编制</h2>
-    <p>复用科研版专业题型与验证规则，数据及草稿属于 Huiteacher 学校；此处不能访问 Survey 研究项目。</p>
+  return <section className="ht-panel ht-admin-panel ht-school-form-studio" aria-label="Huiteacher Form 工具编制">
+    <header className="ht-section-heading"><h2>评价表单编制</h2><ManagementHelp label="学校表单编制说明" buttonText=""><p>复用科研版专业题型与验证规则，数据及草稿属于 Huiteacher 学校；此处不能访问 Survey 研究项目。</p></ManagementHelp></header>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    <div className="ht-inline"><label className="ht-field"><span>新表单名称</span>
+    <div className="ht-inline ht-form-create-row"><label className="ht-field"><span>新表单名称</span>
       <input disabled={busy} value={newTitle} maxLength={200} onChange={e=>setNewTitle(e.target.value)}/></label>
       <button disabled={busy||!newTitle.trim()} onClick={()=>void create()}>创建表单</button></div>
     {listLoading&&<p role="status">正在读取本校表单…</p>}
     {listError&&<div role="alert">{listError}<button disabled={busy} onClick={()=>void action(async()=>{await refresh();setListError('')})}>重试表单列表</button></div>}
     {!listLoading&&!listError&&forms.length===0&&<p className="ht-empty">本校尚无表单，可以先创建草稿。</p>}
-    <div className="ht-inline">{forms.map(item=><button type="button" key={item.id}
+    <div className="ht-school-form-list">{forms.map(item=><button type="button" key={item.id}
       disabled={busy} aria-pressed={active?.id===item.id} onClick={()=>void load(item.id)}>
-      {item.title} · {item.status==='PUBLISHED'?'已发布':'草稿'}
+      <strong>{item.title}</strong><span className="ht-tag"> · {item.status==='PUBLISHED'?'已发布':'草稿'}</span>
     </button>)}</div>
     {active&&draft&&<div>
       <div className="ht-inline"><label className="ht-field"><span>表单标题</span>
