@@ -11,7 +11,7 @@ export function libraryCatalogSnapshot(entryId:string,release:{releaseId:string;
     case 'SCHOOL':
     case 'TEACHER':
     case 'TRAINING':
-      native=adaptCatalogScale(ref,snapshot.title,snapshot.compiledDefinition,{instrumentClass:'CUSTOM_DESCRIPTIVE'})
+      native=adaptCatalogScale(ref,snapshot.title,snapshot.compiledDefinition,{instrumentClass:'CUSTOM_DESCRIPTIVE',...(snapshot.instruction?{instruction:snapshot.instruction}:{})})
       break
     case 'SURVEY':
       native={ref,title:snapshot.title,displayDefinition:snapshot.definition,compiledDefinition:snapshot.compiledDefinition,

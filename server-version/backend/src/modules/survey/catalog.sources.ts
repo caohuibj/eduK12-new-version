@@ -35,6 +35,8 @@ export type CatalogSourceRef={kind:SurveyKind;sourceId:string;sourceVersion:stri
 export type SourceAnswerMapping={type:'SCALE_TYPED_V1';items:Record<string,string>;options:Record<string,string|number>}
 export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefinition:unknown;compiledDefinition:unknown;
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;nativeSituational?:SurveyNativeSituationalHeader;
+  /** Administration instruction of the exact source version; display metadata outside the definition digest. */
+  instruction?:string;
   adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION|typeof NATIVE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string;classificationTags?:CatalogClassificationTag[]}
 const CATALOG_MAX_PAGE=40
@@ -52,7 +54,7 @@ function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unk
 }
 /** Only presentation identifiers are translated. The canonical score definition is copied byte-for-byte. */
 export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2,
-  options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'}={}):CatalogSourceSnapshot {
+  options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';instruction?:string}={}):CatalogSourceSnapshot {
   const valid=validateScaleDefinition(definition,{instrumentClass:options.instrumentClass??'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
   // The canonical Training publisher also rejects randomization: never silently flatten it.
@@ -63,6 +65,7 @@ export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:S
   return copy({ref,title,displayDefinition:display,compiledDefinition:definition,
     definitionDigest:canonicalHash(definition),scoringDigest:canonicalHash(definition.scoring),
     adapterVersion:CANONICAL_SCALE_ADAPTER_VERSION,answerMapping:mapping,
+    ...(options.instruction?{instruction:options.instruction}:{}),
     provenance:{source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true}})
 }
 /** Historical V1 grants keep their exact original presentation, including

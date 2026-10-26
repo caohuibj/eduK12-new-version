@@ -10,7 +10,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileResearchScale} from '../survey/builder.compiler'
 import {assertSurveyDraft} from '../survey/builder.definition'
 import {fail,librarySourceProduct,type LibrarySourceProduct} from './contracts'
-export type LibrarySnapshot=FrozenEducationApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest;educationSource?:{toolId:string;versionId:string;entry:'SCHOOL'|'TEACHER';organizationId:string;contentHash:string}}
+export type LibrarySnapshot=FrozenEducationApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;instruction?:string;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest;educationSource?:{toolId:string;versionId:string;entry:'SCHOOL'|'TEACHER';organizationId:string;contentHash:string}}
 export async function submissionSource(tx:Prisma.TransactionClient,actorId:string,product:LibrarySourceProduct,releaseId:string){
   librarySourceProduct.parse(product)
   const release=await getContentRelease(tx,releaseId,true)
@@ -20,8 +20,8 @@ export async function submissionSource(tx:Prisma.TransactionClient,actorId:strin
   const stored=release.provenance.authoringSnapshot as Partial<LibrarySnapshot>|undefined
   let snapshot:LibrarySnapshot
   if(product==='TRAINING'){
-    const [row]=await tx.$queryRaw<Array<{name:string;definition:ScaleDefinitionV2;definition_hash:string;instrument_class:string;instrument_version:string;measurement_release_id:string}>>(Prisma.sql`
-      SELECT name,definition,definition_hash,instrument_class::text,instrument_version,measurement_release_id FROM scales
+    const [row]=await tx.$queryRaw<Array<{name:string;instruction:string|null;definition:ScaleDefinitionV2;definition_hash:string;instrument_class:string;instrument_version:string;measurement_release_id:string}>>(Prisma.sql`
+      SELECT name,instruction,definition,definition_hash,instrument_class::text,instrument_version,measurement_release_id FROM scales
       WHERE id=${sourceId} AND creator_id=${actorId} AND status='PUBLISHED' FOR SHARE`)
     if(!row||row.instrument_class!=='CUSTOM_DESCRIPTIVE'||row.measurement_release_id!==releaseId||hashScaleDefinition(row.definition)!==row.definition_hash)
       fail('量表来源与已发布版本不一致')
@@ -30,7 +30,7 @@ export async function submissionSource(tx:Prisma.TransactionClient,actorId:strin
     if(expected.contentHash!==release.contentHash)fail('量表来源与已发布版本不一致')
     // This is an explicit new application snapshot, not a rewrite/backfill of the
     // old release. The published Training definition is verified above.
-    snapshot={title:stored?.title??row.name,product,instrumentClass:'CUSTOM_DESCRIPTIVE',definition:stored?.definition??row.definition,
+    snapshot={title:stored?.title??row.name,product,instrumentClass:'CUSTOM_DESCRIPTIVE',...(row.instruction?{instruction:row.instruction}:{}),definition:stored?.definition??row.definition,
       compiledDefinition:(stored?.definition??row.definition) as ScaleDefinitionV2}
     if(canonicalHash(snapshot.compiledDefinition)!==canonicalHash(row.definition))fail('量表不可变编制快照不一致')
   }else if(product==='SURVEY'){

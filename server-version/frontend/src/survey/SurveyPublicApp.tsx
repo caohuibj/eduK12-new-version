@@ -47,7 +47,7 @@ type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Cho
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
-type Unit={executionProtocol?:'SITUATIONAL_NATIVE_V1';materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
+type Unit={executionProtocol?:'SITUATIONAL_NATIVE_V1';materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;instruction?:string;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
@@ -226,6 +226,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
   }
   return <section className={'border rounded-xl bg-slate-50 p-4 my-5'+(purpose==='SURVEY'?' survey-answer-panel'+(surveyForm?' survey-form-experience':''):'')}>
     <h3 className="text-lg font-semibold">{unit.title}</h3>
+    {unit.instruction&&<p className="survey-answer-guide" role="note">{unit.instruction}</p>}
     {purpose==='SURVEY'&&unit.kind==='SJT'&&<p className="survey-answer-guide">请先阅读情境，再选择你的回答。* 为必答。</p>}
     {unit.kind==='FORM'&&<div>
       {(!surveyForm||visiblePages.length>1)&&<div className="survey-form-page-progress"><p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页

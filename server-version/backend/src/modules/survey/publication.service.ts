@@ -50,6 +50,8 @@ export interface ResearchFrozenUnit {
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
   sourceAnswerMapping?:SourceAnswerMapping
+  /** Administration instruction frozen with this unit's exact source version. */
+  instruction?:string
   draftId:string
   instrumentKey:string
   kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'

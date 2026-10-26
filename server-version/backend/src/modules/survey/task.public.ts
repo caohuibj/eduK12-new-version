@@ -71,6 +71,7 @@ export async function getOwnResearchTask(input:{
       const d=readSurveyScalePresentation(unit.displayDefinition)
       const responseOptions=d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label}))
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
+        ...(unit.instruction?{instruction:unit.instruction}:{}),
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions,
         items:d.items.map(q=>{
