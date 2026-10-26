@@ -1,0 +1,599 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "brcs4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "简式韧性应对量表（BRCS成人4题，平台中文研究工作稿，独立五点编排）",
+      "abbreviation": "BRCS-4-ZH",
+      "instrumentFamily": "Brief Resilient Coping Scale (Sinclair & Wallston 2004); independent Chinese research adaptation using open 2016 wording and five-point format"
+    },
+    "construct": {
+      "primaryDomain": "RESILIENCE",
+      "secondaryDomains": [
+        "SELF_REGULATION",
+        "WELL_BEING"
+      ],
+      "constructDefinition": "自报面对困难时主动寻找解决办法、调节自己的反应、从困难中成长并弥补损失的倾向；关注应对方式，不是从压力恢复速度、恒定能力或心理疾病诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "brcs4_zh_cn_research",
+        "domain:resilience",
+        "domain:coping",
+        "domain:self_regulation",
+        "domain:everyday_stress",
+        "construct:resilient_coping",
+        "construct:creative_problem_solving",
+        "construct:response_control_belief",
+        "construct:positive_growth",
+        "construct:loss_replacement",
+        "orientation:adaptive_coping",
+        "orientation:resource_oriented",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:self_report",
+        "population:source_chronic_disease",
+        "population:not_k12_validated",
+        "response:4_items",
+        "response:five_point_self_description",
+        "response:no_reverse_items",
+        "response:endpoint_labels_only",
+        "response:fixed_order",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_school_ranking",
+        "use:no_validated_chinese_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:source_allows_redistribution",
+        "license:source_allows_adaptation",
+        "license:source_allows_commercial_use",
+        "license:not_relying_on_public_domain_claim",
+        "language_validation:open_english_wording",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:this_translation_china_validation_not_established",
+        "韧性应对",
+        "复原应对",
+        "积极应对",
+        "困难处境",
+        "寻找办法",
+        "调节反应",
+        "应对损失",
+        "成人自评",
+        "中文研究工作稿",
+        "个人反思",
+        "非诊断",
+        "五点独立编排"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "2004家族开发样本为美国类风湿关节炎患者（n=90/140）；2016开放题文出处为西班牙SLE患者（n=232，平均48.6岁）且采用删中档四点改编；2017五点计分描述及德国参考分布不构成此中文稿验证。平台暂限成人自评；18岁为保守使用边界，不宣称原作者规定或已获中国/K12验证。已发表其他中文研究不等于本翻译获验证。"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "通常面对困难时的行为与做法；不限定最近7天或30天",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定4题顺序及同一五点1–5作答形式，无反向题。",
+        "英文题文取2016作者共同发表开放附录，响应格式按其正文所述原版五点及2017正文独立编排；不冒称直接取得2004精确题本。",
+        "只标1/5两端文字，2/3/4保留数字；没有借用第三方中间锚点。",
+        "2016 Table 6是删中间档的四点改编，第二行最高数字还与其他行不一致；本包不使用其0–3/0–4编码或Rasch参数。",
+        "本平台保守要求4题齐答；缺失规则不是原作者验证规则，不插补或外推。",
+        "独立指导语仅在研究sidecar中PREPARED，旧schema没有instruction字段，不塞入第一题。",
+        "完成时间为平台估计，不是原作者实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可追溯原家族和开放英文题文；此独立中文研究稿待译审/认知访谈/本地验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "结合实际处境回顾应对做法，不以分数给人贴韧性高低或能力标签。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2016作者共同发表CC BY 4.0附录Table 6英文4题；五点1–5形式按2016正文原版说明及2017正文独立编排，仅标端点，中间为数字；不是2016四点改编版的直接译本。",
+    "adaptationMethod": "CULTURAL_ADAPTATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "独立研究改编身份：开放英文4题工作翻译，加按正式正文说明编排的五点形式；未使用其他中文验证译本或其阈值，未获原作者中文认可。内容、计分、本地化和报告各自版本；不与2004原版、2016四点版或其他译本共用版本序列。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "brcs4_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "brcs4_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "brcs4_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2016 The Author(s): López-Pina, Meseguer-Henarejos, Gascón-Cánovas, Navarro-Villalba, Sinclair and Wallston. 4题英文及共同指导语取自上述作者2016论文附录Table 6（PDF第7页），整篇CC BY 4.0，https://creativecommons.org/licenses/by/4.0/；未见该表第三方许可排除。原量表家族为Sinclair & Wallston 2004（10.1177/1073191103258144）。本平台独立中文翻译并撰写反馈；响应格式按2016正文所述原版五点1–5及2017正文同序4题/总分4–20独立编排，只显示端点文字及中间数字。没有采用2016删中间档的四点改编版、其Rasch参数或表中不一致编码，不声称原2004精确题本已取得，也不复制其他中文译本。允许署名再分发/改编及商用，须保留作者、两来源、许可链接和修改说明。此结论基于明确CC BY 4.0，不以第三方Public Domain标签作为依据。2016作者PDF SHA-256：65e415c77423e1c279ea341976f24a401fc74aa06525ef270e1b54606786a07d。",
+      "标签用于事实检索，不自动授予系统使用/发布权限；本包不激活产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "SELF",
+      "source": {
+        "title": "BRCS family (Sinclair & Wallston 2004); independent Chinese research adaptation from open 2016 wording with five-point format",
+        "citation": "Sinclair, V. G., & Wallston, K. A. (2004). The development and psychometric evaluation of the Brief Resilient Coping Scale. Assessment, 11(1), 94–101. https://doi.org/10.1177/1073191103258144. Open wording source: López-Pina, J.-A., Meseguer-Henarejos, A.-B., Gascón-Cánovas, J.-J., Navarro-Villalba, D.-J., Sinclair, V. G., & Wallston, K. A. (2016). Measurement properties of the brief resilient coping scale in patients with systemic lupus erythematosus using rasch analysis. Health and Quality of Life Outcomes, 14, 128. https://doi.org/10.1186/s12955-016-0534-3. Five-point scoring corroboration: Kocalevent, R.-D., Zenger, M., Hinz, A., Klapp, B., & Brähler, E. (2017). Resilient coping in the general population: standardization of the brief resilient coping scale (BRCS). Health and Quality of Life Outcomes, 15, 251. https://doi.org/10.1186/s12955-017-0822-6.",
+        "url": "https://link.springer.com/article/10.1186/s12955-016-0534-3",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2016 The Author(s): López-Pina, Meseguer-Henarejos, Gascón-Cánovas, Navarro-Villalba, Sinclair and Wallston. 4题英文及共同指导语取自上述作者2016论文附录Table 6（PDF第7页），整篇CC BY 4.0，https://creativecommons.org/licenses/by/4.0/；未见该表第三方许可排除。原量表家族为Sinclair & Wallston 2004（10.1177/1073191103258144）。本平台独立中文翻译并撰写反馈；响应格式按2016正文所述原版五点1–5及2017正文同序4题/总分4–20独立编排，只显示端点文字及中间数字。没有采用2016删中间档的四点改编版、其Rasch参数或表中不一致编码，不声称原2004精确题本已取得，也不复制其他中文译本。允许署名再分发/改编及商用，须保留作者、两来源、许可链接和修改说明。此结论基于明确CC BY 4.0，不以第三方Public Domain标签作为依据。2016作者PDF SHA-256：65e415c77423e1c279ea341976f24a401fc74aa06525ef270e1b54606786a07d。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "brcs4_description_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "非常符合我",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BRCS_01",
+          "content": "我会寻找有创意的办法来改变困难的处境。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "brcs4_description_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BRCS_02",
+          "content": "无论遇到什么事，我相信自己能够控制对这件事的反应。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "brcs4_description_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BRCS_03",
+          "content": "我相信，通过应对困难的处境，我能获得积极的成长。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "brcs4_description_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BRCS_04",
+          "content": "面对生活中遇到的损失，我会积极寻找办法来作出弥补。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "brcs4_description_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "BRCS_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BRCS_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BRCS_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BRCS_04",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "resilient_coping",
+            "type": "total",
+            "label": "面对困难时的应对做法",
+            "description": "4题五点选项等权求和4–20；更多表示本次自述更符合这些应对做法，不是恢复速度、临床判断或稳定能力标签。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BRCS_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BRCS_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BRCS_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BRCS_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "resilient_coping"
+        ],
+        "scoreOrder": [
+          "resilient_coping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "resilient_coping",
+            "headline": "面对困难时的应对做法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份回答整理的是你通常怎样面对困难：会不会尝试不同办法、怎样看待自己的反应，以及能否在损失之后寻找可做的事。现实中的压力大小、可用资源和身边的支持，都会影响这些做法能否用得上。有时先休息或向人求助，也是在照顾自己。可以选一件最近遇到的小困难，回想已经尝试过什么，再找一个自己承受得起的下一步。不必强迫自己立刻从困难中找到好处，也不用凭一次回答判断自己够不够坚强。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一件困难：哪些部分你能稍作改变，哪些部分需要时间、资源或他人的帮助？"
+              },
+              {
+                "category": "strategy",
+                "text": "把能做的部分写成一个很小的动作，例如先收集一条信息、尝试另一种办法，或联系一个能商量的人。"
+              },
+              {
+                "category": "support",
+                "text": "如果事情太重，可以先找可靠的人一起分担；不需要独自承担所有损失，也不必急着要求自己积极起来。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这份回答反映你当下对通常做法的看法，也会受到处境和可用支持的影响。",
+          "不能凭结果判断一个人是否坚强、是否患有心理疾病，或能否承受未来压力。",
+          "中文为独立研究工作稿，尚未完成译审和本地验证，不适合人与人之间排名。",
+          "没有回答的题目不会补成最低分；题目不完整时，本次结果不作解释。"
+        ],
+        "disclaimer": "供成年人回顾面对困难时的应对做法，不用于诊断、选拔或排名。中文为独立研究工作稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language editorial check; human expert review PENDING",
+            "reviewedAt": "2026-10-26T05:57:02.846539Z",
+            "basis": "2016作者共同发表CC BY 4.0附录Table 6英文4题；五点1–5形式按2016正文原版说明及2017正文独立编排，仅标端点，中间为数字；不是2016四点改编版的直接译本。；无常模、经验分档、诊断阈值或作者认可声明。"
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "brcs4",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "BRCS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BRCS_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BRCS_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BRCS_04",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilient_coping": 4
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "BRCS_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BRCS_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BRCS_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BRCS_04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilient_coping": 20
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      },
+      {
+        "name": "midpoint_arithmetic_only",
+        "answers": [
+          {
+            "itemCode": "BRCS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BRCS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BRCS_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BRCS_04",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilient_coping": 12
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "BRCS_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BRCS_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BRCS_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BRCS_04",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "resilient_coping": 12
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      },
+      {
+        "name": "missing_last",
+        "answers": [
+          {
+            "itemCode": "BRCS_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BRCS_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BRCS_03",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "resilient_coping": null
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "resilient_coping": null
+          },
+          "totalScoreKeys": [
+            "resilient_coping"
+          ]
+        }
+      }
+    ]
+  }
+}

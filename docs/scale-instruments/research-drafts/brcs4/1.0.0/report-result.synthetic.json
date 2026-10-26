@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-brcs4",
+    "code": "brcs4_zh_cn_research",
+    "name": "简式韧性应对量表（BRCS成人4题，平台中文研究工作稿，独立五点编排）",
+    "instrumentVersion": "1.0.0"
+  },
+  "method": {
+    "scaleId": "synthetic-brcs4",
+    "instrumentVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "definitionHash": "b9298f5b505c0246e341e8370bddb5f79a562e869ca021360fb55da87d93d80f",
+    "referenceVersions": [],
+    "assessmentContext": null,
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0"
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "BRCS_01",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "BRCS_02",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 4
+    },
+    {
+      "itemCode": "BRCS_03",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "BRCS_04",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    }
+  ],
+  "scores": [
+    {
+      "key": "resilient_coping",
+      "type": "total",
+      "label": "面对困难时的应对做法",
+      "description": "4题五点选项等权求和4–20；更多表示本次自述更符合这些应对做法，不是恢复速度、临床判断或稳定能力标签。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 12,
+      "range": {
+        "min": 4,
+        "max": 20
+      },
+      "expectedItems": [
+        "BRCS_01",
+        "BRCS_02",
+        "BRCS_03",
+        "BRCS_04"
+      ],
+      "answeredItems": [
+        "BRCS_01",
+        "BRCS_02",
+        "BRCS_03",
+        "BRCS_04"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "resilient_coping",
+      "headline": "面对困难时的应对做法",
+      "label": null,
+      "interpretation": "这份回答整理的是你通常怎样面对困难：会不会尝试不同办法、怎样看待自己的反应，以及能否在损失之后寻找可做的事。现实中的压力大小、可用资源和身边的支持，都会影响这些做法能否用得上。有时先休息或向人求助，也是在照顾自己。可以选一件最近遇到的小困难，回想已经尝试过什么，再找一个自己承受得起的下一步。不必强迫自己立刻从困难中找到好处，也不用凭一次回答判断自己够不够坚强。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "回想最近一件困难：哪些部分你能稍作改变，哪些部分需要时间、资源或他人的帮助？"
+        },
+        {
+          "category": "strategy",
+          "text": "把能做的部分写成一个很小的动作，例如先收集一条信息、尝试另一种办法，或联系一个能商量的人。"
+        },
+        {
+          "category": "support",
+          "text": "如果事情太重，可以先找可靠的人一起分担；不需要独自承担所有损失，也不必急着要求自己积极起来。"
+        }
+      ],
+      "limitations": [
+        "这份回答反映你当下对通常做法的看法，也会受到处境和可用支持的影响。",
+        "不能凭结果判断一个人是否坚强、是否患有心理疾病，或能否承受未来压力。",
+        "中文为独立研究工作稿，尚未完成译审和本地验证，不适合人与人之间排名。",
+        "没有回答的题目不会补成最低分；题目不完整时，本次结果不作解释。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这份回答反映你当下对通常做法的看法，也会受到处境和可用支持的影响。",
+    "不能凭结果判断一个人是否坚强、是否患有心理疾病，或能否承受未来压力。",
+    "中文为独立研究工作稿，尚未完成译审和本地验证，不适合人与人之间排名。",
+    "没有回答的题目不会补成最低分；题目不完整时，本次结果不作解释。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "供成年人回顾面对困难时的应对做法，不用于诊断、选拔或排名。中文为独立研究工作稿。"
+}

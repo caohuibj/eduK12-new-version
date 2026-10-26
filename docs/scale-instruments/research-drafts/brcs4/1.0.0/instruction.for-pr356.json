@@ -1,0 +1,15 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "identity": {
+    "instrumentKey": "brcs4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "instructionVersion": "1.0.0",
+    "title": "作答说明",
+    "text": "请想一想自己通常面对困难时的行为和做法，再判断下面的说法有多符合自己。选项从1（完全不符合我）到5（非常符合我），2、3、4表示两端之间逐渐增加的符合程度。请根据自己的实际情况作答，没有对错。",
+    "locale": "zh-CN"
+  },
+  "note": "Prepared content only; old executable source schema has no instruction field. Adapt to actual future instruction schema before integration; never prepend to item 1."
+}
