@@ -13,7 +13,7 @@ const projection=(state:'interpretable'|'limited'|'invalid'='interpretable'):Ant
  contextId:'A',configHash:ANT_FIXTURE_HASH,protocolSignature:ANT_FIXTURE_SIGNATURE,
  qualityFlags:{noInterpretableCondition:state==='invalid',incompleteAccuracy:state!=='interpretable',mixedInput:false,
  incompleteCue_none:false,incompleteCue_double:state!=='interpretable',unavailable_alerting:state!=='interpretable'},
- projection:{state,accuracy:1,cueRows:[
+ projection:{state,accuracy:1,flankerRows:[],cueRows:[
  {cue:'none',correct:12,total:12,accuracy:1,correctMeanRtMs:450,correctRtCount:12,input:'touch'},
  {cue:'double',correct:12,total:12,accuracy:1,correctMeanRtMs:550,correctRtCount:12,input:'touch'}],
  differences:[{key:'alerting',valueMs:-100,input:'touch',firstCorrectCount:12,secondCorrectCount:12}],

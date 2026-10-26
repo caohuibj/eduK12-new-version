@@ -1,5 +1,5 @@
-// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: 193c468841a6e71cc52470f0d327290830a9be377307d1841454e017be7dd856
-import { CUES,INPUTS,type Cue,type Flanker,type Input } from './protocol'
+// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: e86d4004d7aac162a75ce25ca849a041efc624616b063382fdaaa090fb63a60d
+import { CUES,FLANKERS,INPUTS,type Cue,type Flanker,type Input } from './protocol'
 export type AntScoreResult={metrics:Record<string,unknown>;quality:{state:'interpretable'|'limited'|'invalid';flags:Record<string,boolean>;reasons:string[]};audit:{trialCount:number;scorerVersion:string}}
 type CognitiveScoreResult=AntScoreResult
 interface Tally { observed:number; valid:number; correct:number }
@@ -36,6 +36,15 @@ export function projectAntReport(result:CognitiveScoreResult) {
     return [{cue,correct:c.correct,total:c.valid,accuracy:c.accuracy,
       correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
   })
+  const flankerRows=invalid?[]:FLANKERS.flatMap(flanker=>{
+    const c=m.flankerRecords?.[flanker]
+    if(flags['incompleteFlanker_'+flanker]!==false||!validCondition(c))return []
+    const r=input?m.correctRtByInput?.[input]?.flanker?.[flanker]:undefined
+    const show=rtAllowed&&r&&Number.isInteger(r.count)&&r.count>0&&r.count===c.correct
+      &&validNumber(r.meanMs)&&r.meanMs>=0&&r.meanMs<1700&&validNumber(r.sumMs)&&r.meanMs===r.sumMs/r.count
+    return [{flanker,correct:c.correct,total:c.valid,accuracy:c.accuracy,
+      correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
+  })
   const differences=invalid?[]:(Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]).flatMap(key=>{
     if(!rtAllowed||flags['unavailable_'+key]!==false)return []
     const keys=ANT_COSTS[key]
@@ -58,7 +67,7 @@ export function projectAntReport(result:CognitiveScoreResult) {
   const overall=!invalid&&flags.incompleteAccuracy===false&&allCuesValid
     &&m.validTrialCount===m.expectedTrialCount&&totalValid===m.validTrialCount&&totalValid>0
     &&validNumber(m.accuracy)&&m.accuracy===totalCorrect/totalValid?m.accuracy:null
-  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,differences,
+  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,flankerRows,differences,
     reasons:result.quality.reasons,description:'只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。',
     practicalTip:'把设备放稳，关闭通知，让视线留在中央注视点。'}
 }

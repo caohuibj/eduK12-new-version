@@ -140,10 +140,32 @@ export function scoreAnt(input:AuthoritativeScorerInput<AntConfig,AntTrial>):Cog
     validTrialCount:valid,excludedTrialCount:input.trials.length-valid,excludedTrialReasons:exclusions,
     accuracy:valid?correct/valid:null,cueRecords,flankerRecords,inputSourcesObserved:INPUTS.filter(i=>observedInputs.has(i)),
     correctRtByInput:byInput,differencesByInput:differences}
-  return {metrics:{...metrics},quality:{state,flags,reasons:state==='invalid'
+  const result:CognitiveScoreResult={metrics:{...metrics},quality:{state,flags,reasons:state==='invalid'
     ?['完整条件记录不足，本轮不提供表现结论。']:state==='limited'
       ?['部分条件、正确反应或输入来源不足以支持比较，受影响指标暂不展示。']:[]},
     audit:{trialCount:input.trials.length,scorerVersion:ANT_IDENTITY.scoringVersion}}
+  // Native report consumers need explicit scalar definitions; reuse the same gated projection.
+  const publicReport=projectAntReport(result)
+  for(const [group,keys,records,rows] of [
+    ['cue',CUES,cueRecords,publicReport.cueRows],
+    ['flanker',FLANKERS,flankerRecords,publicReport.flankerRows],
+  ] as const)for(const key of keys){
+    const condition=(records as Record<string,ConditionRecord>)[key]
+    const row=rows.find(row=>('cue' in row?row.cue:row.flanker)===key)
+    result.metrics[`${group}Accuracy_${key}`]=row?.accuracy??null
+    result.metrics[`${group}CorrectMeanRtMs_${key}`]=row?.correctMeanRtMs??null
+    result.metrics[`${group}CorrectRtCount_${key}`]=row?.correctRtCount??null
+    result.metrics[`${group}CorrectCount_${key}`]=condition.correct
+    result.metrics[`${group}ValidCount_${key}`]=condition.valid
+    result.metrics[`${group}ExpectedCount_${key}`]=condition.expected
+  }
+  for(const cost of Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]){
+    const value=publicReport.differences.find(value=>value.key===cost)
+    result.metrics[`${cost}MeanRtDifferenceMs`]=value?.valueMs??null
+    result.metrics[`${cost}FirstCorrectCount`]=value?.firstCorrectCount??null
+    result.metrics[`${cost}SecondCorrectCount`]=value?.secondCorrectCount??null
+  }
+  return result
 }
 
 /** Sole candidate user/report/export projection. Missing or raised gates always fail closed. */
@@ -165,6 +187,15 @@ export function projectAntReport(result:CognitiveScoreResult) {
     const show=rtAllowed&&r&&Number.isInteger(r.count)&&r.count>0&&r.count===c.correct
       &&validNumber(r.meanMs)&&r.meanMs>=0&&r.meanMs<1700&&validNumber(r.sumMs)&&r.meanMs===r.sumMs/r.count
     return [{cue,correct:c.correct,total:c.valid,accuracy:c.accuracy,
+      correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
+  })
+  const flankerRows=invalid?[]:FLANKERS.flatMap(flanker=>{
+    const c=m.flankerRecords?.[flanker]
+    if(flags['incompleteFlanker_'+flanker]!==false||!validCondition(c))return []
+    const r=input?m.correctRtByInput?.[input]?.flanker?.[flanker]:undefined
+    const show=rtAllowed&&r&&Number.isInteger(r.count)&&r.count>0&&r.count===c.correct
+      &&validNumber(r.meanMs)&&r.meanMs>=0&&r.meanMs<1700&&validNumber(r.sumMs)&&r.meanMs===r.sumMs/r.count
+    return [{flanker,correct:c.correct,total:c.valid,accuracy:c.accuracy,
       correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
   })
   const differences=invalid?[]:(Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]).flatMap(key=>{
@@ -189,7 +220,7 @@ export function projectAntReport(result:CognitiveScoreResult) {
   const overall=!invalid&&flags.incompleteAccuracy===false&&allCuesValid
     &&m.validTrialCount===m.expectedTrialCount&&totalValid===m.validTrialCount&&totalValid>0
     &&validNumber(m.accuracy)&&m.accuracy===totalCorrect/totalValid?m.accuracy:null
-  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,differences,
+  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,flankerRows,differences,
     reasons:result.quality.reasons,description:'只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。',
     practicalTip:'把设备放稳，关闭通知，让视线留在中央注视点。'}
 }

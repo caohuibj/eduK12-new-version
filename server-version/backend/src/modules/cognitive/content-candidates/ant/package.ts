@@ -22,6 +22,35 @@ for(const [key,label,type] of [
   ['inputSourcesObserved','实际响应输入来源','array'],['correctRtByInput','按输入分开的正确反应均值','object'],
   ['differencesByInput','按输入分开的有符号条件差值','object'],['excludedTrialReasons','技术排除原因','object'],
 ] as const)metrics[key]=metric(key,label,'map','research_only',[],type)
+const nativeConditionKeys:string[]=[],nativeDenominatorKeys:string[]=[]
+const cueLabels:Record<string,string>={none:'无提示',central:'中央提示',double:'双位置提示',spatial_valid:'空间提示'}
+const flankerLabels:Record<string,string>={congruent:'两侧方向相同',incongruent:'两侧方向相反',neutral:'两侧无方向提示'}
+for(const [group,keys,labels] of [['cue',CUES,cueLabels],['flanker',FLANKERS,flankerLabels]] as const)
+  for(const condition of keys){
+    const gate=(group==='cue'?'incompleteCue_':'incompleteFlanker_')+condition
+    for(const [part,label,unit] of [
+      ['Accuracy','正确比例','ratio'],['CorrectMeanRtMs','答对时平均用时','ms'],
+    ] as const){
+      const key=`${group}${part}_${condition}`
+      metrics[key]=metric(key,labels[condition]+'：'+label,unit,'secondary',
+        ['noInterpretableCondition',gate,...(part==='CorrectMeanRtMs'?['mixedInput']:[])])
+      metrics[key].visibility='user';nativeConditionKeys.push(key)
+    }
+    for(const [part,label] of [['CorrectCount','答对次数'],['ValidCount','有效次数'],['ExpectedCount','计划次数'],['CorrectRtCount','用于平均用时的正确回应次数']] as const){
+      const key=`${group}${part}_${condition}`
+      metrics[key]=metric(key,labels[condition]+'：'+label,'count','quality',['noInterpretableCondition',gate])
+      nativeDenominatorKeys.push(key)
+    }
+  }
+for(const [cost,label] of [['alerting','无提示−双位置提示'],['orienting','中央−空间提示'],['conflict','两侧方向相反−相同']] as const){
+  const gates=['noInterpretableCondition','mixedInput','unavailable_'+cost],key=cost+'MeanRtDifferenceMs'
+  metrics[key]=metric(key,label+'：正确反应平均用时差','ms','secondary',gates)
+  metrics[key].direction='signed';metrics[key].visibility='user';nativeConditionKeys.push(key)
+  for(const [part,name] of [['FirstCorrectCount','前项正确回应次数'],['SecondCorrectCount','后项正确回应次数']] as const){
+    const countKey=cost+part;metrics[countKey]=metric(countKey,label+'：'+name,'count','quality',gates)
+    nativeDenominatorKeys.push(countKey)
+  }
+}
 const quality:Record<string,QualityDefinition>={
   noInterpretableCondition:{key:'noInterpretableCondition',label:'无完整线索条件',description:'至少一个线索条件须达到冻结计划中的全部有效次数；这是项目保守完整性规则。',effect:'invalid'},
   incompleteRecords:{key:'incompleteRecords',label:'正式记录不完整',description:'收到的正式次数不足计划。',effect:'limited'},
@@ -45,10 +74,10 @@ export const antDefinition:TaskDefinition<AntConfig,AntTrial>={
       reportCaveats:['48正式＋24练习，理论最短4.8分钟另加指导和休息；每完整条件只有1次，不推断稳定网络能力。']},
   },
   report:{schemaVersion:1,version:ANT_IDENTITY.reportDefinitionVersion,title:'这次的线索与箭头记录',
-    headlineMetrics:['accuracy'],userMetrics:[],detailMetrics:['validTrialCount','excludedTrialCount'],
+    headlineMetrics:['accuracy'],userMetrics:nativeConditionKeys,detailMetrics:['validTrialCount','excludedTrialCount',...nativeDenominatorKeys],
     disclaimer:'记录描述本轮操作，不代表日常注意能力或诊断；体验版没有稳定性或招聘预测证据。',
     practicalTips:['把设备放稳，关闭通知，让视线留在中央注视点。']},
-  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'仅纯逻辑候选；未注册、未接正式runner、未入库；standard与legacy契约须由平台明确处理。'},
+  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'ANT内容候选已含任务前端与native描述性报告合同；未正式注册、入库或接产品保存。standard与legacy准入仍需平台明确处理。'},
 }
 export const createAntSnapshot=(profile:AntProfile,neutralVariant:NeutralVariant='absent',frozenAt='2026-10-26T00:00:00.000Z')=>
   createSessionConfigSnapshot({definition:antDefinition,configVersion:ANT_IDENTITY.configVersion,

@@ -16,7 +16,7 @@ if(begin<0||end<begin||projection<end)throw Error('ANT report projection boundar
 const scoreType=`export type AntScoreResult={metrics:Record<string,unknown>;quality:{state:'interpretable'|'limited'|'invalid';flags:Record<string,boolean>;reasons:string[]};audit:{trialCount:number;scorerVersion:string}}\ntype CognitiveScoreResult=AntScoreResult\n`
 const outputs={
  'protocol.ts':`// Pure ANT protocol projection. Backend SHA256: ${hash(protocol)}\n`+protocol.replace(importLine,types),
- 'report.ts':`// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: ${hash(scorer)}\nimport { CUES,INPUTS,type Cue,type Flanker,type Input } from './protocol'\n`+scoreType+scorer.slice(begin,end)+scorer.slice(projection),
+ 'report.ts':`// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: ${hash(scorer)}\nimport { CUES,FLANKERS,INPUTS,type Cue,type Flanker,type Input } from './protocol'\n`+scoreType+scorer.slice(begin,end)+scorer.slice(projection),
 }
 for(const [name,text] of Object.entries(outputs)){
  const target=path.join(out,name)

@@ -1,0 +1,240 @@
+diff --git a/server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts b/server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts
+index 91c6d6950..172e43b88 100644
+--- a/server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts
++++ b/server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts
+@@ -22,6 +22,35 @@ for(const [key,label,type] of [
+   ['inputSourcesObserved','实际响应输入来源','array'],['correctRtByInput','按输入分开的正确反应均值','object'],
+   ['differencesByInput','按输入分开的有符号条件差值','object'],['excludedTrialReasons','技术排除原因','object'],
+ ] as const)metrics[key]=metric(key,label,'map','research_only',[],type)
++const nativeConditionKeys:string[]=[],nativeDenominatorKeys:string[]=[]
++const cueLabels:Record<string,string>={none:'无提示',central:'中央提示',double:'双位置提示',spatial_valid:'空间提示'}
++const flankerLabels:Record<string,string>={congruent:'两侧方向相同',incongruent:'两侧方向相反',neutral:'两侧无方向提示'}
++for(const [group,keys,labels] of [['cue',CUES,cueLabels],['flanker',FLANKERS,flankerLabels]] as const)
++  for(const condition of keys){
++    const gate=(group==='cue'?'incompleteCue_':'incompleteFlanker_')+condition
++    for(const [part,label,unit] of [
++      ['Accuracy','正确比例','ratio'],['CorrectMeanRtMs','答对时平均用时','ms'],
++    ] as const){
++      const key=`${group}${part}_${condition}`
++      metrics[key]=metric(key,labels[condition]+'：'+label,unit,'secondary',
++        ['noInterpretableCondition',gate,...(part==='CorrectMeanRtMs'?['mixedInput']:[])])
++      metrics[key].visibility='user';nativeConditionKeys.push(key)
++    }
++    for(const [part,label] of [['CorrectCount','答对次数'],['ValidCount','有效次数'],['ExpectedCount','计划次数'],['CorrectRtCount','用于平均用时的正确回应次数']] as const){
++      const key=`${group}${part}_${condition}`
++      metrics[key]=metric(key,labels[condition]+'：'+label,'count','quality',['noInterpretableCondition',gate])
++      nativeDenominatorKeys.push(key)
++    }
++  }
++for(const [cost,label] of [['alerting','无提示−双位置提示'],['orienting','中央−空间提示'],['conflict','两侧方向相反−相同']] as const){
++  const gates=['noInterpretableCondition','mixedInput','unavailable_'+cost],key=cost+'MeanRtDifferenceMs'
++  metrics[key]=metric(key,label+'：正确反应平均用时差','ms','secondary',gates)
++  metrics[key].direction='signed';metrics[key].visibility='user';nativeConditionKeys.push(key)
++  for(const [part,name] of [['FirstCorrectCount','前项正确回应次数'],['SecondCorrectCount','后项正确回应次数']] as const){
++    const countKey=cost+part;metrics[countKey]=metric(countKey,label+'：'+name,'count','quality',gates)
++    nativeDenominatorKeys.push(countKey)
++  }
++}
+ const quality:Record<string,QualityDefinition>={
+   noInterpretableCondition:{key:'noInterpretableCondition',label:'无完整线索条件',description:'至少一个线索条件须达到冻结计划中的全部有效次数；这是项目保守完整性规则。',effect:'invalid'},
+   incompleteRecords:{key:'incompleteRecords',label:'正式记录不完整',description:'收到的正式次数不足计划。',effect:'limited'},
+@@ -45,10 +74,10 @@ export const antDefinition:TaskDefinition<AntConfig,AntTrial>={
+       reportCaveats:['48正式＋24练习，理论最短4.8分钟另加指导和休息；每完整条件只有1次，不推断稳定网络能力。']},
+   },
+   report:{schemaVersion:1,version:ANT_IDENTITY.reportDefinitionVersion,title:'这次的线索与箭头记录',
+-    headlineMetrics:['accuracy'],userMetrics:[],detailMetrics:['validTrialCount','excludedTrialCount'],
++    headlineMetrics:['accuracy'],userMetrics:nativeConditionKeys,detailMetrics:['validTrialCount','excludedTrialCount',...nativeDenominatorKeys],
+     disclaimer:'记录描述本轮操作，不代表日常注意能力或诊断；体验版没有稳定性或招聘预测证据。',
+     practicalTips:['把设备放稳，关闭通知，让视线留在中央注视点。']},
+-  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'仅纯逻辑候选；未注册、未接正式runner、未入库；standard与legacy契约须由平台明确处理。'},
++  publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'ANT内容候选已含任务前端与native描述性报告合同；未正式注册、入库或接产品保存。standard与legacy准入仍需平台明确处理。'},
+ }
+ export const createAntSnapshot=(profile:AntProfile,neutralVariant:NeutralVariant='absent',frozenAt='2026-10-26T00:00:00.000Z')=>
+   createSessionConfigSnapshot({definition:antDefinition,configVersion:ANT_IDENTITY.configVersion,
+diff --git a/server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts b/server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts
+index 5f642530f..30d606dac 100644
+--- a/server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts
++++ b/server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts
+@@ -1,10 +1,10 @@
+ import type { ProtocolDefinition, TrialEnvelope } from '../../v2/types'
+ 
+ export const ANT_IDENTITY = { candidateId:'attention-ant-pebl', testType:'ant', engineVersion:'1.0.0',
+-  scoringVersion:'1.0.0', configVersion:'1.0.0', metricDefinitionVersion:'1.0.0',
+-  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.0.0',
++  scoringVersion:'1.1.0', configVersion:'1.0.0', metricDefinitionVersion:'1.1.0',
++  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.1.0',
+   randomizationAlgorithmVersion:'ant-fnv1a-mulberry32-v1' } as const
+-export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.0.0',version:'1.0.0',
++export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.1.0',version:'1.0.0',
+   clock:'performance',randomizationAlgorithmVersion:ANT_IDENTITY.randomizationAlgorithmVersion,
+   trialEnvelopeVersion:1,phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*'] }
+ export const CUES = ['none','central','double','spatial_valid'] as const
+diff --git a/server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts b/server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts
+index da25e88a1..359319d8d 100644
+--- a/server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts
++++ b/server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts
+@@ -140,10 +140,32 @@ export function scoreAnt(input:AuthoritativeScorerInput<AntConfig,AntTrial>):Cog
+     validTrialCount:valid,excludedTrialCount:input.trials.length-valid,excludedTrialReasons:exclusions,
+     accuracy:valid?correct/valid:null,cueRecords,flankerRecords,inputSourcesObserved:INPUTS.filter(i=>observedInputs.has(i)),
+     correctRtByInput:byInput,differencesByInput:differences}
+-  return {metrics:{...metrics},quality:{state,flags,reasons:state==='invalid'
++  const result:CognitiveScoreResult={metrics:{...metrics},quality:{state,flags,reasons:state==='invalid'
+     ?['完整条件记录不足，本轮不提供表现结论。']:state==='limited'
+       ?['部分条件、正确反应或输入来源不足以支持比较，受影响指标暂不展示。']:[]},
+     audit:{trialCount:input.trials.length,scorerVersion:ANT_IDENTITY.scoringVersion}}
++  // Native report consumers need explicit scalar definitions; reuse the same gated projection.
++  const publicReport=projectAntReport(result)
++  for(const [group,keys,records,rows] of [
++    ['cue',CUES,cueRecords,publicReport.cueRows],
++    ['flanker',FLANKERS,flankerRecords,publicReport.flankerRows],
++  ] as const)for(const key of keys){
++    const condition=(records as Record<string,ConditionRecord>)[key]
++    const row=rows.find(row=>('cue' in row?row.cue:row.flanker)===key)
++    result.metrics[`${group}Accuracy_${key}`]=row?.accuracy??null
++    result.metrics[`${group}CorrectMeanRtMs_${key}`]=row?.correctMeanRtMs??null
++    result.metrics[`${group}CorrectRtCount_${key}`]=row?.correctRtCount??null
++    result.metrics[`${group}CorrectCount_${key}`]=condition.correct
++    result.metrics[`${group}ValidCount_${key}`]=condition.valid
++    result.metrics[`${group}ExpectedCount_${key}`]=condition.expected
++  }
++  for(const cost of Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]){
++    const value=publicReport.differences.find(value=>value.key===cost)
++    result.metrics[`${cost}MeanRtDifferenceMs`]=value?.valueMs??null
++    result.metrics[`${cost}FirstCorrectCount`]=value?.firstCorrectCount??null
++    result.metrics[`${cost}SecondCorrectCount`]=value?.secondCorrectCount??null
++  }
++  return result
+ }
+ 
+ /** Sole candidate user/report/export projection. Missing or raised gates always fail closed. */
+@@ -167,6 +189,15 @@ export function projectAntReport(result:CognitiveScoreResult) {
+     return [{cue,correct:c.correct,total:c.valid,accuracy:c.accuracy,
+       correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
+   })
++  const flankerRows=invalid?[]:FLANKERS.flatMap(flanker=>{
++    const c=m.flankerRecords?.[flanker]
++    if(flags['incompleteFlanker_'+flanker]!==false||!validCondition(c))return []
++    const r=input?m.correctRtByInput?.[input]?.flanker?.[flanker]:undefined
++    const show=rtAllowed&&r&&Number.isInteger(r.count)&&r.count>0&&r.count===c.correct
++      &&validNumber(r.meanMs)&&r.meanMs>=0&&r.meanMs<1700&&validNumber(r.sumMs)&&r.meanMs===r.sumMs/r.count
++    return [{flanker,correct:c.correct,total:c.valid,accuracy:c.accuracy,
++      correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
++  })
+   const differences=invalid?[]:(Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]).flatMap(key=>{
+     if(!rtAllowed||flags['unavailable_'+key]!==false)return []
+     const keys=ANT_COSTS[key]
+@@ -189,7 +220,7 @@ export function projectAntReport(result:CognitiveScoreResult) {
+   const overall=!invalid&&flags.incompleteAccuracy===false&&allCuesValid
+     &&m.validTrialCount===m.expectedTrialCount&&totalValid===m.validTrialCount&&totalValid>0
+     &&validNumber(m.accuracy)&&m.accuracy===totalCorrect/totalValid?m.accuracy:null
+-  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,differences,
++  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,flankerRows,differences,
+     reasons:result.quality.reasons,description:'只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。',
+     practicalTip:'把设备放稳，关闭通知，让视线留在中央注视点。'}
+ }
+diff --git a/server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx b/server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx
+index 925ead766..8f648089d 100644
+--- a/server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx
++++ b/server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx
+@@ -5,6 +5,7 @@ export interface AntBoundReport {
+ }
+ import './ant.css'
+ const cueNames={none:['无提示','No cue'],central:['中央提示','Central cue'],double:['双位置提示','Double cue'],spatial_valid:['空间提示','Spatial cue']}
++const flankerNames={congruent:['两侧方向相同','Side arrows point the same way'],incongruent:['两侧方向相反','Side arrows point the other way'],neutral:['两侧无方向提示','No directional side arrows']}
+ const inputNames={touch:['触屏','Touchscreen'],pointer:['鼠标或触控笔','Mouse or stylus'],keyboard:['键盘','Keyboard']}
+ const costNames={alerting:['无提示−双位置提示','No cue − double cue'],orienting:['中央−空间提示','Central − spatial cue'],conflict:['不一致−一致侧翼','Incongruent − congruent']}
+ export function AntReportCard({data,contextId,configHash,protocolSignature,language='zh',synthetic=false}:{
+@@ -18,6 +19,8 @@ export function AntReportCard({data,contextId,configHash,protocolSignature,langu
+     accuracy:!invalid&&flags.incompleteAccuracy===false?source.accuracy:null,
+     cueRows:invalid?[]:source.cueRows.filter(r=>flags['incompleteCue_'+r.cue]===false).map(r=>({...r,
+       correctMeanRtMs:rtAllowed?r.correctMeanRtMs:null,correctRtCount:rtAllowed?r.correctRtCount:null,input:rtAllowed?r.input:null})),
++    flankerRows:invalid?[]:(source.flankerRows??[]).filter(r=>flags['incompleteFlanker_'+r.flanker]===false).map(r=>({...r,
++      correctMeanRtMs:rtAllowed?r.correctMeanRtMs:null,correctRtCount:rtAllowed?r.correctRtCount:null,input:rtAllowed?r.input:null})),
+     differences:invalid||!rtAllowed?[]:source.differences.filter(d=>flags['unavailable_'+d.key]===false)}
+   const en=language==='en',lang=en?1:0
+   return <article className="ant-candidate ant-report" data-ant-report-state={report.state}>
+@@ -26,6 +29,14 @@ export function AntReportCard({data,contextId,configHash,protocolSignature,langu
+     {report.state!=='interpretable'&&<p>{en?'Some records are incomplete or affected. Unavailable measurements are hidden.':'部分记录不完整或受到影响，相关指标暂不展示。'}</p>}
+     {report.accuracy!==null&&<section className="ant-panel"><h2>{en?'Correct this session':'本轮答对比例'}</h2><p className="ant-big">{(report.accuracy*100).toFixed(1)}%</p></section>}
+     {report.cueRows.length>0&&<div className="ant-table-wrap"><table><caption>{en?'Your responses under each cue':'不同提示下的作答记录'}</caption><thead><tr><th>{en?'Cue':'提示'}</th><th>{en?'Correct / valid':'正确 / 有效'}</th><th>{en?'Mean time when correct':'正确平均用时'}</th></tr></thead><tbody>{report.cueRows.map(r=><tr key={r.cue}><th scope="row">{cueNames[r.cue][lang]}</th><td data-label={en?'Correct / valid':'正确 / 有效'}>{r.correct} / {r.total}</td><td data-label={en?'Mean time when correct':'正确平均用时'}>{r.correctMeanRtMs===null?'—':`${r.correctMeanRtMs.toFixed(0)} ms`}<small>{r.correctRtCount!==null?`${r.correctRtCount} ${en?'correct responses':'次正确回应'} · ${r.input?inputNames[r.input][lang]:''}`:en?'Unavailable':'暂不展示'}</small></td></tr>)}</tbody></table></div>}
++    {report.flankerRows.length>0&&<details><summary>{en?'How the side arrows differed':'看看两侧箭头不同时的记录'}</summary><div className="ant-table-wrap"><table>
++      <caption>{en?'Your responses under each side-arrow condition':'两侧箭头不同时的作答记录'}</caption>
++      <thead><tr><th>{en?'Side arrows':'两侧箭头'}</th><th>{en?'Correct / valid':'正确 / 有效'}</th><th>{en?'Mean time when correct':'正确平均用时'}</th></tr></thead>
++      <tbody>{report.flankerRows.map(r=><tr key={r.flanker}><th scope="row">{flankerNames[r.flanker][lang]}</th>
++        <td data-label={en?'Correct / valid':'正确 / 有效'}>{r.correct} / {r.total}</td>
++        <td data-label={en?'Mean time when correct':'正确平均用时'}>{r.correctMeanRtMs===null?'—':`${r.correctMeanRtMs.toFixed(0)} ms`}
++          <small>{r.correctRtCount!==null?`${r.correctRtCount} ${en?'correct responses':'次正确回应'} · ${r.input?inputNames[r.input][lang]:''}`:en?'Unavailable':'暂不展示'}</small></td>
++      </tr>)}</tbody></table></div></details>}
+     {report.differences.length>0&&<details><summary>{en?'Compare response times':'看看不同条件下的用时差'}</summary>{report.differences.map(d=><p key={d.key}>{costNames[d.key][lang]}：{d.valueMs.toFixed(0)} ms <small>{en?'Correct responses':'正确回应次数'} {d.firstCorrectCount} / {d.secondCorrectCount} · {inputNames[d.input][lang]}</small></p>)}</details>}
+     <p>{en?'This describes this session only. Condition differences are not ability levels; the short profile does not establish stable attention networks.':'这里只描述本轮记录，条件差值不是能力等级；体验版不代表稳定的注意网络能力。'}</p>
+     <p>{en?'Next time: keep your device still, turn off notifications and look at the central fixation.':'下次可以把设备放稳、关闭通知，让视线留在中央注视点。'}</p>
+diff --git a/server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx b/server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx
+index 122a5292f..401276c16 100644
+--- a/server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx
++++ b/server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.test.tsx
+@@ -13,7 +13,7 @@ const projection=(state:'interpretable'|'limited'|'invalid'='interpretable'):Ant
+  contextId:'A',configHash:ANT_FIXTURE_HASH,protocolSignature:ANT_FIXTURE_SIGNATURE,
+  qualityFlags:{noInterpretableCondition:state==='invalid',incompleteAccuracy:state!=='interpretable',mixedInput:false,
+  incompleteCue_none:false,incompleteCue_double:state!=='interpretable',unavailable_alerting:state!=='interpretable'},
+- projection:{state,accuracy:1,cueRows:[
++ projection:{state,accuracy:1,flankerRows:[],cueRows:[
+  {cue:'none',correct:12,total:12,accuracy:1,correctMeanRtMs:450,correctRtCount:12,input:'touch'},
+  {cue:'double',correct:12,total:12,accuracy:1,correctMeanRtMs:550,correctRtCount:12,input:'touch'}],
+  differences:[{key:'alerting',valueMs:-100,input:'touch',firstCorrectCount:12,secondCorrectCount:12}],
+diff --git a/server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts b/server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts
+index 23ffe852b..ae6ecf053 100644
+--- a/server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts
++++ b/server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts
+@@ -1,13 +1,13 @@
+-// Pure ANT protocol projection. Backend SHA256: eec480585323197971d147a29826e197aeda9c6a42dd8b82d9a6d084412a905b
++// Pure ANT protocol projection. Backend SHA256: 3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974
+ type ProtocolDefinition={schemaVersion:1;key:string;version:string;clock:'performance';randomizationAlgorithmVersion:string;trialEnvelopeVersion:1;phases:{key:'test'|'learning'|'delayed';persists:boolean;required:boolean}[];measurementCriticalConfigPaths:string[]}
+ type TrialEnvelope<T>={schemaVersion:1;trialIndex:number;phase:'test'|'learning'|'delayed';startedAtPerfMs:number;endedAtPerfMs:number;durationMs:number;flags:{timeout:boolean;premature:boolean};qualityEvents:('visibility_lost'|'window_blur'|'runner_restart')[];payload:T}
+ 
+ 
+ export const ANT_IDENTITY = { candidateId:'attention-ant-pebl', testType:'ant', engineVersion:'1.0.0',
+-  scoringVersion:'1.0.0', configVersion:'1.0.0', metricDefinitionVersion:'1.0.0',
+-  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.0.0',
++  scoringVersion:'1.1.0', configVersion:'1.0.0', metricDefinitionVersion:'1.1.0',
++  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.1.0',
+   randomizationAlgorithmVersion:'ant-fnv1a-mulberry32-v1' } as const
+-export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.0.0',version:'1.0.0',
++export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.1.0',version:'1.0.0',
+   clock:'performance',randomizationAlgorithmVersion:ANT_IDENTITY.randomizationAlgorithmVersion,
+   trialEnvelopeVersion:1,phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*'] }
+ export const CUES = ['none','central','double','spatial_valid'] as const
+diff --git a/server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts b/server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts
+index 1ca8455e2..ae1528c1f 100644
+--- a/server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts
++++ b/server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts
+@@ -1,4 +1,4 @@
+-// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: 193c468841a6e71cc52470f0d327290830a9be377307d1841454e017be7dd856
++// Exact ANT report projection, no scorer/runtime imports. Backend SHA256: e86d4004d7aac162a75ce25ca849a041efc624616b063382fdaaa090fb63a60d
+ import { CUES,INPUTS,type Cue,type Flanker,type Input } from './protocol'
+ export type AntScoreResult={metrics:Record<string,unknown>;quality:{state:'interpretable'|'limited'|'invalid';flags:Record<string,boolean>;reasons:string[]};audit:{trialCount:number;scorerVersion:string}}
+ type CognitiveScoreResult=AntScoreResult
+@@ -36,6 +36,15 @@ export function projectAntReport(result:CognitiveScoreResult) {
+     return [{cue,correct:c.correct,total:c.valid,accuracy:c.accuracy,
+       correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
+   })
++  const flankerRows=invalid?[]:FLANKERS.flatMap(flanker=>{
++    const c=m.flankerRecords?.[flanker]
++    if(flags['incompleteFlanker_'+flanker]!==false||!validCondition(c))return []
++    const r=input?m.correctRtByInput?.[input]?.flanker?.[flanker]:undefined
++    const show=rtAllowed&&r&&Number.isInteger(r.count)&&r.count>0&&r.count===c.correct
++      &&validNumber(r.meanMs)&&r.meanMs>=0&&r.meanMs<1700&&validNumber(r.sumMs)&&r.meanMs===r.sumMs/r.count
++    return [{flanker,correct:c.correct,total:c.valid,accuracy:c.accuracy,
++      correctMeanRtMs:show?r!.meanMs:null,correctRtCount:show?r!.count:null,input:show?input:null}]
++  })
+   const differences=invalid?[]:(Object.keys(ANT_COSTS) as (keyof typeof ANT_COSTS)[]).flatMap(key=>{
+     if(!rtAllowed||flags['unavailable_'+key]!==false)return []
+     const keys=ANT_COSTS[key]
+@@ -58,7 +67,7 @@ export function projectAntReport(result:CognitiveScoreResult) {
+   const overall=!invalid&&flags.incompleteAccuracy===false&&allCuesValid
+     &&m.validTrialCount===m.expectedTrialCount&&totalValid===m.validTrialCount&&totalValid>0
+     &&validNumber(m.accuracy)&&m.accuracy===totalCorrect/totalValid?m.accuracy:null
+-  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,differences,
++  return {state:invalid?'invalid':result.quality.state,accuracy:overall,cueRows,flankerRows,differences,
+     reasons:result.quality.reasons,description:'只描述本轮记录；条件差值不是能力等级，体验版不代表稳定网络能力。',
+     practicalTip:'把设备放稳，关闭通知，让视线留在中央注视点。'}
+ }

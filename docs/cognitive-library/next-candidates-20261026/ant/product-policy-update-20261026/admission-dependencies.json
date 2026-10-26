@@ -1,0 +1,14 @@
+{
+  "candidateId": "attention-ant-pebl",
+  "registered": false,
+  "publicationGateIssues": [
+    {
+      "path": "profiles",
+      "message": "standard profile is required",
+      "severity": "error"
+    }
+  ],
+  "saveApiConnected": false,
+  "databaseConnected": false,
+  "cosConnected": false
+}

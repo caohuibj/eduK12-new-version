@@ -1,10 +1,10 @@
 import type { ProtocolDefinition, TrialEnvelope } from '../../v2/types'
 
 export const ANT_IDENTITY = { candidateId:'attention-ant-pebl', testType:'ant', engineVersion:'1.0.0',
-  scoringVersion:'1.0.0', configVersion:'1.0.0', metricDefinitionVersion:'1.0.0',
-  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.0.0',
+  scoringVersion:'1.1.0', configVersion:'1.0.0', metricDefinitionVersion:'1.1.0',
+  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.1.0',
   randomizationAlgorithmVersion:'ant-fnv1a-mulberry32-v1' } as const
-export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.0.0',version:'1.0.0',
+export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.1.0',version:'1.0.0',
   clock:'performance',randomizationAlgorithmVersion:ANT_IDENTITY.randomizationAlgorithmVersion,
   trialEnvelopeVersion:1,phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*'] }
 export const CUES = ['none','central','double','spatial_valid'] as const

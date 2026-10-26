@@ -1,13 +1,13 @@
-// Pure ANT protocol projection. Backend SHA256: eec480585323197971d147a29826e197aeda9c6a42dd8b82d9a6d084412a905b
+// Pure ANT protocol projection. Backend SHA256: 3c7d56f2bc6bf4ef92d7251e90bedbc94baaa98ad507fca5e255b13be846d974
 type ProtocolDefinition={schemaVersion:1;key:string;version:string;clock:'performance';randomizationAlgorithmVersion:string;trialEnvelopeVersion:1;phases:{key:'test'|'learning'|'delayed';persists:boolean;required:boolean}[];measurementCriticalConfigPaths:string[]}
 type TrialEnvelope<T>={schemaVersion:1;trialIndex:number;phase:'test'|'learning'|'delayed';startedAtPerfMs:number;endedAtPerfMs:number;durationMs:number;flags:{timeout:boolean;premature:boolean};qualityEvents:('visibility_lost'|'window_blur'|'runner_restart')[];payload:T}
 
 
 export const ANT_IDENTITY = { candidateId:'attention-ant-pebl', testType:'ant', engineVersion:'1.0.0',
-  scoringVersion:'1.0.0', configVersion:'1.0.0', metricDefinitionVersion:'1.0.0',
-  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.0.0',
+  scoringVersion:'1.1.0', configVersion:'1.0.0', metricDefinitionVersion:'1.1.0',
+  qualityDefinitionVersion:'1.0.0', reportDefinitionVersion:'1.1.0',
   randomizationAlgorithmVersion:'ant-fnv1a-mulberry32-v1' } as const
-export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.0.0',version:'1.0.0',
+export const ANT_PROTOCOL:ProtocolDefinition = { schemaVersion:1,key:'ant/1.0.0/1.1.0',version:'1.0.0',
   clock:'performance',randomizationAlgorithmVersion:ANT_IDENTITY.randomizationAlgorithmVersion,
   trialEnvelopeVersion:1,phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*'] }
 export const CUES = ['none','central','double','spatial_valid'] as const

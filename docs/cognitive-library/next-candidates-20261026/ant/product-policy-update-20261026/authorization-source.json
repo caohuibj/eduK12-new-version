@@ -1,0 +1,14 @@
+{
+  "url": "https://app.notion.com/p/405d27635a3881b2a2d3fecce26d7cb3",
+  "title": "认知测评研发总表｜已修订、下一PR与候选排序",
+  "fetchedAsOf": "2026-10-26T09:22:25.456Z",
+  "section": "当前执行原则｜用户体验优先，科研原件留 COS",
+  "effectiveUtc": "2026-10-26T09:20:00Z",
+  "relevantInstructions": [
+    "偶发一帧、十几毫秒量级偏差在产品可接受范围；不能仅因该偏差隐藏正常报告。",
+    "不新增预检、时序分析、对齐、重复计分或COS回读修正。",
+    "保留真实缺答/中断/非法与保存失败；不伪报成功。",
+    "工具/参数常模/报告独立版本与固定绑定；不因无科研级时序证明关闭正常获准反馈。"
+  ],
+  "interpretation": "No16.7ms rejection found in ANT20ms rule; leave threshold/engine/config/quality unchanged, only expose actual native metrics/report."
+}
