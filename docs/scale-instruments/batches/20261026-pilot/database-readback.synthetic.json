@@ -1,0 +1,55 @@
+{
+  "synthetic": true,
+  "role": "scale_app",
+  "scales": [
+    {
+      "id": "5279edf8-1af7-489f-8410-415f8e29802c",
+      "code": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b"
+    },
+    {
+      "id": "e07209b1-d103-43c3-9909-bed54539ddc6",
+      "code": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "status": "DRAFT",
+      "visibility": "HIDDEN",
+      "definitionHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22"
+    }
+  ],
+  "snapshots": [
+    {
+      "scale_id": "5279edf8-1af7-489f-8410-415f8e29802c",
+      "axis_hash": "a2c597f37f3fc64b5021b91b4e4b98cae581faeca0b9dea5f0f864cefb360a2c",
+      "source_hash": "7172516ccae3ba9b4a6494a28fa1f6a31c68f6fc636c1b87c5fcd496063896b3",
+      "axes": {
+        "reportVersion": "1.0.1",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 1
+      }
+    },
+    {
+      "scale_id": "e07209b1-d103-43c3-9909-bed54539ddc6",
+      "axis_hash": "c3b6b3a03f6c3d29502554ab7d3ce4b9115369262bf405780d35ec5cf2ae2aca",
+      "source_hash": "b075ccf02b28796d27de4ff692029f5859061de23dab897b27992b3d2faac897",
+      "axes": {
+        "reportVersion": "1.0.2",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "af6ac774906ea6595d6a29f05a098c603f780211f813569bfb03a18e6d127c22",
+        "instrumentVersion": "1.0.1",
+        "referenceVersions": [],
+        "localizationVersion": "1.0.1",
+        "catalogManifestVersion": 1
+      }
+    }
+  ],
+  "referenceSetCount": 0,
+  "deploymentCount": 0,
+  "production": false
+}

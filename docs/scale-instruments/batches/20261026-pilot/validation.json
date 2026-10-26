@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_RUNTIME_EVIDENCE_NOT_CI",
+  "startedFrom": "7330038efbea8778541a42a5d90188a8879a98b9",
+  "recordedAt": "2026-10-26T03:30:56.266573+00:00",
+  "unitCases": 69,
+  "postgresCases": 12,
+  "distinctToolIdentities": 2,
+  "originalAndRevisedSourceVersions": 4,
+  "actualReportSampleCount": 26,
+  "databaseMaterializedRevisions": 2,
+  "currentTypeCheck": {
+    "status": "PASS",
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "ciExecuted": false,
+  "productionTouched": false,
+  "activation": "NOTRUN",
+  "browser": "NOTRUN",
+  "fullNodeModulesByteManifestRecorded": false,
+  "inputs": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/prisma/schema.prisma": "9793d93c42bf46f415a329211e1f421876101dd36b159ed03ed0256f11354d4a",
+    "server-version/backend/scripts/scale-content-batch.ts": "fc35c785c11dfceea9682325b5a80ef13171fc57d43b6a8bd3da1afef5dc9783",
+    "server-version/backend/scripts/scale-batch-inventory.py": "88b54808ab9213008a844e3a74d660a3de0903b7aed9f364d15f2a6c3a6355d6",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "0ea07a06eb94edad82d9ca875b61b821a90c739134da96c907cc498f7cc7e630",
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": "2f75dad2215f598b329a751f3d91f347caf4b5b39315b783a4a617256056f19a",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "05d433bd13e7433d70afe89a595471d704486047c2854334c952835f8ef47d7b",
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": "94d0939c01371be6bde23a2326c65a771019aed6f5076f1e5ce9fd9c354881e0",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "8136925d8a6b99827da7abd68683d2f7de7cd06353105a246216eab920cfdaba",
+    "server-version/backend/src/modules/scale/scale-scoring.ts": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+    "server-version/backend/src/modules/scale/scale-result.ts": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+    "server-version/backend/src/__tests__/scale/scale-content-batch.test.ts": "ccc6da6e0458ae35a131b2bb1a6534412ce97d66d4ab2ace9075654b64af6174",
+    "server-version/backend/src/__tests__/scale/scale-content-batch.postgres.integration.test.ts": "a130a1a8bdef735c7c6696fd80eb3489d933e18ea82fed92eb66e553ece88581",
+    "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/source.json": "09337dac6463e43e8840542e301a2885c0637293a0d6c06261aef0932996cce4",
+    "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json": "ea08968bc7d3f5361f2959825577e726caa65bc807de00eae9119dc0a8ae831e",
+    "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/source.json": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f",
+    "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json": "88ce988146c93b0b7f2043a7e141d34a784a6f116a970b4062ba060d2fdd04eb"
+  },
+  "originalReporters": [
+    {
+      "file": "original-unit.json",
+      "sha256": "283933ddccd8ff2b553da32616091b7ac28d7f432f20f557a77397b48df91a7f",
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 parses into existing schema and stays DRAFT without installation",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 preserves all 12 items in published Table 1 subgroup sequence",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 uses three disjoint 4-item sums, not OpenScales mean nor fabricated total",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden minimum",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden maximum",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_one",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden mixed_0123_each_dimension",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden only_abandonment_high",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden one_missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not contaminate dimensions when one item varies",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 rejects invalid, duplicate and alien answers",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 suppresses interpretation when incomplete and never prorates",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 builds the actual report at min/mid/max without bands or reference leakage",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 only permits eligible adults and never assumes age when missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 labels language provenance and CC-BY source without claiming Chinese norms",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not modify measurement hash on report-only updates",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft strictly validates source without publishing",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft locks source item order and only author-grounded option text",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft seven additive scores match independent official PDF membership",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores minimum",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores maximum",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores midpoint",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores mixed_independent",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores missing_first",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores all_missing",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft tracks each item to 4/8/16 scores without cross-contamination",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft rejects out-of-range and duplicate or unknown codes",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft does not produce any interpretation on incomplete form",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft generates descriptive original-sum report without invented bands",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft limits use to adults, translation unreviewed and provenance correct",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft keeps report-only revision outside measurement hash",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "revision-first-unit.json",
+      "sha256": "5f5a8b7695dec089b9d1a171504597003eefb0f61ad70ed171c93a039aa12f11",
+      "passed": 12,
+      "failed": 24,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "explicit content batch safety and actual report consumer refuses duplicate identities and two versions of one scale code",
+          "status": "passed"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer refuses source traversal and byte drift",
+          "status": "passed"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer never falls back to an application or production database",
+          "status": "passed"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer captures real versioned reports and does not invent parameter version",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 parses into existing schema and stays DRAFT without installation",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 preserves all 12 items in published Table 1 subgroup sequence",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 uses three disjoint 4-item sums, not OpenScales mean nor fabricated total",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden minimum",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden maximum",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_one",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden mixed_0123_each_dimension",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden only_abandonment_high",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden one_missing",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_missing",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not contaminate dimensions when one item varies",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 rejects invalid, duplicate and alien answers",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 suppresses interpretation when incomplete and never prorates",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 builds the actual report at min/mid/max without bands or reference leakage",
+          "status": "failed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 only permits eligible adults and never assumes age when missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 labels language provenance and CC-BY source without claiming Chinese norms",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not modify measurement hash on report-only updates",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft strictly validates source without publishing",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft locks source item order and only author-grounded option text",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft seven additive scores match independent official PDF membership",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores minimum",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores maximum",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores midpoint",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores mixed_independent",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores missing_first",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores all_missing",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft tracks each item to 4/8/16 scores without cross-contamination",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft rejects out-of-range and duplicate or unknown codes",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft does not produce any interpretation on incomplete form",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft generates descriptive original-sum report without invented bands",
+          "status": "failed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft limits use to adults, translation unreviewed and provenance correct",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft keeps report-only revision outside measurement hash",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "revision-repair-unit.json",
+      "sha256": "1acae918982314fdd88f9569b21788305840e19337789a794d1355ed552ca0e9",
+      "passed": 24,
+      "failed": 0,
+      "skipped": 12,
+      "cases": [
+        {
+          "name": "explicit content batch safety and actual report consumer refuses duplicate identities and two versions of one scale code",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer refuses source traversal and byte drift",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer never falls back to an application or production database",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer captures real versioned reports and does not invent parameter version",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 parses into existing schema and stays DRAFT without installation",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 preserves all 12 items in published Table 1 subgroup sequence",
+          "status": "skipped"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 uses three disjoint 4-item sums, not OpenScales mean nor fabricated total",
+          "status": "skipped"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden minimum",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden maximum",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_one",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden mixed_0123_each_dimension",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden only_abandonment_high",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden one_missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 reproduces independent golden all_missing",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not contaminate dimensions when one item varies",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 rejects invalid, duplicate and alien answers",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 suppresses interpretation when incomplete and never prorates",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 builds the actual report at min/mid/max without bands or reference leakage",
+          "status": "passed"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 only permits eligible adults and never assumes age when missing",
+          "status": "skipped"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 labels language provenance and CC-BY source without claiming Chinese norms",
+          "status": "skipped"
+        },
+        {
+          "name": "CFS-R-12 Chinese working draft, derived from Kato 2020 Table 1 does not modify measurement hash on report-only updates",
+          "status": "skipped"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft strictly validates source without publishing",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft locks source item order and only author-grounded option text",
+          "status": "skipped"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft seven additive scores match independent official PDF membership",
+          "status": "skipped"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores minimum",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores maximum",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores midpoint",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores mixed_independent",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores missing_first",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft correctly scores all_missing",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft tracks each item to 4/8/16 scores without cross-contamination",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft rejects out-of-range and duplicate or unknown codes",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft does not produce any interpretation on incomplete form",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft generates descriptive original-sum report without invented bands",
+          "status": "passed"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft limits use to adults, translation unreviewed and provenance correct",
+          "status": "skipped"
+        },
+        {
+          "name": "EBQ-16 original sum scoring Chinese draft keeps report-only revision outside measurement hash",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "receipt-guard.json",
+      "sha256": "e878958ff7d69effe616eecc18cb763d5346385a7f49ad5bdf9aced7fb5c179d",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 4,
+      "cases": [
+        {
+          "name": "explicit content batch safety and actual report consumer refuses duplicate identities and two versions of one scale code",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer refuses source traversal and byte drift",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer never falls back to an application or production database",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer captures real versioned reports and does not invent parameter version",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit content batch safety and actual report consumer does not overwrite an earlier execution receipt",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "postgres-first.json",
+      "sha256": "243db6885acc6d4495478ada4597cd166bd3021400d852cecc32be004289278a",
+      "passed": 10,
+      "failed": 2,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL uses a role with no ownership, superuser, role creation or RLS bypass",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research does not activate an unapproved draft",
+          "status": "failed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research does not activate an unapproved draft",
+          "status": "failed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL continues the next independent entry after a pinned-source failure and preserves a receipt",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "postgres-repair.json",
+      "sha256": "7ee44d9dc977e6d3309d9ab128e9a71245af2ca2c553f12af24d45a19f88aa63",
+      "passed": 2,
+      "failed": 0,
+      "skipped": 10,
+      "cases": [
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL uses a role with no ownership, superuser, role creation or RLS bypass",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research does not activate an unapproved draft",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research does not activate an unapproved draft",
+          "status": "passed"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL continues the next independent entry after a pinned-source failure and preserves a receipt",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "postgres-cli-final.json",
+      "sha256": "3babc0ddf2dbc841fc5d2b7a5318930a911964e406c16d2b97e01bf8e960509f",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 11,
+      "cases": [
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL uses a role with no ownership, superuser, role creation or RLS bypass",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL cfsr12_zh_cn_research does not activate an unapproved draft",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research rolls back a new scale and snapshot together on failure",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research materializes once, remains DRAFT/HIDDEN and reuses the same snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses mutation or deletion of a frozen snapshot",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research refuses content conflicts without rewriting its existing row",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL ebq16_zh_cn_research does not activate an unapproved draft",
+          "status": "skipped"
+        },
+        {
+          "name": "explicit batch in disposable non-owner PostgreSQL continues the next independent entry after a pinned-source failure and preserves a receipt",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "reuseNotes": [
+    "Original 32 successful cases were not repeated.",
+    "After changing only the two draft report reviewedAt strings from +00:00 to Z, the first 12 successful assertions about item/scoring/eligibility/hash and batch input guard logic remain applicable; 24 failures were rerun and passed.",
+    "PostgreSQL first 10 successes remain original successes. The two bad table-name assertions were repaired and rerun. Fixture create became an idempotent upsert selecting the same existing synthetic actor.",
+    "CLI-only changes to manifest byte binding and receipt protection were rechecked with the affected CLI case; no previous failed invocation is relabelled successful."
+  ]
+}

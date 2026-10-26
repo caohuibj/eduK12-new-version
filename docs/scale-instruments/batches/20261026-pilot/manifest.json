@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "batchId": "pilot-20261026-1-0-1",
+  "sources": [
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourceSha256": "ea08968bc7d3f5361f2959825577e726caa65bc807de00eae9119dc0a8ae831e"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourceSha256": "88ce988146c93b0b7f2043a7e141d34a784a6f116a970b4062ba060d2fdd04eb"
+    }
+  ]
+}

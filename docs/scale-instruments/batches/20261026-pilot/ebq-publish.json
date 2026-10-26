@@ -1,0 +1,8 @@
+{
+  "remoteHead": "d64cf1391bb856335545950aea250384c1000856",
+  "parent": "0090e9466d88037385c379e87ff2b763df8b2f1a",
+  "tree": "d570d51696759fb1b279d4df2c1b6764b29315e5",
+  "affectedFileReadbackCount": 9,
+  "transport": "GitHub connector; public git readback",
+  "force": false
+}

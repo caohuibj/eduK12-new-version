@@ -1,0 +1,1244 @@
+{
+  "schemaVersion": 1,
+  "kind": "DEVELOPMENT_BASELINE_NOT_PUBLICATION_ACCEPTANCE",
+  "baseline": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "snapshotHead": "d64cf1391bb856335545950aea250384c1000856",
+  "snapshotTree": "d570d51696759fb1b279d4df2c1b6764b29315e5",
+  "countingUnit": "Added executable source versions, not independent constructs or activated tools",
+  "executableSourcePackageCount": 44,
+  "toolIdentityCount": 42,
+  "records": [
+    {
+      "instrumentKey": "act_sq6_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/act_sq6_zh_cn/1.0.0/source.json",
+      "sourceSha256": "8fb4a923d155da3c6209f9898b3f35e91c49030098d8730ab11d0c0f22ad49d0",
+      "sourceBlob": "0f2ce8e3da0203e02c522ad68ae5b90946da91b0",
+      "name": "接纳承诺疗法会谈过程问卷（ACT-SQ，6题）— 中文工作译稿",
+      "itemCount": 6,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "cbi_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cbi_zh_cn/1.0.0/source.json",
+      "sourceSha256": "0980f8e86e840623e151cde0af06365ddd30f7b765854285100093d106ca9902",
+      "sourceBlob": "f95611fd69f92276f0e2aae39edcd09a582af0ee",
+      "name": "哥本哈根倦怠量表（CBI，中文工作稿）",
+      "itemCount": 19,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ccfq18_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ccfq18_zh_cn/1.0.0/source.json",
+      "sourceSha256": "4ca5939a4601d3b0e1a845e354fb4b192add1736682e48f9dbffa2a80937c103",
+      "sourceBlob": "458edc3d14c6f6b37ed55ab0d4d8a8e53435ac3f",
+      "name": "认知控制与灵活性问卷（CCFQ-18，中文工作译稿）",
+      "itemCount": 18,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 2
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "cesd10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cesd10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "5c2cd9214a45ed735d058f9617418ef4dc1ccc6e27f999d38d2512c3d26ff476",
+      "sourceBlob": "d50d0a0698fbc8ebaf9c502a9fa54a7e881af703",
+      "name": "CES-D10 过去一周情绪体验（中文研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "09337dac6463e43e8840542e301a2885c0637293a0d6c06261aef0932996cce4",
+      "sourceBlob": "c9ad3dd4f193592e422b1448e82d56d9b882b6a7",
+      "name": "应对灵活性量表修订版（CFS-R，12题中文研究译稿）",
+      "itemCount": 12,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/cfsr12_zh_cn_research/1.0.1/source.json",
+      "sourceSha256": "ea08968bc7d3f5361f2959825577e726caa65bc807de00eae9119dc0a8ae831e",
+      "sourceBlob": "305a55a70cc3fef73b6739495e3936fe76f76234",
+      "name": "应对灵活性量表修订版（CFS-R，12题中文研究译稿）",
+      "itemCount": 12,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.1"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "csacs9_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/csacs9_zh_cn/1.0.0/source.json",
+      "sourceSha256": "c2ff0097228444602d11e092c2bc86640e4b72713601076fa7af844c6fc9b0cf",
+      "sourceBlob": "e798d38e39dc05313bce00995ba0e0d2d839a766",
+      "name": "中文以己为景量表（C-SACS，最终9题版）",
+      "itemCount": 9,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "djgls6_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/djgls6_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "c07038b029b02c520ff0344434499358242145ee8122c7dd9ce1984f12c48a46",
+      "sourceBlob": "38be96db91f579d42e57debe6b5814bd80e584be",
+      "name": "De Jong Gierveld 简式孤独感量表（6题）（中文研究译稿）",
+      "itemCount": 6,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "ccfd11288222eadc4d514144680012318d51e05d6d6b85a42bf251304d1a769f",
+      "sourceBlob": "089151a95b5bc8d1b29fed649d185d4149bf630b",
+      "name": "情绪信念问卷（EBQ-16，中文研究工作译稿）",
+      "itemCount": 16,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 7
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ebq16_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ebq16_zh_cn_research/1.0.1/source.json",
+      "sourceSha256": "88ce988146c93b0b7f2043a7e141d34a784a6f116a970b4062ba060d2fdd04eb",
+      "sourceBlob": "1dcff0948a0a18aa6fa33dfcba8e469b11d1dc42",
+      "name": "情绪信念问卷（EBQ-16，中文研究工作译稿）",
+      "itemCount": 16,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.1"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.2",
+        "interpretationCount": 7
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "gad7_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.1.0/source.json",
+      "sourceSha256": "93019ebbe52aecbf3d3acff87c346fdb8bd20daf81f0d60ace594681ee5b161e",
+      "sourceBlob": "8cef5680c1d576fb5f463a0f8990e86cad4788f9",
+      "name": "广泛性焦虑量表（GAD-7，简体中文研究工作译稿）（中文研究译稿）",
+      "itemCount": 7,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "gse3_asku_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/gse3_asku_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "bb5214bb0b123cd2ee4ed4187af226e17ec4e3169b98a9771052adc3b9bf9451",
+      "sourceBlob": "0e80009eaccc53594590277438278a71e669ab08",
+      "name": "一般自我效能短量表（3题，中文工作译稿）【非商业研究】",
+      "itemCount": 3,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "hse_msit_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/hse_msit_zh_cn/1.0.0/source.json",
+      "sourceSha256": "7e5021f4c8031f2d20650b04342e0025e785ac08f912a4520972f564f6122ef9",
+      "sourceBlob": "b644be50127582c88890e0d03955e076b9cc6f92",
+      "name": "HSE工作环境与压力管理问卷（35题，中文工作稿）",
+      "itemCount": 35,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 7
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ie4_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.1.0/source.json",
+      "sourceSha256": "b3ec87226d5030dccb59e1f362b8da4372fb3dda43ea0559d7998ce45539bca3",
+      "sourceBlob": "31d1850fc1f53b09702ecdf4d007a3b781b0a038",
+      "name": "内外控制点简表（4题）（中文研究工作稿）",
+      "itemCount": 4,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.1.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 2
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip50_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json",
+      "sourceSha256": "6cc56383060babff5d7774c313063e71769fd62c46fdf3709cf80c7f65e6dc45",
+      "sourceBlob": "26de489548e4caa55839ae460db4318089dad1d1",
+      "name": "IPIP 50-item Big Five — 中文研究工作译稿",
+      "itemCount": 50,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.1.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 5
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_attending_emotions10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_attending_emotions10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "79c1977eec784fed5fd974a7c55a2a4fe5f5b9ceee99b7fa4f0ca58aec41a555",
+      "sourceBlob": "079effd9c0b6457af13556e9d471fcee118060ce",
+      "name": "IPIP情绪关注10题（研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_emotion_based_decision9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_emotion_based_decision9_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "7c18445fa8a24e64f5acc46ba2c42036a85c8bf733ce91fe91920a694d232aa2",
+      "sourceBlob": "e07e872eaf084f099cb49eed57c0a9893f9f67ef",
+      "name": "IPIP情绪导向决策9题（研究译稿）",
+      "itemCount": 9,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_empathic_concern10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_empathic_concern10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "c2e2c8c60c091ba6c3e85c2c25721c44d9915365afd4a3067f4798b18d92e4ef",
+      "sourceBlob": "5f47c77530afb7874b3f9414ff9cf294f0aa71e8",
+      "name": "IPIP同情关怀10题（研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_negative_expressivity10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_negative_expressivity10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "c8f4646ebba0e7dc345c010f0cbf36d0852e59b3fc677ccb88fb81231931ee5e",
+      "sourceBlob": "9122549aa443a63cfdd346a20e91f1a28c4724c3",
+      "name": "IPIP消极情绪表达10题（研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_neo_c1_self_efficacy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c1_self_efficacy10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "22ddbb0f7d0a94240c21d56eb5a807306688158bb70a83a228a3857d565acac9",
+      "sourceBlob": "9c74ef87a6f1833264f553c0f08aa778ee4146a5",
+      "name": "一般任务自我效能感（IPIP-NEO C1 中文研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_neo_c5_self_discipline10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_neo_c5_self_discipline10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "7f3a2d36a86d3f2a8cd6a35991e35d1ac1bebbc9f9ebfbc87d54ea07a95c6bfa",
+      "sourceBlob": "916ca9491b04d6d8001d44ac1e9b9e09c6e87270",
+      "name": "任务启动与自律（IPIP-NEO C5 中文研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_nfc10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_nfc10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "fd6b9f4a40cd10729e339d01eacaa0c9b2a64ff13b9413856a888eeb7f59fb5f",
+      "sourceBlob": "bcfb7c053f7b7b565da35bde11e530174ef99d67",
+      "name": "认知需求（IPIP 10题表征版） — 中文研究工作译稿",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_opt10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_opt10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "1327accb2a02d8909fbac4512e7cc8323f4388073256f7e9e9a23d6f77f97cf0",
+      "sourceBlob": "666bb410051d1caa22a042abb5f43af4a7b0d2a8",
+      "name": "乐观倾向（IPIP 10题表征版） — 中文研究工作译稿",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_positive_expressivity9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_positive_expressivity9_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "c9c348aed9a5596aa774d5eae074e63555bd50b379084bcde04f2165c9d2051a",
+      "sourceBlob": "7fa66ac8f5c4634d70f466f4f6751c4dd06ec7c2",
+      "name": "IPIP积极情绪表达9题（研究译稿）",
+      "itemCount": 9,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_responsive_distress10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_distress10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "4d0a1c876f786abd7f7572fa4c9a956e0734744fe3fee428cdc1aefe0b5e8fd0",
+      "sourceBlob": "649accbe3c5325d0f6c5bbe6be634445ce19f7b8",
+      "name": "IPIP他人痛苦情绪反应10题（研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "ipip_responsive_joy10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/ipip_responsive_joy10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "a7a3dcdea8fec952e5beb39c760542c34ad3b55e996fbc9d66d273067239c15c",
+      "sourceBlob": "f145abdef6b23011a67273c12f03f51fe6c28e2f",
+      "name": "IPIP共感愉悦10题（研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "jss8_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/jss8_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "aa46e5e52852230d83410c04315cf8a9173a4795388ffce2f2f6ce8d22eab3db",
+      "sourceBlob": "c2839fec588419175c1198820604cd0ea2d42226",
+      "name": "公正敏感性简表（8题）（中文研究译稿）",
+      "itemCount": 8,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 4
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "k6_zh_cn_research",
+      "instrumentVersion": "1.1.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.1.0/source.json",
+      "sourceSha256": "60f80c0a3c0755f8277dbb60d8cc7d47a550249a096abcaae47890629f682640",
+      "sourceBlob": "9234f3a924032a88537c0f0e9ab39091c07b42f4",
+      "name": "凯斯勒心理困扰量表（K6，作者官网普通话版）（研究呈现）",
+      "itemCount": 6,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "kseg6_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kseg6_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "e7bb632b8da7b942e46777d4d3f55b9c3212b63e8fc6b52a42d9b4772f304dfc",
+      "sourceBlob": "7f524cab304fab8f565189e2ce83c1d17d762533",
+      "name": "自我呈现简表（KSE-G，6题）（中文研究译稿）",
+      "itemCount": 6,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 2
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "kusiv3_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/kusiv3_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "fb8189a4d0c422f6f4c231cef0a1a5c6e8edf664eff4cb921dba3f3bb0f708f2",
+      "sourceBlob": "17a180cb1afd8b84b9ea3cb778ff39449be43978",
+      "name": "人际信任简表（3题）（中文研究译稿）",
+      "itemCount": 3,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "l1_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/l1_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "c50ada90db0da250d253f7a9fb16da65b2c01cd7758e603b3c79bfd72a667833",
+      "sourceBlob": "7728b7c0cb8b05aadf941bafb105498b8439adab",
+      "name": "总体生活满意度简表（1题）（中文研究译稿）",
+      "itemCount": 1,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "mslq_critical_thinking5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mslq_critical_thinking5_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "549556bd24ee7aefb28130abe0e5b6b08cba242c536965c17825d89eab02cc3c",
+      "sourceBlob": "c2fefe260276288b87ca7f29ff567aab751521fa",
+      "name": "MSLQ课程批判性思考策略分量表（5题）（中文研究译稿）",
+      "itemCount": 5,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "mwq5_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/mwq5_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "7e179c1051023b5d7d8b7831ff73a36cb4a117d74038bed8fe0b7940e408f749",
+      "sourceBlob": "d39e21e008352c79bd20ea85c0d12056443c030c",
+      "name": "走神问卷（5题）（中文研究译稿）",
+      "itemCount": 5,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "orvis92_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/orvis92_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "ca75edacb9eed515ea7fe6cc273df26c9b311f9f495c8eadfec71ef86f86dcf5",
+      "sourceBlob": "d3e82942718cfe1c08dd8115151a07fa3e1e51e9",
+      "name": "俄勒冈职业兴趣量表（ORVIS，92题中文工作译稿）",
+      "itemCount": 92,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 8
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "pba23_2018_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/pba23_2018_zh_cn/1.0.0/source.json",
+      "sourceSha256": "e0ccedb0e8f368362cac1d0901fd21f16fd295a449d0ebdf1c316e53026353a4",
+      "sourceBlob": "400da4d295dbb2d2c400f7f097da2b2f63ff423e",
+      "name": "父母养育倦怠评估（PBA-23，2018版中文工作稿）",
+      "itemCount": 23,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 5
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "phq4_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/phq4_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "3ec151119973c2349d90f001d265f6d868b959517bef5fa8f0103f9bb870d531",
+      "sourceBlob": "10fe9a5c868f9c21d1e2159aa11f7382a758a7e3",
+      "name": "超简抑郁焦虑筛查量表（PHQ-4） — 中文研究工作译稿",
+      "itemCount": 4,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "res9_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/res9_zh_cn/1.0.0/source.json",
+      "sourceSha256": "97e209e223ddae28fd81ce0b9727b3ab0c85c972d7db7b0b7cc288f3a9e0221b",
+      "sourceBlob": "b05afbf46fb9484cc7fac550b4517c6c2bcf744a",
+      "name": "中文韧性评估量表（RES，9题数字化候选）",
+      "itemCount": 9,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "rses10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/rses10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "82e4e486da2ead626d28e3bc34a74616618c82b2a5bd4e024dc16195faf9cc45",
+      "sourceBlob": "1a6e1eb66b6e6494154b23e99ca8e12fc67b18d3",
+      "name": "Rosenberg自尊量表（中文研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "sas_sv10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sas_sv10_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "db270c80d2a1086f0adce5ef0005c6acad294aeb396ad05f9d70987e251fe0a1",
+      "sourceBlob": "141d9107370508cd2ff46ca59d5409dc70b97438",
+      "name": "智能手机成瘾量表简版（SAS-SV，10题）（中文研究译稿）",
+      "itemCount": 10,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "sci8_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sci8_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "9a8e7c669cd1df9b9a6279de208029555bafa8a1c5e939187e0a64780cb7a540",
+      "sourceBlob": "d60c559d8e3752e120e8fd392cea6f8c6352d19e",
+      "name": "睡眠状况指标（8题）（中文研究译稿）",
+      "itemCount": 8,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "sop2_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sop2_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "944906cd932b4b60c43508bb106c8c539b4c86e69da543cb614428c9616ff41a",
+      "sourceBlob": "54838ac53b67bdf2251ef1253d49b197b9f31891",
+      "name": "乐观—悲观短量表（2题，中文工作译稿）",
+      "itemCount": 2,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.1",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "srq63_brown_miller_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/srq63_brown_miller_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "31ea003d17f0cdd08b9a76f657805c09c48f7d93b4486778a07738ea675b729d",
+      "sourceBlob": "7aeab9ed63dc84c7ad674798db0e32533ca04aa9",
+      "name": "自我调节问卷（Brown–Miller 63题）（中文研究译稿）",
+      "itemCount": 63,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 1
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "sswq16_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/sswq16_zh_cn_research/1.0.0/source.json",
+      "sourceSha256": "cf23dcb15ece5b40af0d58e48d9c43edac0d9eea8058dcd35b343636820b66b7",
+      "sourceBlob": "b015e1ded86691216ad5d9e4825967fce3c5eff0",
+      "name": "学生学校幸福感问卷（SSWQ16 中文研究译稿）",
+      "itemCount": 16,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 5
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    },
+    {
+      "instrumentKey": "tswq_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourcePath": "server-version/backend/src/modules/scale/instruments/tswq_zh_cn/1.0.0/source.json",
+      "sourceSha256": "9d27fabf9181caf45c4f6cdb705d88759bbd79899bed0052311cde087a9bed62",
+      "sourceBlob": "ea475d0afb70b90c2f39b3607b5899e356ceb5ec",
+      "name": "教师主观幸福感问卷（TSWQ，中文工作稿）",
+      "itemCount": 8,
+      "content": {
+        "scoringVersion": "1.0.0",
+        "localizationVersion": "1.0.0"
+      },
+      "parameter": {
+        "referencePolicy": {
+          "type": "none"
+        },
+        "referenceVersions": [],
+        "independentScoreOnlyVersion": null
+      },
+      "report": {
+        "version": "1.0.0",
+        "interpretationCount": 3
+      },
+      "releaseStatus": "DRAFT",
+      "runtimeValidation": "NOT_INFERRED_FROM_SOURCE",
+      "databaseState": "NOT_QUERIED",
+      "productionAvailability": "NOT_CLAIMED"
+    }
+  ]
+}
