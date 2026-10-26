@@ -1,9 +1,9 @@
 /* Teacher workspaces retain their warm journal palette and compact account banner. */
-.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1120px,100%);padding:18px clamp(16px,3vw,32px) 40px;gap:14px}
+.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1120px,100%);padding:18px clamp(16px,3vw,32px) 40px;gap:14px;font-size:14px;line-height:1.7}
 .ht-app[data-theme=dark] .ht-workspace{--ht-workspace-soft:#382d26}
 .ht-app .ht-workspace .ht-workspace-header{padding:0 2px;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ht-workspace-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 16px;min-width:0}
-.ht-workspace-heading h1{font-size:clamp(1.05rem,1.7vw,1.2rem);line-height:1.4;margin:0}
+.ht-workspace-heading h1{font-size:16px;line-height:1.5;margin:0}
 .ht-workspace-heading .ht-workspace-welcome{min-width:0;max-width:100%;margin:0;color:var(--ht-quiet);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ht-workspace-school{display:flex;justify-content:flex-end;margin-top:8px;padding-top:16px;border-top:1px solid var(--ht-line)}
 .ht-workspace-school>.ht-field{display:flex;flex-direction:row;align-items:center;gap:10px;width:min(430px,100%);min-width:0;margin:0}
@@ -37,7 +37,7 @@
 .ht-workspace-nav-label{display:none}
 .ht-workspace-jumps a{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:46px;padding:10px 6px 12px;color:var(--ht-quiet);text-decoration:none;font-size:14px;font-weight:500;line-height:1.6;white-space:nowrap}
 .ht-workspace-jumps a:hover{color:var(--ht-ink)}
-.ht-workspace-jumps a[aria-current=location]{color:var(--ht-copper);font-weight:650}
+.ht-workspace-jumps a[aria-current=location]{color:var(--ht-copper);font-weight:600}
 .ht-workspace-jumps a[aria-current=location]:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--ht-copper)}
 .ht-workspace-sections{display:grid;gap:18px;min-width:0}
 .ht-workspace-sections>.ht-panel{margin:0}
@@ -45,8 +45,8 @@
 .ht-workspace-section[hidden]{display:none}
 .ht-workspace :is(h1,h2,h3,h4,p,.ht-tag,.ht-welcome){overflow-wrap:anywhere}
 .ht-workspace :is(h2,h3){line-height:1.5}
-.ht-workspace h2{font-size:clamp(1.1rem,1.7vw,1.25rem);margin:0 0 8px}
-.ht-workspace h3{font-size:16px;margin-top:24px;margin-bottom:12px}
+.ht-workspace h2{font-size:18px;font-weight:600;margin:0 0 8px}
+.ht-workspace h3{font-size:15px;font-weight:600;margin-top:24px;margin-bottom:12px}
 .ht-workspace p{line-height:1.8}
 .ht-workspace .ht-panel{min-width:0;padding:22px;border-radius:14px;box-shadow:0 4px 20px #6e392005}
 .ht-workspace .ht-panel>p{max-width:76ch}
@@ -88,7 +88,7 @@
  .ht-workspace-body{gap:12px}
  .ht-app .ht-workspace .ht-workspace-header{padding:0 2px}
  .ht-app .ht-workspace-switcher .ht-workspace-tabs{width:auto;min-width:0;flex:1}
- .ht-app .ht-workspace-tabs button{flex:none;padding:8px 12px;gap:7px;font-size:13px}
+ .ht-app .ht-workspace-tabs button{flex:none;padding:8px 12px;gap:7px;font-size:14px}
  .ht-app .ht-workspace-info-trigger{width:44px;min-height:44px}
  .ht-workspace .ht-panel{padding:18px 16px;border-radius:12px}
  .ht-workspace .ht-empty{padding:18px;margin-top:18px}
@@ -97,8 +97,8 @@
  .ht-workspace .ht-inline>.ht-field{flex-basis:100%}
  .ht-workspace .ht-inline button{margin-bottom:0}
  .ht-workspace-body>.ht-workspace-jumps{gap:18px}
- .ht-workspace-jumps a{flex:none;gap:7px;padding:9px 4px 11px;font-size:13px}
- .ht-workspace h2{font-size:19px}
+ .ht-workspace-jumps a{flex:none;gap:7px;padding:9px 4px 11px;font-size:14px}
+ .ht-workspace h2{font-size:18px}
 }
 
 @media(min-width:901px){
@@ -139,14 +139,14 @@
 
 /* Personal launch tools and assigned assessments share a compact card rhythm. */
 .ht-workspace .ht-assessment-section-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-.ht-assessment-section-title>.ht-tag{font-size:12px;font-weight:500;line-height:1.5}
+.ht-assessment-section-title>.ht-tag{padding:3px 9px;font-size:12px;font-weight:500;line-height:1.5}
 .ht-personal-workbench .ht-personal-catalog{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}
 .ht-personal-catalog>.ht-event{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0;padding:16px 18px}
 .ht-personal-tool-copy{display:grid;justify-items:start;gap:7px;min-width:0}
 .ht-personal-tool-copy>strong{font-size:15px;line-height:1.6}
 .ht-personal-tool-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px}
-.ht-personal-tool-meta>.ht-muted{font-size:12px}
-.ht-personal-tool-meta>.ht-tag{padding:2px 8px;font-size:11px;line-height:1.6}
+.ht-personal-tool-meta>.ht-muted{font-size:13px}
+.ht-personal-tool-meta>.ht-tag{padding:2px 8px;font-size:12px;line-height:1.6}
 .ht-personal-catalog>.ht-event>button{flex:none;margin:0}
 .ht-personal-workbench>.ht-task{margin-top:24px;padding-top:20px;border-top:1px solid var(--ht-line)}
 .ht-personal-workbench .ht-scale-item{margin:14px 0;padding:16px;border:1px solid var(--ht-line);border-radius:12px}
@@ -196,3 +196,21 @@
 .ht-practice-disclosure[open]{padding-bottom:16px}
 .ht-practice-disclosure .ht-inline{margin-top:4px}
 .ht-practice-disclosure .ht-inline button{margin-bottom:0}
+
+/* Reuse School's task-help interaction, with Teacher-only visual tokens. */
+.ht-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;margin-bottom:12px}
+.ht-workspace .ht-section-heading h2{margin:0;min-width:0}
+.ht-section-heading>.hs-teacher-task-help{position:relative;flex:none}
+.ht-app .ht-section-heading .hs-teacher-task-help>button{display:flex;align-items:center;justify-content:center;width:44px;min-height:44px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ht-quiet)}
+.ht-app .ht-section-heading .hs-teacher-task-help>button:hover,.ht-app .ht-section-heading .hs-teacher-task-help>button[aria-expanded=true]{background:var(--ht-workspace-soft);color:var(--ht-copper)}
+.ht-section-heading .hs-teacher-task-help-content{position:absolute;z-index:30;top:calc(100% + 6px);right:0;width:min(380px,calc(100vw - 80px));max-height:min(65vh,360px);overflow-y:auto;padding:14px 16px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper);color:var(--ht-ink);box-shadow:0 10px 30px #211c1a26;font-size:13px;line-height:1.8}
+.ht-section-heading .hs-teacher-task-help-content p{margin:0;font-size:13px;line-height:1.8}
+.ht-section-heading .hs-teacher-task-help-content p+p{margin-top:8px}
+.ht-personal-workbench>.ht-section-heading+.ht-assessment-section-title{margin-top:12px}
+
+/* Ordinary teacher content uses a stable 18/15/14/13 type hierarchy. */
+.ht-app .ht-topbar-workspace .ht-account-actions>button{font-size:14px;line-height:1.5}
+.ht-workspace :is(.ht-assessment-inbox,.ht-personal-workbench)>.ht-event-list>.ht-event>strong{font-size:15px;font-weight:600;line-height:1.6}
+.ht-workspace .ht-personal-tool-copy>strong,.ht-assessment-source>.ht-event-list>.ht-event>strong{font-size:15px;font-weight:600;line-height:1.6}
+.ht-workspace :is(.ht-personal-catalog,.ht-personal-workbench>.ht-event-list,.ht-assessment-source>.ht-event-list)>.ht-event button{font-size:14px;font-weight:600;line-height:1.5}
+.ht-workspace :is(.ht-assessment-inbox,.ht-personal-workbench)>.ht-muted{font-size:13px;line-height:1.7}

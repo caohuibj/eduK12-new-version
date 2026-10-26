@@ -27,6 +27,13 @@ describe('unified Teacher assessment inbox',()=>{
   expect(within(card('课堂观察测评')).getByRole('button',{name:'继续测评'})).toBeEnabled()
   expect(within(card('教师发展测评')).getByRole('button',{name:'查看本人反馈'})).toBeEnabled()
   expect(screen.queryByText('暂无分配给你的测评任务。')).not.toBeInTheDocument()
+  const help=screen.getByRole('button',{name:'参与测评说明'})
+  expect(screen.queryByRole('note',{name:'参与测评说明'})).not.toBeInTheDocument()
+  fireEvent.click(help)
+  expect(screen.getByRole('note',{name:'参与测评说明'})).toHaveTextContent('学校或项目分配给你的测评')
+  fireEvent.keyDown(help,{key:'Escape'})
+  expect(screen.queryByRole('note',{name:'参与测评说明'})).not.toBeInTheDocument()
+
   fireEvent.click(within(card('教学体验测评')).getByRole('button',{name:'开始测评'}))
   await screen.findByRole('textbox',{name:'测评答案'})
   expect(api).toHaveBeenCalledWith('/run-executions/form-task/start','POST',{})
