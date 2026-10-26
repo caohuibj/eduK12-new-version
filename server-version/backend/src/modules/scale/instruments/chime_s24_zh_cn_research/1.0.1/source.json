@@ -1,0 +1,2174 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "chime_s24_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "正念体验综合问卷短版（CHIME-S，24题中文工作稿）",
+      "abbreviation": "CHIME-S-24-ZH",
+      "instrumentFamily": "Comprehensive Inventory of Mindfulness Experiences (CHIME)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING",
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "通过自我报告描述对内外在体验的觉察、专注行动、不评判、与念头保持距离、经验开放及对想法的反思等八方面正念体验；不等同于客观注意能力、道德品质、疗效或临床诊断。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "chime_s24_zh_cn_research",
+        "domain:mindfulness",
+        "domain:self_regulation",
+        "domain:well_being",
+        "construct:mindfulness_experiences",
+        "construct:external_awareness",
+        "construct:internal_awareness",
+        "construct:acting_with_awareness",
+        "construct:thoughts_relativity",
+        "construct:insightful_understanding",
+        "construct:nonjudgmental_acceptance",
+        "construct:nonreactive_decentering",
+        "construct:openness_to_experience",
+        "orientation:multifaceted_mindfulness",
+        "orientation:traditional_mindfulness_informed",
+        "orientation:ant_colony_short_form",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:self_report",
+        "population:source_new_zealand_undergraduates",
+        "population:source_us_adults_and_students",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:24_items",
+        "response:fixed_order",
+        "response:six_point_frequency",
+        "response:five_reverse_items",
+        "response:complete_case_scoring",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:not_high_stakes_selection",
+        "use:not_group_ranking",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:redistribution_allowed",
+        "license:adaptation_allowed",
+        "license:commercial_use_allowed",
+        "language_validation:source_english",
+        "language_validation:zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_pending",
+        "language_validation:china_validation_not_established",
+        "正念",
+        "正念体验",
+        "正念短版",
+        "内在觉察",
+        "外在觉察",
+        "专注当下",
+        "想法并非事实",
+        "善待自己",
+        "去中心化",
+        "不评判",
+        "经验开放",
+        "成人自评",
+        "中文工作译稿",
+        "非诊断",
+        "可署名再分发"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "源英语研究含新西兰大学生N=512（均龄19.14）、美国一般人群N=605（均龄41.68）、美国大学生N=210（均龄18.64）；原文未给精确年龄全距。平台保守限定18岁及以上成人研究自评，该界限是使用政策，不是作者年龄规范或中国成人验证；不推广K12或临床决策。"
+    },
+    "administration": {
+      "itemCount": 24,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "日常或一般体验的频率；S1指导语未规定回顾天数，不擅加最近7天/30天。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "严格采用2024 Supplementary Table S1的24题顺序，八维各3题；CHIME-XS另为16题，不混用。",
+        "六点频率：1 Almost Never、2 Infrequently、3 Somewhat Infrequently、4 Somewhat Frequently、5 Frequently、6 Almost Always；中文为独立工作译文。 中文采用几乎从不/很少/较少/较常/经常/几乎总是，保持频率递增。",
+        "反向第8、9、22、23、24题，换算7减原始分；各维及全部24题分别等权均分。",
+        "独立指导语保存在administration.md及PREPARED sidecar；旧source schema无指导语字段，不拼进第一题，不声称前端已接入。",
+        "作者未给缺失阈值；本工作稿保守要求每个分数涵盖的题目完整，缺失不插补，不冒称原作者缺失规则。",
+        "6分钟为平台估计，原文15分钟是多量表问卷用时而非本短版耗时。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "源英语短版研究有结构及关联证据；中文工作稿独立等待验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助成人回顾日常体验，不凭分数判断正念好坏、治疗需要或练习效果。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "chimes-karl2024-en-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "新西兰大学生及美国一般成人、大学生英语样本，非中国样本",
+        "ageRange": "均龄19.14/41.68/18.64岁；精确全距未提供",
+        "locale": "en",
+        "territory": "NZ",
+        "sampleSize": 512,
+        "studyDesign": "新西兰样本蚁群优化选每维3题，美国N=605和N=210独立复核；相关八因子CFA无高阶因子；并检查与长版及其他量表关联。",
+        "rating": "MIXED",
+        "citation": "Karl, J. A., Ribeiro, L., Bergomi, C., Fischer, R., Dunne, S., & Medvedev, O. N. (2024). Making it Short: Shortening the Comprehensive Inventory of Mindfulness Experiences Using Ant Colony Optimization. Mindfulness, 15, 421–434. https://doi.org/10.1007/s12671-024-02302-z.",
+        "doi": "10.1007/s12671-024-02302-z",
+        "url": "https://link.springer.com/article/10.1007/s12671-024-02302-z",
+        "notes": "正式CHIME-S24与CHIME-XS16分属不同题本；S1明确总分为24题均分，不能照搬2023长版37题求和或Rasch转换。"
+      },
+      {
+        "evidenceId": "chimes-karl2024-en-reliability",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "同篇英语三样本；源证据不自动迁移至中文工作稿",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 605,
+        "studyDesign": "报告各分维内部一致性；原文提示开放维度及文化、测量不变性、重测研究仍有局限。",
+        "rating": "MIXED",
+        "citation": "Karl, J. A., Ribeiro, L., Bergomi, C., Fischer, R., Dunne, S., & Medvedev, O. N. (2024). Making it Short: Shortening the Comprehensive Inventory of Mindfulness Experiences Using Ant Colony Optimization. Mindfulness, 15, 421–434. https://doi.org/10.1007/s12671-024-02302-z.",
+        "doi": "10.1007/s12671-024-02302-z",
+        "url": "https://link.springer.com/article/10.1007/s12671-024-02302-z",
+        "notes": "不是本中文工作稿的信效度证据，不制造中国常模、百分位、临床阈值或高低分级。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "2024 Karl等公开电子补充材料Table S1英语正式CHIME-S24题本、选项、独立指导语与计分说明。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "EDUK12.TOP独立中文工作译稿，与英语CHIME-S24保留来源关系并独立管理内容/本地化版本；专家审校、认知访谈和中国人群验证均未完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "chime_s24_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "chime_s24_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "chime_s24_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© The Author(s) 2024: Johannes A. Karl, Leticia Ribeiro, Claudia Bergomi, Ronald Fischer, Simon Dunne, Oleg N. Medvedev. Karl, J. A., Ribeiro, L., Bergomi, C., Fischer, R., Dunne, S., & Medvedev, O. N. (2024). Making it Short: Shortening the Comprehensive Inventory of Mindfulness Experiences Using Ant Colony Optimization. Mindfulness, 15, 421–434. https://doi.org/10.1007/s12671-024-02302-z. 期刊及电子补充材料采用CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；期刊说明第三方材料除非信用行另注均纳入，已检查S1题本未发现排除声明。采用Supplementary Table S1正式CHIME-S24，不采用CHIME-XS16或37题长版。中文题目、指导语和选项为EDUK12.TOP独立工作翻译，报告为平台原创；已作语言转换与成人研究使用边界说明，未经作者审定，不是已验证中文版。署名、来源、许可证链接及改动说明必须随再分发保留。",
+      "版权标签仅作检索分类；系统实际使用权沿用既有授权事实源，本DRAFT候选不激活任何产品入口。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "CHIME-S24 English Supplementary Table S1 (Karl et al., 2024); independent Chinese working translation",
+        "citation": "Karl, J. A., Ribeiro, L., Bergomi, C., Fischer, R., Dunne, S., & Medvedev, O. N. (2024). Making it Short: Shortening the Comprehensive Inventory of Mindfulness Experiences Using Ant Colony Optimization. Mindfulness, 15, 421–434. https://doi.org/10.1007/s12671-024-02302-z.",
+        "url": "https://link.springer.com/article/10.1007/s12671-024-02302-z",
+        "publicationYear": 2024
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© The Author(s) 2024: Johannes A. Karl, Leticia Ribeiro, Claudia Bergomi, Ronald Fischer, Simon Dunne, Oleg N. Medvedev. Karl, J. A., Ribeiro, L., Bergomi, C., Fischer, R., Dunne, S., & Medvedev, O. N. (2024). Making it Short: Shortening the Comprehensive Inventory of Mindfulness Experiences Using Ant Colony Optimization. Mindfulness, 15, 421–434. https://doi.org/10.1007/s12671-024-02302-z. 期刊及电子补充材料采用CC BY 4.0（https://creativecommons.org/licenses/by/4.0/）；期刊说明第三方材料除非信用行另注均纳入，已检查S1题本未发现排除声明。采用Supplementary Table S1正式CHIME-S24，不采用CHIME-XS16或37题长版。中文题目、指导语和选项为EDUK12.TOP独立工作翻译，报告为平台原创；已作语言转换与成人研究使用边界说明，未经作者审定，不是已验证中文版。署名、来源、许可证链接及改动说明必须随再分发保留。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "chimes_frequency_1_6",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "很少",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "较少",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "较常",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "经常",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "几乎总是",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CHIMES_01",
+          "content": "我会注意到大自然中的细节，比如颜色、形状和质地。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_02",
+          "content": "我会留意身体感受到的事物，比如风吹过头发或阳光照在脸上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_03",
+          "content": "我会注意到周围环境中的声音，比如鸟叫声或汽车驶过的声音。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_04",
+          "content": "当我的心情发生变化时，我会马上注意到。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_05",
+          "content": "当我和别人交谈时，我会注意到自己正在体验什么感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_06",
+          "content": "通常，无论什么时候，我都能觉察到自己当时的感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_07",
+          "content": "我很容易把注意力保持在自己正在做的事情上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_08",
+          "content": "在日常生活中，许多回忆、画面或白日梦会让我分心。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_09",
+          "content": "阅读时，我会因为刚才想着别的事情，而不得不重新读一遍段落。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_10",
+          "content": "在日常生活中，我会意识到自己的想法并不总是事实。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_11",
+          "content": "在日常生活中，我能觉察到自己对事物的看法并不总是基于事实。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_12",
+          "content": "我知道，即使是自己坚信的观点，也可能随时间改变。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_13",
+          "content": "当我注意到自己把事情看得比实际更复杂时，我能会心一笑。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_14",
+          "content": "当我无端为难自己时，我能以幽默的眼光看待这件事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_15",
+          "content": "当我注意到自己把小问题看得过于严重时，我能对自己笑一笑。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_16",
+          "content": "面对生活中的起起落落，我会善待自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_17",
+          "content": "我能看见自己的错误和困难，而不评判自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_18",
+          "content": "即使犯了大错，我仍会以善意和理解对待自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_19",
+          "content": "当我陷入想法和情绪时，我能“退后一步”，迅速觉察到那个想法或画面，而不被它支配。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_20",
+          "content": "我能注意到自己的想法和感受，而不被它们缠住。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_21",
+          "content": "我注意到自己的想法和感受，也能“退后一步”，从一定距离观察它们。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_22",
+          "content": "当我感到不愉快的情绪时，我会试着分散自己的注意力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_23",
+          "content": "我不喜欢自己生气或害怕时的状态，并会努力摆脱这些感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CHIMES_24",
+          "content": "当我感到疼痛时，我会尽可能避开这种感觉。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "chimes_frequency_1_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.1",
+        "itemRules": [
+          {
+            "itemCode": "CHIMES_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "external_awareness",
+            "type": "dimension",
+            "label": "留意周围的体验",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_03",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "internal_awareness",
+            "type": "dimension",
+            "label": "觉察内心的体验",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "acting_awareness",
+            "type": "dimension",
+            "label": "专注正在做的事",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "thoughts_relativity",
+            "type": "dimension",
+            "label": "看见想法的可变性",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "insightful_understanding",
+            "type": "dimension",
+            "label": "放宽对小事的看法",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_15",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "nonjudgmental_acceptance",
+            "type": "dimension",
+            "label": "善意地看待自己",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "nonreactive_decentering",
+            "type": "dimension",
+            "label": "与想法保持一点距离",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_21",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "openness",
+            "type": "dimension",
+            "label": "面对不舒服的体验",
+            "description": "反向题规则转换后，更多表示较少急于避开不愉快情绪或疼痛体验；不表示疼痛或不适更多，不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "total",
+            "type": "total",
+            "label": "整体正念体验",
+            "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CHIMES_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_20",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CHIMES_24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "scoreOrder": [
+          "external_awareness",
+          "internal_awareness",
+          "acting_awareness",
+          "thoughts_relativity",
+          "insightful_understanding",
+          "nonjudgmental_acceptance",
+          "nonreactive_decentering",
+          "openness",
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "external_awareness",
+            "headline": "留意周围的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你是否留意周围的细节，例如经过树下时看到叶子的颜色，或在路上听到车辆的声音。留意并不要求一直保持警觉，也不意味着必须专门寻找特别的体验。环境是否安静、当时是否赶时间，都可能影响你怎么回答。可以回想一个熟悉的地方，看看自己平常会注意到什么，又常常略过什么。下一次路过时，给自己片刻时间，只留意一个自然出现的声音或颜色，然后继续手头的事情。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你今天留意到了身边哪一个平常容易忽略的细节？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次走过熟悉的地方时，留意一个自然出现的声音或颜色。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "internal_awareness",
+            "headline": "觉察内心的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你能否察觉自己当时的感受，以及心情发生变化时是否注意到了。感受有时清楚，有时模糊，忙碌或疲惫也会让人暂时顾不上内心。回答反映的是你目前对自己的描述，不要求你随时准确说出每一种情绪。可以回想最近一次与人交谈，看看那时心里有什么变化。下一次谈话结束后，试着用一个平常的词描述当下感受；如果暂时说不清，也允许自己先停留在这种不确定中。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次心情变化，你是在什么时候注意到的？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次谈话后，试着用一个平常的词描述自己的感受。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "acting_awareness",
+            "headline": "专注正在做的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你做一件事时，注意力是否常常留在当下，还是容易被回忆、画面或别的念头带走。走神是许多人都会有的体验，并不凭一次回答就能判断注意能力。事情是否有趣、环境是否嘈杂、当时是否疲惫，也可能影响投入的程度。可以挑一段最近的阅读或工作，回想自己在什么时候发现已经走神。下一次发现分心时，轻轻指出眼前要做的一个步骤，再把注意力带回这一小步。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次发现自己走神时，当时在做什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件小事，只专注它当前的一步，走神后再回来。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "thoughts_relativity",
+            "headline": "看见想法的可变性",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你能否看见，想法和看法可能会变化，也可能没有完全反映事实。这不要求你否定自己的判断，而是给新的信息和不同的理解留一点空间。生活经验、当时的心情和别人提供的线索，都可能影响我们怎样理解事情。可以回想最近一次改变看法的经历，看看是什么新信息让你有所调整。遇到一个很确定的想法时，试着分别写下自己观察到的事实和对它的解释，再看看还有没有其他可能。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一次新信息让你改变了原先的判断？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一个确定的想法分成观察到的事实和自己的解释。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "insightful_understanding",
+            "headline": "放宽对小事的看法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你发现自己把小问题想得太复杂、或无端为难自己时，是否能够稍微放宽看法，甚至会心一笑。这里的轻松不是要求你把真正的困难当作小事，也不要求在难受的时候强迫自己开心。不同处境下，幽默感和看事情的距离都可能变化。可以回想一件后来觉得没有那么严重的小事，看看当时自己最担心什么。下次遇到类似情形时，先问一问眼前最需要处理的具体事情是什么，再从一小步开始。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一件后来发现没有想象中严重的小事？"
+              },
+              {
+                "category": "strategy",
+                "text": "把一个烦恼改写成眼前最需要处理的一件具体小事。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonjudgmental_acceptance",
+            "headline": "善意地看待自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注你面对生活起伏、错误和困难时，是否仍能以善意和理解看待自己。善待自己可以和承担责任、修正错误同时存在，不需要先证明自己做得足够好。习惯、压力和当时得到的支持，都可能影响这一点。可以想一想，当朋友遇到和你相似的困难时，你会怎样对他说话。下次自己出错时，试着用同样平实、尊重的语气说一句话，再选择一个能够补救或继续前进的小行动。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到同样困难的朋友，你会怎样回应他？"
+              },
+              {
+                "category": "strategy",
+                "text": "下一次出错时，先对自己说一句平实而尊重的话。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonreactive_decentering",
+            "headline": "与想法保持一点距离",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注当想法或情绪变得强烈时，你是否能稍微退后一点，注意到它们正在发生，而不是马上被卷进去。保持一点距离并不是压住情绪，也不是要求你立刻冷静或放弃行动。有时能够察觉到自己正被念头带走，本身就提供了一个停顿的机会。可以回想最近一个反复出现的念头，看看它怎样影响了自己的下一步。下次它出现时，试着说“我注意到自己有这个想法”，再决定眼下适合怎样回应。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪个念头最近常常影响你的下一步行动？"
+              },
+              {
+                "category": "strategy",
+                "text": "念头出现时，试说“我注意到自己有这个想法”，然后再决定行动。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "openness",
+            "headline": "面对不舒服的体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这部分关注面对不愉快情绪或疼痛感觉时，你是否常常想分散注意或赶快摆脱它们。人们在不同处境下会选择不同应对办法，暂时转移注意有时也能帮助继续生活，因此一次回答不能用来评价做法对错。这部分经过反向整理，更多表示较少急于避开这些体验，不意味着应忍受伤害或停止必要照护。可以观察一个轻微的不舒服，先辨认它是什么，再决定需要休息、求助，还是以合适方式继续手头的事。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "轻微不舒服出现时，你通常会怎样回应？"
+              },
+              {
+                "category": "strategy",
+                "text": "遇到轻微的不舒服时，先辨认它，再决定休息、求助或继续。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "total",
+            "headline": "整体正念体验",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "整体结果把不同方面的日常正念体验放在一起，帮助你回顾如何注意周围、觉察内心，以及怎样面对念头和不舒服。它是这次自我描述的整理，不是给一个人贴上“有正念”或“没正念”的标签，也不能代替实际生活中的了解。你在不同环境、不同日子里的体验可能不一样，总体均分也可能掩盖各方面的差别。可以从自己最感兴趣的一个方面开始，选一个容易做到的小行动，过一段时间再回顾它是否适合自己。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一种日常体验最值得你接下来多留意一点？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个适合自己的小行动，在日常的一次停顿里试一试。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+          "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+          "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+          "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+        ],
+        "disclaimer": "用于成人回顾日常正念体验，不是考试或诊断。中文为平台独立工作译稿。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source and plain-language report preparation; not human expert approval",
+            "reviewedAt": "2026-10-26T05:56:22.935801Z",
+            "basis": "Karl et al. 2024 Supplementary Table S1; adult-only working scope. Technical student audience slot does not imply K12 applicability."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "chime_s24",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 1.0,
+            "internal_awareness": 1.0,
+            "acting_awareness": 1.0,
+            "thoughts_relativity": 1.0,
+            "insightful_understanding": 1.0,
+            "nonjudgmental_acceptance": 1.0,
+            "nonreactive_decentering": 1.0,
+            "openness": 1.0,
+            "total": 1.0
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 6.0,
+            "internal_awareness": 6.0,
+            "acting_awareness": 6.0,
+            "thoughts_relativity": 6.0,
+            "insightful_understanding": 6.0,
+            "nonjudgmental_acceptance": 6.0,
+            "nonreactive_decentering": 6.0,
+            "openness": 6.0,
+            "total": 6.0
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "midpoint_3_5",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 3.3333333333333335,
+            "internal_awareness": 3.6666666666666665,
+            "acting_awareness": 3.3333333333333335,
+            "thoughts_relativity": 3.6666666666666665,
+            "insightful_understanding": 3.3333333333333335,
+            "nonjudgmental_acceptance": 3.6666666666666665,
+            "nonreactive_decentering": 3.3333333333333335,
+            "openness": 3.3333333333333335,
+            "total": 3.4583333333333335
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_one",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 1.0,
+            "internal_awareness": 1.0,
+            "acting_awareness": 4.333333333333333,
+            "thoughts_relativity": 1.0,
+            "insightful_understanding": 1.0,
+            "nonjudgmental_acceptance": 1.0,
+            "nonreactive_decentering": 1.0,
+            "openness": 6.0,
+            "total": 2.0416666666666665
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "raw_all_six",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 6.0,
+            "internal_awareness": 6.0,
+            "acting_awareness": 2.6666666666666665,
+            "thoughts_relativity": 6.0,
+            "insightful_understanding": 6.0,
+            "nonjudgmental_acceptance": 6.0,
+            "nonreactive_decentering": 6.0,
+            "openness": 1.0,
+            "total": 4.958333333333333
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_independent",
+        "answers": [
+          {
+            "itemCode": "CHIMES_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "external_awareness": 2.0,
+            "internal_awareness": 5.0,
+            "acting_awareness": 3.3333333333333335,
+            "thoughts_relativity": 5.0,
+            "insightful_understanding": 2.0,
+            "nonjudgmental_acceptance": 5.0,
+            "nonreactive_decentering": 2.0,
+            "openness": 2.0,
+            "total": 3.2916666666666665
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "CHIMES_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_18",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_19",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_20",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_21",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_22",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_23",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CHIMES_24",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "external_awareness": null,
+            "internal_awareness": 3.0,
+            "acting_awareness": 3.6666666666666665,
+            "thoughts_relativity": 3.0,
+            "insightful_understanding": 3.0,
+            "nonjudgmental_acceptance": 3.0,
+            "nonreactive_decentering": 3.0,
+            "openness": 4.0,
+            "total": null
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "empty",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "external_awareness": null,
+            "internal_awareness": null,
+            "acting_awareness": null,
+            "thoughts_relativity": null,
+            "insightful_understanding": null,
+            "nonjudgmental_acceptance": null,
+            "nonreactive_decentering": null,
+            "openness": null,
+            "total": null
+          },
+          "totalScoreKeys": [
+            "external_awareness",
+            "internal_awareness",
+            "acting_awareness",
+            "thoughts_relativity",
+            "insightful_understanding",
+            "nonjudgmental_acceptance",
+            "nonreactive_decentering",
+            "openness",
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}

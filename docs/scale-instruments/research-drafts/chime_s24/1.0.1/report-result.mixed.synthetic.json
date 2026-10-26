@@ -1,0 +1,666 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-chime-revision-1.0.1",
+    "code": "chime_s24_zh_cn_research",
+    "name": "正念体验综合问卷短版（CHIME-S，24题中文工作稿）",
+    "instrumentVersion": "1.0.1"
+  },
+  "method": {
+    "scaleId": "synthetic-chime-revision-1.0.1",
+    "instrumentVersion": "1.0.1",
+    "scoringVersion": "1.0.1",
+    "reportVersion": "1.0.0",
+    "definitionHash": "dc57b509707b96d5c3af31d3a367f959112af060ad8ff624daefe0a1b3fc8eb2",
+    "referenceVersions": [],
+    "assessmentContext": null,
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0"
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "CHIMES_01",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "CHIMES_02",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "CHIMES_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "CHIMES_04",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 4
+    },
+    {
+      "itemCode": "CHIMES_05",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    },
+    {
+      "itemCode": "CHIMES_06",
+      "responseValue": "6",
+      "baseScore": 6,
+      "score": 6
+    },
+    {
+      "itemCode": "CHIMES_07",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "CHIMES_08",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 5
+    },
+    {
+      "itemCode": "CHIMES_09",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 4
+    },
+    {
+      "itemCode": "CHIMES_10",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 4
+    },
+    {
+      "itemCode": "CHIMES_11",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    },
+    {
+      "itemCode": "CHIMES_12",
+      "responseValue": "6",
+      "baseScore": 6,
+      "score": 6
+    },
+    {
+      "itemCode": "CHIMES_13",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "CHIMES_14",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "CHIMES_15",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "CHIMES_16",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 4
+    },
+    {
+      "itemCode": "CHIMES_17",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    },
+    {
+      "itemCode": "CHIMES_18",
+      "responseValue": "6",
+      "baseScore": 6,
+      "score": 6
+    },
+    {
+      "itemCode": "CHIMES_19",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "CHIMES_20",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "CHIMES_21",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "CHIMES_22",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 3
+    },
+    {
+      "itemCode": "CHIMES_23",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 2
+    },
+    {
+      "itemCode": "CHIMES_24",
+      "responseValue": "6",
+      "baseScore": 6,
+      "score": 1
+    }
+  ],
+  "scores": [
+    {
+      "key": "external_awareness",
+      "type": "dimension",
+      "label": "留意周围的体验",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 2,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_01",
+        "CHIMES_02",
+        "CHIMES_03"
+      ],
+      "answeredItems": [
+        "CHIMES_01",
+        "CHIMES_02",
+        "CHIMES_03"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "internal_awareness",
+      "type": "dimension",
+      "label": "觉察内心的体验",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 5,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_04",
+        "CHIMES_05",
+        "CHIMES_06"
+      ],
+      "answeredItems": [
+        "CHIMES_04",
+        "CHIMES_05",
+        "CHIMES_06"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "acting_awareness",
+      "type": "dimension",
+      "label": "专注正在做的事",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 3.3333333333333335,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_07",
+        "CHIMES_08",
+        "CHIMES_09"
+      ],
+      "answeredItems": [
+        "CHIMES_07",
+        "CHIMES_08",
+        "CHIMES_09"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "thoughts_relativity",
+      "type": "dimension",
+      "label": "看见想法的可变性",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 5,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_10",
+        "CHIMES_11",
+        "CHIMES_12"
+      ],
+      "answeredItems": [
+        "CHIMES_10",
+        "CHIMES_11",
+        "CHIMES_12"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "insightful_understanding",
+      "type": "dimension",
+      "label": "放宽对小事的看法",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 2,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_13",
+        "CHIMES_14",
+        "CHIMES_15"
+      ],
+      "answeredItems": [
+        "CHIMES_13",
+        "CHIMES_14",
+        "CHIMES_15"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "nonjudgmental_acceptance",
+      "type": "dimension",
+      "label": "善意地看待自己",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 5,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_16",
+        "CHIMES_17",
+        "CHIMES_18"
+      ],
+      "answeredItems": [
+        "CHIMES_16",
+        "CHIMES_17",
+        "CHIMES_18"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "nonreactive_decentering",
+      "type": "dimension",
+      "label": "与想法保持一点距离",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 2,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_19",
+        "CHIMES_20",
+        "CHIMES_21"
+      ],
+      "answeredItems": [
+        "CHIMES_19",
+        "CHIMES_20",
+        "CHIMES_21"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "openness",
+      "type": "dimension",
+      "label": "面对不舒服的体验",
+      "description": "反向题规则转换后，更多表示较少急于避开不愉快情绪或疼痛体验；不表示疼痛或不适更多，不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 2,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_22",
+        "CHIMES_23",
+        "CHIMES_24"
+      ],
+      "answeredItems": [
+        "CHIMES_22",
+        "CHIMES_23",
+        "CHIMES_24"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "total",
+      "type": "total",
+      "label": "整体正念体验",
+      "description": "更多表示本次自述相关体验较常发生；不作人群高低或临床判断。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 2,
+      "value": 3.2916666666666665,
+      "range": {
+        "min": 1,
+        "max": 6
+      },
+      "expectedItems": [
+        "CHIMES_01",
+        "CHIMES_02",
+        "CHIMES_03",
+        "CHIMES_04",
+        "CHIMES_05",
+        "CHIMES_06",
+        "CHIMES_07",
+        "CHIMES_08",
+        "CHIMES_09",
+        "CHIMES_10",
+        "CHIMES_11",
+        "CHIMES_12",
+        "CHIMES_13",
+        "CHIMES_14",
+        "CHIMES_15",
+        "CHIMES_16",
+        "CHIMES_17",
+        "CHIMES_18",
+        "CHIMES_19",
+        "CHIMES_20",
+        "CHIMES_21",
+        "CHIMES_22",
+        "CHIMES_23",
+        "CHIMES_24"
+      ],
+      "answeredItems": [
+        "CHIMES_01",
+        "CHIMES_02",
+        "CHIMES_03",
+        "CHIMES_04",
+        "CHIMES_05",
+        "CHIMES_06",
+        "CHIMES_07",
+        "CHIMES_08",
+        "CHIMES_09",
+        "CHIMES_10",
+        "CHIMES_11",
+        "CHIMES_12",
+        "CHIMES_13",
+        "CHIMES_14",
+        "CHIMES_15",
+        "CHIMES_16",
+        "CHIMES_17",
+        "CHIMES_18",
+        "CHIMES_19",
+        "CHIMES_20",
+        "CHIMES_21",
+        "CHIMES_22",
+        "CHIMES_23",
+        "CHIMES_24"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "external_awareness",
+      "headline": "留意周围的体验",
+      "label": null,
+      "interpretation": "这部分关注你是否留意周围的细节，例如经过树下时看到叶子的颜色，或在路上听到车辆的声音。留意并不要求一直保持警觉，也不意味着必须专门寻找特别的体验。环境是否安静、当时是否赶时间，都可能影响你怎么回答。可以回想一个熟悉的地方，看看自己平常会注意到什么，又常常略过什么。下一次路过时，给自己片刻时间，只留意一个自然出现的声音或颜色，然后继续手头的事情。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "你今天留意到了身边哪一个平常容易忽略的细节？"
+        },
+        {
+          "category": "strategy",
+          "text": "下次走过熟悉的地方时，留意一个自然出现的声音或颜色。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "internal_awareness",
+      "headline": "觉察内心的体验",
+      "label": null,
+      "interpretation": "这部分关注你能否察觉自己当时的感受，以及心情发生变化时是否注意到了。感受有时清楚，有时模糊，忙碌或疲惫也会让人暂时顾不上内心。回答反映的是你目前对自己的描述，不要求你随时准确说出每一种情绪。可以回想最近一次与人交谈，看看那时心里有什么变化。下一次谈话结束后，试着用一个平常的词描述当下感受；如果暂时说不清，也允许自己先停留在这种不确定中。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近一次心情变化，你是在什么时候注意到的？"
+        },
+        {
+          "category": "strategy",
+          "text": "下一次谈话后，试着用一个平常的词描述自己的感受。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "acting_awareness",
+      "headline": "专注正在做的事",
+      "label": null,
+      "interpretation": "这部分关注你做一件事时，注意力是否常常留在当下，还是容易被回忆、画面或别的念头带走。走神是许多人都会有的体验，并不凭一次回答就能判断注意能力。事情是否有趣、环境是否嘈杂、当时是否疲惫，也可能影响投入的程度。可以挑一段最近的阅读或工作，回想自己在什么时候发现已经走神。下一次发现分心时，轻轻指出眼前要做的一个步骤，再把注意力带回这一小步。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近一次发现自己走神时，当时在做什么？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一件小事，只专注它当前的一步，走神后再回来。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "thoughts_relativity",
+      "headline": "看见想法的可变性",
+      "label": null,
+      "interpretation": "这部分关注你能否看见，想法和看法可能会变化，也可能没有完全反映事实。这不要求你否定自己的判断，而是给新的信息和不同的理解留一点空间。生活经验、当时的心情和别人提供的线索，都可能影响我们怎样理解事情。可以回想最近一次改变看法的经历，看看是什么新信息让你有所调整。遇到一个很确定的想法时，试着分别写下自己观察到的事实和对它的解释，再看看还有没有其他可能。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "哪一次新信息让你改变了原先的判断？"
+        },
+        {
+          "category": "strategy",
+          "text": "把一个确定的想法分成观察到的事实和自己的解释。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "insightful_understanding",
+      "headline": "放宽对小事的看法",
+      "label": null,
+      "interpretation": "这部分关注你发现自己把小问题想得太复杂、或无端为难自己时，是否能够稍微放宽看法，甚至会心一笑。这里的轻松不是要求你把真正的困难当作小事，也不要求在难受的时候强迫自己开心。不同处境下，幽默感和看事情的距离都可能变化。可以回想一件后来觉得没有那么严重的小事，看看当时自己最担心什么。下次遇到类似情形时，先问一问眼前最需要处理的具体事情是什么，再从一小步开始。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "有没有一件后来发现没有想象中严重的小事？"
+        },
+        {
+          "category": "strategy",
+          "text": "把一个烦恼改写成眼前最需要处理的一件具体小事。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "nonjudgmental_acceptance",
+      "headline": "善意地看待自己",
+      "label": null,
+      "interpretation": "这部分关注你面对生活起伏、错误和困难时，是否仍能以善意和理解看待自己。善待自己可以和承担责任、修正错误同时存在，不需要先证明自己做得足够好。习惯、压力和当时得到的支持，都可能影响这一点。可以想一想，当朋友遇到和你相似的困难时，你会怎样对他说话。下次自己出错时，试着用同样平实、尊重的语气说一句话，再选择一个能够补救或继续前进的小行动。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "遇到同样困难的朋友，你会怎样回应他？"
+        },
+        {
+          "category": "strategy",
+          "text": "下一次出错时，先对自己说一句平实而尊重的话。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "nonreactive_decentering",
+      "headline": "与想法保持一点距离",
+      "label": null,
+      "interpretation": "这部分关注当想法或情绪变得强烈时，你是否能稍微退后一点，注意到它们正在发生，而不是马上被卷进去。保持一点距离并不是压住情绪，也不是要求你立刻冷静或放弃行动。有时能够察觉到自己正被念头带走，本身就提供了一个停顿的机会。可以回想最近一个反复出现的念头，看看它怎样影响了自己的下一步。下次它出现时，试着说“我注意到自己有这个想法”，再决定眼下适合怎样回应。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "哪个念头最近常常影响你的下一步行动？"
+        },
+        {
+          "category": "strategy",
+          "text": "念头出现时，试说“我注意到自己有这个想法”，然后再决定行动。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "openness",
+      "headline": "面对不舒服的体验",
+      "label": null,
+      "interpretation": "这部分关注面对不愉快情绪或疼痛感觉时，你是否常常想分散注意或赶快摆脱它们。人们在不同处境下会选择不同应对办法，暂时转移注意有时也能帮助继续生活，因此一次回答不能用来评价做法对错。这部分经过反向整理，更多表示较少急于避开这些体验，不意味着应忍受伤害或停止必要照护。可以观察一个轻微的不舒服，先辨认它是什么，再决定需要休息、求助，还是以合适方式继续手头的事。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "轻微不舒服出现时，你通常会怎样回应？"
+        },
+        {
+          "category": "strategy",
+          "text": "遇到轻微的不舒服时，先辨认它，再决定休息、求助或继续。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "total",
+      "headline": "整体正念体验",
+      "label": null,
+      "interpretation": "整体结果把不同方面的日常正念体验放在一起，帮助你回顾如何注意周围、觉察内心，以及怎样面对念头和不舒服。它是这次自我描述的整理，不是给一个人贴上“有正念”或“没正念”的标签，也不能代替实际生活中的了解。你在不同环境、不同日子里的体验可能不一样，总体均分也可能掩盖各方面的差别。可以从自己最感兴趣的一个方面开始，选一个容易做到的小行动，过一段时间再回顾它是否适合自己。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "哪一种日常体验最值得你接下来多留意一点？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个适合自己的小行动，在日常的一次停顿里试一试。"
+        }
+      ],
+      "limitations": [
+        "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+        "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+        "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+        "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这是一份成人日常体验的自我描述，不能用来诊断、排名或判断练习是否有效。",
+    "中文为独立工作译稿，尚未完成专家审校与中国人群验证，没有适用的中国常模或高低等级。",
+    "每个分数需要相应题目完整作答；漏答不视为几乎从不，也不补填。",
+    "经验开放部分涉及不舒服感受；结果不意味着应忍受伤害或停止必要照护。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "用于成人回顾日常正念体验，不是考试或诊断。中文为平台独立工作译稿。"
+}
