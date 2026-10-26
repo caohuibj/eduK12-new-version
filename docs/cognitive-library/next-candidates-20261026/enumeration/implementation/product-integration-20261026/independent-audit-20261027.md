@@ -80,3 +80,14 @@
 - P1：修 F2 的详细指标呈现（数组型 map 的专用渲染），与 F1 分开提交，避免文案与格式化混在一个 diff。
 - P2：F5 把练习次数改为从冻结 config 读取，失败信息区分“配置不符”与“未完成”。
 - P3：F4 归档显式判别，需与归档协议变更一起评估，本轮不动。
+
+## 8. 更正记录（同日，保留上文不改）
+
+第 5 节 F2 的**归因写错了**，此处更正，原段落保留不改写：
+
+- 参与者报告实际走的是 v2 三层报告卡（`pages/CognitiveResult.tsx:124` → `CognitiveV2ReportCard`），不是 `CognitiveSingleTaskReportCard`。
+- v2 的 `formatMetric` 对 `valueType === 'array'` 走 `JSON.stringify(value)`（`v2/report.ts:78`），不返回 `—`。因此线上真实表现是：展开“详细指标”会看到一段原始 JSON（`[{"targetValue":5,…}]`），而不是一条横杠。
+- `single-task-report.ts:64-70` 的 `—` 分支确实存在，但当前不是点数判断的活路径；只有将来用单任务卡渲染该快照才会触发。
+- 结论不变（详细层对普通用户不可读），但**机制与文件不同**：要改的是 v2 详细指标的数组型渲染或 `byQuantity` 的专用呈现，不是单任务卡。
+- 附带记录：v2 `metricView` 取 `presentation.metrics[key].explanation`，单任务卡取 `singleExplanation`。本轮呈现只提供 `explanation`；若将来接单任务卡需补 `singleExplanation`，当前不影响线上。
+
