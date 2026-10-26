@@ -3,10 +3,22 @@ import {describe,it,expect,vi} from 'vitest'
 import {EducationRosterSource} from './EducationRosterSource'
 import {EducationRosterWorkbench} from './EducationRosterWorkbench'
 import {EducationRosterManagement} from './EducationRosterManagement'
+import {EducationPersonnelDirectory} from './EducationPersonnelDirectory'
 import type {EducationRosterApi,RosterSheet} from './types'
 const units=[{id:'g',unitKind:'GRADE' as const,name:'一年级',parentUnitId:null},{id:'c',unitKind:'CLASS' as const,name:'一班',parentUnitId:'g'}]
 const click=(name:string)=>fireEvent.click(screen.getByRole('button',{name}))
 describe('shared roster workbench interactions',()=>{
+ it('waits for live directory capability before choosing an import protocol',async()=>{
+  let finish!:(value:unknown)=>void;const api=vi.fn(()=>new Promise(resolve=>{finish=resolve}))
+  render(<EducationPersonnelDirectory api={api as EducationRosterApi} organizationId="org" units={units}/>);const toggle=screen.getByRole('button',{name:'批量导入'});expect(toggle).toBeDisabled();fireEvent.click(toggle);expect(screen.queryByRole('region',{name:'统一批量导入'})).toBeNull()
+  await act(async()=>finish({list:[],total:0,page:1,pageSize:25,batchImport:true}));await waitFor(()=>expect(toggle).toBeEnabled());fireEvent.click(toggle);expect(screen.getByRole('region',{name:'整份名单分批导入'})).toBeInTheDocument()
+ })
+ it('does not open legacy mode during MFA expiry or replay the directory automatically after verifying',async()=>{
+  let verified=false;const api=vi.fn(async(path:string)=>{if(path==='/auth/mfa/step-up'){verified=true;return {}}if(!verified)throw Error('敏感操作需要重新验证动态验证码');return {list:[],total:0,page:1,pageSize:25,batchImport:true}})
+  render(<EducationPersonnelDirectory api={api as EducationRosterApi} organizationId="org" units={units}/>);const form=await screen.findByRole('form',{name:'目录身份验证'}),toggle=screen.getByRole('button',{name:'批量导入'});expect(toggle).toBeDisabled()
+  fireEvent.change(within(form).getByLabelText('6 位动态验证码'),{target:{value:'123456'}});fireEvent.click(within(form).getByRole('button',{name:'验证身份'}));await screen.findByText('验证成功，请点击刷新重新读取名单。');expect(toggle).toBeDisabled();expect(api).toHaveBeenCalledTimes(2)
+  fireEvent.click(screen.getByRole('button',{name:'刷新全校人员'}));await waitFor(()=>expect(toggle).toBeEnabled());fireEvent.click(toggle);expect(screen.getByRole('region',{name:'整份名单分批导入'})).toBeInTheDocument();expect(api).toHaveBeenCalledTimes(3)
+ })
  it('requires explicit mapping application and keeps the previous text until then',async()=>{
   const api=vi.fn(),onText=vi.fn(),blocked=vi.fn(),invalidate=vi.fn()
   render(<EducationRosterSource api={api as EducationRosterApi} organizationId="org" kind="STAFF" text="old draft" onText={onText} onBlocked={blocked} onInvalidate={invalidate}/>)
@@ -60,7 +72,7 @@ describe('shared roster workbench interactions',()=>{
  it('uses the same School directory and API paths when Teacher has both authorizations',async()=>{
   const api=vi.fn(async(path:string)=>path.endsWith('/capabilities')?{structure:true,personnel:true}:{list:[],total:0,page:1,pageSize:25})
   render(<EducationRosterManagement api={api as EducationRosterApi} organizationId="org" units={units} onUnits={vi.fn()} entry="TEACHER"/>)
-  const directory=await screen.findByRole('region',{name:'全校人员目录'});fireEvent.click(within(directory).getByRole('button',{name:'批量导入'}))
+  const directory=await screen.findByRole('region',{name:'全校人员目录'});await waitFor(()=>expect(within(directory).getByRole('button',{name:'批量导入'})).toBeEnabled());fireEvent.click(within(directory).getByRole('button',{name:'批量导入'}))
   expect(within(screen.getByRole('combobox',{name:'导入内容'})).getAllByRole('option')).toHaveLength(5)
   await waitFor(()=>expect(api.mock.calls.some(c=>c[0].includes('/personnel/directory?'))).toBe(true))
   expect(directory).toHaveAttribute('data-entry','TEACHER')
@@ -75,7 +87,7 @@ describe('shared roster workbench interactions',()=>{
   const api=vi.fn(async(path:string)=>path.endsWith('/capabilities')?{structure:true,personnel:true}:{list:[],total:0,page:1,pageSize:25})
   render(<EducationRosterManagement api={api as EducationRosterApi} organizationId="org" units={units} onUnits={vi.fn()} entry="TEACHER"/>)
   const directory=await screen.findByRole('region',{name:'全校人员目录'}),toggle=within(directory).getByRole('button',{name:'批量导入'})
-  fireEvent.click(toggle);fireEvent.change(screen.getByRole('textbox',{name:/粘贴名单/}),{target:{value:'still editing'}});fireEvent.click(toggle)
+  await waitFor(()=>expect(toggle).toBeEnabled());fireEvent.click(toggle);fireEvent.change(screen.getByRole('textbox',{name:/粘贴名单/}),{target:{value:'still editing'}});fireEvent.click(toggle)
   expect(screen.queryByRole('textbox',{name:/粘贴名单/})).toBeNull();fireEvent.click(toggle);expect(screen.getByRole('textbox',{name:/粘贴名单/})).toHaveValue('still editing')
  })
 
