@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import TeacherBrand from './TeacherBrand'
-import wordmark from './teacher-wordmark.svg?raw'
-import wordmarkUrl from './teacher-wordmark.svg'
+import wordmark from './teacher-home-wordmark.svg?raw'
+import wordmarkUrl from './teacher-home-wordmark.svg'
 
 describe('Teacher vector identity',()=>{
  it('preserves B3 and exposes one accessible two-line wordmark',()=>{

@@ -21,9 +21,13 @@
 .ht-app[data-theme=dark] .ht-auth-surface:not([data-cognitive-task-root],[data-cognitive-task-root] *):before{background-image:url('/huiteacher/educator-journal-moonlight.webp');opacity:.42}
 .ht-app[data-theme=dark] .ht-auth-surface:not([data-cognitive-task-root],[data-cognitive-task-root] *):after{background:linear-gradient(90deg,#211c1acf,#211c1a33 55%,#211c1a70)}
 .ht-app .ht-topbar{flex-wrap:wrap}
-.ht-app .ht-topbar nav{flex-wrap:wrap}
+.ht-app .ht-topbar nav{flex-wrap:nowrap;justify-content:flex-end;margin-left:auto}
+.ht-app .ht-topbar nav>button{flex:none}
+.ht-app .ht-topbar .ht-welcome{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ht-app .ht-topbar .product-theme-control{flex:none}
+.ht-app .ht-account-entry{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;padding:0;border-radius:50%}
 .ht-brand-wordmark{flex:none}
-@media(max-width:600px){.ht-app .ht-topbar{gap:8px 12px}.ht-app .ht-topbar nav{margin-left:auto}.ht-app .ht-brand-wordmark{width:116px}.ht-app .ht-topbar .product-theme-control{margin-right:4px}}
+@media(max-width:600px){.ht-app .ht-topbar{gap:8px 12px}.ht-app .ht-topbar nav{margin-left:auto}.ht-app .ht-brand-wordmark{width:116px}.ht-app .ht-topbar .product-theme-control{margin-right:0}}
 
 /* Adapters for shared education authoring, reporting and answer shells only. */
 .ht-app[data-theme=dark]{ --product-ink:var(--ht-ink);--product-muted:var(--ht-quiet);--product-line:var(--ht-line);--product-surface:var(--ht-paper);--product-bg:var(--ht-bg);--product-action:var(--ht-copper);--product-soft:var(--ht-surface-soft);--product-on-action:var(--ht-on-primary); }

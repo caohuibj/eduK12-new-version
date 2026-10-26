@@ -1,3 +1,4 @@
+import {assessmentStatus} from './assessmentTaskPresentation'
 import { useCallback,useEffect,useRef,useState } from 'react'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Catalog={resourceId:string;title:string;version:string;scientificMaturity:'PILOT'}
@@ -34,6 +35,9 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
   const [catalogRows,setCatalog]=useState<Catalog[]>([])
   const [attemptRows,setAttempts]=useState<AttemptSummary[]>([])
   const [active,setActive]=useState<Attempt|null>(null)
+  const answering=useRef<HTMLDivElement>(null)
+  const activeAnswerKey=active?.status==='IN_PROGRESS'?active.assessmentId:''
+  useEffect(()=>{if(activeAnswerKey){answering.current?.focus({preventScroll:true});answering.current?.scrollIntoView?.({block:'start'})}},[activeAnswerKey])
   const [answers,setAnswers]=useState<Record<string,string|number>>({})
   const [reports,setReports]=useState<Record<string,Report>>({})
   const [busy,setBusy]=useState(false)
@@ -126,24 +130,24 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
     const report=await api<Report>('/personal-scale/assessments/'+id+'/report')
     setReports(old=>({...old,[id]:report}))
   })
-  return <section className="ht-panel" aria-label="教师个人自主发展测评">
-    <h2>我的专业发展 · 个人自主测评</h2>
-    <p>使用同一教育账号，无须学校开通 Huiteacher。只有平台正式授予本人许可的原创 Pilot 量表可用；个人报告不提供给学校管理者。</p>
+  return <section className="ht-panel ht-personal-workbench" aria-label="教师个人自主发展测评">
+    <h2>组织测评</h2>
+    <p className="ht-muted">选择已授权给本人的工具，发起个人测评；此处仅供本人作答，不向其他人发布。个人反馈仅由本人查看。</p>
     {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
     {notice&&<p className="ht-notice" role="status">{notice}</p>}
-    <h3>本人获授权的量表</h3>
+    <h3 className="ht-assessment-section-title">可用测评工具{listReady&&<span className="ht-tag">{catalog.length} 项</span>}</h3>
     {listReady&&!listPending&&!listError&&!catalog.length?<p className="ht-empty">暂未获得个人测评工具授权。可继续使用学校安排的其他评价任务。</p>:
-      <div className="ht-event-list">{catalog.map(x=><div key={x.resourceId} className="ht-event">
-        <strong>{x.title}</strong><span className="ht-tag">Pilot · {x.version}</span>
-        <button disabled={busy} onClick={()=>begin(x.resourceId)}>开始／继续自主测评</button>
+      <div className="ht-event-list ht-personal-catalog">{catalog.map(x=><div key={x.resourceId} className="ht-event">
+        <div className="ht-personal-tool-copy"><strong>{x.title}</strong><span className="ht-muted">个人作答 · 反馈仅本人可见</span><span className="ht-tag">Pilot · {x.version}</span></div>
+        <button disabled={busy} onClick={()=>begin(x.resourceId)}>发起个人测评</button>
       </div>)}</div>}
-    <h3>我的个人测评记录</h3>
+    <h3 className="ht-assessment-section-title">我的个人测评记录{listReady&&<span className="ht-tag">{attempts.length} 条</span>}</h3>
     {listReady&&!listPending&&!listError&&!attempts.length&&<p className="ht-empty">暂无个人测评记录。</p>}
     <div className="ht-event-list">{attempts.map(x=><article className="ht-event" key={x.assessmentId}>
-      <strong>{x.title}</strong><span className="ht-tag">{x.status}</span>
+      <strong>{x.title}</strong><span className="ht-tag">{assessmentStatus(x.status)}</span>
       <div className="ht-inline">
         {x.status==='IN_PROGRESS'&&
           <button disabled={busy} onClick={()=>continueAttempt(x.assessmentId)}>继续作答</button>}
@@ -168,7 +172,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
           </>}
       </div>}
     </article>)}</div>
-    {active?.status==='IN_PROGRESS'&&<div className="ht-task">
+    {active?.status==='IN_PROGRESS'&&<div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前个人测评作答">
       <h3>{active.title}</h3><p>答案仅在本标签页短时保留，全部填写后一次提交正式计分。</p>
       {active.runner.items.map(q=><fieldset key={q.itemCode} className="ht-scale-item">
         <legend>{q.content}{q.required?' *':''}</legend>
