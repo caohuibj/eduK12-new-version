@@ -1,3 +1,5 @@
+import {educationPersonnelRouter} from '../campus/personnel.routes'
+import {educationRosterFileRouter} from '../education-roster/files.routes'
 import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
 import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
 import { Router } from 'express'
@@ -11,6 +13,8 @@ import { listEducationProductMemberships } from '../organization/educationProduc
 import { requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProductMember } from './authority'
 
 const router=Router()
+router.use(educationRosterFileRouter('TEACHER'))
+router.use(educationPersonnelRouter('TEACHER'))
 router.use('/organizations/:organizationId/private-tools',authenticateHuiteacher,educationPrivateToolRouter('TEACHER'))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const id=z.string().guid()
