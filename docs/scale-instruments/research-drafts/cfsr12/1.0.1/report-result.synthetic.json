@@ -1,0 +1,282 @@
+{
+  "synthetic": true,
+  "generatedBy": "scripts/scale-content-batch.ts -> buildScaleResult -> parseScaleResultV2",
+  "sourceSha256": "ea08968bc7d3f5361f2959825577e726caa65bc807de00eae9119dc0a8ae831e",
+  "sampleName": "mixed_0123_each_dimension",
+  "result": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "synthetic-batch-cfsr12_zh_cn_research",
+      "code": "cfsr12_zh_cn_research",
+      "name": "应对灵活性量表修订版（CFS-R，12题中文研究译稿）",
+      "instrumentVersion": "1.0.1"
+    },
+    "method": {
+      "scaleId": "synthetic-batch-cfsr12_zh_cn_research",
+      "instrumentVersion": "1.0.1",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.1",
+      "definitionHash": "334c59b2a74834d776a4fe9dde8c3be9851413245e1ee584fe9dbbf649fa2e2b",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.1"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "CFSR_01",
+        "responseValue": "0",
+        "baseScore": 0,
+        "score": 0
+      },
+      {
+        "itemCode": "CFSR_02",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "CFSR_03",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "CFSR_04",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "CFSR_05",
+        "responseValue": "0",
+        "baseScore": 0,
+        "score": 0
+      },
+      {
+        "itemCode": "CFSR_06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "CFSR_07",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "CFSR_08",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "CFSR_09",
+        "responseValue": "0",
+        "baseScore": 0,
+        "score": 0
+      },
+      {
+        "itemCode": "CFSR_10",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "CFSR_11",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "CFSR_12",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      }
+    ],
+    "scores": [
+      {
+        "key": "abandonment",
+        "type": "dimension",
+        "label": "停止无效的应对办法",
+        "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 6,
+        "range": {
+          "min": 0,
+          "max": 12
+        },
+        "expectedItems": [
+          "CFSR_01",
+          "CFSR_02",
+          "CFSR_03",
+          "CFSR_04"
+        ],
+        "answeredItems": [
+          "CFSR_01",
+          "CFSR_02",
+          "CFSR_03",
+          "CFSR_04"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "recoping",
+        "type": "dimension",
+        "label": "在受阻时尝试其他办法",
+        "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 6,
+        "range": {
+          "min": 0,
+          "max": 12
+        },
+        "expectedItems": [
+          "CFSR_05",
+          "CFSR_06",
+          "CFSR_07",
+          "CFSR_08"
+        ],
+        "answeredItems": [
+          "CFSR_05",
+          "CFSR_06",
+          "CFSR_07",
+          "CFSR_08"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "metacoping",
+        "type": "dimension",
+        "label": "觉察应对办法是否奏效",
+        "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 0,
+        "value": 6,
+        "range": {
+          "min": 0,
+          "max": 12
+        },
+        "expectedItems": [
+          "CFSR_09",
+          "CFSR_10",
+          "CFSR_11",
+          "CFSR_12"
+        ],
+        "answeredItems": [
+          "CFSR_09",
+          "CFSR_10",
+          "CFSR_11",
+          "CFSR_12"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "abandonment",
+        "headline": "停止无效的应对办法",
+        "label": null,
+        "interpretation": "遇到压力时，有些办法最初似乎有用，后来却可能不再奏效。这组题关心你是否会发现它已经帮不上忙，并考虑停止重复使用。每题从0到3分，四题相加得到0–12分；数字只是你对这种习惯的自我描述，不是“会不会放弃”或“抗压能力强弱”的评价。停止一种方法并不代表放弃事情本身，换办法有时需要环境允许、资源支持或他人帮助。中文工作译稿目前没有经验高低界值，也不能据此对照其他人。 就像发现钥匙不合适时换一把，换的是办法，并不等于放弃想打开的那扇门。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "回想最近一次事情没按计划发展：你有没有发现某个办法越来越不管用？是什么迹象让你察觉到的？"
+          },
+          {
+            "category": "strategy",
+            "text": "可以先问自己“继续做同一件事有帮助吗？”如果没有，再选择一个负担较小的调整，不要求立刻放弃正在努力的目标。"
+          }
+        ],
+        "limitations": [
+          "原发表研究用日语施测，日本20–98岁成人样本N=4000，并非中国常模；本项目译稿未经人工审校、认知访谈或中文版效度/重测验证。不得推广至K12、所有成人或临床群体。",
+          "本包仅保留三维（放弃无效、重新应对、元应对）的0–12分原始合计，不人为制造CFS-R总分、轻中重等级、诊断切点、百分位或可靠变化阈值。",
+          "原论文表格中维度Range写0–16，与每维4题、每题0–3的算术范围冲突；本包按算术0–12，论文均值对应求和而非OpenScales所用均分。",
+          "四题完整作答才计算各维；单题缺失不得推算、自动插补或把缺失当0。这是平台保守规则，非原作者已验证的遗漏规则。",
+          "原研究是日语施测，英文Table 1系作者论文呈现；本站中文工作译本及选项文字未验证。缺少真实年龄时不能自动认定≥20岁或可施测。",
+          "数字反映自我描述，不反映真实应对结果、正式诊断、教学质量或人格价值；使用前需要对应治理批准，报告可见性遵从实际发行与披露策略。",
+          "平台独立指导语在研究文档；未通过真实UI显示、双入口分发或数据库发布验收。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "recoping",
+        "headline": "在受阻时尝试其他办法",
+        "label": null,
+        "interpretation": "当原来的应对办法没能改善局面时，我们有时会寻找另一条路，有时会因为疲惫、时间或资源有限而暂时做不到。这组题关注你通常能否想到并使用不同的应对办法，四题总和为0–12分。分数越高只表示你更认同自己会进行这样的尝试；不意味着每次都能解决问题或一定比坚持原计划更好。先辨认现实限制，比责备自己没有迅速变通更有帮助。本译稿没有正式中国成人常模或分档。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近遇到的一个难题，还有哪些没试过的做法？有没有一种办法需要别人提供信息或帮助才能实行？"
+          },
+          {
+            "category": "strategy",
+            "text": "下次遇到卡住的事情时，可以先写出两个可选择的小步骤，评估各自所需的时间与支持，再选一个适合当下条件的。"
+          }
+        ],
+        "limitations": [
+          "原发表研究用日语施测，日本20–98岁成人样本N=4000，并非中国常模；本项目译稿未经人工审校、认知访谈或中文版效度/重测验证。不得推广至K12、所有成人或临床群体。",
+          "本包仅保留三维（放弃无效、重新应对、元应对）的0–12分原始合计，不人为制造CFS-R总分、轻中重等级、诊断切点、百分位或可靠变化阈值。",
+          "原论文表格中维度Range写0–16，与每维4题、每题0–3的算术范围冲突；本包按算术0–12，论文均值对应求和而非OpenScales所用均分。",
+          "四题完整作答才计算各维；单题缺失不得推算、自动插补或把缺失当0。这是平台保守规则，非原作者已验证的遗漏规则。",
+          "原研究是日语施测，英文Table 1系作者论文呈现；本站中文工作译本及选项文字未验证。缺少真实年龄时不能自动认定≥20岁或可施测。",
+          "数字反映自我描述，不反映真实应对结果、正式诊断、教学质量或人格价值；使用前需要对应治理批准，报告可见性遵从实际发行与披露策略。",
+          "平台独立指导语在研究文档；未通过真实UI显示、双入口分发或数据库发布验收。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "metacoping",
+        "headline": "觉察应对办法是否奏效",
+        "label": null,
+        "interpretation": "我们常常需要一点时间才知道，刚才采取的办法究竟有没有帮助。这组题关注你是否会观察应对的效果、区分有效和无效的策略，以及是否有清楚的应对目标。四题总分0–12是对这些想法的回答汇总，不是对实际判断准确性、智力或专业能力的测试。对于无法控制的压力源，效果也不一定立刻可见；发现还需要支持，同样是有用的信息。该中文译稿尚未验证，不给出所谓高低等级。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "你通常怎样知道自己采取的做法是否有效？有没有一些短期看不出变化、需要更长时间观察的事情？"
+          },
+          {
+            "category": "strategy",
+            "text": "可以给一项应对行动设一个可观察的小目标，过一段时间回看，而不是只看自己当时有没有紧张或难过。"
+          }
+        ],
+        "limitations": [
+          "原发表研究用日语施测，日本20–98岁成人样本N=4000，并非中国常模；本项目译稿未经人工审校、认知访谈或中文版效度/重测验证。不得推广至K12、所有成人或临床群体。",
+          "本包仅保留三维（放弃无效、重新应对、元应对）的0–12分原始合计，不人为制造CFS-R总分、轻中重等级、诊断切点、百分位或可靠变化阈值。",
+          "原论文表格中维度Range写0–16，与每维4题、每题0–3的算术范围冲突；本包按算术0–12，论文均值对应求和而非OpenScales所用均分。",
+          "四题完整作答才计算各维；单题缺失不得推算、自动插补或把缺失当0。这是平台保守规则，非原作者已验证的遗漏规则。",
+          "原研究是日语施测，英文Table 1系作者论文呈现；本站中文工作译本及选项文字未验证。缺少真实年龄时不能自动认定≥20岁或可施测。",
+          "数字反映自我描述，不反映真实应对结果、正式诊断、教学质量或人格价值；使用前需要对应治理批准，报告可见性遵从实际发行与披露策略。",
+          "平台独立指导语在研究文档；未通过真实UI显示、双入口分发或数据库发布验收。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "原发表研究用日语施测，日本20–98岁成人样本N=4000，并非中国常模；本项目译稿未经人工审校、认知访谈或中文版效度/重测验证。不得推广至K12、所有成人或临床群体。",
+      "本包仅保留三维（放弃无效、重新应对、元应对）的0–12分原始合计，不人为制造CFS-R总分、轻中重等级、诊断切点、百分位或可靠变化阈值。",
+      "原论文表格中维度Range写0–16，与每维4题、每题0–3的算术范围冲突；本包按算术0–12，论文均值对应求和而非OpenScales所用均分。",
+      "四题完整作答才计算各维；单题缺失不得推算、自动插补或把缺失当0。这是平台保守规则，非原作者已验证的遗漏规则。",
+      "原研究是日语施测，英文Table 1系作者论文呈现；本站中文工作译本及选项文字未验证。缺少真实年龄时不能自动认定≥20岁或可施测。",
+      "数字反映自我描述，不反映真实应对结果、正式诊断、教学质量或人格价值；使用前需要对应治理批准，报告可见性遵从实际发行与披露策略。",
+      "平台独立指导语在研究文档；未通过真实UI显示、双入口分发或数据库发布验收。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "仅供经审批后的成人非诊断性研究与个人反思候选。CFS-R 原作者Kato(2020)，DOI:10.3389/fpsyg.2020.561731（CC BY 4.0）；中文题项和反馈为平台工作稿，未通过科学/译审，不适用于K12或筛查，也不得以分数给人贴标签。"
+  }
+}

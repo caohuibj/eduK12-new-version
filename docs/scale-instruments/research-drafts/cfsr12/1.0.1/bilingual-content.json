@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cfsr12_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "source": {
+    "citation": "Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731.",
+    "doi": "10.3389/fpsyg.2020.561731",
+    "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.561731/full",
+    "sourcePresentationLanguage": "en",
+    "originalResearchAdministrationLanguage": "ja"
+  },
+  "translation": {
+    "targetLocale": "zh-CN",
+    "kind": "platform_work_translation",
+    "humanExpertReviewed": false,
+    "cognitiveInterviewed": false,
+    "validatedForChinesePopulation": false
+  },
+  "questions": [
+    {
+      "number": 1,
+      "code": "CFSR_01",
+      "dimension": "abandonment",
+      "authorPublishedEnglish": "I can stop using a coping strategy that has made the situation worse.",
+      "platformChinese": "如果一种应对方式让情况变得更糟，我能够停止使用它。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 2,
+      "code": "CFSR_02",
+      "dimension": "abandonment",
+      "authorPublishedEnglish": "I can stop using a failed coping strategy.",
+      "platformChinese": "如果某种应对方式已经失败，我能够停止使用它。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 3,
+      "code": "CFSR_03",
+      "dimension": "abandonment",
+      "authorPublishedEnglish": "I do not repeat using a coping strategy that made the situation worse.",
+      "platformChinese": "我不会反复使用曾让情况变得更糟的应对方式。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 4,
+      "code": "CFSR_04",
+      "dimension": "abandonment",
+      "authorPublishedEnglish": "I can stop using a coping strategy that has been ineffective.",
+      "platformChinese": "如果一种应对方式没有效果，我能够停止使用它。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 5,
+      "code": "CFSR_05",
+      "dimension": "recoping",
+      "authorPublishedEnglish": "If the situation has not improved, I consider a different coping strategy.",
+      "platformChinese": "如果情况没有改善，我会考虑换一种应对方式。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 6,
+      "code": "CFSR_06",
+      "dimension": "recoping",
+      "authorPublishedEnglish": "If I did not cope well, I use an alternative coping strategy.",
+      "platformChinese": "如果之前应对得不好，我会使用另一种应对方式。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 7,
+      "code": "CFSR_07",
+      "dimension": "recoping",
+      "authorPublishedEnglish": "Even if the stressful situation has worsened, I can cope by using another strategy.",
+      "platformChinese": "即使压力情境变得更糟，我也能换一种方式来应对。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 8,
+      "code": "CFSR_08",
+      "dimension": "recoping",
+      "authorPublishedEnglish": "Even if I fail to cope with stress, I can come up with a new coping strategy.",
+      "platformChinese": "即使没能应对好压力，我也能够想出新的应对办法。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 9,
+      "code": "CFSR_09",
+      "dimension": "metacoping",
+      "authorPublishedEnglish": "I know which coping strategies are effective and which strategies are ineffective.",
+      "platformChinese": "我知道哪些应对方式有效，哪些没有效果。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 10,
+      "code": "CFSR_10",
+      "dimension": "metacoping",
+      "authorPublishedEnglish": "I know if a coping strategy has been successful or unsuccessful.",
+      "platformChinese": "我能判断一种应对方式是否成功。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 11,
+      "code": "CFSR_11",
+      "dimension": "metacoping",
+      "authorPublishedEnglish": "I cope with stress by establishing clear objectives.",
+      "platformChinese": "我通过确立清晰的目标来应对压力。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    },
+    {
+      "number": 12,
+      "code": "CFSR_12",
+      "dimension": "metacoping",
+      "authorPublishedEnglish": "I can grasp if a coping strategy that I have used has been working well.",
+      "platformChinese": "我能够判断自己用过的应对方式是否起了作用。",
+      "scoreMin": 0,
+      "scoreMax": 3
+    }
+  ],
+  "options": [
+    {
+      "value": 0,
+      "english": "Not applicable",
+      "chineseWorkTranslation": "不符合"
+    },
+    {
+      "value": 1,
+      "english": "Somewhat applicable",
+      "chineseWorkTranslation": "有一点符合"
+    },
+    {
+      "value": 2,
+      "english": "Applicable",
+      "chineseWorkTranslation": "符合"
+    },
+    {
+      "value": 3,
+      "english": "Very applicable",
+      "chineseWorkTranslation": "非常符合"
+    }
+  ],
+  "notes": [
+    "English items preserve published Table 1 group order, not unverified actual Japanese administration order.",
+    "Chinese translation is unvalidated; original paper dimension range 0-16 conflicts with 4*0..3, use 0..12 arithmetic."
+  ]
+}

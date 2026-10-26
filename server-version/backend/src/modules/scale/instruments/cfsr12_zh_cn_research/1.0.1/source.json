@@ -1,0 +1,1077 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "cfsr12_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "应对灵活性量表修订版（CFS-R，12题中文研究译稿）",
+      "abbreviation": "CFS-R-12-ZH",
+      "instrumentFamily": "Coping Flexibility Scale-Revised"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "自我报告在压力情境中能否停止无效策略、选择替代办法并觉察效果的应对倾向；并非一般认知能力、实际干预效果或疾病筛查，也不是 ACT、CBT 或 DBT 任一疗法专属量表。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "cfsr12_zh_cn_research",
+        "domain:self_regulation",
+        "construct:coping_flexibility",
+        "construct:abandonment",
+        "construct:recoping",
+        "construct:metacoping",
+        "orientation:dual_process_coping_theory",
+        "orientation:ACT_CBT_DBT_related_not_exclusive",
+        "population:adult_20_plus",
+        "population:source_japanese_adults",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:paper",
+        "response:twelve_items",
+        "response:four_point_applicability",
+        "use:research",
+        "use:individual_reflection",
+        "use:not_diagnostic",
+        "use:no_validated_cutoff",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "language_validation:source_author_english_table",
+        "language_validation:platform_chinese_work_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:china_validation_not_established"
+      ]
+    },
+    "population": {
+      "populationNotes": "原 CFS-R 研究用日语施测，日本研究样本1为20–98岁成人网络面板N=4000；原作者另有大学生试测和其他研究样本。本平台只拟对≥20岁成人自我报告草稿进行内容审核；源研究不提供中文或K12验证，年龄边界不是源研究证明所有成人情境适用。真实入口必须执行年龄资格检查，缺龄不得推定符合。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "minAge": 20
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "DIGITAL_SUPERVISED",
+        "PAPER"
+      ],
+      "timeFrame": "通常面对压力时的应对体验；原作者未规定最近一周或某一事件的固定回忆窗口",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "12项按 Kato (2020) Table 1 所刊三组各四项的顺序整理；不能把 OpenScales 的交错 item 顺序称为原版顺序，真实原日语施测题序未能另行证实。",
+        "0–3 分对应不符合、有一点符合、符合、非常符合；源论文英文为 not applicable / somewhat applicable / applicable / very applicable，中文标签是平台工作翻译。",
+        "原作者日语施测；Table 1 给的是作者发表的英文题意。本平台中文工作翻译未经原作者审校、专家译审、认知访谈或本地验证。",
+        "指导语单独记录于研究资料 administration.md；当前平台若尚未将独立指导语接入施测页，不得把它并入第一题或宣称完整施测流程已验收。",
+        "各维度4条合计0–12；原表维度 Range 标注0–16与条目0–3分算术冲突，不能引用其0–16作为本平台理论范围。",
+        "4分钟仅为平台估计，并非原论文实测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原研究提供日语成年人结构/内部一致性证据，本项目中文译稿不享有这些验证结论。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅允许经科学/译审与发布治理批准后给成人提供描述性反馈。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "cfsr-kato2020-jp-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "日本20–98岁成人网络样本（Study 1 Sample 1），非中国常模；原日文施测",
+        "ageRange": "20–98岁，均龄45.31岁",
+        "locale": "ja",
+        "territory": "JP",
+        "sampleSize": 4000,
+        "studyDesign": "Kato 2020 Study 1 的三因素CFA；CFI=0.973、TLI=0.966、RMSEA=0.070、SRMR=0.050；非中文跨文化验证",
+        "rating": "MIXED",
+        "citation": "Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731.",
+        "doi": "10.3389/fpsyg.2020.561731",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.561731/full",
+        "notes": "Table 1 维度统计符合四题求和；表内所谓0–16范围与四题0–3计分不一致，当前项目保守按0–12理论边界。"
+      },
+      {
+        "evidenceId": "cfsr-kato2020-jp-internal-consistency",
+        "evidenceType": "INTERNAL_CONSISTENCY",
+        "population": "同一日本成人N=4000样本，不是另一独立样本",
+        "locale": "ja",
+        "territory": "JP",
+        "sampleSize": 4000,
+        "studyDesign": "原研究三个维度Cronbach alpha分别为0.87、0.93、0.90",
+        "rating": "MIXED",
+        "citation": "Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731.",
+        "doi": "10.3389/fpsyg.2020.561731",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.561731/full",
+        "notes": "内部一致性不能替代中文版效度、重测信度或K12适用性。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.1",
+    "translationSource": "Kato(2020)作者在开放论文 Table 1 公开的英文12条表述；原研究实际日语施测，本项目据作者英文呈现独立翻译中文。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "英文Table 1 是作者出版的英文呈现，不等于英语人群独立验证；本中文题干、指导语和4级标签均为平台工作译稿。须人工审校、认知访谈及目标人群验证后才考虑正式施测；无需改写原日语研究身份。 本修订仅为平台工作译稿的语义校正，保留原语言来源关系及人工审核待办；专家审核进展不等于本包计分或报告执行结果。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "cfsr12_zh_cn_research-1.0.1",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 240
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "cfsr12_zh_cn_research-1.0.1",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "cfsr12_zh_cn_research-1.0.1",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "© 2020 Tsukasa Kato. Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731. 原论文（含作者撰写的 Table 1 12项）采用 CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ ，允许注明来源的复制和改编。本项目仅采用原论文公开表格、独立翻译为中文工作稿，并创作数字界面响应标签和通俗反馈；保留署名、许可证链接及修改说明，作者未认可或验证该中文稿。不是仓库 MIT/CC 协议对原文的替代授权。OpenScales CFSR.osd 仅用于发现和对照：其维度均分与原论文维度描述统计不一致，且其库根 LICENSE 与 README 许可存在冲突，因此本包不复制 OSD 文字作为源题本。",
+      "原论文开源权利只解决题文复制/改编；中文工作译稿无科学验证、自动报告和系统审批均未获得放行。本包始终DRAFT/HIDDEN，未配置deployment、grant或激活统计ReferenceSet。",
+      "原论文 Table 1 已含完整12条题文；非仅论文摘要/README。来源及数字差异详见研究资料和署名说明。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Kato (2020) CFS-R original author-published English Table 1, platform Chinese working translation",
+        "citation": "Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731.",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2020.561731/full",
+        "publicationYear": 2020
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "© 2020 Tsukasa Kato. Kato, T. (2020). Examination of the Coping Flexibility Hypothesis Using the Coping Flexibility Scale-Revised. Frontiers in Psychology, 11, 561731. https://doi.org/10.3389/fpsyg.2020.561731. 原论文（含作者撰写的 Table 1 12项）采用 CC BY 4.0：https://creativecommons.org/licenses/by/4.0/ ，允许注明来源的复制和改编。本项目仅采用原论文公开表格、独立翻译为中文工作稿，并创作数字界面响应标签和通俗反馈；保留署名、许可证链接及修改说明，作者未认可或验证该中文稿。不是仓库 MIT/CC 协议对原文的替代授权。OpenScales CFSR.osd 仅用于发现和对照：其维度均分与原论文维度描述统计不一致，且其库根 LICENSE 与 README 许可存在冲突，因此本包不复制 OSD 文字作为源题本。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "cfsr_applicability_0_3",
+          "options": [
+            {
+              "value": "0",
+              "label": "不符合",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "有一点符合",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "非常符合",
+              "score": 3
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "CFSR_01",
+          "content": "如果一种应对方式让情况变得更糟，我能够停止使用它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_02",
+          "content": "如果某种应对方式已经失败，我能够停止使用它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_03",
+          "content": "我不会反复使用曾让情况变得更糟的应对方式。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_04",
+          "content": "如果一种应对方式没有效果，我能够停止使用它。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_05",
+          "content": "如果情况没有改善，我会考虑换一种应对方式。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_06",
+          "content": "如果之前应对得不好，我会使用另一种应对方式。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_07",
+          "content": "即使压力情境变得更糟，我也能换一种方式来应对。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_08",
+          "content": "即使没能应对好压力，我也能够想出新的应对办法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_09",
+          "content": "我知道哪些应对方式有效，哪些没有效果。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_10",
+          "content": "我能判断一种应对方式是否成功。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_11",
+          "content": "我通过确立清晰的目标来应对压力。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "CFSR_12",
+          "content": "我能够判断自己用过的应对方式是否起了作用。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "cfsr_applicability_0_3",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "itemRules": [
+          {
+            "itemCode": "CFSR_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "CFSR_12",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "abandonment",
+            "type": "dimension",
+            "label": "停止无效的应对办法",
+            "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CFSR_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "recoping",
+            "type": "dimension",
+            "label": "在受阻时尝试其他办法",
+            "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CFSR_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "metacoping",
+            "type": "dimension",
+            "label": "觉察应对办法是否奏效",
+            "description": "本维4题0–3分等权相加，得分范围0–12；分数越高仅表示自述中相应应对倾向更明显，不是应对成效、心理健康等级或常模位置。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "CFSR_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "CFSR_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.1",
+        "primaryScoreKeys": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "scoreOrder": [
+          "abandonment",
+          "recoping",
+          "metacoping"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "abandonment",
+            "headline": "停止无效的应对办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "遇到压力时，有些办法最初似乎有用，后来却可能不再奏效。这组题关心你是否会发现它已经帮不上忙，并考虑停止重复使用。每题从0到3分，四题相加得到0–12分；数字只是你对这种习惯的自我描述，不是“会不会放弃”或“抗压能力强弱”的评价。停止一种方法并不代表放弃事情本身，换办法有时需要环境允许、资源支持或他人帮助。中文工作译稿目前没有经验高低界值，也不能据此对照其他人。 就像发现钥匙不合适时换一把，换的是办法，并不等于放弃想打开的那扇门。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回想最近一次事情没按计划发展：你有没有发现某个办法越来越不管用？是什么迹象让你察觉到的？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以先问自己“继续做同一件事有帮助吗？”如果没有，再选择一个负担较小的调整，不要求立刻放弃正在努力的目标。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "recoping",
+            "headline": "在受阻时尝试其他办法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "当原来的应对办法没能改善局面时，我们有时会寻找另一条路，有时会因为疲惫、时间或资源有限而暂时做不到。这组题关注你通常能否想到并使用不同的应对办法，四题总和为0–12分。分数越高只表示你更认同自己会进行这样的尝试；不意味着每次都能解决问题或一定比坚持原计划更好。先辨认现实限制，比责备自己没有迅速变通更有帮助。本译稿没有正式中国成人常模或分档。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近遇到的一个难题，还有哪些没试过的做法？有没有一种办法需要别人提供信息或帮助才能实行？"
+              },
+              {
+                "category": "strategy",
+                "text": "下次遇到卡住的事情时，可以先写出两个可选择的小步骤，评估各自所需的时间与支持，再选一个适合当下条件的。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "metacoping",
+            "headline": "觉察应对办法是否奏效",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "我们常常需要一点时间才知道，刚才采取的办法究竟有没有帮助。这组题关注你是否会观察应对的效果、区分有效和无效的策略，以及是否有清楚的应对目标。四题总分0–12是对这些想法的回答汇总，不是对实际判断准确性、智力或专业能力的测试。对于无法控制的压力源，效果也不一定立刻可见；发现还需要支持，同样是有用的信息。该中文译稿尚未验证，不给出所谓高低等级。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你通常怎样知道自己采取的做法是否有效？有没有一些短期看不出变化、需要更长时间观察的事情？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以给一项应对行动设一个可观察的小目标，过一段时间回看，而不是只看自己当时有没有紧张或难过。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "原发表研究用日语施测，日本20–98岁成人样本N=4000，并非中国常模；本项目译稿未经人工审校、认知访谈或中文版效度/重测验证。不得推广至K12、所有成人或临床群体。",
+          "本包仅保留三维（放弃无效、重新应对、元应对）的0–12分原始合计，不人为制造CFS-R总分、轻中重等级、诊断切点、百分位或可靠变化阈值。",
+          "原论文表格中维度Range写0–16，与每维4题、每题0–3的算术范围冲突；本包按算术0–12，论文均值对应求和而非OpenScales所用均分。",
+          "四题完整作答才计算各维；单题缺失不得推算、自动插补或把缺失当0。这是平台保守规则，非原作者已验证的遗漏规则。",
+          "原研究是日语施测，英文Table 1系作者论文呈现；本站中文工作译本及选项文字未验证。缺少真实年龄时不能自动认定≥20岁或可施测。",
+          "数字反映自我描述，不反映真实应对结果、正式诊断、教学质量或人格价值；使用前需要对应治理批准，报告可见性遵从实际发行与披露策略。",
+          "平台独立指导语在研究文档；未通过真实UI显示、双入口分发或数据库发布验收。"
+        ],
+        "disclaimer": "仅供经审批后的成人非诊断性研究与个人反思候选。CFS-R 原作者Kato(2020)，DOI:10.3389/fpsyg.2020.561731（CC BY 4.0）；中文题项和反馈为平台工作稿，未通过科学/译审，不适用于K12或筛查，也不得以分数给人贴标签。",
+        "audienceContract": {
+          "schemaVersion": 1,
+          "respondent": "ADULT_SELF",
+          "audience": "student",
+          "locale": "zh-CN",
+          "qcReview": {
+            "reviewer": "AI-assisted source/translation and report preparation; NOT human expert approval",
+            "reviewedAt": "2026-10-26T03:17:16.348Z",
+            "basis": "Platform wording correction and everyday-language feedback revision against the original author source; not human expert approval. Runtime results are recorded separately in the batch evidence; student is only a technical report audience slot."
+          }
+        }
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "cfsr12",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.1"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "CFSR_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "abandonment": 0,
+            "recoping": 0,
+            "metacoping": 0
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "CFSR_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "abandonment": 12,
+            "recoping": 12,
+            "metacoping": 12
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "all_one",
+        "answers": [
+          {
+            "itemCode": "CFSR_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "abandonment": 4,
+            "recoping": 4,
+            "metacoping": 4
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "mixed_0123_each_dimension",
+        "answers": [
+          {
+            "itemCode": "CFSR_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "abandonment": 6,
+            "recoping": 6,
+            "metacoping": 6
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "only_abandonment_high",
+        "answers": [
+          {
+            "itemCode": "CFSR_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "abandonment": 12,
+            "recoping": 0,
+            "metacoping": 4
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "CFSR_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "CFSR_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "abandonment": null,
+            "recoping": 4,
+            "metacoping": 4
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "abandonment": null,
+            "recoping": null,
+            "metacoping": null
+          },
+          "totalScoreKeys": [
+            "abandonment",
+            "recoping",
+            "metacoping"
+          ]
+        }
+      }
+    ]
+  }
+}
