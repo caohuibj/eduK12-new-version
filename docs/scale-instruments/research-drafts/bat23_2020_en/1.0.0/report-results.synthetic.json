@@ -1,0 +1,2206 @@
+{
+  "synthetic": true,
+  "generator": "actual buildScaleResult",
+  "results": [
+    {
+      "caseName": "minimum",
+      "answers": [
+        {
+          "itemCode": "BAT_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_02",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_03",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_04",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_05",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_07",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_08",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_09",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_10",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_11",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_12",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_13",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_14",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_15",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_16",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_17",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_18",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_19",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_20",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_21",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_22",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_23",
+          "responseValue": "1"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-bat23-recorded",
+          "code": "bat23_2020_en",
+          "name": "工作体验问卷（BAT工作相关核心23，2020英文题本）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-bat23-recorded",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          }
+        ],
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "工作中的耗竭体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "mental_distance",
+            "type": "dimension",
+            "label": "与工作的距离感",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "answeredItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "cognitive_impairment",
+            "type": "dimension",
+            "label": "工作中的注意与思路",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "answeredItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "emotional_impairment",
+            "type": "dimension",
+            "label": "工作中的情绪体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "burnout_core",
+            "type": "total",
+            "label": "整体工作体验",
+            "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 1,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "burnout_core",
+            "headline": "Looking back at your working days / 回看一段时间的工作体验",
+            "label": null,
+            "interpretation": "Your answers bring together how work has felt recently: your energy, your connection with the job, and your experiences with attention and emotions. A demanding schedule, recovery time, caring responsibilities and other parts of life can all shape these experiences. Think of one recent working day and notice which parts felt draining and which felt a little easier. You could choose one small change that is within reach, such as leaving a short gap between meetings. These answers do not identify every cause, make a diagnosis, or decide your ability or value.\n\n中文对照：这份回答整理的是你在工作中的整体感受，包括精力、与工作的距离，以及注意和情绪上的体验。有时下班后仍难缓过来，开始一项任务也比平时费劲；这些感受可能和工作安排、恢复时间以及生活中的其他负担交织在一起。可以先挑一个最近的工作日，想想哪些时刻最吃力、哪些安排让自己稍微轻松。结果只是本次自述，不能替你解释全部原因，也不决定你的能力或价值。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Which part of a recent working day used the most energy? Was there a moment that felt easier? / 最近一个工作日，最消耗你的是哪段经历？有没有一小段时间稍微轻松一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one small, feasible change to your working day, then notice whether it helps you recover. / 选一个能调整的小环节，例如给连续会议之间留一小段缓冲，再观察自己是否更好恢复。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "exhaustion",
+            "headline": "Making room to recover / 给恢复留一点位置",
+            "label": null,
+            "interpretation": "This part looks at the effort work takes and how easy it feels to recover afterwards. Familiar tasks may take more energy, or you may still feel drained after getting home. Busy periods, sleep, health and responsibilities outside work can all contribute; a questionnaire cannot separate those causes. Recall when your energy began to dip during a recent day and what was happening around you. If possible, find a small space to pause or adjust one demand. Feeling tired does not mean you have failed or are not trying hard enough.\n\n中文对照：这一部分关注工作时需要付出多少精力，以及工作结束后能不能缓过来。例如，平时顺手的事如今要花更多力气，或回家后仍觉得被掏空。短时忙碌、睡眠安排、身体状况和照护责任都可能影响这些体验，单凭回答无法分清原因。可以回想精力开始下降的时间点，看看当时是否连续处理了太多事情，再找一个可行的恢复空隙，不必把疲惫归结为自己不够努力。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When during the day is recovering your energy hardest, and what demands are you managing then? / 你通常在什么时候最难恢复精力？当时还有哪些现实安排需要兼顾？"
+              },
+              {
+                "category": "strategy",
+                "text": "If your situation allows, leave one short recovery gap or discuss a workload adjustment with someone who can help. / 在可行的情况下，给一段高消耗工作后留一个短暂停顿，并看看它对你是否有帮助。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "mental_distance",
+            "headline": "Noticing your connection with work / 留意与工作的连接感",
+            "label": null,
+            "interpretation": "This part concerns how connected or distant you feel towards your work. You may notice less enthusiasm, feel detached, or find yourself going through the motions. Workload, fairness, support, personal priorities and the fit between a job and your needs may all matter. One set of answers cannot tell which explanation fits, and it does not define your character. Think of a recent moment when your connection with work changed. You could identify one need or question to discuss, without making a major decision on the strength of a score.\n\n中文对照：这一部分整理你与工作之间的距离感。有时人还在做事，心里却已经很难投入，或只是按熟悉的步骤机械地完成任务。这种体验可能随任务内容、团队互动和工作节奏而变化，不能据此判断你是否负责，也不说明你必须喜欢每项工作。可以选一件曾经愿意投入的事情，想想现在和以前有什么不同，再寻找一个能够讨论或调整的具体环节。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When did you last feel more connected with, or more distant from, a task at work? What was different? / 哪类工作最容易让你觉得只是机械地完成？其中是否有不清楚或难以认同的安排？"
+              },
+              {
+                "category": "strategy",
+                "text": "Write down one need or question about that situation and consider a suitable person with whom to discuss it. / 挑一个具体困难和可信任的同事或负责人讨论，例如任务的意义、优先级或可调整的做法。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "cognitive_impairment",
+            "headline": "Giving your attention some support / 让注意与思路少受打扰",
+            "label": null,
+            "interpretation": "This part looks at keeping track of tasks and thinking clearly while working. Frequent interruptions, switching between tasks and low energy can make it harder to remember where you were or decide what comes next. These answers cannot diagnose a memory problem or judge your working ability. Recall one recent interruption and consider what was happening in the task and the surroundings. You could make the next step visible with a brief note, or reduce one avoidable interruption where possible. The aim is to find useful support for your situation, rather than blame yourself.\n\n中文对照：这一部分关注工作时保持注意、理清思路和记住事情的体验。例如，读过一段文字却难以接上思路，或被打断后忘记原来做到哪一步。连续任务、频繁切换和精力不足都可能带来类似感受，这份回答不能用来判断认知疾病或工作能力。可以回想最近一个分心的片段，看看哪些干扰来自环境，哪些任务能够拆开，再尝试让下一步更清楚一些。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What was happening around you the last time you lost track of a task? Were you handling several things at once? / 最近一次思路被打断时，周围发生了什么？你当时是否同时处理了好几件事？"
+              },
+              {
+                "category": "strategy",
+                "text": "For one task, write down the next step and reduce one interruption that is within your control. / 选一段需要专注的工作，把下一步写下来，并在条件允许时减少一个可控的打扰来源。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "emotional_impairment",
+            "headline": "Leaving a little space before responding / 给工作中的情绪一个缓冲",
+            "label": null,
+            "interpretation": "This part concerns emotions at work and how they are expressed. A reaction may feel stronger than usual, or you may feel upset without immediately knowing why. Pressure, communication, available support and life outside work can all play a part; this questionnaire cannot identify the cause or make a diagnosis. Think about what happened just before one recent emotional moment and what you needed then. If circumstances allow, a brief pause before replying may create room to decide how to respond. You can also seek support or discuss a practical need.\n\n中文对照：这一部分整理工作时情绪出现和表达的体验。有时事情没有照预想进行，反应比平时更强烈，过后又觉得那不像自己；也可能说不清为什么突然难过。工作压力、沟通方式和生活处境都可能参与其中，单凭问卷无法认定原因或作出诊断。可以先回想情绪起伏前发生了什么，给自己留一点辨认和缓冲的空间，再考虑是否需要表达需求或寻求支持。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What happened just before a recent reaction that surprised you, and what did you need at that moment? / 最近一次情绪反应让你意外时，之前发生了哪些具体事情？你当时最需要什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "When you notice emotions rising, pause briefly if possible, then consider one need you could express or one source of support. / 下次察觉情绪在上升时，若情境允许，先暂停片刻再回应；之后记录一个你希望调整的沟通环节。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+          "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+          "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+          "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。"
+      }
+    },
+    {
+      "caseName": "maximum",
+      "answers": [
+        {
+          "itemCode": "BAT_01",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_02",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_03",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_04",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_06",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_07",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_08",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_09",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_10",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_11",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_12",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_13",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_14",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_15",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_16",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_17",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_18",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_19",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_20",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_21",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_22",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_23",
+          "responseValue": "5"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-bat23-recorded",
+          "code": "bat23_2020_en",
+          "name": "工作体验问卷（BAT工作相关核心23，2020英文题本）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-bat23-recorded",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          }
+        ],
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "工作中的耗竭体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "mental_distance",
+            "type": "dimension",
+            "label": "与工作的距离感",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "answeredItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "cognitive_impairment",
+            "type": "dimension",
+            "label": "工作中的注意与思路",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "answeredItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "emotional_impairment",
+            "type": "dimension",
+            "label": "工作中的情绪体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "burnout_core",
+            "type": "total",
+            "label": "整体工作体验",
+            "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 5,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "burnout_core",
+            "headline": "Looking back at your working days / 回看一段时间的工作体验",
+            "label": null,
+            "interpretation": "Your answers bring together how work has felt recently: your energy, your connection with the job, and your experiences with attention and emotions. A demanding schedule, recovery time, caring responsibilities and other parts of life can all shape these experiences. Think of one recent working day and notice which parts felt draining and which felt a little easier. You could choose one small change that is within reach, such as leaving a short gap between meetings. These answers do not identify every cause, make a diagnosis, or decide your ability or value.\n\n中文对照：这份回答整理的是你在工作中的整体感受，包括精力、与工作的距离，以及注意和情绪上的体验。有时下班后仍难缓过来，开始一项任务也比平时费劲；这些感受可能和工作安排、恢复时间以及生活中的其他负担交织在一起。可以先挑一个最近的工作日，想想哪些时刻最吃力、哪些安排让自己稍微轻松。结果只是本次自述，不能替你解释全部原因，也不决定你的能力或价值。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Which part of a recent working day used the most energy? Was there a moment that felt easier? / 最近一个工作日，最消耗你的是哪段经历？有没有一小段时间稍微轻松一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one small, feasible change to your working day, then notice whether it helps you recover. / 选一个能调整的小环节，例如给连续会议之间留一小段缓冲，再观察自己是否更好恢复。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "exhaustion",
+            "headline": "Making room to recover / 给恢复留一点位置",
+            "label": null,
+            "interpretation": "This part looks at the effort work takes and how easy it feels to recover afterwards. Familiar tasks may take more energy, or you may still feel drained after getting home. Busy periods, sleep, health and responsibilities outside work can all contribute; a questionnaire cannot separate those causes. Recall when your energy began to dip during a recent day and what was happening around you. If possible, find a small space to pause or adjust one demand. Feeling tired does not mean you have failed or are not trying hard enough.\n\n中文对照：这一部分关注工作时需要付出多少精力，以及工作结束后能不能缓过来。例如，平时顺手的事如今要花更多力气，或回家后仍觉得被掏空。短时忙碌、睡眠安排、身体状况和照护责任都可能影响这些体验，单凭回答无法分清原因。可以回想精力开始下降的时间点，看看当时是否连续处理了太多事情，再找一个可行的恢复空隙，不必把疲惫归结为自己不够努力。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When during the day is recovering your energy hardest, and what demands are you managing then? / 你通常在什么时候最难恢复精力？当时还有哪些现实安排需要兼顾？"
+              },
+              {
+                "category": "strategy",
+                "text": "If your situation allows, leave one short recovery gap or discuss a workload adjustment with someone who can help. / 在可行的情况下，给一段高消耗工作后留一个短暂停顿，并看看它对你是否有帮助。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "mental_distance",
+            "headline": "Noticing your connection with work / 留意与工作的连接感",
+            "label": null,
+            "interpretation": "This part concerns how connected or distant you feel towards your work. You may notice less enthusiasm, feel detached, or find yourself going through the motions. Workload, fairness, support, personal priorities and the fit between a job and your needs may all matter. One set of answers cannot tell which explanation fits, and it does not define your character. Think of a recent moment when your connection with work changed. You could identify one need or question to discuss, without making a major decision on the strength of a score.\n\n中文对照：这一部分整理你与工作之间的距离感。有时人还在做事，心里却已经很难投入，或只是按熟悉的步骤机械地完成任务。这种体验可能随任务内容、团队互动和工作节奏而变化，不能据此判断你是否负责，也不说明你必须喜欢每项工作。可以选一件曾经愿意投入的事情，想想现在和以前有什么不同，再寻找一个能够讨论或调整的具体环节。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When did you last feel more connected with, or more distant from, a task at work? What was different? / 哪类工作最容易让你觉得只是机械地完成？其中是否有不清楚或难以认同的安排？"
+              },
+              {
+                "category": "strategy",
+                "text": "Write down one need or question about that situation and consider a suitable person with whom to discuss it. / 挑一个具体困难和可信任的同事或负责人讨论，例如任务的意义、优先级或可调整的做法。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "cognitive_impairment",
+            "headline": "Giving your attention some support / 让注意与思路少受打扰",
+            "label": null,
+            "interpretation": "This part looks at keeping track of tasks and thinking clearly while working. Frequent interruptions, switching between tasks and low energy can make it harder to remember where you were or decide what comes next. These answers cannot diagnose a memory problem or judge your working ability. Recall one recent interruption and consider what was happening in the task and the surroundings. You could make the next step visible with a brief note, or reduce one avoidable interruption where possible. The aim is to find useful support for your situation, rather than blame yourself.\n\n中文对照：这一部分关注工作时保持注意、理清思路和记住事情的体验。例如，读过一段文字却难以接上思路，或被打断后忘记原来做到哪一步。连续任务、频繁切换和精力不足都可能带来类似感受，这份回答不能用来判断认知疾病或工作能力。可以回想最近一个分心的片段，看看哪些干扰来自环境，哪些任务能够拆开，再尝试让下一步更清楚一些。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What was happening around you the last time you lost track of a task? Were you handling several things at once? / 最近一次思路被打断时，周围发生了什么？你当时是否同时处理了好几件事？"
+              },
+              {
+                "category": "strategy",
+                "text": "For one task, write down the next step and reduce one interruption that is within your control. / 选一段需要专注的工作，把下一步写下来，并在条件允许时减少一个可控的打扰来源。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "emotional_impairment",
+            "headline": "Leaving a little space before responding / 给工作中的情绪一个缓冲",
+            "label": null,
+            "interpretation": "This part concerns emotions at work and how they are expressed. A reaction may feel stronger than usual, or you may feel upset without immediately knowing why. Pressure, communication, available support and life outside work can all play a part; this questionnaire cannot identify the cause or make a diagnosis. Think about what happened just before one recent emotional moment and what you needed then. If circumstances allow, a brief pause before replying may create room to decide how to respond. You can also seek support or discuss a practical need.\n\n中文对照：这一部分整理工作时情绪出现和表达的体验。有时事情没有照预想进行，反应比平时更强烈，过后又觉得那不像自己；也可能说不清为什么突然难过。工作压力、沟通方式和生活处境都可能参与其中，单凭问卷无法认定原因或作出诊断。可以先回想情绪起伏前发生了什么，给自己留一点辨认和缓冲的空间，再考虑是否需要表达需求或寻求支持。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What happened just before a recent reaction that surprised you, and what did you need at that moment? / 最近一次情绪反应让你意外时，之前发生了哪些具体事情？你当时最需要什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "When you notice emotions rising, pause briefly if possible, then consider one need you could express or one source of support. / 下次察觉情绪在上升时，若情境允许，先暂停片刻再回应；之后记录一个你希望调整的沟通环节。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+          "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+          "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+          "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。"
+      }
+    },
+    {
+      "caseName": "mixed_cyclic",
+      "answers": [
+        {
+          "itemCode": "BAT_01",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_02",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BAT_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_04",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BAT_05",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_06",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_07",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BAT_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_09",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BAT_10",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_11",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_12",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BAT_13",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_14",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BAT_15",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_16",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_17",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BAT_18",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_19",
+          "responseValue": "4"
+        },
+        {
+          "itemCode": "BAT_20",
+          "responseValue": "5"
+        },
+        {
+          "itemCode": "BAT_21",
+          "responseValue": "1"
+        },
+        {
+          "itemCode": "BAT_22",
+          "responseValue": "2"
+        },
+        {
+          "itemCode": "BAT_23",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-bat23-recorded",
+          "code": "bat23_2020_en",
+          "name": "工作体验问卷（BAT工作相关核心23，2020英文题本）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-bat23-recorded",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "interpretable",
+          "flags": []
+        },
+        "itemScores": [
+          {
+            "itemCode": "BAT_01",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "4",
+            "baseScore": 4,
+            "score": 4
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "5",
+            "baseScore": 5,
+            "score": 5
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "1",
+            "baseScore": 1,
+            "score": 1
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "2",
+            "baseScore": 2,
+            "score": 2
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "工作中的耗竭体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 2.625,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "mental_distance",
+            "type": "dimension",
+            "label": "与工作的距离感",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "answeredItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "cognitive_impairment",
+            "type": "dimension",
+            "label": "工作中的注意与思路",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "answeredItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "emotional_impairment",
+            "type": "dimension",
+            "label": "工作中的情绪体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "burnout_core",
+            "type": "total",
+            "label": "整体工作体验",
+            "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": 2.869565217391304,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [
+          {
+            "scoreKey": "burnout_core",
+            "headline": "Looking back at your working days / 回看一段时间的工作体验",
+            "label": null,
+            "interpretation": "Your answers bring together how work has felt recently: your energy, your connection with the job, and your experiences with attention and emotions. A demanding schedule, recovery time, caring responsibilities and other parts of life can all shape these experiences. Think of one recent working day and notice which parts felt draining and which felt a little easier. You could choose one small change that is within reach, such as leaving a short gap between meetings. These answers do not identify every cause, make a diagnosis, or decide your ability or value.\n\n中文对照：这份回答整理的是你在工作中的整体感受，包括精力、与工作的距离，以及注意和情绪上的体验。有时下班后仍难缓过来，开始一项任务也比平时费劲；这些感受可能和工作安排、恢复时间以及生活中的其他负担交织在一起。可以先挑一个最近的工作日，想想哪些时刻最吃力、哪些安排让自己稍微轻松。结果只是本次自述，不能替你解释全部原因，也不决定你的能力或价值。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "Which part of a recent working day used the most energy? Was there a moment that felt easier? / 最近一个工作日，最消耗你的是哪段经历？有没有一小段时间稍微轻松一些？"
+              },
+              {
+                "category": "strategy",
+                "text": "Choose one small, feasible change to your working day, then notice whether it helps you recover. / 选一个能调整的小环节，例如给连续会议之间留一小段缓冲，再观察自己是否更好恢复。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "exhaustion",
+            "headline": "Making room to recover / 给恢复留一点位置",
+            "label": null,
+            "interpretation": "This part looks at the effort work takes and how easy it feels to recover afterwards. Familiar tasks may take more energy, or you may still feel drained after getting home. Busy periods, sleep, health and responsibilities outside work can all contribute; a questionnaire cannot separate those causes. Recall when your energy began to dip during a recent day and what was happening around you. If possible, find a small space to pause or adjust one demand. Feeling tired does not mean you have failed or are not trying hard enough.\n\n中文对照：这一部分关注工作时需要付出多少精力，以及工作结束后能不能缓过来。例如，平时顺手的事如今要花更多力气，或回家后仍觉得被掏空。短时忙碌、睡眠安排、身体状况和照护责任都可能影响这些体验，单凭回答无法分清原因。可以回想精力开始下降的时间点，看看当时是否连续处理了太多事情，再找一个可行的恢复空隙，不必把疲惫归结为自己不够努力。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When during the day is recovering your energy hardest, and what demands are you managing then? / 你通常在什么时候最难恢复精力？当时还有哪些现实安排需要兼顾？"
+              },
+              {
+                "category": "strategy",
+                "text": "If your situation allows, leave one short recovery gap or discuss a workload adjustment with someone who can help. / 在可行的情况下，给一段高消耗工作后留一个短暂停顿，并看看它对你是否有帮助。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "mental_distance",
+            "headline": "Noticing your connection with work / 留意与工作的连接感",
+            "label": null,
+            "interpretation": "This part concerns how connected or distant you feel towards your work. You may notice less enthusiasm, feel detached, or find yourself going through the motions. Workload, fairness, support, personal priorities and the fit between a job and your needs may all matter. One set of answers cannot tell which explanation fits, and it does not define your character. Think of a recent moment when your connection with work changed. You could identify one need or question to discuss, without making a major decision on the strength of a score.\n\n中文对照：这一部分整理你与工作之间的距离感。有时人还在做事，心里却已经很难投入，或只是按熟悉的步骤机械地完成任务。这种体验可能随任务内容、团队互动和工作节奏而变化，不能据此判断你是否负责，也不说明你必须喜欢每项工作。可以选一件曾经愿意投入的事情，想想现在和以前有什么不同，再寻找一个能够讨论或调整的具体环节。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "When did you last feel more connected with, or more distant from, a task at work? What was different? / 哪类工作最容易让你觉得只是机械地完成？其中是否有不清楚或难以认同的安排？"
+              },
+              {
+                "category": "strategy",
+                "text": "Write down one need or question about that situation and consider a suitable person with whom to discuss it. / 挑一个具体困难和可信任的同事或负责人讨论，例如任务的意义、优先级或可调整的做法。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "cognitive_impairment",
+            "headline": "Giving your attention some support / 让注意与思路少受打扰",
+            "label": null,
+            "interpretation": "This part looks at keeping track of tasks and thinking clearly while working. Frequent interruptions, switching between tasks and low energy can make it harder to remember where you were or decide what comes next. These answers cannot diagnose a memory problem or judge your working ability. Recall one recent interruption and consider what was happening in the task and the surroundings. You could make the next step visible with a brief note, or reduce one avoidable interruption where possible. The aim is to find useful support for your situation, rather than blame yourself.\n\n中文对照：这一部分关注工作时保持注意、理清思路和记住事情的体验。例如，读过一段文字却难以接上思路，或被打断后忘记原来做到哪一步。连续任务、频繁切换和精力不足都可能带来类似感受，这份回答不能用来判断认知疾病或工作能力。可以回想最近一个分心的片段，看看哪些干扰来自环境，哪些任务能够拆开，再尝试让下一步更清楚一些。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What was happening around you the last time you lost track of a task? Were you handling several things at once? / 最近一次思路被打断时，周围发生了什么？你当时是否同时处理了好几件事？"
+              },
+              {
+                "category": "strategy",
+                "text": "For one task, write down the next step and reduce one interruption that is within your control. / 选一段需要专注的工作，把下一步写下来，并在条件允许时减少一个可控的打扰来源。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          },
+          {
+            "scoreKey": "emotional_impairment",
+            "headline": "Leaving a little space before responding / 给工作中的情绪一个缓冲",
+            "label": null,
+            "interpretation": "This part concerns emotions at work and how they are expressed. A reaction may feel stronger than usual, or you may feel upset without immediately knowing why. Pressure, communication, available support and life outside work can all play a part; this questionnaire cannot identify the cause or make a diagnosis. Think about what happened just before one recent emotional moment and what you needed then. If circumstances allow, a brief pause before replying may create room to decide how to respond. You can also seek support or discuss a practical need.\n\n中文对照：这一部分整理工作时情绪出现和表达的体验。有时事情没有照预想进行，反应比平时更强烈，过后又觉得那不像自己；也可能说不清为什么突然难过。工作压力、沟通方式和生活处境都可能参与其中，单凭问卷无法认定原因或作出诊断。可以先回想情绪起伏前发生了什么，给自己留一点辨认和缓冲的空间，再考虑是否需要表达需求或寻求支持。",
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "What happened just before a recent reaction that surprised you, and what did you need at that moment? / 最近一次情绪反应让你意外时，之前发生了哪些具体事情？你当时最需要什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "When you notice emotions rising, pause briefly if possible, then consider one need you could express or one source of support. / 下次察觉情绪在上升时，若情境允许，先暂停片刻再回应；之后记录一个你希望调整的沟通环节。"
+              }
+            ],
+            "limitations": [
+              "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+              "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+              "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+              "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。"
+            ],
+            "referenceVersion": null
+          }
+        ],
+        "caveats": [
+          "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+          "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+          "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+          "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。"
+      }
+    },
+    {
+      "caseName": "missing_one",
+      "answers": [
+        {
+          "itemCode": "BAT_02",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_03",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_04",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_05",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_06",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_07",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_08",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_09",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_10",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_11",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_12",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_13",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_14",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_15",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_16",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_17",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_18",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_19",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_20",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_21",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_22",
+          "responseValue": "3"
+        },
+        {
+          "itemCode": "BAT_23",
+          "responseValue": "3"
+        }
+      ],
+      "result": {
+        "schemaVersion": 2,
+        "instrument": {
+          "scaleId": "synthetic-bat23-recorded",
+          "code": "bat23_2020_en",
+          "name": "工作体验问卷（BAT工作相关核心23，2020英文题本）",
+          "instrumentVersion": "1.0.0"
+        },
+        "method": {
+          "scaleId": "synthetic-bat23-recorded",
+          "instrumentVersion": "1.0.0",
+          "scoringVersion": "1.0.0",
+          "reportVersion": "1.0.0",
+          "definitionHash": "a9d3073925ed6bb741d0e839814f38b3d5f9085fdb45e3ad5ce6fe5a29c43b2a",
+          "referenceVersions": [],
+          "assessmentContext": null,
+          "reportAudience": "student",
+          "localizationVersion": "1.0.0"
+        },
+        "quality": {
+          "status": "invalid",
+          "flags": [
+            "missing_items",
+            "score_not_calculable"
+          ]
+        },
+        "itemScores": [
+          {
+            "itemCode": "BAT_02",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_03",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_04",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_05",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_06",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_07",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_08",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_09",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_10",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_11",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_12",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_13",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_14",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_15",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_16",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_17",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_18",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_19",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_20",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_21",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_22",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          },
+          {
+            "itemCode": "BAT_23",
+            "responseValue": "3",
+            "baseScore": 3,
+            "score": 3
+          }
+        ],
+        "scores": [
+          {
+            "key": "exhaustion",
+            "type": "dimension",
+            "label": "工作中的耗竭体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "answeredItems": [
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          },
+          {
+            "key": "mental_distance",
+            "type": "dimension",
+            "label": "与工作的距离感",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "answeredItems": [
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "cognitive_impairment",
+            "type": "dimension",
+            "label": "工作中的注意与思路",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "answeredItems": [
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "emotional_impairment",
+            "type": "dimension",
+            "label": "工作中的情绪体验",
+            "description": "本维题目等权均分1–5。",
+            "direction": "higher_is_more",
+            "canonical": false,
+            "displayPrecision": 2,
+            "value": 3,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "calculated",
+            "prorated": false
+          },
+          {
+            "key": "burnout_core",
+            "type": "total",
+            "label": "整体工作体验",
+            "description": "全部23题等权均分1–5；不是四维均分的简单平均。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "value": null,
+            "range": {
+              "min": 1,
+              "max": 5
+            },
+            "expectedItems": [
+              "BAT_01",
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "answeredItems": [
+              "BAT_02",
+              "BAT_03",
+              "BAT_04",
+              "BAT_05",
+              "BAT_06",
+              "BAT_07",
+              "BAT_08",
+              "BAT_09",
+              "BAT_10",
+              "BAT_11",
+              "BAT_12",
+              "BAT_13",
+              "BAT_14",
+              "BAT_15",
+              "BAT_16",
+              "BAT_17",
+              "BAT_18",
+              "BAT_19",
+              "BAT_20",
+              "BAT_21",
+              "BAT_22",
+              "BAT_23"
+            ],
+            "status": "not_calculable",
+            "prorated": false
+          }
+        ],
+        "references": [],
+        "interpretations": [],
+        "caveats": [
+          "This questionnaire describes experiences at work; it does not identify all causes or make a diagnosis. / 本问卷整理工作自述，不解释所有原因或作诊断。",
+          "Items and response options remain in the original published English. Feedback is English first with a Chinese parallel explanation; this is not a validated Chinese questionnaire. / 题干与选项保留原英文；报告为英文主文配中文对照，不是已验证中文版。",
+          "No population norms, percentiles, clinical cutoffs or severity bands are bound. Do not use results for hiring, staff ranking or performance decisions. / 未绑定常模、百分位、临床切点或等级，不用于人事筛选或绩效判断。",
+          "Complete answers are required under a conservative platform rule. Current work context and English comprehension need separate confirmation. / 完整作答是平台保守约定，工作情境和英文理解仍需另行确认。",
+          "至少一个 canonical score 无法计算，因此不提供解释或群体参考。",
+          "未提供群体参考。"
+        ],
+        "disclaimer": "For adults reflecting on their work context; not a diagnosis or a judgment of ability. / 供成年人结合工作处境反思，不是诊断或能力评价。"
+      }
+    }
+  ]
+}

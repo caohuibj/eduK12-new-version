@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "instructionVersion": "1.0.0",
+  "instrumentKey": "bat23_2020_en",
+  "instrumentVersion": "1.0.0",
+  "locale": "en",
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instruction": "The following statements are related to your work situation and how you experience this situation. Please state how often each statement applies to you.",
+  "source": "2020 Appendix B Table A2; unchanged original standalone instruction",
+  "notInsertedIntoItemOne": true
+}

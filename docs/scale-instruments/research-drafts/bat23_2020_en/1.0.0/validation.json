@@ -1,0 +1,75 @@
+{
+  "identity": {
+    "instrumentKey": "bat23_2020_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "sourceSha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f",
+  "units": {
+    "status": "PASS_REVIEWED_CASE_UNION",
+    "uniqueCases": 18,
+    "original": {
+      "passed": 17,
+      "failed": 1,
+      "reporterSha256": "fd87326c014cc26df212e2a5fab605a79c5c90c4c7c0daf4a6dc6f6e92db2873"
+    },
+    "repair": {
+      "passed": 1,
+      "filtered": 17,
+      "reporterSha256": "6b8694de7330f2f9d4477b83eb7dfdcb32638ca2aafdfe9bfeaacd6510e1d995"
+    },
+    "sourceUnchangedDuringRepair": true,
+    "cause": "Only one test expectation incorrectly nulled unaffected complete dimensions; source/fixtures already correct. No algorithm changed."
+  },
+  "types": {
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--project",
+      "/workspace/eduk12-scale-evidence/20261026-wave7/bat23/tsconfig.bat23.json",
+      "--pretty",
+      "false"
+    ],
+    "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+    "startedAt": "2026-10-26T07:08:03.851429+00:00",
+    "finishedAt": "2026-10-26T07:08:06.580178+00:00",
+    "exitCode": 0,
+    "inputsManifestSha256": "c2abe2dc2e426eb13a56197c798b92a72078f0454fe0c42bb0953ee51569fd4e",
+    "ciExecuted": false,
+    "originalExecutionSigned": false
+  },
+  "typeReuseAfterRepair": "Only expected value assertion changed; imports/types/structure unchanged. Coordinator final registry closure also passed.",
+  "reports": {
+    "actual": 4,
+    "complete": 3,
+    "interpretationSections": 15,
+    "receipt": {
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "/workspace/eduk12-scale-evidence/20261026-wave7/bat23/capture.cjs"
+      ],
+      "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+      "startedAt": "2026-10-26T07:09:54.078865+00:00",
+      "finishedAt": "2026-10-26T07:09:54.370596+00:00",
+      "exitCode": 0,
+      "inputsManifestSha256": "013f21b884f8c1c97586ec65c2d11d89ef141da143836ccd9be4922a0f4712e9",
+      "ciExecuted": false,
+      "originalExecutionSigned": false
+    }
+  },
+  "initialSchemaFailure": {
+    "exitCode": 1,
+    "actualUnitCases": 0,
+    "reason": "Pure Chinese report locale mismatched English measurement; repaired with genuine English-primary plus Chinese parallel report, contract en; no engine changes"
+  },
+  "notRun": [
+    "browser",
+    "activation",
+    "CI",
+    "production",
+    "human expert review",
+    "English/Chinese local validation"
+  ],
+  "scientificSource": "2020 Table A2 original English; no new item translation; Flemish Dutch source evidence not English validation"
+}

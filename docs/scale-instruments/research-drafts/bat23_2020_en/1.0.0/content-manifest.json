@@ -1,0 +1,198 @@
+{
+  "identity": {
+    "instrumentKey": "bat23_2020_en",
+    "instrumentVersion": "1.0.0"
+  },
+  "contentLocale": "en",
+  "reportLocale": "zh-CN",
+  "copySource": "2020 development paper Appendix B Table A2 pp17–18",
+  "sourcePdfSha256": "76090c93830f60cac2c9098c9456d8c5d69d7208f4c20858b33451c23e0c4803",
+  "normalization": "Only remove layout line breaks. Preserve punctuation including item6 somehow comma. No new item translation.",
+  "instructionEnglish": "The following statements are related to your work situation and how you experience this situation. Please state how often each statement applies to you.",
+  "instructionStatus": "PREPARED_SIDECAR",
+  "responseOptions": [
+    {
+      "value": 1,
+      "label": "Never"
+    },
+    {
+      "value": 2,
+      "label": "Rarely"
+    },
+    {
+      "value": 3,
+      "label": "Sometimes"
+    },
+    {
+      "value": 4,
+      "label": "Often"
+    },
+    {
+      "value": 5,
+      "label": "Always"
+    }
+  ],
+  "items": [
+    {
+      "itemCode": "BAT_01",
+      "sourceEnglish": "At work, I feel mentally exhausted",
+      "platformEnglish": "At work, I feel mentally exhausted",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_02",
+      "sourceEnglish": "Everything I do at work requires a great deal of effort",
+      "platformEnglish": "Everything I do at work requires a great deal of effort",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_03",
+      "sourceEnglish": "After a day at work, I find it hard to recover my energy",
+      "platformEnglish": "After a day at work, I find it hard to recover my energy",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_04",
+      "sourceEnglish": "At work, I feel physically exhausted",
+      "platformEnglish": "At work, I feel physically exhausted",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_05",
+      "sourceEnglish": "When I get up in the morning, I lack the energy to start a new day at work",
+      "platformEnglish": "When I get up in the morning, I lack the energy to start a new day at work",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_06",
+      "sourceEnglish": "I want to be active at work, but somehow, I am unable to manage",
+      "platformEnglish": "I want to be active at work, but somehow, I am unable to manage",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_07",
+      "sourceEnglish": "When I exert myself at work, I quickly get tired",
+      "platformEnglish": "When I exert myself at work, I quickly get tired",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_08",
+      "sourceEnglish": "At the end of my working day, I feel mentally exhausted and drained",
+      "platformEnglish": "At the end of my working day, I feel mentally exhausted and drained",
+      "dimension": "exhaustion",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_09",
+      "sourceEnglish": "I struggle to find any enthusiasm for my work",
+      "platformEnglish": "I struggle to find any enthusiasm for my work",
+      "dimension": "mental_distance",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_10",
+      "sourceEnglish": "At work, I do not think much about what I am doing and I function on autopilot",
+      "platformEnglish": "At work, I do not think much about what I am doing and I function on autopilot",
+      "dimension": "mental_distance",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_11",
+      "sourceEnglish": "I feel a strong aversion towards my job",
+      "platformEnglish": "I feel a strong aversion towards my job",
+      "dimension": "mental_distance",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_12",
+      "sourceEnglish": "I feel indifferent about my job",
+      "platformEnglish": "I feel indifferent about my job",
+      "dimension": "mental_distance",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_13",
+      "sourceEnglish": "I’m cynical about what my work means to others",
+      "platformEnglish": "I’m cynical about what my work means to others",
+      "dimension": "mental_distance",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_14",
+      "sourceEnglish": "At work, I have trouble staying focused",
+      "platformEnglish": "At work, I have trouble staying focused",
+      "dimension": "cognitive_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_15",
+      "sourceEnglish": "At work I struggle to think clearly",
+      "platformEnglish": "At work I struggle to think clearly",
+      "dimension": "cognitive_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_16",
+      "sourceEnglish": "I’m forgetful and distracted at work",
+      "platformEnglish": "I’m forgetful and distracted at work",
+      "dimension": "cognitive_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_17",
+      "sourceEnglish": "When I’m working, I have trouble concentrating",
+      "platformEnglish": "When I’m working, I have trouble concentrating",
+      "dimension": "cognitive_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_18",
+      "sourceEnglish": "I make mistakes in my work because I have my mind on other things",
+      "platformEnglish": "I make mistakes in my work because I have my mind on other things",
+      "dimension": "cognitive_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_19",
+      "sourceEnglish": "At work, I feel unable to control my emotions",
+      "platformEnglish": "At work, I feel unable to control my emotions",
+      "dimension": "emotional_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_20",
+      "sourceEnglish": "I do not recognize myself in the way I react emotionally at work",
+      "platformEnglish": "I do not recognize myself in the way I react emotionally at work",
+      "dimension": "emotional_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_21",
+      "sourceEnglish": "During my work I become irritable when things don’t go my way",
+      "platformEnglish": "During my work I become irritable when things don’t go my way",
+      "dimension": "emotional_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_22",
+      "sourceEnglish": "I get upset or sad at work without knowing why",
+      "platformEnglish": "I get upset or sad at work without knowing why",
+      "dimension": "emotional_impairment",
+      "reverse": false
+    },
+    {
+      "itemCode": "BAT_23",
+      "sourceEnglish": "At work I may overreact unintentionally",
+      "platformEnglish": "At work I may overreact unintentionally",
+      "dimension": "emotional_impairment",
+      "reverse": false
+    }
+  ]
+}
