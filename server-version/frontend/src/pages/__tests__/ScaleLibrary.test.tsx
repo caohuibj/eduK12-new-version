@@ -290,3 +290,20 @@ describe('ScaleLibrary page', () => {
     expect(mockDetail).toHaveBeenCalledTimes(2)
   })
 })
+
+it('threads explicit non-commercial tags through the real list query without treating labels as availability',async()=>{
+ vi.clearAllMocks();mockList.mockReset();mockDetail.mockReset();authState.user={id:'student-1',role:'STUDENT'}
+ const item=entry({classificationTags:[{id:'license:noncommercial_only',label:'仅限非商业',facet:'license'}]})
+ mockList.mockResolvedValue({code:0,data:{entries:[item],tagFacets:{population:[],construct:[],subject:[],domain:[],language:[],license:[{id:'license:noncommercial_only',label:'仅限非商业'}]}}})
+ const user=userEvent.setup();render(<MemoryRouter><ScaleLibrary/></MemoryRouter>)
+ await screen.findByText('WHO-5 Well-Being Index')
+ expect(screen.getByRole('listitem')).toHaveTextContent('仅限非商业')
+ await user.selectOptions(screen.getByLabelText('许可说明'),'license:noncommercial_only')
+ expect(mockList).toHaveBeenCalledTimes(1)
+ await user.click(screen.getByRole('button',{name:'检索'}))
+ await waitFor(()=>expect(mockList).toHaveBeenLastCalledWith({tags:'license:noncommercial_only'}))
+ expect(screen.getByRole('button',{name:'移除分类标签：仅限非商业'})).toBeVisible()
+ await user.click(screen.getByRole('button',{name:'移除分类标签：仅限非商业'}))
+ await waitFor(()=>expect(mockList).toHaveBeenLastCalledWith({tags:undefined}))
+ expect(screen.getByLabelText('许可说明')).toHaveValue('')
+})

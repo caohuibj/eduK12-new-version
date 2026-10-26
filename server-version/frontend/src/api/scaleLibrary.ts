@@ -1,4 +1,5 @@
 import apiClient from './client'
+import type {CatalogClassificationTag,CatalogTagFacets} from './catalogDiscovery'
 
 export type ScaleLibraryAvailabilityStatus = 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'
 export type ScaleLibraryRespondent = 'SELF' | 'PARENT' | 'TEACHER' | 'OBSERVER' | 'CLINICIAN'
@@ -13,6 +14,7 @@ export interface ScaleLibraryIdentity {
 }
 
 export interface ScaleLibraryEntry {
+  classificationTags?: CatalogClassificationTag[]
   identity: ScaleLibraryIdentity
   source: {
     title?: string
@@ -152,6 +154,7 @@ export interface ScaleLibraryListResponse {
   schemaVersion: 1
   generatedAt: string
   entries: ScaleLibraryEntry[]
+  tagFacets?: CatalogTagFacets
 }
 
 const cleanParams = (filters: ScaleLibraryFilters): Record<string, string | number> => Object.entries(filters).reduce((result, [key, value]) => {

@@ -21,3 +21,10 @@ describe('catalog discovery display and request contract', () => {
     expect(new URLSearchParams(catalogQuery(1, filters)).has('origin')).toBe(false)
   })
 })
+
+describe('eight-axis request compatibility',()=>{
+ it('preserves old subject filters and adds declared orientation/response/use/license IDs without aliases',()=>{
+  const filters={...EMPTY_CATALOG_FILTERS,subject:'mathematics',orientation:'orientation:ACT',response:'response:self',use:'use:research',license:'license:noncommercial_only'}
+  expect(new URLSearchParams(catalogQuery(3,filters)).get('tags')).toBe('mathematics,orientation:ACT,response:self,use:research,license:noncommercial_only')
+ })
+})

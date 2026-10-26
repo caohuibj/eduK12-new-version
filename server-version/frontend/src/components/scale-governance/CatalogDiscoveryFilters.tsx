@@ -13,17 +13,18 @@ type Props = {
   includeOrigin?: boolean
   disabled?: boolean
   label?: string
+  showKeyword?: boolean
 }
 
-export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, includeOrigin = false, disabled = false, label = '量表目录检索' }: Props) {
+export default function CatalogDiscoveryFilters({ filters, facets, onChange, onApply, includeOrigin = false, disabled = false, label = '量表目录检索', showKeyword = true }: Props) {
   return <form className="catalog-discovery" role="search" aria-label={label} onSubmit={event => { event.preventDefault(); onApply(filters) }}>
     <fieldset disabled={disabled}>
       <legend className="sr-only">工具分类与关键词</legend>
-      <label className="catalog-discovery-keyword">关键词
+      {showKeyword&&<label className="catalog-discovery-keyword">关键词
         <input type="search" maxLength={100} value={filters.keyword} onChange={event => onChange({ ...filters, keyword: event.target.value })} placeholder="搜索名称、编号或标签" />
-      </label>
+      </label>}
       {CATALOG_FACETS.map(facet => <label key={facet}>{CATALOG_FACET_LABELS[facet]}
-        <select value={filters[facet]} onChange={event => onChange({ ...filters, [facet]: event.target.value })}>
+        <select value={filters[facet]??''} onChange={event => onChange({ ...filters, [facet]: event.target.value })}>
           <option value="">全部{CATALOG_FACET_LABELS[facet]}</option>
           {(facets[facet] ?? []).map(tag => <option key={tag.id} value={tag.id}>{catalogTagLabel(tag)}</option>)}
         </select>

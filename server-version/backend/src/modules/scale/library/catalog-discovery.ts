@@ -1,13 +1,17 @@
 import { z } from 'zod'
+import sourceTagLabels from './catalog-tag-labels.json'
 
 /** Discovery labels only. Never mutate registry sources, frozen Reference, or
  * infer permission/scientific eligibility from a classification tag. */
-export type CatalogTagFacet = 'population' | 'construct' | 'subject' | 'domain' | 'language' | 'other'
+export type CatalogTagFacet = 'population' | 'construct' | 'subject' | 'domain' | 'language' | 'orientation' | 'response' | 'use' | 'license' | 'other'
 export type CatalogClassificationTag = { id: string; label: string; facet: CatalogTagFacet }
 export type CatalogDiscoveryFilters = { keyword?: string; tags?: readonly string[] }
 export type CatalogTagFacets = Record<Exclude<CatalogTagFacet, 'other'>, Array<{ id: string; label: string }>>
 
 const labels: Record<string, { label: string; facet: CatalogTagFacet }> = {
+  '非商业': { label: '非商业', facet: 'license' },
+  non_commercial: { label: '非商业', facet: 'license' },
+  'license:noncommercial_only': { label: '仅限非商业', facet: 'license' },
   student_self_report: { label: '学生', facet: 'population' },
   academic_self_concept: { label: '学科自我概念', facet: 'construct' },
   academic_self_efficacy: { label: '学科学习自我效能', facet: 'construct' },
@@ -42,10 +46,18 @@ type ClassificationMetadata = {
 }
 const respondentLabels: Record<string, string> = { SELF: '本人自评', PARENT: '家长评定', TEACHER: '教师评定', OBSERVER: '观察者评定', CLINICIAN: '临床人员评定' }
 const languageLabels: Record<string, string> = { 'zh-CN': '简体中文', 'zh-TW': '繁体中文', en: '英语', 'en-US': '英语（美国）', und: '语言未声明' }
+const namespaces:Record<string,CatalogTagFacet>={domain:'domain',construct:'construct',orientation:'orientation',population:'population',response:'response',use:'use',license:'license',language_validation:'language',language:'language',subject:'subject'}
+const dictionary:Record<string,{label:string;axis:string}>=sourceTagLabels
+const classification=(id:string):{label:string;facet:CatalogTagFacet}=>{
+  if(Object.prototype.hasOwnProperty.call(labels,id))return labels[id]
+  const term=Object.prototype.hasOwnProperty.call(dictionary,id)?dictionary[id]:undefined
+  const namespace=term?.axis??id.split(':')[0]
+  return {label:term?.label??id,facet:Object.prototype.hasOwnProperty.call(namespaces,namespace)?namespaces[namespace]:'other'}
+}
 
 export function catalogClassificationTags(construct: { constructOverlapTags?: readonly string[]; primaryDomain?: string }, metadata: ClassificationMetadata = {}): CatalogClassificationTag[] {
   const result = [...new Set(construct.constructOverlapTags ?? [])].map(id => ({
-    id, ...(Object.prototype.hasOwnProperty.call(labels, id) ? labels[id] : { label: id, facet: 'other' as const }),
+    id, ...classification(id),
   }))
   if (construct.primaryDomain && !result.some(tag => tag.id === construct.primaryDomain)) {
     result.push({ id: construct.primaryDomain, label: domains[construct.primaryDomain] ?? construct.primaryDomain, facet: 'domain' })
@@ -64,7 +76,7 @@ export function catalogClassificationTags(construct: { constructOverlapTags?: re
   if (metadata.targetLocale && metadata.targetLocale !== 'und') {
     result.push({ id: 'language:' + metadata.targetLocale, label: languageLabels[metadata.targetLocale] ?? metadata.targetLocale, facet: 'language' })
   }
-  return result
+  return [...new Map(result.map(tag=>[tag.id,tag])).values()]
 }
 
 export const scaleEntryClassificationTags = (entry: { construct: Parameters<typeof catalogClassificationTags>[0]; applicability?: ClassificationMetadata['population']; localization?: { targetLocale?: string } }) =>
@@ -74,7 +86,7 @@ export const scaleSourceClassificationTags = (source: { catalog: { construct: Pa
   catalogClassificationTags(source.catalog.construct, { population: source.catalog.population, targetLocale: source.executable?.contentLocale ?? source.localization?.targetLocale })
 
 export function catalogTagFacets(tagLists: readonly (readonly CatalogClassificationTag[])[]): CatalogTagFacets {
-  const facets: CatalogTagFacets = { population: [], construct: [], subject: [], domain: [], language: [] }
+  const facets: CatalogTagFacets = { population: [], construct: [], subject: [], domain: [], language: [], orientation: [], response: [], use: [], license: [] }
   for (const tags of tagLists) for (const { id, label, facet } of tags) {
     if (facet !== 'other' && !facets[facet].some(tag => tag.id === id)) facets[facet].push({ id, label })
   }

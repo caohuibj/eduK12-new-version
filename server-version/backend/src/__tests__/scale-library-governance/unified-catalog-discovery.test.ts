@@ -19,7 +19,7 @@ describe('shared Training catalog discovery before pagination',()=>{
  })
  it('passes private-source keywords to the existing visibility-scoped query before its LIMIT',async()=>{
   await readUnifiedCatalog('actor','TRAINING',{page:2,pageSize:25,keyword:'private synthetic',origin:'AUTHORED'})
-  expect(mocks.entries).toHaveBeenCalledWith('actor',undefined,{offset:25,limit:25,keyword:'private synthetic'})
+  expect(mocks.entries).toHaveBeenCalledWith('actor',undefined,{offset:25,limit:25,keyword:'private synthetic'},'TRAINING')
   expect(mocks.read).toHaveBeenCalledTimes(1)
  })
  it('keeps registered origin independent of authorship and does not broaden an unknown tag',async()=>{
