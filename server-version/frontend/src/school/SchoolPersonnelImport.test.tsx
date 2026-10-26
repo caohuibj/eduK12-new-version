@@ -95,7 +95,7 @@ describe('School personnel preview/confirm',()=>{
   const api=vi.fn().mockResolvedValue(preview)
   await prepare(api as SchoolApi)
   const file={size:20,name:'名单.csv',text:()=>Promise.reject(Error('file unavailable'))}
-  fireEvent.change(screen.getByLabelText('UTF-8 CSV／TSV 文件'),{target:{files:[file]}})
+  fireEvent.change(screen.getByLabelText('CSV／Excel 文件（含表头）'),{target:{files:[file]}})
   await screen.findByText(/文件读取失败，当前文本已保留/)
   expect(screen.getByRole('textbox',{name:/粘贴名单/})).toHaveValue(text)
   expect(screen.queryByRole('button',{name:'确认新增 1 条'})).toBeNull()

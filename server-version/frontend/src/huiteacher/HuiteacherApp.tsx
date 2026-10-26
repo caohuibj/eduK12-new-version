@@ -1,3 +1,4 @@
+import {EducationRosterManagement} from '../components/education-roster/EducationRosterManagement'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
@@ -517,6 +518,7 @@ export default function HuiteacherApp(){
         {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
           <div className="ht-inline"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>
             <button disabled={working||!mfaCode} onClick={stepUp}>重新验证敏感操作</button></div>
+          <EducationRosterManagement api={teacherApi} organizationId={org.organizationId} units={units} onUnits={setUnits} disabled={working} entry="TEACHER"/>
           <h3>学校成员邀请</h3>
           <button disabled={working} onClick={invite}>签发教师邀请</button>
           {issuedInvite&&<p className="ht-secret">一次性邀请码：<code className="ht-wrap">{issuedInvite}</code></p>}
@@ -540,7 +542,7 @@ export default function HuiteacherApp(){
             <div className="ht-members">{issuedStudentInvites.map(item=><p key={item.inviteCode}>
               学号 {item.studentNumber}：<code className="ht-wrap">{item.inviteCode}</code>
             </p>)}</div></div>}
-          <h3>当前学校成员</h3><div className="ht-members">{members.map(m=><span key={m.membershipId} className="ht-tag">{m.loginName} · {m.role}</span>)}</div>
+          <details><summary>Teacher 当前已授权成员（{members.length}）</summary><div className="ht-members">{members.map(m=><span key={m.membershipId} className="ht-tag">{m.loginName} · {m.role}</span>)}</div></details>
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}

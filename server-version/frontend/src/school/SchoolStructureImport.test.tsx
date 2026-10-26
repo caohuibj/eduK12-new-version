@@ -74,11 +74,14 @@ describe('School structure import confirmation',()=>{
   const api=vi.fn();setup(api);preview('二年级')
   let resolve!:(text:string)=>void
   const file={size:20,text:()=>new Promise<string>(yes=>{resolve=yes})}
-  fireEvent.change(screen.getByLabelText('读取 CSV／文本文件'),{target:{files:[file]}})
+  fireEvent.change(screen.getByLabelText('CSV／Excel 文件（可含表头）'),{target:{files:[file]}})
   expect(screen.queryByRole('button',{name:'确认新增 1 条'})).not.toBeInTheDocument()
   expect(screen.getByRole('button',{name:'解析预览'})).toBeDisabled()
-  await act(async()=>resolve('三年级'))
-  expect(screen.getByLabelText('待导入内容')).toHaveValue('三年级')
+  await act(async()=>resolve('年级\n三年级'))
+  expect(screen.getByLabelText('待导入内容')).toHaveValue('二年级')
+  expect(screen.getByRole('button',{name:'解析预览'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'使用这份名单'}))
+  expect(screen.getByLabelText('待导入内容')).toHaveValue('"年级"\n"三年级"')
   expect(api).not.toHaveBeenCalled()
  })
  it('refreshes the structure without writes before resuming a partial import',async()=>{
