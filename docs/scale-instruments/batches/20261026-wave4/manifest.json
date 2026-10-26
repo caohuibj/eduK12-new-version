@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave4-sleep-scales-20261026",
+  "sources": [
+    {
+      "instrumentKey": "bps9_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510"
+    },
+    {
+      "instrumentKey": "wibps7_adolescent_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98"
+    }
+  ]
+}

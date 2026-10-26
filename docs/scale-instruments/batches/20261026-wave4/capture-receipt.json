@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave4-sleep-scales-20261026",
+  "startedAt": "2026-10-26T05:04:00.023Z",
+  "updatedAt": "2026-10-26T05:04:00.503Z",
+  "mode": "ISOLATED_DRAFT_MATERIALIZE",
+  "manifestSha256": "6835528729ceff11485bbff0e8b3da477eca318d60601717b48b1954e971eb0b",
+  "entries": [
+    {
+      "id": "bps9_zh_cn_research@1.0.0",
+      "status": "PASS",
+      "sourceSha256": "4b0af6464233bdcbba61a57b65dfe3e68bac358bcd816d53d9e9e24f434d9510",
+      "reportFile": "bps9_zh_cn_research@1.0.0.reports.json",
+      "materialization": {
+        "scaleId": "f9754f69-ee4b-4266-9b6a-a01e9b153160",
+        "created": false,
+        "definitionHash": "ba0b97ac92dc665dcabc3ffc660433bb79a84457d8bfc9e695a316337262dc2c",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    },
+    {
+      "id": "wibps7_adolescent_zh_cn_research@1.0.0",
+      "status": "PASS",
+      "sourceSha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98",
+      "reportFile": "wibps7_adolescent_zh_cn_research@1.0.0.reports.json",
+      "materialization": {
+        "scaleId": "444a303e-c1b5-434d-8b75-af5aaa4d0360",
+        "created": false,
+        "definitionHash": "61a55d5952d229115182ee341527a0972d4f8a384b2e333b3d9ee85f07a81d6c",
+        "status": "DRAFT",
+        "visibility": "HIDDEN"
+      }
+    }
+  ],
+  "activation": "NOTRUN",
+  "production": "NOTRUN",
+  "browser": "NOTRUN"
+}

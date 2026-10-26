@@ -1,0 +1,15 @@
+{
+  "ciTriggered": false,
+  "readbackAtUtc": "2026-10-26T05:12:43.801892+00:00",
+  "commits": [
+    {
+      "sha": "34dddc5eb52b43438dc5fed466ffe3ba40e5c8f6",
+      "actionsRunCount": 0
+    },
+    {
+      "sha": "2ef54a302c3d4b10ab0a0f0e823c832d834ee95f",
+      "actionsRunCount": 0
+    }
+  ],
+  "scope": "GitHub Actions API readback; no ready_for_review/manual activation"
+}

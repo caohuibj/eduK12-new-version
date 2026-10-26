@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DEVELOPMENT_EVIDENCE_NOT_CI_OR_PUBLICATION_ACCEPTANCE",
+  "baseline": "5fa2f933b7afdb024a20eb2e46577e997fd3bd09",
+  "scope": "two new independent Chinese sleep-habit research drafts; no engine/schema edits",
+  "unit": {
+    "status": "PASS",
+    "uniqueCases": 39,
+    "firstInvocationStatus": "FAIL",
+    "firstExit": 1,
+    "firstPassed": 20,
+    "firstFailed": 18,
+    "repairExit": 0,
+    "repairPassed": 22,
+    "repairSkipped": 17,
+    "caseUnion": "unit-case-union.json"
+  },
+  "types": {
+    "status": "PASS",
+    "firstExit": 2,
+    "firstLogSha256": "7c17e576da1971b6c57be2b482a70ab8d559ba71b41d716f3d1fbac61e3ad166",
+    "repairExit": 0,
+    "repairLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "configSha256": "0ebb63994969c1a52ddc9daa97c20fdb5754bff6007738d00604d31b9023b7ef",
+    "scope": "three new test files and transitive imports; not backend business build"
+  },
+  "postgres": {
+    "status": "PASS",
+    "actualAssertions": 12,
+    "exitCode": 0,
+    "reporterSha256": "6a5a0ee839f9a298ace63c3624ce06e87858d22d064f2bbad77b02b75e225d0e",
+    "nonOwner": true,
+    "restoredOnlyTaskOwnedSyntheticDump": true,
+    "oldDefinitionsPreserved": 3,
+    "oldSnapshotsPreserved": 5,
+    "rowsAfter": 5,
+    "snapshotsAfter": 7,
+    "draftHiddenRows": 5,
+    "referenceSets": 0,
+    "deploymentPolicies": 0
+  },
+  "reports": {
+    "status": "PASS",
+    "toolVersions": 2,
+    "actualBuildScaleResultSamples": 18,
+    "mixedResultsInResearchDocs": 2,
+    "persistedDefinitionResultsAlsoChecked": true,
+    "newReportConfigurations": 2
+  },
+  "sourceManifestSha256": "6835528729ceff11485bbff0e8b3da477eca318d60601717b48b1954e971eb0b",
+  "inputs": {
+    "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts": "8c74a8901e56874072e185066587bb9556e6ea3d6866cba11e91026afe3b4416",
+    "server-version/backend/src/__tests__/scale/instruments/wave4-sleep.postgres.integration.test.ts": "63c2575b02851155b3177b03e7d9cd7a4370aa11a33d4979d791d38873972e9f",
+    "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts": "b12c01624a9188400caa519517aa024ff0834c1c0947f18384ee4e397398b902",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/scripts/scale-content-batch.ts": "fc35c785c11dfceea9682325b5a80ef13171fc57d43b6a8bd3da1afef5dc9783",
+    "server-version/backend/scripts/generate-scale-instruments.ts": "7f779e56f6ab244117e1812baeb7bdb77b02b036b804c6925fe81ee2208be1b5",
+    "server-version/backend/src/modules/scale/scale-scoring.ts": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+    "server-version/backend/src/modules/scale/scale-result.ts": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "55c9be87179e100fee5d34b8fde1f70ec04f137212dc750d142f2fea147cb2e7",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "05d433bd13e7433d70afe89a595471d704486047c2854334c952835f8ef47d7b",
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": "94d0939c01371be6bde23a2326c65a771019aed6f5076f1e5ce9fd9c354881e0"
+  },
+  "notRun": [
+    "product HTTP/browser",
+    "instruction UI",
+    "formal dual-entry use",
+    "activation",
+    "GitHub CI",
+    "production",
+    "expert translation review",
+    "Chinese population research"
+  ],
+  "image": "NOTRUN_NOT_REQUIRED; text takeaway only",
+  "classification": {
+    "newlyDiscovered": 0,
+    "knownLeadsReexamined": [
+      "adult BPS9",
+      "WIBPS7",
+      "BRCS"
+    ],
+    "firstCategoryAdded": 2,
+    "secondCategoryAdded": 0,
+    "thirdCategoryAdded": 0
+  },
+  "deferred": [
+    "2020 adolescent BPS8 exact separate identity reserved for a later batch, not combined with BPS9",
+    "BRCS publisher link returns placeholder JPEG, search-cache permissions/scoring conflict not used as final author source",
+    "AAQ-US existing third-category authorization questions remain unresolved"
+  ],
+  "parameterNote": "score_only none policy; independent parameter identity remains a feature-line gap, not invented metadata or a norm-data gate",
+  "environmentLimits": "Current lock retained; full historical node_modules bytes not attested; no CI execution signature",
+  "registry": {
+    "status": "PASS",
+    "method": "original generator used for each sequential tool commit and final registry; final original --check passed",
+    "finalWorkingRegistrySha256": "98005da939e7fbe95a15a3c849e471cdb354268d88ebd1385caa919177acc1ba",
+    "sequentialFirstCommitContainsOnlyFirstTool": true
+  },
+  "formatting": "Removed whitespace from generated empty test line before commit; no test assertion, runtime input or type semantics changed.",
+  "pr356Discovery": {
+    "status": "PASS",
+    "pinnedHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+    "newToolVersions": 2,
+    "assertedConditions": 8,
+    "scope": "two Chinese keyword positives, two exact-license positives, two wrong-license negatives, two unknown-tag negatives; pure function only"
+  }
+}

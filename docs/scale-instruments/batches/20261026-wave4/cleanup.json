@@ -1,0 +1,11 @@
+{
+  "scope": "only task-created loopback synthetic PostgreSQL",
+  "container": "eduk12-scale-wave4-20261026",
+  "idAndTaskLabelChecked": true,
+  "dumpBytes": 1462583,
+  "dumpSha256": "6c3734f203b3e7f6018b886654b294903837c231ccb736a52af0ef9ad9683209",
+  "dumpPurpose": "retained for a later incremental task; restore qualification of this new dump NOTRUN",
+  "containerAndItsAnonymousVolumeRemoved": true,
+  "otherDatabasesTouched": false,
+  "recordedAtUtc": "2026-10-26T05:10:22.013936+00:00"
+}

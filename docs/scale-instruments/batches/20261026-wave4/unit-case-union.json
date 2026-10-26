@@ -1,0 +1,217 @@
+{
+  "status": "PASS",
+  "uniqueAssertions": 39,
+  "originalInvocation": {
+    "exitCode": 1,
+    "passed": 20,
+    "failed": 18,
+    "reporterSha256": "5adf2c8d3804f2e8c723eb685dc33f6c27e76500ce708c75034783b206467bca"
+  },
+  "affectedContinuation": {
+    "exitCode": 0,
+    "passed": 22,
+    "skipped": 17,
+    "reporterSha256": "ad738f1957159f8cd3071b1937ef01b3737710bb908712c7aa747b6a2ead4f0b"
+  },
+  "reason": "18 golden cases initially queried a nonexistent output field; corrected assertion uses actual total-type scores. BPS metadata no longer invents a study country; affected source/provenance cases and one new assertion also execute. One subsequent empty-array number[] annotation changes types only. No scorer/engine behavior was changed.",
+  "cases": [
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract validates and registers exactly once as an independent DRAFT identity",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract retains complete ordered Chinese items and exact scale options",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract uses one original-scale mean score and precisely the source reverse keys",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract respects single-item direction and weight independently of stored fixtures",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract does not fill missing responses or generate a report on incomplete answers",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract rejects illegal, duplicate and unknown answers",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract refuses out-of-scope and missing ages instead of guessing",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract builds readable original feedback without norms, labels or diagnostic claims",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract keeps three axes independently changeable without contaminating measurement",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract has rich factual tags on all eight axes and precise licensing/translation provenance",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract validates and registers exactly once as an independent DRAFT identity",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract retains complete ordered Chinese items and exact scale options",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract uses one original-scale sum score and precisely the source reverse keys",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract respects single-item direction and weight independently of stored fixtures",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract does not fill missing responses or generate a report on incomplete answers",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract rejects illegal, duplicate and unknown answers",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract refuses out-of-scope and missing ages instead of guessing",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract builds readable original feedback without norms, labels or diagnostic claims",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract keeps three axes independently changeable without contaminating measurement",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract has rich factual tags on all eight axes and precise licensing/translation provenance",
+      "origin": "original local invocation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic minimum",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic maximum",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic midpoint",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic all_raw_one",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic all_raw_five",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic mixed_independent",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic missing_first",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic missing_last",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract scores pinned arithmetic all_missing",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/bps9_zh_cn_research.test.ts",
+      "name": "bps9_zh_cn_research exact source contract does not invent a study country when the original MTurk report omits it",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic minimum",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic maximum",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic midpoint",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic mixed_independent",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic only_video_higher",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic only_snack_higher",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic missing_first",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic missing_last",
+      "origin": "affected continuation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "name": "wibps7_adolescent_zh_cn_research exact source contract scores pinned arithmetic all_missing",
+      "origin": "affected continuation"
+    }
+  ],
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "inputBindingLimit": "Original complete node_modules bytes and per-file first-execution hash manifest were not recorded; retained case bodies compared with the preserved original authoring script and localized edits. This is reviewed local evidence, not formal CI admission."
+}

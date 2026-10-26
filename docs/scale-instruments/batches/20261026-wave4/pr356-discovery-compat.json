@@ -1,0 +1,29 @@
+{
+  "prHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "scope": "pinned PR pure discovery function; not product DB/UI/authority qualification",
+  "cases": [
+    {
+      "instrumentKey": "bps9_zh_cn_research",
+      "keyword": "上床拖延",
+      "exactLicense": "license:cc_by_3_0",
+      "keywordMatch": true,
+      "exactLicenseMatch": true,
+      "wrongLicenseMatch": false,
+      "unknownTagMatch": false
+    },
+    {
+      "instrumentKey": "wibps7_adolescent_zh_cn_research",
+      "keyword": "上床后拖延",
+      "exactLicense": "license:cc_by_4_0",
+      "keywordMatch": true,
+      "exactLicenseMatch": true,
+      "wrongLicenseMatch": false,
+      "unknownTagMatch": false
+    }
+  ],
+  "inputHashes": {
+    "catalog-discovery.ts": "69650416187e87a1114969c6d954b545f32cb0d36767379114eb088dcb632210",
+    "catalog-tag-labels.json": "4078cfedffc6591017e83c479cf346bdc4b239f19adc3ed0606bbee97b213dd2",
+    "compatibility.ts": "32901698309c8dd37a8d676f50df8fe1107eb4aceeb5db0e0421df907a894c40"
+  }
+}

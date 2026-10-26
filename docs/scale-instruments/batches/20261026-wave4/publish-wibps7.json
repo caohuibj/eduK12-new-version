@@ -1,0 +1,103 @@
+{
+  "parent": "34dddc5eb52b43438dc5fed466ffe3ba40e5c8f6",
+  "commit": "2ef54a302c3d4b10ab0a0f0e823c832d834ee95f",
+  "tree": "6bd148fed0f4cb9e2781a90cc5c49b7a79918d06",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T05:10:15.453601+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/README.md",
+      "remoteBlob": "75483c8560c940d1145e850d9ba2494e1f846b0f",
+      "sha256": "e299971b9bbefa45f85465a7fcf1b1a4c394ff3a914c0f9ff2ff85c85c186a2a",
+      "bytes": 1247
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/administration.md",
+      "remoteBlob": "3cbb566ed0af35cf85c938ee739c9996c0665788",
+      "sha256": "36ea53983e5a682c12ddfe3cf0f8706c02f0d9d26e52502a61cc18dd8acfe804",
+      "bytes": 766
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/bilingual-content.json",
+      "remoteBlob": "76569a68df5c54fac6cb415d5e6f9e1c645c731f",
+      "sha256": "8ffc6aed3af0b40be1970bc2e59c0c600761bfc3fb9235690acd22757fbf8b48",
+      "bytes": 3779
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/instruction.for-pr356.json",
+      "remoteBlob": "51e0bb47b8e8c22a0a4bceb4c86bacbf2c6a882d",
+      "sha256": "fa74e4ee9a166b732f5c7a76452a11105c3661661901c01ad00aa2e178af7c4c",
+      "bytes": 712
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/references.md",
+      "remoteBlob": "6f433bf1a0c098e2c9d7d0974c2628bc34446202",
+      "sha256": "d00764e7704ea06dff381c8a6666a1f4e83079f75372216a16975d84ed5be70d",
+      "bytes": 1795
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/report-example.md",
+      "remoteBlob": "c0383b5f76240aaa5bb7836df410cf8b497f301d",
+      "sha256": "3c68646b2fab15a7c6c355ef15947ea38177326ab096ff1dc73e1ba9de6f0a6f",
+      "bytes": 1744
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/report-result.synthetic.json",
+      "remoteBlob": "d451007e9b345f47a914185b867aa8edd2bea2c4",
+      "sha256": "53b780e75fe202e317869d4199c0eb11305fdcf1a3d3f72b66c0ecb4c55ac6ec",
+      "bytes": 5348
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "92d1b46135d9c465e59f074d469b9a1a778750e1",
+      "sha256": "b814f3d8e8e80ed1351c0b9c61a8d503bf270d1c3f4d1b5a34c98371469425d4",
+      "bytes": 1146
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/take-home-message.md",
+      "remoteBlob": "402f9baa35aba347dbf60c8bb1ff03d16a92bdc4",
+      "sha256": "2c828be439f5c882ef64e7115b49b898ceb5dbe36d2048e206eec6bf39796e7d",
+      "bytes": 191
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/wibps7/1.0.0/validation.md",
+      "remoteBlob": "e2ac3d0e200fa237db46a8cfa59cdc598ee9b496",
+      "sha256": "c3801089d8ae07cb69f13f6a4134e12d738fffb6a0e28276744d9813816871ef",
+      "bytes": 1788
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/wibps7_adolescent_zh_cn_research.test.ts",
+      "remoteBlob": "ddd965cdacf1c530a206d58df9bfbe1069f6313a",
+      "sha256": "8c74a8901e56874072e185066587bb9556e6ea3d6866cba11e91026afe3b4416",
+      "bytes": 8165
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "d27f3c6f28432dd56925f9be2857b377dc1ed685",
+      "sha256": "8cff4374519ed01330bf438cac2b3f5d12d533e44aaf85ef942e6a33359e1cac",
+      "bytes": 1296
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/instrument.ts",
+      "remoteBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "bytes": 193
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/wibps7_adolescent_zh_cn_research/1.0.0/source.json",
+      "remoteBlob": "03193be89dc9e25fbfd033ef7ee921bb8f246b59",
+      "sha256": "304eac4add31b811b799a3b39c6bdd5cf88bf6e63dd1b4b5616529f6dc8f8c98",
+      "bytes": 28097
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "4de21e180b1528c7160d46056664cc7ffb760c74",
+      "sha256": "98005da939e7fbe95a15a3c849e471cdb354268d88ebd1385caa919177acc1ba",
+      "bytes": 13510
+    }
+  ]
+}

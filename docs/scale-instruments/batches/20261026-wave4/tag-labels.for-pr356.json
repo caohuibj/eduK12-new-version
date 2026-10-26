@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "status": "PREPARED_CONTENT_LABEL_INCREMENT_NOT_APPLIED_TO_PR356",
+  "targetPrHead": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "labels": {
+    "domain:sleep_behavior": {
+      "label": "睡眠相关行为",
+      "axis": "domain"
+    },
+    "domain:digital_daily_life": {
+      "label": "数字生活习惯",
+      "axis": "domain"
+    },
+    "construct:bedtime_procrastination": {
+      "label": "上床拖延",
+      "axis": "construct"
+    },
+    "construct:intention_action_gap": {
+      "label": "意图与行动之间的落差",
+      "axis": "construct"
+    },
+    "construct:bedtime_transition": {
+      "label": "上床前的收尾",
+      "axis": "construct"
+    },
+    "construct:while_in_bed_procrastination": {
+      "label": "上床后拖延",
+      "axis": "construct"
+    },
+    "construct:pre_sleep_activities": {
+      "label": "入睡前活动",
+      "axis": "construct"
+    },
+    "construct:in_bed_media_use": {
+      "label": "上床后使用媒体",
+      "axis": "construct"
+    },
+    "orientation:self_regulation_perspective": {
+      "label": "自我调节视角",
+      "axis": "orientation"
+    },
+    "orientation:behavioral_sleep_procrastination": {
+      "label": "睡眠拖延行为视角",
+      "axis": "orientation"
+    },
+    "population:adult_18_plus": {
+      "label": "18岁以上成人",
+      "axis": "population"
+    },
+    "population:source_mturk_adults": {
+      "label": "原研究MTurk成人",
+      "axis": "population"
+    },
+    "population:adolescent_15_to_20": {
+      "label": "15至20岁青少年",
+      "axis": "population"
+    },
+    "population:source_portuguese_high_school": {
+      "label": "原研究葡萄牙高中生",
+      "axis": "population"
+    },
+    "response:9_items": {
+      "label": "9题",
+      "axis": "response"
+    },
+    "response:7_items": {
+      "label": "7题",
+      "axis": "response"
+    },
+    "response:endpoint_labels_only": {
+      "label": "仅量尺两端有文字锚点",
+      "axis": "response"
+    },
+    "response:shared_stem_expanded_per_item": {
+      "label": "每题完整展开共享情境",
+      "axis": "response"
+    },
+    "response:neutral_midpoint_from_author_table": {
+      "label": "保留作者表格中立选项",
+      "axis": "response"
+    },
+    "use:sleep_habit_reflection": {
+      "label": "睡前习惯反思",
+      "axis": "use"
+    },
+    "use:not_insomnia_screen": {
+      "label": "不用作失眠筛查",
+      "axis": "use"
+    },
+    "license:cc_by_3_0": {
+      "label": "CC BY 3.0 署名许可",
+      "axis": "license"
+    },
+    "language_validation:original_en": {
+      "label": "原版英文",
+      "axis": "language_validation"
+    },
+    "language_validation:source_administration_pt": {
+      "label": "原研究葡萄牙语施测",
+      "axis": "language_validation"
+    }
+  },
+  "note": "Reuse existing dictionary; source free Chinese terms already pass pinned pure-function keyword checks. Labels do not issue grants; no schema/PR/UI change claimed."
+}

@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "method": "independent original author HTML <li> extraction and pdftotext -raw Table2 extraction; whitespace/curly-apostrophe normalization only",
+  "bps9": {
+    "itemCount": 9,
+    "reverseItems": [
+      2,
+      3,
+      7,
+      9
+    ],
+    "license": "CC BY 3.0",
+    "itemOrderAndTextMatched": true
+  },
+  "wibps7": {
+    "fragmentCount": 7,
+    "sharedStemPresent": true,
+    "itemOrderAndTextMatched": true,
+    "license": "CC BY 4.0"
+  },
+  "discoveryBpsObjects": {
+    "objects": 17,
+    "sections": 2,
+    "scoredQuestions": 15,
+    "formalIdentity": "2020 adolescent BPS8 + independent WIBPS7, distinct from adult BPS9"
+  },
+  "sourceFiles": {
+    "bps2014-author.html": {
+      "sha256": "7c6fe65010099e91258874db81b3a9a6c13d693de8bc8e3508a38bbe9c1e8013",
+      "bytes": 665489
+    },
+    "bps2014-author.pdf": {
+      "sha256": "7b60729ff85028c41dc2cceefb677227c2949cc98b8869c7c4784ab6803da8d0",
+      "bytes": 385142
+    },
+    "retrieval.json": {
+      "sha256": "ebb0b2c9f660526fb3ffb9fb341eca654680a86dabb2977480072e23a9be887b",
+      "bytes": 1982
+    },
+    "sleep2020-author.txt": {
+      "sha256": "7445828414b3b3dc6ebaefd5b1207563e18526ac9e66f2a52d507d57c7cc3438",
+      "bytes": 60329
+    },
+    "brcs-publisher-ancillary.pdf": {
+      "sha256": "52d819636ee022f21d472c1ac4cadc945c116e250a6097bc763d472c97aefc29",
+      "bytes": 99230
+    },
+    "sleep2020-raw.txt": {
+      "sha256": "bab1c2295abc7e5352b072313aef39abdca3e8bef00c4869d7694b48de1ed7e4",
+      "bytes": 56886
+    },
+    "brcs-discovery.osd": {
+      "sha256": "7b905e20e9b4eb3d9d532f279b75ab376cbe37772a2d2207a193ff00f14e79f8",
+      "bytes": 3169
+    },
+    "bps2014-author.txt": {
+      "sha256": "030954580e0c072f4375aa7c34e6bf02cabb9eff2f8b302d506f41b09452d850",
+      "bytes": 52822
+    },
+    "bps-discovery.osd": {
+      "sha256": "03a69a9c01540d36f71c6ef19864b857085e450a1c7310693ef0cda8639e5876",
+      "bytes": 6364
+    },
+    "sleep2020-author.pdf": {
+      "sha256": "b97dc2837fa71dfb785fe1b17ca8cb29308960c96c5915676ed55bc3ac0a542f",
+      "bytes": 352734
+    }
+  }
+}

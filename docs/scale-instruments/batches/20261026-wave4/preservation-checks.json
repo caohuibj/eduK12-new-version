@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "fixedSnapshot": "20210dfe235039871b1919a84954e2c263a52247",
+  "unchangedExistingSourceVersions": 45,
+  "includes": "original37, RES catalogv2, CFS-R/EBQ old and revised versions, MPMI",
+  "comparison": "actual raw SHA256 against immutable previous candidate-45 records",
+  "newSourceVersions": 2,
+  "engineOrSchemaChanges": false
+}
