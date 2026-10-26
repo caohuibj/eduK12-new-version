@@ -51,13 +51,14 @@ export function SchoolPeerConsent({api,role}:{
     finally{setBusy(false)}
   }
   const list=role==='STUDENT'?studentItems:parentItems
-  if(role==='PARENT'&&!list.length&&!error)return null
-  return <section className={"hs-panel"+(role==='STUDENT'?' hs-student-peer':'')}>
-    <h2>自愿参加同伴互评</h2>
-    <p>{policy?.text??'同伴互评仅用于安全的班级群体研究，不自动生成同学个人画像。'}
+  const policyText=<p>{policy?.text??'同伴互评仅用于安全的班级群体研究，不自动生成同学个人画像。'}
       最少 {policy?.minimumCohort??5} 名同时获得学生及监护人同意的学生才可抽样。</p>
-    {role==='STUDENT'&&loading&&<p role="status">正在读取同伴授权…</p>}
+  return <section className={"hs-panel hs-peer-consent"+(role==='STUDENT'?' hs-student-peer':' hs-parent-peer')}>
+    <h2>{role==='STUDENT'?'自愿参加同伴互评':'家校参与授权'}</h2>
+    {!loading&&!error&&list.length===0?<details className="hs-peer-information"><summary>参与说明</summary>{policyText}</details>:policyText}
+    {loading&&<p role="status">{role==='STUDENT'?'正在读取同伴授权…':'正在读取参与授权…'}</p>}
     {role==='STUDENT'&&!loading&&!error&&list.length===0&&<div className="hs-student-peer-empty"><h3>暂无需要处理的同伴授权</h3><p>学校开放相应活动后，需要你与监护人分别确认，才可参加。</p></div>}
+    {role==='PARENT'&&!loading&&!error&&list.length===0&&<div className="hs-peer-empty"><h3>暂无需要确认的参与授权</h3><p>学校发起相应活动、孩子提出参与申请后，需要你确认的事项会在这里显示。</p></div>}
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {notice&&<p role="status" className="hs-message">{notice}</p>}
     {role==='STUDENT'?studentItems.map(item=><article className="hs-task-card" key={item.courseId}>

@@ -59,7 +59,7 @@ it('keeps registration pane drafts and the original roster, code and window requ
   fireEvent.click(screen.getByRole('button',{name:'刷新班级状态'}))
   await screen.findByText('名册版本 4')
   fireEvent.click(tabs.getByRole('button',{name:'资格名册'}))
-  const roster=screen.getByLabelText('资格名册（每行一个学号，仅上传时用于计算受保护索引）')
+  const roster=screen.getByLabelText('学号名单（每行一个，不含表头）')
   fireEvent.change(roster,{target:{value:'S001\nS002'}})
   fireEvent.click(tabs.getByRole('button',{name:'激活码'}))
   fireEvent.click(tabs.getByRole('button',{name:'资格名册'}))

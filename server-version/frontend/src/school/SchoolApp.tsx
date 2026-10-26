@@ -10,6 +10,7 @@ import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
+import {SchoolStructureImport} from './SchoolStructureImport'
 import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
 import {SchoolReportHeader} from './SchoolReportPresentation'
 import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
@@ -46,6 +47,7 @@ import '../components/education-tools/education-entry-layout.css'
 import './school-private-tools.css'
 import './school-compact-navigation.css'
 import './school-administrator-polish.css'
+import './school-secondary-pages.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -492,8 +494,8 @@ export default function SchoolApp(){
           <div><h3>修改密码</h3>
           <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/></div>
         </section>}
-        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className={'hs-panel'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
-          <SchoolReportHeader compact={administratorWorkspace} title="敏感操作二次验证" label="二次验证使用说明"><p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p></SchoolReportHeader>
+        {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className={'hs-panel hs-account-security'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
+          <SchoolReportHeader compact title="敏感操作二次验证" label="二次验证使用说明"><p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p></SchoolReportHeader>
           <div className="hs-actions">
             <label className="hs-field"><span>验证器 6 位动态验证码</span>
               <input value={stepUpCode} onChange={event=>setStepUpCode(event.target.value)}
@@ -513,7 +515,7 @@ export default function SchoolApp(){
           </>:
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
-          {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></SchoolAdminPanel></div>}
+          {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><SchoolStructureImport api={api} organizationId={schoolId} units={units} onUnits={setUnits} onBusy={setWorking} disabled={working}/><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></SchoolAdminPanel></div>}
           {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
           {page==='classes'&&!professionalClassPage&&!administratorClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>
@@ -524,7 +526,7 @@ export default function SchoolApp(){
           </section>}
           {administratorAdmissionPage&&<div className="hs-professional-admission"><SchoolProfessionalClassScope admission>{workspaceContext}</SchoolProfessionalClassScope>{!schoolId||!classId?<section className="hs-panel hs-recovery-empty"><h2>选择要管理的班级</h2><p>选择班级后，可查看进度并管理资格名册、激活码与注册窗口。</p></section>:<SchoolAdminSections key={classPath} label="班级注册管理" busy={working} panes={[
             {id:'progress',title:'注册进度',content:<SchoolAdmissionProgress classSelected summary={summary} working={working} approvalDisabled={classApprovalDisabled} onRefresh={()=>void loadSummary()} onApprove={()=>void approve()} showApproval={psychologyStaff}/>},
-            {id:'roster',title:'资格名册',content:<SchoolAdminPanel title="更新资格名册" label="资格名册使用说明" help={<p>每行填写一个学号，仅上传时用于计算受保护索引。</p>}><label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span><textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label><button disabled={working||!roster.trim()} onClick={()=>void saveRoster()}>更新资格名册</button></SchoolAdminPanel>},
+            {id:'roster',title:'资格名册',content:<SchoolAdminPanel title="更新资格名册" label="资格名册使用说明" help={<p>此处录入当前班级的学号资格名单，每行一个、不含表头；不会直接建立学生账号，也不接收姓名或初始密码。已注册、注册开放或已审批时仍按原有规则锁定名册。</p>}><label className="hs-field"><span>学号名单（每行一个，不含表头）</span><textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label><button disabled={working||!roster.trim()} onClick={()=>void saveRoster()}>更新资格名册</button></SchoolAdminPanel>},
             {id:'codes',title:'激活码',content:<SchoolAdminPanel title="一次性激活码" label="激活码使用说明" help={<p>以下注册码只在本次操作显示，请分别安全交付给学生。</p>}><button disabled={working} onClick={()=>void issueCodes()}>批量生成一次性激活码</button>{issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}</SchoolAdminPanel>},
             {id:'window',title:'注册窗口',content:<SchoolAdminPanel title="班级注册窗口" label="注册窗口使用说明" help={<p>设置注册截止时间后开启注册；注册状态与整班身份审批分别核验。</p>}><label className="hs-field"><span>注册截止时间</span><input type="datetime-local" value={windowEnd} onChange={e=>setWindowEnd(e.target.value)}/></label><div className="hs-actions"><button disabled={working||!windowEnd} onClick={()=>void actionWindow('OPEN')}>开启注册</button><button disabled={working} onClick={()=>void actionWindow('CLOSE')}>关闭注册</button></div><details className="hs-admin-registration-link"><summary>查看注册链接</summary><code className="hs-break">{joinUrl}</code></details></SchoolAdminPanel>},
           ]}/>}</div>}
@@ -533,7 +535,7 @@ export default function SchoolApp(){
             {schoolAdmin&&<p>注册链接：<code className="hs-break">{joinUrl}</code></p>}
             {summary&&<p>状态：{summary.status} · 名册预期 {summary.rosterExpectedCount} · 当前资格 {summary.eligibleCount} · 已注册 {summary.registeredCount} · 待处理异常 {summary.unresolvedIncidents} · 版本 {summary.rosterVersion}</p>}
             <button onClick={()=>void loadSummary()} disabled={working}>刷新班级状态</button>
-            {schoolAdmin&&<><label className="hs-field"><span>资格名册（每行一个学号，仅上传时用于计算受保护索引）</span>
+            {schoolAdmin&&<><label className="hs-field"><span>学号名单（每行一个，不含表头）</span>
               <textarea value={roster} onChange={e=>setRoster(e.target.value)} rows={6}/></label>
             <button disabled={working||!roster.trim()} onClick={()=>void saveRoster()}>更新资格名册</button>
             <div className="hs-actions"><button disabled={working} onClick={()=>void issueCodes()}>批量生成一次性激活码</button>
@@ -583,7 +585,7 @@ export default function SchoolApp(){
             &&<SchoolReportOfficer key={'SchoolReportOfficer:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='report-officers'&&campusParentReportEnabled&&schoolAdmin&&schoolId&&<SchoolDisclosureOfficers key={'SchoolDisclosureOfficers:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='report-review'&&!campusParentReportEnabled&&(schoolAdmin||psychologyStaff)&&<p>家长版报告披露尚未正式开放，需完成逐资源科学审核后单独启用。</p>}
-          {page==='staff'&&schoolAdmin&&schoolId&&<SchoolAdminPanel className="hs-admin-staff" title="邀请校园教职员工" label="人员邀请使用说明" help={<p>岗位、心理专业权限和学校管理员权限分别设置。邀请码仅显示一次，请安全交付给受邀人员。</p>}>
+          {page==='staff'&&schoolAdmin&&schoolId&&<SchoolAdminPanel className="hs-admin-staff" title="邀请校园教职员工" label="人员邀请使用说明" help={<p>岗位、心理专业权限和学校管理员权限分别设置。教师通过邀请码自行注册；当前不支持整份教师名单直接建号。邀请码仅显示一次，请安全交付给受邀人员。</p>}>
             <div className="hs-admin-staff-fields"><label className="hs-field"><span>岗位</span><select value={staffPersona} onChange={e=>setStaffPersona(e.target.value as 'TEACHER'|'COUNSELOR')}>
               <option value="TEACHER">普通教师</option><option value="COUNSELOR">心理教师</option></select></label>
               <label><input type="checkbox" checked={staffPsych} onChange={e=>setStaffPsych(e.target.checked)}/> 心理专业权限</label>

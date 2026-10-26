@@ -44,3 +44,16 @@ describe('Huischool peer consent UI',()=>{
     ok.mockRestore()
   })
 })
+
+it('shows parent authorization loading and a confirmed empty state without consent writes',async()=>{
+ let resolve!:(value:unknown)=>void
+ const api=vi.fn(()=>new Promise(done=>{resolve=done}))
+ render(<SchoolPeerConsent api={api as SchoolApi} role="PARENT"/>)
+ expect(screen.getByRole('status')).toHaveTextContent('正在读取参与授权')
+ expect(screen.queryByText('暂无需要确认的参与授权')).not.toBeInTheDocument()
+ resolve({list:[],policy:{version:'v1',minimumCohort:5,text:'自愿参与'}})
+ expect(await screen.findByText('暂无需要确认的参与授权')).toBeInTheDocument()
+ expect(screen.getByText('参与说明').closest('details')).not.toHaveAttribute('open')
+ expect(screen.queryByRole('status')).not.toBeInTheDocument()
+ expect(api.mock.calls).toEqual([['/guardian/peer-consent-requests']])
+})

@@ -1,0 +1,57 @@
+/* Remaining relationship/consent screens use the same School surfaces in every theme. */
+.hs-app.hs-workspace .hs-peer-consent{min-width:0;margin:0;padding:20px;box-shadow:none}
+.hs-app.hs-workspace .hs-peer-consent>h2{font-family:inherit;font-size:19px;line-height:1.6;margin:0 0 12px;font-weight:600;color:var(--hs-ink)}
+.hs-app.hs-workspace .hs-peer-consent p{font-size:14px;line-height:1.8;color:var(--hs-muted);overflow-wrap:anywhere}
+.hs-app.hs-workspace .hs-peer-consent .hs-task-card{padding:16px;margin-top:14px;background:var(--hs-surface);border-color:var(--hs-border);border-radius:10px}
+.hs-app.hs-workspace .hs-peer-consent .hs-task-card h3{font-family:inherit;font-size:17px;line-height:1.6;color:var(--hs-ink)}
+.hs-app.hs-workspace .hs-peer-consent button{min-height:44px;font-size:14px;white-space:normal;max-width:100%}
+.hs-app.hs-workspace .hs-peer-empty{padding:16px;margin-top:16px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface-soft)}
+.hs-app.hs-workspace .hs-peer-empty h3{font-family:inherit;font-size:16px;margin:0 0 6px;font-weight:600;color:var(--hs-ink)}
+.hs-app.hs-workspace .hs-peer-empty p{margin:0}
+@media(max-width:600px){
+ .hs-app.hs-workspace .hs-peer-consent{padding:16px 12px}
+ .hs-app.hs-workspace .hs-peer-consent>h2{font-size:18px}
+ .hs-app.hs-workspace .hs-peer-consent p{font-size:13px}
+ .hs-app.hs-workspace .hs-peer-consent .hs-task-card{padding:14px 12px}
+ .hs-app.hs-workspace .hs-peer-consent .hs-task-card button{width:100%}
+}
+.hs-app.hs-workspace .hs-workspace-content:has(.hs-peer-consent,.hs-student-family)>.hs-workspace-page-heading{height:0;min-height:0;margin:0;padding:0}
+.hs-app.hs-workspace .hs-workspace-content:has(.hs-peer-consent,.hs-student-family)>.hs-workspace-page-heading>:not(h1){display:none}
+.hs-app.hs-workspace .hs-workspace-content:has(.hs-peer-consent,.hs-student-family)>.hs-workspace-page-heading>h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hs-app.hs-workspace .hs-peer-information{margin:0 0 12px;padding:0;border:0;background:transparent}
+.hs-app.hs-workspace .hs-peer-information>summary{font-size:13px;color:var(--hs-muted);min-height:44px;padding:10px 0;cursor:pointer}
+.hs-app.hs-workspace .hs-student-family{margin:0;padding:20px;min-width:0;box-shadow:none}
+.hs-app.hs-workspace .hs-student-family>h2{font-family:inherit;font-size:19px;line-height:1.6;font-weight:600;margin:0 0 12px;color:var(--hs-ink)}
+.hs-app.hs-workspace .hs-student-family>p{font-size:14px;line-height:1.8;color:var(--hs-muted)}
+@media(max-width:600px){
+ .hs-app.hs-workspace .hs-student-family{padding:16px 12px}
+ .hs-app.hs-workspace .hs-student-family>h2{font-size:18px}
+ .hs-app.hs-workspace .hs-student-family>p{font-size:13px}
+ .hs-app.hs-workspace .hs-student-family button{font-size:14px;min-height:44px;max-width:100%;white-space:normal}
+}
+.hs-app.hs-workspace.hs-learner .hs-student-family>h2{display:block;grid-column:1/-1}
+.hs-app.hs-workspace.hs-learner .hs-student-family>p:first-of-type{grid-row:2}
+.hs-app.hs-workspace.hs-learner .hs-student-family>button{grid-row:2}
+.hs-app.hs-workspace.hs-learner .hs-student-peer-empty{padding:16px;margin-top:12px;text-align:left;border-style:solid;background:var(--hs-surface-soft)}
+@media(max-width:600px){.hs-app.hs-workspace.hs-learner .hs-student-family>button{grid-row:auto}}
+/* Account forms share the administrator's compact rhythm across School roles. */
+.hs-app.hs-workspace .hs-account-panel form{gap:12px}
+.hs-app.hs-workspace .hs-account-panel form>*{margin-block:0}
+.hs-app.hs-workspace .hs-account-panel form>.hs-field{margin:0;gap:5px}
+.hs-app.hs-workspace .hs-account-panel form>.hs-field>span{font-size:13px;margin:0}
+.hs-app.hs-workspace .hs-account-panel form>p{font-size:12px;line-height:1.8}
+.hs-app.hs-workspace .hs-account-panel :is(h2,h3),.hs-app.hs-workspace .hs-account-security h2{font-family:inherit;font-size:19px;line-height:1.6;font-weight:600;margin:0 0 14px}
+.hs-app.hs-workspace .hs-account-security .hs-report-heading{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.hs-app.hs-workspace .hs-account-security .hs-report-heading h2{margin:0}
+.hs-app.hs-workspace .hs-account-security .hs-teacher-task-help{position:static;flex:none}
+.hs-app.hs-workspace .hs-account-security .hs-teacher-task-help>button{font-size:13px;min-height:44px;display:flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--hs-muted);padding:8px 0}
+.hs-app.hs-workspace .hs-account-security .hs-teacher-task-help-content{position:absolute;top:100%;right:0;z-index:30;width:min(420px,100%);max-height:65vh;overflow:auto;padding:16px;background:var(--hs-surface);border:1px solid var(--hs-border);border-radius:10px;box-shadow:0 10px 28px #10251b20}
+.hs-app.hs-workspace .hs-account-security .hs-teacher-task-help-content p{margin:0;font-size:13px;line-height:1.8;color:var(--hs-muted)}
+@media(max-width:600px){
+ .hs-app.hs-workspace .hs-account-panel :is(h2,h3),.hs-app.hs-workspace .hs-account-security h2{font-size:18px}
+ .hs-app.hs-workspace .hs-account-panel form :is(input,select){font-size:16px;min-height:44px}
+}
+.hs-app.hs-workspace.hs-professional .hs-report-controls>p{padding:4px 0;border:0;border-radius:0;background:transparent;margin:0 0 8px}
+@media(max-width:440px){
+ .hs-app.hs-workspace.hs-professional[data-theme] .hs-workspace-content .hs-professional-class-scope>.hs-workspace-context{grid-template-columns:minmax(0,1fr)}
+}

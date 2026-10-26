@@ -106,3 +106,13 @@ describe('Huischool report privacy and lifecycle UI', () => {
   })
 
 })
+
+it('replaces student feedback loading with its read error without a false empty state',async()=>{
+ const api=vi.fn(async()=>{throw Error('反馈读取失败')})
+ render(<SchoolStudentFeedback api={api as SchoolApi}/>)
+ expect(screen.getByRole('status')).toHaveTextContent('正在读取允许查看的个人纵向记录')
+ expect(await screen.findByRole('alert')).toHaveTextContent('反馈读取失败')
+ expect(screen.queryByRole('status')).not.toBeInTheDocument()
+ expect(screen.queryByText('暂无可查看的反馈')).not.toBeInTheDocument()
+ expect(api.mock.calls).toEqual([['/reports/student/longitudinal']])
+})
