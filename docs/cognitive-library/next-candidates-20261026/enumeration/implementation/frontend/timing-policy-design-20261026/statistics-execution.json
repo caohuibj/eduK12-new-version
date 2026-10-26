@@ -1,0 +1,15 @@
+{
+  "kind": "READ_ONLY_STATISTICS_AND_DESIGN_MATERIALIZATION_NOT_POLICY_OR_TEST_EXECUTION",
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "/workspace/eduK12-new-version/docs/cognitive-library/next-candidates-20261026/enumeration/implementation/frontend/timing-policy-design-20261026/raw-statistics.cjs"
+  ],
+  "exitCode": 0,
+  "observedFrom": "actual tool command completion/output in this task",
+  "durationSeparatelyMeasured": false,
+  "inputSha256": "92ce9ca47badb38c0af37e28c4ee497ecf3c5863c4c752a4c7f26290ccace132",
+  "scriptSha256": "b60d1c874f9dd27cf0f6ccb938c5f2b961a52f6be7a0bc0072dca1236c49a3db",
+  "newAdmissionPolicyExecuted": false,
+  "oldTestsOrBrowserExecuted": false,
+  "preparationFailureHistory": "First inline materialization command had Python SyntaxError before any output write; corrected in saved builder. No source/raw changed."
+}

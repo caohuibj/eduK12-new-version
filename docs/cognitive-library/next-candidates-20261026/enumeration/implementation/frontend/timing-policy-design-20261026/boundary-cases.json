@@ -1,0 +1,288 @@
+{
+  "status": "DESIGN_ONLY_NOT_EXECUTED",
+  "currentPolicyApplied": false,
+  "cases": [
+    {
+      "id": "stable59_94",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "warmup": 30,
+        "measurement": 240,
+        "eachIntervalMs": 16.683350016683352
+      },
+      "expectedIfDraftApproved": "P16.6833500167 within60 family; N3; all variance0. Other probe/draw/lifecycle evidence still required.",
+      "supportsOrLimits": "Ideal arithmetic only; not a real59.94 panel test. N*P=50.0500500501, not50.000."
+    },
+    {
+      "id": "near120",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "ratesHz": [
+          119.88,
+          120,
+          120.12
+        ],
+        "periodMs": [
+          8.341675008341676,
+          8.333333333333334,
+          8.325008325008325
+        ]
+      },
+      "expectedIfDraftApproved": "Each may classify120 under0.5% period band; N6, never round an unsupported rate into120.",
+      "supportsOrLimits": "No physical device cadence/clock evidence."
+    },
+    {
+      "id": "quantized120",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "measurementIntervalPatternMs": [
+          8.3,
+          8.3,
+          8.4
+        ],
+        "repeatPattern": 80
+      },
+      "expectedIfDraftApproved": "Mean period=8.3333333333; median8.3 remains descriptive.",
+      "supportsOrLimits": "Explains mean preference without asserting an actual timestamp quantizer."
+    },
+    {
+      "id": "unsupported90",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "eachIntervalMs": 11.11111111111111,
+        "count": 240,
+        "target50msSlots": 4.5
+      },
+      "expectedIfDraftApproved": "Block before trial reservation/stimulus; no floor/ceil/alternating or fallback60.",
+      "supportsOrLimits": "100Hz has5 ideal slots but is intentionally outside the initial whitelist; mathematical divisibility is not approval."
+    },
+    {
+      "id": "unsupported144",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "eachIntervalMs": 6.944444444444445,
+        "count": 240,
+        "target50msSlots": 7.2
+      },
+      "expectedIfDraftApproved": "Block before trial reservation/stimulus; no floor/ceil/alternating or fallback60.",
+      "supportsOrLimits": "100Hz has5 ideal slots but is intentionally outside the initial whitelist; mathematical divisibility is not approval."
+    },
+    {
+      "id": "unsupported100",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "eachIntervalMs": 10.0,
+        "count": 240,
+        "target50msSlots": 5.0
+      },
+      "expectedIfDraftApproved": "Block before trial reservation/stimulus; no floor/ceil/alternating or fallback60.",
+      "supportsOrLimits": "100Hz has5 ideal slots but is intentionally outside the initial whitelist; mathematical divisibility is not approval."
+    },
+    {
+      "id": "one_missing_opportunity",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "nominalFamilyHz": 60,
+        "intervals": "239*(1000/60), one2*(1000/60)",
+        "spanMeanMs": 16.73611111111111
+      },
+      "expectedIfDraftApproved": "Mean may remain in60 band, but max deviation, ratio>=1.5 and affected window reject.",
+      "supportsOrLimits": "Mean alone cannot detect a rare gap. No code executed."
+    },
+    {
+      "id": "mixed60_120",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "intervals": "120*(1000/60) followed by120*(1000/120)"
+      },
+      "expectedIfDraftApproved": "P12.5ms outside both families; block as unsupported/mixed observed cadence.",
+      "supportsOrLimits": "Cannot identify physical VRR hardware."
+    },
+    {
+      "id": "slow_mixed_blocks",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "fourWindowPeriodsMs": [
+          16.52,
+          16.62,
+          16.72,
+          16.82
+        ],
+        "eachWindowCount": 60
+      },
+      "expectedIfDraftApproved": "Overall P16.67 may classify60; window range0.30 and out-of-family windows reject.",
+      "supportsOrLimits": "Demonstrates block/window criteria."
+    },
+    {
+      "id": "small_variation_not_hardware_certificate",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "fourWindowPeriodsMs": [
+          16.6,
+          16.74,
+          16.6,
+          16.74
+        ],
+        "eachWindowCount": 60
+      },
+      "expectedIfDraftApproved": "These ideal numbers can fit the provisional window/variance budgets; must not label VRR absent or actual50ms proven.",
+      "supportsOrLimits": "A numerical observed-cadence screen cannot certify panel mode or all possible adaptive cadence."
+    },
+    {
+      "id": "six_small_delays",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "frozenP": 8.333333333333334,
+        "prospectiveIntervalsMs": [
+          8.833333333333334,
+          8.833333333333334,
+          8.833333333333334,
+          8.833333333333334,
+          8.833333333333334,
+          8.833333333333334
+        ]
+      },
+      "expectedIfDraftApproved": "Each individual+0.5 fits0.75, but cumulative residual reaches1ms at k2 and ends attempt before another stimulus group.",
+      "supportsOrLimits": "Why cumulative check is required in addition to individual gap budget."
+    },
+    {
+      "id": "marker_boundary",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "residualMs": [
+          0.5,
+          0.5001,
+          -0.5,
+          -0.5001
+        ]
+      },
+      "expectedIfDraftApproved": "Exact±0.5 is within F02; ±0.5001 rejects. No epsilon.",
+      "supportsOrLimits": "Mechanical inequality boundary, not a scientific validation of0.5."
+    },
+    {
+      "id": "command_accumulation",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "NPms": 50.25,
+        "markerSpanMs": 50.75,
+        "commandStartSpanMs": 51.25
+      },
+      "expectedIfDraftApproved": "Draft individual budgets reach widest51.25ms command envelope; label technical-only, not50ms exposure guarantee.",
+      "supportsOrLimits": "Records maximum combination rather than hiding additive budgets."
+    },
+    {
+      "id": "coarse_clock",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "positivePerformanceNowStepsMs": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expectedIfDraftApproved": "Reject observed step>0.25; no simulation/default60 replacement.",
+      "supportsOrLimits": "Clock screen may reject a physically good device whose API is too coarse to assess; do not label person/device cognition."
+    },
+    {
+      "id": "clock_never_advances",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "positiveAdvances": 0,
+        "capReached": "20ms observed resource guard or262144 total reads"
+      },
+      "expectedIfDraftApproved": "CLOCK_EVIDENCE_UNKNOWN, preparation fails; second explicit unexposed preparation at most, no infinite retry.",
+      "supportsOrLimits": "Resource deadlines are observed, not a guaranteed physical CPU bound."
+    },
+    {
+      "id": "zero_draw_reading",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "probe": "observed16 positive steps<=0.25",
+        "rawWorkMs": 0,
+        "chargedWorkMs": 0.25,
+        "rawCostInterpretation": "censored/not demonstrated zero"
+      },
+      "expectedIfDraftApproved": "Keep raw0; reserve0.25 in work budget. Unknown actual upper bound remains unknown.",
+      "supportsOrLimits": "Engineering accounting only, not a claim the work cost≤0.25."
+    },
+    {
+      "id": "long_idle_same_cadence",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "idleMs": 45000,
+        "frozenFamilyHz": 60,
+        "nextExistingFixationMs": 1000,
+        "sameCadenceIntervals": "at least60 with all required metrics"
+      },
+      "expectedIfDraftApproved": "Revalidate within same existing fixation; no extra trial, extension or N switch.",
+      "supportsOrLimits": "45000ms is a scenario value only; no idle/stale threshold or parameter. Every fixation revalidates."
+    },
+    {
+      "id": "long_idle_power_switch",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "idleMs": 45000,
+        "frozenFamilyHz": 120,
+        "nextFixationCadenceHz": 60
+      },
+      "expectedIfDraftApproved": "Online delta fails immediately; gray-clear/end proposal, no formal dots, no reclassification into N3.",
+      "supportsOrLimits": "Once trial reservation/draw began, failure ends same attempt."
+    },
+    {
+      "id": "insufficient_fixation",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "existingFixationBoundaryMs": 1000,
+        "continuousIntervals": 59
+      },
+      "expectedIfDraftApproved": "Do not wait for a60th interval or add fixation. Reject first-formal-draw gate and end reserved attempt.",
+      "supportsOrLimits": "Coverage rather than fabricated/extended1000ms."
+    },
+    {
+      "id": "failed_mask_or_clear",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "firstMaskDraw": "throws",
+        "neutralBackgroundClear": "throws"
+      },
+      "expectedIfDraftApproved": "Retain attempts/errors, actual returned mask/off null; physical offset unknown. No fake mask from deadline/end/clear.",
+      "supportsOrLimits": "Explicit actual/attempted/unknown clock semantics."
+    },
+    {
+      "id": "preparation_retry",
+      "kind": "DESCRIPTIVE_BOUNDARY_CONTRACT_NOT_AN_EXECUTED_TEST",
+      "inputDefinition": {
+        "firstPreparation": "fails before reservation",
+        "second": "explicit requested preparation",
+        "thirdRequested": true,
+        "attemptScope": "same genuinely host-admitted frozen attempt"
+      },
+      "expectedIfDraftApproved": "Keep both preparations of the same host-admitted frozen attempt; max2 before reservation/draw. Third preparation of that attempt blocked. A separately host-admitted legitimate new attempt may prepare anew; client renaming never grants it.",
+      "supportsOrLimits": "Retry budget is project UX/resource choice; not an instruction to sample until PASS."
+    },
+    {
+      "id": "host_new_attempt_vs_client_alias",
+      "kind": "DESCRIPTIVE_NOT_EXECUTED",
+      "inputDefinition": {
+        "oldAttempt": "host-admitted A ended after exposure",
+        "clientAlias": "renamed context/port/attemptId still maps to A",
+        "newLegitimateAttempt": "host independently authorizes/freeze B"
+      },
+      "expectedIfDraftApproved": "Alias remains ended A; B gets its own max2 pre-exposure preparations. No lifetime page/candidate lock.",
+      "supportsOrLimits": "Authoritative mapper is an unimplemented platform dependency, not a current client string capability."
+    }
+  ]
+}
