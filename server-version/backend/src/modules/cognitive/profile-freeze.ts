@@ -1,4 +1,5 @@
 import { resolveParticipantPresentation, type CognitiveParticipantPresentationV1 } from './participant-presentation'
+import { resolveNativeParticipantPresentation } from './content-candidates/native-registry/participant-presentations'
 import { getCognitiveTaskResource, resolveNativeReportBundle, type CognitiveTaskResource } from './task-resource'
 import { buildCognitiveV2TaskDefinition } from './v2/registry'
 import { computeProtocolSignature } from './v2/canonical'
@@ -140,9 +141,13 @@ export function freezeNativeAssignmentProfile(input: {
   const r = input.resource, profile = r.profiles[input.profile]
   if (!profile) throw BAD_REQUEST(`该原生任务未声明 Profile ${input.profile}`)
   const resolvedConfig = r.configSchema.parse({ ...(input.baseConfig as Record<string, unknown>), ...profile.configPatch })
+  // Display-only sidecar: frozen with the assignment so an old report never looks up a newer wording.
+  const participantPresentation = resolveNativeParticipantPresentation({ testType: r.testType, engineVersion: r.engineVersion,
+    scoringVersion: r.scoringVersion, configVersion: r.configVersion })
   const resolvedReport: FrozenReportSnapshot = {
     nativeIdentity: { testType: r.testType, engineVersion: r.engineVersion, scoringVersion: r.scoringVersion,
       configVersion: r.configVersion, protocolSignature: computeProtocolSignature(r.definition.protocol) },
+    ...(participantPresentation ? { presentationVersion: participantPresentation.presentationVersion, participantPresentation } : {}),
     profile: input.profile, randomizationAlgorithmVersion: r.randomizationAlgorithmVersion,
     profileDefinitionVersion: r.profileDefinitionVersion, metricDefinitionVersion: r.metricDefinitionVersion,
     qualityDefinitionVersion: r.qualityDefinitionVersion, reportDefinitionVersion: r.reportDefinitionVersion,
