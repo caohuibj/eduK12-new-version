@@ -1,3 +1,4 @@
+import {checkPersonnelCredential,completePersonnelClaim,lockImportedStudentIdentity} from './personnel.binding'
 import { createHash, createHmac, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -15,12 +16,8 @@ type AdmissionRow = {
 type EligibilityRow = { id: string; rosterVersion: number }
 type CodeRow = { id: string; rosterVersion: number }
 
-export class CampusAdmissionError extends Error {
-  constructor(public readonly code: string, public readonly statusCode = 409) {
-    super(code)
-    this.name = 'CampusAdmissionError'
-  }
-}
+export { CampusAdmissionError } from './admission.error'
+import { CampusAdmissionError } from './admission.error'
 function fail(code: string, statusCode = 409):never { throw new CampusAdmissionError(code, statusCode) }
 const scoped = (value: string) => value.trim()
 const normalizeNo = (value: string) => {
@@ -135,6 +132,8 @@ export async function replaceCampusRoster(input: {
         AND "status"='VALID' AND "claimed_user_id" IS NOT NULL
     `
     if (claimed[0]?.count) fail('ROSTER_HAS_REGISTRATIONS')
+    const imported=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM campus_personnel WHERE organization_id=${input.organizationId} AND class_unit_id=${input.classUnitId} LIMIT 1`
+    if(imported.length)fail('PERSONNEL_ADDITIVE_IMPORT_REQUIRED')
     const version = row.rosterVersion + 1
     // Never record plaintext student numbers. Unique by school, even across
     // classrooms, so accidental duplicate school identities fail atomically.
@@ -274,6 +273,7 @@ export async function registerCampusStudent(input: {
     return await prisma.$transaction(async tx => {
       const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
       if (row.status!=='OPEN' || !row.windowClosesAt || row.windowClosesAt<=new Date()) fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+      await lockImportedStudentIdentity(tx,input.organizationId,studentNoDigest)
       const codes=await tx.$queryRaw<CodeRow[]>`
         SELECT "id", "roster_version" AS "rosterVersion" FROM "campus_activation_codes"
         WHERE "organization_id"=${input.organizationId} AND "class_unit_id"=${input.classUnitId}
@@ -290,6 +290,7 @@ export async function registerCampusStudent(input: {
       `
       if (!codes[0] || !eligible[0] || codes[0].rosterVersion!==row.rosterVersion
         || eligible[0].rosterVersion!==row.rosterVersion) fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+      const personnel=await checkPersonnelCredential(tx,{studentCodeId:codes[0].id,eligibilityId:eligible[0].id})
       const user=await tx.user.create({data:{
         username:'huischool_'+randomUUID().replace(/-/g,''),
         passwordHash, role:UserRole.STUDENT, accountDomain:'SCHOOL',
@@ -313,6 +314,7 @@ export async function registerCampusStudent(input: {
           "user_id","organization_id","class_unit_id","eligibility_id","roster_version"
         ) VALUES (${user.id},${input.organizationId},${input.classUnitId},${eligible[0].id},${row.rosterVersion})
       `
+      await completePersonnelClaim(tx,personnel,user.id)
       // No OrganizationMembership/Persona is created until whole-class approval.
       return { userId:user.id, status:'PENDING_CLASS_APPROVAL' as const }
     })
@@ -348,6 +350,7 @@ export async function claimExistingCampusStudent(input:{
     const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
     if(row.status!=='OPEN'||!row.windowClosesAt||row.windowClosesAt<=new Date())
       fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    await lockImportedStudentIdentity(tx,input.organizationId,studentNoDigest,user.id)
     const valid=await tx.$queryRaw<Array<{eligibilityId:string;rosterVersion:number;codeId:string}>>`
       SELECT e."id" AS "eligibilityId",e."roster_version" AS "rosterVersion",
         code."id" AS "codeId"
@@ -369,6 +372,7 @@ export async function claimExistingCampusStudent(input:{
     `
     const credential=valid[0]
     if(!credential)fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    const personnel=await checkPersonnelCredential(tx,{studentCodeId:credential.codeId,eligibilityId:credential.eligibilityId,actorUserId:user.id})
     const prior=await tx.campusStudentEnrollment.findUnique({
       where:{userId:user.id},select:{userId:true},
     })
@@ -391,6 +395,7 @@ export async function claimExistingCampusStudent(input:{
       classUnitId:input.classUnitId,
       eligibilityId:credential.eligibilityId,rosterVersion:row.rosterVersion,
     }})
+    await completePersonnelClaim(tx,personnel,user.id)
     return {userId:user.id,status:'PENDING_CLASS_APPROVAL' as const,
       reusedEducationIdentity:true}
   })}

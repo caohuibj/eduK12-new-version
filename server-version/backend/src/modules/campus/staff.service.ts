@@ -1,3 +1,4 @@
+import {checkPersonnelCredential,completePersonnelClaim} from './personnel.binding'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -46,11 +47,11 @@ export async function createCampusStaffInvitation(input:{
 }
 
 export async function registerCampusStaff(input:{
-  inviteCode:string;username:string;password:string
+  inviteCode:string;username:string;password:string;actorUserId?:string
 }){
-  const normalized=normalizedLogin(input.username)
+  const normalized=input.actorUserId?null:normalizedLogin(input.username)
   if(input.inviteCode.length<28||input.inviteCode.length>64)fail('CAMPUS_INVITE_UNAVAILABLE',404)
-  const passwordHash=await hashPassword(input.password)
+  const passwordHash=input.actorUserId?null:await hashPassword(input.password)
   try {
     return await prisma.$transaction(async tx=>{
       const invitations=await tx.$queryRaw<Array<{
@@ -117,24 +118,30 @@ export async function registerCampusStaff(input:{
       ])
       if(!issuerMembership||issuerMembership.validFrom>invitation.createdAt||revokedSinceInvite)
         fail('CAMPUS_INVITE_UNAVAILABLE',404)
-      const user=await tx.user.create({data:{
-        username:'huischool_'+randomUUID().replace(/-/g,''),
-        passwordHash,accountDomain:'SCHOOL',
-        role:invitation.adminRole?UserRole.ADMIN:UserRole.TEACHER,
-        teacherApproved:true,nickname:null,phone:null,
-      }})
-      await tx.campusAccount.create({data:{
-        userId:user.id,loginName:input.username.trim(),normalizedLogin:normalized,
-      }})
-      const membership=await tx.organizationMembership.create({data:{
-        id:randomUUID(),organizationId:invitation.organizationId,userId:user.id,
-        orgRole:invitation.adminRole?'ORG_ADMIN':'MEMBER',
-      }})
-      await tx.organizationPersonaGrant.create({data:{
-        id:randomUUID(),organizationId:invitation.organizationId,
-        membershipId:membership.id,persona:invitation.persona,
-        grantedByUserId:invitation.invitedByUserId,
-      }})
+      const personnel=await checkPersonnelCredential(tx,{staffInvitationId:invitation.id,actorUserId:input.actorUserId})
+      if(input.actorUserId&&(!personnel||invitation.adminRole||invitation.psychologyStaff))fail('CAMPUS_INVITE_UNAVAILABLE',404)
+      let user:{id:string}
+      if(input.actorUserId){
+        const existing=await tx.user.findUnique({where:{id:input.actorUserId},select:{id:true,accountDomain:true,role:true,isActive:true,isFrozen:true,mustChangePassword:true,expiresAt:true}})
+        if(!existing||existing.accountDomain!=='SCHOOL'||!['TEACHER','ADMIN'].includes(existing.role)||!existing.isActive||existing.isFrozen||existing.mustChangePassword||(existing.expiresAt&&existing.expiresAt<=new Date()))fail('CAMPUS_INVITE_UNAVAILABLE',404)
+        const denied=await tx.organizationAccessDeny.findFirst({where:{organizationId:invitation.organizationId,userId:existing!.id,liftedAt:null,permission:{in:['*','EDUCATION_ACCESS','HUISCHOOL_ACCESS']}},select:{id:true}})
+        if(denied)fail('CAMPUS_INVITE_UNAVAILABLE',404)
+        user=existing!
+      }else{
+        user=await tx.user.create({data:{
+          username:'huischool_'+randomUUID().replace(/-/g,''),passwordHash:passwordHash!,accountDomain:'SCHOOL',
+          role:invitation.adminRole?UserRole.ADMIN:UserRole.TEACHER,teacherApproved:true,nickname:null,phone:null,
+        }})
+        await tx.campusAccount.create({data:{userId:user.id,loginName:input.username.trim(),normalizedLogin:normalized!}})
+      }
+      let membership=await tx.organizationMembership.findFirst({where:{organizationId:invitation.organizationId,userId:user.id,validFrom:{lte:new Date()},OR:[{validUntil:null},{validUntil:{gt:new Date()}}]}})
+      if(membership){
+        const persona=await tx.organizationPersonaGrant.findFirst({where:{organizationId:invitation.organizationId,membershipId:membership.id,persona:invitation.persona,revokedAt:null},select:{id:true}})
+        if(!persona)fail('CAMPUS_EXISTING_PERSONA_MISMATCH')
+      }else{
+        membership=await tx.organizationMembership.create({data:{id:randomUUID(),organizationId:invitation.organizationId,userId:user.id,orgRole:invitation.adminRole?'ORG_ADMIN':'MEMBER'}})
+        await tx.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:invitation.organizationId,membershipId:membership.id,persona:invitation.persona,grantedByUserId:invitation.invitedByUserId}})
+      }
       if (invitation.adminRole) {
         await tx.educationProductRoleGrant.create({data:{
           id:randomUUID(),organizationId:invitation.organizationId,
@@ -161,6 +168,7 @@ export async function registerCampusStaff(input:{
           adminRole:invitation.adminRole,
         },
       })
+      await completePersonnelClaim(tx,personnel,user.id)
       return {status:'REGISTERED' as const,username:input.username.trim()}
     })
   }catch(e:any){
