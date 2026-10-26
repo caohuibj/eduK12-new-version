@@ -1,3 +1,4 @@
+import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
@@ -188,7 +189,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     </div>}
     {visible&&<p className="ht-muted">请先在当前测评中保存并退出，再打开另一项自评。</p>}
     {loading&&!visible&&<button type="button" onClick={leave}>取消打开测评</button>}
-    {message&&<p role="status" className="ht-notice">{message}</p>}
+    {message&&!visible&&<p role="status" className="ht-notice">{message}</p>}
     {listReady&&!listPending&&!listError&&!tasks.length&&!unified?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.title}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span>
@@ -204,7 +205,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
           {item.status==='COMPLETED'&&<button type="button" disabled={loading||reportBusy}
             onClick={()=>void showReport(item)}>查看本人反馈</button>}
         </div>
-        {reports[item.executionId]&&<div className="ht-personal-report">
+        {reports[item.executionId]&&<TeacherAssessmentPage kind="feedback" title={item.title} onBack={()=>closeReport(item.executionId)}><div className="ht-personal-report">
           <h4>本人描述性反馈</h4>
           {reports[item.executionId].kind==='EDUCATION_SCALE_PERSONAL_REPORT'?<EducationScalePersonalReport
             data={reports[item.executionId]} api={api} executionId={item.executionId} entry="TEACHER"/>:
@@ -231,14 +232,17 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
                 {reports[item.executionId].disclaimer}</p>}
             </>}
           <button type="button" onClick={()=>closeReport(item.executionId)}>关闭本人反馈</button>
-        </div>}
+        </div></TeacherAssessmentPage>}
       </article>)}</div>}
-    {selected&&attempt&&attempt.status!=='COMPLETED'&&<div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
-      <h3>正在完成：{selected.title}</h3>
+    {selected&&attempt&&attempt.status!=='COMPLETED'&&<TeacherAssessmentPage kind="answer" title={selected.title} showTitle={false}><div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
+      {!unified&&<h3>正在完成：{selected.title}</h3>}
+      {message&&<p role="status" className="ht-notice">{message}</p>}
       <FinalCompositeAssessment
         key={`${attempt.id}:${attempt.currentItem?.id??''}:${attempt.currentItem?.definitionHash??''}`}
         state={attempt}
         campusMode={false}
+        autoAdvanceSingleChoice
+        instructionsSummary="作答说明"
         mediaTransport={mediaTransport}
         submitScale={submitScale}
         submitFormSection={async()=>{throw new Error('教师 Scale 任务不存在 Form Section')}}
@@ -248,6 +252,6 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         onEnterCognitive={()=>setMessage('该教师个人测评不允许启动认知任务')}
         onEnterSituational={()=>setMessage('该教师个人测评不允许启动情境任务')}
       />
-    </div>}
+    </div></TeacherAssessmentPage>}
   </section>
 }

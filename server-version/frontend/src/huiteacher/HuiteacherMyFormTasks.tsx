@@ -1,3 +1,4 @@
+import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import { TaskForm } from '../survey/SurveyPublicApp'
@@ -155,7 +156,7 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
-    {notice&&<p role="status" className="ht-notice">{notice}</p>}
+    {notice&&!active&&<p role="status" className="ht-notice">{notice}</p>}
     {listReady&&!listPending&&!listError&&tasks.length===0&&!unified?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.formTitle}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span>
@@ -166,12 +167,13 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
           {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(item.status==='ASSIGNED'?'开始评价':'继续评价')}
         </button>
       </article>)}</div>}
-    {active&&<div className="ht-task">
-      <h3>{active.title}</h3>
+    {active&&<TeacherAssessmentPage kind="answer" title={active.title} onBack={()=>{if(active.status==='STARTED')storeDraft(active,answers);setActive(null)}}><div className="ht-task">
+      {!unified&&<h3>{active.title}</h3>}
+      {notice&&<p role="status" className="ht-notice">{notice}</p>}
       {active.status==='COMPLETED'?<p role="status">本次评价已正式提交。</p>:
       <>
         <p>答案仅在本标签页短时暂存；按整份表单一次性提交。</p>
-        <TaskForm purpose="HUITEACHER"
+        <TaskForm purpose="HUITEACHER" advanceSingleChoiceFocus
           unit={{kind:'FORM',instrumentKey:active.formId,title:active.title,pages:active.pages}}
           answer={answers} onChange={updateAnswer} pageIndex={page}
           onPageChange={setPage}/>
@@ -179,6 +181,6 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
           正式提交评价
         </button>
       </>}
-    </div>}
+    </div></TeacherAssessmentPage>}
   </section>
 }

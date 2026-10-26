@@ -58,7 +58,7 @@ describe('real Teacher host and FinalComposite assessment media',()=>{
   fireEvent.click(await screen.findByRole('link',{name:'参与测评'}))
   const buttons=await screen.findAllByRole('button',{name:'继续测评'});fireEvent.click(buttons[0])
   await waitFor(()=>expect(request.mock.calls.some(([url])=>url.includes('/old/items/unit/scale/assets/'))).toBe(true))
-  expect(screen.getAllByRole('button',{name:'继续测评'})[1]).toBeDisabled()
+  expect(screen.queryByRole('button',{name:'继续测评'})).not.toBeInTheDocument()
   fireEvent.click(await screen.findByRole('button',{name:'保存并退出'}))
   await waitFor(()=>expect(screen.getAllByRole('button',{name:'继续测评'})[1]).toBeEnabled())
   fireEvent.click(screen.getAllByRole('button',{name:'继续测评'})[1])

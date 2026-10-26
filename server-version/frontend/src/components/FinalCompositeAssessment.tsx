@@ -58,6 +58,8 @@ export interface FinalCompositeAssessmentProps {
     loadVideoCapability: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
   }
   campusMode?: boolean
+  /** Presentation only; never selects a product authority or transport. */
+  autoAdvanceSingleChoice?: boolean
   /** Optional product presentation; answer and submission controllers stay unchanged. */
   instructionsSummary?: string
   instructionsAppendix?: React.ReactNode
@@ -88,7 +90,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport, instructionsSummary, instructionsAppendix }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, autoAdvanceSingleChoice=false, campusVideoLoader, mediaTransport, instructionsSummary, instructionsAppendix }) => {
   const item = state.currentItem
   const expiredCognitive = item?.type === 'COGNITIVE' && cognitiveRecovery?.reason === 'LOCAL_DRAFT_EXPIRED'
   const [sectionIndex, setSectionIndex] = useState(0)
@@ -650,7 +652,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   <FormPlayer
                     submitLabel={campusMode?'提交本页':undefined}
-                    autoAdvance={campusMode}
+                    autoAdvance={campusMode || autoAdvanceSingleChoice}
                     scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={{
                       id: field.formItemId,
@@ -708,7 +710,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
-                    autoAdvance={!allScaleItems && (campusMode || (isTrainingHost() && !publicMode))}
+                    autoAdvance={!allScaleItems && (campusMode || autoAdvanceSingleChoice || (isTrainingHost() && !publicMode))}
                     hideNavigation={allScaleItems}
                     scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={question}

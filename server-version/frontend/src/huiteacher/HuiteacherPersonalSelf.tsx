@@ -1,3 +1,5 @@
+import {TeacherAssessmentPage} from './TeacherAssessmentPage'
+import ScalePlayer from '../components/questionnaire/ScalePlayer'
 import {SchoolTaskHelp as AssessmentHelp} from '../school/SchoolTaskHelp'
 import {assessmentStatus} from './assessmentTaskPresentation'
 import { useCallback,useEffect,useRef,useState } from 'react'
@@ -36,6 +38,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
   const [catalogRows,setCatalog]=useState<Catalog[]>([])
   const [attemptRows,setAttempts]=useState<AttemptSummary[]>([])
   const [active,setActive]=useState<Attempt|null>(null)
+  const [questionIndex,setQuestionIndex]=useState(0)
   const answering=useRef<HTMLDivElement>(null)
   const activeAnswerKey=active?.status==='IN_PROGRESS'?active.assessmentId:''
   useEffect(()=>{if(activeAnswerKey){answering.current?.focus({preventScroll:true});answering.current?.scrollIntoView?.({block:'start'})}},[activeAnswerKey])
@@ -87,7 +90,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
   const load=async(id:string)=>{
     const state=await api<Attempt>('/personal-scale/assessments/'+id)
     setActive(state);setAnswers(saved(id,state.definitionHash))
-    setSubmissionId('')
+    setSubmissionId('');setQuestionIndex(0)
   }
   const begin=(resourceId:string)=>perform(async()=>{
     const created=await api<{assessmentId:string}>('/personal-scale/assessments',
@@ -140,7 +143,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
-    {notice&&<p className="ht-notice" role="status">{notice}</p>}
+    {notice&&active?.status!=='IN_PROGRESS'&&<p className="ht-notice" role="status">{notice}</p>}
     <h3 className="ht-assessment-section-title">可用测评工具{listReady&&<span className="ht-tag">{catalog.length} 项</span>}</h3>
     {listReady&&!listPending&&!listError&&!catalog.length?<p className="ht-empty">暂未获得个人测评工具授权。可继续使用学校安排的其他评价任务。</p>:
       <div className="ht-event-list ht-personal-catalog">{catalog.map(x=><div key={x.resourceId} className="ht-event">
@@ -157,7 +160,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
         {x.status==='COMPLETED'&&
           <button disabled={busy} onClick={()=>loadReport(x.assessmentId)}>查看本人反馈</button>}
       </div>
-      {reports[x.assessmentId]&&<div className="ht-personal-report">
+      {reports[x.assessmentId]&&<TeacherAssessmentPage scope="ht-personal-self" kind="feedback" title={x.title} onBack={()=>setReports(old=>{const next={...old};delete next[x.assessmentId];return next})}><div className="ht-personal-report">
         {reports[x.assessmentId].state==='WITHHELD'
           ?<p>当前结果因答案质量或授权限制暂不显示。</p>
           :<>
@@ -173,20 +176,21 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
             </article>)}
             <p className="ht-muted">{reports[x.assessmentId].disclaimer}</p>
           </>}
-      </div>}
+      </div></TeacherAssessmentPage>}
     </article>)}</div>
-    {active?.status==='IN_PROGRESS'&&<div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前个人测评作答">
-      <h3>{active.title}</h3><p>答案仅在本标签页短时保留，全部填写后一次提交正式计分。</p>
-      {active.runner.items.map(q=><fieldset key={q.itemCode} className="ht-scale-item">
-        <legend>{q.content}{q.required?' *':''}</legend>
-        {q.options.map(option=><label key={String(option.value)}>
-          <input type="radio" name={'personal-scale-'+q.itemCode}
-            checked={answers[q.itemCode]===option.value}
-            onChange={()=>setAnswers(old=>({...old,[q.itemCode]:option.value}))}/>
-          {option.label}
-        </label>)}
-      </fieldset>)}
-      <button className="ht-primary" disabled={busy} onClick={submit}>一次性正式提交</button>
-    </div>}
+    {active?.status==='IN_PROGRESS'&&<TeacherAssessmentPage scope="ht-personal-self" kind="answer" title={active.title} busy={busy} onBack={()=>{store(active.assessmentId,active.definitionHash,answers);setActive(null)}}><div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前个人测评作答">
+      <p>答案仅在本标签页短时保留，全部填写后一次提交正式计分。</p>
+      {notice&&<p className="ht-notice" role="status">{notice}</p>}
+      {active.runner.items[questionIndex]&&<ScalePlayer
+        item={{...active.runner.items[questionIndex],type:'single'}}
+        value={answers[active.runner.items[questionIndex].itemCode]}
+        autoAdvance scopeKey={active.assessmentId+':'+active.definitionHash}
+        position={questionIndex+1} total={active.runner.items.length} disabled={busy}
+        onChange={value=>setAnswers(old=>({...old,[active.runner.items[questionIndex].itemCode]:value}))}
+        onPrevious={()=>setQuestionIndex(index=>Math.max(0,index-1))}
+        onNext={questionIndex<active.runner.items.length-1?()=>setQuestionIndex(index=>index+1):undefined}
+        onSubmit={questionIndex===active.runner.items.length-1?submit:undefined}
+        submitLabel="一次性正式提交" submitting={busy}/>}
+    </div></TeacherAssessmentPage>}
   </section>
 }

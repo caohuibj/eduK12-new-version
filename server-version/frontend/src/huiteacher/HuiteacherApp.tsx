@@ -1,3 +1,4 @@
+import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
@@ -188,6 +189,7 @@ export default function HuiteacherApp(){
     const heading=appRoot.current?.querySelector<HTMLElement>(screen==='home'?'.ht-journal h1':'.ht-form-panel h1')
     if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
   },[screen,loading])
+  const [assessmentPageOpen,setAssessmentPageOpen]=useState(false)
   const [message,setMessage]=useState('')
   const [username,setUsername]=useState('')
   const [password,setPassword]=useState('')
@@ -363,10 +365,10 @@ export default function HuiteacherApp(){
   },[workspaceTab,loading,me?.id,selectedOrg])
   const publicHome=screen==='home'
   const publicAuth=!me&&screen!=='home'
-  const workspaceNavigation=Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role!=='STUDENT')
+  const workspaceNavigation=Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role!=='STUDENT'&&!assessmentPageOpen)
   return <main ref={appRoot} className={`ht-app${!me||publicHome?' ht-app-public':''}${me?' ht-app-signed-in':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
-    <header className={`ht-topbar${workspaceNavigation?' ht-topbar-workspace':''}`}>
+    <header className={`ht-topbar${workspaceNavigation||assessmentPageOpen?' ht-topbar-workspace':''}`}>
       <button type="button" className="ht-brand-home" aria-label="Teacher 首页"
         onClick={()=>changeScreen('home')}><TeacherBrand/></button>
       {workspaceNavigation&&me&&<div className="ht-header-workspaces">
@@ -467,7 +469,7 @@ export default function HuiteacherApp(){
       <h1>首次登录 · 修改教育账号密码</h1>
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
-    me&&screen==='workspace'?<div className="ht-workspace">
+    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:'other'}><div className="ht-workspace" hidden={assessmentPageOpen}>
       <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
@@ -565,7 +567,7 @@ export default function HuiteacherApp(){
           {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
         </select></label>
       </div>}
-    </div>:null}
+    </div></TeacherAssessmentProvider>:null}
     </div>
     {me&&!me.mustChangePassword&&<>
         <AccountDialog open={accountOpen} onClose={()=>setAccountOpen(false)}>
