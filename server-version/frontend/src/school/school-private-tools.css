@@ -159,3 +159,19 @@
 @media(max-width:600px){.hs-app.hs-professional .education-private-tools--school .education-form-group{padding:0}}
 .hs-app .education-private-tools--school .education-form-question label:has(>input:is([type=checkbox],[type=radio])){display:inline-flex;align-items:center;gap:8px;min-height:36px}
 .hs-app .education-private-tools--school .education-form-question label>input:is([type=checkbox],[type=radio]){margin:0}
+
+/* Append-only form import shares the current School canvas and theme. */
+.hs-app .education-private-tools--school .education-form-import{margin:0;padding:0 16px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface-soft)}
+.hs-app .education-private-tools--school .education-form-import[open]{padding-bottom:16px}
+.hs-app .education-private-tools--school .education-form-import>section{min-width:0}
+.hs-app .education-private-tools--school .education-form-import-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}
+.hs-app .education-private-tools--school .education-form-import-help{margin:12px 0;padding:0;border-top:1px solid var(--hs-border);background:transparent}
+.hs-app .education-private-tools--school .education-form-import-help pre{font-size:12px;background:var(--hs-surface);border:1px solid var(--hs-border);border-radius:8px}
+.hs-app .education-private-tools--school .education-form-import-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:12px}
+.hs-app .education-private-tools--school .education-form-import-preview{min-width:0;margin-top:16px;padding-top:16px;border-top:1px solid var(--hs-border)}
+.hs-app .education-private-tools--school .education-form-import-preview>ol{list-style:none;padding:0;margin:16px 0;max-height:420px;overflow-y:auto;overscroll-behavior:contain;display:grid;gap:10px}
+.hs-app .education-private-tools--school .education-form-import-preview li{padding:12px;border:1px solid var(--hs-border);border-radius:9px;background:var(--hs-surface);overflow-wrap:anywhere}
+.hs-app .education-private-tools--school .education-form-import-preview li span{display:block;font-size:12px;color:var(--hs-muted);margin-top:4px}
+.hs-app .education-private-tools--school .education-form-import-preview li strong{font-size:14px;color:var(--hs-ink);font-weight:500}
+.hs-app .education-private-tools--school .education-form-import-preview [role=alert]{padding-left:18px;color:var(--survey-ui-danger,#963f3a)}
+@media(max-width:600px){.hs-app .education-private-tools--school .education-form-import-settings{grid-template-columns:minmax(0,1fr);gap:12px}.hs-app .education-private-tools--school .education-form-import-actions>button{flex:1 1 100%}}
