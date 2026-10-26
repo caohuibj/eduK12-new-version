@@ -101,6 +101,9 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
     const path = `executable.references.${referenceIndex}`
     const validation = validateReferenceSetDefinition(reference)
     validation.issues.forEach((issue) => issues.push({ path: `${path}.${issue.path}`, message: issue.message, severity: issue.severity }))
+    // A dossier has no executable entries. Keep its located validation errors
+    // instead of dereferencing entries on an invalid/untrusted envelope.
+    if (!validation.definition) return
     if (reference.instrumentType !== 'scale') issues.push({ path: `${path}.instrumentType`, message: 'Scale source reference 必须为 instrumentType=scale', severity: 'error' })
     if (reference.instrumentKey !== source.identity.instrumentKey) issues.push({ path: `${path}.instrumentKey`, message: 'reference instrumentKey 与 source identity 不一致', severity: 'error' })
     if (referenceVersions.has(reference.referenceVersion)) issues.push({ path: `${path}.referenceVersion`, message: 'referenceVersion 不能重复', severity: 'error' })
@@ -110,6 +113,16 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1): 
       if(axes && (!entry.governance || entry.governance.subjectKey!==axes.subjectKey || entry.governance.locale!==axes.locale || entry.governance.measurementHash!==hashScaleDefinition(source.executable!.definition))) issues.push({path:`${path}.entries.${entryIndex}.governance`,message:'REFERENCE_MEASUREMENT_AXES_MISMATCH',severity:'error'})
       if (entry.instrumentVersion !== source.identity.instrumentVersion) issues.push({ path: `${path}.entries.${entryIndex}.instrumentVersion`, message: 'reference instrumentVersion 与 source identity 不一致', severity: 'error' })
       if (entry.scoringVersion !== source.executable?.definition.scoring.scoringVersion) issues.push({ path: `${path}.entries.${entryIndex}.scoringVersion`, message: 'reference scoringVersion 与 definition 不一致', severity: 'error' })
+      if (entry.governance?.schoolStage === 'adult') {
+        const match = entry.population?.match
+        const subject = source.applicability?.subject
+        const catalog = source.catalog.population
+        // An adult parameter cannot be attached to a school-only source. Ages
+        // are intersections, not an assumption that grades imply adult age.
+        const min = Math.max(match?.minAgeMonthsInclusive ?? -Infinity, subject?.ageMonths?.minInclusive ?? -Infinity, (catalog.minAge ?? -Infinity) * 12)
+        const max = Math.min(match?.maxAgeMonthsExclusive ?? Infinity, subject?.ageMonths?.maxExclusive ?? Infinity, catalog.maxAge === undefined ? Infinity : (catalog.maxAge + 1) * 12)
+        if (subject?.grades?.length || catalog.gradeRange || min >= max) issues.push({ path: `${path}.entries.${entryIndex}.population`, message: 'ADULT_REFERENCE_SOURCE_SCOPE_MISMATCH', severity: 'error' })
+      }
       if (axes && entry.governance) {
         const interpretation=source.executable!.definition.report.interpretations.find(x=>x.scoreKey===entry.scoreKey)
         if (!interpretation || entry.governance.bands.some(b=>!interpretation.bands.some(x=>x.key===b.key))) issues.push({path:`${path}.entries.${entryIndex}.governance.bands`,message:'REPORT_REFERENCE_BAND_COVERAGE_REQUIRED',severity:'error'})
