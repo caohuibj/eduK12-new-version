@@ -1,11 +1,11 @@
 import {RefreshCw} from 'lucide-react'
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 type Api=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 type Formal={id:string;kind:'FACT'|'FORMAL_FEEDBACK';content:string}
 type Consensus={id:string;organizationId:string;eventId:string;title:string;
   content:string;status:'DRAFT'|'SUBMITTED';revision:number;digest:string;
   sourceRecordIds:string[];independentEvaluatorCount:number;
-  approvalCount:number;submittedAt:string|null}
+  approvalCount:number;submittedAt:string|null;approvedByMe?:boolean}
 export function HuiteacherConsensusManager({organizationId,eventId,api}:{
   organizationId:string;eventId:string;api:Api
 }){
@@ -105,6 +105,10 @@ export function HuiteacherConsensusManager({organizationId,eventId,api}:{
 }
 export function HuiteacherConsensusReviews({api}:{api:Api}){
   const [reviews,setReviews]=useState<Consensus[]>([])
+  const [confirmed,setConfirmed]=useState<Set<string>>(()=>new Set())
+  const pending=useRef(false)
+  const reviewKey=(r:Consensus)=>JSON.stringify([r.id,r.revision,r.digest])
+  const approved=(r:Consensus)=>r.approvedByMe===true||confirmed.has(reviewKey(r))
   const [busy,setBusy]=useState(false),[notice,setNotice]=useState('')
   const [loaded,setLoaded]=useState(false),[readError,setReadError]=useState(false)
   const refresh=async()=>{
@@ -120,13 +124,18 @@ export function HuiteacherConsensusReviews({api}:{api:Api}){
     return()=>{live=false}
   },[api])
   const approve=(r:Consensus)=>{
+    if(pending.current||approved(r))return
     if(!window.confirm('确认本人已阅读并认可本次精确版本的人工共识吗？'))return
-    setBusy(true);setNotice('')
-    void api('/consensuses/'+r.id+'/approve','POST',{
+    pending.current=true;setBusy(true);setNotice('')
+    void api<{approved:boolean;id:string;revision:number}>('/consensuses/'+r.id+'/approve','POST',{
       expectedRevision:r.revision,expectedDigest:r.digest,
-    }).then(refresh).then(()=>setNotice('本人对该版本的确认已保存。'))
+    }).then(receipt=>{
+      if(receipt.approved!==true||receipt.id!==r.id||receipt.revision!==r.revision)throw Error('确认回执与当前共识版本不一致，请刷新核对。')
+      setConfirmed(old=>new Set([...old,reviewKey(r)]))
+      return refresh()
+    }).then(()=>setNotice('本人对该版本的确认已保存。'))
       .catch(e=>setNotice(e instanceof Error?e.message:'独立签署失败'))
-      .finally(()=>setBusy(false))
+      .finally(()=>{pending.current=false;setBusy(false)})
   }
   return <section className="ht-panel ht-practice-consensus" aria-label="协商共识独立签署">
     <header className="ht-section-heading"><h2>专家／同行共识确认</h2>
@@ -140,8 +149,8 @@ export function HuiteacherConsensusReviews({api}:{api:Api}){
     {reviews.map(r=><article className="ht-event" key={r.id}>
       <h3>{r.title}</h3><p className="ht-field-content">{r.content}</p>
       <p className="ht-muted">版本 {r.revision} · 评价者确认数 {r.approvalCount} · {r.status}</p>
-      {r.status==='DRAFT'&&<button disabled={busy} onClick={()=>approve(r)}>
-        我确认此版本的人工共识</button>}
+      {r.status==='DRAFT'&&(approved(r)?<span className="ht-tag">本人已确认此版本</span>:<button disabled={busy} onClick={()=>approve(r)}>
+        我确认此版本的人工共识</button>)}
     </article>)}
   </section>
 }

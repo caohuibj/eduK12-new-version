@@ -125,11 +125,14 @@ suite('Huiteacher PR4 human consensus — distinct experts, matching signature, 
       actorUserId:stranger.id,consensusId:draft.id,
       expectedRevision:draft.revision,expectedDigest:draft.digest,
     })).rejects.toThrow()
-    const first=await approveHuiteacherFieldConsensus({
+    const parallel=await Promise.all([0,1].map(()=>approveHuiteacherFieldConsensus({
       actorUserId:a.id,consensusId:draft.id,expectedRevision:draft.revision,
       expectedDigest:draft.digest,
-    })
-    expect(first.approved).toBe(true)
+    })))
+    expect(parallel.every(receipt=>receipt.approved)).toBe(true)
+    expect(parallel.map(receipt=>receipt.replayed).sort()).toEqual([false,true])
+    expect(await db.huiteacherFieldConsensusApproval.count({where:{consensusId:draft.id,observerUserId:a.id,revision:draft.revision}})).toBe(1)
+    expect((await myHuiteacherConsensusReviews(a.id)).list.find(row=>row.id===draft.id)?.approvedByMe).toBe(true)
     expect((await approveHuiteacherFieldConsensus({
       actorUserId:a.id,consensusId:draft.id,expectedRevision:draft.revision,
       expectedDigest:draft.digest,
