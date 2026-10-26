@@ -1,0 +1,1 @@
+First native test preparation used repository-relative paths from backend cwd. cp and shell append failed (No such file or directory); Vitest then selected zero new tests. That invocation is not qualified despite shell final exit 0. Original reporter retained as vitest-no-selected-tests.json. Corrected cwd/paths before actual new-test execution; old 43 not repeated.

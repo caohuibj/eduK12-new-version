@@ -1,0 +1,163 @@
+import { describe, expect, it } from 'vitest'
+import { freezeCandidate, replayCandidate, IDENTITY, type FrozenCandidate, type Request } from '../../modules/cognitive/content-candidates/continuous-recognition/protocol'
+import { scoreRecognition, projectRecognitionReport, type RawSession, type RawEvent, type ResearchReview } from '../../modules/cognitive/content-candidates/continuous-recognition/scorer'
+const clone=<T>(x:T):T=>JSON.parse(JSON.stringify(x)) as T
+const request=(profile:'research'|'experience'='experience',seed='recognition-golden'):Request=>({profile,seed,
+  formalAssetIds:Array.from({length:184},(_,i)=>'logic-'+i),practiceAssetIds:Array.from({length:6},(_,i)=>'practice-'+i)})
+const freeze=(profile:'research'|'experience'='experience')=>freezeCandidate(request(profile))
+function raw(f:FrozenCandidate):RawSession {return {snapshotHash:f.snapshotHash,phase:'formal',termination:'completed',events:[],
+  records:f.manifest.formal.map(p=>({index:p.index,assetId:p.assetId,kind:p.kind,status:'complete',interruptions:[],
+    imageOnsetMs:100+p.plannedOnsetMs,imageOffsetMs:100+p.plannedImageOffsetMs,windowEndMs:100+p.plannedWindowEndMs}))}}
+function event(atMs:number,id:string,input:RawEvent['input']='touch'):RawEvent {return {id,atMs,action:'seen',input,key:input==='keyboard'?'r':null,isRepeat:false}}
+function answers(f:FrozenCandidate,hits:number,falseAlarms:number):RawSession {
+  const r=raw(f)
+  f.manifest.targetPairs.forEach((p,i)=>{if(i<hits)r.events.push(event(r.records[p.repeatIndex].imageOnsetMs!+100,'hit-'+i))
+    if(i<falseAlarms)r.events.push(event(r.records[p.firstIndex].imageOnsetMs!+100,'false-'+i))})
+  r.events.sort((a,b)=>a.atMs-b.atMs);return r
+}
+const review=(f:FrozenCandidate):ResearchReview=>({snapshotHash:f.snapshotHash,qualityRule:IDENTITY.qualityRule,
+  decision:'allow-descriptive-research',reviewerId:'synthetic-test-reviewer',evidenceNote:'Synthetic logic fixture only; no real participant approval.'})
+describe('continuous recognition candidate: deterministic protocol',()=>{
+  it.each([['research',60,124,16,260],['experience',20,54,6,100]] as const)('%s count arithmetic and paired lag manifest',(profile,t,fill,v,n)=>{
+    const f=freeze(profile)
+    expect(f.manifest.counts).toEqual({targetFirst:t,targetRepeat:t,fillerFirst:fill,vigilanceRepeat:v,total:n})
+    expect(f.manifest.formal[n-1].plannedWindowEndMs).toBe(n*1550)
+    expect(f.manifest.targetPairs).toHaveLength(t)
+    expect(new Set(f.manifest.readyPoolSizes)).toEqual(new Set([1]))
+    expect(f.manifest.targetPairs.every(p=>p.blockLag===5&&p.lagImages>=17&&p.lagImages<=23&&p.interveningImages===p.lagImages-1)).toBe(true)
+    expect(f.manifest.vigilancePairs.every(p=>p.blockLag===1)).toBe(true)
+    expect(Object.values(f.manifest.lagHistogram).reduce((a,b)=>a+b,0)).toBe(t)
+    expect(new Set(f.manifest.formal.map(p=>p.assetId)).size).toBe(t+fill)
+  })
+  it('replays only the entire original snapshot; changed seed changes actual sequence',()=>{
+    const f=freeze();expect(replayCandidate(JSON.parse(JSON.stringify(f)))).toEqual(f)
+    expect(freezeCandidate(request())).toEqual(f)
+    expect(freezeCandidate(request('experience','other-seed')).manifest.formal).not.toEqual(f.manifest.formal)
+  })
+  it('verifies actual pair ordering across 20 seeds without enlarging default ready pool',()=>{
+    for(let seed=0;seed<20;seed++){
+      const f=freezeCandidate(request('research','manifest-'+seed))
+      const first=f.manifest.formal.filter(p=>p.kind==='target-first').map(p=>p.assetId)
+      const repeated=f.manifest.formal.filter(p=>p.kind==='target-repeat').map(p=>p.assetId)
+      expect(repeated).toEqual(first)
+      expect(f.manifest.targetPairs.every(p=>p.lagImages===p.repeatIndex-p.firstIndex&&p.blockLag===5)).toBe(true)
+    }
+  })
+  it('isolates practice identities and records its shorter lags explicitly',()=>{
+    const f=freeze(), practice=f.manifest.practice
+    expect(practice.map(p=>p.assetId)).toEqual(['practice-0','practice-1','practice-2','practice-0','practice-3','practice-1','practice-4','practice-5'])
+    expect(practice.filter(p=>p.seenBefore)).toHaveLength(2)
+    expect(practice.some(p=>f.manifest.formal.some(x=>x.assetId===p.assetId))).toBe(false)
+  })
+  it.each(['insufficient','duplicate','overlap','bad-id','unknown-profile','extra-field','empty-seed'])('rejects %s asset/config input',(problem)=>{
+    const q:any=request()
+    if(problem==='insufficient')q.formalAssetIds=q.formalAssetIds.slice(0,73)
+    if(problem==='duplicate')q.formalAssetIds[1]=q.formalAssetIds[0]
+    if(problem==='overlap')q.practiceAssetIds[0]=q.formalAssetIds[0]
+    if(problem==='bad-id')q.formalAssetIds[0]='../../image'
+    if(problem==='unknown-profile')q.profile='standard'
+    if(problem==='extra-field')q.targetNum=19
+    if(problem==='empty-seed')q.seed=''
+    expect(()=>freezeCandidate(q)).toThrow()
+  })
+  it.each(['identity','parameters','manifest','request','hash','extra'])('rejects altered frozen %s',(part)=>{
+    const f:any=clone(freeze())
+    if(part==='identity')f.identity.scoringVersion='latest'
+    if(part==='parameters')f.parameters.imageMs=700
+    if(part==='manifest')f.manifest.formal[0].assetId='wrong'
+    if(part==='request')f.request.profile='research'
+    if(part==='hash')f.snapshotHash='0'.repeat(64)
+    if(part==='extra')f.normVersion='invented'
+    expect(()=>replayCandidate(f)).toThrow()
+  })
+})
+describe('continuous recognition candidate: raw validation and paired scoring',()=>{
+  it('golden 16/20 hits and 5/20 false alarms, with explicit review and matching report denominators',()=>{
+    const f=freeze(),r=answers(f,16,5),s=scoreRecognition(f,r,review(f)),p=projectRecognitionReport(s)
+    expect(s.metrics).toMatchObject({hitRate:.8,falseAlarmRate:.25,correctedRecognitionRate:.55,completeTargetPairs:20,targetHits:16,targetFalseAlarms:5})
+    expect(p).toMatchObject({state:'interpretable',denominator:20,hitRate:.8,falseAlarmRate:.25,correctedRecognitionRate:.55,logo:'EDUK12.TOP'})
+  })
+  it('defaults complete records to limited until an explicit bound research review; projection hides performance',()=>{
+    const f=freeze(),s=scoreRecognition(f,answers(f,16,5)),p=projectRecognitionReport(s)
+    expect(s.metrics.hitRate).toBe(.8);expect(p.state).toBe('limited')
+    expect([p.hitRate,p.falseAlarmRate,p.correctedRecognitionRate,p.denominator,p.targetHits,p.targetFalseAlarms]).toEqual(Array(6).fill(null))
+    expect(p.canGenerateTakeHomeImage).toBe(false)
+  })
+  it('keeps negative CRR and permits normal no-response as valid evidence',()=>{
+    const f=freeze(),s=scoreRecognition(f,answers(f,6,10),review(f))
+    expect(s.metrics.correctedRecognitionRate).toBeCloseTo(-.2)
+    expect(projectRecognitionReport(s).correctedRecognitionRate).toBeCloseTo(-.2)
+    const noResponse=scoreRecognition(f,raw(f),review(f))
+    expect(noResponse.quality.state).toBe('interpretable');expect(noResponse.metrics.hitRate).toBe(0)
+  })
+  it('never adds filler false alarms or vigilance hits into target HR/FAR',()=>{
+    const f=freeze(),r=raw(f)
+    for(const p of f.manifest.formal)if(p.kind==='filler-first'||p.kind==='vigilance-repeat')r.events.push(event(r.records[p.index].imageOnsetMs!+100,'aux-'+p.index))
+    const s=scoreRecognition(f,r,review(f))
+    expect(s.metrics).toMatchObject({hitRate:0,falseAlarmRate:0,completeTargetPairs:20,validFillerFirst:54,fillerFalseAlarmRate:1,validVigilancePairs:6,vigilanceMissRate:0})
+  })
+  it('shares the same eligible target pair set when either member fails, never substitutes filler denominator',()=>{
+    const f=freeze(),r=answers(f,16,5),first=f.manifest.targetPairs[0].firstIndex
+    r.records[first].status='timeout'
+    const s=scoreRecognition(f,r,review(f))
+    expect(s.metrics.completeTargetPairs).toBe(19);expect(s.metrics.hitRate).toBe(15/19);expect(s.metrics.falseAlarmRate).toBe(4/19)
+    expect(projectRecognitionReport(s).hitRate).toBeNull()
+  })
+  it('empty and insufficient streams retain null and invalid/limited states',()=>{
+    const f=freeze(),empty=raw(f);empty.records=[];empty.termination='aborted'
+    const s=scoreRecognition(f,empty)
+    expect(s.quality.state).toBe('invalid');expect(s.metrics.hitRate).toBeNull();expect(s.metrics.vigilanceMissRate).toBeNull()
+    const partial=raw(f);partial.records=partial.records.slice(0,90);partial.termination='aborted'
+    const part=scoreRecognition(f,partial,review(f));expect(part.quality.state).toBe('limited');expect(projectRecognitionReport(part).correctedRecognitionRate).toBeNull()
+  })
+  it('assigns image/ISI by half-open boundaries, counting first seen once',()=>{
+    const f=freeze(),r=raw(f),a=r.records[0],b=r.records[1]
+    r.events=[event(a.imageOffsetMs!,'on-isi'),event(a.imageOffsetMs!+1,'extra'),event(a.windowEndMs!,'next-onset')]
+    const s=scoreRecognition(f,r)
+    expect(s.audit.firstResponses).toEqual([{index:0,eventId:'on-isi',rtMs:750,phase:'isi'},
+      {index:1,eventId:'next-onset',rtMs:0,phase:'image'}])
+    expect(b.imageOnsetMs).toBe(a.windowEndMs);expect(s.audit.extraSeen).toBe(1)
+  })
+  it('retains premature/after-window seen as audit and blocks descriptive release',()=>{
+    const f=freeze(),r=raw(f);r.events=[event(99,'early'),event(r.records.at(-1)!.windowEndMs!,'late')]
+    const s=scoreRecognition(f,r,review(f));expect(s.audit.prematureSeen).toBe(1);expect(s.audit.outsideSeen).toBe(1)
+    expect(s.quality.state).toBe('limited');expect(projectRecognitionReport(s).hitRate).toBeNull()
+  })
+  it('does not count held repeats, unrelated keys or other actions as seen',()=>{
+    const f=freeze(),r=raw(f),at=r.records[0].imageOnsetMs!+1
+    r.events=[{...event(at,'held','keyboard'),isRepeat:true},{...event(at+1,'wrong','keyboard'),key:'x'},
+      {...event(at+2,'other'),action:'other'},event(at+3,'real','keyboard')]
+    const s=scoreRecognition(f,r);expect(s.audit.ignoredEvents).toBe(3);expect(s.audit.firstResponses[0].eventId).toBe('real')
+  })
+  it('load failure without timestamps and interrupted exposure exclude pairs, not ordinary missed responses',()=>{
+    const f=freeze(),r=raw(f),i=f.manifest.targetPairs[0].firstIndex
+    r.records[i]={...r.records[i],status:'load-failure',imageOnsetMs:null,imageOffsetMs:null,windowEndMs:null}
+    const j=f.manifest.targetPairs[1].repeatIndex;r.records[j].interruptions=[{type:'blur',atMs:r.records[j].imageOnsetMs!+1}]
+    const s=scoreRecognition(f,r,review(f));expect(s.metrics.completeTargetPairs).toBe(18);expect(s.quality.state).toBe('limited')
+  })
+  it.each(['duplicate-event','event-order','wrong-asset','wrong-kind','missing-index','overlap','gap','bad-clock','incomplete-clock','wrong-hash','practice-phase','nonfinite','extra-raw','wrong-review'])('rejects %s raw contract',(problem)=>{
+    const f=freeze(),r:any=raw(f),a=r.records[0];let q:any=review(f)
+    if(problem==='duplicate-event')r.events=[event(101,'dup'),event(102,'dup')]
+    if(problem==='event-order')r.events=[event(102,'a'),event(101,'b')]
+    if(problem==='wrong-asset')a.assetId='wrong'
+    if(problem==='wrong-kind')a.kind=a.kind==='target-first'?'filler-first':'target-first'
+    if(problem==='missing-index')r.records.splice(0,1)
+    if(problem==='overlap')r.records[1].imageOnsetMs=a.windowEndMs-1
+    if(problem==='gap')r.records[1].imageOnsetMs=a.windowEndMs+1
+    if(problem==='bad-clock')a.imageOffsetMs=a.imageOnsetMs
+    if(problem==='incomplete-clock')a.imageOffsetMs=null
+    if(problem==='wrong-hash')r.snapshotHash='0'.repeat(64)
+    if(problem==='practice-phase')r.phase='practice'
+    if(problem==='nonfinite')a.imageOnsetMs=Infinity
+    if(problem==='extra-raw')r.score=0
+    if(problem==='wrong-review')q.snapshotHash='0'.repeat(64)
+    expect(()=>scoreRecognition(f,r,q)).toThrow()
+  })
+  it('hides forged report rates and altered review binding',()=>{
+    const f=freeze(),s=scoreRecognition(f,answers(f,16,5),review(f)),bad=clone(s)
+    bad.metrics.hitRate=.9
+    expect(projectRecognitionReport(bad).hitRate).toBeNull()
+    const other=clone(s);other.quality.review!.snapshotHash='0'.repeat(64)
+    expect(projectRecognitionReport(other).canGenerateTakeHomeImage).toBe(false)
+  })
+})
