@@ -1,3 +1,4 @@
+import {assertLibraryUseGrantCurrent} from '../../modules/scale-library-governance/usage'
 import { readFileSync } from 'node:fs'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { describe, expect, it, vi } from 'vitest'
@@ -87,4 +88,44 @@ describe.skipIf(!url)('content grant UTC storage contract on real PostgreSQL', (
       }, { isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted, timeout: 30_000 })).rejects.toBe(rollback)
     } finally { state.tx = null; await db.$disconnect() }
   }, 40_000)
+})
+
+
+describe.skipIf(!url)('shared library original delegation UTC admission',()=>{
+ it.each(['UTC','Asia/Tokyo','America/Los_Angeles'])('shared library delegated admission: %s',async zone=>{
+  const u=new URL(url!);if(process.env.NODE_ENV!=='test'||!['localhost','127.0.0.1'].includes(u.hostname)||u.port!=='55439'||!/^\/pr356_utc_test_[a-f0-9]{10}$/.test(u.pathname))throw new Error('Explicit isolated UTC test DB required')
+  const db=new PrismaClient({datasources:{db:{url}}}),rollback=new Error('ROLLBACK_UTC_LIBRARY_ONLY')
+  try{
+   await expect(db.$transaction(async tx=>{
+    await tx.$queryRaw`SELECT set_config('TimeZone',${zone},true)`
+    const tables=[
+     'CREATE TEMP TABLE content_capability_grants(id text PRIMARY KEY,ancestry text[],revoked_at timestamp(3),valid_from timestamp(3),expires_at timestamp(3)) ON COMMIT DROP',
+     'CREATE TEMP TABLE scale_library_use_grants(id text PRIMARY KEY,entry_id text,user_id text,product text,scope_kind text,organization_id text,status text,authority_grant_id text,survey_tool_grant_id text) ON COMMIT DROP',
+     'CREATE TEMP TABLE scale_library_entries(id text PRIMARY KEY,release_id text,status text) ON COMMIT DROP',
+     'CREATE TEMP TABLE measurement_content_releases(id text PRIMARY KEY,content_hash text,provenance jsonb,source_release_id text) ON COMMIT DROP',
+     'CREATE TEMP TABLE scale_library_emergency_stops(target_kind text,target_id text) ON COMMIT DROP',
+     'CREATE TEMP TABLE survey_tool_policies(product text,resource_key text,fingerprint text,decision text,paused boolean,version int,reason text) ON COMMIT DROP',
+     'CREATE TEMP TABLE survey_tool_grants(id text PRIMARY KEY,status text) ON COMMIT DROP',
+    ];for(const statement of tables)await tx.$executeRawUnsafe(statement)
+    await tx.$executeRaw`INSERT INTO content_capability_grants VALUES ('root',ARRAY['ancestor'],NULL,(clock_timestamp() AT TIME ZONE 'UTC')-interval '1 minute',(clock_timestamp() AT TIME ZONE 'UTC')+interval '1 minute'),('ancestor',ARRAY[]::text[],NULL,(clock_timestamp() AT TIME ZONE 'UTC')-interval '1 minute',(clock_timestamp() AT TIME ZONE 'UTC')+interval '1 minute')`
+    await tx.$executeRaw`INSERT INTO scale_library_use_grants VALUES ('use','entry','recipient','SURVEY','USER',NULL,'ACTIVE','root','survey-use')`
+    await tx.$executeRaw`INSERT INTO scale_library_entries VALUES ('entry','release','ACTIVE')`
+    await tx.$executeRaw`INSERT INTO measurement_content_releases VALUES ('release','hash','{}',NULL)`
+    await tx.$executeRaw`INSERT INTO survey_tool_policies VALUES ('SURVEY','release:release','hash','APPROVED',false,1,'Synthetic UTC test')`
+    await tx.$executeRaw`INSERT INTO survey_tool_grants VALUES ('survey-use','ACTIVE')`
+    const admit=()=>assertLibraryUseGrantCurrent(tx,{entryId:'entry',userId:'recipient',product:'SURVEY'})
+    await expect(admit()).resolves.toMatchObject({id:'use'})
+    // The UTC-stored window is valid in all three session zones. Future,
+    // exclusive expiry, and ancestor revocation remain effective in each zone.
+    await tx.$executeRaw`UPDATE content_capability_grants SET valid_from=(clock_timestamp() AT TIME ZONE 'UTC')+interval '1 minute' WHERE id='root'`
+    await expect(admit()).rejects.toThrow('尚未生效或到期')
+    await tx.$executeRaw`UPDATE content_capability_grants SET valid_from=(clock_timestamp() AT TIME ZONE 'UTC')-interval '1 minute',expires_at=(clock_timestamp() AT TIME ZONE 'UTC') WHERE id='root'`
+    await expect(admit()).rejects.toThrow('尚未生效或到期')
+    await tx.$executeRaw`UPDATE content_capability_grants SET expires_at=(clock_timestamp() AT TIME ZONE 'UTC')+interval '1 minute' WHERE id='root'`
+    await tx.$executeRaw`UPDATE content_capability_grants SET revoked_at=(clock_timestamp() AT TIME ZONE 'UTC') WHERE id='ancestor'`
+    await expect(admit()).rejects.toThrow('已撤销')
+    throw rollback
+   },{timeout:15000})).rejects.toBe(rollback)
+  }finally{await db.$disconnect()}
+ },20000)
 })
