@@ -1,0 +1,380 @@
+{
+  "schemaVersion": 2,
+  "instrument": {
+    "scaleId": "synthetic-ffmq15-revision",
+    "code": "ffmq15_zh_cn_research",
+    "name": "正念五个侧面问卷（FFMQ-15，中文工作稿）",
+    "instrumentVersion": "1.0.1"
+  },
+  "method": {
+    "scaleId": "synthetic-ffmq15-revision",
+    "instrumentVersion": "1.0.1",
+    "scoringVersion": "1.0.1",
+    "reportVersion": "1.0.0",
+    "definitionHash": "631c16ac07251c04743cac1437836b90b750f3a7aba6adcd1291094feeb5ac0c",
+    "referenceVersions": [],
+    "assessmentContext": null,
+    "reportAudience": "student",
+    "localizationVersion": "1.0.0"
+  },
+  "quality": {
+    "status": "interpretable",
+    "flags": []
+  },
+  "itemScores": [
+    {
+      "itemCode": "FFMQ15_01",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "FFMQ15_02",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "FFMQ15_03",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "FFMQ15_04",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 2
+    },
+    {
+      "itemCode": "FFMQ15_05",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    },
+    {
+      "itemCode": "FFMQ15_06",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "FFMQ15_07",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 4
+    },
+    {
+      "itemCode": "FFMQ15_08",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "FFMQ15_09",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 2
+    },
+    {
+      "itemCode": "FFMQ15_10",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    },
+    {
+      "itemCode": "FFMQ15_11",
+      "responseValue": "1",
+      "baseScore": 1,
+      "score": 1
+    },
+    {
+      "itemCode": "FFMQ15_12",
+      "responseValue": "2",
+      "baseScore": 2,
+      "score": 2
+    },
+    {
+      "itemCode": "FFMQ15_13",
+      "responseValue": "3",
+      "baseScore": 3,
+      "score": 3
+    },
+    {
+      "itemCode": "FFMQ15_14",
+      "responseValue": "4",
+      "baseScore": 4,
+      "score": 2
+    },
+    {
+      "itemCode": "FFMQ15_15",
+      "responseValue": "5",
+      "baseScore": 5,
+      "score": 5
+    }
+  ],
+  "scores": [
+    {
+      "key": "observe",
+      "type": "dimension",
+      "label": "留意身边和身体的感觉",
+      "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 3,
+      "range": {
+        "min": 3,
+        "max": 15
+      },
+      "expectedItems": [
+        "FFMQ15_01",
+        "FFMQ15_06",
+        "FFMQ15_11"
+      ],
+      "answeredItems": [
+        "FFMQ15_01",
+        "FFMQ15_06",
+        "FFMQ15_11"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "describe",
+      "type": "dimension",
+      "label": "把感受说出来",
+      "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 8,
+      "range": {
+        "min": 3,
+        "max": 15
+      },
+      "expectedItems": [
+        "FFMQ15_02",
+        "FFMQ15_07",
+        "FFMQ15_12"
+      ],
+      "answeredItems": [
+        "FFMQ15_02",
+        "FFMQ15_07",
+        "FFMQ15_12"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "act_aware",
+      "type": "dimension",
+      "label": "留意正在做的事",
+      "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 9,
+      "range": {
+        "min": 3,
+        "max": 15
+      },
+      "expectedItems": [
+        "FFMQ15_03",
+        "FFMQ15_08",
+        "FFMQ15_13"
+      ],
+      "answeredItems": [
+        "FFMQ15_03",
+        "FFMQ15_08",
+        "FFMQ15_13"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "nonjudge",
+      "type": "dimension",
+      "label": "少一点急着评价自己",
+      "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 6,
+      "range": {
+        "min": 3,
+        "max": 15
+      },
+      "expectedItems": [
+        "FFMQ15_04",
+        "FFMQ15_09",
+        "FFMQ15_14"
+      ],
+      "answeredItems": [
+        "FFMQ15_04",
+        "FFMQ15_09",
+        "FFMQ15_14"
+      ],
+      "status": "calculated",
+      "prorated": false
+    },
+    {
+      "key": "nonreact",
+      "type": "dimension",
+      "label": "给想法留一点空间",
+      "description": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "direction": "higher_is_more",
+      "canonical": true,
+      "displayPrecision": 0,
+      "value": 15,
+      "range": {
+        "min": 3,
+        "max": 15
+      },
+      "expectedItems": [
+        "FFMQ15_05",
+        "FFMQ15_10",
+        "FFMQ15_15"
+      ],
+      "answeredItems": [
+        "FFMQ15_05",
+        "FFMQ15_10",
+        "FFMQ15_15"
+      ],
+      "status": "calculated",
+      "prorated": false
+    }
+  ],
+  "references": [],
+  "interpretations": [
+    {
+      "scoreKey": "observe",
+      "headline": "留意身边和身体的感觉",
+      "label": null,
+      "interpretation": "这部分关注你平时会不会留意身体感觉、声音或身边的小变化。有人很容易注意到细节，也有人做事时更专注于眼前任务。注意到更多，并不自动表示更放松或更会照顾自己；同样的感觉，在不同处境里也可能有不同意义。可以挑一个中性的声音或触感，短暂留意后，再把注意力带回正在做的事。如果这样做让你不舒服，可以停下来，换一种适合自己的方式。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近你注意到的一个身体感觉或周围变化，是怎样影响你的？"
+        },
+        {
+          "category": "strategy",
+          "text": "选一个中性的声音或触感短暂留意，再回到手头的事；不舒服时可以停止。"
+        }
+      ],
+      "limitations": [
+        "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+        "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+        "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+        "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+        "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "describe",
+      "headline": "把感受说出来",
+      "label": null,
+      "interpretation": "有时候我们知道自己不舒服，却一时说不出是委屈、烦躁还是担心。这部分关注你能否用语言描述自己的体验，不是在考表达水平。感受本来就可能混在一起，也不需要一次说得很准确。你可以先用一个大致的词，再补一句“它让我想做什么”或“身体哪里有感觉”。慢慢找词语，有时能帮助自己和愿意倾听的人更清楚地理解当下。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "如果只选一个词，你会怎样形容此刻的感受？"
+        },
+        {
+          "category": "strategy",
+          "text": "先用一个大致的感受词，再补一句“我现在需要什么”。"
+        }
+      ],
+      "limitations": [
+        "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+        "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+        "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+        "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+        "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "act_aware",
+      "headline": "留意正在做的事",
+      "label": null,
+      "interpretation": "忙碌时，我们可能一边做事，一边想着别的事情，回过神来才发现刚才像在自动运行。这部分关注你是否留意正在做的活动，分心并不等于做事不认真，更不能用来判断一个人的价值。可以选一件熟悉的小事，例如倒水或整理桌面，短暂看清自己正在做哪一步。不需要逼自己一直专注；发现走神时，再温和地回到手头的事就可以。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "今天哪件小事最容易让你一边做、一边想别的事情？"
+        },
+        {
+          "category": "strategy",
+          "text": "做一件熟悉的小事时，只留意当前这一步，发现走神再回来。"
+        }
+      ],
+      "limitations": [
+        "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+        "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+        "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+        "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+        "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "nonjudge",
+      "headline": "少一点急着评价自己",
+      "label": null,
+      "interpretation": "有些时候，难受之后又会冒出一句“我怎么能这样想”或“我不该有这种感觉”。这部分关注你会不会急着评价自己的内心，不是要求你赞同所有想法，也不意味着任何行为都不用负责。出现不喜欢的念头，不等于你这个人不好。可以试着把“我不该这样”换成“我现在确实有这样的感受”，再决定怎样行动。允许看见感受，和选择下一步，是可以分开的。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "当你不喜欢自己的某种感受时，会怎样对自己说话？"
+        },
+        {
+          "category": "strategy",
+          "text": "试着说“我现在有这样的感受”，然后再选择一个合适的小行动。"
+        }
+      ],
+      "limitations": [
+        "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+        "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+        "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+        "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+        "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+      ],
+      "referenceVersion": null
+    },
+    {
+      "scoreKey": "nonreact",
+      "headline": "给想法留一点空间",
+      "label": null,
+      "interpretation": "一个令人苦恼的念头出现时，我们有时会马上跟着它走，有时也能稍微停一下，知道“这是一个正在出现的想法”。这部分关注你怎样和想法、画面相处，不是要求把它们赶走或假装没有。可以把念头想成暂时经过的消息：先看见，再决定是否需要回应。若某个想法持续让你很困扰，也可以向信任的人寻求支持，不必独自把一切处理好。",
+      "guidance": [
+        {
+          "category": "reflection",
+          "text": "最近有什么念头让你很快就跟着它行动了？"
+        },
+        {
+          "category": "strategy",
+          "text": "先给自己一个短暂停顿，再决定要不要回应这个念头。"
+        }
+      ],
+      "limitations": [
+        "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+        "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+        "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+        "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+        "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。"
+      ],
+      "referenceVersion": null
+    }
+  ],
+  "caveats": [
+    "这份结果整理的是你对自己体验和做法的描述，不能代替对实际处境的了解。",
+    "不能仅凭回答判断疾病、人格、能力或一个人的价值。",
+    "中文题目为平台工作译稿，没有可直接拿来给中国人群排高低的依据。",
+    "不同时间、不同处境的回答可能变化；不能只凭分数变化断定某种练习或方法有效。",
+    "没有回答的题目不会算成最低分；信息不足时，本次报告不作解释。",
+    "未提供群体参考。"
+  ],
+  "disclaimer": "供成年人回顾个人体验和习惯，不是考试，也不能用于诊断或证明干预效果。中文为平台工作译稿。"
+}

@@ -1,0 +1,209 @@
+{
+  "identity": {
+    "instrumentKey": "ffmq15_zh_cn_research",
+    "instrumentVersion": "1.0.1"
+  },
+  "sourceSha256": "3faa7bab6250e6aaf1e6ab109416a8f6f2a10f4016e7e3141a65904787267962",
+  "scope": "Narrow scoring-description metadata correction; numeric algorithms, items, translation, sources, report and parameter policy reused",
+  "versions": {
+    "instrumentVersion": "1.0.1",
+    "scoringVersion": "1.0.1",
+    "reportVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "catalogManifestVersion": 1
+  },
+  "sourceJsonpathDiff": [
+    {
+      "path": "$.identity.instrumentVersion",
+      "before": "1.0.0",
+      "after": "1.0.1"
+    },
+    {
+      "path": "$.applicability.policyVersion",
+      "before": "ffmq15_zh_cn_research-1.0.0",
+      "after": "ffmq15_zh_cn_research-1.0.1"
+    },
+    {
+      "path": "$.disclosure.policyVersion",
+      "before": "ffmq15_zh_cn_research-1.0.0",
+      "after": "ffmq15_zh_cn_research-1.0.1"
+    },
+    {
+      "path": "$.usageRequirements.policyVersion",
+      "before": "ffmq15_zh_cn_research-1.0.0",
+      "after": "ffmq15_zh_cn_research-1.0.1"
+    },
+    {
+      "path": "$.executable.definition.scoring.scoringVersion",
+      "before": "1.0.0",
+      "after": "1.0.1"
+    },
+    {
+      "path": "$.executable.definition.scoring.scores[0].description",
+      "before": "三题反向后等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "after": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。"
+    },
+    {
+      "path": "$.executable.definition.scoring.scores[1].description",
+      "before": "三题反向后等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "after": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。"
+    },
+    {
+      "path": "$.executable.definition.scoring.scores[2].description",
+      "before": "三题反向后等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "after": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。"
+    },
+    {
+      "path": "$.executable.definition.scoring.scores[3].description",
+      "before": "三题反向后等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "after": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。"
+    },
+    {
+      "path": "$.executable.definition.scoring.scores[4].description",
+      "before": "三题反向后等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。",
+      "after": "按反向题规则转换后，三题等权求和3–15，更多表示该侧面自报更符合，不能推断疗效。"
+    }
+  ],
+  "immutablePreviousFiles": {
+    "count": 14,
+    "allCurrentHashesMatch": true,
+    "hashesRelativeToBackend": {
+      "src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md": "56df40b1f2f12630a11ed6169c1731d97dfa82a09d31d30dc0bf380ef3b805b5",
+      "src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/instrument.ts": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "src/modules/scale/instruments/ffmq15_zh_cn_research/1.0.0/source.json": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/validation.md": "4ac3788d53feac46bb192396f34f919b16ea385108e0da14271fd1c629265018",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/instruction.for-pr356.json": "52b2ebc57765d94173931fbb2f425f8fb9e9dd69b142f709e06378704b46cb25",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/report-example.md": "c7338e8fa01eb9533c347ec45e2df1d578eb2ddabccc7bc8d23afbf881233e55",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/bilingual-content.json": "8fdcd7b30b62143495f165c049bda8c2fef44c4978c83d486b081a57ef6a111a",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/README.md": "ca16c833c77ebe0b7e035010d5a933dd274e44f2b96abaeb444f9bbe9b975cdc",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/take-home-message.md": "64c30f7ef2c11f1f9262b7d16d917324932af34c64f2b33b84b7525979340222",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/references.md": "9985e8cc66312c4d8626a9e1c14f049634df748bf37d2c7585fb002076b905d1",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/administration.md": "36ef45ca5e43b9a7e14b025558f4729b4e2d571940f58f45bf34a8156ad7ecfa",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/report-result.synthetic.json": "1bd27f1b1d1b3959c603881f81e79595b09b9019ccd100ae07326ca2ca1acd97",
+      "../../docs/scale-instruments/research-drafts/ffmq15/1.0.0/scoring-and-parameters.md": "0adb806d73ee78547c3d3f7db12ee9ded01dcdddc5f98cb1148cb67f720b9747",
+      "src/__tests__/scale/instruments/ffmq15_zh_cn_research.test.ts": "e22c491d3db50e66c2e82829fb109d84a72ddce7b19b21dcd07b791114019384"
+    }
+  },
+  "verification": {
+    "validationSubprocessExecutions": 3,
+    "failedValidationSubprocesses": 0,
+    "unit": {
+      "executions": 1,
+      "totalTests": 5,
+      "passed": 5,
+      "failed": 0,
+      "reporterSha256": "f699b7861532eac0fd068fec058edea7bb12d7a32dde7fd47038b88c235edf89",
+      "retainedGoldenVectorsComparedWithinSingleContract": 12,
+      "oldTestSuiteExecuted": false
+    },
+    "strictTypes": {
+      "executions": 1,
+      "rootFiles": [
+        "src/__tests__/scale/instruments/ffmq15_zh_cn_research_revision.test.ts"
+      ],
+      "exitCode": 0
+    },
+    "actualMixedReport": {
+      "executions": 1,
+      "exitCode": 0,
+      "inputVector": "mixed_independent retained from 1.0.0",
+      "scores": {
+        "observe": 3,
+        "describe": 8,
+        "act_aware": 9,
+        "nonjudge": 6,
+        "nonreact": 15
+      },
+      "method": {
+        "scaleId": "synthetic-ffmq15-revision",
+        "instrumentVersion": "1.0.1",
+        "scoringVersion": "1.0.1",
+        "reportVersion": "1.0.0",
+        "definitionHash": "631c16ac07251c04743cac1437836b90b750f3a7aba6adcd1291094feeb5ac0c",
+        "referenceVersions": [],
+        "assessmentContext": null,
+        "reportAudience": "student",
+        "localizationVersion": "1.0.0"
+      },
+      "reportResultSha256": "6029f412f8106187393d156ce7f4e2004255f73d355edff588f3783df954b0a2"
+    },
+    "originalPreparationFailure": {
+      "executions": 1,
+      "exitCode": 1,
+      "stage": "old file hash preparation",
+      "cause": "Path.relative_to cannot represent docs outside backend; changed to os.path.relpath",
+      "occurredBeforeSourceAndTestWrites": true,
+      "noTestOrTypeAssertionsExecuted": true,
+      "retainedRecord": "setup-failure.json"
+    },
+    "executionReceipts": {
+      "mixed-report": {
+        "command": [
+          "node",
+          "--import",
+          "tsx",
+          "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/build-mixed-report.ts"
+        ],
+        "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+        "startedAt": "2026-10-26T07:01:15.578972+00:00",
+        "completedAt": "2026-10-26T07:01:15.930502+00:00",
+        "exitCode": 0,
+        "directInputManifest": "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/direct-inputs.pre-report.json",
+        "directInputManifestSha256": "049a625b8053765641d4689f8a708c9d477eecdc721d61b641c49827f19ff24e",
+        "directInputCount": 56
+      },
+      "revision-unit": {
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/__tests__/scale/instruments/ffmq15_zh_cn_research_revision.test.ts",
+          "--reporter=json",
+          "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/revision-unit.report.json"
+        ],
+        "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+        "startedAt": "2026-10-26T07:01:15.938351+00:00",
+        "completedAt": "2026-10-26T07:01:16.892138+00:00",
+        "exitCode": 0,
+        "directInputManifest": "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/direct-inputs.pre-unit.json",
+        "directInputManifestSha256": "a3c204efdb04662c4bd52eb860031806f1d13553251d058750ca73aa9f402e10",
+        "directInputCount": 57
+      },
+      "revision-types": {
+        "command": [
+          "node",
+          "node_modules/typescript/bin/tsc",
+          "--project",
+          "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/tsconfig.revision.json",
+          "--pretty",
+          "false"
+        ],
+        "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+        "startedAt": "2026-10-26T07:01:16.892259+00:00",
+        "completedAt": "2026-10-26T07:01:18.597875+00:00",
+        "exitCode": 0,
+        "directInputManifest": "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1/direct-inputs.pre-unit.json",
+        "directInputManifestSha256": "a3c204efdb04662c4bd52eb860031806f1d13553251d058750ca73aa9f402e10",
+        "directInputCount": 57
+      }
+    }
+  },
+  "notRun": [
+    "old ffmq15 full test suite",
+    "new scientific source research",
+    "registry generation or integration",
+    "database",
+    "API/browser",
+    "Git commit/push/PR",
+    "CI",
+    "deployment"
+  ],
+  "limitations": [
+    "Human translation/expert review and local validation states retained unchanged",
+    "Report source and report version unchanged; no new clinical or norm claims",
+    "Parameter none has no new independent runtime version field",
+    "Existing independent instruction remains PREPARED; no runtime instruction change"
+  ],
+  "privateEvidenceDirectory": "/workspace/eduk12-scale-evidence/20261026-wave7/ffmq15_1_0_1",
+  "completedAt": "2026-10-26T07:02:20.327519+00:00"
+}
