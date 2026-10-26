@@ -15,7 +15,8 @@ export interface MotTaskProps {
   draft: MotDraftPort
   /** Persist core through the platform. false/rejection leaves an explicit retry, never repeats exposure. */
   onTrialComplete: (core:MotTrial)=>Promise<void|boolean>
-  /** Platform uploads raw frames to private COS and verifies its version before the final core is submitted. */
+  /** Seal existing durable raw locally before FINAL. This acknowledgement is not a COS upload receipt. */
+  onTaskComplete?: ()=>Promise<{coreSaved:true}>
   prepareFinalArchive: (records:{formal:readonly MotDraftRecord[];practice:readonly MotDraftRecord[]})=>Promise<void>
 }
 export function MotTask(props:MotTaskProps){
@@ -32,8 +33,8 @@ export function MotTask(props:MotTaskProps){
 /** Same identity rerenders keep initial ports/callbacks. A genuine context or language switch destroys the old generation. */
 function MotTaskGeneration(incoming:MotTaskProps){
   const [initial]=useState(()=>({config:structuredClone(incoming.config),randomSeed:incoming.randomSeed,language:incoming.language??'zh',
-    draft:freezeMotDraftPort(incoming.draft),onTrialComplete:incoming.onTrialComplete,prepareFinalArchive:incoming.prepareFinalArchive}))
-  const {config,randomSeed,language,draft,onTrialComplete,prepareFinalArchive}=initial
+    draft:freezeMotDraftPort(incoming.draft),onTrialComplete:incoming.onTrialComplete,prepareFinalArchive:incoming.prepareFinalArchive,onTaskComplete:incoming.onTaskComplete}))
+  const {config,randomSeed,language,draft,onTrialComplete,prepareFinalArchive,onTaskComplete}=initial
   const trialIndex=incoming.trialIndex
   const owner=useRef<object>({}),active=useRef(true),slot=useRef<MotRecoverySlot|null>(null)
   const capturePhase=useRef<MotRecordPhase>('practice')
@@ -91,12 +92,23 @@ function MotTaskGeneration(incoming:MotTaskProps){
       if(accepted===false)throw new Error('Core persistence has not been confirmed')
       releaseMotRecovery(retained);slot.current=null
       retry.current=null
-      if(record.core.trialIndex===config.totalTrials-1){setView('saving');return}
+      if(record.core.trialIndex===config.totalTrials-1){await finalizeCore();return}
       const boundary=(record.core.trialIndex+1)%(config.repetitionsPerSpeedPerBlock*3)===0
       setView(boundary?'break':'ready')
     }catch{
       if(!active.current)return
       retry.current=()=>persist(record);setError(en?'Saving is not confirmed. Your local record is retained; retry saving without repeating the trial.':'保存尚未确认。本机记录已保留，请重试保存，无需重复作答。');setView('error')
+    }
+  }
+  /** FINAL retries never re-append the last trial or repeat an exposure. */
+  async function finalizeCore(){
+    if(!onTaskComplete){setView('saving');return}
+    setView('saving')
+    try{const receipt=await onTaskComplete();if(!active.current)return
+      if(receipt?.coreSaved!==true)throw Error('Final submission is not confirmed')
+    }catch{if(!active.current)return
+      retry.current=finalizeCore
+      setError(en?'Your answers are retained. Retry submitting without repeating the task.':'作答记录已保留，请重试提交，无需重复作答。');setView('error')
     }
   }
   function persistPractice(record:MotDraftRecord):Promise<void>{

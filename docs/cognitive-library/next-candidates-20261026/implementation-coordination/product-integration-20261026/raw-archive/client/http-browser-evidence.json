@@ -1,0 +1,163 @@
+{
+  "status": "CLOUD_HTTP_BROWSER_SLICE_PASS_NOT_EXTERNAL_COS_OR_DEPLOYMENT",
+  "sealedAt": "2026-10-26T11:14:19.044627+00:00",
+  "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/native-mot-client-review.cjs",
+  "exitCode": 0,
+  "actualComponents": [
+    "CognitiveRunner default entry and readiness",
+    "NativeMotRunner + existing MotCalibration/MotTask",
+    "CognitiveResult + CognitiveRawArchiveNotice",
+    "existing authenticated apiClient",
+    "real cognitiveRouter/authentication/START/FINAL/report and raw-archive router/service/isolated PostgreSQL"
+  ],
+  "fixtures": [
+    "BrowserRouter/domain-only entry: full App/StudentProtectedRoute shell omitted",
+    "Software clock and self-reported calibration fixture, not real device physical timing",
+    "COS uploader is isolated fake; no external object written",
+    "HTTP harness does not install full App CSRF middleware; existing apiClient /api/auth/csrf probes returned 404, preserved in raw trace."
+  ],
+  "scopeResults": {
+    "formalCount": 9,
+    "practiceCount": 2,
+    "FINALPosts": 1,
+    "rawArchivePosts": 2,
+    "rawRetainedOn503": true,
+    "genericDraftDeletedOnlyAfterConfirmedRetry": true,
+    "rawKeyboardInputsRecorded": true,
+    "reportQuality": "limited; speed8 one record excluded by existing scorer; not asserted all valid",
+    "report200PercentOverflow": {
+      "scroll": 820,
+      "client": 820
+    },
+    "browserPageErrors": []
+  },
+  "visualInspection": [
+    "390px pending archive/report screenshot inspected",
+    "820px confirmed archive/report screenshot inspected",
+    "200% report screenshot inspected; no horizontal overflow"
+  ],
+  "findingsForParent": [
+    "Generic report renders full long floating point 2.6666666666666665; future presentation-only rounding suggested, scorer/raw unchanged.",
+    "Only generic FINAL draft cleanup tested; existing MOT-specific durable raw store remains per prior protocol.",
+    "Raw API trace includes /src/api/client.ts source fetch due broad filter; no claim it is an API route."
+  ],
+  "artifacts": [
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/harness-source.cjs.txt",
+      "sha256": "a256c77b410b8f80f00ac4d95e27530236337fa3875d39b1ae68e10cb7715ad9",
+      "bytes": 10273
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/report-200-percent.png",
+      "sha256": "1f1c891db722477d20e0739151957dfa096bcc56b7853d5039356c9c6aa54a3b",
+      "bytes": 323026
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/report-archive-confirmed-390.png",
+      "sha256": "ed9740a95a6813164bbb6f74511fd72bf529396108614919aaf258b9a0208512",
+      "bytes": 125603
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/report-archive-confirmed-820.png",
+      "sha256": "b71cd2761de3bddf8cc8b59d91e2cb787b5c41b195c233d4fdf904a1cdde73ae",
+      "bytes": 129834
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/report-core-saved-archive-pending-390.png",
+      "sha256": "711130feed92b42f9294e479659e679357ce07b2aa257351019d912c02ffee72",
+      "bytes": 137843
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/implementation-coordination/product-integration-20261026/raw-archive/client/browser/review.json",
+      "sha256": "d1deec79c9075345159c74d3fa27b68fd290b99fcc72ad8120b3fd07b2696b48",
+      "bytes": 4409
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveRawArchiveNotice.tsx",
+      "sha256": "6950c8d0dc39f4b520ed53ec46b67bc10c8d3af845f5325a6bceb51fb6037323"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/api.ts",
+      "sha256": "dd155a58cbe283bde0cc75ce339cc3404b9791b7c2048f89e061f99b7f411550"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-api.test.ts",
+      "sha256": "d56f3733672d14d91bd3b6929ba377c2c01c19957a9d1a3703d1adff116470a9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-archive.test.ts",
+      "sha256": "c5dc086a38280300e50399a91664d62a9a7f29e1bf63695f37223839cc2c6c61"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/native-mot-session.test.tsx",
+      "sha256": "d88ec0277c40b8d4c80db2bc52ce3618672794ccabb287521306bc490226ab78"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/native-session-contract.ts",
+      "sha256": "bf950818fa33da56b1c9c73c90660a94dab3047d344d0014b3f60b709b6dfae1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/raw-archive.ts",
+      "sha256": "3541c05b1c10ff32826ea9248f9f60704f1784e5d6f29bc6da6cae2f76740e03"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/readiness.ts",
+      "sha256": "23b0523c2eb41657df36a663da6a6df9d981d0c1c9c2c2c1296956a705878ef2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/runner.state.ts",
+      "sha256": "a327def5d2845828defd37a7b5210f0d9b9f029107f443f2038c40d49afaa0ae"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/runner.types.ts",
+      "sha256": "3078ccd02febd16203205266b719d0d03a86e763725bf3ca6384dcc815be0889"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "33dc8a125d6d6fcaa9f209f5409f497852de86d6d9065ef131840809c4115199"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/native-runners.tsx",
+      "sha256": "fbf54d9f80149bbe92dc4fbbeac41a29ea18120ce9ca5eff8b70097923b97acf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx",
+      "sha256": "0abc48de57896fb4310c96e387fb63cd8facccc5dd8b827262ae66c04dd4a932"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx",
+      "sha256": "8f187353c41a9dd969b3429f5838d92b32cf2da833a48c6cc1524a2caa5202a3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/registry.ts",
+      "sha256": "cbcd64d98168a4428fe11fd6609dba39f5f6257f9028854ddb8bbfc1d81e3617"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "sha256": "c662727a6aeab049f751d37ea0d728332ec053bc8d4f791795146b79ab0ba3aa"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/NativeMotRunner.tsx",
+      "sha256": "17ec9da1e5ada6821c094ce4b039c677a5a6d806a49c20d2fff7188951d95e36"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/types.ts",
+      "sha256": "07e70b71fc4f479e89056ea5004cfd20006dda7d5dc5445536b193ca17014df7"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx",
+      "sha256": "9c1231e10cc008d3ef320968f1a567a458a23e9ffb7cc45ba0b5f0073ba3105f"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "1f0e27673d2142aebcc88c3c93b834e805bc23f108a3c2dc4f844f0482ac3ca6"
+    }
+  ],
+  "noNewUpstreamReuse": "No new upstream code/stimulus/font/dependency imported; uses existing project MOT literature-derived implementation and palette. No OMI/NC-SA images."
+}

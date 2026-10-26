@@ -1,3 +1,4 @@
+import {mutateCognitiveRawArchive,type CognitiveRawArchiveState,type CognitiveArchiveIdentity,type CognitiveArchiveMutation} from './cognitiveRawArchiveState'
 /**
  * Durable local state for final-only instrument attempts.
  *
@@ -70,6 +71,8 @@ export class FinalDraftExpiredError extends Error {
 }
 
 export interface FinalDraftMeta {
+  /** Optional native raw lifecycle; core completion must not delete an unconfirmed archive. */
+  cognitiveRawArchive?: CognitiveRawArchiveState
   draftKey: string
   instrument: FinalDraftInstrument
   attemptId: string
@@ -299,7 +302,7 @@ const hasTrainingRetention = (meta: FinalDraftMeta) => {
     && meta.draftKey === trainingCognitiveDraftKey(b)
 }
 const trainingExpired = (meta: FinalDraftMeta, now: number) => {
-  if (!hasTrainingRetention(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission) return false
+  if (!hasTrainingRetention(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission || (meta.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return false
   const b = meta.trainingRetention!
   return b.expiredAt === undefined && Number.isFinite(now) && now > 0
     && Number.isFinite(b.lastWriteAt) && b.lastWriteAt > 0 && b.lastWriteAt <= now
@@ -398,6 +401,7 @@ export interface FinalDraftStore {
   reopenRejectedForm(draftKey: string, rejection: RejectedFormSubmission): Promise<FinalDraftMeta | null>
   snapshot(draftKey: string): Promise<FinalDraftSnapshot | null>
   sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T): Promise<FinalDraftSealResult<T> | null>
+  mutateCognitiveArchive(draftKey:string,identity:CognitiveArchiveIdentity,mutation:CognitiveArchiveMutation):Promise<FinalDraftMeta>
   delete(draftKey: string): Promise<void>
 }
 
@@ -607,8 +611,17 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     return { meta: cloneValue(next), payload }
   }
 
+  async mutateCognitiveArchive(draftKey:string,identity:CognitiveArchiveIdentity,mutation:CognitiveArchiveMutation) {
+    const current=this.metas.get(draftKey)
+    if(!current)throw new FinalDraftStorageError('本地认知原件不存在')
+    assertNotExpired(current)
+    const next=mutateCognitiveRawArchive(current,identity,mutation)
+    this.metas.set(draftKey,cloneValue(next));return cloneValue(next)
+  }
+
   async delete(draftKey: string) {
-    if (this.metas.get(draftKey)?.trainingRetention?.expiredAt !== undefined) return
+    const existing=this.metas.get(draftKey)
+    if (existing?.trainingRetention?.expiredAt !== undefined || (existing?.cognitiveRawArchive && !existing.cognitiveRawArchive.archiveConfirmed)) return
     this.metas.delete(draftKey)
     for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
     for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
@@ -941,10 +954,20 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
+  async mutateCognitiveArchive(draftKey:string,identity:CognitiveArchiveIdentity,mutation:CognitiveArchiveMutation) {
+    return this.run<FinalDraftMeta>([META_STORE],'readwrite',async transaction=>{
+      const store=transaction.objectStore(META_STORE),current=await requestResult<FinalDraftMeta|undefined>(store.get(draftKey))
+      if(!current)throw new FinalDraftStorageError('本地认知原件不存在')
+      assertNotExpired(current)
+      const next=mutateCognitiveRawArchive(current,identity,mutation)
+      store.put(next);return next
+    })
+  }
+
   async delete(draftKey: string) {
     await this.run<void>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
-      if (meta?.trainingRetention?.expiredAt !== undefined) return
+      if (meta?.trainingRetention?.expiredAt !== undefined || (meta?.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return
       transaction.objectStore(META_STORE).delete(draftKey)
       // The index returns primary keys, not draftKey index values. Avoid cloning
       // potentially large answer/trial payloads solely to discard accepted drafts.

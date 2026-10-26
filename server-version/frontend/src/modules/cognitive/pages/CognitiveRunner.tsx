@@ -88,6 +88,8 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
   const navigate = learner.navigate
   const administrationProvenance = useAdministrationProvenance(state.session, state.status)
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
+  const [nativeSubmitting,setNativeSubmitting]=useState(false)
+  const [nativeSubmitError,setNativeSubmitError]=useState('')
   const [restarting, setRestarting] = useState(false)
   const [restartError, setRestartError] = useState<string | null>(null)
   const [instructionVideoReady, setInstructionVideoReady] = useState<Record<string, string>>({})
@@ -257,7 +259,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
     )
   }
 
-  if (state.status === 'COMPLETING') {
+  if (state.status === 'COMPLETING' && !state.session?.nativeTask) {
     return (
       <AssessmentShell
         title={title}
@@ -296,6 +298,16 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
         </AssessmentShell>
       )
     }
+
+    // All formal records can be submitted without mounting a task or exposing any image again.
+    if (state.session?.nativeTask && total > 0 && state.trialIndex === total) return <AssessmentShell title={title}>
+      <p>本设备已记录全部正式作答，可继续提交原记录，无需重复作答。</p>
+      <button type="button" className="btn-primary" disabled={nativeSubmitting} onClick={()=>{
+        setNativeSubmitting(true);setNativeSubmitError('')
+        void controller.nativeHost.complete().catch(e=>setNativeSubmitError(e instanceof Error?e.message:'提交尚未确认')).finally(()=>setNativeSubmitting(false))
+      }}>{nativeSubmitting?'正在确认提交…':'提交原作答记录'}</button>
+      {nativeSubmitError&&<p role="alert">{nativeSubmitError}</p>}
+    </AssessmentShell>
 
     const unsafeLocalResume = state.session?.deliveryMode === 'FINAL_ONLY'
       && state.trialIndex > 0
@@ -507,6 +519,14 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
       ? { kind: 'position', current: Math.min(state.trialIndex + 1, total), total, label: '试次进度' }
       : { kind: 'phase', phase: '任务进行中', detail: `已记录 ${state.trialIndex} 个试次；完成点由当前任务契约决定。`, label: '任务进度' }
 
+    // Native task owns its neutral stimulus surround; product-entry colours/progress do not enter it.
+    if (state.session.nativeTask) return <div data-cognitive-task-root="true">
+      <Runner taskContext={state.taskContext} trialIndex={state.trialIndex}
+        nativeHost={{...controller.nativeHost, complete:()=>controller.nativeHost.complete(administrationProvenance.snapshot() ?? undefined)}}
+        onTrialComplete={controller.appendTrial}/>
+      {state.error && <p role="status">{state.error.message}</p>}
+    </div>
+
     return (
       <AssessmentShell
         title={entry.name}
@@ -527,6 +547,7 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
             imageAssetUrls={imageState.urls}
             videoSources={videoState.sources}
             refreshVideoSource={videoState.refresh}
+            nativeHost={state.session.nativeTask ? controller.nativeHost : undefined}
             trialIndex={state.trialIndex}
             onTrialComplete={controller.appendTrial}
             onTaskComplete={taskCompletes ? completeWithProvenance : undefined}

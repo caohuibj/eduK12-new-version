@@ -205,7 +205,13 @@ const CognitiveAssignmentList: React.FC = () => {
             </label>
             <label className="text-sm text-gray-700">
               任务类型
-              <select className="mt-1 w-full border rounded px-3 py-2" value={form.configId} onChange={(e) => setForm({ ...form, configId: e.target.value, profile: 'standard' })}>
+              <select className="mt-1 w-full border rounded px-3 py-2" value={form.configId} onChange={(e) => {
+                const selected=configs.find(c=>c.id===e.target.value)
+                const task=tests.find(t=>t.testType===selected?.testType&&t.engineVersion===selected?.engineVersion&&t.scoringVersion===selected?.scoringVersion)
+                const available=task?.profiles.map(p=>p.profile)??[]
+                const profile=available.includes('standard')?'standard':available.includes('experience')?'experience':available[0]
+                setForm({...form,configId:e.target.value,profile:profile??'standard'})
+              }}>
                 <option value="">选择任务类型</option>
                 {configs.map((config) => (
                   <option key={config.id} value={config.id}>
