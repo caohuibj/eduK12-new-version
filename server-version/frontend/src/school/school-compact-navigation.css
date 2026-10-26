@@ -73,3 +73,18 @@
 .hs-app.hs-professional .hs-professional-class-scope .hs-workspace-context select{width:100%;max-width:none;min-width:0}
 .hs-app.hs-professional .hs-professional-class-scope .hs-context-security{min-height:32px;padding:0;border:0;align-self:center}
 .hs-app.hs-professional .hs-recovery-heading .hs-teacher-task-help-content{position:absolute;top:100%;right:0;left:auto;width:min(420px,calc(100vw - 64px));max-width:none;max-height:min(65vh,420px);overflow-y:auto;z-index:30}
+
+/* Wide screens put the three groups inside the brand/account banner. */
+@media(min-width:1101px){
+ .hs-app.hs-workspace.hs-professional .hs-header{grid-template-columns:auto minmax(0,1fr) auto}
+ .hs-app.hs-workspace.hs-professional .hs-header>nav.hs-account-actions{grid-column:3}
+ .hs-app.hs-professional .hs-professional-navigation{display:contents}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{grid-column:2;grid-row:1;justify-self:center;justify-content:center}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{grid-column:1/-1;grid-row:2;justify-self:stretch;padding:4px 0 0;border:0;border-top:1px solid var(--hs-border)}
+}
+/* Narrow screens keep groups and the current group's functions on separate rows. */
+@media(max-width:1100px){
+ .hs-app.hs-professional .hs-professional-navigation{row-gap:0}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-groups{width:100%;justify-content:flex-start}
+ .hs-app.hs-workspace.hs-professional .hs-header .hs-professional-navigation>nav.hs-professional-pages{flex-basis:100%;padding:0;border:0}
+}
