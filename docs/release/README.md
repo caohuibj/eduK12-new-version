@@ -1963,3 +1963,19 @@ candidate review. No other opt-in suites/types/build/browser/CI were executed;
 no Ready/merge/deploy/protection/credential action occurred. Detailed per-case
 mapping, portable pointers and remaining decisions are in
 [the activation record](../pr356-ci-activation-20261026.md).
+
+### PR356 eligible PR-event bridge (2026-10-26 correction)
+
+GitHub branch rulesets do not accept workflow_dispatch-created job checks as
+required PR checks. A successful manual PR356 admission is evidence, not the
+platform's final merge authorization. On a non-Draft pull_request event, the
+existing stable gate now recomputes the actual merge-preview and source plan,
+reads one canonical `pr356-admission-pin:v1` JSON marker from the live PR body,
+and authenticates that exact same-head manual admission plus Q and fixed original
+phase metadata. The marker supplies coordinates only; no status is inferred from
+PR prose, an input boolean, or a skipped job. Missing/stale/ambiguous pins refuse.
+This eligible consumer never runs application producers or tests. Main reuses the
+same explicit pin after validating the normal merge parents and exact tree.
+Keep the manual source proof distinct from the eligible merge-preview consumer.
+The final source commit must not carry skip-ci, because GitHub otherwise leaves
+its PR checks pending. No protection, credential, query or finding policy changes.

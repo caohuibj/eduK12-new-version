@@ -1,3 +1,4 @@
+import vm from 'node:vm';
 /** Direct adapter contracts with fake recompute/aggregate. No official API,
  * application, historical evidence admission or CI is executed. */
 import test from 'node:test';
@@ -6,7 +7,7 @@ import {mkdtempSync,rmSync,readFileSync,writeFileSync,mkdirSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,dirname} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {runPr356StableGate} from './pr356-stable-gate.mjs';
+import {runPr356StableGate,runPr356PullRequestGate} from './pr356-stable-gate.mjs';
 import {REPOSITORY,BRANCH,REQUIRED_PHASE_IDS,REQUIRED_EVIDENCE_IDS,canonicalSHA256,candidateInputsDigest,pr356Outputs} from './pr356-plan.mjs';
 const h='a'.repeat(40),base='b'.repeat(40),tree='c'.repeat(40),blob='d'.repeat(40);
 function setup(t){
@@ -38,4 +39,44 @@ test('actual complete case/identity recompute drift refuses before aggregate and
 });
 test('actual merge-gate CLI on PR356 refuses skipped precheck without legacy fallback or API',t=>{
  const s=setup(t);s.needs['pr356-admission'].result='skipped';const r=spawnSync(process.execPath,['.github/scripts/merge-gate.mjs'],{env:{...process.env,...s.env,CI_HEAD_REF:BRANCH,NEEDS_JSON:JSON.stringify(s.needs)},encoding:'utf8',timeout:10000});assert.equal(r.status,1);assert.match(r.stderr,/precheck did not succeed/);assert.doesNotMatch(r.stdout,/"required":/);
+});
+
+import {readPr356AdmissionPin} from './pr356-admission.mjs';
+
+function prSetup(t){
+ const s=setup(t);s.plan.phase='observe';s.plan.checkout=s.plan.context.mergeCommitSha;s.plan.context.event='pull_request';
+ Object.assign(s.env,{GITHUB_EVENT_NAME:'pull_request',GITHUB_REF:'refs/pull/356/merge',GITHUB_SHA:s.plan.checkout,GH_TOKEN:'synthetic-only'});s.needs.scope.outputs=pr356Outputs(s.plan);s.needs['pr356-admission']={result:'skipped',outputs:{}};
+ s.pin={head:h,runId:'200',attempt:1,artifactId:321,zipSHA256:'6'.repeat(64)};
+ s.pr={number:356,state:'open',merged:false,draft:false,head:{sha:h,repo:{full_name:REPOSITORY}},base:{sha:base},body:'<!-- pr356-admission-pin:v1\n'+JSON.stringify(s.pin)+'\n-->'};
+ s.fetcher=async(url,options)=>{assert.equal(url,'https://api.github.com/repos/'+REPOSITORY+'/pulls/356');assert.equal(options.redirect,'error');return {status:200,json:async()=>s.pr};};return s;
+}
+test('eligible PR wrapper checks live source and explicit locator then invokes only authenticated metadata reuse',async t=>{
+ const s=prSetup(t);let calls=0;const result=await runPr356StableGate({...s,recompute:async()=>s.plan,aggregate:async a=>{calls++;assert.equal(a.mode,'pr-gate');assert.equal(a.plan.checkout,s.env.GITHUB_SHA);assert.equal(a.admissionPin.artifactId,321);assert.equal(a.admissionPin.runId,'200');return {synthetic:true};}});
+ assert.equal(calls,1);assert.equal(result.role,'pull-request-admission');assert.equal(result.releaseAuthorized,false);assert.equal(result.head,h);
+});
+test('eligible PR wrapper refuses wrong event, source, draft and missing locator without aggregate',async t=>{
+ for(const mutate of [s=>s.env.GITHUB_EVENT_NAME='workflow_dispatch',s=>s.env.GITHUB_REF='refs/pull/999/merge',s=>s.needs.scope.result='failure',s=>s.needs.scope.outputs.pr356_phase='qualify',s=>s.pr.head.sha=base,s=>s.pr.draft=true,s=>s.pr.body='',s=>s.pr.body=s.pr.body+s.pr.body,s=>s.pr.head.repo.full_name='foreign/repository']){
+  const s=prSetup(t);mutate(s);await assert.rejects(runPr356PullRequestGate({...s,recompute:async()=>s.plan,aggregate:()=>{throw Error('UNEXPECTED_AGGREGATE')}}),e=>!e.message.includes('UNEXPECTED_AGGREGATE'));
+ }
+});
+test('explicit PR locator rejects stale, ambiguous or malformed metadata rather than latest-success fallback',()=>{
+ const pin={head:h,runId:'200',attempt:1,artifactId:321,zipSHA256:'6'.repeat(64)},body=p=>'<!-- pr356-admission-pin:v1\n'+JSON.stringify(p)+'\n-->';
+ assert.deepEqual(readPr356AdmissionPin(body(pin),h),{runId:'200',attempt:1,artifactId:321,zipSHA256:'6'.repeat(64)});
+ for(const p of [{...pin,head:base},{...pin,attempt:0},{...pin,artifactId:-1},{...pin,zipSHA256:'bad'},{...pin,url:'https://evil.invalid'}])assert.throws(()=>readPr356AdmissionPin(body(p),h));
+ for(const b of ['',body(pin)+body(pin),body(pin)+'<!-- pr356-admission-pin:v1',body(pin).replace('v1','v2')])assert.throws(()=>readPr356AdmissionPin(b,h));
+});
+
+test('actual YAML gives eligible Ready PR the stable name while never selecting application qualification',()=>{
+ const parsed=spawnSync('python3',['-c','import yaml,json; print(json.dumps(yaml.safe_load(open(".github/workflows/ci.yml"))["jobs"]))'],{encoding:'utf8'});assert.equal(parsed.status,0);const jobs=JSON.parse(parsed.stdout),job=jobs['merge-gate'];
+ const evaluate=(expression,github,inputs={},phase='observe')=>{
+  const body=expression.replace(/^\s*\$\{\{\s*/,'').replace(/\s*\}\}\s*$/,'');
+  return vm.runInNewContext(body,{github,inputs,needs:{scope:{outputs:{application_route:'pr356',pr356_phase:phase}}},vars:{},always:()=>true,contains:(array,value)=>array.includes(value),fromJSON:JSON.parse},{timeout:1000});
+ };
+ const pr=draft=>({event_name:'pull_request',repository:REPOSITORY,ref:'refs/pull/356/merge',ref_name:'356/merge',event:{pull_request:{number:356,draft,head:{ref:BRANCH,repo:{full_name:REPOSITORY}}}}});
+ assert.equal(evaluate(job.name,pr(false)),'merge gate / ready PR');assert.equal(evaluate(job.if,pr(false)),true);
+ assert.equal(evaluate(job.name,pr(true)),'PR356 / no merge eligibility');assert.equal(evaluate(job.if,pr(true)),false);
+ const dispatch={event_name:'workflow_dispatch',ref:'refs/heads/'+BRANCH,ref_name:BRANCH,event:{}};
+ assert.equal(evaluate(job.name,dispatch,{pr356_phase:'qualify'},'qualify'),'PR356 / no merge eligibility');assert.equal(evaluate(job.if,dispatch,{pr356_phase:'qualify'},'qualify'),false);
+ assert.equal(evaluate(job.name,dispatch,{pr356_phase:'admit'},'admit'),'merge gate / ready PR');assert.equal(evaluate(job.if,dispatch,{pr356_phase:'admit'},'admit'),true);
+ for(const id of REQUIRED_PHASE_IDS)assert.equal(evaluate(jobs['pr356-'+id].if,pr(false)),false,id+' cannot replay on PR metadata admission');
 });

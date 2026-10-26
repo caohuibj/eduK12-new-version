@@ -644,3 +644,17 @@ Run40362649830 / attempt1 / HEAD fa59b5d5178d3ea25ca3149c65d6c9de80899f7c 的14�
 另发现原admit要求1055项完整ID/resultSHA JSON，即使理由1字符亦至少220495字符，超过GitHub workflow_dispatch 65535字符上限。仅增indexed-v1无损编码：先验证完整target/resultSet哈希，逐项显式[索引,处置,理由表索引]展开成原findingId/resultSHA，再走原完整覆盖和策略检查；无默认/自动处置，无新网络/权限/凭据。禁止漏项、重复、越界、错误target、混合格式及accepted-risk。1055项正例与14种变体反例覆盖原件和Q读取路径；受影响SARIF21控制PASS。新测试初次漏模拟Q的analysis-complete包装而失败，补齐正确夹具后通过，不抹首轮本地失败。
 
 此静态审计针对第三轮原SARIF，最终新HEAD必须核新原件并逐条重绑，不能沿用旧head资格。原三个失败候选仍保留，当前仅Python环境、审计输入编码及直接控制/记录变化，无应用/schema/锁文件改变。下一次限定qualify仍须精确head/tree/base、Notion检查清单及独立放行，不部署。
+
+### GitHub eligible-event 最后一层门禁修复（2026-10-26 18:24 UTC）
+
+77fe8be9的正式qualify40368855385已success，全部16phase与Q通过。admit40374553856首次仅HTTP502失败，原件保留；只重试admission及下游后attempt2success，manual stable gate121756431544 success，App15368，stable artifact12673613136 SHA38d169b71e3f907216932603f297dd69775bec5fa4c757daf78677e02ec84b8a。未重跑应用。
+
+但GitHub PR仍显示required expected。独立核官方当前规则：workflow_dispatch作业检查不参与PR分支ruleset必需检查判定，即使名称/HEAD/App/状态匹配。此前只核检查成功和ruleset名称不足；不尝试强合并、改保护或伪造status。来源：https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks#checks-from-some-workflow-jobs-are-not-evaluated
+
+最小补充仅在已有pull_request事件中运行同名稳定门禁，保留observe的完整官方merge-preview/source/tree重算，不执行16个应用phase。它读取PR正文唯一canonical pr356-admission-pin:v1 locator，要求pin.head等于当前源HEAD，再认证同HEAD手动stable admission原artifact/Q及全部原phase/role元数据和审计处置。正文只给精确坐标，不授予通过；缺少、过期、错误source/attempt/digest、Draft或任何原件失败均拒绝，不找latest-success。真正的PR事件检查退出成功才满足GitHub规则。
+
+PR consumer使用真实merge-preview checkout，不冒充source-head执行；不将它的本地proof上传为旧source producer资格。后续main只通过同一显式pin读取已验证manual admission和Q，正常合并仍核精确parents/tree，不复验应用。没有新增网络主机、凭据、权限或通用跨commit复用框架。
+
+定向证据：3个PR包装器/locator正反控制、1个实际YAML条件/name及16phase不选中的控制通过；真实reader/CLI合成Git＋ZIP＋官方元数据fixture在actual merge-preview下只下载stable admission与Q两包，通过；Draft/原phase digest漂移拒绝。首个新reader测试沿用了manual-only fixture event而失败，补齐真实pull_request/merge-preview fixture后单项通过，原失败保留。受影响的旧stable adapter4项通过；原B gate/main控制通过。以上不是新的正式GitHub事件资格。
+
+既有recipe把全部CI控制字节绑定进精确候选，不能把77fe旧绿结果直接贴给这一新候选。保持用户已批准的必要限定重跑方式：新提交不带skip-ci以产生真实PR事件；第一次PR gate在新资格和显式pin缺失时必须失败，绝不跳过变绿。随后仅授权原16phase限定qualify、同源admit；写入新精确pin后只重试PR gate，最终正常merge。旧4轮资格及一次轻量502失败均保留计数；不扩大全平台路线，不部署。

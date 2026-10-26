@@ -6,7 +6,7 @@
 #   Routing always runs; the stable aggregate check completes for every selected route.
 #   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
 #   Ready platform PR: existing full route, except fixed PR356 observation-only entry.
-#   PR356: explicit qualify dispatch; admit verifies the same official source and evidence under the stable required gate.
+#   PR356: explicit qualify/admit dispatch; eligible pull_request gate authenticates the pinned same-head admission.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
 #   workflow_dispatch: one component probe; Full Gate requires explicit full_acceptance=true.
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
@@ -2118,7 +2118,7 @@ jobs:
   merge-gate:
     name: ${{ (((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
-      && inputs.pr356_phase == 'admit')) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
+      && inputs.pr356_phase == 'admit') && !(github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false)) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
     needs:
     - scope
     - survey-governance
@@ -2181,7 +2181,7 @@ jobs:
     - survey-home
     - teacher-survey
     - pr356-admission
-    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
+    if: ${{ always() && ((github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
       || (!((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && needs.scope.outputs.application_route != 'pr356' && (!(github.event_name == 'workflow_dispatch'
       && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'),
@@ -2277,10 +2277,10 @@ jobs:
         retention-days: 3
         if-no-files-found: error
     - name: Stage actual successful stable PR356 admission only
-      if: ${{ needs.scope.outputs.application_route == 'pr356' }}
+      if: ${{ needs.scope.outputs.application_route == 'pr356' && github.event_name == 'workflow_dispatch' }}
       run: node .github/scripts/pr356-artifacts.mjs stage merge-admission --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/merge-admission"
     - name: Retain stable required admission for exact main reuse
-      if: ${{ needs.scope.outputs.application_route == 'pr356' }}
+      if: ${{ needs.scope.outputs.application_route == 'pr356' && github.event_name == 'workflow_dispatch' }}
       id: pr356-stable-upload
       uses: actions/upload-artifact@v4
       with:
