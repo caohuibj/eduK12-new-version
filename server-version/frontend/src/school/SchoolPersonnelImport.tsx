@@ -4,14 +4,15 @@ import type {SchoolApi} from './SchoolRecovery'
 import {parsePersonnelImport,personnelTemplates,type PersonnelImportInput,type PersonnelKind} from './school-personnel-import'
 import './school-personnel-import.css'
 
-type Person={id:string;kind:string;number:string;name:string;persona:string;grade:string|null;className:string|null;activated:boolean;existingAccount:boolean}
+export type PersonnelPerson={id:string;kind:string;number:string;name:string;persona:string;grade:string|null;className:string|null;activated:boolean;existingAccount:boolean}
+type Person=PersonnelPerson
 type Preview={token:string;add:number;skip:number;errors:number;rows:{line:number;number:string;name:string;state:string;message:string}[]}
-type Props={api:SchoolApi;organizationId:string;disabled?:boolean}
-export function SchoolPersonnelImport(props:Props){return <PersonnelSession key={props.organizationId} {...props}/>}
-function PersonnelSession({api,organizationId,disabled}:Props){
- const [open,setOpen]=useState(false),[kind,setKind]=useState<PersonnelKind>('STUDENT'),[text,setText]=useState('')
+type Props={api:SchoolApi;organizationId:string;disabled?:boolean;mode?:'full'|'import'|'person';person?:Person;onChanged?:()=>void}
+export function SchoolPersonnelImport(props:Props){return <PersonnelSession key={props.organizationId+':'+(props.person?.id??props.mode??'full')} {...props}/>}
+function PersonnelSession({api,organizationId,disabled,mode='full',person,onChanged}:Props){
+ const [open,setOpen]=useState(mode==='import'),[kind,setKind]=useState<PersonnelKind>('STUDENT'),[text,setText]=useState('')
  const [preview,setPreview]=useState<Preview|null>(null),[input,setInput]=useState<PersonnelImportInput|null>(null)
- const [people,setPeople]=useState<Person[]>([]),[next,setNext]=useState<string|null>(null),[loaded,setLoaded]=useState(false)
+ const [people,setPeople]=useState<Person[]>(person?[person]:[]),[next,setNext]=useState<string|null>(null),[loaded,setLoaded]=useState(!!person)
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[verified,setVerified]=useState(false)
  const [searchOpen,setSearchOpen]=useState(false),[query,setQuery]=useState(''),[sort,setSort]=useState('default')
  const [linkPerson,setLinkPerson]=useState<Person|null>(null),[linkUsername,setLinkUsername]=useState(''),[linkVerified,setLinkVerified]=useState(false)
@@ -33,6 +34,12 @@ function PersonnelSession({api,organizationId,disabled}:Props){
   finally{lock.current=false;if(alive.current){setBusy(false);setOperation('')}}
  }
  const load=async(after?:string)=>{
+  if(mode==='import'){onChanged?.();return}
+  if(mode==='person'&&person){
+   const current=await api<{personId:string;kind:string;number:string;name:string;persona:string;grade:string|null;className:string|null;activation:string;existingAccount:boolean}>(base+'/directory/p.'+person.id)
+   if(alive.current){setPeople([{...current,id:current.personId,activated:current.activation==='ACTIVATED'}]);onChanged?.()}
+   return
+  }
   const result=await api<{list:Person[];next:string|null}>(base+(after?`?after=${encodeURIComponent(after)}`:''))
   if(alive.current){setPeople(old=>after?[...old,...result.list]:result.list);setNext(result.next);setLoaded(true)}
  }
@@ -73,13 +80,13 @@ function PersonnelSession({api,organizationId,disabled}:Props){
   await api('/auth/mfa/step-up','POST',{code:mfaCode})
   if(alive.current){setMfaRequired(false);setMfaCode('');setNotice('身份验证成功，名单和预览已保留。请重新点击刚才的操作。')}
  },'mfa')
- return <section className="hs-panel hs-admin-panel hs-personnel" aria-label="学生与教师名单导入" aria-busy={busy}>
-  <div className="hs-personnel-toolbar"><h2>人员名单</h2><div className="hs-actions">
+ return <section className={"hs-panel hs-admin-panel hs-personnel"+(mode==='person'?' hs-personnel-single':'')} aria-label={mode==='person'?'人员激活与账号核实':'学生与教师名单导入'} aria-busy={busy}>
+  <div className="hs-personnel-toolbar"><h2>{mode==='person'?'激活与账号核实':mode==='import'?'导入名单':'人员名单'}</h2>{mode==='full'&&<div className="hs-actions">
    <button type="button" disabled={busy||disabled} className={open?'hs-personnel-open':''} aria-expanded={open} aria-controls={open?'hs-personnel-import':undefined} onClick={()=>{setOpen(v=>!v);setCredential(null);setIssueTarget(null);setLinkPerson(null)}}>{open?'收起导入':'批量导入'}</button>
    <label><span className="hs-sr-only">名单排序（当前已加载人员）</span><select aria-label="名单排序（当前已加载人员）" value={sort} onChange={e=>setSort(e.target.value)}><option value="default">默认顺序</option><option value="number">按编号排序</option><option value="pending">待激活优先</option></select></label>
    <button type="button" aria-label="检索名单" aria-expanded={searchOpen} aria-pressed={searchOpen||!!query.trim()} onClick={()=>setSearchOpen(v=>!v)}><Search size={18}/></button>
    <button type="button" aria-label="刷新人员名单" disabled={busy||disabled} onClick={()=>void run(()=>load(),'load')}><RefreshCw size={18} className={operation==='load'?'hs-personnel-spinning':undefined}/></button>
-  </div></div>
+  </div>}</div>
   {searchOpen&&<label className="hs-field hs-personnel-search"><span>检索当前已加载名单</span><input type="search" value={query} onChange={e=>setQuery(e.target.value)} placeholder="编号、姓名或班级"/></label>}
   {error&&<div className="hs-personnel-message" data-tone="error" role="alert"><AlertCircle size={18}/><span>{error}</span></div>}
   {notice&&<div className="hs-personnel-message" data-tone="success" role="status"><CheckCircle2 size={18}/><span>{notice}</span></div>}
@@ -112,10 +119,10 @@ function PersonnelSession({api,organizationId,disabled}:Props){
     <div className="hs-personnel-preview-footer">{preview.errors>0&&<button type="button" disabled={busy} onClick={()=>textInput.current?.focus()}>返回修改名单</button>}{preview.add>0&&<button type="button" className="hs-primary" disabled={busy||disabled||preview.errors>0||(needsVerification&&!verified)} onClick={()=>void confirm()}>{operation==='import'?'正在保存名单…':`确认新增 ${preview.add} 条`}</button>}</div>
    </section>}
   </div>}
-  {!loaded?<div className="hs-personnel-empty"><span>读取当前学校已导入的人员，查看激活状态。</span><button type="button" disabled={busy||disabled} onClick={()=>void run(()=>load(),'load')}>{operation==='load'?'正在读取…':'读取人员名单'}</button></div>:<>
-   <div className="hs-personnel-list-meta"><p className="hs-personnel-count">已加载 {people.length} 人{next?'（还有更多）':''}{query.trim()?` · 匹配 ${filtered.length} 人`:''}</p>{query.trim()&&<span className="hs-personnel-query">检索：{query.trim()}<button type="button" aria-label="清空名单检索" onClick={()=>setQuery('')}><X size={15}/></button></span>}</div>
+  {mode!=='import'&&(!loaded?<div className="hs-personnel-empty"><span>读取当前学校已导入的人员，查看激活状态。</span><button type="button" disabled={busy||disabled} onClick={()=>void run(()=>load(),'load')}>{operation==='load'?'正在读取…':'读取人员名单'}</button></div>:<>
+   {mode!=='person'&&<div className="hs-personnel-list-meta"><p className="hs-personnel-count">已加载 {people.length} 人{next?'（还有更多）':''}{query.trim()?` · 匹配 ${filtered.length} 人`:''}</p>{query.trim()&&<span className="hs-personnel-query">检索：{query.trim()}<button type="button" aria-label="清空名单检索" onClick={()=>setQuery('')}><X size={15}/></button></span>}</div>}
    <ul className="hs-personnel-list">{filtered.map(p=><li key={p.id}>
-    <div className="hs-personnel-row"><div className="hs-personnel-identity"><strong>{p.name||p.number}</strong><span>{p.name?p.number+' · ':''}{p.kind==='STUDENT'?[p.grade,p.className].filter(Boolean).join(' / '):p.persona==='COUNSELOR'?'心理教师（权限单独授权）':'普通教师'}</span></div><span className="hs-personnel-badge" data-active={p.activated}>{p.activated?'已激活':p.existingAccount?'待本人确认':'待激活'}</span>{!p.activated&&<div className="hs-actions">{!p.existingAccount&&<button type="button" className="hs-personnel-secondary" disabled={busy||disabled} aria-expanded={linkPerson?.id===p.id} onClick={()=>{setLinkPerson(linkPerson?.id===p.id?null:p);setLinkUsername('');setLinkVerified(false);setCredential(null);setIssueTarget(null)}}>核实已有账号</button>}<button type="button" disabled={busy||disabled} aria-expanded={issueTarget?.id===p.id||credential?.person.id===p.id} onClick={()=>{setIssueTarget(issueTarget?.id===p.id?null:p);setLinkPerson(null)}}>发放激活码</button></div>}</div>
+    <div className="hs-personnel-row">{mode!=='person'&&<><div className="hs-personnel-identity"><strong>{p.name||p.number}</strong><span>{p.name?p.number+' · ':''}{p.kind==='STUDENT'?[p.grade,p.className].filter(Boolean).join(' / '):p.persona==='COUNSELOR'?'心理教师（权限单独授权）':'普通教师'}</span></div><span className="hs-personnel-badge" data-active={p.activated}>{p.activated?'已激活':p.existingAccount?'待本人确认':'待激活'}</span></>}{!p.activated&&<div className="hs-actions">{!p.existingAccount&&<button type="button" className="hs-personnel-secondary" disabled={busy||disabled} aria-expanded={linkPerson?.id===p.id} onClick={()=>{setLinkPerson(linkPerson?.id===p.id?null:p);setLinkUsername('');setLinkVerified(false);setCredential(null);setIssueTarget(null)}}>核实已有账号</button>}<button type="button" disabled={busy||disabled} aria-expanded={issueTarget?.id===p.id||credential?.person.id===p.id} onClick={()=>{setIssueTarget(issueTarget?.id===p.id?null:p);setLinkPerson(null)}}>发放激活码</button></div>}</div>
     {linkPerson?.id===p.id&&<form className="hs-personnel-row-panel" aria-label={`为 ${p.number} 核实已有账号`} onSubmit={e=>{e.preventDefault();void run(async()=>{
      await api(base+`/${p.id}/bind-existing`,'POST',{username:linkUsername.trim(),verifiedOffline:linkVerified})
      if(alive.current){setLinkPerson(null);setLinkUsername('');setLinkVerified(false);setCredential(null);setNotice('已记录核实结果，请重新发放激活码，交由本人登录原账号确认。');await load()}
@@ -124,7 +131,7 @@ function PersonnelSession({api,organizationId,disabled}:Props){
     {credential?.person.id===p.id&&issueTarget?.id!==p.id&&<section className="hs-personnel-row-panel hs-personnel-credential" aria-label="本次激活凭据"><div className="hs-personnel-toolbar"><strong>个人激活码 · 仅显示本次</strong><button type="button" className="hs-personnel-icon" aria-label="关闭凭据" onClick={()=>setCredential(null)}><X size={18}/></button></div><div className="hs-personnel-code"><code>{credential.code}</code><button type="button" onClick={()=>void copy(credential.code,'激活码已复制，请单独安全交付本人。')}><Copy size={16}/>复制激活码</button></div><p>有效至 {new Date(credential.expiresAt).toLocaleString()}。{p.existingAccount?'本人登录原校园账号，在“我的账号 → 激活名单身份”中确认。':'本人从登录页“使用注册码注册”设置用户名和密码。'}{p.kind==='STUDENT'?'学生还需学校开放注册窗口及整班审批。':''}</p></section>}
    </li>)}</ul>
    {!filtered.length&&<div className="hs-personnel-empty"><span>{query.trim()?'没有匹配的人员，请修改检索词。':'当前学校还没有导入人员。'}</span>{query&&<button type="button" onClick={()=>setQuery('')}>清空检索</button>}</div>}{next&&<button type="button" disabled={busy} onClick={()=>void run(()=>load(next),'load')}>加载更多人员</button>}
-  </>}
+  </>)}
  </section>
 }
 

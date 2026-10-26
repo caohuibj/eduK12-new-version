@@ -2,10 +2,11 @@ import express from 'express'
 import type {Server} from 'node:http'
 import {afterAll,beforeAll,beforeEach,describe,expect,it,vi} from 'vitest'
 import {randomUUID} from 'node:crypto'
-const calls=vi.hoisted(()=>({preview:vi.fn(),apply:vi.fn(),list:vi.fn(),issue:vi.fn(),bind:vi.fn()}))
+const calls=vi.hoisted(()=>({preview:vi.fn(),apply:vi.fn(),list:vi.fn(),issue:vi.fn(),bind:vi.fn(),directory:vi.fn(),detail:vi.fn()}))
 vi.mock('../../middleware/auth',()=>({authenticateSchool:(req:any,res:any,next:any)=>{if(!req.headers['x-fixture-user'])return res.status(401).json({code:'UNAUTHENTICATED'});req.user={userId:req.headers['x-fixture-user'],accountDomain:'SCHOOL'};next()}}))
 vi.mock('../../middleware/redisRateLimit',()=>({createRedisRateLimiter:()=> (_req:any,_res:any,next:any)=>next()}))
 vi.mock('../../modules/campus/personnel.service',async original=>({...await original<Record<string,unknown>>(),previewPersonnel:calls.preview,importPersonnel:calls.apply,listPersonnel:calls.list,issuePersonnelCredential:calls.issue,bindExistingPersonnel:calls.bind}))
+vi.mock('../../modules/campus/personnel.directory',async original=>({...await original<Record<string,unknown>>(),listPersonnelDirectory:calls.directory,readPersonnelDirectoryEntry:calls.detail}))
 import router from '../../modules/campus/personnel.routes'
 import {schoolOriginGuard} from '../../modules/campus/originGuard'
 import {csrfProtection} from '../../middleware/csrf'
@@ -30,6 +31,17 @@ describe('personnel router MFA / CSRF / origin and strict input (synthetic ident
  it('does not admit injected permissions or credentials',async()=>{
   for(const data of [{...body,adminRole:true},{...body,rows:[{...body.rows[0],psychologyStaff:true}]},{...body,rows:[{...body.rows[0],password:'not allowed'}]}])expect((await post('/preview',data)).status).toBe(400)
   expect(calls.preview).not.toHaveBeenCalled()
+ })
+ it('guards unified directory and detail with fresh MFA and strict pagination',async()=>{
+  for(const path of ['/directory','/directory/p.'+randomUUID()]){
+   expect((await fetch(base+path,{headers:headers(301)})).status).toBe(403)
+  }
+  expect(calls.directory).not.toHaveBeenCalled();expect(calls.detail).not.toHaveBeenCalled()
+  expect((await fetch(base+'/directory?pageSize=1000',{headers:headers()})).status).toBe(400)
+  expect((await fetch(base+'/directory?unknown=1',{headers:headers()})).status).toBe(400)
+  const result=await fetch(base+'/directory?kind=STUDENT&page=2',{headers:headers()})
+  expect(result.status).toBe(200);expect(result.headers.get('cache-control')).toBe('no-store')
+  expect(calls.directory).toHaveBeenCalledWith(expect.objectContaining({query:expect.objectContaining({kind:'STUDENT',page:2,pageSize:25})}))
  })
  it('accepts valid preview only after the three existing request guards',async()=>{const res=await post('/preview',body);expect(res.status).toBe(200);expect(calls.preview).toHaveBeenCalledOnce();expect(res.headers.get('cache-control')).toBe('no-store')})
 })

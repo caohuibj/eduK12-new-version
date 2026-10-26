@@ -11,7 +11,8 @@ import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspace
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
 import {SchoolStructureImport} from './SchoolStructureImport'
-import {SchoolPersonnelImport,SchoolPersonnelClaim} from './SchoolPersonnelImport'
+import {SchoolPersonnelDirectory} from './SchoolPersonnelDirectory'
+import {SchoolPersonnelClaim} from './SchoolPersonnelImport'
 import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
 import {SchoolReportHeader} from './SchoolReportPresentation'
 import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
@@ -518,7 +519,7 @@ export default function SchoolApp(){
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
           {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><SchoolStructureImport api={api} organizationId={schoolId} units={units} onUnits={setUnits} onBusy={setWorking} disabled={working}/><details className="hs-admin-manual-create"><summary>手动新建年级／班级</summary><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></details></SchoolAdminPanel></div>}
-          {administratorClassPage&&schoolId&&<SchoolPersonnelImport api={api} organizationId={schoolId} disabled={working}/>}
+          {administratorClassPage&&schoolId&&<SchoolPersonnelDirectory api={api} organizationId={schoolId} units={units} disabled={working}/>}
           {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
           {page==='classes'&&!professionalClassPage&&!administratorClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>

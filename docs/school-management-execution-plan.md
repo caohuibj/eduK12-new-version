@@ -5,7 +5,9 @@
 当前基线 73009cc1174e17240608a94307941150f84bfcbb，已包含最新 origin/main
 ff8471e529e7b3c56e1e20f17d1e2581040fc896（PR355 已合并）。沿用 School 独立
 worktree；Teacher、现有手动验收数据、生产和其他服务不变，不推送。
-规则：AGENTS 592945af44a0bf72761f2ceb34386c87adc08fb3；release README
+按用户后续授权，已本地合入 PR356 c064b38eb6ef68517e5a3861072cf3dc055da978；
+本地集成提交 a565aabc，PR在对齐时仍OPEN，不代表GitHub已合并。
+更新规则：AGENTS 27d6849de6d3461941a2772b008a28347e933e03；release README
 70bd4031b5ac1ec23bff6650ba825d9b9d9e5a37。
 
 原计划可行，但增加以下实施约束：
