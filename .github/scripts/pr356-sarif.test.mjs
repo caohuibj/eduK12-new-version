@@ -189,3 +189,19 @@ test('recorded SARIF disposition shares raw policy and exact review decisions wi
  // credential. No authenticated/rawVerified/dotApproved claim is returned.
  assert.equal(Object.hasOwn(raw,'rawVerified'),false);assert.equal(Object.hasOwn(raw,'dotApproved'),false);
 });
+
+
+test('indexed review transport preserves all 1055 explicit decisions within dispatch input budget',()=>{
+ const f=fixture('javascript-typescript',Array.from({length:1055},(_,i)=>finding('javascript',{message:{text:'Synthetic finding '+i}})));
+ const policy=fixedPolicy(['not-applicable']),full=reviewed(f,policy),analysis=validateSarifEvidence(f.expected,f.artifact);
+ const summary={...analysis,phaseId:'codeql-javascript-typescript',status:'analysis-complete',disposition:'pending',policySHA256:policy.sha256};
+ const {findings,...header}=full;
+ const compact={...header,encoding:'indexed-v1',rationales:['Explicit synthetic disposition, not a real source review.'],findingsByIndex:findings.map((_,i)=>[i,'not-applicable',0])};
+ assert(JSON.stringify({reviews:compact}).length<65535);assert(JSON.stringify(full).length>65535);
+ const input=admission(f,policy,compact),expected=verifySarifDisposition(admission(f,policy,full));
+ assert.deepEqual(verifySarifDisposition(input),expected);
+ assert.deepEqual(verifyRecordedSarifDisposition({plan:input.plan,phaseId:input.phase.id,summary,reviewRecord:compact}),expected);
+ for(const mutate of [r=>r.findingsByIndex.pop(),r=>r.findingsByIndex[1][0]=0,r=>r.findingsByIndex[0][0]=-1,r=>r.findingsByIndex[0][0]=1055,r=>r.findingsByIndex[0][0]=0.5,r=>r.findingsByIndex[0][2]=1,r=>r.findingsByIndex[0][2]='0',r=>r.findingsByIndex[0][1]='accepted-risk',r=>r.rationales[0]='',r=>r.target.resultSetSHA256='f'.repeat(64),r=>r.target.sourceHead='f'.repeat(40),r=>r.findings=full.findings,r=>r.encoding='unknown',r=>delete r.encoding]){
+  const bad=structuredClone(compact);mutate(bad);assert.throws(()=>verifyRecordedSarifDisposition({plan:input.plan,phaseId:input.phase.id,summary,reviewRecord:bad}),/REVIEW_|FINDING_DISPOSITION_REQUIRED/);
+ }
+});

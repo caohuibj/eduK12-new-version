@@ -246,6 +246,25 @@ function applySarifDisposition({plan,phaseId,summary,reviewRecord}){
   if(summary.findings.length>0||reviewRecord!==undefined){
     check(reviewRecord?.schemaVersion===1&&text(reviewRecord.reviewer)&&date(reviewRecord.reviewedAt),'FINDINGS_UNREVIEWED');
     same(reviewRecord.target,target,'REVIEW_TARGET');
+    // Compact transport only. The authenticated, complete result-set hash above
+    // binds the ordered index to both original finding and result identities.
+    // Every row is an explicit reviewer decision, never an inferred default.
+    if(reviewRecord.encoding!==undefined){
+      check(reviewRecord.encoding==='indexed-v1'&&reviewRecord.findings===undefined,'REVIEW_ENCODING');
+      check(Array.isArray(reviewRecord.rationales)&&reviewRecord.rationales.length>0&&reviewRecord.rationales.every(text),'REVIEW_RATIONALES');
+      const rows=reviewRecord.findingsByIndex;
+      check(Array.isArray(rows)&&rows.length===summary.findings.length,'REVIEW_COVERAGE');
+      const seen=new Set();
+      const findings=rows.map(row=>{
+        check(Array.isArray(row)&&row.length===3,'REVIEW_INDEX_ROW');
+        const [index,disposition,reason]=row;
+        check(Number.isSafeInteger(index)&&index>=0&&index<summary.findings.length&&!seen.has(index),'REVIEW_INDEX');seen.add(index);
+        check(Number.isSafeInteger(reason)&&reason>=0&&reason<reviewRecord.rationales.length,'REVIEW_REASON_INDEX');
+        const finding=summary.findings[index];
+        return {findingId:finding.findingId,resultSHA256:finding.resultSHA256,disposition,rationale:reviewRecord.rationales[reason]};
+      });
+      reviewRecord={...reviewRecord,findings};
+    }else check(reviewRecord.findingsByIndex===undefined&&reviewRecord.rationales===undefined,'REVIEW_ENCODING');
     check(Array.isArray(reviewRecord.findings)&&reviewRecord.findings.length===summary.findings.length&&new Set(reviewRecord.findings.map(f=>f.findingId)).size===reviewRecord.findings.length,'REVIEW_COVERAGE');
     for(const finding of summary.findings){
       const review=reviewRecord.findings.find(r=>r.findingId===finding.findingId);

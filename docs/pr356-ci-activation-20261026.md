@@ -629,3 +629,18 @@ Run40362649830 / attempt1 / HEAD fa59b5d5178d3ea25ca3149c65d6c9de80899f7c 的14�
 同版官方CLI按实际init→begin→trace顺序，默认提取新增python/tools/__pycache__/python_tracer.cpython-312.pyc；设置PYTHONDONTWRITEBYTECODE=1后无新增/删除。本次真实微型Python完整init→begin→trace→finalize→analyze→finish成功，严格全CLI/pack字节校验保留。此前database create先提取再begin的微型验证未覆盖这一顺序，不能抹去该盲点。本次不是平台重扫描或正式CI证明。
 
 修复仅Python job级环境禁写字节码及一个实际YAML断言，不忽略任何CLI文件、不删查询/放宽安全阈值/增加预算。直接新控制1PASS。原失败artifact12669621074、SHA256 b84005578d95ee3b9f5ffd57aa3f7120307a1f4865497a7050abdd03049295fc已回读保存，原SARIF零results不等于失败job通过。Notion已追加根因和下轮检查，待本轮其余结果齐全后精确复核再决定限定恢复；前三轮失败不归零。
+
+### 原始安全发现的独立差异审计与小型传输修复（17:22 UTC）
+
+第三轮JS/TS完整105查询成功，artifact12670641694、ZIP SHA256 2c851b7ff39d9587739cb877e92c14617c4179d755adced51458a2ad446d0619，原SARIF SHA256 3afaa47f67135a03d9aba076e94e678082a29402c7fbc4f6037167b9424d43e7。原1055发现全部保留，887条为missing-rate-limiting，不把工具执行success称为零漏洞。汇总job121725025143准确拒绝Python失败，不fallback。
+
+对全部primary/related/code-flow引用逐一核base ff8471e5的Git blob：1020条所有引用文件完整字节未变；35条触及修改文件，其中18条引用区域新增/变化。没有仓库SECURITY.md，采用既定pr356-independent-review-v1及实际入口/隔离边界作静态PR回归评估，不宣称全面解决基线安全债务。完整逐条索引、原ID/resultSHA、引用文件base/head blob及理由保留在dot核查原件。
+
+- 既有引用区域完整保留的项目按pre-existing-no-regression区分，保留旧风险，不标成false-positive。新增grant/revoke上的两条授权耗时提示具体指向与main公开既有入口完全相同的authenticateProduct/verifyToken；没有新口令猜测/发令牌机制，服务再核精确分配权。公共认证限流完善仍是既有硬化事项，不声称服务免疫DoS。
+- 定时器项实际有4000ms、总256、每key2的上限及abort清理；两条POW条件项在缺失时拒绝，并在后续验证server-stored challenge/difficulty，不能由非空输入绕过。三条有具体反证。
+- 新CI stat/read提示的支持边界是固定同仓HEAD的独立官方runner或测试私有临时目录，不存在受支持的较低信任并发写者；未声称stat/read在敌对共享OS原子安全。既有mode/symlink/hash/exclusive-create防线未删。
+- scope只向固定GitHub官方仓库PR身份端点发送授权header；artifact元数据只写受控receipt；vertical fixture响应只用于隔离测试证据。均核对实际输入/目的地，没有任意远程代码执行或私有字节向任意主机发送。
+
+另发现原admit要求1055项完整ID/resultSHA JSON，即使理由1字符亦至少220495字符，超过GitHub workflow_dispatch 65535字符上限。仅增indexed-v1无损编码：先验证完整target/resultSet哈希，逐项显式[索引,处置,理由表索引]展开成原findingId/resultSHA，再走原完整覆盖和策略检查；无默认/自动处置，无新网络/权限/凭据。禁止漏项、重复、越界、错误target、混合格式及accepted-risk。1055项正例与14种变体反例覆盖原件和Q读取路径；受影响SARIF21控制PASS。新测试初次漏模拟Q的analysis-complete包装而失败，补齐正确夹具后通过，不抹首轮本地失败。
+
+此静态审计针对第三轮原SARIF，最终新HEAD必须核新原件并逐条重绑，不能沿用旧head资格。原三个失败候选仍保留，当前仅Python环境、审计输入编码及直接控制/记录变化，无应用/schema/锁文件改变。下一次限定qualify仍须精确head/tree/base、Notion检查清单及独立放行，不部署。
