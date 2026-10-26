@@ -1,0 +1,97 @@
+/* Administrator-only presentation; existing actions and authorization remain in the page adapters. */
+.hs-app.hs-school-admin :is(.hs-professional-admission,.hs-professional-recovery){grid-template-columns:minmax(0,1fr);gap:14px}
+.hs-app.hs-school-admin .hs-professional-class-scope{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:center;gap:12px;padding:12px 16px}
+.hs-app.hs-school-admin .hs-professional-class-scope>header{grid-column:2;grid-row:1;margin:0;position:static}
+.hs-school-admin .hs-professional-class-scope>header>h2{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hs-app.hs-school-admin .hs-professional-class-scope>header .hs-teacher-task-help>button{width:44px;height:44px;min-height:44px;justify-content:center;font-size:0;gap:0;padding:8px}
+.hs-app.hs-school-admin .hs-professional-class-scope>header .hs-teacher-task-help-content{left:auto;right:0;width:min(420px,100%);max-width:none;max-height:65vh;overflow:auto}
+.hs-app.hs-workspace.hs-professional.hs-school-admin[data-theme] .hs-professional-class-scope>.hs-workspace-context{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(140px,.8fr) auto;align-items:center;gap:10px 20px;padding:0;margin:0;border:0}
+.hs-app.hs-school-admin .hs-professional-class-scope .hs-workspace-context>label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px}
+.hs-app.hs-school-admin .hs-professional-class-scope .hs-workspace-context>label>span{font-size:12px;margin:0}
+.hs-app.hs-school-admin .hs-professional-class-scope .hs-context-security{grid-column:auto;min-height:44px;padding:10px 0;white-space:nowrap}
+.hs-app.hs-school-admin .hs-admin-panel{position:relative}
+.hs-app.hs-school-admin .hs-admin-panel .hs-field{margin-bottom:12px;gap:5px}
+.hs-app.hs-school-admin .hs-admin-panel .hs-field>span{margin-bottom:0}
+.hs-app.hs-school-admin .hs-admin-panel :is(h3){margin-bottom:12px}
+.hs-app.hs-school-admin .hs-admin-panel .hs-report-heading{margin-bottom:14px}
+.hs-app.hs-school-admin .hs-admin-panel .hs-teacher-task-help-content{max-height:65vh;overflow:auto}
+.hs-app.hs-school-admin .hs-admin-create-grid{gap:16px;align-items:start}
+.hs-app.hs-school-admin .hs-admin-create-grid>section{padding:16px;background:transparent;border:0;border-left:2px solid var(--hs-border);border-radius:0}
+.hs-app.hs-school-admin .hs-admin-create-grid>section .hs-field{max-width:540px}
+.hs-app.hs-school-admin .hs-admin-create-grid>section>button{margin-top:2px}
+.hs-app.hs-school-admin .hs-admin-staff-fields{grid-template-columns:minmax(180px,1fr) repeat(2,minmax(0,1fr));gap:12px 16px;align-items:end}
+.hs-app.hs-school-admin .hs-admin-staff-fields>.hs-field{grid-column:auto;max-width:none;margin:0}
+.hs-app.hs-school-admin .hs-admin-staff-fields>label:not(.hs-field){min-height:46px;margin:0;padding:10px 12px}
+.hs-app.hs-school-admin .hs-admin-staff-fields>button{grid-column:1/-1;justify-self:end;margin-top:4px}
+.hs-app.hs-school-admin .hs-admin-relation-search{grid-template-columns:minmax(0,600px) auto;justify-content:start;gap:12px;margin-bottom:14px}
+.hs-app.hs-school-admin .hs-admin-relation-forms{margin:0;padding:16px;border-radius:10px}
+.hs-app.hs-school-admin .hs-admin-relation-list{padding-top:16px;margin-top:16px}
+.hs-app.hs-school-admin .hs-admin-relationships .hs-task-card{padding:12px 14px;border-radius:9px}
+.hs-app.hs-school-admin .hs-admin-account>div+div{margin-top:16px;padding-top:16px}
+.hs-app.hs-school-admin .hs-admin-account form{gap:12px}
+.hs-app.hs-school-admin .hs-admin-account form>*{margin-block:0}
+.hs-app.hs-school-admin .hs-admin-account form>.hs-field{margin:0}
+.hs-app.hs-school-admin .hs-admin-account form>p{font-size:12px;line-height:1.8}
+.hs-app.hs-school-admin .hs-admin-account form>button{align-self:flex-end;width:auto}
+.hs-app.hs-school-admin .hs-admin-security>.hs-actions{display:flex;flex-direction:row;align-items:end;gap:12px;margin:0}
+.hs-app.hs-school-admin .hs-admin-security>.hs-actions>.hs-field{flex:1;min-width:140px;margin:0}
+.hs-app.hs-school-admin .hs-admin-security>.hs-actions>button{width:auto;margin:0}
+.hs-app.hs-school-admin .hs-recovery-pane .hs-field{margin:0 0 12px}
+.hs-app.hs-school-admin .hs-recovery-pane>h3{font-size:16px;margin-bottom:14px}
+.hs-app.hs-school-admin .hs-recovery-pane>.hs-field:has(input[type=checkbox]){min-height:44px;justify-content:center}
+.hs-app.hs-school-admin .hs-recovery-pane :is(input:not([type=checkbox]),select){font-size:15px;min-height:44px}
+.hs-app.hs-school-admin .hs-report-controls>p{padding:4px 0;border:0;border-radius:0;background:transparent;margin:0 0 8px}
+.hs-app.hs-school-admin .hs-report-controls fieldset{margin-bottom:12px}
+.hs-app.hs-school-admin .hs-professional-home{gap:20px}
+.hs-app.hs-school-admin .hs-professional-home-heading{padding-bottom:16px;gap:16px}
+.hs-app.hs-school-admin .hs-professional-home h1{font-size:24px;margin-bottom:4px}
+.hs-app.hs-school-admin .hs-professional-section>h2{font-size:15px;margin-bottom:10px}
+.hs-app.hs-school-admin .hs-professional-home .hs-workspace-shortcuts{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px}
+.hs-app.hs-school-admin .hs-professional-home .hs-workspace-shortcuts>a{min-height:88px;padding:14px 16px;border-radius:10px;gap:10px}
+.hs-app.hs-school-admin .hs-professional-home .hs-workspace-shortcuts h3{font-size:15px;margin:0 0 3px}
+.hs-app.hs-school-admin .hs-professional-home .hs-workspace-shortcuts p{font-size:12px;line-height:1.7}
+@media(min-width:1001px){
+ .hs-app.hs-school-admin .hs-recovery-pane:has(>.hs-field){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 20px;align-items:start}
+ .hs-app.hs-school-admin .hs-recovery-pane:has(>.hs-field)>:not(.hs-field){grid-column:1/-1}
+ .hs-app.hs-school-admin .hs-recovery-pane:has(>.hs-field)>.hs-field:has(input[type=checkbox]){grid-column:1/-1}
+ .hs-app.hs-school-admin .hs-recovery-pane:has(>.hs-field)>button{justify-self:start}
+}
+@media(max-width:900px){
+ .hs-app.hs-workspace.hs-professional.hs-school-admin[data-theme] .hs-professional-class-scope>.hs-workspace-context{grid-template-columns:minmax(0,1.2fr) minmax(100px,.8fr)}
+ .hs-app.hs-school-admin .hs-professional-class-scope .hs-context-security{grid-column:1/-1;min-height:30px;padding:0;justify-self:end}
+ .hs-app.hs-school-admin .hs-professional-class-scope .hs-workspace-context>label{display:flex;flex-direction:column;align-items:stretch;gap:4px}
+ .hs-app.hs-school-admin .hs-admin-staff-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hs-app.hs-school-admin .hs-admin-staff-fields>.hs-field{grid-column:1/-1}
+}
+@media(max-width:700px){
+ .hs-app.hs-school-admin .hs-professional-class-scope{padding:12px;gap:6px;align-items:start}
+ .hs-app.hs-school-admin .hs-admin-panel .hs-field :is(input,select,textarea),.hs-app.hs-school-admin .hs-recovery-pane :is(input:not([type=checkbox]),select){font-size:16px}
+ .hs-app.hs-school-admin .hs-admin-create-grid{grid-template-columns:minmax(0,1fr);gap:20px}
+ .hs-app.hs-school-admin .hs-admin-create-grid>section{padding:0 0 0 12px}
+ .hs-app.hs-school-admin .hs-admin-relation-search{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-school-admin .hs-admin-account form>button{align-self:stretch;width:100%}
+ .hs-app.hs-school-admin .hs-admin-security>.hs-actions{display:grid;grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-school-admin .hs-admin-security>.hs-actions>button{width:100%}
+ .hs-app.hs-school-admin .hs-admin-panel .hs-teacher-task-help-content{width:min(420px,calc(100vw - 58px))}
+ .hs-app.hs-school-admin .hs-professional-home-heading{gap:10px}
+ .hs-app.hs-school-admin .hs-professional-home h1{font-size:22px}
+}
+@media(max-width:440px){
+ .hs-app.hs-school-admin .hs-admin-staff-fields{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-school-admin .hs-admin-staff-fields>button{justify-self:stretch;width:100%}
+}
+
+.hs-app.hs-school-admin .hs-admin-relationships>.hs-admin-directory-summary{margin:0;font-size:12px;line-height:1.8}
+.hs-app.hs-school-admin .hs-admin-relation-forms>div>.hs-teacher-task-help{margin:0 0 12px}
+@media(min-width:1001px){
+ .hs-app.hs-school-admin .hs-admin-relationships:has(.hs-admin-relation-forms){gap:14px 20px}
+ .hs-app.hs-school-admin .hs-admin-relationships:has(.hs-admin-relation-forms)>.hs-admin-relation-list{margin:0;padding:16px}
+}
+@media(max-width:440px){
+ .hs-app.hs-workspace.hs-professional.hs-school-admin[data-theme] .hs-professional-class-scope>.hs-workspace-context{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-school-admin .hs-professional-class-scope .hs-context-security{grid-column:1;justify-self:start}
+}
+/* A selected activity supplies its own title and back action. */
+.hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading{height:0;min-height:0;margin:0;padding:0}
+.hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading>:not(h1){display:none}
+.hs-app.hs-school-admin .hs-workspace-content:has(.hs-activity-current-title)>.hs-workspace-page-heading>h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

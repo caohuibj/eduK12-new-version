@@ -45,6 +45,7 @@ import './school-administrator.css'
 import '../components/education-tools/education-entry-layout.css'
 import './school-private-tools.css'
 import './school-compact-navigation.css'
+import './school-administrator-polish.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}

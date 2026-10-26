@@ -47,7 +47,7 @@ export function SchoolRelationships({api,organizationId,classes,compact=false}:{
   const counselors=staff.filter(s=>s.canCounsel&&s.hasPsychology)
   const staffName=(id:string)=>staff.find(s=>s.membershipId===id)?.displayName??'已离职或不再符合岗位的教职员工'
   return <section className={'hs-panel'+(compact?' hs-admin-panel hs-admin-relationships':'')}>
-    <SchoolReportHeader compact={compact} title={compact?'关系管理':'学校管理员 · 任教与心理个案关系'} label="校园关系使用说明"><p>仅当前学校管理员可操作。请先通过账号安全验证完成最近五分钟的 TOTP 验证，再加载或修改关系。学生只使用校园匿名观察编号，不会在这里公开学号、登录名或心理报告。</p></SchoolReportHeader>
+    <SchoolReportHeader compact={compact} title={compact?'关系管理':'学校管理员 · 任教与心理个案关系'} label="校园关系使用说明"><p>仅当前学校管理员可操作。请先通过账号安全验证完成最近五分钟的 TOTP 验证，再加载或修改关系。学生只使用校园匿名观察编号，不会在这里公开学号、登录名或心理报告。</p>{compact&&<p>账号与班级权限变更后，旧关系需要重新核验。</p>}</SchoolReportHeader>
     <div className={compact?'hs-admin-relation-search':undefined}>
     <label className="hs-field"><span>选择班级</span>
       <select value={classUnitId} onChange={e=>onClass(e.target.value)}>
@@ -62,8 +62,8 @@ export function SchoolRelationships({api,organizationId,classes,compact=false}:{
     {notice&&<p role="status" className="hs-message">{notice}</p>}
     {directory&&<>
       {compact&&<nav className="hs-admin-tabs" aria-label="校园关系管理">{[['teaching','任教关系'],['counseling','心理个案']].map(([id,label])=><button key={id} type="button" aria-pressed={pane===id} disabled={busy} onClick={()=>setPane(id)}>{label}</button>)}</nav>}
-      <p>当前目录：{staff.length} 名教职员工；当前所选班级 {directory.students.length} 名获批学生。
-        账号与班级权限变更后，旧关系需要重新核验。</p>
+      <p className={compact?"hs-admin-directory-summary":undefined}>当前目录：{staff.length} 名教职员工；当前所选班级 {directory.students.length} 名获批学生。
+        {!compact&&"账号与班级权限变更后，旧关系需要重新核验。"}</p>
       {Object.values(directory.truncated).some(Boolean)&&<p>有部分历史记录超出单页上限，请缩小到具体班级。</p>}
       {classUnitId&&<div className={compact?"hs-admin-relation-forms":"hs-grid"}>
         {(!compact||pane==='teaching')&&<div>

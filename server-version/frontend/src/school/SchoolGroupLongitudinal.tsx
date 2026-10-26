@@ -68,8 +68,8 @@ export function SchoolGroupLongitudinal({api,organizationId,compact=false}:{
           </option>)}
         </select>
       </label>
-      <fieldset className="hs-task-list">
-        <legend>选择 2–4 个不同的校园 Run（必须为同一工具）</legend>
+      {(!compact||catalog.sources.length>0)&&<fieldset className="hs-task-list">
+        <legend>{compact?"选择 2–4 个同一工具的测评批次":"选择 2–4 个不同的校园 Run（必须为同一工具）"}</legend>
         {catalog.sources.map(source=><label className="hs-task-card" key={id(source)}>
           <input type="checkbox" checked={selected.includes(id(source))} disabled={busy}
             onChange={e=>{
@@ -80,7 +80,8 @@ export function SchoolGroupLongitudinal({api,organizationId,compact=false}:{
           <span>{source.runName} · {source.resource.family} {source.resource.key}
             （{source.resource.version}）</span>
         </label>)}
-      </fieldset>
+      </fieldset>}
+      {compact&&catalog.sources.length===0&&<p>暂无可用于比较的测评批次。</p>}
       {picked.length>1&&groups.size!==1&&<p role="alert">所选测量工具不一致，无法比较。</p>}
       {catalog.specs.length===0&&<p>没有满足当前学校最低人数要求的已审核纵向方案。</p>}
       {catalog.truncated&&<p>仅显示部分近期 Run；不得通过私有名单筛选绕过匿名门槛。</p>}
