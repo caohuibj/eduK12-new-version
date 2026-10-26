@@ -1,3 +1,4 @@
+import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
 import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
@@ -318,11 +319,10 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     await refresh()
     setNotice('活动已变更为 '+result.status+'。请确认任务与报告授权独立。')
   })
-  return <section className="ht-panel" aria-label="Huiteacher 评价活动管理">
-    <h2>评价对象与活动</h2>
-    <p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p>
+  return <section className="ht-panel ht-admin-panel ht-evaluation-workbench" aria-label="Huiteacher 评价活动管理">
+    <header className="ht-section-heading"><h2>评价对象与活动</h2><ManagementHelp label="学校评价活动说明" buttonText=""><p>对象标识和活动事件独立于个人登录账户；共享 School 的基础组织关系，不共享 School 的测评数据。</p><p>活动和作答任务分别发布；结果仍按原有授权与隐私规则开放。</p></ManagementHelp></header>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    <h3>创建稳定评价对象</h3>
+    <details className="ht-admin-action"><summary>创建稳定评价对象</summary>
     <div className="ht-inline">
       <label className="ht-field"><span>对象类型</span><select value={targetKind}
         onChange={e=>setTargetKind(e.target.value)}>
@@ -335,13 +335,14 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
           onChange={e=>setSubjectUserId(e.target.value)}/></label>}
       <button disabled={working||!targetName.trim()} onClick={addTarget}>新增评价对象</button>
     </div>
+    </details>
     <div className="ht-units">{targets.map(x=><span key={x.id} className="ht-tag">
       {targetLabels[x.kind]??x.kind} · {x.name}</span>)}</div>
     {targetLoading&&<p role="status">正在读取评价对象…</p>}
     {targetError&&<p role="alert">{targetError} <button disabled={targetLoading} onClick={()=>void loadTargets(targetCursor??undefined)}>重试评价对象</button></p>}
     {!targetLoading&&!targetError&&targets.length===0&&<p className="ht-empty">尚无评价对象，请先新增。</p>}
     {targetCursor&&<button disabled={targetLoading||working} onClick={()=>void loadTargets(targetCursor)}>加载更多评价对象</button>}
-    <h3>创建评价活动</h3>
+    <details className="ht-admin-action"><summary>创建评价活动</summary>
     <div className="ht-inline">
       <label className="ht-field"><span>所属评价对象</span><select value={eventTargetId}
         onChange={e=>setEventTargetId(e.target.value)}>
@@ -356,7 +357,8 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
         onChange={e=>setEventTitle(e.target.value)} maxLength={200}/></label>
       <button disabled={working||!eventTargetId||!eventTitle.trim()} onClick={addEvent}>创建活动草稿</button>
     </div>
-    <div className="ht-inline"><h3>近期活动</h3>
+    </details>
+    <div className="ht-admin-list-heading"><h3>近期活动</h3>
       <button type="button" disabled={working} onClick={reloadReleasedForms}>
         刷新已发布表单
       </button>

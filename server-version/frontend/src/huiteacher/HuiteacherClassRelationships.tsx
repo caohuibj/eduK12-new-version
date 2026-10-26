@@ -1,3 +1,4 @@
+import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {useEffect,useState,type FormEvent} from 'react'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Member={membershipId:string;loginName:string;role:string}
@@ -49,29 +50,28 @@ export function HuiteacherClassRelationships({organizationId,members,units,api}:
     <span>第 {page} 页 · 共 {total} 条</span>
     <button type="button" disabled={busy||page*25>=total} onClick={()=>void run(()=>kind==='staff'?refresh(page+1,studentPage):refresh(staffPage,page+1))}>下一页</button>
   </nav>
-  return <section className="ht-panel ht-class-relations" aria-label="任教与学生班级关系管理">
-    <h2>任教与学生班级关系</h2>
-    <p>维护学校核验的教师任教和学生班级关系。保存或结束关系需要近期 MFA 验证；请先在上方完成敏感操作验证。</p>
+  return <section className="ht-panel ht-class-relations ht-admin-panel" aria-label="任教与学生班级关系管理">
+    <header className="ht-section-heading"><h2>任教与学生班级关系</h2><ManagementHelp label="班级关系与验证说明" buttonText=""><p>维护学校核验的教师任教和学生班级关系。保存或结束关系需要近期验证，可在“学校设置与成员”的“敏感操作验证”中完成。</p></ManagementHelp></header>
     {error&&<p role="alert" className="ht-notice">{error}</p>}
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
     {!classes.length&&<p>请先创建班级，再设置任教和学生班级关系。</p>}
     <section aria-label="教师任教关系"><h3>教师任教</h3>
-      <form className="ht-relation-form" onSubmit={assignStaff}>
+      <details className="ht-admin-action"><summary>添加教师任教关系</summary><form className="ht-relation-form" onSubmit={assignStaff}>
         <label className="ht-field"><span>教师</span><select aria-label="教师" required value={teacher} onChange={e=>setTeacher(e.target.value)}><option value="">选择已加入学校的教师</option>{members.filter(m=>m.role==='TEACHER').map(m=><option key={m.membershipId} value={m.membershipId}>{m.loginName}</option>)}</select></label>
         <label className="ht-field"><span>任教班级</span><select aria-label="任教班级" required value={staffClass} onChange={e=>setStaffClass(e.target.value)}><option value="">选择班级</option>{classes.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
         <label className="ht-field"><span>任教身份</span><select aria-label="任教身份" value={staffRole} onChange={e=>setStaffRole(e.target.value as 'HOMEROOM'|'TEACHING')}><option value="TEACHING">任课教师</option><option value="HOMEROOM">班主任</option></select></label>
         <button type="submit" disabled={busy||!teacher||!staffClass}>保存任教关系</button>
-      </form>
+      </form></details>
       {staff.list.map(row=><div className="ht-relation-entry" key={row.id}><p>{name(row.membershipId)} · {className(row.classUnitId)} · {row.staffRole==='HOMEROOM'?'班主任':'任课教师'}</p><button type="button" disabled={busy} onClick={()=>end('staff',row)}>结束任教</button></div>)}
       {!staff.total&&<p className="ht-empty">暂无当前任教关系。</p>}{pagination('staff',staffPage,staff.total)}
     </section>
     <section aria-label="学生班级关系"><h3>学生班级</h3>
-      <form className="ht-relation-form" onSubmit={assignStudent}>
+      <details className="ht-admin-action"><summary>添加学生班级关系</summary><form className="ht-relation-form" onSubmit={assignStudent}>
         <label className="ht-field"><span>学生</span><select aria-label="学生" required value={student} onChange={e=>setStudent(e.target.value)}><option value="">选择已加入学校的学生</option>{members.filter(m=>m.role==='STUDENT').map(m=><option key={m.membershipId} value={m.membershipId}>{m.loginName}</option>)}</select></label>
         <label className="ht-field"><span>学生班级</span><select aria-label="学生班级" required value={studentClass} onChange={e=>setStudentClass(e.target.value)}><option value="">选择班级</option>{classes.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
         <label className="ht-field"><span><input type="checkbox" checked={primary} onChange={e=>setPrimary(e.target.checked)}/>设为主要班级</span></label>
         <button type="submit" disabled={busy||!student||!studentClass}>保存学生班级</button>
-      </form>
+      </form></details>
       {students.list.map(row=><div className="ht-relation-entry" key={row.id}><p>{name(row.membershipId)} · {className(row.classUnitId)}{row.isPrimary?' · 主要班级':''}</p><button type="button" disabled={busy} onClick={()=>end('student',row)}>结束班级关系</button></div>)}
       {!students.total&&<p className="ht-empty">暂无当前学生班级关系。</p>}{pagination('student',studentPage,students.total)}
     </section>
