@@ -1,0 +1,1191 @@
+{
+  "schema_version": "1.0",
+  "title": "注意/执行任务协议候选卡（Round 2）",
+  "review_date_utc": "2026-10-26",
+  "task_count": 7,
+  "coverage": [
+    "ANT",
+    "MOT",
+    "enumeration",
+    "GradCPT",
+    "attentional blink",
+    "visual search",
+    "dual task"
+  ],
+  "source_repositories_primary": [
+    "stmueller/pebl",
+    "flowersteam/cognitive-testbattery",
+    "manybrainsproject/TestMyBrainCodeRepo",
+    "alexholcombe/attentional-blink"
+  ],
+  "cross_check_repository": "open-cogsci/OpenSesame",
+  "implementation_routes": [
+    "代码适配",
+    "文献自研",
+    "暂缓"
+  ],
+  "copyright_categories": [
+    "可 GitHub 公开",
+    "获权后系统用但不公开",
+    "待联系授权"
+  ],
+  "rule_categories": [
+    "技术质量规则",
+    "理论参照",
+    "文献经验",
+    "项目暂定研究者规则"
+  ],
+  "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+  "limitations": [
+    "优先级是下一步协议研究顺序，不是效度排名、上线或许可最终批准。",
+    "未创建/修改产品代码，未运行上游源码、测试、浏览器时序或CI；已发现风险仅静态。",
+    "OpenSesame仅作为AB交叉变式，不重复算任务；新Holcombe补充源已明确理由。",
+    "版权三类不等于实现策略三类：公开GitHub须履行适用开源条款；素材待核不表示已发现禁止，也不能当作获准复制。",
+    "作者论文样本不作中文/儿童常模；无能力等级、诊断或百分位。"
+  ],
+  "cards": [
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-ant-pebl",
+      "name_zh": "注意网络任务：PEBL PANT 1.2",
+      "priority_rank": 1,
+      "construct": {
+        "target": "以不同线索和侧翼条件的反应差异，研究警觉、空间定向和冲突处理；不是三种脑网络的直接生物测量。",
+        "coverage_gap": "ANT（不同于已有单独 Flanker）；同一次试验分离线索效应和干扰效应。",
+        "evidence_level": "Fan et al. 2002 原范式论文 + PEBL 作者任务说明 + 固定源码；当前改版未独立验证。"
+      },
+      "source": {
+        "repository": "stmueller/pebl",
+        "sha": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+        "task_version": "源码 gPANTVersion=1.2；schema version=1.1，两者不混称",
+        "path": "battery/ANT/ANT.pbl",
+        "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/ANT/ANT.pbl"
+      },
+      "protocol_observed": {
+        "practice": "从48条件设计抽24试次；正确/错误反馈，RT反馈默认关闭；无已核实的通过门槛。",
+        "formal": "4 cue × 2位置 × 2目标方向 × 3侧翼 × reps=2 = 96/块；3块共288正式试次。if(0)内10练习/20正式的调试缩短路径不启用。",
+        "stimuli": "无/中央/双位置/空间有效线索；上下位置；中央左/右箭头；一致、相反、中性侧翼。默认 showNeutralFlankers=0：中性条件无侧翼，不是横杠。",
+        "timing": "试次起始至线索约400–1600 ms（扣除准备耗时）；线索100 ms，后注视400 ms；目标显示到响应或1700 ms；按绝对截止补足起始间隔4000 ms，不是额外4000 ms ITI。",
+        "response": "WaitForLayoutResponse返回left/right/<timeout>；responsemode默认auto，物理键/鼠标依设备布局选择，不能宣称固定左右Shift。重实现应冻结键盘方案并保存设备。",
+        "timeout": "1700 ms；超时进入错误且留下实际rt，不是missing后删去。",
+        "randomization": "设计Shuffle，练习SampleN；本任务未见保存seed；需保存条件顺序与线索延迟。",
+        "raw_fields": [
+          "block",
+          "trial",
+          "practice",
+          "cue",
+          "topbottom",
+          "targdir",
+          "flankercoherence",
+          "flankerdir",
+          "time0",
+          "delay",
+          "resp",
+          "corr",
+          "rt"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "ComputeStats同时给全正式试次和correct-only均值差：alerting=无提示−双提示；orienting=中央提示−空间提示；conflict=不一致−一致；条件正确率和RT。",
+        "exclusion": "练习不进入gRTs/gCorr；correct-only分支排除错误/超时，但all-trials分支保留它们；未见快反应或浏览器失焦自动剔除。",
+        "caution": "块后调用ComputeStats而累积数组未清空，标称byblock摘要实为累计到该块；不能误作每块独立成绩。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "优先报告correct-only条件RT和正确率，另保留上游all-trials值用于对照；所有差值同时呈示有效试次数。此为拟议本地分析，不称原作者唯一算法。",
+        "qc": "预注册设备/失焦/帧异常记录；条件无有效正确反应时输出不可估计，不填0；技术异常和错误反应分开编码。暂不自定最低能力阈值。",
+        "version": "固定中性侧翼形式、responsemode、呈现尺度和试次长度；任何变化另起版本。"
+      },
+      "literature": [
+        {
+          "citation": "Fan, McCandliss, Sommer, Raz & Posner (2002). Testing the Efficiency and Independence of Attentional Networks.",
+          "url": "https://raz-lab.org/wp-content/uploads/2023/09/089892902317361886.pdf",
+          "read": "原作者实验室PDF，设计和程序段已读",
+          "relationship": "24练习+3×96与核心时序一致；原论文中性横线与当前默认无侧翼不同，不能称逐项同版。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "根COPYING GPL-2.0；本文件未另给宽松许可",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "仅在保留通知、源代码和适用GPL义务等履约前提下；不意味着可改为闭源/MIT。"
+        },
+        "assets": {
+          "description": "任务绘制箭头/线索并依PEBL字体/布局；没有本任务外部照片",
+          "copyright_status": "待联系授权",
+          "condition": "若沿用字体/框架素材，先完成逐项许可核验；优先自行绘制几何形状并采用已授权字体。不是已发现禁用条款。"
+        },
+        "strategy": "文献独立实现优先；合规源码复用亦可研究；当前runtime不直接导入。"
+      },
+      "reuse_decision": {
+        "route": "文献自研",
+        "reusable": "条件矩阵、数据字段、正确/错误分支和双口径计分契约可作研究证据；保留论文及软件引用。",
+        "hold": "自动响应设备混用、累计块摘要及未测时序必须先澄清；本轮不做代码修复。"
+      },
+      "plain_report": {
+        "can_say": [
+          "在这次任务中，空间提示条件比中央提示条件快/慢多少毫秒。",
+          "在答对的试次中，干扰箭头带来的额外反应时间为多少。"
+        ],
+        "cannot_say": [
+          "你的警觉脑网络受损/正常。",
+          "可凭此判断ADHD、智力或学习能力等级。"
+        ]
+      },
+      "open_questions": [
+        "目标年龄和中文指令的可理解性/练习需求；待伦理和试点设计。",
+        "当前布局实际物理键映射与不同设备是否等效。",
+        "correct-only差值信度及每条件足够精度；无本地常模。",
+        "块级数据应从raw重算，不能依累计summary。"
+      ],
+      "evidence": [
+        {
+          "role": "练习、正式、时序、计分全关键路径静态已读",
+          "path": "battery/ANT/ANT.pbl",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/ANT/ANT.pbl"
+        },
+        {
+          "role": "默认参数/版本差异",
+          "path": "battery/ANT/params/ANT.pbl.schema.json",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/ANT/params/ANT.pbl.schema.json"
+        },
+        {
+          "role": "原作者软件说明",
+          "path": "battery/ANT/ANT.pbl.about.txt",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/ANT/ANT.pbl.about.txt"
+        },
+        {
+          "role": "代码许可",
+          "path": "COPYING",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/COPYING"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "本任务未见独立的掉帧/失焦自动排除阈值；1700ms是反应窗口参数，不是能力或技术合格界线。"
+        ],
+        "理论参照": [
+          "警觉/定向/冲突由指定条件RT差定义；0差值仅表示本次条件均值相等，不是正常/异常界线。"
+        ],
+        "文献经验": [
+          "原论文提供设计和样本研究；本卡不从其均值或样本差异构造个体能力阈值。"
+        ],
+        "项目暂定研究者规则": [
+          "拟按正确有效试次计算差值，独立标技术异常；分母不足则不估计。具体最少试次数/掉帧容限尚未设定或验证。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "优先协议定稿",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "文献自研",
+        "deduplication_class": "protocol_variant",
+        "closest_baseline_families": [
+          "flanker"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次答对时，各种提示条件下的平均用时为 {各提示条件毫秒数及有效次数}；有干扰和无干扰时为 {干扰条件毫秒数及有效次数}。这些差异只描述本次任务，不代表脑网络正常或异常。",
+        "limited": "部分提示或干扰条件记录不足，相关反应时间差暂不解释。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-mot-flower",
+      "name_zh": "多目标追踪：Flower 固定5目标速度变式",
+      "priority_rank": 2,
+      "construct": {
+        "target": "研究动态视觉追踪在不同移动速度下的表现；包含空间注意、目标身份保持与选择反应，不是纯记忆容量测量。",
+        "coverage_gap": "MOT",
+        "evidence_level": "作者电池论文有此变式与跨日研究；源码静态可追溯，不能把论文样本统计当本地常模。"
+      },
+      "source": {
+        "repository": "flowersteam/cognitive-testbattery",
+        "sha": "58ba32fa8b582bedac65ef1c037c9974303dbf5c",
+        "task_version": "app_moteval，固定5/10目标，非自适应阈值版",
+        "path": "js/app_moteval/config.js",
+        "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/config.js"
+      },
+      "protocol_observed": {
+        "practice": "教程后 1遍速度[1,4]，5目标，共2练习试次；允许教程重新练习，次数并非封顶。",
+        "formal": "速度[1,4,8]各5次=15/块；max_break=3且在第2次继续后关闭break，实际意图3块共45试次、每速度15次。不是num_rep_main=5就只有5试次。",
+        "stimuli": "10对象，前5个身份为目标；直径1.2°，12°×12°区域；目标标红1000 ms、移动8000 ms、停止500 ms；注视500 ms；初始不重叠，运动时允许相交/遮挡。",
+        "response": "停止后点击5个互不重复的位置；不可撤销，达到5个自动继续；无已核实响应超时。RT从选择画面开始到第5次选择，不是移动期间反应时间。",
+        "timing": "速度=ppd/60 × [1,4,8] 像素/帧，依赖60 Hz假设；Date.now和draw轮询决定阶段长度。屏幕宽默认34.25 cm、视距50 cm，不等于已校准视觉角。",
+        "randomization": "shuffle条件、random位置/方向，无已核实seed记录；必须记录完整轨迹或可重放seed/帧时序。",
+        "raw_fields": [
+          "results_responses",
+          "results_rt",
+          "results_speed_stim",
+          "results_correct"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "save()按所选对象index<=4的数量 / 所选数量计算trial比例；默认选满5个时等于正确追踪比例。原作者论文展示准确率/平均正确追踪数量；源码未输出常模或阈值。",
+        "exclusion": "未见固定任务脚本自动按失焦、掉帧或过快选择排除；不能把选错当设备无效。",
+        "caution": "这是固定5目标、3速度版；correct scorer硬编码前5个身份，改变num_target不能只改config。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "按速度汇总命中目标数0–5和命中比例，保留5个选择ID；猜测基线和不确定性单列，不把命中数称精确注意容量。暂不创建K值或速度阈值。",
+        "qc": "实际视距/屏宽校准；按真实时间积分或校准刷新率并记录帧异常；轨迹生成/遮挡规则冻结。失焦试次技术无效须另列，不映射能力低分。",
+        "export": "把块号/试次号、目标ID、位置/轨迹、响应次序和时间写为逐trial记录；这是拟议数据契约，不是上游现有字段。"
+      },
+      "literature": [
+        {
+          "citation": "Adolphe et al. (2022). An Open-Source Cognitive Test Battery to Assess Human Attention and Memory. §2.4.1.",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.880375/full",
+          "read": "作者原文方法、表现分析和研究范围已读",
+          "relationship": "5目标/5干扰、1/4/8°每秒、1s提示和8s运动相符；固定HEAD及本地实现的时序/导出正确性仍需独立验证。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "MIT，Flowers Team 2022",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "保留版权与许可；第三方依赖另按其许可。"
+        },
+        "assets": {
+          "description": "obj_mot.png、研究员/背景插画、Gill Sans OTF字体等独立于几何轨迹",
+          "copyright_status": "待联系授权",
+          "condition": "根MIT不能替代第三方来源清点。仅自行绘制几何刺激时不复制这些素材；替换也需记录新版本。"
+        },
+        "strategy": "文献独立实现优先；合规复用纯协议/生成逻辑可另评估。"
+      },
+      "reuse_decision": {
+        "route": "文献自研",
+        "reusable": "速度×目标数设计、阶段时序和原始正确目标数计分定义。",
+        "hold": "不直接包装现有p5 runtime：末块TimeManager定义end_scene却赋scene_end（未定义）；跨块tmp_connect将旧数组push成嵌套；导出名仍workingmemory。均为静态风险，未运行复现。"
+      },
+      "plain_report": {
+        "can_say": [
+          "在这次追踪5个目标的任务中，你在不同移动速度下平均找回了多少个目标。"
+        ],
+        "cannot_say": [
+          "你最多能同时注意几件事。",
+          "游戏/运动/课堂注意力一定更强，或训练必然提高现实能力。"
+        ]
+      },
+      "open_questions": [
+        "确定使用几何圆点还是原图片；逐素材许可。",
+        "复核45正式试次及跨块保存/终止的端到端行为；本轮未执行。",
+        "60/90/120 Hz与触屏操作下速度、遮挡、点击负担是否一致。",
+        "目标年龄/视力和色觉要求、中文练习与测量精度均待研究。"
+      ],
+      "evidence": [
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_moteval/config.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/config.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_moteval/parametermanager.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/parametermanager.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_moteval/timemanager.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/timemanager.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_moteval/scene_testtrial.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/scene_testtrial.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_moteval/scene_tutorials.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_moteval/scene_tutorials.js"
+        },
+        {
+          "role": "代码许可",
+          "path": "LICENSE",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/LICENSE"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "上游未见自动设备QC阈值；1/4/8速度、5目标、8秒均为刺激/流程参数。"
+        ],
+        "理论参照": [
+          "默认从10对象随机选五，期望选中2.5个目标即0.5比例；只是随机选择算术参照，不是个体能力合格线。"
+        ],
+        "文献经验": [
+          "作者论文是该实验样本的条件表现/再测研究，不提供本地年龄常模阈值。"
+        ],
+        "项目暂定研究者规则": [
+          "拟记录校准和逐帧异常，按速度报告有效分母；不预设能力等级或猜测比例删样本规则。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "优先协议定稿",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "文献自研",
+        "deduplication_class": "new_family_candidate",
+        "closest_baseline_families": [
+          "corsi",
+          "nback"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次每次需要找回 5 个移动目标。不同速度下，你平均找回 {各速度平均正确目标数} 个，有效次数为 {各速度有效次数}。这不等于日常最多能同时注意几件事。",
+        "limited": "部分画面速度或帧记录不可靠，受影响条件不比较；选错目标与设备异常分开记录。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-enumeration-flower",
+      "name_zh": "短时点数判断：Flower 5–9圆点变式",
+      "priority_rank": 3,
+      "construct": {
+        "target": "研究短暂多对象呈现后的数量报告准确度；含视觉编码、短时保持和数量判断。正式只用5–9，不应标为完整subitizing跨度测验或数学能力测验。",
+        "coverage_gap": "enumeration",
+        "evidence_level": "作者原文与配置可比对；发现呈现区域差异，需先选择测量版本。"
+      },
+      "source": {
+        "repository": "flowersteam/cognitive-testbattery",
+        "sha": "58ba32fa8b582bedac65ef1c037c9974303dbf5c",
+        "task_version": "app_enumeration，正式5–9，slider报告",
+        "path": "js/app_enumeration/config.js",
+        "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/config.js"
+      },
+      "protocol_observed": {
+        "practice": "数量[3,4,5]每个1次=3练习；呈现1000 ms；教程可重复。",
+        "formal": "数量[5,6,7,8,9]每个5次=25/块；4块=100正式，每数量20次。max_break=4即3次中途继续，不是4次休息再做5块。",
+        "stimuli": "注视1000 ms → 圆点50 ms → noise.png掩蔽1000 ms → 滑杆报告。点直径0.5°；代码roi_obj=7°并在正方形范围采样且拒绝初始重叠；作者论文描述5°区域，不应合并成同一精确参数。",
+        "response": "1–15整数滑杆，初始值每试次随机；点击OK提交。RT从响应画面出现计时，包含操作滑杆，不是点数感知RT；无已核实响应超时。",
+        "timing": "Date.now + p5 draw轮询；50ms不保证任意刷新率上恰好达到。屏宽34.25cm/视距50cm为默认假设。",
+        "randomization": "每遍shuffle数量；random圆点位置/滑杆初值；未见seed持久记录。",
+        "raw_fields": [
+          "results_responses",
+          "results_rt",
+          "results_targetvalue"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "源码记录报告数量、真实数量和响应时长，没有在ParameterManager内生成correct或标准分；作者论文按数量条件计算准确率。",
+        "exclusion": "未见自动设备失焦/掉帧排除规则；无数量误差阈值即无效的原规则。",
+        "caution": "正式5–9且50ms呈现不能用来估计1–4的subitizing范围；滑杆RT不等于经典按键计数斜率。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "主输出为每数量的exact-match准确率；补充有符号误差、绝对误差作为探索性指标并标明非原论文主指标；不从这5点拟合儿童数感诊断阈值。",
+        "qc": "记录每次实际帧呈现时长/失焦/屏幕校准，曝光异常单列；练习理解检查与正式表现分开，不按错误多直接删除。",
+        "version": "先决定复现论文5°还是冻结代码7°正方形；换区域、掩蔽图或反应装置均新版本，需重新试点。"
+      },
+      "literature": [
+        {
+          "citation": "Adolphe et al. (2022), §2.4.2 Enumeration Task；原文追溯 Green & Bavelier (2006b)。",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2022.880375/full",
+          "read": "原作者方法与准确率分析已读；本轮未把Green & Bavelier全文当已核验来源",
+          "relationship": "100正式、每数量20次、50ms相符；ROI论文5°与代码7°不一致。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "MIT，Flowers Team 2022",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "保留通知；依赖各按许可。"
+        },
+        "assets": {
+          "description": "圆点可程序生成；noise.png、研究员/背景插画、Gill Sans OTF另核",
+          "copyright_status": "待联系授权",
+          "condition": "掩蔽图和字体未完成单项来源核查；替换为原创噪声也需定义统计特征并验证，不冒称原刺激同版。"
+        },
+        "strategy": "优先按选定文献协议独立实现。"
+      },
+      "reuse_decision": {
+        "route": "文献自研",
+        "reusable": "条件表、短时呈现/掩蔽/数量报告结构和原始反应字段。",
+        "hold": "现有runtime末块end_scene/scene_end命名不一致；跨块保存push旧数组而形成嵌套；未执行验证，不宜直接套React。"
+      },
+      "plain_report": {
+        "can_say": [
+          "在这次短暂显示5–9个圆点的任务中，报告正确的比例，以及倾向多报还是少报。"
+        ],
+        "cannot_say": [
+          "由此判断数学天赋、计算障碍或智力。",
+          "以本版测出你的subitizing上限、年龄百分位或稳定注意容量。"
+        ]
+      },
+      "open_questions": [
+        "论文5°与代码7°选哪一个并冻结；不能混称原版。",
+        "掩蔽图空间统计、亮度/显示器及字体/素材许可。",
+        "逐trial准确率计算与嵌套CSV重整；末块能否正确终止。",
+        "目标群体理解滑杆及练习是否足够；短时呈现设备可靠性。"
+      ],
+      "evidence": [
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_enumeration/config.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/config.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_enumeration/parametermanager.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/parametermanager.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_enumeration/timemanager.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/timemanager.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_enumeration/scene_testtrial.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/scene_testtrial.js"
+        },
+        {
+          "role": "固定源码关键路径已静态读",
+          "path": "js/app_enumeration/scene_tutorials.js",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/js/app_enumeration/scene_tutorials.js"
+        },
+        {
+          "role": "代码许可",
+          "path": "LICENSE",
+          "url": "https://github.com/flowersteam/cognitive-testbattery/blob/58ba32fa8b582bedac65ef1c037c9974303dbf5c/LICENSE"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "上游未见自动时序/失焦排除界线；50ms/1000ms、点数和ROI是协议参数。"
+        ],
+        "理论参照": [
+          "exact-match以报告数量等于真实数量定义；这不是能力正常阈值。正式5–9不能推出subitizing边界。"
+        ],
+        "文献经验": [
+          "论文准确率与跨日样本表现不当作产品合格线；论文5°与代码7°必须分版本。"
+        ],
+        "项目暂定研究者规则": [
+          "拟加误差分布和技术标记，属研究性分析；不设数学能力或计算障碍阈值。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "优先协议定稿",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "文献自研",
+        "deduplication_class": "new_family_candidate",
+        "closest_baseline_families": [
+          "patterncompare"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次短暂显示 5–9 个圆点。各数量下你报告正确的次数为 {各数量正确次数及有效分母}；多报和少报另列。这里只描述这次数量判断，不评价数学天赋。",
+        "limited": "部分短时画面或掩蔽记录不完整，相应数量条件暂不解释；滑杆操作时间也不当作看清圆点所需时间。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-gradcpt-tmb",
+      "name_zh": "渐变持续作业：TestMyBrain GradCPT Apr24",
+      "priority_rank": 4,
+      "construct": {
+        "target": "持续监控中对高频城市做反应、对低频山景不反应；区分反应遗漏/误按、反应稳定性和策略偏向。不是临床诊断。",
+        "coverage_gap": "持续注意的渐变呈现变式（不是简单Go/No-Go的重复命名）。",
+        "evidence_level": "原作者2015论文支持gradCPT研究用途；当前默认时长和QC与论文不同，不能直接继承其年龄轨迹/效度或常模。"
+      },
+      "source": {
+        "repository": "manybrainsproject/TestMyBrainCodeRepo",
+        "sha": "ec09ea0d35779bb39997131313dfd1380ee34922",
+        "task_version": "GradCPT_Main.v1.Apr24",
+        "path": "TMB_Tests/TMB_GradCPT/src/GradCPT_Main.v1.Apr24.html",
+        "url": "https://github.com/manybrainsproject/TestMyBrainCodeRepo/blob/ec09ea0d35779bb39997131313dfd1380ee34922/TMB_Tests/TMB_GradCPT/src/GradCPT_Main.v1.Apr24.html"
+      },
+      "protocol_observed": {
+        "practice": "默认nopractice=false；6个静态教学图（输入等待2000ms）、10个渐变练习（2400ms/图，50%山景，有反馈）、20个渐变练习（800ms/图，50%山景，无正式反馈）。URL允许skip或optional，须记录。",
+        "formal": "默认ntrials=150，mprop=.1；默认shuffle法为15山景+135城市，另有首尾scrambled图；约120秒核心序列。可由输入文件覆盖，不应以当前默认宣称2015论文4分钟/299试次。",
+        "stimuli": "10张城市、10张山景灰度照片和scrambled边界图；图像透明度渐变800ms。小屏自动放大1.5倍，需记录imageSize。",
+        "response": "键盘空格/触控输入（chooseInput按设备）；城市按、山景不按；记录反应时/透明度并由assignTrial分配到当前或前一图。",
+        "timeout": "不是独立800ms截止后全部丢弃；assignTrial根据透明度0.4/0.6/0.8及当前/前trial已有反应分配晚反应。连续运行无应答记遗漏/正确拒绝，不重做。",
+        "randomization": "默认seed=1，正式开始重新seed；shuffle保持精确山景比例，randraw有放回且比例近似；输入文件又是第三种序列策略。保存所选策略和序列。",
+        "raw_fields": [
+          "trialId",
+          "trialType",
+          "image",
+          "trialLength",
+          "go",
+          "frameCount",
+          "rt",
+          "correct",
+          "imageOpacity",
+          "responseType",
+          "responseCode",
+          "trialTimestamp",
+          "responseTimestamp",
+          "flagged",
+          "state"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "总体/go/nogo准确率；正确且有反应试次的meanRTc、medianRTc、sdRTc、cvRTc；dprime和crit。源码pHit=1−commission error、pFA=omission error，极端率用0.5/N校正，criterion符号须沿用此约定。",
+        "display_score": "score=100×sqrt(goAccuracy×nogoAccuracy)，是几何均值展示分，不是百分位，也不证明同龄位置。",
+        "exclusion": "trialLength>1600ms标flagged；goAccuracy<.5标omissionErrorRate；被标trial的时长总和>60000ms标trialFlags；连续无反应>75次标nonResponse（严格>，不是>=75）。汇总tmp1未过滤flagged；flags不是自动删样本。",
+        "paper_difference": "2015论文299试次/4分钟、固定序列，平均呈现时长偏离800ms达到10%和30s无反应为排除依据；不能混入当前Apr24规则或称已原样复现。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "优先报告遗漏/误按率、正确反应RT分布及CV，另列dprime/crit定义与有效分母；保留原score仅作透明派生值，不标0–100能力分。",
+        "qc": "先锁晚反应归属契约并建立人工golden cases；技术时序标记与参与度/理解标记分别呈示。是否排除以及哪套规则需预注册，不能静默用上游QC做能力判断。",
+        "version": "固定150或299试次、seed/图片序列、输入设备、图像大小。改变照片或时长就是新变式，必须验证。"
+      },
+      "literature": [
+        {
+          "citation": "Fortenbaugh et al. (2015). Sustained Attention Across the Life Span in a Sample of 10,000: Dissociating Ability and Strategy.",
+          "url": "https://www.bu.edu/ballab/pubs/Psychological%20Science-2015-Fortenbaugh-0956797615594896.pdf",
+          "read": "作者实验室公开PDF方法、刺激及排除段已读；另一个作者站PDF超时，未据此断言缺文献",
+          "relationship": "299试次4分钟版不是当前默认150试次2分钟版；样本年龄范围不作为本任务产品适用年龄。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "LGPL-3.0；文件头与仓README一致，COPYING.LESSER/GPL配套文本见首轮冻结证据",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "保留版权、LGPL、改动说明及相应源代码/分发义务；不能统一改MIT。"
+        },
+        "assets": {
+          "description": "仓README默认stimuli为CC-BY-SA4.0，task overview有优先例外；本轮未读取GradCPT overview的具体图片致谢/例外",
+          "copyright_status": "待联系授权",
+          "condition": "先核该overview，若无例外按CC-BY-SA4.0署名/同许可；不能由代码LGPL推断图片许可。必要时联系权利人，不表示已知禁止。"
+        },
+        "strategy": "先协议与scorer契约提取；是否合规复用原图/代码取决于许可清点和集成方式。"
+      },
+      "reuse_decision": {
+        "route": "代码适配",
+        "reusable": "最值得继续审的部分是明确raw数据契约、晚反应归属及计分/QC标记；可原许可隔离复用或按文献重实现。",
+        "hold": "不直接把score、flag或论文年龄轨迹用于用户报告；素材overview、设备时序、失焦策略、输入归属单元例尚未完成。"
+      },
+      "plain_report": {
+        "can_say": [
+          "这次连续任务中，城市漏按多少次、山景误按多少次，正确反应的速度波动如何。",
+          "有多少试次出现呈现异常，结果是否需要谨慎解释。"
+        ],
+        "cannot_say": [
+          "score=80就是超过80%同龄人。",
+          "据此确诊ADHD、预测课堂专注、推断脑年龄或把2分钟版等同研究常模。"
+        ]
+      },
+      "open_questions": [
+        "读取GradCPT Task Overview和数据字典，逐图许可/署名核对。",
+        "当前源码flags与最终分析排除的关系必须由研究方案决定。",
+        "晚反应归属、连按/按住、跨设备交互与掉帧的静态测试样例待设计，未执行。",
+        "中文目标群体的练习/可理解性、时长可靠性和再测效应。"
+      ],
+      "evidence": [
+        {
+          "role": "练习/正式、assignTrial、saveData、summary和QC关键路径已静态读",
+          "path": "TMB_Tests/TMB_GradCPT/src/GradCPT_Main.v1.Apr24.html",
+          "url": "https://github.com/manybrainsproject/TestMyBrainCodeRepo/blob/ec09ea0d35779bb39997131313dfd1380ee34922/TMB_Tests/TMB_GradCPT/src/GradCPT_Main.v1.Apr24.html"
+        },
+        {
+          "role": "代码/素材许可声明已读",
+          "path": "README.md",
+          "url": "https://github.com/manybrainsproject/TestMyBrainCodeRepo/blob/ec09ea0d35779bb39997131313dfd1380ee34922/README.md"
+        },
+        {
+          "role": "存在性确认；本轮未读内容，明确待核，不作已读证据",
+          "path": "TMB_Tests/TMB_GradCPT/docs/Task Overview TMB GradCPT.pdf",
+          "url": "https://github.com/manybrainsproject/TestMyBrainCodeRepo/blob/ec09ea0d35779bb39997131313dfd1380ee34922/TMB_Tests/TMB_GradCPT/docs/Task%20Overview%20TMB%20GradCPT.pdf"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "源码trialLength>1600ms标试次；标记试次时长总和>60000ms标会话；只是作者软件技术警示，摘要未自动剔除。"
+        ],
+        "理论参照": [
+          "dprime/criterion为信号检测定义；100×sqrt(goAcc×nogoAcc)是派生展示分，没有百分位含义。"
+        ],
+        "文献经验": [
+          "2015论文平均过渡时长偏差达10%/≥30秒无反应的研究排除，和Apr24源码规则不同。",
+          "Apr24上游软件另有goAcc<.5与无反应串>75的操作性质量警示；属于作者来源经验规则而非已验证能力界线，也非纯设备故障指标。"
+        ],
+        "项目暂定研究者规则": [
+          "是否采用哪一套排除、如何处理技术异常须预注册；暂不把上游flags自动转换为项目删样本或用户能力判定。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "研究储备",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "代码适配",
+        "deduplication_class": "protocol_variant",
+        "closest_baseline_families": [
+          "cpt",
+          "gonogo"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次城市图片漏按 {城市漏按次数}/{城市有效次数} 次，山景误按 {山景误按次数}/{山景有效次数} 次；正确回应的中位用时为 {正确反应中位毫秒数} 毫秒。结果不代表同龄排名。",
+        "limited": "部分图片呈现或按键归属受到影响，相关指标暂不解释；只展示质量足够且未受影响的记录。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-blink-holcombe",
+      "name_zh": "注意闪瞬：Holcombe 双目标字母辨认变式",
+      "priority_rank": 5,
+      "construct": {
+        "target": "研究快速字母流中两个目标的时间选择表现，分析随目标间隔变化的T2报告；不是一般专注能力总分。",
+        "coverage_gap": "attentional blink；采用补充真实来源，不强行归入三主库。",
+        "evidence_level": "作者开源实验脚本和README；经典Raymond论文用于范式/条件分析依据，双圈双字母版并非其白字母+X检测版，未确认此SHA独立效度。"
+      },
+      "source": {
+        "repository": "alexholcombe/attentional-blink",
+        "sha": "cabc4e5857b2adbd2112344b43db989dfd4e818f",
+        "commit_date_utc": "2021-08-23T05:30:43Z",
+        "task_version": "AB.py main, task=T1T2, defaultNoiseLevel=0, staircase默认关闭",
+        "path": "AB.py",
+        "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/AB.py",
+        "replacement_reason": "在PEBL/Flower/TestMyBrain任务树和ExpFactory冻结树的本次目录/关键词核查未找到目标AB脚本；GitHub代码检索找到作者仓。另以已评OpenSesame AB示例交叉核查；没找到不等于全库客观不存在。"
+      },
+      "protocol_observed": {
+        "practice": "无固定自动练习block；README要求操作者先另跑若干试次、ESC退出并忽略练习数据。不能编造8/10练习或宣称默认已带通过标准。需要独立制定并标为本地新协议。",
+        "formal": "T1位置索引[6,7,8,9,10] × T2 lag[1,2,5,8,10] × trialsPerCondition=8 = 200正式；各lag40次。位置索引为0起，显示序位应加1。",
+        "stimuli": "26个大写字母无重复打乱；目标由环形提示标出，按顺序报告两个字母；默认无噪声。名义SOA133ms、letter80ms，分别floor成帧。60Hz设定下意图4帧字母+3帧空白=约116.7ms SOA（不是133ms）；waitBlanking=False且默认非全屏，不能声称实测达到。",
+        "timing": "预刺激等待0.1s，再按公式floor((rand/2+0.3)×refreshRate)+20帧注视；不采用注释中另一范围作实际时序。",
+        "response": "键盘输入A–Z；collectStringResponse等待2个字符，支持退格/退出；requireAcceptance=False，不要求ENTER确认。未设已核实的反应超时。",
+        "randomization": "numpy随机字母与TrialHandler设计顺序；未见已启用的seed固定/输出。数据存目标位置/目标字符/回答/相对位置，不等于全流轨迹可重放。",
+        "raw_fields": [
+          "experimentPhase",
+          "trialnum",
+          "task",
+          "noisePercent",
+          "answerPos0/1",
+          "answer0/1",
+          "response0/1",
+          "correct0/1",
+          "responsePosRelative0/1",
+          "timingBlips"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "逐目标exact正确和相对目标位置误差；approxCorrect为报告在目标前后3个序位内。结尾按lag的T2准确率使用全部该lag试次分母，未限定T1正确。approx指标不是标准T2|T1 exact。",
+        "exclusion": "timingCheckAndLog按>1.3×预计帧长记录timingBlips；注释称150%但代码为130%，报告以代码为准。记录不是自动排除。",
+        "optional_staircase": "可选独立噪声staircase：preface20、最多25阶梯、threshCriterion=.58；README注明cue1位置/lag不逐trial改变的未解决事项。本卡不选此模式，不把噪声阈值作能力分。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "主研究指标拟用每lag的T2 exact accuracy conditional on T1 exact correct，并同时给T1准确率/有效分母；原all-trial T2和±3近似仅作分开补充。此条件化来自经典范式分析，不是本脚本现成汇总。",
+        "qc": "RSVP必须先完成真实刷新率、逐帧时序、目标cue可见度核验；保留异常不静默重试。练习、最少有效分母、掉帧排除在试点后预注册，无先验能力阈值。",
+        "version": "选定双辨认还是白T1+X检测，不能把两者参数混接；浏览器重写用新协议ID，不宣称经典原版。"
+      },
+      "literature": [
+        {
+          "citation": "Holcombe attentional-blink README",
+          "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/README.md",
+          "read": "作者README已读",
+          "relationship": "提供main与噪声阶梯运行说明；其中引述的Martini参数不是当前AB.py默认参数。"
+        },
+        {
+          "citation": "Raymond, Shapiro & Arnell (1992). Temporary Suppression of Visual Processing in an RSVP Task: An Attentional Blink?",
+          "url": "https://psych.hanover.edu/classes/Cognition/Papers/raymond%20et%20al%201992%20attn%20blink.pdf",
+          "read": "原论文PDF实验2方法与条件化分析已读",
+          "relationship": "白T1辨认+X有无检测、含控制条件，和本卡双字母环形提示不同；不移植其具体结果/诊断推断。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "MIT，LICENSE.md Copyright2015-present Alex O. Holcombe",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "保留MIT与作者版权；PsychoPy及其他依赖独立许可。"
+        },
+        "assets": {
+          "description": "几何环和文字可自行生成；仓内406__tictacshutup__click-1-d.wav的单独来源许可未确认",
+          "copyright_status": "待联系授权",
+          "condition": "不直接复制音频，先核其授权；若重实现自制反馈音/不用音频，应记录为新版本。"
+        },
+        "strategy": "文献自研优先，MIT脚本适合作实现对照；尚非可直接上线程序。"
+      },
+      "reuse_decision": {
+        "route": "文献自研",
+        "reusable": "目标位置×lag设计、trial级目标答案和响应相对位置、逐帧diagnostic思路。",
+        "hold": "本卡不采用噪声staircase；默认时序换算、非全屏/不同步、练习缺口与conditioned score未实现需重新设计验证。"
+      },
+      "comparison_variant": {
+        "repository": "open-cogsci/OpenSesame",
+        "sha": "5b2479d556996a5b628e9526eba4a922196a1d84",
+        "path": "opensesame_extensions/core/example_experiments/examples/attentional_blink/experiment.osexp",
+        "url": "https://github.com/open-cogsci/OpenSesame/blob/5b2479d556996a5b628e9526eba4a922196a1d84/opensesame_extensions/core/example_experiments/examples/attentional_blink/experiment.osexp",
+        "license": "GPL-3.0根COPYING；几何/字母资产另核字体",
+        "protocol": "白T1辨认+X检测；lag0–8的9个present加9个absent=18条件；block_loop repeat=1；practice_loop2块，experimental_loop10块。静态执行路径为36练习+180正式，而block_repeat字段练习0.5/正式2未被该loop使用。fixation995ms，letter_dur10ms+isi70ms；回应无限等待。",
+        "static_risks": [
+          "T1答案在替换lag0的X之前赋值；lag0实际显示白X而correct_response仍是旧字母，需验证修正。",
+          "说明笔记15ms/75ms/180ms与当前执行值10ms/70ms/995ms不一致。"
+        ],
+        "decision": "暂缓直接复用；仍可作范式结构/日志参考。不是第8项独立任务。"
+      },
+      "plain_report": {
+        "can_say": [
+          "这次快速字母流中，在先认对第一个字母的试次里，第二个字母在不同间隔下的认对比例。"
+        ],
+        "cannot_say": [
+          "注意闪瞬大就是注意力差或学习障碍。",
+          "把±3近似正确当完全辨认正确，或把任意短流小游戏称临床注意闪瞬测验。"
+        ]
+      },
+      "open_questions": [
+        "选择双辨认或T1+X检测目标范式并独立冻结，不混用。",
+        "固定练习方案、完整刺激流和seed；逐lag有效分母/精度。",
+        "显示器刷新下真实SOA、cue显著度及失焦处理；本轮未运行。",
+        "目标人群字母熟悉度影响与中文指令；不把字母表现视为无文化负担。"
+      ],
+      "evidence": [
+        {
+          "role": "main设计/呈现/计分/时序diagnostic关键路径已静态读",
+          "path": "AB.py",
+          "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/AB.py"
+        },
+        {
+          "role": "输入/退出/无超时已静态读",
+          "path": "stringResponse.py",
+          "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/stringResponse.py"
+        },
+        {
+          "role": "作者协议和阶梯限制已读",
+          "path": "README.md",
+          "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/README.md"
+        },
+        {
+          "role": "MIT全文已读",
+          "path": "LICENSE.md",
+          "url": "https://github.com/alexholcombe/attentional-blink/blob/cabc4e5857b2adbd2112344b43db989dfd4e818f/LICENSE.md"
+        },
+        {
+          "role": "交叉变式全关键路径已读",
+          "path": "opensesame_extensions/core/example_experiments/examples/attentional_blink/experiment.osexp",
+          "url": "https://github.com/open-cogsci/OpenSesame/blob/5b2479d556996a5b628e9526eba4a922196a1d84/opensesame_extensions/core/example_experiments/examples/attentional_blink/experiment.osexp"
+        },
+        {
+          "role": "GPL-3.0已核",
+          "path": "COPYING",
+          "url": "https://github.com/open-cogsci/OpenSesame/blob/5b2479d556996a5b628e9526eba4a922196a1d84/COPYING"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "Holcombe代码按帧间隔>1.3×预计帧长记timingBlips；不是自动排除，更非能力阈值。"
+        ],
+        "理论参照": [
+          "按lag对照T2|T1正确是条件化分析；±3序位为另一近似计分定义，不是能力合格线。"
+        ],
+        "文献经验": [
+          "Raymond原论文的控制/实验比较与样本分析不等于当前双辨认版的能力cutoff；不从经典闪瞬时间范围判人正常异常。"
+        ],
+        "项目暂定研究者规则": [
+          "拟用T1 exact条件化T2 exact作为主分析，另建练习和有效分母标准；数值标准未定、未验证。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "研究储备",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "文献自研",
+        "deduplication_class": "new_family_candidate",
+        "closest_baseline_families": [
+          "cpt"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "在先认对第一个字母的试次中，不同间隔下第二个字母认对的次数为 {各间隔第二目标正确次数及有效分母}。这里只描述本次快速字母流中的表现。",
+        "limited": "部分画面时序或第一目标记录不足，相关间隔下第二目标的认对比例暂不解释。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-visual-search-pebl",
+      "name_zh": "视觉搜索：PEBL 双阶段搜索—定位变式",
+      "priority_rank": 6,
+      "construct": {
+        "target": "目标在干扰项中的搜索时间及位置辨认；只称范式目标，不宣称此具体变式已验证一般注意能力。",
+        "coverage_gap": "visual search（不把未提交草稿算已入库）",
+        "evidence_level": "PEBL原作者任务说明和固定源码；本卡未找到/核验该精确双阶段变式的独立心理测量效度文献。"
+      },
+      "source": {
+        "repository": "stmueller/pebl",
+        "sha": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+        "task_version": "vsearch，源码作者2010–2014；about标迁移至PEBL2.3/2026，不作为同版效度证据",
+        "path": "battery/vsearch/vsearch.pbl",
+        "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/vsearch/vsearch.pbl"
+      },
+      "protocol_observed": {
+        "practice": "10个固定结构练习：显示10项，0目标/1目标交替5次；目标字符/颜色随机。",
+        "formal": "目标字符O/X × 目标色white/green × 总项目10/20/30 × 目标个数0/1/5 = 36条件。parpairs和schema写reps=5，但CreateParameters后无条件gParams.reps<-1，实际默认执行路径36正式，不是180；不是if(0)调试路径。",
+        "stimuli": "黑底；搜索框600×400像素；干扰字符U/D/G/C/Q均白；目标预览800ms，之后在随机位置显示搜索阵列；字号30，位置生成拟最小间距40像素、最多100次调整。",
+        "response": "阶段1先按鼠标表示完成搜索，得到rt1；隐藏字符后出现位置圆圈及NONE按钮；阶段2只选择一个位置或NONE，得到rt2。不是标准有/无两键RT，也不是点击找完全部5个目标。",
+        "timeout": "两阶段分别WaitForDownClick、WaitForClickOnTarget，未见trial反应截止。",
+        "randomization": "条件Shuffle、目标/练习Sample、坐标Random；未见任务seed记录。输出刺激字符串但未见完整坐标写入raw，不能仅凭字符重放原阵列。",
+        "raw_fields": [
+          "trial",
+          "time",
+          "numtargs",
+          "size",
+          "targchar",
+          "targcol",
+          "stim",
+          "resp",
+          "corr",
+          "rt1",
+          "rt2"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "保存搜索rt1、选择rt2、正确标记，汇总条件meanRT/meanAcc；均值不先筛正确试次；未生成搜索斜率或常模。",
+        "exclusion": "练习不写正式输出循环；未见反应超时/失焦/快反应过滤。",
+        "critical_static_risk": "SearchTrial将NONE按钮放在响应目标列表首位，并对应Sequence(0,num,1)中的0。无目标时corr=(resp==0)；有目标时corr=(resp<=numtargs)，所以静态推断NONE=0也会判对。未见该分支排除0；本轮未运行复现。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "先冻结任务是两阶段定位式还是另选标准yes/no搜索；若保留本版，正确应区分无目标和有效目标ID。修正计分属于新版本变更，不把原摘要直接导入。",
+        "scoring": "拟按条件报告正确率及正确定位试次的rt1/rt2，搜索斜率仅在充分重复和已定模型后探索；当前每cell一次不足以当稳定个体斜率。",
+        "qc": "保存完整坐标、首次点击和位置选择、timeout/失焦；区分未完成与错误。任何新增超时或最小有效数均为本地拟议规则，不是原作者阈值。"
+      },
+      "literature": [
+        {
+          "citation": "Mueller, S.T. (2011). The PEBL Visual Search Task. 作者软件说明。",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/vsearch/vsearch.pbl.about.txt",
+          "read": "任务作者about已读",
+          "relationship": "给出软件引用、两阶段数据字段及参数；不等于独立效度论文。about的reps=5与当前代码无条件覆盖不一致。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "根GPL-2.0；vsearch文件头另写可使用/修改/再分发的宽松授权，但后续贡献与框架边界需核清",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "保守按根GPL履约，不能仅凭早期头注把整套迁移代码改MIT；若需要更宽松分发应联系确认。"
+        },
+        "assets": {
+          "description": "文字/圆圈程序生成，依PEBL字体和UI；没有该任务专属照片",
+          "copyright_status": "待联系授权",
+          "condition": "沿用字体或框架素材前核查；可独立绘制且选明确开放字体，不借此声称标准测验身份。"
+        },
+        "strategy": "协议参考可用；文献独立实现需先选有明确定义的视觉搜索变式。"
+      },
+      "reuse_decision": {
+        "route": "文献自研",
+        "reusable": "总项目数×目标个数×目标颜色/形状条件矩阵、搜索和位置反应分离的设计思路。",
+        "hold": "当前计分和重复数静态风险决定不直接复用现成运行时；缺精确变式效度来源，暂不作为能力测评产品。"
+      },
+      "plain_report": {
+        "can_say": [
+          "本次搜索中，不同项目数/目标条件下，你完成搜索和随后定位的速度、正确率。"
+        ],
+        "cannot_say": [
+          "这就是标准视觉搜索能力分/同龄百分位。",
+          "未修正计分就把NONE响应算作找到了目标；或把两阶段rt1直接等同经典按键搜索RT。"
+        ]
+      },
+      "open_questions": [
+        "选两阶段定位式还是原文支持的yes/no变式；二者不能混称。",
+        "明确是否保持36还是恢复180正式；改变重复数后重新评估精度。",
+        "验证NONE分支、正式raw与summary一致性；本轮未修复或运行。",
+        "实际显示范围、鼠标运动/触控负担、目标群体理解和布局；完整坐标/seed缺口。"
+      ],
+      "evidence": [
+        {
+          "role": "设计、双响应、计分分支已静态读",
+          "path": "battery/vsearch/vsearch.pbl",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/vsearch/vsearch.pbl"
+        },
+        {
+          "role": "reps和默认条件",
+          "path": "battery/vsearch/params/vsearch.pbl.schema.json",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/vsearch/params/vsearch.pbl.schema.json"
+        },
+        {
+          "role": "作者任务说明已读",
+          "path": "battery/vsearch/vsearch.pbl.about.txt",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/vsearch/vsearch.pbl.about.txt"
+        },
+        {
+          "role": "根代码许可",
+          "path": "COPYING",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/COPYING"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "本任务未见独立自动技术QC阈值；响应无截止；坐标生成100次上限是生成器参数。"
+        ],
+        "理论参照": [
+          "按目标有无/身份判定正确是任务定义；搜索斜率是可能研究指标，非现成能力阈值。"
+        ],
+        "文献经验": [
+          "本卡只有作者软件说明，未核精确变式效度/经验排除；不借他任务cutoff。"
+        ],
+        "项目暂定研究者规则": [
+          "拟修正NONE的正确性定义、补位置和异常日志并按正确试次汇总；改变现版本必须另立验证，暂不定合格线。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "研究储备",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "文献自研",
+        "deduplication_class": "new_family_candidate",
+        "closest_baseline_families": [
+          "patterncompare",
+          "flanker"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次在不同项目数和目标条件下，正确定位次数为 {各条件正确次数及有效分母}；完成搜索和随后定位的用时分开展示。两阶段用时不是一个标准注意能力分。",
+        "limited": "部分搜索或定位记录未完成，或计分规则尚不能确认；相关正确率和速度不作解释。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "review_date_utc": "2026-10-26",
+      "scope": "协议候选；只静态读取固定SHA源码与作者文献/文档，未执行第三方源码、未安装依赖、未测设备时序，未修改产品；研究提取阶段未执行外部写入，文档交付状态见 README。",
+      "norms_and_population": {
+        "norms": "未建立中文或本地常模；不生成百分位、年龄常模、能力等级或诊断。",
+        "age_suitability": "本轮未确认目标年龄适用性；研究样本年龄不是产品适用范围。",
+        "validity_transfer": "上游范式研究不自动验证本SHA、翻译、缩短版或浏览器重实现。"
+      },
+      "qc_boundary": "技术QC和任务理解/参与度警示不是能力阈值；低正确率不自动等于注意力差，不因低分而静默剔除。",
+      "id": "attention-dual-task-pebl",
+      "name_zh": "双任务干扰：PEBL 双箭头双反应变式",
+      "priority_rank": 7,
+      "construct": {
+        "target": "对比单维度和同时双维度反应中的干扰；涉及视觉判别、动作选择/双手协调。只称范式目标，不认定纯分配注意力或普适多任务能力测验。",
+        "coverage_gap": "dual task",
+        "evidence_level": "作者about和实际源码；未核实精确默认变式独立领域效度文献。"
+      },
+      "source": {
+        "repository": "stmueller/pebl",
+        "sha": "eb22a0725d765a0597a4905920ad3c603b1c9ae8",
+        "task_version": "dualtask，实际stimtype=4，默认无yoked块",
+        "path": "battery/dualtask/dualtask.pbl",
+        "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/dualtask/dualtask.pbl"
+      },
+      "protocol_observed": {
+        "practice": "每block前8个练习（4种刺激各2次打乱）；默认12块，合计96练习，不是全程仅8练习。",
+        "formal": "numrounds=4；每轮固定single维度1、single维度2、dual顺序，各25正式；12块共300正式、每类100。doyoked=0；打开才增加第4块，不能混用默认总数。",
+        "stimuli": "parpairs写stimtype=3，但CreateParameters后无条件覆盖为4；实际为上下红/蓝箭头并左右错开40像素，4种方向组合。不是文件头宣称的默认shape+size。smallsize源码65，schema写70，须冻结。",
+        "timing": "注视300–800ms；两维度刺激同时开始（SOA=0）；等待一个或两个响应，默认deadline5000ms；正确反馈500ms，任何相关错误延至1000ms。",
+        "response": "维度1按1/2，维度2按9/0；GetResponses分别锁定每维度首响应；单任务只监听相关键，双任务要两维度均回应或达截止。",
+        "timeout": "5000ms后停止；未回答维度resp=NA、rt=0，tooslow标记；rt=0亦用于当前不要求回应的维度，不能把它们混为真实0ms反应。",
+        "randomization": "每块4种刺激balanced sampling到25次，不能四等分；练习ShuffleRepeat。未见block顺序平衡/seed记录。",
+        "raw_fields": [
+          "stimtype",
+          "block",
+          "trialtype(PRACTICE/TEST)",
+          "trial",
+          "condition",
+          "stim",
+          "dim1",
+          "dim2",
+          "time0",
+          "resp1",
+          "rt1",
+          "corr1",
+          "resp2",
+          "rt2",
+          "corr2",
+          "tooslow"
+        ]
+      },
+      "original_metrics_and_exclusion": {
+        "metrics": "每块两个RT均值、两正确率、tooslow均值；当前均值直接使用返回值，含未答/非活动维度0；未生成正式dual-task cost。固定顺序可能混入学习、疲劳效应。",
+        "exclusion": "练习单独标记但保存；未见依据correct/tooslow筛除后再算RT；无浏览器失焦QC。",
+        "optional_rule": "doyoked=1的额外同步响应块提示50ms窗口是可选任务要求，不是默认双任务能力阈值。本卡不采用。"
+      },
+      "proposed_rules_not_upstream": {
+        "analysis": "若未来使用，先对每维度分别定义dual−single的正确有效反应RT差和准确率差，并报告两者；不可用单一总分掩盖速度—准确率权衡。这是拟议后处理，不是已有原指标。",
+        "qc": "依据trialtype、当前维度是否需反应、NA与tooslow区分有效RT；0ms不进入速度均值。记录设备键盘同时按键限制、手指映射/失焦；不把低准确率当技术故障。",
+        "design": "如需改顺序平衡、独立分配注意测量或PRP-SOA操纵，应另立有原文依据的新协议；当前SOA恒0不能称完整PRP曲线任务。"
+      },
+      "literature": [
+        {
+          "citation": "PEBL dualtask 作者任务说明",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/dualtask/dualtask.pbl.about.txt",
+          "read": "已读，说明单独响应一维与同时响应两维",
+          "relationship": "该说明未给独立效度论文；本轮不补写未经核验文献或声称标准化。"
+        }
+      ],
+      "licensing": {
+        "code": {
+          "license": "根COPYING GPL-2.0，所读任务未另给宽松声明",
+          "copyright_status": "可 GitHub 公开",
+          "condition": "适用GPL与框架义务须保留；不认为公开可见即任意闭源复制。"
+        },
+        "assets": {
+          "description": "几何双箭头/圆方可绘制；字体/框架UI独立",
+          "copyright_status": "待联系授权",
+          "condition": "原字体/打包素材若沿用需核清；自绘新刺激须版本化，不能偷换测量身份。"
+        },
+        "strategy": "范式/研究设计补充优先，现成协议采用暂缓。"
+      },
+      "reuse_decision": {
+        "route": "暂缓",
+        "reusable": "可用于比较双反应raw结构、锁首响应与单/双任务条件；不按低优先级否定范式研究价值。",
+        "hold": "在找到精确变式原文支持、澄清默认强制覆盖、重设计顺序与修正RT零值处理前，不作为优先能力任务采用；本轮不编码修复。"
+      },
+      "plain_report": {
+        "can_say": [
+          "在这次双箭头任务里，同时回答两种方向与单独回答时的反应变化。"
+        ],
+        "cannot_say": [
+          "你擅长/不擅长现实世界多任务或适合某职业。",
+          "将5000ms/50ms等任务设置解释为正常/异常能力界线。"
+        ]
+      },
+      "open_questions": [
+        "确切默认变式的理论/原文和适用群体证据；目前仅作者软件说明。",
+        "单任务和双任务是否应顺序平衡，动作兼容/手指映射影响如何控制。",
+        "schema与源码默认差异；NA/0/timeout的raw和summary对齐。",
+        "如保留yoked，需另审其同步提示索引和计分，不在本卡默认范围。"
+      ],
+      "evidence": [
+        {
+          "role": "默认执行路径、12块、练习、GetResponses与计分已静态读",
+          "path": "battery/dualtask/dualtask.pbl",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/dualtask/dualtask.pbl"
+        },
+        {
+          "role": "参数差异",
+          "path": "battery/dualtask/params/dualtask.pbl.schema.json",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/dualtask/params/dualtask.pbl.schema.json"
+        },
+        {
+          "role": "作者说明已读",
+          "path": "battery/dualtask/dualtask.pbl.about.txt",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/battery/dualtask/dualtask.pbl.about.txt"
+        },
+        {
+          "role": "代码许可",
+          "path": "COPYING",
+          "url": "https://github.com/stmueller/pebl/blob/eb22a0725d765a0597a4905920ad3c603b1c9ae8/COPYING"
+        }
+      ],
+      "evidence_read_dates_utc": [
+        "2026-10-25",
+        "2026-10-26"
+      ],
+      "rule_classification": {
+        "技术质量规则": [
+          "未见独立掉帧/失焦规则；5000ms为作答窗口，yoked50ms为可选任务要求，不是技术/能力合格线。"
+        ],
+        "理论参照": [
+          "拟比较同一维度dual与single差值；差值0不是多任务能力正常边界。"
+        ],
+        "文献经验": [
+          "精确默认变式未核到独立效度/排除文献，仅作者软件说明，不补造阈值。"
+        ],
+        "项目暂定研究者规则": [
+          "拟区分NA、非活动维度与超时0ms，重新定义有效RT；采用前先找明确协议支持，现阶段暂缓。"
+        ]
+      },
+      "rule_classification_note": "四类名称固定；试次数、反应窗口、呈现长度和刺激比例另列protocol_observed，不一概叫阈值。所有规则不输出能力等级。",
+      "integration_selection": {
+        "priority": "研究储备",
+        "status": "SOURCE_RESEARCH_ONLY",
+        "implementation_strategy": "暂缓",
+        "deduplication_class": "new_family_candidate",
+        "closest_baseline_families": [
+          "reaction",
+          "taskswitch"
+        ],
+        "counting_note": "归类为研究候选而非正式新增任务；接入前按六个协议轴进一步复核。"
+      },
+      "public_report_examples": {
+        "interpretable": "本次同时回答两个箭头方向与单独回答时，各方向的正确次数和有效反应用时为 {分条件记录}。这不用于判断现实生活中是否擅长多任务。",
+        "limited": "部分方向未回答或不要求回答，相应零值不是零毫秒反应；受影响速度指标暂不解释。",
+        "invalid": "本次有效记录不足或关键流程不完整，暂不提供表现结论。",
+        "binding_required": true,
+        "comparison_policy": "只在实际指标和质量状态支持时描述差异；反向按实际写，不能支持差异时只列条件记录、不宣称等效。负差值不裁零。"
+      }
+    }
+  ]
+}

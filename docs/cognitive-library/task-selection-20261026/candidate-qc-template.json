@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "RESEARCH_INTAKE_TEMPLATE_NOT_RUNTIME_IMPORT",
+  "baselineCommit": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "instructions": [
+    "Copy one record per candidate task/protocol, not per repository.",
+    "All nulls mean unknown/not supplied; no readiness or scientific result is asserted.",
+    "Parameter defaults and thresholds are different fields.",
+    "Required fixed threshold labels are enumerated in allowedThresholdTypes.",
+    "Do not promote this planning object to an onboarding PASS or publication decision.",
+    "Rights disposition and implementation strategy are independent; evaluate code and stimulus assets separately. A private-use plan is not an authorization grant."
+  ],
+  "allowedThresholdTypes": [
+    "技术质量规则",
+    "理论参照",
+    "文献经验",
+    "项目暂定研究者规则"
+  ],
+  "candidate": {
+    "candidateId": null,
+    "displayName": null,
+    "oneSentenceUserInstruction": null,
+    "selectionStatus": "SOURCE_RESEARCH_ONLY",
+    "deduplication": {
+      "classification": "unresolved",
+      "closestExistingFamilies": [],
+      "materialProtocolDifferences": [],
+      "newFamilyRationale": null
+    },
+    "source": {
+      "repositoryUrl": null,
+      "commitSha": null,
+      "taskFiles": [],
+      "scoringFiles": [],
+      "licenseFiles": [],
+      "upstreamProtocolReferences": [],
+      "lastVerifiedAt": null,
+      "codeRights": {
+        "status": "UNVERIFIED",
+        "license": null,
+        "notices": []
+      },
+      "assetRights": {
+        "status": "UNVERIFIED",
+        "assets": []
+      },
+      "adaptationIntent": null,
+      "rightsDisposition": {
+        "code": null,
+        "assets": null,
+        "conditions": [],
+        "status": "UNVERIFIED"
+      },
+      "implementationStrategy": null
+    },
+    "tool": {
+      "runtimeFramework": null,
+      "dependencyVersions": [],
+      "inputModes": [],
+      "deviceRequirements": [],
+      "timingSensitivity": null,
+      "hardwareTimingEvidence": null,
+      "populationScope": null,
+      "language": null,
+      "intendedUse": null,
+      "accessibilityAndBurden": []
+    },
+    "parameterTemplate": {
+      "key": null,
+      "unit": null,
+      "sourceDefault": null,
+      "proposedValue": null,
+      "sourcePermalink": null,
+      "changeRationale": null,
+      "measurementCritical": null,
+      "profile": null,
+      "version": null,
+      "isThreshold": false
+    },
+    "protocol": {
+      "phases": [],
+      "practiceIncludedInScoring": null,
+      "trialAndConditionCounts": null,
+      "stimulusVersion": null,
+      "timingAndTimeouts": null,
+      "responseMapping": null,
+      "randomizationAndSeed": null,
+      "adaptiveAndStopRules": null,
+      "missingAndInterruptedTrialPolicy": null
+    },
+    "rawFieldTemplate": {
+      "fieldPath": null,
+      "type": null,
+      "unit": null,
+      "nullable": null,
+      "missingMeaning": null,
+      "collectedOrDerived": null,
+      "scoringPurpose": null,
+      "baselineMapping": null,
+      "retentionAndAccess": null
+    },
+    "metricTemplate": {
+      "key": null,
+      "plainLabel": null,
+      "definitionAndFormula": null,
+      "denominator": null,
+      "includedTrials": null,
+      "exclusions": null,
+      "unit": null,
+      "direction": null,
+      "allowsNegative": null,
+      "nullCondition": null,
+      "qualityGates": [],
+      "userVisibility": "research_only",
+      "referenceEligible": false,
+      "sourcePermalink": null
+    },
+    "thresholdTemplate": {
+      "id": null,
+      "type": null,
+      "valueOrExpression": null,
+      "unit": null,
+      "operator": null,
+      "targetField": null,
+      "purpose": null,
+      "sourcePermalink": null,
+      "sourceExactLocator": null,
+      "evidenceStrength": null,
+      "sample": {
+        "source": "UNSPECIFIED",
+        "n": null,
+        "ageRange": null,
+        "language": null,
+        "device": null,
+        "protocol": null,
+        "uncertainty": null
+      },
+      "assumptions": [],
+      "applicability": {
+        "identity": null,
+        "profile": null,
+        "resolvedConfigHash": null,
+        "stimulusVersion": null,
+        "population": null
+      },
+      "effectWhenTriggered": null,
+      "plainExplanation": null,
+      "limitations": [],
+      "researcher": null,
+      "version": null,
+      "reviewCondition": null,
+      "normativePercentileAllowed": false
+    },
+    "report": {
+      "headline": null,
+      "userMetrics": [],
+      "researchMetrics": [],
+      "interpretableText": null,
+      "limitedText": null,
+      "invalidText": "本次数据未达到可解释条件，暂不提供表现结论。",
+      "evidenceBindings": [],
+      "disclaimer": "结果仅描述本次任务表现，不等同于诊断、稳定能力等级或人群百分位。",
+      "claimedPercentiles": false,
+      "legacyScorePlan": "UNRESOLVED_DO_NOT_INVENT_SCORE",
+      "freezeRequirements": [
+        "identity",
+        "resolvedConfigHash",
+        "protocolSignature",
+        "profile",
+        "stimulusVersion",
+        "metricDefinitionVersion",
+        "qualityDefinitionVersion",
+        "reportDefinitionVersion",
+        "presentationVersion"
+      ],
+      "invalidMetricsRemainInternal": true
+    },
+    "verificationPlanOnly": {
+      "executed": false,
+      "requiredCases": [
+        "golden",
+        "empty",
+        "insufficient",
+        "timeout_or_premature_if_applicable",
+        "interrupted",
+        "invalid_sequence",
+        "null_and_signed_metrics_if_applicable",
+        "frozen_version_replay",
+        "quality_gated_report",
+        "raw_and_research_export_semantics"
+      ],
+      "originalSourceEvidence": [],
+      "adaptationEvidence": [],
+      "technicalResult": null,
+      "pilotPublishResult": null,
+      "scientificEligibility": null
+    },
+    "platformDependencies": [],
+    "scientificEvidenceTemplate": {
+      "kind": null,
+      "allowedKinds": [
+        "RESEARCH_FOUNDATION",
+        "PROVENANCE",
+        "EMPIRICAL_REFERENCE",
+        "FORMAL_OUTPUT"
+      ],
+      "reference": null,
+      "identity": {
+        "testType": null,
+        "engineVersion": null,
+        "scoringVersion": null
+      },
+      "scope": {
+        "profiles": [],
+        "protocolSignature": null,
+        "stimulusVersion": null,
+        "populationScope": null
+      },
+      "humanReviewStatus": "NOT_REVIEWED",
+      "applicabilityNote": null
+    }
+  },
+  "platformDependencyTemplate": {
+    "candidateId": null,
+    "impact": null,
+    "requiredCapability": null,
+    "baselineEvidence": null,
+    "route": "Separate platform review; PR356 owner to reconcile against its final pinned commit if applicable",
+    "pr356ImplementationStatus": "NOT_REVIEWED",
+    "resolutionEvidence": null,
+    "blockingStage": "PENDING_SCOPE_REVIEW",
+    "blockerExampleNotExecuted": {
+      "schemaVersion": 1,
+      "code": "COG_PLATFORM_CAPABILITY_REQUIRED",
+      "severity": "ERROR",
+      "domain": "REGISTRATION",
+      "gate": "TECHNICAL_BUILD",
+      "fieldPath": "candidate.requiredCapability",
+      "message": "Planning example only: replace with the exact unsupported contract and affected candidate before use.",
+      "expected": "Explicitly supported candidate contract",
+      "actual": "Not established by fixed baseline",
+      "remediation": {
+        "type": "PLATFORM_CAPABILITY",
+        "hint": "Keep required platform work separate from task content; no arbitrary score, schema bypass or assumed PR356 support."
+      }
+    }
+  },
+  "notClaimed": [
+    "readiness",
+    "validation pass",
+    "scientific validity",
+    "normative percentiles",
+    "runtime availability",
+    "current PR356 state",
+    "deployment"
+  ],
+  "allowedRightsDispositions": [
+    "可 GitHub 公开",
+    "获权后系统用但不公开",
+    "待联系授权"
+  ],
+  "allowedImplementationStrategies": [
+    "代码适配",
+    "文献自研",
+    "暂缓"
+  ]
+}

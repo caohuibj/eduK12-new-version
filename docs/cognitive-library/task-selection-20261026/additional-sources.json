@@ -1,0 +1,1265 @@
+{
+  "schema_version": "2.0",
+  "review_date_utc": "2026-10-25",
+  "title": "认知来源补查：五项目家族固定快照对照",
+  "status": "frozen_static_review",
+  "scope": "source evaluation only; no ingestion, PR, product-code edits, third-party execution or external writes",
+  "counts": {
+    "project_families_assessed": 5,
+    "primary_assessment_records": 5,
+    "primary_repositories_new_vs_first_round": [
+      "tatool/tatool-web",
+      "thesimonho/cognitive-battery",
+      "TaskBeacon/T000006-mid",
+      "ResearchKit/ResearchKit",
+      "ResearchStack/ResearchStack"
+    ],
+    "supporting_repositories_new_vs_first_round": [
+      "TaskBeacon/.github",
+      "TaskBeacon/H000006-mid",
+      "TaskBeacon/psyflow",
+      "TaskBeacon/taskbeacon.github.io"
+    ],
+    "all_new_fixed_snapshot_repositories_count": 9,
+    "all_new_fixed_snapshot_repositories": [
+      "ResearchKit/ResearchKit",
+      "ResearchStack/ResearchStack",
+      "TaskBeacon/.github",
+      "TaskBeacon/H000006-mid",
+      "TaskBeacon/T000006-mid",
+      "TaskBeacon/psyflow",
+      "TaskBeacon/taskbeacon.github.io",
+      "tatool/tatool-web",
+      "thesimonho/cognitive-battery"
+    ],
+    "first_round_overlap": [],
+    "real_cognitive_content_families_sampled": 4,
+    "framework_only_families": 1,
+    "actual_deeply_sampled_task_instances": [
+      "Tatool Mapping 1 with shared switching executor",
+      "cognitive-battery Sternberg",
+      "TaskBeacon MID (canonical Python + paired HTML, one paradigm)",
+      "ResearchKit Swift Stroop"
+    ],
+    "new_main_collection_priority_families": [
+      "tatool-web"
+    ],
+    "new_topic_reference_families": [
+      "cognitive-battery",
+      "researchkit"
+    ],
+    "discovery_only_families": [
+      "taskbeacon"
+    ],
+    "not_cognitive_content_source_families": [
+      "researchstack"
+    ]
+  },
+  "unified_rubric": {
+    "A": "针对明确用途优先细审：区分可反复挖掘主库、专题来源、技术底座；已有透明、可追溯的取用价值，不代表原代码直接采用、效度或上线资格。",
+    "B": "有用的补充来源；需先选择具体变式、缩小取用范围或补工程/版本证据；不代表低科学质量。",
+    "C": "当前目标下暂不直接采用成品/源码；不阻断合适原文支持的独立自研。"
+  },
+  "rating_policy": "质量与复用许可分轴。NC/SA/GPL不自动降低科学质量；A/B/C只在本次具体取用目标下使用，不做星数、活跃度或lane字母平均。",
+  "limitations": [
+    "5家族不等于5任务、5新增独立范式或5优质库；TaskBeacon多个配套仓合并为一家族。",
+    "本轮9个不同真实GitHub仓有固定snapshot，其中5主评审仓+4支持仓；它们与首轮34无重复，但不可把支持仓计为9个新优质来源。",
+    "9 仓仅指本补查的固定证据覆盖；未据此加总其他协议卡的来源全集，不与首轮 34 仓或 5 家族混算优质来源数量。",
+    "TaskBeacon138条/137preview仅为固定索引自报条目的本地数数核实；只审MID一对，不外推其余任务。",
+    "所有检查为静态代码/文档/CSV解析；未安装运行任何第三方代码、未运行测试、未浏览执行demo、未测时序、未评估儿童效度。",
+    "代码许可和素材许可分开；无素材清单不等于素材必然受限，但不允许据代码许可默认全可搬。",
+    "原文核对只说明题名/DOI/来源可追溯；不把该版本任务视为已验证测验，不给诊断或个体标签。"
+  ],
+  "snapshots": [
+    {
+      "repository": "ResearchStack/ResearchStack",
+      "github_repository_id": 43707061,
+      "sha": "78ae673b6af8adfe6a788a3f3237996608f3f043",
+      "commit_date_utc": "2017-01-26T23:12:34Z",
+      "default_branch": "master",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/ResearchStack/ResearchStack/commit/78ae673b6af8adfe6a788a3f3237996608f3f043",
+      "evidence_file_count": 13
+    },
+    {
+      "repository": "TaskBeacon/taskbeacon.github.io",
+      "github_repository_id": 941431077,
+      "sha": "52cf4f1dd60dbf8e7c705b468ee4943400daba5f",
+      "commit_date_utc": "2026-10-22T16:16:38Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/TaskBeacon/taskbeacon.github.io/commit/52cf4f1dd60dbf8e7c705b468ee4943400daba5f",
+      "evidence_file_count": 4
+    },
+    {
+      "repository": "TaskBeacon/H000006-mid",
+      "github_repository_id": 1175005395,
+      "sha": "3d56e5b1f6a1744af977392c950a74e4826255ee",
+      "commit_date_utc": "2026-06-23T06:29:10Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/TaskBeacon/H000006-mid/commit/3d56e5b1f6a1744af977392c950a74e4826255ee",
+      "evidence_file_count": 8
+    },
+    {
+      "repository": "TaskBeacon/psyflow",
+      "github_repository_id": 958932136,
+      "sha": "0b1f02cdbf8476b52e6c83b225564f849142f5c0",
+      "commit_date_utc": "2026-09-08T01:05:21Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/TaskBeacon/psyflow/commit/0b1f02cdbf8476b52e6c83b225564f849142f5c0",
+      "evidence_file_count": 3
+    },
+    {
+      "repository": "tatool/tatool-web",
+      "github_repository_id": 24703196,
+      "sha": "19593f24336771ceb089a2b1db39dfb41f0c90e1",
+      "commit_date_utc": "2026-10-03T16:09:56Z",
+      "default_branch": "master",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/tatool/tatool-web/commit/19593f24336771ceb089a2b1db39dfb41f0c90e1",
+      "evidence_file_count": 32
+    },
+    {
+      "repository": "thesimonho/cognitive-battery",
+      "github_repository_id": 45780937,
+      "sha": "14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc",
+      "commit_date_utc": "2025-05-18T10:37:41Z",
+      "default_branch": "master",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/thesimonho/cognitive-battery/commit/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc",
+      "evidence_file_count": 11
+    },
+    {
+      "repository": "ResearchKit/ResearchKit",
+      "github_repository_id": 31979038,
+      "sha": "834c968df94be039fc55bc91efddb4f6e79cf49d",
+      "commit_date_utc": "2026-09-23T18:31:25Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/ResearchKit/ResearchKit/commit/834c968df94be039fc55bc91efddb4f6e79cf49d",
+      "evidence_file_count": 14
+    },
+    {
+      "repository": "TaskBeacon/T000006-mid",
+      "github_repository_id": 958917133,
+      "sha": "48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e",
+      "commit_date_utc": "2026-09-08T00:46:47Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/TaskBeacon/T000006-mid/commit/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e",
+      "evidence_file_count": 14
+    },
+    {
+      "repository": "TaskBeacon/.github",
+      "github_repository_id": 941431731,
+      "sha": "dad19c39dbab9852154fe518396a6b6ef7abe7a6",
+      "commit_date_utc": "2026-03-26T01:04:47Z",
+      "default_branch": "main",
+      "archived": false,
+      "review_date_utc": "2026-10-25",
+      "commit_url": "https://github.com/TaskBeacon/.github/commit/dad19c39dbab9852154fe518396a6b6ef7abe7a6",
+      "evidence_file_count": 2
+    }
+  ],
+  "records": [
+    {
+      "family_id": "tatool-web",
+      "repository": "tatool/tatool-web",
+      "project_family_count": 1,
+      "source_type": "真实浏览器任务／battery与AngularJS实验平台同仓，非仅framework",
+      "unified_priority": "A",
+      "recommendation_track": "main_collection",
+      "decision": "值得追加为可反复挖掘的协议主来源；优先审UZH-Shifting等有论文与固定刺激表的battery，不直接搬运行器。",
+      "official_mapping": "官方 tatool-web README指向tatool-web.com；库文档明确Download返回同仓app/projects/public。未采用第三方tatool-tasks仓猜测。",
+      "coverage": "同仓有普通实验demo及UZH-EF、UZH-LUCO、UZH-MULTI、UZH-Shifting等完整module配置。UZH-Shifting文档列5类切换×4任务，但属于一个研究battery，不算20个独立来源；本次只深入Mapping 1，其他为树/官方目录核验。",
+      "sampled_task": "UZH-Shifting stimulus-response Mapping 1（Autumn/Winter），同时核共享执行器及四变式module。",
+      "protocol": "shifting_mapping.json按4变式顺序执行（文档明确不是论文施测顺序）。Mapping 1 CSV实数24练习、145测试＝1 start+72 repetition+72 switch；cue=150ms、blankInterval=500ms。执行器displayDuration默认2000ms，但timerEnabled默认false且module未开启，因此不能把2000ms抄成实际响应截止。固定CSV顺序；若改full/full-condition随机化会动态重算shiftingType。",
+      "scoring": "uzhShifting.service.js保存stimulusValue/stimulusType/correctResponse/givenResponse/shiftingType/reactionTime/score；score为反应相等得1否则0，RT=endTime-startTime。没有在所抽路径见标准化switch-cost最终scorer、异常RT剔除、失焦/掉帧invalid规则或儿童常模。可独立计算switch/repeat正确试次差，但须先冻结排除规则。",
+      "scientific_provenance": "官方库给von Bastian & Druey (2017), Shifting between mental sets, JEP:General 146(9),1266–1285, DOI 10.1037/xge0000333；Mapping 1归因Meiran 1996，其他变式来源von Bastian & Oberauer 2013、Duncan 1978。作者机构原文仓核对题名/DOI；论文研究不等同本次Web移植版本或中国儿童的效度。",
+      "testing": "完整tree只有test/spec/controllers/main.js单个实质spec，实际断言scope.awesomeThings.length===3（脚手架测试）；test/testModule.js为空module定义。package.json无test script。两GitHub workflows是手动build/deploy，已读prod配置无行为测试。不能写自动测试通过或认知任务已验证。本次未运行。",
+      "default_outbound": "Mapping module明设export=[{mode:upload,auto:true,enabled:true},download]。app.module.ctrl.js初始化已装modules时runAutoExport；export.service.js把压缩trialData POST到同源/api/{mode}/modules/{moduleId}/trials/{sessionId}，亦支持配置remote target。trial.data.service.js先用IndexedDB缓存，不等于仅本地。私有模块analytics文档可显示邀请邮箱；迁移必须移除默认upload并另定数据最小化。",
+      "code_license": "根LICENSE.md及package.json明确GPL-3.0；复用源码须独立处理GPL义务，不因GPL降低科学来源优先级。",
+      "asset_license": "大量图片、fractals、德语刺激/指导语；未见统一独立素材权利清单。GPL软件声明不能自动证明每张图片/外部刺激/字体可再分发，先选择可自制几何/字词版本，资产逐项核权。",
+      "adaptation": "以协议、固定CSV条件平衡和原始trial字段为主；AngularJS旧平台不直接嵌入React/TS。补中文等价化、seed/失焦/截止策略、纯scorer与单测；禁默认外发。",
+      "high_value_candidate": "Mapping switching为可重点追加的细分切换范式；五component为领域分解，不直接宣称五个独立能力或诊断维度。",
+      "scientific_links": [
+        "https://doi.org/10.1037/xge0000333",
+        "https://eprints.glos.ac.uk/5147/",
+        "https://doi.org/10.1037/0278-7393.22.6.1423"
+      ],
+      "snapshot": {
+        "github_repository_id": 24703196,
+        "sha": "19593f24336771ceb089a2b1db39dfb41f0c90e1",
+        "commit_date_utc": "2026-10-03T16:09:56Z",
+        "default_branch": "master",
+        "archived": false,
+        "review_date_utc": "2026-10-25",
+        "commit_url": "https://github.com/tatool/tatool-web/commit/19593f24336771ceb089a2b1db39dfb41f0c90e1"
+      },
+      "canonical_url": "https://github.com/tatool/tatool-web",
+      "github_repository_id": 24703196,
+      "evidence": [
+        {
+          "repository": "tatool/tatool-web",
+          "path": ".github/workflows/build-deploy-prod.yml",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/.github/workflows/build-deploy-prod.yml",
+          "sha256": "a4bcc33e9d42b9e4d77cd9e731defa0933a8732f7dcf5ca8cfc58a8bbb0e65d8",
+          "line_count": 39
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "LICENSE.md",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/LICENSE.md",
+          "sha256": "c61f12da7cdad526bdcbed47a4c0a603e60dbbfdaf8b66933cd088e9132c303f",
+          "line_count": 621
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "README.md",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/README.md",
+          "sha256": "39072ab5e0a3e83af9485bb05f3b507f55ba5d6779a5e92e0b6e7f85cf87d06d",
+          "line_count": 12
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/projects/public/uzh-shifting-battery/executables/uzhShifting.ctrl.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/projects/public/uzh-shifting-battery/executables/uzhShifting.ctrl.js",
+          "sha256": "c27f50d45dcf2b819057d29a4e43f08272acb8933c13bfc59ba729c2d992fb40",
+          "line_count": 55
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/projects/public/uzh-shifting-battery/executables/uzhShifting.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/projects/public/uzh-shifting-battery/executables/uzhShifting.service.js",
+          "sha256": "127e7af7bcabe73760c237259febea674ca1c5ccfb6871d2747f35b7960928df",
+          "line_count": 202
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/projects/public/uzh-shifting-battery/modules/shifting_mapping.json",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/projects/public/uzh-shifting-battery/modules/shifting_mapping.json",
+          "sha256": "e1a4022630eacd8ccf73b29f723225ca08c4e0c4afc5ca5d8465e0171b2a0a2f",
+          "line_count": 779
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/projects/public/uzh-shifting-battery/stimuli/de_shifting_mapping_01.csv",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/projects/public/uzh-shifting-battery/stimuli/de_shifting_mapping_01.csv",
+          "sha256": "02156b01883c3d5726b4e719be8dc7695fed37e038ced00a9373dd9d35c05f0d",
+          "line_count": 147
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/projects/public/uzh-shifting-battery/stimuli/de_shifting_mapping_01_practice.csv",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/projects/public/uzh-shifting-battery/stimuli/de_shifting_mapping_01_practice.csv",
+          "sha256": "415281ce969d09963c3596bc1f5c951ace663de4708309ba9a670c24c5e92c96",
+          "line_count": 26
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/app/app.module.ctrl.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/app/app.module.ctrl.js",
+          "sha256": "bd50960787a4cb278fb0818810f44fe8407cd5135abd73847c072255a83d646d",
+          "line_count": 375
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/app/export.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/app/export.service.js",
+          "sha256": "cc5ad97e15e30a4bc2cce47f753be8c9997b6a077db749433d3a78c6b62184e1",
+          "line_count": 414
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module/executable.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module/executable.service.js",
+          "sha256": "350592af1b0f344264ec77515b3bcbe9631b583aa423e148f3da9584116d3aed",
+          "line_count": 262
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module/main.ctrl.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module/main.ctrl.js",
+          "sha256": "395a800e3b9ad3044664608ebba8ed4d571edd218f7d0fbf2bb36ebba3c016c3",
+          "line_count": 184
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module/module.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module/module.service.js",
+          "sha256": "41b1a5c77e5b2eb540d4910b9ddf44a5cfe3f47b2a860f98f69b7d514f167315",
+          "line_count": 176
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module/trial.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module/trial.service.js",
+          "sha256": "96d1e5735064e2ce1c448c7a9ec70fed745da049bd1a90d92911737563663dfa",
+          "line_count": 48
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module/util.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module/util.service.js",
+          "sha256": "99d0180b41df51c4c1e17596b85986dc445756a3b775abda37038d1a54430c2c",
+          "line_count": 30
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/module.data.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/module.data.service.js",
+          "sha256": "51cf8462edac91ec28ca074a3ca52bc9d206e12eb38319f3b85e2bc98ba8a311",
+          "line_count": 426
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/scripts/trial.data.service.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/scripts/trial.data.service.js",
+          "sha256": "ea89fe4fe6ee897f09da82fe4265fa8cbc92afe37fe861e7bb5d5569c900e67c",
+          "line_count": 155
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/about-license.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/about-license.html",
+          "sha256": "8f22208fa6564aecb630123f3297e5456ef3ee8ca39e5e249d0be568e76bf4aa",
+          "line_count": 5
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/about-privacy-policy.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/about-privacy-policy.html",
+          "sha256": "5fa0c9eb067946e405d99017796e4d534337b1f0b18d87175e5bb09f16331986",
+          "line_count": 114
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/about-publications.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/about-publications.html",
+          "sha256": "d9f14c759bc2c43aac07b29abaaf2b6a26810d0a033633ba90c4eee257267a47",
+          "line_count": 334
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat-uzh-ef.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat-uzh-ef.html",
+          "sha256": "ebeaeae1b9cae4d0cb05b9ed2730596b2a210fa3377131b4ca0d32f59e49a314",
+          "line_count": 34
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat-uzh-luco.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat-uzh-luco.html",
+          "sha256": "3bf27c6c0814d88cfbf69d27f075a0c49671615823d3986cb8c179ba2cf19a1b",
+          "line_count": 34
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat-uzh-multi.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat-uzh-multi.html",
+          "sha256": "c8e9171686bd4ea7b7dc7860ff672175eff4b5908329160b8b9bc8df73ca4072",
+          "line_count": 34
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat-uzh-shifting-mapping.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat-uzh-shifting-mapping.html",
+          "sha256": "8f0b526e8bfc49b0dd81165287249ed30bd3546a6adb9901905381f1bde9a06e",
+          "line_count": 239
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat-uzh-shifting.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat-uzh-shifting.html",
+          "sha256": "ee167d7b0b1472e0aafd7508581551601763eef53776eaf6e47e8284fe90f9a9",
+          "line_count": 36
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-bat.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-bat.html",
+          "sha256": "770853e70a5f1f23aad2c03e95c139bbb3d012b7f21c96d55e44cb98cec25270",
+          "line_count": 45
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/lib-exp.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/lib-exp.html",
+          "sha256": "d072a6528c01075b0f5f723df20ff8fa494c20772ed895a5b42328e5f8709512",
+          "line_count": 25
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/use-analytics.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/use-analytics.html",
+          "sha256": "0b70c03848b0edc7ad780dca63d5a3ca42f67eba20dd3ab8109e408d588201f9",
+          "line_count": 35
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "app/views/doc/use-host.html",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/app/views/doc/use-host.html",
+          "sha256": "88074f4c294bba6e7f41b45480996de8a2a5e251a77810bb9616a7bfe98b4717",
+          "line_count": 49
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "package.json",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/package.json",
+          "sha256": "a4c0820547844b2cbe93770a16ae8a76229360abad9a11edb9769b8354bf6892",
+          "line_count": 98
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "test/spec/controllers/main.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/test/spec/controllers/main.js",
+          "sha256": "b422a51d8f5ae40613ffdde17cdf51b581938789a89491d95dcd1fd3b2102eda",
+          "line_count": 23
+        },
+        {
+          "repository": "tatool/tatool-web",
+          "path": "test/testModule.js",
+          "url": "https://github.com/tatool/tatool-web/blob/19593f24336771ceb089a2b1db39dfb41f0c90e1/test/testModule.js",
+          "sha256": "15af9b30d7f3356068155eb47a973fb8393212b7027e03b8d234a7038a95739b",
+          "line_count": 3
+        }
+      ],
+      "audit_depth": {
+        "level": "sampled_source_audit",
+        "scope": "UZH-Shifting stimulus-response Mapping 1（Autumn/Winter），同时核共享执行器及四变式module。",
+        "third_party_code_executed": false,
+        "tests_executed": false,
+        "timing_measured": false,
+        "external_writes": false
+      },
+      "integration_adoption_axes": {
+        "assessment_kind": "PROPOSED_RESEARCH_PATH_NOT_PERMISSION_OR_PUBLICATION_APPROVAL",
+        "code_rights_disposition": "可 GitHub 公开",
+        "code_conditions": "仅就已查明的代码许可而言；须满足署名、保留通知、对应许可证及兼容性条件，不外推刺激、商标或外部依赖。",
+        "unverified_asset_rights_disposition": "待联系授权",
+        "asset_conditions": "只针对拟采用且尚未明确获权的外部刺激/引导图/音频等；自制材料另留原创依据，不用根代码许可推定素材授权。",
+        "implementation_strategy": "文献自研",
+        "implementation_note": "本轮优先提取方法与协议独立设计；若以后转为代码适配，须重新核对所用文件、许可义务及平台边界。"
+      }
+    },
+    {
+      "family_id": "cognitive-battery",
+      "repository": "thesimonho/cognitive-battery",
+      "project_family_count": 1,
+      "source_type": "真实桌面 Python/Pygame/PyQt 的 7 项任务 battery",
+      "unified_priority": "B",
+      "recommendation_track": "topic_reference",
+      "decision": "追加补充协议／计分参考；Sternberg实现可审，不列优先整套移植库。MRT/Raven素材缺失且有版权风险。",
+      "coverage": "ANT、backward digit span、Flanker、MRT、Raven、Sternberg、SART 7个任务模块；是已知范式的另外实现，不视为7个新范式。MRT/Raven不因代码存在就视为素材完整可用任务。",
+      "sampled_task": "tasks/sternberg.py + analysis/analysis.py aggregate_sternberg +实际Excel保存与更新检查路径。",
+      "protocol": "Sternberg默认2×48主试次＋24练习；数字0–9、不重复抽样；setSize 2/6×probe present/absent平衡，块内random.shuffle无显式seed记录。每digit1200ms、间隔250ms、probe warning2000ms再空屏250ms、probe2250ms、feedback1000ms、ITI1500ms；左键present、右键absent，超时按错误记。",
+      "scoring": "原始trial记录set、probe、setSize、probeType、response、RT、correct；主试次加trialNum，练习不在返回主数据中。aggregate_sternberg默认response_type='full'，可选correct/incorrect；算setSize分组均值/SD/CV/正确数，OLS RT~C(setSize,Treatment(reference=2))。该slope为6相对2项目的类别对比，不是每项目ms扫描斜率；若转为per-item需另定义。默认full含错误/超时，不可无说明当正确RT指标。",
+      "scientific_provenance": "README任务逐条给来源，Sternberg指向1966原始研究(PMID5939936)与Martins2012（块大小/负荷）；未找到此代码版心理计量验证。Raven说明同时出现WAIS及Advanced Set #2，来源表述不充分，且原图未附，不能据此上架题目。",
+      "testing": "固定tree未见unit/spec/CI workflow，仅.github/FUNDING.yml；README自述仅Windows测试，不是跨平台或当前依赖验证。源码使用DataFrame.set_value/get_value等旧式调用且没有锁定环境文件，兼容性待测；本次不安装运行。",
+      "timing_and_invalidity": "RT用time.time()*1000、pygame事件轮询；显示flip后才起计时。未见monotonic时钟、refresh calibration、focus/drop-frame作废、RT离群排除。timeout2250ms与取时先后需要边界测试。",
+      "default_outbound": "battery_window.py将受试信息及任务dataframe写本地每人Excel各sheet；所抽任务与保存路径无结果上传。仅用户点Check for updates时UpdateDialog发urllib请求读取GitHub RSS，其他帮助链接打开浏览器。不能把全依赖库未审的行为概括成绝对不联网。",
+      "code_license": "根LICENSE明确MIT，Simon Ho，2015。",
+      "asset_license": "README明确MRT/Raven受版权限制，未纳入原始图。两个图片目录README只是占位；其他图片/WAV未见独立逐项来源授权。代码MIT不能授权缺失测验材料。",
+      "adaptation": "取用Sternberg流程/原始数据schema或独立重写scorer较有价值；旧Python桌面UI不直接搬进Web。已有同范式来源时只作交叉验证，不增加覆盖计数。",
+      "scientific_links": [
+        "https://pubmed.ncbi.nlm.nih.gov/5939936/",
+        "https://www.sciencedirect.com/science/article/pii/S1469029212001380"
+      ],
+      "snapshot": {
+        "github_repository_id": 45780937,
+        "sha": "14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc",
+        "commit_date_utc": "2025-05-18T10:37:41Z",
+        "default_branch": "master",
+        "archived": false,
+        "review_date_utc": "2026-10-25",
+        "commit_url": "https://github.com/thesimonho/cognitive-battery/commit/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc"
+      },
+      "canonical_url": "https://github.com/thesimonho/cognitive-battery",
+      "github_repository_id": 45780937,
+      "evidence": [
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "LICENSE",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/LICENSE",
+          "sha256": "2f14b523173f6d34ab9119271a2780debf792f486785357c6b6a7572e5bc13eb",
+          "line_count": 23
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "README.md",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/README.md",
+          "sha256": "53f30bc9baf9b7976aff75ff5655fbf0b4adca986380345c94bda27b25ffb573",
+          "line_count": 192
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "analysis/analysis.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/analysis/analysis.py",
+          "sha256": "1cdeab0cf3a122c1a1f98c239347eda4cafda4be17ab4aa8236edea03ca1ea75",
+          "line_count": 302
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "interface/battery_window.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/interface/battery_window.py",
+          "sha256": "64a7e65657276fb973e973bb32f1fc63d3e1fb379cd7124c2f1e69eb8c2cbb03",
+          "line_count": 532
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "interface/update_dialog.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/interface/update_dialog.py",
+          "sha256": "e4db8359c070143c32dd4a2331c44496cead316e6727cd31ba2721b885bb9643",
+          "line_count": 68
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "run_battery.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/run_battery.py",
+          "sha256": "0a56ca799ed7466d6ec0e5b4e44990d6c06fecb1640664f9b08dc9a045334eb3",
+          "line_count": 24
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "tasks/README.md",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/tasks/README.md",
+          "sha256": "d5bf5c5731de29f3692a7e1108e6d622351f0a489eec592cbcf7d8e6b1e6772b",
+          "line_count": 68
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "tasks/images/MRT/README.md",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/tasks/images/MRT/README.md",
+          "sha256": "eeb69c473c3c7eb3a8776f4d8f4c101a9ee8f85ddd02f89bec7257e7e707071c",
+          "line_count": 2
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "tasks/images/Ravens/README.md",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/tasks/images/Ravens/README.md",
+          "sha256": "b5ca6c1519ba5cc6e01d0ae969255f08711b2bdcb443d05c1593a951f6022b88",
+          "line_count": 1
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "tasks/sternberg.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/tasks/sternberg.py",
+          "sha256": "26f5665f5935fcccd733f67ac752d16d261ffa8be073bfdd005acd46ecd72157",
+          "line_count": 396
+        },
+        {
+          "repository": "thesimonho/cognitive-battery",
+          "path": "utils/display.py",
+          "url": "https://github.com/thesimonho/cognitive-battery/blob/14ddb6c8d3d0287eaf3895cfcf5154efc30b86cc/utils/display.py",
+          "sha256": "45b83a98656a8dc370dbd6a50069f589ec306ad11e9dffa0f8f8c695e0c986b0",
+          "line_count": 124
+        }
+      ],
+      "audit_depth": {
+        "level": "sampled_source_audit",
+        "scope": "tasks/sternberg.py + analysis/analysis.py aggregate_sternberg +实际Excel保存与更新检查路径。",
+        "third_party_code_executed": false,
+        "tests_executed": false,
+        "timing_measured": false,
+        "external_writes": false
+      },
+      "integration_adoption_axes": {
+        "assessment_kind": "PROPOSED_RESEARCH_PATH_NOT_PERMISSION_OR_PUBLICATION_APPROVAL",
+        "code_rights_disposition": "可 GitHub 公开",
+        "code_conditions": "仅就已查明的代码许可而言；须满足署名、保留通知、对应许可证及兼容性条件，不外推刺激、商标或外部依赖。",
+        "unverified_asset_rights_disposition": "待联系授权",
+        "asset_conditions": "只针对拟采用且尚未明确获权的外部刺激/引导图/音频等；自制材料另留原创依据，不用根代码许可推定素材授权。",
+        "implementation_strategy": "文献自研",
+        "implementation_note": "本轮优先提取方法与协议独立设计；若以后转为代码适配，须重新核对所用文件、许可义务及平台边界。"
+      }
+    },
+    {
+      "family_id": "taskbeacon",
+      "repository": "TaskBeacon/T000006-mid",
+      "project_family_count": 1,
+      "canonical_site": "https://taskbeacon.github.io/",
+      "source_type": "任务发现索引＋canonical PsychoPy模板＋paired TypeScript浏览器preview＋自有runtime的一家族",
+      "unified_priority": "C",
+      "recommendation_track": "discovery_index_only",
+      "decision": "保留发现入口/候选模板，不列优质成品任务库；源码可读且结构透明，但抽样发现引用、计分一致性、测试证据和逐仓许可缺口。",
+      "coverage": "固定站点tasks_index.json实数138唯一T任务条目、137web_variant；task-manifest.json实数137预览条目。只是索引计数，不是138个审查通过/独立范式/经验证任务。标签分布86 draft、45 smoke_tested、7 piloted均作者自标。本次只审MID一对T/H，不外推其余137项质量。",
+      "sampled_task": "T000006-mid main.py/config/src/run_trial.py/src/utils.py及H000006-mid main.ts/src/run_trial.ts/src/utils.ts/controller；网站索引、profile许可、psyflow StimBank语音路径只作辅助。",
+      "protocol": "T-MID config为3×60=180 trial，win/lose/neut；cue0.3s、anticipation1–1.2s、prefeedback0.6–0.8s、feedback1s；target初始0.2s，限0.04–0.37s，step0.03，按condition累计正确率与0.66比较逐次增减（不是按上一次hit/miss简单一上一下）。早按anticipation一律miss。win hit +10，lose miss -10，neutral0。config seed_mode=same_across_sub；未审完整种子实现，不承诺可复现。",
+      "scoring": "run_trial.py将早按修正后的hit存feedback_hit，controller更新用修正hit。Python main.py块hit_rate却取target_hit；H src/utils.ts summarizeBlock取feedback_hit。早按且目标阶段成功响应时两端块命中率口径分歧（静态可定位的条件性风险，未运行触发）。Python block总分仅当前block之和，README称cumulative；final_score为全试次和。",
+      "scientific_provenance": "README称Knutson2000与ABCD2018设计；references.yaml另列2001/2004文献；parameter_mapping.md除conditions外大多数参数标inferred，故不能当精确原文复刻。实际发现references.yaml/selected_papers把题名Incentive-Elicited Brain Activation in Adolescents配错DOI：仓写10.1523/jneurosci.2372-04.2004，原文期刊PDF/PMC是10.1523/JNEUROSCI.4862-03.2004；作者字段亦未逐一核准。引用数/is_high_impact字段不是验证证据。",
+      "generation_quality": "官网确有task-build/task-py2js代理工作流，但不能推断每个任务全部AI生成。可见人工/自动生成格式化协议、推断日志与移植指南。MID README写main1.1.0、2026-02-16、COM3串口；taskbeacon.yaml写release1.1.2；实际human config默认mock trigger。表述之间需校准。matched preview不能消除上述实证代码分歧。",
+      "testing": "T taskbeacon.yaml引用outputs/qa/qa_report.json、static_report.json、contract_report.json，但完整固定tree只有outputs/.gitkeep，无报告；有qa/sim配置、sampler，不代表已跑通过。H仅notify部署工作流，无本任务单测。psyflow框架另有tests，但不等于这138任务或此MID已经验证。未运行第三方代码。",
+      "default_outbound": "T main.py只见本地settings JSON、CSV及mock trigger，无参与者结果上传。human config voice_enabled=true；调用psyflow StimBank.convert_to_voice，现存MP3且overwrite=false时复用，否则edge_tts.Communicate会将instruction text发送语音服务。随仓已有MP3，故不是每次必发；禁把姓名等PII插入远端语音文本。H使用本地MP3、fallbackToSpeech=false；共享web runtime未全审，预览仅作读代码，不启动。",
+      "code_license": "T000006-mid与H000006-mid的固定tree无LICENSE，GitHub license=null；组织profile README泛称tasks/variants MIT但措辞为All components of this repository，且该MIT文件位于.github/profile。网站与psyflow各自有MIT，不能以此替代T/H仓明确授权。记录为组织层MIT意图、单任务许可归属待确认，不武断宣称完全无许可或已可复用。",
+      "asset_license": "MID几何刺激代码生成；instruction_text_voice.mp3与task_flow图未见单独生成来源/再分发许可清单。TTS输出权利与代码MIT分开；更不能将此抽样推至含人脸/图片等其他任务。",
+      "adaptation": "若未来取用，先选择少数明确范式，纠正引用与Python/HTML反馈指标，再固定runtime版本、补任务级QA/契约/scorer tests与素材/代码授权。此轮仅索引候选，不新增任务入库。",
+      "scientific_links": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC6730402/",
+        "https://www.jneurosci.org/content/jneuro/24/8/1793.full.pdf"
+      ],
+      "snapshot": {
+        "github_repository_id": 958917133,
+        "sha": "48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e",
+        "commit_date_utc": "2026-09-08T00:46:47Z",
+        "default_branch": "main",
+        "archived": false,
+        "review_date_utc": "2026-10-25",
+        "commit_url": "https://github.com/TaskBeacon/T000006-mid/commit/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e"
+      },
+      "canonical_url": "https://github.com/TaskBeacon/T000006-mid",
+      "github_repository_id": 958917133,
+      "evidence": [
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "README.md",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/README.md",
+          "sha256": "6fba53ee63ad50a8fce7dd3ba89caca92da6462e42e733c3a57ff239d8ca21d9",
+          "line_count": 180
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "config/config.yaml",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/config/config.yaml",
+          "sha256": "b8086973d643d342ae27b98c80b9dd98b32036de0f1736bdf5dd9427f1efb9ca",
+          "line_count": 319
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "config/config_qa.yaml",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/config/config_qa.yaml",
+          "sha256": "81f3485d942ff9f645d5153e31d964b8841dba0e07740e5ed0aef5852328a953",
+          "line_count": 354
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "config/config_scripted_sim.yaml",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/config/config_scripted_sim.yaml",
+          "sha256": "fd2193b76a09c62b0a727d92456ca4a6b57746fe43639fd2d72190d7bacbae2f",
+          "line_count": 314
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "main.py",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/main.py",
+          "sha256": "0ce3125865f1ff920295e0b1c073d706a801340f2e47f3d529435778e8f3c325",
+          "line_count": 166
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "references/parameter_mapping.md",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/references/parameter_mapping.md",
+          "sha256": "f9962c48008a1e8ef92513ea6503e85b967f5e9316bf98299adcef7429466167",
+          "line_count": 22
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "references/references.md",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/references/references.md",
+          "sha256": "25509f6d3a9f0475aa66568ace0ac078ddcf7bbbc612f2706b474e194dd07817",
+          "line_count": 21
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "references/references.yaml",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/references/references.yaml",
+          "sha256": "8dc398002aac686701f3dc4655b1e7de49b0e97f71e1e310703ef596ca3ce6cf",
+          "line_count": 39
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "references/selected_papers.json",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/references/selected_papers.json",
+          "sha256": "4358a83142d8bcc1b562c0e9b12bb35e14d0a632373eccd6c49b2089bf759d13",
+          "line_count": 77
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "references/task_logic_audit.md",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/references/task_logic_audit.md",
+          "sha256": "3bb277161f50905f6fe6810479686c2e64ea28c4459d1bf628688de81b7cc856",
+          "line_count": 97
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "responders/mid_sampler.py",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/responders/mid_sampler.py",
+          "sha256": "9b6847b42db32789cfd23628017b0774edbfc10da42c77b59c37b755ebc0ac04",
+          "line_count": 219
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "src/run_trial.py",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/src/run_trial.py",
+          "sha256": "0a7fa64e5afeaeeb4aa7e527609979321d962a2954324c84991a8b4952d529e0",
+          "line_count": 146
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "src/utils.py",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/src/utils.py",
+          "sha256": "fd168b846275f740cde4e5e683392f7eb5eb5235f09160aa53299d49e4d68b8e",
+          "line_count": 104
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "path": "taskbeacon.yaml",
+          "url": "https://github.com/TaskBeacon/T000006-mid/blob/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e/taskbeacon.yaml",
+          "sha256": "457e1c4ffd2e7be4d09fc5ebb64120aad5eaba7390f497f67f6a46a8fa7435bb",
+          "line_count": 20
+        }
+      ],
+      "audit_depth": {
+        "level": "sampled_source_audit",
+        "scope": "T000006-mid main.py/config/src/run_trial.py/src/utils.py及H000006-mid main.ts/src/run_trial.ts/src/utils.ts/controller；网站索引、profile许可、psyflow StimBank语音路径只作辅助。",
+        "third_party_code_executed": false,
+        "tests_executed": false,
+        "timing_measured": false,
+        "external_writes": false
+      },
+      "family_snapshots": [
+        {
+          "repository": "TaskBeacon/taskbeacon.github.io",
+          "github_repository_id": 941431077,
+          "sha": "52cf4f1dd60dbf8e7c705b468ee4943400daba5f",
+          "commit_date_utc": "2026-10-22T16:16:38Z",
+          "default_branch": "main",
+          "archived": false,
+          "review_date_utc": "2026-10-25",
+          "commit_url": "https://github.com/TaskBeacon/taskbeacon.github.io/commit/52cf4f1dd60dbf8e7c705b468ee4943400daba5f",
+          "evidence_file_count": 4
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "github_repository_id": 1175005395,
+          "sha": "3d56e5b1f6a1744af977392c950a74e4826255ee",
+          "commit_date_utc": "2026-06-23T06:29:10Z",
+          "default_branch": "main",
+          "archived": false,
+          "review_date_utc": "2026-10-25",
+          "commit_url": "https://github.com/TaskBeacon/H000006-mid/commit/3d56e5b1f6a1744af977392c950a74e4826255ee",
+          "evidence_file_count": 8
+        },
+        {
+          "repository": "TaskBeacon/psyflow",
+          "github_repository_id": 958932136,
+          "sha": "0b1f02cdbf8476b52e6c83b225564f849142f5c0",
+          "commit_date_utc": "2026-09-08T01:05:21Z",
+          "default_branch": "main",
+          "archived": false,
+          "review_date_utc": "2026-10-25",
+          "commit_url": "https://github.com/TaskBeacon/psyflow/commit/0b1f02cdbf8476b52e6c83b225564f849142f5c0",
+          "evidence_file_count": 3
+        },
+        {
+          "repository": "TaskBeacon/T000006-mid",
+          "github_repository_id": 958917133,
+          "sha": "48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e",
+          "commit_date_utc": "2026-09-08T00:46:47Z",
+          "default_branch": "main",
+          "archived": false,
+          "review_date_utc": "2026-10-25",
+          "commit_url": "https://github.com/TaskBeacon/T000006-mid/commit/48b6d5b7432b7a0a705ad5577f176f7abbdf5a9e",
+          "evidence_file_count": 14
+        },
+        {
+          "repository": "TaskBeacon/.github",
+          "github_repository_id": 941431731,
+          "sha": "dad19c39dbab9852154fe518396a6b6ef7abe7a6",
+          "commit_date_utc": "2026-03-26T01:04:47Z",
+          "default_branch": "main",
+          "archived": false,
+          "review_date_utc": "2026-10-25",
+          "commit_url": "https://github.com/TaskBeacon/.github/commit/dad19c39dbab9852154fe518396a6b6ef7abe7a6",
+          "evidence_file_count": 2
+        }
+      ],
+      "supporting_evidence": [
+        {
+          "repository": "TaskBeacon/taskbeacon.github.io",
+          "path": "LICENSE",
+          "url": "https://github.com/TaskBeacon/taskbeacon.github.io/blob/52cf4f1dd60dbf8e7c705b468ee4943400daba5f/LICENSE",
+          "sha256": "6ecc0d3b0d4e9eab8fd34dd7c99216d73004129121c64823f06bb71f791a2bc9",
+          "line_count": 22
+        },
+        {
+          "repository": "TaskBeacon/taskbeacon.github.io",
+          "path": "README.md",
+          "url": "https://github.com/TaskBeacon/taskbeacon.github.io/blob/52cf4f1dd60dbf8e7c705b468ee4943400daba5f/README.md",
+          "sha256": "1c2e07a3bfdd7357ba7bf7d93f8e13557bb66606c0c104786b6c2aa1cc195520",
+          "line_count": 167
+        },
+        {
+          "repository": "TaskBeacon/taskbeacon.github.io",
+          "path": "public/psyflow-web/task-manifest.json",
+          "url": "https://github.com/TaskBeacon/taskbeacon.github.io/blob/52cf4f1dd60dbf8e7c705b468ee4943400daba5f/public/psyflow-web/task-manifest.json",
+          "sha256": "399d2b8c4a143b615991d92263be6e5038707c19dae615b94d55954476e750f9",
+          "line_count": 2065
+        },
+        {
+          "repository": "TaskBeacon/taskbeacon.github.io",
+          "path": "src/data/tasks_index.json",
+          "url": "https://github.com/TaskBeacon/taskbeacon.github.io/blob/52cf4f1dd60dbf8e7c705b468ee4943400daba5f/src/data/tasks_index.json",
+          "sha256": "965b0a5ddadb481a69e6e80c1fc9fa4e167549f182d994613e68ae2555ed903b",
+          "line_count": 8645
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "README.md",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/README.md",
+          "sha256": "dc1a947640c5a6fff3ba6ecc4aba583173d85f98b8e564b96e0e93682e84480c",
+          "line_count": 30
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "config/config.yaml",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/config/config.yaml",
+          "sha256": "5ef059e08e93168df22c3d8fcbc83a5c0896e025da76d219bf840598c13d64de",
+          "line_count": 233
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "main.ts",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/main.ts",
+          "sha256": "c40cf2e93c54230e8dc6e6505849097df1be4c8fb7599cdced61d916137b2380",
+          "line_count": 180
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "src/controller.ts",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/src/controller.ts",
+          "sha256": "55fdafbcafac6958cf10df298aa3e6ea86c3f53e66a72a155300cf88210f4b1e",
+          "line_count": 68
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "src/run_trial.ts",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/src/run_trial.ts",
+          "sha256": "79f945230998184dcbd087df3c3c91a933ea4e28e9dfd1bd8ff4771b5ffd6122",
+          "line_count": 160
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "src/utils.ts",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/src/utils.ts",
+          "sha256": "31f1e33338975214d7e9929fbf85fcc66269fff523f4ba59554c622280aa3298",
+          "line_count": 41
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "taskbeacon.yaml",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/taskbeacon.yaml",
+          "sha256": "ee2640e948751d085913fd5aaebc19ebe9cf61a7bb961441a5fe6efd096bf750",
+          "line_count": 15
+        },
+        {
+          "repository": "TaskBeacon/H000006-mid",
+          "path": "transfer_node.md",
+          "url": "https://github.com/TaskBeacon/H000006-mid/blob/3d56e5b1f6a1744af977392c950a74e4826255ee/transfer_node.md",
+          "sha256": "40691087a17f46f65d6b79b6213a6316f8272a7b81e5bd2112cca53939e7e8ed",
+          "line_count": 260
+        },
+        {
+          "repository": "TaskBeacon/psyflow",
+          "path": "LICENSE",
+          "url": "https://github.com/TaskBeacon/psyflow/blob/0b1f02cdbf8476b52e6c83b225564f849142f5c0/LICENSE",
+          "sha256": "6ecc0d3b0d4e9eab8fd34dd7c99216d73004129121c64823f06bb71f791a2bc9",
+          "line_count": 22
+        },
+        {
+          "repository": "TaskBeacon/psyflow",
+          "path": "psyflow/StimBank.py",
+          "url": "https://github.com/TaskBeacon/psyflow/blob/0b1f02cdbf8476b52e6c83b225564f849142f5c0/psyflow/StimBank.py",
+          "sha256": "b1473078aff9c5759b4c9788a797e61a1d375ca232104f2c5250df9958ae0bc6",
+          "line_count": 623
+        },
+        {
+          "repository": "TaskBeacon/psyflow",
+          "path": "pyproject.toml",
+          "url": "https://github.com/TaskBeacon/psyflow/blob/0b1f02cdbf8476b52e6c83b225564f849142f5c0/pyproject.toml",
+          "sha256": "b16e7016670b0f7c70badf6fb772636ee0bc37c2bb40807c0a2b71524033925a",
+          "line_count": 30
+        },
+        {
+          "repository": "TaskBeacon/.github",
+          "path": "profile/LICENSE",
+          "url": "https://github.com/TaskBeacon/.github/blob/dad19c39dbab9852154fe518396a6b6ef7abe7a6/profile/LICENSE",
+          "sha256": "6ecc0d3b0d4e9eab8fd34dd7c99216d73004129121c64823f06bb71f791a2bc9",
+          "line_count": 22
+        },
+        {
+          "repository": "TaskBeacon/.github",
+          "path": "profile/README.md",
+          "url": "https://github.com/TaskBeacon/.github/blob/dad19c39dbab9852154fe518396a6b6ef7abe7a6/profile/README.md",
+          "sha256": "952a54dff636dd2b26797e87f9b19958044f68e63e77f827925fa962e9a3763f",
+          "line_count": 32
+        }
+      ],
+      "integration_adoption_axes": {
+        "assessment_kind": "PROPOSED_RESEARCH_PATH_NOT_PERMISSION_OR_PUBLICATION_APPROVAL",
+        "code_rights_disposition": "待联系授权",
+        "code_conditions": "组织层许可意图不能替代所审任务仓授权；先核权。",
+        "unverified_asset_rights_disposition": "待联系授权",
+        "asset_conditions": "只针对拟采用且尚未明确获权的外部刺激/引导图/音频等；自制材料另留原创依据，不用根代码许可推定素材授权。",
+        "implementation_strategy": "暂缓",
+        "implementation_note": "仅留索引或排除记录，不进入任务实现。"
+      }
+    },
+    {
+      "repository": "ResearchKit/ResearchKit",
+      "canonical_url": "https://github.com/ResearchKit/ResearchKit",
+      "github_repository_id": 31979038,
+      "project_family_count": 1,
+      "snapshot": {
+        "github_repository_id": 31979038,
+        "sha": "834c968df94be039fc55bc91efddb4f6e79cf49d",
+        "commit_date_utc": "2026-09-23T18:31:25Z",
+        "default_branch": "main",
+        "archived": false,
+        "review_date_utc": "2026-10-25",
+        "commit_url": "https://github.com/ResearchKit/ResearchKit/commit/834c968df94be039fc55bc91efddb4f6e79cf49d"
+      },
+      "audit_depth": {
+        "level": "sampled_source_audit",
+        "third_party_code_executed": false,
+        "tests_executed": false,
+        "timing_measured": false,
+        "external_writes": false
+      },
+      "evidence": [
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "LICENSE",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/LICENSE",
+          "sha256": "016ffd49a31f39240cdf0e2aa762ea4cd90fb2512a9be48e7ee447faab864ae1",
+          "line_count": 29
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "README.md",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/README.md",
+          "sha256": "c10f1df336411e8939a398f908a61ef06a421b6ab8e27f417e03c325661214cc",
+          "line_count": 178
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKit/ResearchKit.docc/ResearchKit.md",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKit/ResearchKit.docc/ResearchKit.md",
+          "sha256": "c19c430a472c889c788a539868f3feffe0df89bbd6487d97682779832461e212",
+          "line_count": 59
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKit/ResearchKit.docc/Resources/Understanding-Active-Tasks/Understanding-Active-Tasks.md",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKit/ResearchKit.docc/Resources/Understanding-Active-Tasks/Understanding-Active-Tasks.md",
+          "sha256": "437aab411eb7f51270ac32c902e66fd57f5659f22699622aaae0d917b3f29be2",
+          "line_count": 436
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/PrivacyInfo.xcprivacy",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/PrivacyInfo.xcprivacy",
+          "sha256": "08284d889e084575a7c64aba23c1fc5bff6637c255b65152b3a06a171668618c",
+          "line_count": 85
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Model/StroopColor.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Model/StroopColor.swift",
+          "sha256": "a0d7b694d1624327c60164fd13fea893bc28e30f90c4e32001f486a4f344dda5",
+          "line_count": 117
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Model/StroopResultBuilder.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Model/StroopResultBuilder.swift",
+          "sha256": "e31761af3b189d283fd0d532cdc80330ea283d6d97424565f5a4b89f1c0aa14c",
+          "line_count": 128
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Model/StroopStepViewModel.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Model/StroopStepViewModel.swift",
+          "sha256": "6bd81c39d4d767af88825d20b9186d99aaa84e579807ca0ccc35f010010c9fe2",
+          "line_count": 265
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Model/StroopTrialsGenerator.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Model/StroopTrialsGenerator.swift",
+          "sha256": "1b26ef1eb722132f80413585179d6ef5e7685eac524bb3f6dc38dabb52c1e4aa",
+          "line_count": 195
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Result/StroopStepResponse.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Result/StroopStepResponse.swift",
+          "sha256": "507ddd75d76cd369df2ebe09a9f337b7a02c9761ee8a8ea4a4ae1fcac28acc3f",
+          "line_count": 78
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/Result/StroopStepResult.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/Result/StroopStepResult.swift",
+          "sha256": "1254133412e0606f2c3460989222e134567fbc0e35c2fe8ef95e80c6ea73acad",
+          "line_count": 72
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/StroopStep.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/StroopStep.swift",
+          "sha256": "e3d7c1ba162ce8d5de311c2f21e23c7260041b19ba7059acde4f5dc5f4533a1a",
+          "line_count": 262
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitActiveTask/Stroop/StroopStepFactory.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitActiveTask/Stroop/StroopStepFactory.swift",
+          "sha256": "6692927d628a448caff001f59baa8fa04cd4a3ba2e1272a7ca4ef05f1d54e468",
+          "line_count": 80
+        },
+        {
+          "repository": "ResearchKit/ResearchKit",
+          "path": "ResearchKitTests/StroopStepViewModelTests.swift",
+          "url": "https://github.com/ResearchKit/ResearchKit/blob/834c968df94be039fc55bc91efddb4f6e79cf49d/ResearchKitTests/StroopStepViewModelTests.swift",
+          "sha256": "145163e99c1a4aeeccda6db559bd28421e0ecb87175c6f363730872ef961b8f5",
+          "line_count": 325
+        }
+      ],
+      "source_type": "iOS research framework with implemented active cognitive tasks; not a validated cognitive battery",
+      "recommended_tier": "B — 优质移动端实现／原始结果模型专题参考；不列浏览器主任务合集",
+      "decision": "值得追加为专题参考来源；Stroop 已静态样查，其他 active tasks 只做树与官方文档覆盖确认。",
+      "actual_tasks_confirmed": [
+        "Swift Stroop task (sampled implementation)",
+        "Spatial Span Memory (tree and official docs)",
+        "Paced Serial Addition Test: PASAT/PVSAT/PAVSAT (tree and official docs)",
+        "Tower of Hanoi (tree and official docs)",
+        "Trail Making (tree and official docs)"
+      ],
+      "sampled_task": "ResearchKitActiveTask/Stroop/* current Swift implementation; not the separate Stroop-Legacy implementation",
+      "protocol": {
+        "default_trial_count": 10,
+        "default_colors": [
+          "red",
+          "green",
+          "yellow",
+          "blue"
+        ],
+        "congruent_frequency": 0.5,
+        "incongruent_frequency": 0.5,
+        "neutral_frequency": 0.0,
+        "iti_seconds": [
+          0.5,
+          0.5
+        ],
+        "intertrial_mask": "none",
+        "record_results": true,
+        "validation": "初始化可校验频率在 [0,1] 且和约等于1、release trialCount >=10（DEBUG >=1）、至少2种颜色、ITI 0.25–1.5 秒；withoutValidation 初始化器可绕过校验。",
+        "generation": "先按 trialCount×frequency 向下取整，各类型尽量颜色平衡；余数按配置频率随机补齐，再 shuffle。使用 Swift 默认随机源，所查路径未暴露／保存 seed。",
+        "response_window": "所查 view model 以选择颜色推进 trial；未发现独立响应超时或漏答截止参数。不要把默认10 trial当标准测量协议。"
+      },
+      "scoring": "结果逐 trial 保存 selectedColor、trialWord、trialColor、trialType、startTime、endTime。view model 用 selectedColor == currentTrial.color 计算上一反应正确性。StroopStepResult 为原始响应集合；所查路径未提供标准化 Stroop 干扰总分、RT剔除规则、常模或诊断阈值。",
+      "timing_and_invalidity": "start/end 由 Date.now 记于状态转换／选色时点，ITI 用 Task.sleep；没有在此样查路径看到真实屏幕 onset 校准、掉帧或退后台自动无效判定。不能把状态时间戳等同实测光学呈现时序。",
+      "scientific_provenance": "官方 active-task 文档描述 Stroop 操作及返回结果；样查的 README、Stroop 代码与对应文档段落未给此 Swift 版本的原始研究验证、重测信度或儿童常模。其他任务文档存在领域引用不意味着此 Stroop 参数得到验证。",
+      "testing": "实际读取 ResearchKitTests/StroopStepViewModelTests.swift：14个 @Test，覆盖初始化、配置保留/无效配置失败、选色正确性、非进行中选色、trial推进/等待、10次回答后完成、响应数量、起止时间顺序。完整树另有大量序列化测试。未运行测试、未核当前CI结果；此范围不是统计效度、随机平衡分布或真机显示时序校准测试。",
+      "default_outbound": "所查 Stroop 路径只构造内存结果，无固定外发地址。官方文档明确结果在内存，存储／传输序列化由应用方负责。ActiveTask privacy manifest 声明 tracking=false，但包含音视频、健康、定位等框架能力；该声明不能证明全框架或嵌入应用不联网，尤其不能外推语音识别等任务。",
+      "code_license": "根 LICENSE 为 Apple 三条款 BSD 风格许可并明确不授予商标许可；GitHub metadata 为 NOASSERTION/Other，不应简单自动标为标准 BSD-3-Clause。抽查 Swift 文件带同类许可头。",
+      "asset_license": "树中仅发现根 LICENSE，未发现独立素材总清单。Stroop 核心字词／颜色由代码和本地化键产生，避免必需的第三方图片刺激；引导插图和系统资源仍应逐项审计，不把 root code license 推定为所有截图、音频、字体或商标授权。",
+      "adaptation": "Objective-C/Swift/iOS框架，不可直接当 React/TypeScript browser task。优先借鉴 trial schema、参数校验、状态机与测试；移植需另建 seed、monotonic时间、visibility/掉帧与计分规则。",
+      "limits": [
+        "只样查当前 Swift Stroop，不把 legacy 与新实现重复计任务。",
+        "没有运行、安装、真机时序或心理计量验证。",
+        "10 trial 是库默认而非推荐科研／教育测量长度。"
+      ],
+      "family_id": "researchkit",
+      "unified_priority": "B",
+      "recommendation_track": "topic_reference",
+      "integration_adoption_axes": {
+        "assessment_kind": "PROPOSED_RESEARCH_PATH_NOT_PERMISSION_OR_PUBLICATION_APPROVAL",
+        "code_rights_disposition": "可 GitHub 公开",
+        "code_conditions": "仅就已查明的代码许可而言；须满足署名、保留通知、对应许可证及兼容性条件，不外推刺激、商标或外部依赖。",
+        "unverified_asset_rights_disposition": "待联系授权",
+        "asset_conditions": "只针对拟采用且尚未明确获权的外部刺激/引导图/音频等；自制材料另留原创依据，不用根代码许可推定素材授权。",
+        "implementation_strategy": "文献自研",
+        "implementation_note": "本轮优先提取方法与协议独立设计；若以后转为代码适配，须重新核对所用文件、许可义务及平台边界。"
+      }
+    },
+    {
+      "repository": "ResearchStack/ResearchStack",
+      "canonical_url": "https://github.com/ResearchStack/ResearchStack",
+      "github_repository_id": 43707061,
+      "project_family_count": 1,
+      "snapshot": {
+        "github_repository_id": 43707061,
+        "sha": "78ae673b6af8adfe6a788a3f3237996608f3f043",
+        "commit_date_utc": "2017-01-26T23:12:34Z",
+        "default_branch": "master",
+        "archived": false,
+        "review_date_utc": "2026-10-25",
+        "commit_url": "https://github.com/ResearchStack/ResearchStack/commit/78ae673b6af8adfe6a788a3f3237996608f3f043"
+      },
+      "audit_depth": {
+        "level": "sampled_source_audit",
+        "third_party_code_executed": false,
+        "tests_executed": false,
+        "timing_measured": false,
+        "external_writes": false
+      },
+      "evidence": [
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": ".travis.yml",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/.travis.yml",
+          "sha256": "4c8267e8fce699e02ff31fb47e732529d1877419f8984864a844a7aba2eea66b",
+          "line_count": 44
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "LICENSE",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/LICENSE",
+          "sha256": "f94b6777280da17a45e761f6f71bc7f3badff87a463771a063c1c2162cd69ba8",
+          "line_count": 191
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "README.md",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/README.md",
+          "sha256": "668a4430ee651aa487acbc224379d50f1337ff1c94c253aa23d5b7d6763769fc",
+          "line_count": 149
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/main/AndroidManifest.xml",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/main/AndroidManifest.xml",
+          "sha256": "928a7a8cfd3d6518bc1ce0ea6a771b38378906f697f25dbc21a752c424fee79a",
+          "line_count": 2
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/main/java/org/researchstack/backbone/StorageAccess.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/main/java/org/researchstack/backbone/StorageAccess.java",
+          "sha256": "835317937b5b888fc25ceec9d57bb3457b3f6135169a8bc7f2479fad1ae21fbd",
+          "line_count": 311
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/main/java/org/researchstack/backbone/storage/file/SimpleFileAccess.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/main/java/org/researchstack/backbone/storage/file/SimpleFileAccess.java",
+          "sha256": "7b3935cb7730df1900e3d07b3bf5a1989435ba9f22d18feedd8dc019cc5e7d41",
+          "line_count": 93
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/test/java/org/researchstack/backbone/result/ResultTest.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/test/java/org/researchstack/backbone/result/ResultTest.java",
+          "sha256": "807bf1283ac6d5ee1684039b6fcb789101ddfed8e9ddf334dd8a05065b078262",
+          "line_count": 32
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/test/java/org/researchstack/backbone/task/OrderedTaskTest.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/test/java/org/researchstack/backbone/task/OrderedTaskTest.java",
+          "sha256": "87fb24c229118839bee66a9c0d015b0f734eea0b55930857d7ce237fe3a70651",
+          "line_count": 85
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "backbone/src/test/java/org/researchstack/backbone/task/TaskTest.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/backbone/src/test/java/org/researchstack/backbone/task/TaskTest.java",
+          "sha256": "af8503f3c85d1da1595c45fdfcc30eabe61806cbd6832134b058fa1bc1c5c49b",
+          "line_count": 72
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "skin/src/main/AndroidManifest.xml",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/skin/src/main/AndroidManifest.xml",
+          "sha256": "5c584c043058816b08e853ae1dca50c2bd85cd7dea3722b45727c610cc1bb13c",
+          "line_count": 12
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "skin/src/main/java/org/researchstack/skin/DataProvider.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/skin/src/main/java/org/researchstack/skin/DataProvider.java",
+          "sha256": "a42741a476a64b4302ba28b24d4c6c7ee01adfa8c9669f42d920ec39e369db61",
+          "line_count": 243
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "skin/src/main/java/org/researchstack/skin/ResearchStack.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/skin/src/main/java/org/researchstack/skin/ResearchStack.java",
+          "sha256": "44dad5e505873360121249dc4b81dac87870bc08da631019656104c2480e0424",
+          "line_count": 151
+        },
+        {
+          "repository": "ResearchStack/ResearchStack",
+          "path": "skin/src/main/java/org/researchstack/skin/ui/fragment/ActivitiesFragment.java",
+          "url": "https://github.com/ResearchStack/ResearchStack/blob/78ae673b6af8adfe6a788a3f3237996608f3f043/skin/src/main/java/org/researchstack/skin/ui/fragment/ActivitiesFragment.java",
+          "sha256": "64c1c4618bfaed4f4c818f27e8bcec67b776bb7fdb1f888714a11b2eebc036ff",
+          "line_count": 215
+        }
+      ],
+      "source_type": "Android consent/survey/study-app SDK (Backbone + Skin); no cognitive task implementation found in this fixed default-branch tree",
+      "recommended_tier": "C — 历史研究应用架构参考；不追加认知内容优质来源",
+      "decision": "保留排除记录即可；不是可直接提供认知范式／计分的任务库。",
+      "actual_tasks_confirmed": [],
+      "sampled_task": "纯框架：实际读取 DataProvider、ActivitiesFragment、StorageAccess/SimpleFileAccess、Task/OrderedTask tests。完整393文件树含 consent、survey、onboarding 和通用 task/step，未发现 Stroop、memory、PSAT、Hanoi 等认知任务代码。README外链样例不计本仓任务。",
+      "protocol": "Task、Step、Result 是研究应用流程抽象，consent quiz/问卷不是认知行为范式。无可提取的认知刺激呈现协议、trial参数或范式计分。",
+      "scoring": "没有本仓可确认的认知任务 scorer；问卷/表单结果与导航验证不能当认知计分。",
+      "scientific_provenance": "README 为 SDK 与 ResearchKit 兼容/迁移说明，所查文件未给独立认知范式或心理计量验证。",
+      "testing": "完整树11个测试源码文件；.travis.yml 配置 ./gradlew test（Android 23、JDK8）。实际 OrderedTaskTest 验证前后step、identifier查询、progress、重复参数和不可变列表；TaskTest 验证标题。ResultTest 3个测试均 @Ignore 且空函数，不能把文件存在当序列化测试有效。未运行、未核CI当前状态。",
+      "default_outbound": "Skin ActivitiesFragment.onActivityResult 在成功后先 saveTaskResult，再直接调用 DataProvider.uploadTaskResult（L115–117）。DataProvider 是应用注入抽象实现，没有本仓固定上传终点；因此不能称默认离线，使用Skin即有完成后上传hook。Skin manifest声明 INTERNET/ACCESS_NETWORK_STATE、外部读写存储、精确定位和SYSTEM_ALERT_WINDOW；应逐项缩减权限。",
+      "storage": "SimpleFileAccess 写入 context.getFilesDir()+path 并交给配置的 encrypter；支持 UnencryptedProvider，不能一概承诺默认加密。ResearchStack.init 要求应用提供 EncryptionProvider/FileAccess/AppDatabase/DataProvider 实现。",
+      "code_license": "根 LICENSE 为 Apache-2.0，copyright Cornell Tech 2015–2016。",
+      "asset_license": "存在 consent图等drawable资源；未找到单独素材许可总表。README说明示例应用资源可来自其他应用，不把本仓Apache许可外推到链接的外部样例资源。",
+      "maintenance": "default branch master SHA 日期2017-01-26；repository pushed_at=2024-03-29只代表仓事件，不能当主代码更新日期。未archived也不等于维护活跃。",
+      "adaptation": "历史Android Java SDK；对当前React/TS认知内容库无直接任务素材价值，最多参考consent/result/storage抽象。",
+      "limits": [
+        "不扩展审查README链接的SampleApp等子仓，避免膨胀任务库数量。",
+        "默认分支代码与现代Android兼容性未验证。",
+        "上传接口不等于具体网络请求已经发生；本审查未运行应用。"
+      ],
+      "family_id": "researchstack",
+      "unified_priority": "C",
+      "recommendation_track": "historical_framework_only",
+      "integration_adoption_axes": {
+        "assessment_kind": "PROPOSED_RESEARCH_PATH_NOT_PERMISSION_OR_PUBLICATION_APPROVAL",
+        "code_rights_disposition": "可 GitHub 公开",
+        "code_conditions": "仅就已查明的代码许可而言；须满足署名、保留通知、对应许可证及兼容性条件，不外推刺激、商标或外部依赖。",
+        "unverified_asset_rights_disposition": "待联系授权",
+        "asset_conditions": "只针对拟采用且尚未明确获权的外部刺激/引导图/音频等；自制材料另留原创依据，不用根代码许可推定素材授权。",
+        "implementation_strategy": "暂缓",
+        "implementation_note": "仅留索引或排除记录，不进入任务实现。"
+      }
+    }
+  ],
+  "web_verifications": [
+    {
+      "claim": "Tatool论文题名/DOI",
+      "url": "https://eprints.glos.ac.uk/5147/",
+      "finding": "作者机构仓确认von Bastian & Druey 2017与10.1037/xge0000333；未将全文心理计量结论外推到Web版本。"
+    },
+    {
+      "claim": "TaskBeacon MID文献DOI不匹配",
+      "repository_file": "references/references.yaml",
+      "repo_value": "10.1523/jneurosci.2372-04.2004",
+      "paper_title": "Incentive-Elicited Brain Activation in Adolescents: Similarities and Differences from Young Adults",
+      "verified_doi": "10.1523/JNEUROSCI.4862-03.2004",
+      "urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC6730402/",
+        "https://www.jneurosci.org/content/jneuro/24/8/1793.full.pdf"
+      ],
+      "method": "primary-paper PMC/official journal search result verified against repository snapshot, not full-paper methods audit"
+    }
+  ],
+  "baseline_inventory": "../source-survey-20261026/sources.json (34 repository records)",
+  "integration_date_utc": "2026-10-26"
+}

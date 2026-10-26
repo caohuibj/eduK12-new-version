@@ -1,0 +1,470 @@
+{
+  "schemaVersion": 1,
+  "artifactKind": "READ_ONLY_BASELINE_RESEARCH_MAP",
+  "baselineCommit": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "reviewMethod": "git show exact baseline; static source inspection only",
+  "counts": {
+    "realTaskFamilies": 24,
+    "realExecutionIdentities": 28,
+    "allExecutionIdentitiesIncludingFake": 29,
+    "realRunnerIdentities": 24
+  },
+  "exclusions": [
+    "fake is a test fixture, not a real task family",
+    "visualsearch is absent from this baseline catalog; paused worktree draft excluded",
+    "No PR356 implementation, runtime database availability, publication or deployment claim"
+  ],
+  "families": [
+    {
+      "family": "reaction",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "对简单视觉信号尽快做出反应，练习快速启动。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "reaction",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        },
+        {
+          "testType": "reaction",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L27-L27",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/reaction/governance.ts#L3-L17"
+    },
+    {
+      "family": "memory",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住越来越长的数字序列，挑战短时记忆容量。",
+      "interactionFamily": "keypad_sequence",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "memory",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        },
+        {
+          "testType": "memory",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L28-L28",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/memory/governance.ts#L3-L17"
+    },
+    {
+      "family": "stroop",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "当颜色和文字含义\"打架\"时，快速说出正确的颜色。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "stroop",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        },
+        {
+          "testType": "stroop",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L29-L29",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/stroop/governance.ts#L3-L17"
+    },
+    {
+      "family": "gonogo",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "见到 Go 快速按下，见到 No-Go 忍住不按。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "gonogo",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L30-L30",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/gonogo/governance.ts#L3-L17"
+    },
+    {
+      "family": "cpt",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "长时间盯住屏幕，目标一出现就快速准确响应。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "cpt",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L31-L31",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/cpt/governance.ts#L3-L17"
+    },
+    {
+      "family": "nback",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住\"刚才第 N 个\"是什么，并实时判断匹配。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "nback",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L32-L32",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/nback/governance.ts#L3-L17"
+    },
+    {
+      "family": "corsi",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住方块亮起的顺序，再按同样顺序点回来。",
+      "interactionFamily": "click_sequence",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "corsi",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L33-L33",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/corsi/governance.ts#L3-L17"
+    },
+    {
+      "family": "sst",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "快速响应，但听到停止信号时要立刻\"刹车\"。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "sst",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L34-L34",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/sst/governance.ts#L3-L17"
+    },
+    {
+      "family": "taskswitch",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "按照提示在不同任务规则之间快速切换。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "taskswitch",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L35-L35",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/taskswitch/governance.ts#L3-L17"
+    },
+    {
+      "family": "patterncompare",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "在有限时间里快速判断两个图形是不是一样。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "patterncompare",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L36-L36",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/patterncompare/governance.ts#L3-L17"
+    },
+    {
+      "family": "flanker",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "忽略两边箭头的干扰，只判断中间箭头的方向。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "flanker",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L37-L37",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/flanker/governance.ts#L3-L17"
+    },
+    {
+      "family": "cardsort",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "按不断变化的规则把卡片分到正确的一边。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "cardsort",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L38-L38",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/cardsort/governance.ts#L3-L17"
+    },
+    {
+      "family": "digitbackward",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "把看到的数字倒着顺序回忆出来。",
+      "interactionFamily": "keypad_sequence",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "digitbackward",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L39-L39",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/digitbackward/governance.ts#L3-L17"
+    },
+    {
+      "family": "picturesequence",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住一组图片事件的发生顺序并还原。",
+      "interactionFamily": "item_ordering",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "picturesequence",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L40-L40",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/picturesequence/governance.ts#L3-L17"
+    },
+    {
+      "family": "pairedassociate",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住每个图形对应的位置，越学越快。",
+      "interactionFamily": "position_selection",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "pairedassociate",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L41-L41",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/pairedassociate/governance.ts#L3-L17"
+    },
+    {
+      "family": "matrix",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "找出图形排列的规律，选出合适的答案。",
+      "interactionFamily": "multi_option_selection",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "matrix",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L42-L42",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/matrix/governance.ts#L3-L17"
+    },
+    {
+      "family": "mentalrotation",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "判断两个图形是不是同一个（只是转了个角度）。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "mentalrotation",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L43-L43",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/mentalrotation/governance.ts#L3-L17"
+    },
+    {
+      "family": "tower",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "动脑筋用最少的步数把圆盘挪到目标位置。",
+      "interactionFamily": "click_sequence",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "tower",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L44-L44",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/tower/governance.ts#L3-L17"
+    },
+    {
+      "family": "trailmaking",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "按顺序尽快找到并连接下一个目标。",
+      "interactionFamily": "click_sequence",
+      "rtSensitivity": "moderate",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "trailmaking",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L45-L45",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/trailmaking/governance.ts#L3-L17"
+    },
+    {
+      "family": "reversallearning",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "根据反馈学会哪边更\"划算\"，并在规则反转后重新学习。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "reversallearning",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L46-L46",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/reversallearning/governance.ts#L3-L17"
+    },
+    {
+      "family": "bart",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "给气球一点点打气赚奖励，吹爆就没有了。",
+      "interactionFamily": "incremental_button",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "bart",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        },
+        {
+          "testType": "bart",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.1.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L47-L47",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/bart/governance.ts#L3-L17"
+    },
+    {
+      "family": "wordlist",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "记住一组词语，然后凭记忆打出来。",
+      "interactionFamily": "typed_recall",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "wordlist",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L48-L48",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/wordlist/governance.ts#L3-L17"
+    },
+    {
+      "family": "lexicaldecision",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "尽快判断屏幕上的字符串是不是真词。",
+      "interactionFamily": "button_choice",
+      "rtSensitivity": "high",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "lexicaldecision",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L49-L49",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/lexicaldecision/governance.ts#L3-L17"
+    },
+    {
+      "family": "emotionrecognition",
+      "countingUnit": "task_family_not_version",
+      "educationalPurpose": "看图片里人物的表情，选出对应的情绪。",
+      "interactionFamily": "multi_option_selection",
+      "rtSensitivity": "low",
+      "baselineExecutionIdentities": [
+        {
+          "testType": "emotionrecognition",
+          "engineVersion": "1.0.0",
+          "scoringVersion": "1.0.0"
+        }
+      ],
+      "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/generated/catalog.ts#L50-L50",
+      "governanceEvidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/cognitive/tasks/emotionrecognition/governance.ts#L3-L17"
+    }
+  ],
+  "deduplicationClasses": [
+    "existing_family_evidence",
+    "protocol_variant",
+    "new_family_candidate",
+    "unresolved"
+  ],
+  "deduplicationAxes": [
+    "stimulus_generator",
+    "response_rule",
+    "trial_and_phase_protocol",
+    "randomization",
+    "scoring_formula",
+    "measurement_construct"
+  ],
+  "surveyBaseline": {
+    "templateKey": "gonogo-software-frame-v1",
+    "testType": "gonogo",
+    "configVersion": "1.1.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "totalTrials": 120,
+    "nogoRatio": 0.25,
+    "stimulusMs": 800,
+    "isiMs": 500,
+    "validRtFloorMs": 100,
+    "devicePolicy": "DESKTOP_KEYBOARD",
+    "restartLimit": 1,
+    "maturity": "PILOT",
+    "referenceMode": "none",
+    "feedbackMetricAllowlist": [
+      "hitRate",
+      "goMedianRtMs"
+    ],
+    "sourceRequires": [
+      "PUBLISHED",
+      "OPEN",
+      "exact frozen config hash"
+    ],
+    "evidence": "https://github.com/caohuibj/eduK12-new-version/blob/ff8471e529e7b3c56e1e20f17d1e2581040fc896/server-version/backend/src/modules/survey/cognitive.definition.ts#L8-L80"
+  },
+  "executionPerformed": {
+    "repoMutation": false,
+    "service": false,
+    "database": false,
+    "test": false,
+    "ci": false
+  }
+}
