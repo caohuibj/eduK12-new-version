@@ -14,9 +14,33 @@ describe('Teacher personal consensus review states',()=>{
   expect(screen.queryByText('暂时无法读取')).not.toBeInTheDocument()
   expect(api.mock.calls).toEqual([['/my-consensus-reviews'],['/my-consensus-reviews']])
  })
+ it('shows an existing exact-version approval after reloading and allows a revised version to be reviewed',async()=>{
+  let review={id:'review',title:'课堂观察共识',content:'合成共识',status:'DRAFT',revision:3,digest:'digest-3',approvalCount:1,approvedByMe:true}
+  const api=vi.fn(async(_path:string)=>({list:[review]}));render(<HuiteacherConsensusReviews api={api as Api}/>)
+  expect(await screen.findByText('本人已确认此版本')).toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'我确认此版本的人工共识'})).not.toBeInTheDocument()
+  review={...review,revision:4,digest:'digest-4',approvalCount:0,approvedByMe:false}
+  fireEvent.click(screen.getByRole('button',{name:'刷新待办'}))
+  expect(await screen.findByRole('button',{name:'我确认此版本的人工共识'})).toBeEnabled()
+  expect(screen.queryByText('本人已确认此版本')).not.toBeInTheDocument()
+  expect(api.mock.calls.every(call=>call.length===1)).toBe(true)
+ })
+ it('coalesces fast confirmation clicks and retains the receipt if refresh fails',async()=>{
+  const review={id:'review',title:'课堂观察共识',content:'合成共识',status:'DRAFT',revision:3,digest:'digest-3',approvalCount:0}
+  let reads=0,release!:(value:unknown)=>void
+  const api=vi.fn((path:string)=>path==='/my-consensus-reviews'?(++reads===1?Promise.resolve({list:[review]}):Promise.reject(Error('列表刷新失败'))):new Promise(resolve=>{release=resolve}))
+  vi.spyOn(window,'confirm').mockReturnValue(true);render(<HuiteacherConsensusReviews api={api as Api}/>)
+  const button=await screen.findByRole('button',{name:'我确认此版本的人工共识'})
+  fireEvent.click(button);fireEvent.click(button)
+  expect(api.mock.calls.filter(([path])=>path.endsWith('/approve'))).toHaveLength(1)
+  release({approved:true,id:'review',revision:3})
+  expect(await screen.findByText('本人已确认此版本')).toBeInTheDocument()
+  expect(await screen.findByText('列表刷新失败')).toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'我确认此版本的人工共识'})).not.toBeInTheDocument()
+ })
  it('keeps exact-version approval behind explicit confirmation',async()=>{
   const review={id:'review',title:'本次课堂观察共识',content:'合成专业共识',status:'DRAFT',revision:3,digest:'frozen-digest',approvalCount:0}
-  const api=vi.fn(async(path:string)=>path==='/my-consensus-reviews'?{list:[review]}:{ok:true})
+  const api=vi.fn(async(path:string)=>path==='/my-consensus-reviews'?{list:[review]}:{approved:true,id:review.id,revision:review.revision})
   const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
   render(<HuiteacherConsensusReviews api={api as Api}/>)
   const approve=await screen.findByRole('button',{name:'我确认此版本的人工共识'})
