@@ -3,7 +3,7 @@ import type { TaskDefinition } from './v2/types'
 import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cognitive.registry'
 import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions } from './content-candidates/native-registry/definitions'
 import { ANT_IDENTITY } from './content-candidates/ant/protocol'
-import { getEnumerationIdentity } from './content-candidates/enumeration/protocol'
+import { getEnumerationIdentity, ENUMERATION_RECIPE_IDENTITY } from './content-candidates/enumeration/protocol'
 import { getMotReportBundle } from './content-candidates/mot/package'
 import { MOT_IDENTITY } from './content-candidates/mot/protocol'
 import { NATIVE_IDENTITY } from './content-candidates/continuous-recognition/native'
@@ -72,7 +72,11 @@ export function assertResourceConfigVersion(resource: CognitiveTaskResource, con
 }
 export function assertNativeDeliverySupported(resource: CognitiveTaskResource, purpose: 'authenticated' | 'public'): void {
   if (resource.kind !== 'native') return
-  if (purpose !== 'authenticated' || resource.testType !== 'mot')
+  const enumeration = resource.testType === ENUMERATION_RECIPE_IDENTITY.testType
+    && resource.engineVersion === ENUMERATION_RECIPE_IDENTITY.engineVersion
+    && resource.scoringVersion === ENUMERATION_RECIPE_IDENTITY.scoringVersion
+    && resource.configVersion === ENUMERATION_RECIPE_IDENTITY.configVersion
+  if (purpose !== 'authenticated' || (resource.testType !== 'mot' && !enumeration))
     throw BAD_REQUEST('This native Cognitive identity is not enabled for this delivery path')
 }
 

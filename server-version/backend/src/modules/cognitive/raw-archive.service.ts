@@ -11,6 +11,8 @@ import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { encryptCognitivePayload,decryptCognitivePayload } from './cognitive.security'
 import { parseCognitiveResultSnapshot } from './v2/result-snapshot'
 import { motTrialSchema } from './content-candidates/mot/schema'
+import {ENUMERATION_RECIPE_IDENTITY} from './content-candidates/enumeration/protocol'
+import {cognitiveEnumerationArchiveDetailSchema,type CognitiveEnumerationArchiveDetail} from './content-candidates/enumeration/archive-schema'
 
 export const COGNITIVE_RAW_ARCHIVE_PENDING_TYPE='CognitiveRawArchivePending'
 export const COGNITIVE_RAW_ARCHIVE_FINAL_TYPE='CognitiveRawArchive'
@@ -30,7 +32,8 @@ export const cognitiveMotArchiveDetailSchema=z.object({schemaVersion:z.literal(1
   practice:z.array(record).max(100)}).strict()
 export type CognitiveMotArchiveDetail=z.infer<typeof cognitiveMotArchiveDetailSchema>
 const uploadSchema=z.object({rawPayload:cognitiveMotArchiveDetailSchema,rawSha256:hash,expectedCoreHash:hash.optional()}).strict()
-export type CognitiveRawArchiveUpload=z.infer<typeof uploadSchema>
+const originalUploadSchema=z.object({rawPayload:z.unknown(),rawSha256:hash,expectedCoreHash:hash.optional()}).strict()
+export interface CognitiveRawArchiveUpload {rawPayload:unknown;rawSha256:string;expectedCoreHash?:string}
 export type CognitiveRawArchiveErrorCode='INVALID_ARCHIVE_PAYLOAD'|'HASH_MISMATCH'|'ARCHIVE_FORBIDDEN'|'CORE_NOT_COMMITTED'
  |'ARCHIVE_IDENTITY_CONFLICT'|'ARCHIVE_CONFLICT'|'UNSUPPORTED_ARCHIVE_SCOPE'|'ARCHIVE_STORAGE_UNCONFIRMED'
 export class CognitiveRawArchiveError extends Error {
@@ -58,7 +61,9 @@ async function loadAuthority(db:Db,input:CognitiveRawArchiveIdentity,actor:Cogni
     fail('CORE_NOT_COMMITTED',409,'请先确认本次作答提交成功')
   if(session.attemptNo!==input.attemptEpoch||session.submissionId!==input.submissionId)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'归档与已保存作答身份不一致')
-  if(session.testType!=='mot')fail('UNSUPPORTED_ARCHIVE_SCOPE',422,'此任务暂不支持归档')
+  if(session.testType!=='mot'&&(session.testType!==ENUMERATION_RECIPE_IDENTITY.testType
+    ||session.engineVersion!==ENUMERATION_RECIPE_IDENTITY.engineVersion||session.scoringVersion!==ENUMERATION_RECIPE_IDENTITY.scoringVersion
+    ||session.configVersion!==ENUMERATION_RECIPE_IDENTITY.configVersion))fail('UNSUPPORTED_ARCHIVE_SCOPE',422,'此任务暂不支持归档')
   const raw=await db.cognitiveRawSubmission.findUnique({where:{sessionId_attemptEpoch:{sessionId:session.id,attemptEpoch:input.attemptEpoch}}})
   if(!raw||raw.payloadSchemaVersion!==1||raw.encodingVersion!=='CANONICAL_JSON_SHA256_V1')
     fail('CORE_NOT_COMMITTED',409,'已保存原始作答不可用')
@@ -164,17 +169,48 @@ export async function getCognitiveRawArchiveStatus(inputValue:CognitiveRawArchiv
 }
 export async function archiveCognitiveRawSubmission(inputValue:CognitiveRawArchiveIdentity,actor:CognitiveRawArchiveActor,
   uploadValue:CognitiveRawArchiveUpload,override:Partial<CognitiveRawArchiveDependencies>={}):Promise<CognitiveRawArchiveReceipt>{
-  const input=parseIdentity(inputValue),parsed=uploadSchema.safeParse(uploadValue)
-  if(!parsed.success)fail('INVALID_ARCHIVE_PAYLOAD',400,'归档内容无效')
+  const input=parseIdentity(inputValue),original=originalUploadSchema.safeParse(uploadValue)
+  if(!original.success)fail('INVALID_ARCHIVE_PAYLOAD',400,'归档内容无效')
+  const isEnumeration=Boolean(original.data.rawPayload&&typeof original.data.rawPayload==='object'&&'artifact' in original.data.rawPayload)
+  // Preserve the historical MOT parser. Enumeration validators never replace original nested objects.
+  const parsed=isEnumeration?original:uploadSchema.safeParse(uploadValue)
+  if(!parsed.success||(isEnumeration&&!cognitiveEnumerationArchiveDetailSchema.safeParse(original.data.rawPayload).success))
+    fail('INVALID_ARCHIVE_PAYLOAD',400,'归档内容无效')
   const upload=parsed.data!,rawBytes=canonicalJsonBytes(upload.rawPayload)
   if(rawBytes.length>COGNITIVE_RAW_ARCHIVE_MAX_DETAIL_BYTES)fail('INVALID_ARCHIVE_PAYLOAD',413,'归档内容超出限制')
   if(digest(rawBytes)!==upload.rawSha256)fail('HASH_MISMATCH',400,'原件校验不一致')
   const deps=dependencies(override),a=await loadAuthority(deps.db,input,actor)
   if(upload.expectedCoreHash&&upload.expectedCoreHash!==a.session.submissionPayloadHash)
     fail('ARCHIVE_IDENTITY_CONFLICT',409,'已提交核心校验不一致')
-  if(upload.rawPayload.formal.length!==a.core.trials.length||upload.rawPayload.formal.some((value,index)=>
-    value.core.trialIndex!==index||a.core.trials[index]?.trialIndex!==index||canonicalHash(value.core)!==canonicalHash(a.core.trials[index]?.payload)))
-    fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与已保存核心作答不一致')
+  if(isEnumeration){
+    const detail=upload.rawPayload as CognitiveEnumerationArchiveDetail,A=detail.artifact,C=A.context
+    if(a.session.testType!==ENUMERATION_RECIPE_IDENTITY.testType||C.attemptId!==JSON.stringify([a.session.id,input.attemptEpoch])
+      ||C.randomSeed!==a.session.randomSeed||canonicalHash(C.config)!==canonicalHash(a.authority.configSnapshot.config)
+      ||canonicalHash(C.recipe)!==canonicalHash(C.config.stimulusRecipe))
+      fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与冻结设置不一致')
+    const {artifactHash,...artifactBody}=A
+    if(digest(Buffer.from(JSON.stringify(artifactBody),'utf8'))!==artifactHash)
+      fail('HASH_MISMATCH',400,'刺激原件校验不一致')
+    const seen=new Set<string>()
+    for(const saved of [...detail.formal,...detail.practice]){
+      const r=saved.record,t=r.core
+      if(digest(Buffer.from(JSON.stringify(r),'utf8'))!==saved.recordHash)fail('HASH_MISMATCH',400,'逐轮原件校验不一致')
+      if(r.contextId!==C.contextId||r.attemptId!==C.attemptId||r.artifactHash!==A.artifactHash||seen.has(r.exposureId)
+        ||t.plan.sequenceSeed!==a.session.randomSeed
+        ||(t.calibrationReference!==null&&t.calibrationReference!==C.calibration?.id)
+        ||(t.renderedStimulusReference!==null&&t.renderedStimulusReference!==A.artifactHash))
+        fail('ARCHIVE_IDENTITY_CONFLICT',409,'逐轮原件引用不一致')
+      seen.add(r.exposureId)
+    }
+    if(detail.formal.length!==a.core.trials.length||detail.formal.some((v,index)=>v.record.core.plan.trialIndex!==index
+      ||a.core.trials[index]?.trialIndex!==index||canonicalHash(v.record.core)!==canonicalHash(a.core.trials[index]?.payload)))
+      fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与已保存核心作答不一致')
+  }else{
+    const detail=upload.rawPayload as CognitiveMotArchiveDetail
+    if(a.session.testType!=='mot'||detail.formal.length!==a.core.trials.length||detail.formal.some((value,index)=>
+      value.core.trialIndex!==index||a.core.trials[index]?.trialIndex!==index||canonicalHash(value.core)!==canonicalHash(a.core.trials[index]?.payload)))
+      fail('ARCHIVE_IDENTITY_CONFLICT',409,'完整原件与已保存核心作答不一致')
+  }
   const fullPackage={schemaVersion:1,kind:'COGNITIVE_FULL_RAW_ARCHIVE',authority:a.authority,detail:upload.rawPayload}
   const fullBytes=canonicalJsonBytes(fullPackage)
   if(fullBytes.length>COGNITIVE_RAW_ARCHIVE_MAX_PACKAGE_BYTES)fail('INVALID_ARCHIVE_PAYLOAD',413,'完整归档超出限制')
