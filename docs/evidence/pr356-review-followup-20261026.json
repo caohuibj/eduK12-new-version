@@ -1,0 +1,572 @@
+{
+  "schemaVersion": 1,
+  "recordedAtUTC": "2026-10-26T06:58:06.552368+00:00",
+  "kind": "review-followup-development-observations",
+  "repository": "caohuibj/eduK12-new-version",
+  "pr": 356,
+  "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "parentBeforeClosure": "5c05355daf8a0b17087dc7139c9b410e43e870a4",
+  "currentQualification": "pending-exact-candidate-freeze-and-independent-review",
+  "ciExecuted": false,
+  "formalCIFailureRounds": 0,
+  "originalExecutionSigned": false,
+  "qualificationClaim": false,
+  "sourceAssociation": {
+    "kind": "working-tree-observation-at-collection",
+    "contemporaneousSourceManifest": false,
+    "note": "Not a retrospective execution signature; source manifest binds only this collection. Per-execution receipts retain their own narrower facts."
+  },
+  "changedSourceSHA256AtCollection": {
+    "server-version/backend/src/__tests__/assessment-reference/scale-wave1-longitudinal.test.ts": "9a8b6ea2497ed529a736a32347e555a285e45c720140c9998a8a17918865394d",
+    "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts": "8e65621b99cb86edf4f4383333223ee74291c44c2166fb38ccdd9bea3c8772bf",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": "fc4df21506b4b132a1c1758d5843442a3358b5730162507e5f3f540fe799e525",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": "e0ee839d23f55787aa90b054f876acbc233df88ed1e4032b98d660378187be64",
+    "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts": "094bf315ef1198d379c3cdca4c29897b3fa0299a852dffd0b7aff03937752ab6",
+    "server-version/backend/src/__tests__/scale/pr356-entry-lifecycle.postgres.integration.test.ts": "0a7626168f1d7c324c16111ee90102a465e0e801971b8e70be80def6c136790d",
+    "server-version/backend/src/__tests__/scale/scale-governance-boundaries.test.ts": "14a183263b613ee789b0dbe7bfe085b1264ac1b0d20ddc515ac7576246489a52",
+    "server-version/backend/src/__tests__/scale/scale-publication-guard.test.ts": "ed1f1bd73dee80cf04b2d5526eb1e15253ea1aa22a4a6a4dccb5e79f32ab0d69",
+    "server-version/backend/src/__tests__/scale/standalone-instruction-envelope.test.ts": "86e4e1c282ec582c3029c7863560db47d9106dbc10277259f150df084e6b39dc",
+    "server-version/backend/src/__tests__/survey/catalog-scale-instruction.contract.test.ts": "170a554c2d31916326dbd1fdcfff893a030b9a8c084a28de1a488fd03d163db5",
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": "22ef96071ac8b2e2e2b8059a2a0e40fd77f84d2ee1c1ee0791d378c50d842e38",
+    "server-version/backend/src/controllers/questionnaireController.ts": "e4a37890f7f6aa1e3a1989f867edf237e8d490ac8f3d63a714c09db999fc072a",
+    "server-version/backend/src/modules/assessment-reference/longitudinal.ts": "3d7b076712445a32ef729433002fb08db7194f6b3f060e82aa5c082fa4af0505",
+    "server-version/backend/src/modules/assessment-runtime/frozen-scale-instruction.ts": "478d662e2fe50de27bd23d4696b3d7c68de56a6e53327eeaed5ecec03e122c97",
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts": "8289e94603daa83a22c68120e96080e4c8deccb87d0f467a09be52124e4dcd3a",
+    "server-version/backend/src/modules/composite/composite.service.ts": "7856449484d7fe7a34269cef6c9432ee06a4ae03c15ecbbddf6380459a6e370d",
+    "server-version/backend/src/modules/composite/training-standard-combination.ts": "a0cd5c326a78014d087793c5f9345ed692a1a0a06e0c20be3596f450fdaf0f09",
+    "server-version/backend/src/modules/measurement-content/standard-combination-use.ts": "ddaab04c467406b3fbe419cb9488d1d16895bf7d4c28a8fc877b5e104939db8e",
+    "server-version/backend/src/modules/scale-library-governance/authority.ts": "83ed9c9a1487ee8f96e66903542f65f22a64920b99914d9ee0e31a91a8f0905e",
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": "f6d5653dcf75a91bc87675437e2831bbda1ba3c13312da3ffa7d500e21460b59",
+    "server-version/backend/src/modules/scale/scale-collection-guard.ts": "8ec3ece7c4c8a21ff247e2690111ae7a25301e9ff011dcbbf2d916a2c0039485",
+    "server-version/backend/src/modules/scale/scale-publication-guard.ts": "21d4f7997e7485ef13cbce4a0e01c1314781f84c8e41024e6dba7ff6df680f36",
+    "server-version/backend/src/modules/scale/scale-restart.service.ts": "907be593407f412d51c93b306b7947d675deb76102e73a792379e4ffab94e82e",
+    "server-version/backend/src/modules/scale/scale-start.controller.ts": "bd939333a5b052f83ba125d9ed04c0ec73e04364e05c42170555b1917d51a69e",
+    "server-version/backend/src/modules/scale/unified-final-submit.service.ts": "01b3619bd4f69bf1b98145a42316b51923bf5e1dcdf654337aeae7c2b11fb014",
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": "a8291b9ac1502fa6e20897362014b87f14e5fb21aadaf372c42bb75def7f2cea",
+    "server-version/backend/src/services/questionnaire-form-section.service.ts": "624ec1c973e5f45c13a333cb7becd836b9c3756934b5b845bd024c79f4c16a11",
+    "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": "e83b9a58c80a287d64c945484a8c100c0a6de30aad97ee95290cefaf927700aa",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "e2bf56939351cbdf09ee57fe37aeb9e6982da719fa79d0bc01ad0c18885c87b3",
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "ba49e557032018db945312214772e11843e5f22384f288317c23df9069107572"
+  },
+  "protectedSHA256AtCollection": {
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/prisma/schema.prisma": "6533527006c1fb08ef30f779d007c5be6e1a5f212dce0fd1e567056b558393a2"
+  },
+  "reporters": [
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-date-affected-existing.json",
+      "sha256": "e00c5018827ebe8cf1d30352f3f77f35d95f6e2e1a95c23a16de5d6ab5f2f4de",
+      "total": 16,
+      "passed": 13,
+      "failed": 0,
+      "pendingOrFiltered": 3,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-mixed-green.json",
+      "sha256": "9fe0d9799f264a1c076a1d95ecb5e86b2c8f36f17cc26af8ce38162836eb5a2b",
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-mixed-red.json",
+      "sha256": "b27cb924484361249e4ad2eb3930e0d8c2eed7cac628dc58db533d63eae49e4d",
+      "total": 12,
+      "passed": 0,
+      "failed": 3,
+      "pendingOrFiltered": 9,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-window-dates-green.json",
+      "sha256": "896cdf457a41a2051e8a937d776e5bf946454a12146bc0179d0749099c4d70c1",
+      "total": 16,
+      "passed": 3,
+      "failed": 0,
+      "pendingOrFiltered": 13,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-window-dates-red.json",
+      "sha256": "ba21da065485106e460e7fadf5ede8bb5ac8cc99e486114038c7ca06e6d6487b",
+      "total": 16,
+      "passed": 1,
+      "failed": 2,
+      "pendingOrFiltered": 13,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/choice-axis-version-dto.json",
+      "sha256": "65f443c834c781a204545dbae1119f1343423ac1da44eff3f2f5ed12d8793f68",
+      "total": 74,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 73,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/delegation-system-message.json",
+      "sha256": "8d921ba9f036cabc5f16d604ebb127b8a2715b6b5096fac7b3a3685d31793c34",
+      "total": 73,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 72,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entered-emergency-green.json",
+      "sha256": "d88ab4c50955c96e7de7290412f58b537e562b1c88df9e4af879dee8236da2cc",
+      "total": 9,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 8,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entered-emergency-red.json",
+      "sha256": "74c838f04521927dd1e9f2adab155e71c7cf4859aa77d32cc17b032acef0bcc1",
+      "total": 9,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 8,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-actual-domain-red.json",
+      "sha256": "f2000b5e27391345a5f53d12e477434b01bbc80bcf3ac5ef3c305b7c139435f4",
+      "total": 2,
+      "passed": 0,
+      "failed": 2,
+      "pendingOrFiltered": 0,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-approval-early.json",
+      "sha256": "e455331d74da40fcdb04799bffbfe265f9869f91cc84f0006f37620640526739",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-domain-fixed-red.json",
+      "sha256": "d62e1bd41dd2b065375066cb1eeff32e0df228652bfce45abc801e68fdd432aa",
+      "total": 2,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 2,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-lifecycle.json",
+      "sha256": "0a5d4aa250741ab2d8cead8bdee437641bc8021654b81806e1fab2092a050d48",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-narrow-fix-green.json",
+      "sha256": "76995f779d7d98b0b0dfe4b4577ea7c07b59398d68e754bed8a3907b3c120404",
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-red.json",
+      "sha256": "9c4da0fd5600d4559bf055dd29f790db360b0c0245223a1fd955a696158d6fc9",
+      "total": 2,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 2,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/exact-delegation.json",
+      "sha256": "c8e03f89bf8fe708a7711841e30404918d9e1e38e2bd88ba439b8e4d29e314b9",
+      "total": 73,
+      "passed": 72,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/exact-instruction-fixed-import.json",
+      "sha256": "3c40b36fd4e4f2058bc608f16e983775840ba70eef08c4a448adbc59814fd3f7",
+      "total": 10,
+      "passed": 9,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/exact-instruction-fixture-recheck.json",
+      "sha256": "31f424bfe68522d82435017b6f7a21fc087a49462f9880c63c6f260ed60ea653",
+      "total": 3,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 2,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/exact-instruction.json",
+      "sha256": "031e287b75de1604396e0deced9c6659e86e86400962974a5d898f30b7c7199a",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/parent-status-mock.json",
+      "sha256": "c3b6823d0f53f42b5f38e7d41c5ecc7247d349791f96adce0b4f81d28ee306d3",
+      "total": 17,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 16,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/shared-entry-contracts.json",
+      "sha256": "dd55d45076894c6f47ae59898ee75ef9766f87ab100f36ba6ba38aece27f28b1",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/stage-transition.json",
+      "sha256": "bd440b60bf9319570ada2328a7d49b9c5b4ba0143242e3530f74071c3af01f35",
+      "total": 13,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 12,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/standalone-instruction-envelope-counterexample.json",
+      "sha256": "177cdca3f44b0de3a1a9f674b34c696cfa8bbd233418c9e4c18583ec12cfcddc",
+      "total": 8,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 7,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/standalone-instruction-envelope-green.json",
+      "sha256": "4926f21c38040ab1c87eae929c9b693f55dc708a8349766157aef60429b446bc",
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/standalone-instruction-envelope-isolated-red.json",
+      "sha256": "a472a55aff8f5187b067698e477600c64179953970b48a9ff07f9f260123a506",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/standalone-instruction-envelope-red.json",
+      "sha256": "0b80e0169f394ea772301c5105b13cd06d87212ca172d96185935191d8426b6f",
+      "total": 8,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 7,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/survey-instruction-before.json",
+      "sha256": "13721415046de9c66d1d2dcbc05767c83e64fde49a11ce55fde82a45d3c00e29",
+      "total": 52,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 52,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/survey-instruction-green.json",
+      "sha256": "34b1010ddac993b5554b522f0b3c8f5a3497ba95317cb08ac82e4f2c0a8ad473",
+      "total": 53,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 52,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/survey-instruction-red.json",
+      "sha256": "3ec8db01d309032953e32f63f6e1941b320ba7ae1fb7482fc0ab560833c0f09d",
+      "total": 53,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 52,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/teacher-frozen-version-summary.json",
+      "sha256": "c0c24ea687d2d954e9523964cc4fa7c7c6ca15c998647a0c4686f3c03aca9aa1",
+      "total": 75,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 74,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-axes-saved-summary.json",
+      "sha256": "7d66f588db2573d12c5111f561b5260ccc9b4da22bdfa748b3003a7717d4e7ff",
+      "total": 84,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 83,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-axes-scope.json",
+      "sha256": "27c1d197158139056f0514135195e2df759b154564d1651aec304c08c13b1e58",
+      "total": 84,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 82,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-general-final.json",
+      "sha256": "7cad79852b4fcbb3564246c459dee2179f166e4cda1a100a4c5ba1723aec1e5e",
+      "total": 84,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 83,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-picker-fixed.json",
+      "sha256": "bdb33bd6f8fcce7a8b922de83077f994f645d6473dc0780afdc3137cc82c589c",
+      "total": 82,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 81,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-picker-legacy-ready.json",
+      "sha256": "1b3f5c12a607196f89039d9140f9d296b1ee654ca106dbb514967001386068cb",
+      "total": 82,
+      "passed": 3,
+      "failed": 0,
+      "pendingOrFiltered": 79,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-picker-legacy.json",
+      "sha256": "ea2ea52959b4a2783e491b4adea0d9a78f8190eddf4beb00cca9cc287bb4d870",
+      "total": 82,
+      "passed": 2,
+      "failed": 1,
+      "pendingOrFiltered": 79,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-picker.json",
+      "sha256": "001d574aae930157844e867ebec2a645cf9be2281284fe1b5cb21127c898d960",
+      "total": 82,
+      "passed": 0,
+      "failed": 1,
+      "pendingOrFiltered": 81,
+      "success": false,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-same-content-axes.json",
+      "sha256": "e6c4c15ec65a965065af6dbcae379bde376aa76ce1fd80621ad6cd4688c11f87",
+      "total": 83,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 82,
+      "success": true,
+      "interpretation": "original invocation only; filtered/empty/setup failure are not passing checks"
+    }
+  ],
+  "executionReceipts": [
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-window-dates-green.receipt.json",
+      "sha256": "b0a08c4e62965f5b3de3f91cea2158c964e97127705228ba972033615c2cc2f1",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/adult-window-dates-red.receipt.json",
+      "sha256": "8d682dff3ce348ce79f24bc98898ab2edbdea2a4e91aa55f6a3c6ac9d0aece5e",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/backend-changed-diagnostics.receipt.json",
+      "sha256": "443153cdfb01fc3cdd5de30af5961f18a40987f7a284deb2b183186de84eb96d",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/backend-standalone-response-diagnostics.receipt.json",
+      "sha256": "ca788ddbce3d4d477d5f5d89825c749f65dcdf9f1618566dc2c8fd18a6e1855c",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/entry-lifecycle-execution.json",
+      "sha256": "92265dab759d28b36561031e1636225701725d5fe465c3b1f155bea18549ff0f",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/frontend-app-types-fixed.receipt.json",
+      "sha256": "246b9c53760557e186ce1d0fddb52902ee9f03a165993a4cc64b3ca3be8f75a6",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/frontend-final-types.receipt.json",
+      "sha256": "fbcac2c6c89fca6e28827569ef31c6f4a5f83c3a625024d4f5c825370ed064d2",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/frontend-lint.receipt.json",
+      "sha256": "cebd6ceaf4d3ae181f264d7f9707795234014992ed48625fe5c4cfb427be461c",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/instruction-ui-agent-lint.execution.json",
+      "sha256": "37a8eebb8169250f8bffc9441a13b2289105f397d32e66bb8cab8564e8edb74e",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/standalone-instruction-envelope-green.receipt.json",
+      "sha256": "c823b714e7c079a9aefdbc4f5834b6649f61d93e42e4cb60757dcd6f1ae4d8f7",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-axes-saved-summary.execution.json",
+      "sha256": "c0fbbf310a5f851a6f1bcaf13c0e6e8aa66e5bcb7119b3c3a93cb5c50155f811",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/training-general-final.execution.json",
+      "sha256": "6cdb3314c51b86eb749825b308020f3cc7024ab0f3757098ece09098a8024bff",
+      "kind": "execution-receipt-not-test-count"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/final-eof-format.receipt.json",
+      "sha256": "416f6ccf5537e1b962d5876e3b96dd1defe092939721bb6dcfc518b475fc0bc7",
+      "kind": "format-compatibility-observation-not-test-count"
+    }
+  ],
+  "environment": {
+    "node": "24.21.0",
+    "npm": "11.9.0",
+    "postgres": "16.15 isolated synthetic local databases on 127.0.0.1:55439",
+    "redis": "7.4.11 isolated local on 127.0.0.1:56380",
+    "productionAccess": false
+  },
+  "userDecision": "Exact approved C/P/R combination has independent TRAINING admission; native item keeps its separate entry approval. Existing integrity/current use/deployment/stop checks remain.",
+  "approvalHistory": {
+    "abandonedBroadRewrite": "denied-known-not-executed",
+    "reason": "Unvalidated broad access-policy rewrite could widen access",
+    "replacement": "Narrow per-path changes based on real failures and explicit user business decision; original denied operation was not retried"
+  },
+  "notExecutedCurrentQualification": [
+    "fresh normal vertical 4 cases",
+    "fresh normal whole receipt worker 1 case",
+    "230-to-237 old-data upgrade and dump/restore",
+    "clean production builds and artifact consumers",
+    "formal required merge gate",
+    "full traditional Questionnaire/organization HTTP",
+    "NFC10 content acceptance",
+    "PHQ HOLD",
+    "complete Training longitudinal",
+    "356-01 cold/hot baseline"
+  ],
+  "rawPreservation": "CI control followup collection preserves original bytes separately; no historical report identity rewritten.",
+  "backendSourceStaticBinding": {
+    "initialReceiptUnchangedFiles": 15,
+    "supersededOneFile": [
+      "server-version/backend/src/modules/scale/scale-start.controller.ts"
+    ],
+    "finalOneFileReceipt": "/workspace/scratch/pr356-review-followup/backend-standalone-response-diagnostics.receipt.json",
+    "currentSourceCoveredByOriginal16AndFinal1": false,
+    "initialReceiptPreserved": true,
+    "noProductionBuild": true,
+    "oneOtherFileOnlyRemovedTrailingBlankLines": "server-version/backend/src/modules/assessment-runtime/frozen-scale-instruction.ts",
+    "currentSemanticSourceCoveredByOriginalChecksAndFinalOneFile": true
+  },
+  "additionalStandaloneInstructionFinding": {
+    "counterexample": "standalone-instruction-envelope-isolated-red.json",
+    "fixed": "standalone-instruction-envelope-green.json",
+    "originalFixtureImportTimeouts": [
+      "standalone-instruction-envelope-red.json",
+      "standalone-instruction-envelope-counterexample.json"
+    ],
+    "noOldChecksRepeated": true
+  },
+  "formatOnlyAfterValidation": {
+    "kind": "EOF-format-only-no-statement-or-contract-change",
+    "changes": [
+      {
+        "path": "server-version/backend/src/__tests__/scale/standalone-instruction-envelope.test.ts",
+        "beforeSHA256": "bd22bc99e7235ee9772984553b91cace9526abaeb817260b56e5968d034658e6",
+        "afterSHA256": "86e4e1c282ec582c3029c7863560db47d9106dbc10277259f150df084e6b39dc",
+        "onlyRemovedTrailingBlankLines": true
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/frozen-scale-instruction.ts",
+        "beforeSHA256": "c1ce195ea514be7d22e666e0a212e63a3678cccd4e3e7d099aab13950502442f",
+        "afterSHA256": "478d662e2fe50de27bd23d4696b3d7c68de56a6e53327eeaed5ecec03e122c97",
+        "onlyRemovedTrailingBlankLines": true
+      }
+    ],
+    "noChecksRepeated": true
+  }
+}

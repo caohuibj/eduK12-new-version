@@ -96,9 +96,15 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
    runtimePolicyHash:runtime.runtimePolicyHash,localizationVersion:VERSION,inFlightCompletion:'FROZEN_DEADLINE' as const}}
   expect((await onboarding.planScaleInstrumentInstall(db,install)).blockers).toEqual([])
   const installed=await onboarding.installScaleInstrument(db,install);expect(installed.scaleId).toBeTruthy()
-  const pub={instrumentKey:KEY,instrumentVersion:VERSION,actorUserId:system.id,visibility:'HIDDEN' as const,allowedProducts:['TRAINING' as const]}
+  const pub={instrumentKey:KEY,instrumentVersion:VERSION,actorUserId:system.id,visibility:'HIDDEN' as const,allowedProducts:['SURVEY' as const]}
   const pp=await publication.planStandardScalePublication(db,pub);expect(pp.blockers).toEqual([])
   await publication.publishStandardScale(db,{...pub,expectedProofHash:pp.proofHash})
+  // User decision: native Scale and exact C/P/R combination have independent
+  // entry approval, as in Survey. The generic source cannot enter Training;
+  // the TRAINING-approved combination below must still complete its real flow.
+  const nativeGuard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
+  await expect(db.$transaction((tx:any)=>nativeGuard(tx,[installed.scaleId]))).rejects.toThrow('该精确版本未获本入口准入')
+  summary.entryAdmission={nativeScale:['SURVEY'],exactCombination:['TRAINING'],nativeTrainingRejected:true}
   stage='real-three-trial-approval'
   const candidate=await request(system,`/api/platform/survey-standard/candidate/${KEY}/${VERSION}`)
   const preview=await request(system,'/api/platform/survey-standard/preview',candidate.selection)
@@ -215,9 +221,19 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   await request(outsider,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:3,reason:'Foreign issuer cannot revoke'},403)
   expect(await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:3,reason:'Original exact delegate revokes own use'})).toMatchObject({version:4,revoked:true})
   await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,grantId:root.id,expectedUseVersion:4})
+  // A later entry appointment cannot replace the use's original exact root.
+  await changeRole(true,4)
+  expect(await assertUse()).toMatchObject({authorityGrantId:root.id,useGrantVersion:5})
   await request(system,`/api/admin/permissions/content-grants/${root.id}/revoke`,{expectedVersion:root.version,reason:'Synthetic delegated root withdrawal'})
-  await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:5,reason:'Revoked root cannot revoke use'},403)
+  await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:5,reason:'Revoked original root cannot be replaced by later entry role'},403)
   await expect(assertUse()).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+  const unchanged=await db.materialGrant.findUniqueOrThrow({where:{id:use.id}})
+  expect(unchanged).toMatchObject({version:5,authorityGrantId:root.id,authorityEntryGrantId:null,revokedAt:null})
+  // Historical reads retain frozen provenance and the normal participant/data ACL.
+  const completed=await db.compositeAssessmentAttempt.findFirstOrThrow({where:{userId:student.id,status:'COMPLETED'}})
+  expect((await request(student,`/api/composite-assessments/attempts/${completed.id}`)).status).toBe('COMPLETED')
+  expect((await request(teacher,`/api/composite-assessments/${completed.compositeAssessmentId}/attempts/${completed.id}/report`)).contentReports).toHaveLength(1)
+  await changeRole(false,5)
   completedCases++
  })
  it.skipIf(authorityContinuation)('keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop',async()=>{
@@ -225,7 +241,13 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   const pointer=summary.combination,use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:pointer.releaseId}}})
   if(receiptContinuation)await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:use.version,reason:'Revoked exact root cannot revoke'},403)
   const {changeEntryGrant}=await import('../../modules/admin-permissions/service')
-  await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active:true,expectedVersion:4,reason:'Synthetic current role for receipt scenario',actorSession:{...proof,tokenVersion:system.tokenVersion}})
+  const entry=await db.adminEntryGrant.findUniqueOrThrow({where:{userId_entry:{userId:issuer.id,entry:'TRAINING'}}})
+  // Fresh cases include two more audited role changes. An explicitly fenced
+  // old receipt continuation retains its original version-4 fixture.
+  expect(entry.revokedAt).not.toBeNull()
+  if(receiptContinuation)expect([4,6]).toContain(entry.version)
+  else expect(entry.version).toBe(6)
+  await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active:true,expectedVersion:entry.version,reason:'Synthetic current role for receipt scenario',actorSession:{...proof,tokenVersion:system.tokenVersion}})
   issuer=await db.user.findUniqueOrThrow({where:{id:issuer.id}})
   await request(system,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:use.version,reason:'Explicit role-basis reissue'})
   await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,expectedUseVersion:use.version+1})

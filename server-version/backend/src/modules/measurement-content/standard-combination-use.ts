@@ -1,8 +1,9 @@
+import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {MaterialResourceType,Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
 import {assertEntryAdmin,AdminPermissionError} from '../admin-permissions/service'
-import {assertLibraryAuthority,libraryActor} from '../scale-library-governance/authority'
+import {assertLibraryAuthority,libraryActor,assertExactTrainingDistributionDelegation} from '../scale-library-governance/authority'
 import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-identity-lock'
 import {readCurrentStandardCombination} from './standard-combination-source'
 import {standardCombinationPointerSchema} from './standard-combination'
@@ -63,9 +64,8 @@ export async function assertTrainingStandardUse(tx:Prisma.TransactionClient,inpu
   const current=await assertEntryAdmin(tx,header.granted_by,'TRAINING')
   if(current.grantId!==original.authorityEntryGrantId||current.grantVersion!==original.authorityEntryGrantVersion)deny('入口分配依据已变化')
  }else{
-  // Keep the established legacy rule: a current formal entry admin needs no
-  // per-content approval; without that role the original exact 21B root must pass.
-  await assertLibraryAuthority(tx,header.granted_by,input.measurementReleaseId,'material.distribute','TRAINING',original.authorityGrantId)
+  // This row froze an exact 21B basis. A later entry role does not replace it.
+  await assertExactTrainingDistributionDelegation(tx,header.granted_by,input.measurementReleaseId,original.authorityGrantId)
  }
  const [locked]=await tx.$queryRaw<UseRow[]>(Prisma.sql`SELECT id,teacher_id,resource_id,granted_by,standard_combination_hash,authority_grant_id,authority_entry_grant_id,authority_entry_grant_version,version,revoked_at
  FROM material_grants WHERE id=${header.id} FOR SHARE`)
@@ -90,6 +90,7 @@ export async function grantTrainingStandardCombinationUse(actorId:string,combina
   await assertTrainingStandardRecipient(tx,input.userId)
   const source=await readCurrentStandardCombination(tx,{releaseId:id,combinationHash:input.combinationHash})
   if(source.measurement.releaseId!==header.measurement_release.releaseId)deny()
+  await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+id,fingerprint:input.combinationHash},'TRAINING')
   await assertScaleLibraryCollectionAllowed(tx,[source.measurement.releaseId])
   // One operation receipt and one versioned use, independent of course. Retrying
   // a previously successful request never reactivates a subsequently revoked use.
@@ -146,7 +147,7 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
      SELECT combination_hash,measurement_release FROM survey_standard_releases WHERE id=${grant.resourceId} FOR SHARE`)
     if(!source?.measurement_release||source.combination_hash!==grant.standardCombinationHash)deny()
     // Original issuer, original exact root and original measurement only.
-    await assertLibraryAuthority(tx,actorId,source.measurement_release.releaseId,'material.distribute','TRAINING',basis.authorityGrantId)
+    await assertExactTrainingDistributionDelegation(tx,actorId,source.measurement_release.releaseId,basis.authorityGrantId)
    }
   }
   await assertRevokeAuthority()
@@ -166,8 +167,9 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
 export async function listTrainingStandardCombinationChoices(userId:string){
  return prisma.$transaction(async tx=>{
   await assertTrainingStandardRecipient(tx,userId)
-  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;scale_id:string;measurement_release:{releaseId:string};use_id:string;use_version:number}>>(Prisma.sql`
+  const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;scale_id:string;measurement_release:{releaseId:string};use_id:string;use_version:number}>>(Prisma.sql`
    SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
+    r.snapshot#>>'{parts,CONTENT,version}' AS content_version,r.snapshot#>>'{parts,PARAMETERS,version}' AS parameters_version,r.snapshot#>>'{parts,REPORT,version}' AS report_version,
     s.id AS scale_id,r.measurement_release,g.id AS use_id,g.version AS use_version
    FROM material_grants g JOIN survey_standard_releases r ON r.id=g.resource_id AND r.combination_hash=g.standard_combination_hash
    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
@@ -176,10 +178,10 @@ export async function listTrainingStandardCombinationChoices(userId:string){
    ORDER BY r.tool_key,r.id LIMIT 100`)
   const choices=[]
   for(const row of rows){
-   try{await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
+   try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
    catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))continue;throw e}
    choices.push({combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,
-    toolKey:row.tool_key,instrumentVersion:row.instrument_version,useGrantId:row.use_id,useGrantVersion:row.use_version})
+    toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version})
   }
   return choices
  },options)

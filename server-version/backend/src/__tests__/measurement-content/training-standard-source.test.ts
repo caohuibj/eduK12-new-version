@@ -2,7 +2,7 @@ import {afterEach,describe,expect,it,vi} from 'vitest'
 vi.mock('../../config/database',()=>({prisma:{}}))
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {ASSESSMENT_OPERATIONAL_HOLDS,operationalIdentityKey} from '../../modules/assessment-governance/operational-hold'
-import {freezeTrainingStandardReference,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource} from '../../modules/composite/training-standard-combination'
+import {freezeTrainingStandardReference,verifyStoredTrainingStandardItem,decodeTrainingStandardItemSource,trainingStandardCombinationSummary} from '../../modules/composite/training-standard-combination'
 import {hashScaleDeploymentPolicy} from '../../modules/scale/policy/deployment'
 import {ids,tid,trainingSourceHarness} from './training-standard-source.fixture'
 const run=(f:ReturnType<typeof trainingSourceHarness>)=>freezeTrainingStandardReference(f.db,ids.owner,ids.composite,f.input)
@@ -67,9 +67,9 @@ describe('Training consumes one exact shared combination through one user Materi
   })
  it('a current formal entry admin distributes without per-content re-approval',async()=>{
   const f=trainingSourceHarness()
-  // The historical root rows are mutated or gone; the current entry role alone
-  // carries the distribution authority under the merged contract.
-  f.h.use.authority_grant_id=tid(99);f.h.grants=[]
+  // A use CREATED on the entry-role basis needs no delegated content root.
+  // This is distinct from an older delegated use whose issuer gains that role.
+  f.h.use.authority_grant_id=null;f.h.use.authority_entry_grant_id=f.h.entryGrantId;f.h.use.authority_entry_grant_version=f.h.entryGrantVersion;f.h.grants=[]
   const source=await run(f)
   expect(source.reference.authority).toMatchObject({useGrantId:ids.leaf,issuerId:ids.issuer})
   expect(f.h.writes).toEqual([])
@@ -201,4 +201,72 @@ describe('the persisted Training source is exact, while live use remains current
   await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).resolves.toMatchObject({referenceHash:source.referenceHash})
   f.h.row.state='WITHDRAWN';await expect(verifyStoredTrainingStandardItem(f.db,f.h.composite,item,'COLLECTION')).rejects.toThrow('NOT_CURRENT')
  })
+})
+
+
+describe('exact Training entry approval precedes grant and publication',()=>{
+ it.each(['PENDING','RETURNED','PAUSED'] as const)('rejects %s during source binding instead of waiting for student START',async state=>{
+  const f=trainingSourceHarness();f.h.trainingDecision=state==='PAUSED'?'APPROVED':state;f.h.trainingPaused=state==='PAUSED'
+  await expect(run(f)).rejects.toMatchObject({statusCode:409})
+  expect(f.h.writes).toEqual([])
+ })
+ it('does not issue a Training use for a combination without Training entry approval',async()=>{
+  const f=trainingSourceHarness();f.h.trainingDecision='PENDING'
+  const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
+  client.$transaction=async(fn:any)=>fn(f.db)
+  try{
+   const {grantTrainingStandardCombinationUse}=await import('../../modules/measurement-content/standard-combination-use')
+   await expect(grantTrainingStandardCombinationUse(ids.issuer,ids.combo,{requestId:tid(101),userId:ids.owner,combinationHash:f.h.row.combination_hash})).rejects.toMatchObject({statusCode:409})
+   expect(f.h.writes).toEqual([])
+  }finally{client.$transaction=previous}
+ })
+})
+
+
+describe('frozen delegation is not replaced by a later entry appointment',()=>{
+ it.each(['missing','revoked','expired','wrong-content','wrong-product'] as const)('rejects the original %s root even while issuer has a current entry role',async state=>{
+  const f=trainingSourceHarness();expect(f.h.entryActive).toBe(true)
+  if(state==='missing')f.h.grants=[]
+  if(state==='revoked')f.root().revoked_at=new Date('2026-01-01')
+  if(state==='expired')f.root().expires_at=new Date('2025-01-01')
+  if(state==='wrong-content')f.root().resource_keys=[tid(99)]
+  if(state==='wrong-product')f.root().product='SURVEY'
+  await expect(run(f)).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+  expect(f.h.writes).toEqual([])
+ })
+})
+
+
+it('projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot',async()=>{
+ const f=trainingSourceHarness(),parts=f.h.row.snapshot.parts
+ parts.CONTENT.version='approved-content-1';parts.PARAMETERS.version='approved-parameters-2';parts.REPORT.version='none-v1'
+ const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
+ client.$transaction=async(fn:any)=>fn(f.db)
+ try{
+  const {listTrainingStandardCombinationChoices}=await import('../../modules/measurement-content/standard-combination-use')
+  const choices=await listTrainingStandardCombinationChoices(ids.owner)
+  expect(choices).toHaveLength(1)
+  expect(choices[0]).toMatchObject({combination:f.input.combination,scaleId:ids.scale,instrumentVersion:'1.0.0',axisVersions:{CONTENT:'approved-content-1',PARAMETERS:'approved-parameters-2',REPORT:'none-v1'}})
+  expect(choices[0]).not.toHaveProperty('snapshot');expect(choices[0]).not.toHaveProperty('definition');expect(choices[0]).not.toHaveProperty('references')
+  expect(f.h.writes).toEqual([])
+ }finally{client.$transaction=previous}
+})
+
+
+it('projects only validated frozen version labels into teacher summaries without current authority reads',async()=>{
+ const f=trainingSourceHarness(),source=await run(f),combination=source.reference.combination
+ // Historical labels come from the validated frozen item, even after mutable
+ // availability changes. The caller still owns normal container/data ACL.
+ f.h.use=null;f.h.entryActive=false;f.h.row.state='WITHDRAWN';f.h.calls=[]
+ const summary=trainingStandardCombinationSummary(source)
+ expect(summary).toEqual({instrumentVersion:combination.instrumentVersion,axisVersions:{
+  CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}})
+ expect(summary.axisVersions).not.toBe(combination.axes)
+ expect(Object.keys(summary).sort()).toEqual(['axisVersions','instrumentVersion'])
+ expect(JSON.stringify(summary)).not.toMatch(/authority|issuer|grant|hash|releaseId|scaleId|ownerId|definition|snapshot/i)
+ expect(f.h.calls).toEqual([]);expect(f.h.writes).toEqual([])
+ const tampered=JSON.parse(JSON.stringify(source));tampered.reference.combination.axes.REPORT.version='later-report'
+ expect(()=>trainingStandardCombinationSummary(tampered)).toThrow('REFERENCE_HASH_MISMATCH')
+ expect(()=>trainingStandardCombinationSummary(null)).toThrow()
+ expect(f.h.calls).toEqual([])
 })

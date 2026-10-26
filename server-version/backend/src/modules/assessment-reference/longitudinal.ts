@@ -2,7 +2,7 @@ import {gradeLevelSchema,sexAtBirthSchema} from '../assessment-context/context'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { referenceSetHash } from '../assessment-runtime/reference-binding'
-import { resolveAssessmentReference, type AssessmentReferenceSetDefinition, type ReferenceContext, type ResolvedScaleReference } from './reference'
+import { matchReferencePopulation, resolveAssessmentReference, type AssessmentReferenceSetDefinition, type ReferenceContext, type ResolvedScaleReference } from './reference'
 export type ReferenceResolutionMode = 'ORIGINAL' | 'TIME_MATCHED' | 'LATER_REFERENCE'
 export interface ScaleReferenceIdentityV1 {
  instrumentKey:string; instrumentVersion:string; scoringVersion:string; measurementHash:string
@@ -38,17 +38,24 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
  // A subsequently imported, backdated reference must not change even the fallback path.
  const attached = points.map(original)
  const pool = input.explicitLatest ? input.references.filter(r=>r.status==='ACTIVE') : attached
- const effectiveAt = (r:AssessmentReferenceSetDefinition,p:LongitudinalReferencePoint) => Date.parse(entryFor(r,p.identity)?.governance?.effectiveFrom??'')
+ const contextFor=(p:LongitudinalReferencePoint):ReferenceContext=>({...p.identity.frozenContext,language:p.identity.locale})
+ const effectiveAt = (r:AssessmentReferenceSetDefinition,p:LongitudinalReferencePoint) => {
+  const entries=entriesFor(r,p.identity),kind=entries[0]?.referenceKind
+  // Match the projection's selected kind and real population; another window
+  // cannot supply its effective date, and ambiguity must remain unavailable.
+  const matches=entries.filter(e=>e.referenceKind===kind&&matchReferencePopulation(e.population,contextFor(p))==='MATCH')
+  return matches.length===1?Date.parse(matches[0].governance!.effectiveFrom):NaN
+ }
  const last = points[points.length-1]
  const candidates = [...pool].filter(r=>effectiveAt(r,last)<=Date.parse(input.generatedAt)).sort((a,b)=>effectiveAt(b,last)-effectiveAt(a,last))
- const later=mode==='LATER_REFERENCE' ? candidates.find(r=>points.every(p=>compatible(p.identity,points[points.length-1].identity) && !!entryFor(r,p.identity))) : undefined
+ const later=mode==='LATER_REFERENCE' ? candidates.find(r=>points.every(p=>compatible(p.identity,last.identity) && effectiveAt(r,p)<=Date.parse(input.generatedAt))) : undefined
  const project=(p:LongitudinalReferencePoint,r:AssessmentReferenceSetDefinition):ResolvedScaleReference|null=>{
   const e=entryFor(r,p.identity)
   if(!e) return null
   // Reinterpret the participant at measurement time; never manufacture a
   // matching age/grade from the candidate reference population. Old identities
   // without demographics remain readable but may be uninterpretable.
-  const context:ReferenceContext={...p.identity.frozenContext,language:p.identity.locale}
+  const context=contextFor(p)
   return resolveAssessmentReference({instrumentType:'scale',instrumentKey:r.instrumentKey,instrumentVersion:p.identity.instrumentVersion,scoringVersion:p.identity.scoringVersion,selections:[{scoreKey:p.identity.scoreKey,referenceVersion:r.referenceVersion,referenceKind:e.referenceKind}],references:[{...r,status:'ACTIVE',entries:entriesFor(r,p.identity)}],measurementHash:p.identity.measurementHash,score:{key:p.identity.scoreKey,value:p.value},context})[0]
  }
  const projected=points.map(p=>{

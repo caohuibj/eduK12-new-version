@@ -9,6 +9,7 @@ import { makeCanonicalFactsReference } from '../assessment-runtime/compact-asses
 import { makeScaleFactsReference, makeScaleRawReference, persistScaleFactRecords, attachCommittedScaleFacts, type ScaleFactRecord } from '../assessment-runtime/scale-fact-records'
 import { ReportProcessingLeaseLostError } from '../assessment-runtime/report-outbox.service'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
+import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { createHash } from 'node:crypto'
 import { Prisma, type CompositeReportJob } from '@prisma/client'
@@ -365,7 +366,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
       return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
-    await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
+    // Current epoch and frozen runtime/admission are locked and checked above.
+    // Existing standalone FINAL keeps emergency collection policy, not new-entry policy.
+    if(child.compositeAttemptId){
+      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
+    }else await assertScaleLibraryCollectionAllowed(tx,[],[child.scaleId])
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {

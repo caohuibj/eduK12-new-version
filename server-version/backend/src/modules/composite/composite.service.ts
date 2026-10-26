@@ -11,7 +11,7 @@ import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
-import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime} from './training-standard-combination'
+import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
@@ -684,6 +684,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
   position: item.position,
   required: item.required,
   scale: item.scale ? { id: item.scale.id, code: item.scale.code, name: packageSlotLabels.get(item.position) ?? item.scale.name } : null,
+  ...(item.standardCombinationSource!=null?{standardCombinationSummary:trainingStandardCombinationSummary(item.standardCombinationSource)}:{}),
   cognitiveAssignment: item.cognitiveAssignment
     ? {
         id: item.cognitiveAssignment.id,
@@ -2528,7 +2529,9 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
-      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id]})
+      // Match the existing parent START boundary for education organization resources.
+      if(attempt.compositeAssessment.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
+      else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id]})
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2955,7 +2958,14 @@ const createAttempt = async (
   // shared emergency-stop/identity lock applies, never Training entry policies.
   const collectionScaleIds=composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId)
   if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],collectionScaleIds)
-  else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,collectionScaleIds,{sourceOwnerId:composite.createdBy})
+  else {
+    // Explicit product decision: exact C/P/R combinations carry their own
+    // Training entry approval. contentCandidate already revalidated each such
+    // item, its current use, source/deployment identity and shared stop locks.
+    // Filter at item level so a native item sharing the Scale cannot borrow it.
+    const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId)
+    await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,nativeScaleIds,{sourceOwnerId:composite.createdBy})
+  }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({
