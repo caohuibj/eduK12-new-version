@@ -1,6 +1,8 @@
 import express from 'express'
 import type {Server} from 'node:http'
-import {randomUUID} from 'node:crypto'
+import {randomUUID,createHash} from 'node:crypto'
+import {createClient} from 'redis'
+import {cacheService} from '../../services/cacheService'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {prisma} from '../../config/database'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
@@ -69,6 +71,39 @@ suite('whole roster jobs over real HTTP and isolated PostgreSQL',()=>{
   const [rolledBack]=await prisma.$queryRaw<Array<{n:number}>>`SELECT COUNT(*)::int n FROM organization_units WHERE organization_id=${f.org.id} AND name='同批班'`
   expect(rolledBack.n).toBe(0)
  })
+ it('completes 5000 rows with production Redis quota, shared-IP refusal and explicit continuation',async()=>{
+  const redisUrl=process.env.ROSTER_INTEGRATION_REDIS_URL
+  expect(redisUrl,'explicit disposable loopback Redis DB14 required').toBeTruthy()
+  const parsed=new URL(redisUrl!);expect(['localhost','127.0.0.1']).toContain(parsed.hostname);expect(parsed.pathname).toBe('/14');expect(process.env.REDIS_URL).toBe(redisUrl)
+  const redis=createClient({url:redisUrl});await redis.connect();expect(await redis.dbSize()).toBe(0)
+  const previous=process.env.NODE_ENV
+  try{
+   await cacheService.initialize();expect(cacheService.getStatus().connected).toBe(true)
+   const f=await fixture(),other=await fixture(),users=await prisma.user.count(),grants=await prisma.educationProductRoleGrant.count()
+   process.env.NODE_ENV='production'
+   const p=await prepare(f,staff(5000)),otherPlan=await prepare(other,staff(1)),otherToken=await begin(other,otherPlan)
+   const token=await begin(f,p)
+   for(let i=0;i<40;i++)expect((await save(f,p,i,token)).status).toBe(200)
+   const before=(await f.call(`/${p.id}`)).body.data;expect(before.savedRows).toBe(4000)
+   const denied=await save(f,p,40,token);expect(denied.status).toBe(429);expect(Number(denied.retryAfter)).toBeGreaterThan(0)
+   expect((await save(other,otherPlan,0,otherToken)).status).toBe(429);expect(await other.count()).toBe(0)
+   expect(await f.count()).toBe(4000)
+   await f.call(`/${p.id}/pause`,{proof:p.proof})
+   const key='ratelimit:campus-personnel:'+createHash('sha256').update('127.0.0.1').digest('hex')
+   const ttl=await redis.ttl(key);expect(ttl).toBeGreaterThan(0);expect(ttl).toBeLessThanOrEqual(900)
+   // Expire only this isolated fixture window instead of waiting 15 minutes.
+   // Actual middleware/Lua, production limit and request identities stay real.
+   await redis.pExpire(key,1);await new Promise(r=>setTimeout(r,20))
+   p.job=(await f.call(`/${p.id}`)).body.data
+   const resumed=await begin(f,p,true);expect(resumed).not.toBe(token)
+   expect((await save(f,p,40,token)).status).toBe(409)
+   for(let i=40;i<50;i++)expect((await save(f,p,i,resumed)).status).toBe(200)
+   const final=(await f.call(`/${p.id}`)).body.data
+   expect(final).toMatchObject({status:'COMPLETED',savedRows:5000,added:5000})
+   expect(final.parts.slice(0,40)).toEqual(before.parts.slice(0,40))
+   expect(await f.count()).toBe(5000);expect(await prisma.user.count()).toBe(users);expect(await prisma.educationProductRoleGrant.count()).toBe(grants)
+  }finally{process.env.NODE_ENV=previous;await cacheService.close();await redis.quit()}
+ },120000)
  it('validates cross-part duplicate numbers and accounts before persisting a plan',async()=>{
   const f=await fixture(),input=staff(101);input.rows[100].number=input.rows[0].number.toLowerCase()
   expect(await f.call('',{requestId:randomUUID(),input,source})).toMatchObject({status:400,body:{code:'ROSTER_WHOLE_FILE_INVALID',data:{issues:[{line:102}]}}})

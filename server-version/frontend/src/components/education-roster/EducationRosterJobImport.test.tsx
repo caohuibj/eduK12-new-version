@@ -37,6 +37,7 @@ const commits=(s:ReturnType<typeof server>)=>s.api.mock.calls.filter(c=>c[0].end
 describe('controlled whole-file import interaction',()=>{
  beforeEach(()=>{vi.stubGlobal('crypto',{subtle:webcrypto.subtle,randomUUID})})
  afterEach(()=>{vi.unstubAllGlobals();vi.useRealTimers()})
+ it('explains the 5000-row quota and preserved progress before confirmation',()=>{const s=server();renderImport(s);expect(screen.getByText(/同一网络每15分钟最多保存40批/)).toBeVisible();expect(screen.getByText(/5000行需50批/)).toBeVisible();expect(commits(s)).toHaveLength(0)})
  it('previews all 201 rows before any explicit write and saves ordered chunks of 100',async()=>{
   const s=server(),changed=vi.fn();renderImport(s,{onChanged:changed});await preview(201)
   expect(screen.getByRole('region',{name:'导入任务进度'})).toHaveTextContent('预计新增 201');expect(commits(s)).toHaveLength(0);expect(s.api.mock.calls.filter(c=>c[0].endsWith('/preview'))).toHaveLength(3)
