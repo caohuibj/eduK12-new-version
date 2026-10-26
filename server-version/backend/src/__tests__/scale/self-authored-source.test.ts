@@ -91,3 +91,17 @@ describe('registered self-authored source boundary', () => {
     expect(allowsScaleAxisRevision(previous, source.executable!.definition)).toBe(false)
   })
 })
+
+describe('STANDARD sources cannot masquerade through the self-authored path', () => {
+  it('submissionSource requires the actor to own a PRIVATE published custom release', async () => {
+    const { submissionSource } = await import('../../modules/scale-library-governance/source')
+    const systemAdmin = '0'.repeat(18)
+    // A registered platform STANDARD source fails the private-ownership and
+    // CUSTOM_DESCRIPTIVE gates before any snapshot is built.
+    await expect(submissionSource({} as never, systemAdmin, {
+      requestId: '00000000-0000-4000-8000-000000000001', releaseId: 'standard:academic_self_concept_chinese_zh_cn', version: 1,
+      metadata: { title: '伪自编', author: '', copyright: '', applicability: '', scoringDescription: '', reportDescription: '' },
+      dependencyReleaseIds: [],
+    } as never)).rejects.toThrow()
+  })
+})

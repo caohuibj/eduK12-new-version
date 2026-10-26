@@ -15,6 +15,9 @@ surveyStandardTripletRouter.use(authenticate,createRedisRateLimiter({name:'surve
 surveyStandardTripletRouter.use(async(req,res,next)=>{try{await service.assertStandardSystem(prisma,req.user!.userId);res.setHeader('Cache-Control','no-store');next()}catch(e){if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode);next(e)}})
 const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{try{return success(res,await work(req))}catch(e){if(e instanceof z.ZodError)return error(res,'请求参数不合法',-1,400);if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode);next(e)}}
 surveyStandardTripletRouter.get('/management-design',handle(async()=>MANAGEMENT_DESIGN))
+// Per-version onboarding governance view: distinct lifecycle states, located
+// blockers with owner/next-action, and stage labels (导入 ≠ 上线).
+surveyStandardTripletRouter.get('/onboarding-status',handle(async()=>(await import('../scale/onboarding/status')).listStandardOnboardingStatus(prisma)))
 const hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().trim().min(1).max(300),reason=z.string().trim().min(1).max(1000)
 const selection=z.object({toolKey:text,CONTENT:hash,PARAMETERS:hash,REPORT:hash}).strict()
 surveyStandardTripletRouter.get('/catalog',handle(req=>{const {page,...filters}=z.object({page:z.coerce.number().int().min(1).max(10000).default(1),...catalogDiscoveryQueryFields}).parse(req.query);return service.standardTripletCatalog(req.user!.userId,page,filters)}))

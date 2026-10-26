@@ -8,6 +8,7 @@ import {standardAxisHashes,standardCombinationHash} from '../measurement-content
 import {assertTrainingStandardUse,standardCombinationPointerSchema} from '../measurement-content/standard-combination-use'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
+import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {assertCurrentTrainingContentOwner} from './training-report-selection'
 import {resolveScaleStartDeployment} from '../scale/deployment/service'
@@ -111,7 +112,10 @@ export async function freezeTrainingStandardReference(tx:Prisma.TransactionClien
  * P records must match the immutable approved P, never a latest/default set. */
 export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionClient,source:Awaited<ReturnType<typeof verifyStoredTrainingStandardItem>>){
  const t=source.resolved.row.snapshot
- const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE'})
+ // Standard combinations freeze the versioned source instruction with the
+ // exact approved tool version (presentation content, outside the P/R hash).
+ const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',
+  instruction:resolveFrozenScaleInstructionForScale({code:t.toolKey,instrumentVersion:t.instrumentVersion,instrumentClass:'STANDARD'})})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }

@@ -28,15 +28,32 @@ describe('Training consumes one exact shared combination through one user Materi
   expect(second.reference.authority).toEqual(first.reference.authority)
   expect(second.referenceHash).toBe(first.referenceHash);expect(f.h.writes).toEqual([])
  })
- it.each(['missing-use','wrong-recipient','wrong-combo','wrong-hash','replaced-root','missing-root','wrong-product','course-root','wrong-content','wrong-subject','no-distribute','revoked-root','expired-root','future-root','wrong-entry','revoked-entry','system-issuer'])(
-  'ONLINE cannot replace current %s authority',async field=>{
+ // The merged entry contract (PR355, per the 2026-10-25 daily-release rules):
+ // a CURRENT formal Training entry admin distributes without per-content
+ // re-approval; anyone else must present the exact delegated 21B root.
+ // Use-row integrity and the delegated path keep their strict negatives.
+ it.each(['missing-use','wrong-recipient','wrong-combo','wrong-hash'])(
+  'cannot start from a use row that is not the exact current combination use: %s',async field=>{
    const f=trainingSourceHarness()
    if(field==='missing-use')f.h.use=null
    if(field==='wrong-recipient')f.h.use.teacher_id=tid(99)
    if(field==='wrong-combo')f.h.use.resource_id=tid(99)
    if(field==='wrong-hash')f.h.use.standard_combination_hash='f'.repeat(64)
+   await expect(run(f)).rejects.toThrow('精确组合的 Training 使用授权不可用');expect(f.h.writes).toEqual([])
+  })
+ it.each(['system-issuer'])(
+  'entry distribution never borrows system authority: %s',async field=>{
+   const f=trainingSourceHarness()
+   if(field==='system-issuer')f.h.entryRole='SYSTEM_ADMIN'
+   await expect(run(f)).rejects.toThrow('系统管理员不能代替入口管理员');expect(f.h.writes).toEqual([])
+  })
+ it.each(['replaced-root','missing-root','wrong-product','course-root','wrong-content','wrong-subject','no-distribute','revoked-root','expired-root','future-root','wrong-entry','revoked-entry'])(
+  'without a current entry role the exact 21B delegation root is still enforced: %s',async field=>{
+   const f=trainingSourceHarness()
+   // No formal TRAINING entry admin: distribution must come from the exact grant.
+   f.h.entryActive=false
    if(field==='replaced-root')f.h.use.authority_grant_id=tid(99)
-   if(field==='missing-root')f.h.grants=[]
+   if(field==='missing-root'||field==='wrong-entry'||field==='revoked-entry')f.h.grants=[]
    if(field==='wrong-product')f.root().product='SURVEY'
    if(field==='course-root'){f.root().scope_kind='COURSE';f.root().scope_id=ids.course}
    if(field==='wrong-content')f.root().resource_keys=[tid(99)]
@@ -45,13 +62,18 @@ describe('Training consumes one exact shared combination through one user Materi
    if(field==='revoked-root')f.root().revoked_at=new Date('2026-01-01')
    if(field==='expired-root')f.root().expires_at=new Date('2025-01-01')
    if(field==='future-root')f.root().valid_from=new Date('2027-01-01')
-   if(field==='wrong-entry')f.h.entryProduct='SURVEY'
-   if(field==='revoked-entry')f.h.entryActive=false
-   if(field==='system-issuer')f.h.entryRole='SYSTEM_ADMIN'
-   const reason=['missing-use','wrong-recipient','wrong-combo','wrong-hash'].includes(field)?'精确组合的 Training 使用授权不可用'
-    :['wrong-entry','revoked-entry'].includes(field)?'缺少当前入口管理授权':field==='system-issuer'?'系统管理员不能代替入口管理员':'CONTENT_AUTHORITY_DENIED'
+   const reason='CONTENT_AUTHORITY_DENIED'
    await expect(run(f)).rejects.toThrow(reason);expect(f.h.writes).toEqual([])
   })
+ it('a current formal entry admin distributes without per-content re-approval',async()=>{
+  const f=trainingSourceHarness()
+  // The historical root rows are mutated or gone; the current entry role alone
+  // carries the distribution authority under the merged contract.
+  f.h.use.authority_grant_id=tid(99);f.h.grants=[]
+  const source=await run(f)
+  expect(source.reference.authority).toMatchObject({useGrantId:ids.leaf,issuerId:ids.issuer})
+  expect(f.h.writes).toEqual([])
+ })
  it.each(['foreign-owner','foreign-course-owner','library-course','wrong-course-type','frozen-owner','survey-realm','wrong-item','changed-scale-version','changed-scale-key'])(
   'keeps the actual container/source boundary: %s',async field=>{
    const f=trainingSourceHarness()
@@ -72,11 +94,21 @@ describe('Training consumes one exact shared combination through one user Materi
   const f=trainingSourceHarness();f.h.row.state=state
   await expect(run(f)).rejects.toThrow('STANDARD_COMBINATION_NOT_CURRENT')
  })
- it.each(['missing-license','revoked-license','expired-license','wrong-mode','changed-policy-hash'])('preserves third-party rights: %s',async field=>{
+ // License-record absence/revocation/expiry no longer gates deployment or the
+ // runtime chain (user decision 2026-10-25 09:48UTC: third-party license
+ // records retire as a system gate; real sources and copyright notes remain
+ // presentation metadata). Deployment-policy integrity stays enforced.
+ it.each(['missing-license','revoked-license','expired-license'])('keeps %s non-gating after license retirement',async field=>{
   const f=trainingSourceHarness()
   if(field==='missing-license')f.h.auth=null
   if(field==='revoked-license')f.h.auth.status='REVOKED'
   if(field==='expired-license')f.h.auth.validTo=new Date('2025-01-01')
+  const source=await run(f)
+  expect(source.reference.combination).toMatchObject({releaseId:ids.combo})
+  expect(f.h.writes).toEqual([])
+ })
+ it.each(['wrong-mode','changed-policy-hash'])('preserves deployment policy integrity: %s',async field=>{
+  const f=trainingSourceHarness()
   if(field==='wrong-mode'){f.h.policy.deploymentModes=['STANDALONE'];f.h.deployment.policyHash=hashScaleDeploymentPolicy(f.h.policy)}
   if(field==='changed-policy-hash')f.h.deployment.policyHash='f'.repeat(64)
   await expect(run(f)).rejects.toThrow(field==='changed-policy-hash'?'Scale deployment policy hash mismatch':'DEPLOYMENT_OR_RIGHTS_UNAVAILABLE')
@@ -99,9 +131,10 @@ describe('Training consumes one exact shared combination through one user Materi
   const f=trainingSourceHarness();f.h.expireDuringStop=true
   await expect(run(f)).rejects.toThrow('账号不可用')
  })
- it('rejects license expiry after the same source-lock wait',async()=>{
+ it('keeps deployment-policy expiry checks while the license gate is retired',async()=>{
   const f=trainingSourceHarness();f.h.auth.validTo=new Date('2027-01-01');f.h.expireLicenseDuringStop=true
-  await expect(run(f)).rejects.toThrow('DEPLOYMENT_OR_RIGHTS_UNAVAILABLE')
+  const source=await run(f)
+  expect(source.reference.combination).toMatchObject({releaseId:ids.combo})
  })
  it('rejects client axes, self-authored and PUBLIC fields before any SQL',async()=>{
   const f=trainingSourceHarness()
