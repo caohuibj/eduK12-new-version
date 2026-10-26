@@ -26,7 +26,7 @@ describe('Huischool psychological professional protected reporting workspace',()
     const confirm=window.confirm
     window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolProtectedReportStudio api={api as unknown as SchoolApi}
+      render(<SchoolProtectedReportStudio compact api={api as unknown as SchoolApi}
         organizationId={org}/>)
       const sources=await screen.findByLabelText('合法个案与观察来源')
       fireEvent.change(sources,{target:{value:'1'}})

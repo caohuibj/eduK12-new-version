@@ -32,7 +32,7 @@ describe('Huischool longitudinal professional workspace',()=>{
     })
     const original=window.confirm;window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolIndividualLongitudinalStudio api={api as unknown as SchoolApi}
+      render(<SchoolIndividualLongitudinalStudio compact api={api as unknown as SchoolApi}
         organizationId={org}/>)
       fireEvent.change(await screen.findByLabelText('当前心理服务学生的匿名观察编号'),
         {target:{value:alias}})

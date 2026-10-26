@@ -372,7 +372,8 @@ export default function SchoolApp(){
 
   const professionalClassPage=professionalWorkspace&&!schoolAdmin&&page==='classes'
   const professionalAdmissionPage=professionalWorkspace&&!schoolAdmin&&page==='admission'
-  const professionalScopePage=professionalClassPage||professionalAdmissionPage
+  const professionalRecoveryPage=professionalWorkspace&&!schoolAdmin&&page==='recovery'
+  const professionalScopePage=professionalClassPage||professionalAdmissionPage||professionalRecoveryPage
   const classApprovalDisabled=working||!summary||summary.status!=='CLOSED'
     ||summary.rosterExpectedCount!==summary.eligibleCount||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0
   const contextSecurity=(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>
@@ -531,7 +532,8 @@ export default function SchoolApp(){
             </ul>}
             {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}
-          {page==='recovery'&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
+          {professionalRecoveryPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope recovery>{workspaceContext}</SchoolProfessionalClassScope>{schoolId&&classId?<SchoolRecoveryOfficer compact key={classPath} api={api} classPath={classPath}/>:<section className="hs-panel hs-recovery-empty"><h2>选择要处理的班级</h2><p>选择班级后，可进入账号恢复与注册异常处理。</p></section>}</div>}
+          {page==='recovery'&&!professionalRecoveryPage&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks compact={ordinaryTeacher} key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
@@ -548,17 +550,17 @@ export default function SchoolApp(){
             compact={ordinaryTeacher||professionalWorkspace} isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupReports key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolGroupReports compact={professionalWorkspace} key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='group-trends'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
-            &&<SchoolGroupLongitudinal key={'SchoolGroupLongitudinal:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolGroupLongitudinal compact={professionalWorkspace} key={'SchoolGroupLongitudinal:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='protected-reports'&&psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
             &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_PROTECTED_FEEDBACK_V1'].includes(x))
-            &&<SchoolProtectedReportStudio key={'SchoolProtectedReportStudio:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolProtectedReportStudio compact={professionalWorkspace} key={'SchoolProtectedReportStudio:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='individual-trends'&&psychologyStaff&&schoolId&&access?.capabilities.includes('PSYCHOLOGY_STAFF')
             &&!access?.explicitDenies.some(x=>['*','PSYCHOLOGY_STAFF','REPORT_READ','ORG_INDIVIDUAL_REPORT_V1'].includes(x))
-            &&<SchoolIndividualLongitudinalStudio key={'SchoolIndividualLongitudinalStudio:'+schoolId} api={api} organizationId={schoolId}/>}
-          {page==='professional-reports'&&psychologyStaff&&schoolId&&<SchoolProfessionalReports key={'SchoolProfessionalReports:'+schoolId} api={api} organizationId={schoolId}/>}
+            &&<SchoolIndividualLongitudinalStudio compact={professionalWorkspace} key={'SchoolIndividualLongitudinalStudio:'+schoolId} api={api} organizationId={schoolId}/>}
+          {page==='professional-reports'&&psychologyStaff&&schoolId&&<SchoolProfessionalReports compact={professionalWorkspace} key={'SchoolProfessionalReports:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='report-review'&&campusParentReportEnabled&&psychologyStaff&&schoolId
             &&access?.capabilities.includes('PARENT_REPORT_DISCLOSURE')
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','PARENT_REPORT_DISCLOSURE'].includes(x))
@@ -579,7 +581,7 @@ export default function SchoolApp(){
           {page==='tasks'&&<SchoolParentTasks api={api}/>}
           {page==='parent-reports'&&campusParentReportEnabled&&<SchoolParentReports api={api}/>}
         </div>}
-        {['admission','recovery'].includes(page)&&!professionalAdmissionPage&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
+        {['admission','recovery'].includes(page)&&!professionalAdmissionPage&&!professionalRecoveryPage&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
       </SchoolWorkspaceShell>}
     </main>
     <footer className="hs-footer">School · 科学支持 · 专业陪伴 · 健康成长</footer>

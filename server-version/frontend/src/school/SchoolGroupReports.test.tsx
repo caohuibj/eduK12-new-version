@@ -31,7 +31,7 @@ describe('Huischool school-only aggregate workbench',()=>{
     })
     const confirm=window.confirm;window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolGroupReports api={api as unknown as SchoolApi} organizationId={org}/>)
+      render(<SchoolGroupReports compact api={api as unknown as SchoolApi} organizationId={org}/>)
       fireEvent.change(await screen.findByLabelText('选择正式校园测评来源'),{
         target:{value:run+':'+track},
       })

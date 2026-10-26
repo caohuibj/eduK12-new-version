@@ -27,7 +27,7 @@ describe('Huischool internal fixed-population group trends',()=>{
     })
     const original=window.confirm;window.confirm=vi.fn(()=>true)
     try{
-      render(<SchoolGroupLongitudinal api={api as unknown as SchoolApi}
+      render(<SchoolGroupLongitudinal compact api={api as unknown as SchoolApi}
         organizationId={org}/>)
       const checkboxes=await screen.findAllByRole('checkbox')
       checkboxes.forEach(x=>fireEvent.click(x))

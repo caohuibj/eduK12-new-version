@@ -32,7 +32,7 @@ describe('campus recovery officer interface',()=>{
       }
       return {list:[]}
     })
-    render(<SchoolRecoveryOfficer api={invoke as unknown as SchoolApi}
+    render(<SchoolRecoveryOfficer compact api={invoke as unknown as SchoolApi}
       classPath="/organizations/school-x/classes/class-y" />)
     fireEvent.change(screen.getByLabelText('资格学号（不显示在审计记录中）'),{
       target:{value:'P1234'},

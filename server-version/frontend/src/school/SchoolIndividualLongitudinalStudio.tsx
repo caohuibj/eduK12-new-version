@@ -1,3 +1,4 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { useEffect,useRef,useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -16,8 +17,8 @@ const message=(error:unknown)=>
 /** Each selection invalidates the prior student's data. The API accepts only
  * a campus-scoped pseudonym; no username, student number or raw score.
  */
-export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
-  api:SchoolApi;organizationId:string
+export function SchoolIndividualLongitudinalStudio({api,organizationId,compact=false}:{
+  api:SchoolApi;organizationId:string;compact?:boolean
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
   const [catalogLoading,setCatalogLoading]=useState(true)
@@ -72,16 +73,17 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
     }catch(e){if(t===epoch.current)setError(message(e))}
     finally{if(t===epoch.current)setBusy(false)}
   }
-  return <section className="hs-panel">
-    <h2>心理教师 · 个人纵向测评分析</h2>
+  return <section className={"hs-panel"+(compact?" hs-report-panel":"")}>
+    <SchoolReportHeader compact={compact} title={compact?"个体纵向分析配置":"心理教师 · 个人纵向测评分析"} label="个体纵向分析使用说明">
     <p>仅针对本人当前授权的学生个案，选择同一工具的两次及以上正式测量。
       每个指标与相邻版本均需要独立的科学可比性证据；平台不依据同名维度推断变化，也不自动给家长或任课教师授权。</p>
+    </SchoolReportHeader>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {catalogLoading&&<p role="status">正在核验心理服务关系和可用科学方案…</p>}
     {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
       <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
     </div>}
-    {catalog&&<>
+    {catalog&&<div className={compact?"hs-report-controls":undefined}>
       <label className="hs-field"><span>当前心理服务学生的匿名观察编号</span>
         <select value={subject} disabled={busy} onChange={e=>void chooseSubject(e.target.value)}>
           <option value="">选择本人当前服务个案</option>
@@ -116,7 +118,7 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
       <button disabled={busy||!ready} onClick={()=>void generate()}>
         经近期动态验证码核验后生成专业纵向分析
       </button>
-    </>}
+    </div>}
     {result&&<div role="region" aria-label="个人纵向生成结果" className="hs-task-detail">
       <p>个案：{result.subjectReference}</p>
       <p>{result.note}</p>

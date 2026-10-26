@@ -1,3 +1,4 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { useEffect, useRef, useState } from 'react'
 import {ArrowLeft,ArrowRight,MessageSquareText} from 'lucide-react'
 import {workspaceHref} from './school-navigation'
@@ -408,7 +409,7 @@ type ProfessionalDetail = {artifactId:string;generatedAt:string;projection:Profe
 /** Current CLIENT-scoped professional index and read-only scientific results.
  * No raw responses, rater identities, direct exports or student labels.
  */
-export function SchoolProfessionalReports({api,organizationId}: {api:SchoolApi;organizationId:string}) {
+export function SchoolProfessionalReports({api,organizationId,compact=false}: {api:SchoolApi;organizationId:string;compact?:boolean}) {
   const [reports,setReports]=useState<ProfessionalList|null>(null)
   const [detail,setDetail]=useState<ProfessionalDetail|null>(null)
   const [selected,setSelected]=useState<string|null>(null)
@@ -431,9 +432,8 @@ export function SchoolProfessionalReports({api,organizationId}: {api:SchoolApi;o
     finally{setBusy(false)}
   }
   const projection=detail?.projection
-  return <section className="hs-panel">
-    <h2>心理专业人员 · 已获授权的专业报告</h2>
-    <p>仅当前合法的专业关系与专项心理能力可读取。这里只呈现已有科学规则允许的汇总指标；不显示被评价者的原始回答或互评身份。</p>
+  return <section className={"hs-panel"+(compact?" hs-report-panel hs-report-library":"")}>
+    <SchoolReportHeader compact={compact} title={compact?'已授权报告':'心理专业人员 · 已获授权的专业报告'} label="专业报告使用说明"><p>仅当前合法的专业关系与专项心理能力可读取。这里只呈现已有科学规则允许的汇总指标；不显示被评价者的原始回答或互评身份。</p></SchoolReportHeader>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {!reports?<p>正在核对授权个案和报告…</p>:reports.list.length===0?
       <p>当前没有符合权限与科学发布条件的专业报告。</p>:

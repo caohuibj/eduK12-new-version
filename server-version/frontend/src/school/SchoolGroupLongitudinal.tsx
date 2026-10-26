@@ -1,3 +1,4 @@
+import {SchoolReportHeader} from './SchoolReportPresentation'
 import { useEffect,useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 type Source={runId:string;trackId:string;runName:string;publishedAt:string|null;
@@ -9,8 +10,8 @@ type Report={artifactId:string;kind:'SCHOOL_LONGITUDINAL';state:'READY'|'WITHHEL
   metrics:Record<string,Array<{wave:number;mean:number}>>;limitations:string[]}
 const id=(s:Source)=>s.runId+':'+s.trackId
 
-export function SchoolGroupLongitudinal({api,organizationId}:{
-  api:SchoolApi;organizationId:string
+export function SchoolGroupLongitudinal({api,organizationId,compact=false}:{
+  api:SchoolApi;organizationId:string;compact?:boolean
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
   const [catalogLoading,setCatalogLoading]=useState(true)
@@ -47,17 +48,18 @@ export function SchoolGroupLongitudinal({api,organizationId}:{
     }catch(e){setError(e instanceof Error?e.message:'不满足相同参与者及科学可比性条件')}
     finally{setBusy(false)}
   }
-  return <section className="hs-panel">
-    <h2>学校内部 · 固定群体纵向分析</h2>
+  return <section className={"hs-panel"+(compact?" hs-report-panel":"")}>
+    <SchoolReportHeader compact={compact} title={compact?"纵向分析配置":"学校内部 · 固定群体纵向分析"} label="群体纵向分析使用说明">
     <p>只允许同一学生集合在同一工具上的两至四次正式测量。
       所有 Run 与活动均须结束，且每次至少有十名不同学生；任一波次人数不同、个体不一致或可比性证据缺失都会拒绝。</p>
     <p>这不是教师绩效报告，不支持学生对教师的个人评价发布，不对学生或家长自动开放。</p>
+    </SchoolReportHeader>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {catalogLoading&&<p role="status">正在核对当前学校的正式波次与科学方案…</p>}
     {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
       <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
     </div>}
-    {catalog&&<>
+    {catalog&&<div className={compact?"hs-report-controls":undefined}>
       <label className="hs-field"><span>纵向分析科学方案</span>
         <select value={specId} disabled={busy} onChange={e=>{setSpecId(e.target.value);setReport(null)}}>
           <option value="">选择独立审核的正式方案</option>
@@ -85,7 +87,7 @@ export function SchoolGroupLongitudinal({api,organizationId}:{
       <button disabled={busy||!ready} onClick={()=>void submit()}>
         经近期动态验证码核对后生成固定群体分析
       </button>
-    </>}
+    </div>}
     {report&&<section role="region" aria-label="固定群体纵向投影" className="hs-task-detail">
       <h3>{report.state==='READY'?'受限的描述性群体比较':'未达到披露要求'}</h3>
       {report.state==='READY'&&Object.entries(report.metrics).map(([metric,points])=>
