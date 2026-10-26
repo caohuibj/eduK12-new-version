@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticate,authenticateSurvey} from '../../middleware/auth'
@@ -27,7 +28,7 @@ async function serviceCheck(req:Request,kind:'SYSTEM'|'LIBRARY'){if(kind==='SYST
 const search=z.string().trim().max(120).optional()
 surveyGovernedToolsRouter.get('/sources',handle(req=>service.governedSources(req.user!.userId,ref.shape.kind.parse(req.query.kind),page.parse(req.query.page),search.parse(req.query.q))))
 surveyGovernedToolsRouter.get('/source-preview',handle(req=>service.governedSourcePreview(req.user!.userId,ref.parse(req.query))))
-surveyGovernedToolsRouter.get('/catalog',handle(req=>service.governedCatalog(req.user!.userId,{family:governedFamily.optional().parse(req.query.family),page:page.parse(req.query.page),query:search.parse(req.query.q)})))
+surveyGovernedToolsRouter.get('/catalog',handle(req=>service.governedCatalog(req.user!.userId,{family:governedFamily.optional().parse(req.query.family),page:page.parse(req.query.page),query:search.parse(req.query.q),...z.object(catalogDiscoveryQueryFields).parse(req.query)})))
 surveyGovernedToolsRouter.get('/components',handle(req=>service.governedComponentOptions(req.user!.userId,page.parse(req.query.page),search.parse(req.query.q))))
 surveyGovernedToolsRouter.get('/versions/:id',handle(req=>service.governedDetail(req.user!.userId,uuid.parse(req.params.id))))
 surveyGovernedToolsRouter.use(requireRecentAdminKey)
@@ -41,7 +42,7 @@ surveyGovernedToolsRouter.post('/versions/:id/retry',handle(req=>service.runGove
 surveyGovernedToolsRouter.post('/versions/:id/withdraw',handle(req=>{const b=z.object({expectedVersion:z.number().int().positive(),reason}).strict().parse(req.body);return service.withdrawGovernedTool(req.user!.userId,uuid.parse(req.params.id),b.expectedVersion,b.reason,req.user!)}))
 export const surveyGovernedUseRouter=Router()
 surveyGovernedUseRouter.use(authenticate,async(req,res,next)=>{try{await serviceCheck(req,'LIBRARY');res.setHeader('Cache-Control','no-store');next()}catch(e){next(e)}})
-surveyGovernedUseRouter.get('/catalog',handle(req=>service.governedCatalog(req.user!.userId,{family:governedFamily.optional().parse(req.query.family),page:page.parse(req.query.page),query:search.parse(req.query.q)},false)))
+surveyGovernedUseRouter.get('/catalog',handle(req=>service.governedCatalog(req.user!.userId,{family:governedFamily.optional().parse(req.query.family),page:page.parse(req.query.page),query:search.parse(req.query.q),...z.object(catalogDiscoveryQueryFields).parse(req.query)},false)))
 surveyGovernedUseRouter.get('/researchers/:id/package-grants',handle(req=>packages.packageGrantsForManager(req.user!.userId,uuid.parse(req.params.id),page.parse(req.query.page),search.parse(req.query.q))))
 surveyGovernedUseRouter.use(requireRecentAdminKey)
 surveyGovernedUseRouter.post('/package-grants',handle(async req=>{const b=z.object({currentPassword:z.string().min(1).max(128),requestId:uuid,toolId:uuid,hash,userId:uuid,reason,expiresAt:z.string().datetime().nullable().optional()}).strict().parse(req.body);await authorizeAdmin(req.user!.userId,b.currentPassword);return packages.grantSurveyPackage(req.user!.userId,b)}))

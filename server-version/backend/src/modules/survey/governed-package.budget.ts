@@ -11,6 +11,14 @@ import {parseCompiledInstrumentRuntime} from '../assessment-runtime/compiler'
 export const PACKAGE_REPORT_MAX_BYTES=4_000_000
 export const PACKAGE_REPORT_MAX_CIPHER_BYTES=2*PACKAGE_REPORT_MAX_BYTES+30*4096
 export const jsonBytes=(value:unknown)=>Buffer.byteLength(JSON.stringify(value),'utf8')
+/** Explicit, persisted format boundary. NULL/missing belongs to historical
+ * artifacts; no unverified deployment timestamp is inferred from creation time. */
+export const PACKAGE_REPORT_BUDGET_VERSION=1
+export function hasPackageReportBudget(version:number|null|undefined){
+ if(version==null)return false
+ if(version!==PACKAGE_REPORT_BUDGET_VERSION)throw new PackageReportBudgetError('PACKAGE_REPORT_BUDGET_VERSION_UNSUPPORTED')
+ return true
+}
 const textBytes=(value:string)=>jsonBytes(value)-2
 export class PackageReportBudgetError extends Error{readonly statusCode=409}
 export function assertPackageReportBytes(bytes:number,kind='展开正文',limit=PACKAGE_REPORT_MAX_BYTES){
@@ -64,5 +72,5 @@ export function packageReportWorstCaseBytes(spec:PackageReport,components:readon
   }
  })
  const report=renderDeclaredReport({title:spec.title,blocks,limitations:[],...(spec.disclaimer?{disclaimer:spec.disclaimer}:{})},metrics,[])
- return jsonBytes({schemaVersion:1,packageTitle,packageVersionHash:'0'.repeat(64),reportVersion:spec.version,sourceFinalHash:'0'.repeat(64),report})+expansion+4096
+ return jsonBytes({schemaVersion:2,budgetVersion:PACKAGE_REPORT_BUDGET_VERSION,packageTitle,packageVersionHash:'0'.repeat(64),reportVersion:spec.version,sourceFinalHash:'0'.repeat(64),report})+expansion+4096
 }

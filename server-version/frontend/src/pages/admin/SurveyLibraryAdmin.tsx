@@ -1,11 +1,14 @@
 import GovernedToolLibrary from './GovernedToolLibrary'
-import {useCallback,useEffect,useState} from 'react'
+import {useCallback,useEffect,useRef,useState} from 'react'
 import {Link} from 'react-router-dom'
 import {RefreshCw,ChevronDown,BookOpen} from 'lucide-react'
 import {useAuth} from '../../contexts/AuthContext'
 import AdminStepUp from '../../admin/AdminStepUp'
 import {surveyManagementRequest as request,type SurveyToolPolicy,type SurveyPolicyIdentity,type SurveyReadiness} from '../../api/surveyManagement'
 import type {GovernanceCatalogRecord,GovernanceSubmission,GovernanceUseGrant} from '../../api/scaleLibraryGovernance'
+import {catalogQuery,EMPTY_CATALOG_FACETS,EMPTY_CATALOG_FILTERS,type CatalogDiscoveryPage,type CatalogFilters,type CatalogTagFacets} from '../../api/catalogDiscovery'
+import CatalogDiscoveryFilters from '../../components/scale-governance/CatalogDiscoveryFilters'
+import CatalogClassificationTags from '../../components/scale-governance/CatalogClassificationTags'
 import './survey-admin.css'
 import './survey-library.css'
 type Item=GovernanceCatalogRecord&{policy:SurveyToolPolicy;policyIdentity:SurveyPolicyIdentity;states:{content:SurveyReadiness;assignment:SurveyReadiness;deployment:SurveyReadiness}}
@@ -17,13 +20,21 @@ export default function SurveyLibraryAdmin(){
  const [view,setView]=useState<'catalog'|'submissions'|'governed'>('catalog'),[page,setPage]=useState(1),[more,setMore]=useState(false)
  const [items,setItems]=useState<Item[]>([]),[submissions,setSubmissions]=useState<Submission[]>([]),[reason,setReason]=useState('')
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false)
- const [details,setDetails]=useState<Record<string,unknown>>({}),[query,setQuery]=useState(''),[origin,setOrigin]=useState('ALL')
+ const [details,setDetails]=useState<Record<string,unknown>>({})
+ const [filters,setFilters]=useState<CatalogFilters>(EMPTY_CATALOG_FILTERS),[appliedFilters,setAppliedFilters]=useState<CatalogFilters>(EMPTY_CATALOG_FILTERS),[tagFacets,setTagFacets]=useState<CatalogTagFacets>(EMPTY_CATALOG_FACETS)
+ const requestVersion=useRef(0)
+ const invalidateCatalog=useCallback(()=>{requestVersion.current++},[])
  const [people,setPeople]=useState<{id:string;username:string}[]>([]),[selected,setSelected]=useState(''),[grants,setGrants]=useState<GovernanceUseGrant[]>([]),[entryId,setEntryId]=useState('')
- const refresh=useCallback(async()=>{setLoading(true);setError('');try{
-  if(view==='catalog'){const result=await api<{list:Item[];hasMore:boolean}>('/catalog?page='+page);setItems(result.list);setMore(result.hasMore)}
-  else if(view==='submissions'){const result=await api<{list:Submission[];hasMore:boolean}>('/submissions?page='+page);setSubmissions(result.list);setMore(result.hasMore)}
- }catch(e){setError(e instanceof Error?e.message:'读取失败')}finally{setLoading(false)}},[view,page])
- useEffect(()=>{void refresh()},[refresh])
+ const refresh=useCallback(async()=>{
+  const version=++requestVersion.current;setLoading(true);setError('')
+  try{
+   if(view==='catalog'){const result=await api<CatalogDiscoveryPage<Item>>('/catalog?'+catalogQuery(page,appliedFilters,true));if(version!==requestVersion.current)return;setItems(result.list);setMore(result.hasMore);setTagFacets(result.tagFacets??EMPTY_CATALOG_FACETS)}
+   else if(view==='submissions'){const result=await api<{list:Submission[];hasMore:boolean}>('/submissions?page='+page);if(version!==requestVersion.current)return;setSubmissions(result.list);setMore(result.hasMore)}
+  }catch(e){if(version===requestVersion.current){if(view==='catalog')setItems([]);else setSubmissions([]);setMore(false);setError(e instanceof Error?e.message:'读取失败')}}
+  finally{if(version===requestVersion.current)setLoading(false)}
+ },[view,page,appliedFilters])
+ useEffect(()=>{void refresh();return invalidateCatalog},[refresh,invalidateCatalog])
+ const applyFilters=(next:CatalogFilters)=>{invalidateCatalog();setAppliedFilters({...next,keyword:next.keyword.trim()});setPage(1);setEntryId('')}
  const run=async(work:()=>Promise<unknown>,message:string)=>{if(busy)return;setBusy(true);setError('');setNotice('');try{await work();setNotice(message);await refresh()}catch(e){setError((e instanceof Error?e.message:'操作失败')+'；未自动重试，请刷新核对。')}finally{setBusy(false)}}
  const policy=(row:{policy:SurveyToolPolicy;policyIdentity:SurveyPolicyIdentity},decision:SurveyToolPolicy['decision'],paused:boolean)=>run(()=>api('/policies',{...row.policyIdentity,expectedVersion:row.policy.version,decision,paused,reason:reason.trim()}),'Survey 范围状态已更新，未自动分配任何工具。')
  const controls=(row:{policy:SurveyToolPolicy;policyIdentity:SurveyPolicyIdentity},ready=true)=><div className="sra-actions">{system&&<><button disabled={busy||!reason.trim()||!ready} onClick={()=>void policy(row,'APPROVED',row.policy.paused)}>批准 Survey 使用范围</button><button disabled={busy||!reason.trim()} onClick={()=>void policy(row,'RETURNED',row.policy.paused)}>退回 Survey 审批</button></>}<button disabled={busy||!reason.trim()} onClick={()=>void policy(row,row.policy.decision,!row.policy.paused)}>{row.policy.paused?'恢复 Survey 使用':'暂停 Survey 使用'}</button></div>
@@ -35,7 +46,7 @@ export default function SurveyLibraryAdmin(){
   {error&&<p role="alert" className="sra-alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   <div className="slg-workspace"><div className="slg-content">
    <label className="sra-field">审批或暂停原因<textarea value={reason} maxLength={1000} onChange={e=>setReason(e.target.value)} placeholder="填写本次操作原因；系统会保留审计记录"/></label>
-   {view==='governed'?<GovernedToolLibrary/>:view==='catalog'?<><label className="sra-field">筛选当前页<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="工具名称"/></label><label className="sra-field">来源<select value={origin} onChange={e=>setOrigin(e.target.value)}><option value="ALL">全部来源</option><option value="STANDARD_REGISTRY">标准工具</option><option value="AUTHORED">自编工具</option></select></label><div className="slg-catalog-grid">{items.filter(row=>(origin==='ALL'||row.origin===origin)&&row.title.toLowerCase().includes(query.toLowerCase())).map(row=><article className="slg-catalog-card" key={row.catalogId}><header><BookOpen size={20}/><div><h2>{row.title}</h2><p>{row.origin==='STANDARD_REGISTRY'?'标准工具':'自编工具'} · 精确版本 {row.exactVersion.instrumentVersion??row.exactVersion.releaseVersion}</p></div></header><div className="survey-tool-summary"><span>内容：{row.states.content.ready?'就绪':'待补齐'}</span><span>授权：{row.states.assignment.ready?'可分配':'受阻'}</span><span>投放：{row.policy.paused?'已暂停':row.states.assignment.ready?'投放前核对':'受阻'}</span></div>
+   {view==='governed'?<GovernedToolLibrary/>:view==='catalog'?<><CatalogDiscoveryFilters filters={filters} facets={tagFacets} onChange={setFilters} onApply={applyFilters} includeOrigin disabled={busy}/>{loading&&<p role="status">正在检索量表目录…</p>}<div className="slg-catalog-grid" aria-busy={loading}>{items.map(row=><article className="slg-catalog-card" key={row.catalogId}><header><BookOpen size={20}/><div><h2>{row.title}</h2><p>{row.origin==='STANDARD_REGISTRY'?'标准工具':'自编工具'} · 精确版本 {row.exactVersion.instrumentVersion??row.exactVersion.releaseVersion}</p><CatalogClassificationTags tags={row.classificationTags}/></div></header><div className="survey-tool-summary"><span>内容：{row.states.content.ready?'就绪':'待补齐'}</span><span>授权：{row.states.assignment.ready?'可分配':'受阻'}</span><span>投放：{row.policy.paused?'已暂停':row.states.assignment.ready?'投放前核对':'受阻'}</span></div>
    <details className="slg-action-disclosure"><summary>状态、详情与操作<ChevronDown size={17}/></summary><div className="slg-disclosure-content"><div className="survey-tool-states"><State title="内容就绪" value={row.states.content}/><State title="可授权" value={row.states.assignment}/><State title="可投放" value={row.states.deployment} pending={!row.policy.paused&&row.states.assignment.ready}/></div><p>Survey 审批：{row.policy.decision==='APPROVED'?'已批准':row.policy.decision==='RETURNED'?'已退回':'待审批'} · {row.policy.reason}</p>{controls(row,row.states.content.ready)}
    {row.standard&&<details><summary>精确目录与来源诊断</summary><pre className="survey-json">{JSON.stringify(row.standard,null,2)}</pre></details>}
    {row.authored&&<><button onClick={()=>void inspect(row.authored!.submissionId)}>读取冻结内容、计分与报告</button>{details[row.authored.submissionId]!==undefined&&<pre className="survey-json">{JSON.stringify(details[row.authored.submissionId],null,2)}</pre>}{!system&&<button disabled={!row.states.assignment.ready||busy} onClick={()=>void choose(row.authored!.id)}>分配 Survey 精确版本</button>}</>}

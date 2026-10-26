@@ -172,6 +172,7 @@ model AdminEntryGrant {
   grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
   revokedBy String? @map("revoked_by")
   revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  standardCombinationUses MaterialGrant[] @relation("StandardCombinationEntryAuthority")
   @@unique([userId, entry], map: "admin_entry_grants_user_entry_key")
   @@map("admin_entry_grants")
 }
@@ -761,6 +762,7 @@ enum MaterialResourceType {
   SCALE
   COGNITIVE_CONFIG
   REPORT_PACKAGE
+  STANDARD_COMBINATION
 }
 
 enum CognitiveConfigAccessPolicy {
@@ -769,6 +771,14 @@ enum CognitiveConfigAccessPolicy {
 }
 
 model MaterialGrant {
+  version Int @default(1)
+  revokedAt DateTime? @map("revoked_at")
+  standardCombinationHash String? @map("standard_combination_hash")
+  authorityGrantId String? @map("authority_grant_id")
+  standardCombinationAuthority ContentCapabilityGrant? @relation("StandardCombinationMaterialAuthority",fields:[authorityGrantId],references:[id],onDelete:Restrict)
+  authorityEntryGrantId String? @map("authority_entry_grant_id")
+  authorityEntryGrantVersion Int? @map("authority_entry_grant_version")
+  standardCombinationEntryAuthority AdminEntryGrant? @relation("StandardCombinationEntryAuthority",fields:[authorityEntryGrantId],references:[id],onDelete:Restrict)
   legacyScaleGrant Boolean @default(false) @map("legacy_scale_grant")
   id           String               @id @default(uuid())
   teacherId    String               @map("teacher_id")
@@ -1366,6 +1376,7 @@ model AssessmentManagementEvent {
 
 // 综合测评中按 position 排序的模块。一个模块只允许填写 scale/cognitive/form 三类中的一种。
 model CompositeAssessmentItem {
+  standardCombinationSource Json? @map("standard_combination_source")
   id                    String                      @id @default(uuid())
   compositeAssessmentId String                      @map("composite_assessment_id")
   type                  CompositeAssessmentItemType
@@ -4193,6 +4204,7 @@ model SurveyReportDraft {
 }
 
 model ContentCapabilityGrant {
+  standardCombinationUses MaterialGrant[] @relation("StandardCombinationMaterialAuthority")
   publicScaleDistributions Scale[]
   scaleLibraryUseGrants ScaleLibraryUseGrant[]
   id                       String   @id
@@ -4505,7 +4517,9 @@ model SurveyParticipantCode {
 }
 
 // Survey administration only. Append-only audit enforcement lives in the migration.
+// product-scoped exact admission identity; matches migration 20261025120000.
 model SurveyToolPolicy {
+ product String @default("SURVEY")
  resourceKey String @map("resource_key")
  fingerprint String
  decision String @default("PENDING")
@@ -4515,7 +4529,7 @@ model SurveyToolPolicy {
  reviewedBy String @map("reviewed_by")
  reviewer User @relation("SurveyPolicyReviewer",fields:[reviewedBy],references:[id],onDelete:Restrict,onUpdate:NoAction)
  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
- @@id([resourceKey,fingerprint])
+ @@id([product,resourceKey,fingerprint])
  @@map("survey_tool_policies")
 }
 model SurveySystemExportGrant {

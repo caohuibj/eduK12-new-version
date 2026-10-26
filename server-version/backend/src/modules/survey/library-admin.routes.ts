@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields} from '../scale/library/catalog-discovery'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
@@ -15,7 +16,7 @@ surveyLibraryAdminRouter.use(createRedisRateLimiter({name:'survey-library-admin'
 surveyLibraryAdminRouter.use(authenticate,async(req,res,next)=>{try{await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,req.user!.userId));res.setHeader('Cache-Control','no-store');next()}catch(e){if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode);next(e)}})
 const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{try{return success(res,await fn(req))}catch(e){if(e instanceof z.ZodError)return error(res,'请求参数不合法',-1,400);if(e instanceof AdminPermissionError)return error(res,e.message,-1,e.statusCode);next(e)}}
 const page=z.coerce.number().int().min(1).max(10000).default(1)
-surveyLibraryAdminRouter.get('/catalog',handle(req=>service.surveyLibraryCatalog(req.user!.userId,page.parse(req.query.page))))
+surveyLibraryAdminRouter.get('/catalog',handle(req=>{const input=z.object({page,...catalogDiscoveryQueryFields,origin:z.enum(['ALL','STANDARD_REGISTRY','AUTHORED']).default('ALL')}).parse(req.query);return service.surveyLibraryCatalog(req.user!.userId,input.page,input)}))
 surveyLibraryAdminRouter.get('/submissions',handle(req=>service.surveyLibrarySubmissions(req.user!.userId,page.parse(req.query.page))))
 surveyLibraryAdminRouter.get('/submissions/:id',handle(req=>service.surveySubmissionDetail(req.user!.userId,z.string().uuid().parse(req.params.id))))
 surveyLibraryAdminRouter.post('/policies',requireRecentAdminKey,handle(req=>service.changeSurveyToolPolicy(req.user!.userId,z.object({resourceKey:z.string().min(1).max(300),fingerprint:z.string().regex(/^[a-f0-9]{64}$/),expectedVersion:z.number().int().nonnegative(),decision:z.enum(['APPROVED','RETURNED','PENDING']),paused:z.boolean(),reason:z.string().trim().min(1).max(1000)}).strict().parse(req.body))))

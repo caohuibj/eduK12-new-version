@@ -57,22 +57,33 @@ export const projectScaleAttemptForResume = (input: {
   deviceInputProvenance?: DeviceInputProvenanceV1
   includeAnswers: boolean
   decryptError?: boolean
-}) => ({
-  ...attemptBase(input.assessment),
+  /** Frozen instruction of the distributed version; overrides the live Scale field. */
+  frozenInstruction?: { text: string } | null
+}) => {
+  const base = attemptBase(input.assessment)
+  const scale = base.scale && input.frozenInstruction !== undefined ? { ...base.scale, instruction: input.frozenInstruction?.text ?? null } : base.scale
+  return ({
+  ...base,
+  ...(scale !== base.scale && scale ? { scale } : {}),
   ...(input.includeAnswers ? { answers: input.answers.map(projectExternalScaleAnswer) } : {}),
   ...(input.includeAnswers && input.deviceInputProvenance
     ? { deviceInputProvenance: projectExternalDeviceProvenance(input.deviceInputProvenance) }
     : {}),
   ...(input.decryptError ? { decryptError: true } : {}),
-})
+  })
+}
 
 export const projectScaleCompletedResponse = (input: {
   assessment: any
   result: ScaleResultV2 | null
   context: ScaleProjectionContext
   decryptError?: boolean
+  /** Frozen instruction of the distributed version; overrides the live Scale field. */
+  frozenInstruction?: { text: string } | null
 }) => {
-  const scale = scaleMetadata(input.assessment?.scale, input.result)
+  const scale = input.frozenInstruction !== undefined
+    ? { ...scaleMetadata(input.assessment?.scale, input.result), instruction: input.frozenInstruction?.text ?? null }
+    : scaleMetadata(input.assessment?.scale, input.result)
   const instrument = {
     scaleId: scale?.id ?? input.result?.instrument.scaleId ?? input.assessment?.scaleId ?? 'unknown',
     code: scale?.code ?? input.result?.instrument.code ?? 'unknown',
@@ -89,6 +100,7 @@ export const projectScaleCompletedResponse = (input: {
   })
   return {
     ...attemptBase(input.assessment, input.result),
+    ...(scale ? { scale } : {}),
     report,
     // External completed responses are report-first. Returning a ScaleResultV2
     // compatibility alias would require reconstructing raw-answer-bearing

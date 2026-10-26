@@ -3,7 +3,7 @@ import {useScaleTimingLifecycle} from '../modules/scale/useScaleTimingLifecycle'
 import {SurveyScaleTimingTracker,type SurveyScaleTimings} from './survey-scale-timing'
 
 export type SurveyTimedScaleUnit={
-  instrumentKey:string;title:string
+  instrumentKey:string;title:string;instruction?:string
   items:{itemKey:string;prompt:string;required:boolean;responseOptions?:{optionKey:string;label:string}[]}[]
   responseOptions:{optionKey:string;label:string}[]
 }
@@ -73,6 +73,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
     aria-label={'逐题施测：'+unit.title}>
     <div className="survey-scale-heading"><div>
       <h3>{unit.title}</h3>
+      {unit.instruction&&<p className="survey-answer-guide" role="note">{unit.instruction}</p>}
     </div><span className="survey-scale-count"><strong>{String(index+1).padStart(2,'0')}</strong> / {String(unit.items.length).padStart(2,'0')}</span></div>
     <div className="survey-scale-progress-row">
       <div className="survey-scale-progress"><div><span>作答进度</span><span>已答 {answeredCount} / {unit.items.length}</span></div>

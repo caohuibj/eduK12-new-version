@@ -1,7 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 const m=vi.hoisted(()=>({use:vi.fn(),collection:vi.fn()}))
 vi.mock('../../services/materialGrant',()=>({canUseScale:m.use}))
-vi.mock('../../modules/scale/scale-collection-guard',()=>({assertTrainingScaleCollectionAllowed:m.collection}))
+vi.mock('../../modules/scale/scale-collection-guard',()=>({assertScaleNewEntryAllowed:m.collection}))
 import {assertScalePublicationRights} from '../../modules/scale/scale-publication-guard'
 describe('publication revalidates source rights in its write transaction',()=>{
  beforeEach(()=>vi.resetAllMocks())
@@ -9,7 +9,7 @@ describe('publication revalidates source rights in its write transaction',()=>{
   const source={id:'s',creatorId:'owner',status:'PUBLISHED'},tx={scale:{findMany:vi.fn().mockResolvedValue([source])}}
   m.use.mockResolvedValue(true)
   await assertScalePublicationRights(tx as never,'actor','TEACHER',['s'])
-  expect(m.collection).toHaveBeenCalledWith(tx,['s'])
+  expect(m.collection).toHaveBeenCalledWith(tx,['s'],'actor',{sourceOwnerId:'actor'})
   expect(m.use).toHaveBeenCalledWith('actor','TEACHER',source,tx)
  })
  it('rejects revoked rights rather than granting publication from an earlier draft attachment',async()=>{

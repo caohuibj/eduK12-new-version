@@ -27,7 +27,7 @@ export async function assertLibraryUseGrantCurrent(tx:Prisma.TransactionClient,i
     const ids=[...new Set([header.authority_grant_id,...root.ancestry])].sort()
     const active=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`WITH locked AS MATERIALIZED (
       SELECT id,revoked_at,valid_from,expires_at FROM content_capability_grants WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR SHARE
-    ) SELECT id FROM locked WHERE revoked_at IS NULL AND valid_from<=clock_timestamp() AND expires_at>clock_timestamp()`)
+    ) SELECT id FROM locked WHERE revoked_at IS NULL AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC')`)
     if(active.length!==ids.length)fail('原精确委托已撤销、尚未生效或到期，停止新入场',403)
   }
   const [grant]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`SELECT * FROM scale_library_use_grants WHERE id=${header.id} FOR SHARE`)

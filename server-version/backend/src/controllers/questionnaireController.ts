@@ -1,5 +1,5 @@
 import { assertScalePublicationRights } from '../modules/scale/scale-publication-guard'
-import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
+import { assertQuestionnaireScaleNewEntryAllowed } from '../modules/scale/scale-collection-guard'
 import { serveProjectedReportImage } from '../modules/reporting/report-image-delivery'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
@@ -2441,7 +2441,7 @@ export const questionnaireController = {
           if (snapshot.schemaVersion === 2) assertScaleContextCollectable({ policy: snapshot.compiledPolicy.applicability, scalePosition: qs.position, sections: frozenFormSections })
           return { qs, snapshot }
         }))
-        await assertTrainingScaleCollectionAllowed(tx,questionnaire.questionnaireScales.map((entry:any)=>entry.scaleId))
+        await assertQuestionnaireScaleNewEntryAllowed(tx,questionnaire.id,questionnaire.questionnaireScales.map((entry:any)=>entry.scaleId))
         await tx.assessment.createMany({
           data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ qs, snapshot }) => ({
             scaleId: qs.scaleId,

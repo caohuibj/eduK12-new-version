@@ -22,6 +22,8 @@ import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, ensureScaleAdmissionAtDelivery, l
 import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUnifiedScaleCollectionBatch } from '../scale/unified-final-submit.service'
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
+import {assertTrainingScaleCollectionAllowed} from '../scale/scale-collection-guard'
+import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -34,7 +36,7 @@ export const wholeQuestionnaireSubmitSchema = z.object({
 }).strict()
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
-export type WholeReceiptExecution = { submissionId: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
+export type WholeReceiptExecution = { submissionId: string; payloadHash: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
 /** Invocation-scoped verified scientific data; never an authorization cache. */
 export type WholeQuestionnaireReportContext = {
   attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null;
@@ -198,7 +200,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
       presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
       ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
+      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })
   }
   const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
@@ -223,7 +225,7 @@ const receiptResponse = (attemptId: string, submissionId: string, payloadHash: s
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   select: typeof REPORT_PARENT_SELECT & { userId: true; recoveryTokenHash: true };
-}> & { consentId: string | null;trainingTimingSnapshot:unknown;
+}> & { consentId: string | null;trainingTimingSnapshot:unknown;hasStandardCombination:boolean;
   trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
   compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
@@ -255,6 +257,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
       parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
       parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
+      (EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=product.id AND i.standard_combination_source IS NOT NULL)
+       OR jsonb_path_exists(COALESCE(parent.training_content_binding,'{}'::jsonb),'$.units[*].source.standardCombination')) AS "hasStandardCombination",
       parent."user_id" AS "userId",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
@@ -348,6 +352,15 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
+  },async tx=>{
+    // A new durable ACK is still collection. Resolve and lock every selected
+    // real child/source in this same receipt transaction, including ordinary
+    // questionnaires. A previously accepted replay returned above.
+    const children=await tx.assessment.findMany({where:{id:{in:prepared.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
+      compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
+    if(children.length!==prepared.length||children.some(child=>!prepared.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
+    if(parent.hasStandardCombination)await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),{compositeAttemptId:parent.id,compositeItemIds:children.map(child=>child.compositeItemId!)})
+    else await assertScaleLibraryCollectionAllowed(tx,[],children.map(child=>child.scaleId))
   })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
@@ -361,7 +374,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   const receipt = job
   if (!receipt.wholeSubmissionId) return false
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
-  const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
+  const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, payloadHash: receipt.wholePayloadHash!, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
     timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch

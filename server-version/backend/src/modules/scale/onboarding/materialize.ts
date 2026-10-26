@@ -42,6 +42,9 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
         itemCount: definitionCounts.itemCount,
         dimensionCount: definitionCounts.dimensionCount,
         estimatedTime: source.catalog.administration.estimatedMinutes,
+        // STANDARD rows are platform-owned content: the source instruction is
+        // the authoritative wording and is materialized with the definition.
+        instruction: source.instruction?.text ?? null,
         creatorId: input.actorUserId,
         tags: [source.catalog.construct.primaryDomain],
       },
@@ -63,8 +66,12 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
           itemCount: definitionCounts.itemCount,
           dimensionCount: definitionCounts.dimensionCount,
           estimatedTime: source.catalog.administration.estimatedMinutes,
+          instruction: source.instruction?.text ?? null,
         },
       })
+    } else if ((scale.instruction??null)!==(source.instruction?.text??null)) {
+      // Independent presentation revision: retain scoring definition and lifecycle.
+      scale=await db.scale.update({where:{id:scale.id},data:{instruction:source.instruction?.text??null}})
     }
   }
 

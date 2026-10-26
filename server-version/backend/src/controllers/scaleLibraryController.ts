@@ -1,3 +1,4 @@
+import {catalogDiscoveryQueryFields,catalogTagFacets,scaleEntryClassificationTags} from '../modules/scale/library/catalog-discovery'
 import { Request, Response } from 'express'
 import {
   constructDomainSchema,
@@ -26,6 +27,7 @@ const optionalNumber = z.preprocess((value) => {
 }, z.number().int().min(0).max(100).optional())
 
 const libraryQuerySchema = z.object({
+  tags: catalogDiscoveryQueryFields.tags,
   keyword: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   instrumentFamily: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   primaryDomain: z.preprocess(queryValue, constructDomainSchema.optional()),
@@ -62,6 +64,7 @@ const parseQuery = (req: Request): { query?: z.infer<typeof libraryQuerySchema>;
 
 const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibraryFilterInput => ({
   keyword: query.keyword,
+  tags: query.tags,
   instrumentFamily: query.instrumentFamily,
   primaryDomain: query.primaryDomain,
   secondaryDomain: query.secondaryDomain,
@@ -91,7 +94,8 @@ export const scaleLibraryController = {
       return success(res, {
         schemaVersion: model.schemaVersion,
         generatedAt: model.generatedAt,
-        entries: filterUnifiedScaleLibraryEntries(model.entries, filterFromQuery(query)),
+        entries: filterUnifiedScaleLibraryEntries(model.entries, filterFromQuery(query)).map(entry=>({...entry,classificationTags:scaleEntryClassificationTags(entry)})),
+        tagFacets: catalogTagFacets(model.entries.map(scaleEntryClassificationTags)),
       })
     } catch (err) {
       return handleError(res, err)
@@ -106,7 +110,7 @@ export const scaleLibraryController = {
       const model = await readStandardScaleLibraryForActor(req.user, parsed.query)
       const entry = getUnifiedScaleLibraryEntry(model, String(req.params.instrumentKey), String(req.params.instrumentVersion))
       if (!entry) return notFound(res, '量表库条目不存在')
-      return success(res, { entry })
+      return success(res, { entry: {...entry,classificationTags:scaleEntryClassificationTags(entry)} })
     } catch (err) {
       return handleError(res, err)
     }

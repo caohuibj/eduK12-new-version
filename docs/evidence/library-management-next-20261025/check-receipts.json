@@ -1,0 +1,65 @@
+{
+  "scope": "observed local execution; not CI qualification",
+  "checks": [
+    {
+      "command": "tsc --noEmit --pretty false",
+      "cwd": "server-version/backend",
+      "node": "24.21.0",
+      "exitCode": 0,
+      "toolSession": 67414,
+      "note": "last command in shell; preceding targeted Vitest has its own reporter identity"
+    },
+    {
+      "command": "tsc -p tsconfig.app.json --noEmit --pretty false",
+      "cwd": "server-version/frontend",
+      "node": "24.21.0",
+      "exitCode": 0,
+      "toolSession": 71926
+    },
+    {
+      "command": "eslint changed frontend files",
+      "cwd": "server-version/frontend",
+      "exitCode": 0,
+      "toolSession": 94080,
+      "warnings": 3,
+      "note": "Existing ScaleLibraryGovernance generation-ref cleanup warnings; after final JSX relocation this file alone was checked again with exit 0 and same 3 warnings"
+    }
+  ],
+  "logs": [
+    {
+      "path": "logs/backend-types-final.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/frontend-types-confirmed.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/frontend-lint-final.log",
+      "sha256": "eeaa938926e3037bd6a06acd8874476b7c03e351047f0d07c911a8fa15851e21",
+      "bytes": 1147
+    },
+    {
+      "path": "logs/frontend-lint-last-file.log",
+      "sha256": "eeaa938926e3037bd6a06acd8874476b7c03e351047f0d07c911a8fa15851e21",
+      "bytes": 1147
+    },
+    {
+      "path": "logs/prisma-generate.log",
+      "sha256": "4e596a79db00ecda29007daf5377c0af205c8c22afebe4420379604aa91cd62f",
+      "bytes": 331
+    },
+    {
+      "path": "logs/backend-install-pinned.log",
+      "sha256": "a86d23c8eb7e27034872dbf159818382319d6cee20655b925f063881bd564873",
+      "bytes": 1125
+    },
+    {
+      "path": "logs/frontend-install-pinned.log",
+      "sha256": "659a2f01f60c1c0ba4c058ab8dd1f6ce96fdcf0ecb5bd0d895eada1b28336f09",
+      "bytes": 358
+    }
+  ]
+}

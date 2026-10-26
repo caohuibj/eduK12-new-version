@@ -1,3 +1,4 @@
+import {scaleEntryClassificationTags,catalogTagFacets,catalogKeywordTerms,matchesCatalogDiscovery,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import {assertStandardSystem} from './standard-triplet.service'
 import {assertGovernedOnline} from './governed-tool.service'
 import type {StandardRelease} from './standard-triplet.service'
@@ -53,23 +54,28 @@ async function decorate(tx:Prisma.TransactionClient,row:PlatformCatalogRecord){
  return {...row,policyIdentity:identity,policy,states:{content,assignment:{ready:assignable,reasons:[...new Set(reasons)]},
   deployment:{ready:false,status:assignable?'REQUIRES_RUNTIME_CHECK':'BLOCKED',reasons:[...new Set([...reasons,'还需研究者持有精确版本授权，并通过冻结发布及个人准入核对'])],requiresRuntimeCheck:true}}}
 }
-export async function surveyLibraryCatalog(actorId:string,page:number){
+export async function surveyLibraryCatalog(actorId:string,page:number,filters:CatalogDiscoveryFilters&{origin?:'ALL'|'STANDARD_REGISTRY'|'AUTHORED'}={}){
  await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,actorId))
  const standard=await readStandardScaleLibraryForActor({userId:actorId,role:UserRole.ADMIN})
- const sorted=standard.entries.slice().sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
+ const tagFacets=catalogTagFacets(standard.entries.map(row=>scaleEntryClassificationTags(row)))
+ const sorted=(filters.origin==='AUTHORED'?[]:standard.entries).filter(row=>matchesCatalogDiscovery([row.identity.canonicalName,row.identity.instrumentKey,row.identity.instrumentVersion,row.identity.instrumentFamily??'',row.construct.constructDefinition],scaleEntryClassificationTags(row),filters)).sort((a,b)=>`${a.identity.instrumentKey}:${a.identity.instrumentVersion}`.localeCompare(`${b.identity.instrumentKey}:${b.identity.instrumentVersion}`))
  const offset=(page-1)*25,selected=sorted.slice(offset,offset+25)
  return prisma.$transaction(async tx=>{
   await assertSurveyLibraryManager(tx,actorId)
   const list:PlatformCatalogRecord[]=selected.map(row=>standardCatalogRecord(row,'SURVEY'))
   let more=offset+25<sorted.length
-  if(list.length<25){
-   const entries=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM scale_library_entries ORDER BY created_at DESC,id LIMIT ${26-list.length} OFFSET ${Math.max(0,offset-sorted.length)}`
+  // Authored entries have no declared classification tags yet. Do not infer them
+  // from names or ignore a requested tag; keyword filtering also precedes LIMIT.
+  if(!more&&filters.origin!=='STANDARD_REGISTRY'&&!filters.tags?.length){
+   const terms=catalogKeywordTerms(filters.keyword)
+   const keyword=terms.length?Prisma.sql`AND ${Prisma.join(terms.map(term=>Prisma.sql`strpos(lower(concat_ws(' ',s.metadata->>'title',s.metadata->>'author',s.metadata->>'applicability',s.release_id)),${term})>0`),' AND ')}`:Prisma.empty
+   const entries=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT e.id FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id WHERE TRUE ${keyword} ORDER BY e.created_at DESC,e.id LIMIT ${26-list.length} OFFSET ${Math.max(0,offset-sorted.length)}`)
    for(const e of entries.slice(0,25-list.length)){const {entry,submission}=await loadEntry(tx,e.id);list.push(authoredCatalogRecord(entryView(entry,submission),'SURVEY'))}
    more=entries.length>25-selected.length
   }
   const decorated=[]
-  for(const row of list)decorated.push(await decorate(tx,row))
-  return {schemaVersion:1,list:decorated,page,pageSize:25,hasMore:more,generatedAt:new Date().toISOString()}
+  for(const row of list)decorated.push({...await decorate(tx,row),classificationTags:row.origin==='STANDARD_REGISTRY'?scaleEntryClassificationTags(row.standard):[]})
+  return {schemaVersion:1,list:decorated,page,pageSize:25,hasMore:more,tagFacets,generatedAt:new Date().toISOString()}
  },{timeout:20000})
 }
 export async function surveyLibrarySubmissions(actorId:string,page:number){

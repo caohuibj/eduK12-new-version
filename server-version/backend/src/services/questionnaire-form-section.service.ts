@@ -1,4 +1,4 @@
-import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
+import { assertQuestionnaireScaleNewEntryAllowed } from '../modules/scale/scale-collection-guard'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Prisma } from '@prisma/client'
@@ -1096,7 +1096,7 @@ export const restartQuestionnaireAssessment = async (
       },
     })
     if (current.questionnaire.questionnaireScales.length > 0) {
-      await assertTrainingScaleCollectionAllowed(tx,current.questionnaire.questionnaireScales.map(entry=>entry.scaleId))
+      await assertQuestionnaireScaleNewEntryAllowed(tx,current.questionnaire.id,current.questionnaire.questionnaireScales.map(entry=>entry.scaleId))
       await tx.assessment.createMany({
         data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ entry, snapshot }) => ({
           scaleId: entry.scaleId,

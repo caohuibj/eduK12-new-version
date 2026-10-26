@@ -1,0 +1,62 @@
+{
+  "kind": "recorded-local-development-results",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "base": "76bc59d910fcfbcbbe97fb74f8e4ae8068268804",
+  "contentReferenceCommit": "7330038efbea8778541a42a5d90188a8879a98b9",
+  "recordedAt": "2026-10-26T02:10:04.151025+00:00",
+  "reports": [
+    {
+      "file": "backend-contracts.json",
+      "sha256": "604ea0ea22a75934c4fa88d6e95c2f8e6b4e13ae62ebea714bb1cb1c2aded9f2",
+      "success": false,
+      "numPassedTests": 28,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    {
+      "file": "backend-recheck.json",
+      "sha256": "eb1f341c4d891c3ff9baa8d6e0d7aa562ba957c32b337876a73de3aa677ba7b6",
+      "success": true,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3
+    },
+    {
+      "file": "controller-contracts.json",
+      "sha256": "a43af3c5969d9c23e4d290ce4957dc59e4757a28458aac62983d664ee3aae362",
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "frontend-contracts.json",
+      "sha256": "d4720841dd929759317fe1dad3835dfcf58a1a7a0da9499cb7943a2a04f8a243",
+      "success": true,
+      "numPassedTests": 37,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  ],
+  "sourceSnapshotRecordedAfterExecution": {
+    "server-version/backend/src/__tests__/scale-library-governance/unified-catalog-discovery.test.ts": "6d8ceff35f16966589f8ea4a0176322a244d3a6e4ab8310894587d8b03859158",
+    "server-version/backend/src/__tests__/scale/eight-axis-discovery.test.ts": "18ae01701935b12def0de6a8f3443ed4ee118a23b621e6007815300159e39df9",
+    "server-version/backend/src/__tests__/scale/scale-library-discovery-controller.test.ts": "cdf95e4727c770245f6b3d412d40f2204db1f6bb5af6c0686da26227ceecca9d",
+    "server-version/backend/src/controllers/scaleLibraryController.ts": "12e29fab83196224ac98344c354844044ef94c37c401611ef9d8315571bc5e5f",
+    "server-version/backend/src/modules/scale/library/catalog-discovery.ts": "69650416187e87a1114969c6d954b545f32cb0d36767379114eb088dcb632210",
+    "server-version/backend/src/modules/scale/library/catalog-tag-labels.json": "4078cfedffc6591017e83c479cf346bdc4b239f19adc3ed0606bbee97b213dd2",
+    "server-version/frontend/src/api/catalogDiscovery.test.ts": "a4ad892eca02e280e41883ebeccc92e8af0f0ad4bd5481791fb286b6a43ef769",
+    "server-version/frontend/src/api/catalogDiscovery.ts": "2e4fa797a50cc79e0269a40641791606c46086923c07f05907ce9588f3d7bce3",
+    "server-version/frontend/src/api/scaleLibrary.ts": "18071bcba616978efdbb25404ca9e80521e8ab943ee741acc117a9eba40bdc19",
+    "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.test.tsx": "ca561116c9a67a9d840b23507f9f4bea889ecd2d5bd93df2187651d649c90fde",
+    "server-version/frontend/src/components/scale-governance/CatalogDiscoveryFilters.tsx": "f40fbdc950b3c1d3733522b7b04294a1b2f2f0284c13d30f78eb1f5ee215c0ef",
+    "server-version/frontend/src/pages/ScaleLibrary.tsx": "91b747465030fb72ec5af9ce97b9c96996307b5868701249d87814dad1c4c3fc",
+    "server-version/frontend/src/pages/__tests__/ScaleLibrary.test.tsx": "ee5b52f730888b88b49f76ee53ce41602fe535a7fbde78a7b94cf0012da9c535"
+  },
+  "limits": [
+    "Display dictionary only: no proposed source mappings, aliases or permission/scientific decisions are applied.",
+    "Backend initial failed invocation remains failed; only its one stale product-argument assertion was rechecked.",
+    "Source hashes were recorded after execution. These are unsigned local development records, not CI qualification."
+  ]
+}

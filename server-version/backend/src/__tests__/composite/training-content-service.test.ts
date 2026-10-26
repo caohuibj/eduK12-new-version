@@ -47,7 +47,7 @@ describe('actual composite service measurement-binding call chain (mock DB and r
   const prepared=await prepareCompositePublication('teacher',UserRole.TEACHER,'composite',mocks.db as never,new Map())
   expect(prepared).toMatchObject({trainingContentSnapshot:snapshot,trainingContentSnapshotHash:snapshotHash})
   expect(mocks.recheckPublication).toHaveBeenCalledTimes(1)
-  expect(mocks.publication).toHaveBeenCalledExactlyOnceWith(mocks.db,fixture(),new Map())
+  expect(mocks.publication).toHaveBeenCalledExactlyOnceWith(mocks.db,fixture(),new Map(),'NEW_ADMINISTRATION','PREVIEW')
   expect(mocks.db.materialGrant.findUnique).not.toHaveBeenCalled()
  })
  it('passes the locked publication and actual sources through createAttempt and persists the exact attempt-bound hash',async()=>{

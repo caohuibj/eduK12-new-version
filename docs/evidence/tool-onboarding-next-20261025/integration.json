@@ -1,0 +1,268 @@
+{
+  "recordedAt": "2026-10-25T04:47:16.633685+00:00",
+  "kind": "local-integration-static-evidence-not-ci-qualification",
+  "branch": "tool-onboarding-next-20261025",
+  "base355": "6c9745fd010d32c719946ca6d2dcd65e64d7828e",
+  "base355Tree": "dc90ab8b2b1a9150ae965a8a7b97b787055a222c",
+  "upstream356Base": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+  "upstream356": "0d2e417d1f9ec06380a87dec1b241ee833d5880d",
+  "upstream356Tree": "d51dff4bd8b96c95e3bfed1ef9cea7e2a66eb8bf",
+  "integratedHead": "6fedb640fdd0700b9c1ca9974bf417b5a43cf58c",
+  "integratedTree": "ec7db992e223ea9de251f039faba0eacd6e5b0af",
+  "method": "ordered git cherry-pick -x of exactly three commits onto #355 candidate",
+  "conflicts": [],
+  "mapping": [
+    {
+      "upstream": "65f3c593169ede363192db1f3459b57b17881960",
+      "local": "293bc25e9b35deddb1486c7009de8a4741415ea5",
+      "stablePatchId": "665b469fb2f7a325a635e4c43183232ef8b7ec6e",
+      "patchesEqual": true
+    },
+    {
+      "upstream": "f3a7eb58299c2a0733402c18f691410687393a9b",
+      "local": "807c4dd015679bbde94404f87f4fdca82960e719",
+      "stablePatchId": "8eae93cf8ac515763d071c27e9462c6e2857310e",
+      "patchesEqual": true
+    },
+    {
+      "upstream": "0d2e417d1f9ec06380a87dec1b241ee833d5880d",
+      "local": "6fedb640fdd0700b9c1ca9974bf417b5a43cf58c",
+      "stablePatchId": "53715bd051f54baa6f6753224794fede95a1fcd8",
+      "patchesEqual": true
+    }
+  ],
+  "upstream356Files": [
+    {
+      "path": "docs/content-capability-time-contract.md",
+      "upstreamBlob": "90bf6267c03e01737ac0650b73924e0f138f81cd",
+      "integratedBlob": "90bf6267c03e01737ac0650b73924e0f138f81cd"
+    },
+    {
+      "path": "docs/evidence/runtime-time-20261025/frontend-validation-summary.json",
+      "upstreamBlob": "e936889fafd333d3ba4a567a5ab6638b9025b827",
+      "integratedBlob": "e936889fafd333d3ba4a567a5ab6638b9025b827"
+    },
+    {
+      "path": "docs/evidence/runtime-time-20261025/validation-summary.json",
+      "upstreamBlob": "8fc99a10be762bb5f6f1b79cd299b35d38141c09",
+      "integratedBlob": "8fc99a10be762bb5f6f1b79cd299b35d38141c09"
+    },
+    {
+      "path": "docs/local-survey-development-entry.md",
+      "upstreamBlob": "c2afd58254e2397c142717147a6dd24c9847043e",
+      "integratedBlob": "c2afd58254e2397c142717147a6dd24c9847043e"
+    },
+    {
+      "path": "docs/runtime-validation-contracts.md",
+      "upstreamBlob": "e807a520423c5bdda8b38b4673f199516fb4e048",
+      "integratedBlob": "e807a520423c5bdda8b38b4673f199516fb4e048"
+    },
+    {
+      "path": "server-version/backend/prisma/migrations/20261025040000_content_grant_utc_time/migration.sql",
+      "upstreamBlob": "e95203b676a8184fd01ee2b28c018bf72b50f7c6",
+      "integratedBlob": "e95203b676a8184fd01ee2b28c018bf72b50f7c6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts",
+      "upstreamBlob": "642f98a288d4fc592d7e5c7b8b99e9be931ed0c9",
+      "integratedBlob": "642f98a288d4fc592d7e5c7b8b99e9be931ed0c9"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/content-authority.test.ts",
+      "upstreamBlob": "ba2b0cb580309b9c69db3a84706e24ca978cda65",
+      "integratedBlob": "ba2b0cb580309b9c69db3a84706e24ca978cda65"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/content-grant-time-contract.test.ts",
+      "upstreamBlob": "325311b551272dee3209716ab50cd77cea9f714e",
+      "integratedBlob": "325311b551272dee3209716ab50cd77cea9f714e"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/content-grant-time.postgres.integration.test.ts",
+      "upstreamBlob": "991953850decc1f15a2293162bc801769c8515c9",
+      "integratedBlob": "991953850decc1f15a2293162bc801769c8515c9"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+      "upstreamBlob": "60c518dbcc7de9ee548d20a2236de33e8c676195",
+      "integratedBlob": "60c518dbcc7de9ee548d20a2236de33e8c676195"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/content-authority.repository.ts",
+      "upstreamBlob": "bda772b4295342aac6f39228efd6d960002a8854",
+      "integratedBlob": "bda772b4295342aac6f39228efd6d960002a8854"
+    },
+    {
+      "path": "server-version/backend/src/modules/measurement-content/formal-reference-authority.ts",
+      "upstreamBlob": "7dd35536a1b263cbe4dd76bcf28a22874ceee48b",
+      "integratedBlob": "7dd35536a1b263cbe4dd76bcf28a22874ceee48b"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale-library-governance/authority.ts",
+      "upstreamBlob": "23e8ad51c0c0d1d47b9b0148b65e1db69c3eaa63",
+      "integratedBlob": "23e8ad51c0c0d1d47b9b0148b65e1db69c3eaa63"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/entry-authority.ts",
+      "upstreamBlob": "3d55ed572f282f61a8babe9c5d2cdcb83a31960c",
+      "integratedBlob": "3d55ed572f282f61a8babe9c5d2cdcb83a31960c"
+    },
+    {
+      "path": "server-version/frontend/src/pages/AdminLogin.test.tsx",
+      "upstreamBlob": "9d57a686706d73abd73f04df666bbbd77da04d28",
+      "integratedBlob": "9d57a686706d73abd73f04df666bbbd77da04d28"
+    },
+    {
+      "path": "server-version/frontend/src/product-entry.development.test.ts",
+      "upstreamBlob": "f0839632dea31c1291c6e3ced57edd57e48a581b",
+      "integratedBlob": "f0839632dea31c1291c6e3ced57edd57e48a581b"
+    },
+    {
+      "path": "server-version/frontend/src/product-entry.ts",
+      "upstreamBlob": "97d854d62f65aba24bb36a3cd5c042f6f32fb409",
+      "integratedBlob": "97d854d62f65aba24bb36a3cd5c042f6f32fb409"
+    },
+    {
+      "path": "server-version/frontend/src/products/development-entry.ts",
+      "upstreamBlob": "57e0643f029e3648ad3dccac23dd63a9f2fd2d01",
+      "integratedBlob": "57e0643f029e3648ad3dccac23dd63a9f2fd2d01"
+    },
+    {
+      "path": "server-version/frontend/src/products/origins.development.test.ts",
+      "upstreamBlob": "9d2593055ad4f6186560199d55763192657af197",
+      "integratedBlob": "9d2593055ad4f6186560199d55763192657af197"
+    },
+    {
+      "path": "server-version/frontend/src/products/origins.ts",
+      "upstreamBlob": "b3f152369c0a39b68875dfd9d86655ce15f7430a",
+      "integratedBlob": "b3f152369c0a39b68875dfd9d86655ce15f7430a"
+    }
+  ],
+  "unchanged355OnlyPathsVerified": 137,
+  "overlappingChangedPaths": [],
+  "inheritedEvidence": [
+    {
+      "summary": "docs/evidence/runtime-time-20261025/validation-summary.json",
+      "directInputs": [
+        {
+          "path": "server-version/backend/src/modules/measurement-content/admin-authority.service.ts",
+          "sha256": "e56f33598a157cef45c009ff9159d71dd539962997e9726a39e8d103b46b254f",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/src/modules/measurement-content/content-authority.repository.ts",
+          "sha256": "0ca17d2000286382945e589c2dc2ce2121a0785356e9a0668325bfd754c01313",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/src/modules/measurement-content/formal-reference-authority.ts",
+          "sha256": "23f2250538d1b6bdd887d4beef3841e410927b903cdb6215dc47d9befa89337b",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/src/modules/scale-library-governance/authority.ts",
+          "sha256": "cbdc3fa5a36b2a26fb6324b74006ed6888537d675e88465c1f4a3865bb9b4f1d",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/src/modules/situational/entry-authority.ts",
+          "sha256": "fd9571c64b3d17259c941edb5133ae47ae06b8172bd24b6586367c3ee1f4bd50",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/src/__tests__/measurement-content/content-grant-time.postgres.integration.test.ts",
+          "sha256": "79da7bd2294e29dc583f5ad982d8e6c87ee176bc1aca014537999a9ca7c8ccab",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/prisma/migrations/20261025040000_content_grant_utc_time/migration.sql",
+          "sha256": "2847458653247da107a82260f19f69bc8dd13caa786c4924e50a5f1ede3a0a76",
+          "matches": true
+        },
+        {
+          "path": "server-version/backend/package-lock.json",
+          "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+          "matches": true
+        }
+      ],
+      "status": "direct-inputs-match-only",
+      "limitation": "Not full transitive runtime/environment binding; inherited local results, not current CI or integrated execution."
+    },
+    {
+      "summary": "docs/evidence/runtime-time-20261025/frontend-validation-summary.json",
+      "directInputs": [
+        {
+          "path": "server-version/frontend/src/product-entry.ts",
+          "sha256": "74de6ff88d4b980d88426efbcd77cf3f6922c5464590853a32cb4ed04186a7c8",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/src/product-entry.development.test.ts",
+          "sha256": "db7435a7f4362002f6bb5b5c81dd064387ef4096068b8ac5f897e8192c3f810f",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/src/products/development-entry.ts",
+          "sha256": "dbebf41646f94bd6e52ec191176694e6150cae02ec961c560c05c077566ed72a",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/src/products/origins.ts",
+          "sha256": "94eed0ccb129c808a7e7f2d7a9ffba74618a431271668f1db2d5588bfcb33e44",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/src/products/origins.development.test.ts",
+          "sha256": "c0976121b72f854a8ca5160d33fe5116a75c2ebf6deaa53d6ee059f5045dd300",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/src/pages/AdminLogin.test.tsx",
+          "sha256": "aab4d3e1ba400adc23c924ca11203437688f075640a01ac526fee4528685b9ca",
+          "matches": true
+        },
+        {
+          "path": "docs/local-survey-development-entry.md",
+          "sha256": "5065c58ad555975f1aed04f1b79db0ef16ff94ccc412b6b970059aa45c8a0d82",
+          "matches": true
+        },
+        {
+          "path": "server-version/frontend/package-lock.json",
+          "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+          "matches": true
+        }
+      ],
+      "status": "direct-inputs-match-only",
+      "limitation": "Not full transitive runtime/environment binding; inherited local results, not current CI or integrated execution."
+    }
+  ],
+  "githubObserved": {
+    "355": {
+      "state": "open",
+      "head": "6c9745fd010d32c719946ca6d2dcd65e64d7828e",
+      "merged": false,
+      "mergeableState": "blocked"
+    },
+    "356": {
+      "state": "open",
+      "head": "0d2e417d1f9ec06380a87dec1b241ee833d5880d",
+      "merged": false,
+      "draft": true,
+      "commits": 3,
+      "mergeableState": "blocked"
+    }
+  },
+  "runtimeChecksRun": [],
+  "operationsNotPerformed": [
+    "push",
+    "workflow dispatch",
+    "PR merge",
+    "production deploy",
+    "database install/publish/trial"
+  ],
+  "notes": [
+    "Suggested work/... branch collided with the existing local branch work; use tool-onboarding-next-20261025.",
+    "Initial failed branch switch left index/worktree exactly equal to #355 candidate while HEAD remained work. The following cherry-pick refused before applying a patch. Verified index tree dc90ab8b2b1a9150ae965a8a7b97b787055a222c, no unstaged/untracked changes; quit the unstarted sequencer then switched to the independent branch. Existing work ref preserved.",
+    "No .agents/skills present in checkout/candidate or /workspace/.agents; no repository skill files were found."
+  ]
+}

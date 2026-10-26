@@ -1,3 +1,5 @@
+import { registeredSelfAuthoredSourceProof } from '../onboarding/self-authored'
+import {scaleEntryClassificationTags,matchesCatalogDiscovery} from './catalog-discovery'
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
@@ -57,6 +59,7 @@ export interface ScaleLibraryReadModelContext {
 
 export interface ScaleLibraryFilterInput {
   keyword?: string
+  tags?: readonly string[]
   instrumentFamily?: string
   primaryDomain?: ConstructDomain
   secondaryDomain?: ConstructDomain
@@ -93,7 +96,7 @@ export interface ScaleLibraryLocalizationSummary {
 }
 
 export interface ScaleLibraryRightsSummary {
-  status: 'NOT_EVALUATED' | 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
+  status: 'NOT_EVALUATED' | 'SELF_AUTHORED' | 'APPROVED' | 'EVIDENCE_PENDING' | 'NOT_GRANTED' | 'SCOPE_MISMATCH' | 'INELIGIBLE'
   commercialNature: InstrumentAuthorizationRecordV1['scope']['commercialNature']
   locales: string[]
   territories: string[]
@@ -182,7 +185,6 @@ const bindingKey = (instrumentKey: string, instrumentVersion: string): string =>
 
 const unique = (values: string[]): string[] => [...new Set(values)]
 
-const normalizeText = (value: string): string => value.trim().toLocaleLowerCase()
 
 const deploymentForKey = (
   deployments: readonly ScaleLibraryDeploymentRecord[],
@@ -191,7 +193,8 @@ const deploymentForKey = (
   deployment.code === pkg.key && deployment.instrumentVersion === pkg.instrumentVersion
 ))
 
-const summarizeRights = (): ScaleLibraryRightsSummary => ({
+/** Copyright permissions are not evaluated or represented as approved. */
+const summarizeRights = (): ScaleLibraryEntry['rights'] => ({
   status: 'NOT_EVALUATED', commercialNature: 'UNSPECIFIED', locales: [], territories: [],
 })
 
@@ -210,7 +213,12 @@ const summarizeGateReason = (input: {
   const deploymentPublished = input.deployment?.status === 'PUBLISHED'
 
   if (input.pkg.releaseStatus === 'RETIRED') reasons.push('量表包已退役。')
-  if (input.manifest.catalogStatus !== 'ACCEPTED') reasons.push('目录记录尚未完成治理审核。')
+  // Authored source review remains REVIEWED/PILOT; explicit product publication
+  // is not an assertion of new psychometric evidence or external expert review.
+  const publishedAuthored = deploymentPublished && input.pkg.releaseStatus === 'PUBLISHED'
+    && input.manifest.catalogStatus === 'REVIEWED' && Boolean(registeredSelfAuthoredSourceProof(input.pkg.key, input.pkg.instrumentVersion))
+  if (input.manifest.catalogStatus !== 'ACCEPTED' && !publishedAuthored) reasons.push('目录记录尚未完成治理审核。')
+  if (publishedAuthored && input.deployment?.visibility === 'HIDDEN') reasons.push('已正式发布；具体投放及用户使用权限须另行核验。')
   if (!targetLocaleMatches) reasons.push(`当前内容语言为 ${input.localization.targetLocale}，不提供 ${input.locale} 版本。`)
   if (!respondentMatches) reasons.push('当前作答者类型不在该量表的适用范围内。')
   if (!input.deployment) reasons.push('当前环境尚无已发布的可启动量表部署。')
@@ -388,18 +396,18 @@ export const filterScaleLibraryEntries = (
   entries: readonly ScaleLibraryEntry[],
   filters: ScaleLibraryFilterInput = {},
 ): ScaleLibraryEntry[] => {
-  const keyword = filters.keyword ? normalizeText(filters.keyword) : undefined
   return entries.filter((entry) => {
-    if (keyword) {
-      const haystack = normalizeText([
+    if (filters.keyword || filters.tags?.length) {
+      const matches = matchesCatalogDiscovery([
         entry.identity.canonicalName,
         entry.identity.abbreviation ?? '',
         entry.identity.instrumentFamily ?? '',
         entry.construct.primaryDomain,
         entry.construct.constructDefinition,
         entry.source.title ?? '',
-      ].join(' '))
-      if (!haystack.includes(keyword)) return false
+        entry.identity.instrumentKey,
+      ], scaleEntryClassificationTags(entry), filters)
+      if (!matches) return false
     }
     if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false
     if (filters.primaryDomain && entry.construct.primaryDomain !== filters.primaryDomain) return false

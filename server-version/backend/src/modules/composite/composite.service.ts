@@ -11,13 +11,14 @@ import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
 import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
 import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
+import {verifyStoredTrainingStandardItem,freezeTrainingStandardScaleRuntime,trainingStandardCombinationSummary} from './training-standard-combination'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
+import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers, type VerifiedTrainingFlowMaterialization } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
@@ -100,6 +101,7 @@ import {
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
+import { resolveFrozenScaleInstructionForScale } from '../scale/onboarding/instrument-registry'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
 import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
@@ -281,6 +283,7 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
                     code: true,
                     name: true,
                     description: true,
+                    instruction: true,
                     instrumentClass: true,
                     instrumentVersion: true,
                     definition: true,
@@ -590,6 +593,7 @@ export const assertValidItem = async (
   prisma: Db = defaultPrisma,
   situationalReleases?: Map<string, ResolvedSituationalRelease>,
 ) => {
+  if(input.standardCombination)throw compositeBadRequest('批准组合请选择 Training 课程问卷的精确来源入口')
   if ((input as any).formPolicy != null && composite.productKind !== 'QUESTIONNAIRE') throw compositeBadRequest('Form V3 只支持新版普通问卷')
   if (input.required === false && input.type !== 'FORM') {
     throw compositeBadRequest('只有表单字段可以设置为选填')
@@ -680,6 +684,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
   position: item.position,
   required: item.required,
   scale: item.scale ? { id: item.scale.id, code: item.scale.code, name: packageSlotLabels.get(item.position) ?? item.scale.name } : null,
+  ...(item.standardCombinationSource!=null?{standardCombinationSummary:trainingStandardCombinationSummary(item.standardCombinationSource)}:{}),
   cognitiveAssignment: item.cognitiveAssignment
     ? {
         id: item.cognitiveAssignment.id,
@@ -1930,7 +1935,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
-export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
+export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>,standardMode:'PREVIEW'|'PUBLISH'='PREVIEW') => {
   assertTeacher(role)
   // Publish validates, it never repairs. The write-time invariant guarantees
   // every FORM module is sectioned on create/copy/import, so a published
@@ -2132,7 +2137,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
   let content = composite.items.some((item:any)=>item.type!=='FORM')
-    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases) : null
+    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases,'NEW_ADMINISTRATION',standardMode) : null
   if(composite.trainingReportSelectionDraft!=null||composite.trainingReferenceSelectionDraft!=null){
     if(!content||!composite.createdBy)throw compositeBadRequest('报告选择缺少测量来源')
     const expiry=await assertCurrentTrainingContentOwner(prisma as Prisma.TransactionClient,{userId},composite)
@@ -2150,10 +2155,15 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
-  const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational)
+  const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational,'PUBLISH')
   const publicationSource=await loadComposite(id,true,db)
-  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
+  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId))
   await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
+  // Shared P/R insertion or material locks may have waited past expiry. Repeat
+  // CURRENT exact use/deployment rights after those waits, immediately before
+  // publication; only immutable source bodies can be reused in this transaction.
+  for(const item of publicationSource.items)if(item.standardCombinationSource!=null)
+    await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,publicationSource,item)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -2483,7 +2493,9 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes) => {
+const createChildRecords = async (db: Db, attempt: any, composite: {productKind:string}, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>, prepared?: PreparedVariantRuntimes, verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization) => {
+  // Prisma create/findUnique parent rows contain scalar fields only. Product
+  // policy comes from the caller's already-loaded server-owned composite.
   // A composition may reference several sources in different orders. Always
   // acquire their locks in the same order to avoid cross-composition deadlocks.
   if (userId && !prepared) {
@@ -2515,9 +2527,14 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
             instrumentVersion: item.scale.instrumentVersion,
             definition: frozenDatabaseScaleDefinition(item.scale),
             requestedMode: 'COMPOSITE',
+            instruction: resolveFrozenScaleInstructionForScale(item.scale),
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
+      // Match the existing parent START boundary for education organization resources.
+      if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],[item.scaleId!])
+      else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!],{compositeAttemptId:attempt.id,compositeItemIds:[item.id],
+        ...(verifiedFlowMaterialization?{verifiedFlowMaterialization,compositeAttemptEpoch:attempt.attemptEpoch}:{})})
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2664,7 +2681,7 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
     if(!snapshot||snapshot.definitionHash!==release.snapshot.definitionHash||snapshot.compiledRuntimeHash!==release.snapshot.compiledRuntimeHash)throw compositeForbidden('情境工具冻结身份不匹配')
     releases.set(situationalReleaseKey(situationalItemIdentity(item)),{...release,snapshot})
   }
-  const runtime=await createChildRecords(tx,parent,[item],parent.userId,composite.formSections,releases,prepared)
+  const runtime=await createChildRecords(tx,parent,composite,[item],parent.userId,composite.formSections,releases,prepared,item.type==='SCALE'?verified!:undefined)
   const created=freezeCompositeActiveSlotSet({...runtime,attemptEpoch:parent.attemptEpoch,formSections:[]})
   const expected=flow.frozenSlots.slots.find(s=>s.sourceBinding.compositeItemId===item.id)
   if(created.slots.length!==1||canonicalHash(created.slots[0])!==canonicalHash(expected))throw compositeForbidden('实际准入与冻结候选不一致')
@@ -2816,7 +2833,8 @@ const createAttempt = async (
     if(!userId)composite={...composite,deliveryCourseId:composite.questionnaireCourses[0].courseId}
   }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
-  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const hasStandardCombinations=composite.items.some((item:any)=>item.standardCombinationSource!=null)
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled||hasStandardCombinations) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2841,9 +2859,12 @@ const createAttempt = async (
   if (prepared) {
     try {
     for (const item of composite.items) {
-      if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
+      if (item.type === 'SCALE'&&item.standardCombinationSource!=null)prepared.scales.set(item.id,await freezeTrainingStandardScaleRuntime(db as Prisma.TransactionClient,
+        await verifyStoredTrainingStandardItem(db as Prisma.TransactionClient,composite,item,'COLLECTION')))
+      else if (item.type === 'SCALE') prepared.scales.set(item.id, await freezeScaleRuntimeAtAttemptStart(db, {
         instrumentKey:item.scale.code,instrumentVersion:item.scale.instrumentVersion,
         definition:frozenDatabaseScaleDefinition(item.scale),requestedMode:'COMPOSITE',
+        instruction:resolveFrozenScaleInstructionForScale(item.scale),
       }))
       if (item.type === 'COGNITIVE') {
         assertCognitiveModuleEnabled()
@@ -2940,7 +2961,14 @@ const createAttempt = async (
   // shared emergency-stop/identity lock applies, never Training entry policies.
   const collectionScaleIds=composite.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId)
   if(composite.productKind==='ORGANIZATION_RESOURCE')await assertScaleLibraryCollectionAllowed(db as Prisma.TransactionClient,[],collectionScaleIds)
-  else await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,collectionScaleIds,composite.createdBy)
+  else {
+    // Explicit product decision: exact C/P/R combinations carry their own
+    // Training entry approval. contentCandidate already revalidated each such
+    // item, its current use, source/deployment identity and shared stop locks.
+    // Filter at item level so a native item sharing the Scale cannot borrow it.
+    const nativeScaleIds=composite.items.filter((item:any)=>item.type==='SCALE'&&item.standardCombinationSource==null).map((item:any)=>item.scaleId)
+    await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient,nativeScaleIds,{sourceOwnerId:composite.createdBy})
+  }
   const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
     units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({
@@ -2997,7 +3025,7 @@ const createAttempt = async (
   }
   const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
-  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite.items, userId, formSections, situationalReleases, prepared)
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite, composite.items, userId, formSections, situationalReleases, prepared)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
@@ -3980,7 +4008,7 @@ const getUnifiedCompositeAttemptState = async (
         scale: {
           id: item.scale.id,
           name: packageSlotLabels.get(item.position) ?? item.scale.name,
-          instruction: item.scale.instruction ?? null,
+          instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : item.scale.instruction ?? null,
           description: item.scale.description ?? null,
           instrumentVersion: item.scale.instrumentVersion,
           definition: runnerDefinition(runtime.definition),

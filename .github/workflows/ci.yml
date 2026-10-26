@@ -122,7 +122,7 @@ jobs:
         run: throw new Error('Known Survey Mac candidate has no manual full/probe qualification; await independent tools review and explicit PR/CI authorization.');
 
   probe-frontend-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe))) }}
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -130,19 +130,19 @@ jobs:
       ui_runner_labels: '["ubuntu-24.04"]'
 
   probe-browser-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe))) }}
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend')) }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend-regression:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe))) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -150,14 +150,14 @@ jobs:
 
   probe-browser:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser')) }}
     uses: ./.github/workflows/ci-browser.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-media:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media')) }}
     uses: ./.github/workflows/ci-media.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -166,7 +166,7 @@ jobs:
 
   probe-ui-mac:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui')) }}
     strategy:
       fail-fast: false
       matrix:
@@ -181,7 +181,7 @@ jobs:
 
   probe-qa-ui:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui')) }}
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -191,7 +191,7 @@ jobs:
 
   probe-ui-hosted:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium')) }}
     strategy:
       fail-fast: false
       matrix:
@@ -205,27 +205,27 @@ jobs:
       qa_round3: true
 
   probe-maintenance:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance')) }}
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-ops:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops')) }}
     uses: ./.github/workflows/ops-prelaunch.yml
 
   probe-perf:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf')) }}
     uses: ./.github/workflows/perf-phase0-smoke.yml
 
   probe-images:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images')) }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ inputs.probe_frontend_only }}
 
   probe-cognitive:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive')) }}
     # Inline the unchanged diagnostic job to keep reusable references at GitHub's limit.
     permissions:
       contents: read
@@ -257,14 +257,14 @@ jobs:
 
   probe-frontend:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend')) }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   scope:
     name: classify changed content
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
@@ -2057,7 +2057,7 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [scope, survey-governance, training-polish, sjt-native, survey-review, training-entry, training-teacher-management, training-admin-integration, participant-capacity, survey-assessment, training-manual-ui, survey-manual-ui, training-assessment, school-teacher-visual, participant-access, shared-authoring, school-teacher, survey-cloud, admin-authenticator, training-appearance, survey-workspace, survey-experience, scale-library-governance, composite-csv-memory, training-workspace, exact-candidate, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, assessment-capacity, access-efficiency, backend-security-efficiency, shared-asset-storage, survey-candidate, reviewed-candidate, survey-mac-ui, release-tools, campus, teacher-home, survey-home, teacher-survey]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
@@ -2114,3 +2114,366 @@ jobs:
           path: training-completion.json
           retention-days: 3
           if-no-files-found: error
+
+  pr356-source:
+    name: PR356 / immutable candidate
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify official head, base and complete product diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR356_STEP_PROBE: ${{ inputs.step_probe }}
+          PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance }}
+          PR356_COMPLETE_TRAINING: ${{ inputs.complete_training }}
+        run: |
+          mkdir -p pr356-evidence
+          node .github/scripts/pr356-scope.mjs > pr356-evidence/candidate.json
+          node .github/scripts/pr356-evidence.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr356-source-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pr356-evidence/
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-audit:
+    name: PR356 / locked dependency audit
+    needs: pr356-source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: python3 .github/scripts/pr356-qualification.py audits
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr356-audits-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pr356-evidence/
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-database:
+    name: PR356 / upgrade restore and unfinished receipt journeys
+    needs: pr356-source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+          - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+          - 56380:6379
+    env:
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      PR356_EVIDENCE_DIR: ${{ github.workspace }}/pr356-evidence
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: install native build requirements from signed Ubuntu sources
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+      - name: install locked backend dependencies with normal lifecycle
+        working-directory: server-version/backend
+        run: npm ci
+      - name: run missing upgrade restore and current-source full receipt cases
+        env:
+          PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: python3 .github/scripts/pr356-qualification.py database
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr356-database-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            pr356-evidence/
+            !pr356-evidence/*.dump
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-images:
+    name: PR356 / build each affected production component once
+    needs: pr356-source
+    outputs:
+      images_artifact_id: ${{ steps.images-upload.outputs.artifact-id }}
+      dist_artifact_id: ${{ steps.dist-upload.outputs.artifact-id }}
+      images_artifact_name: ${{ steps.producer.outputs.images }}
+      dist_artifact_name: ${{ steps.producer.outputs.dist }}
+      producer_run: ${{ steps.producer.outputs.run }}
+      producer_head: ${{ steps.producer.outputs.head }}
+      producer_attempt: ${{ steps.producer.outputs.attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - name: bind the actual producer attempt
+        id: producer
+        run: |
+          echo "run=$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          echo "attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+          echo "images=pr356-images-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+          echo "dist=pr356-dist-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
+      - name: compile and retain backend worker and frontend images
+        run: python3 .github/scripts/pr356-qualification.py images
+      - uses: actions/upload-artifact@v4
+        id: images-upload
+        if: always()
+        with:
+          name: pr356-images-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            pr356-evidence/
+            !pr356-evidence/dist/**
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        id: dist-upload
+        if: success()
+        with:
+          name: pr356-dist-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            pr356-evidence/dist/
+            pr356-evidence/frontend-dist.json
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-image-security:
+    name: PR356 / scan retained runtime images
+    needs: pr356-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: require exact original producer artifact input
+        env:
+          PR356_ARTIFACT_KIND: images
+          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.images_artifact_name }}
+          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.images_artifact_id }}
+          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
+          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
+          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+        shell: python
+        run: |
+          import os,re
+          e=os.environ
+          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
+          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
+          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
+          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
+          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
+          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
+          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
+          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.pr356-images.outputs.images_artifact_name }}
+          path: pr356-evidence
+      - name: load original producer bytes without rebuilding
+        id: runtime-load
+        env:
+          SOURCE_HEAD: ${{ github.sha }}
+          PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+        run: |
+          python3 - <<'PYCODE'
+          import json,hashlib,os
+          from pathlib import Path
+          for c in ['backend','frontend']:
+              proof=json.loads(Path('pr356-evidence/'+c+'-archive.json').read_text())
+              assert proof['sourceHead']==os.environ['SOURCE_HEAD'] and proof['run']==os.environ['GITHUB_RUN_ID']
+              assert proof['tag']=='pr356-'+c+':'+os.environ['SOURCE_HEAD']
+              assert proof['attempt']==os.environ['PRODUCER_ATTEMPT']
+              with Path('pr356-evidence/'+c+'.tar').open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==proof['sha256']
+          PYCODE
+          docker load --input pr356-evidence/backend.tar
+          docker load --input pr356-evidence/frontend.tar
+          docker run --rm --network none --entrypoint node "pr356-backend:$SOURCE_HEAD" -e "require('canvas');require('sharp');if(!require('fs').existsSync('/app/dist/workers/main.js'))throw Error('Missing worker runtime');console.log('Native modules and worker entry present')"
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan backend and worker runtime
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: pr356-backend:${{ github.sha }}
+          format: json
+          output: pr356-evidence/backend-trivy.json
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          skip-setup-trivy: true
+      - name: scan frontend runtime
+        if: ${{ !cancelled() && steps.runtime-load.outcome == 'success' }}
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: pr356-frontend:${{ github.sha }}
+          format: json
+          output: pr356-evidence/frontend-trivy.json
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          skip-setup-trivy: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr356-runtime-scans-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pr356-evidence/*trivy.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  pr356-browser:
+    name: PR356 / same-image onboarding browser
+    needs: pr356-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PR356_EVIDENCE_DIR: pr356-evidence
+      CI_SOURCE_HEAD: ${{ github.sha }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: require exact original producer artifact input
+        env:
+          PR356_ARTIFACT_KIND: dist
+          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.dist_artifact_name }}
+          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.dist_artifact_id }}
+          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
+          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
+          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+        shell: python
+        run: |
+          import os,re
+          e=os.environ
+          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
+          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
+          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
+          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
+          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
+          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
+          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
+          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.pr356-images.outputs.dist_artifact_name }}
+          path: pr356-evidence
+      - name: prepare pinned browser tools from official sources
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: verify secure Chromium status paging and distinct lifecycle states
+        run: node .github/scripts/pr356-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr356-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            pr356-evidence/*.json
+            pr356-evidence/*.png
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-codeql:
+    name: PR356 / CodeQL (${{ matrix.language }})
+    needs: pr356-source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, python]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+          ram: 3500
+          threads: 2
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: pr356/${{ matrix.language }}
+          # Same repository setting as the established main CodeQL job: analysis
+          # runs locally and SARIF is retained without unavailable endpoint upload.
+          upload: never
+          upload-database: false
+          output: pr356-evidence/codeql-${{ matrix.language }}
+      - name: retain actual language analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr356-codeql-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pr356-evidence/codeql-${{ matrix.language }}/*.sarif
+          if-no-files-found: error
+          retention-days: 7
+
+  pr356-result:
+    name: PR356 / affected qualification (no merge eligibility)
+    needs: [pr356-source, pr356-audit, pr356-database, pr356-images, pr356-image-security, pr356-browser, pr356-codeql]
+    if: always() && github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: require actual success for every selected job
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        shell: node {0}
+        run: |
+          const fs=require('node:fs'),jobs=JSON.parse(process.env.RESULTS);
+          const bad=Object.entries(jobs).filter(([,v])=>v.result!=='success');
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,JSON.stringify({qualification:'PR356 affected fixes',jobs,mergeEligible:false,contentAcceptance:'HOLD/NOTRUN preserved',productionDeployment:false},null,2));
+          if(bad.length)throw Error('Missing/failed/skipped/cancelled selected qualification: '+bad.map(([k,v])=>k+':'+v.result).join(', '));

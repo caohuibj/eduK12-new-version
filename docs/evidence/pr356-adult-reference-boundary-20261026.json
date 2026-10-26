@@ -1,0 +1,36 @@
+{
+  "kind": "recorded-local-development-results",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "base": "36d4c4183709699b42d6f9796eb071c97231142f",
+  "contentReferenceCommit": "7330038efbea8778541a42a5d90188a8879a98b9",
+  "recordedAt": "2026-10-26T01:58:11.309695+00:00",
+  "reports": [
+    {
+      "file": "contracts.json",
+      "sha256": "7d27b6901db149fa87bc195b47a1a9599db7e9586ac93fcb822a79ce4d9b8d2b",
+      "success": true,
+      "numPassedTests": 24,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "dossier-final.json",
+      "sha256": "86ea01349580110e6055cb7aa1d8e406d2da3c51ce6465da566f9f43e647f599",
+      "success": true,
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 10
+    }
+  ],
+  "sourceSnapshotRecordedAfterExecution": {
+    "server-version/backend/src/modules/assessment-reference/reference.ts": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "b04825206d508d8e1ee27fba7acc3410fbd3313c235770ba8863c01c268e3966",
+    "server-version/backend/src/__tests__/scale/adult-reference-onboarding.test.ts": "5c70774dfd594af41ae4787ff9737368de76306492874cb3a495d471ef52150a"
+  },
+  "limits": [
+    "Synthetic scope fixtures are not registered instruments or adult scientific evidence.",
+    "24 contracts passed in the initial run; only the two affected dossier cases were rerun after adding the raw-envelope rejection.",
+    "Source hashes were recorded after execution; no formal CI, source publication, scientific approval or deployment is claimed."
+  ]
+}

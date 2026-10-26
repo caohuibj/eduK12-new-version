@@ -1,0 +1,306 @@
+{
+  "purpose": "PR356 pre-merge CI preparation; not CI execution or activation approval",
+  "createdAt": "2026-10-26T03:56:16.870226+00:00",
+  "targetId": "PR356-merge-qualification",
+  "formalRuns": 0,
+  "formalFailedRounds": 0,
+  "candidate": {
+    "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+    "head": "d0dd0ca983c1364c73de6ff423296b20c6077060",
+    "tree": "7ae431b14112a1a2fe76985e04e8f62e839d43da",
+    "rawDiffSha256": "fc656ea349a452481ff579b87cb2c3d700abeeae63f52a9841a2b53e01fd40da",
+    "files": 314,
+    "added": 22652,
+    "deleted": 2356,
+    "groupCounts": {
+      "backend_modules": 114,
+      "backend_tests": 54,
+      "database": 8,
+      "frontend": 39,
+      "docs": 93,
+      "ci": 0
+    }
+  },
+  "mergePreview": {
+    "sha": "86173a6312760cd4ad3aef37d109c083e857c96f",
+    "parents": [
+      "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+      "d0dd0ca983c1364c73de6ff423296b20c6077060"
+    ],
+    "tree": "7ae431b14112a1a2fe76985e04e8f62e839d43da",
+    "sameTreeAsProductHead": true
+  },
+  "notion": {
+    "pageId": "404d2763-5a38-8186-ac80-de3593da05a5",
+    "title": "CI 常见错误清单",
+    "url": "https://app.notion.com/p/404d27635a388186ac80de3593da05a5",
+    "pageLastEditedAt": "2026-10-25T11:23:36.298Z",
+    "writtenThisTurn": false,
+    "writePolicy": "On a later actual CI failure, append the exact run/SHA/root cause/fix/evidence/next checklist to the same page before reactivation; preserve original history and owner. No fabricated CI incident."
+  },
+  "inputBindings": [
+    {
+      "path": "server-version/backend/package.json",
+      "base": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "head": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "same": true
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "base": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "head": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "same": true
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "base": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+      "head": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+      "same": true
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "base": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "head": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "same": true
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "base": "a30f925de8f8415a296439927dee6b2cec1e0fe3",
+      "head": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb",
+      "same": false
+    },
+    {
+      "path": ".github",
+      "base": "200d3d182758f3db67ccaf285698c6dde73d22cf",
+      "head": "200d3d182758f3db67ccaf285698c6dde73d22cf",
+      "same": true
+    },
+    {
+      "path": "AGENTS.md",
+      "base": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+      "head": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+      "same": true
+    },
+    {
+      "path": "docs/release/README.md",
+      "base": "70bd4031b5ac1ec23bff6650ba825d9b9d9e5a37",
+      "head": "70bd4031b5ac1ec23bff6650ba825d9b9d9e5a37",
+      "same": true
+    }
+  ],
+  "actualRequiredRules": [
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "caohuibj/eduK12-new-version",
+      "ruleset_id": 23665026
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "caohuibj/eduK12-new-version",
+      "ruleset_id": 23665026
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "require_extra_approval_for_unattributed_changes": false,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "caohuibj/eduK12-new-version",
+      "ruleset_id": 23665026
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "merge gate / ready PR",
+            "integration_id": 15368
+          }
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "caohuibj/eduK12-new-version",
+      "ruleset_id": 23665026
+    }
+  ],
+  "readOnlyRouter": {
+    "scenario": "platform",
+    "application_route": "legacy",
+    "run_performance_tests": true,
+    "media_selection": "[\"media2\",\"video_core\",\"media7\",\"situational_video\",\"situational_branching\"]",
+    "codeql": true,
+    "app_shell": true,
+    "canonical_visual": true,
+    "perf_smoke": true,
+    "ops": true
+  },
+  "suiteOptinWiring": [
+    {
+      "file": "server-version/backend/src/__tests__/measurement-content/content-grant-time.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "CONTENT_GRANT_TIME_TEST_DATABASE_URL",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "DOT356_STANDARD_VERTICAL",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/measurement-content/training-receipt-recovery.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "PR356_RECEIPT_RECOVERY_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/measurement-content/training-standard-connected.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "TRAINING_STANDARD_SQL_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/scale/bibliography-axis.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "PR356_BIBLIOGRAPHY_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/catalog-discovery.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "LIBRARY_DISCOVERY_TEST_DATABASE_URL",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/catalog-instruction.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "PR356_INSTRUCTION_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/library-management.http.integration.test.ts",
+      "flags": [
+        {
+          "name": "LIBRARY_MANAGEMENT_HTTP_ISOLATED",
+          "mentionedInWorkflows": false
+        },
+        {
+          "name": "LIBRARY_MANAGEMENT_HTTP_TEST_DATABASE_URL",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/onboarding-pagination.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "PR356_STATUS_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/standard-approval-scope.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "PR356_APPROVAL_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+      "flags": [
+        {
+          "name": "SURVEY_TRIPLET_ISOLATED",
+          "mentionedInWorkflows": false
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "router",
+      "exitCode": 0,
+      "path": "/workspace/scratch/pr356-ci-preparation-20261026/router.stdout",
+      "sha256": "7f86657ba3a971d92732e3f3cf9d188a7d950cf3d69544e848f97f70638e6f17",
+      "scope": "planning/static inventory only"
+    },
+    {
+      "name": "final-routes-correct-entry",
+      "exitCode": 0,
+      "path": "/workspace/scratch/pr356-ci-preparation-20261026/final-routes-correct-entry.log",
+      "sha256": "b3b8fb447450b1d5c7925818c78279e278d55223c5fad1907be9f54a539d49a8",
+      "scope": "planning/static inventory only"
+    },
+    {
+      "name": "frontend-routes",
+      "exitCode": 0,
+      "path": "/workspace/scratch/pr356-ci-preparation-20261026/frontend-routes.log",
+      "sha256": "a7c66eb95e0e69bee0818134b42c2d3b4ae9b0513606ab64a25b6d5625e7550e",
+      "scope": "planning/static inventory only"
+    }
+  ],
+  "decision": "DO_NOT_ACTIVATE_YET",
+  "blockingPreparationItems": [
+    "Current router selects legacy/full platform, including unrelated media/performance/Ops",
+    "No PR356 exact evidence-admission or explicit missing-suite lane has been reviewed/wired",
+    "Eleven changed isolated suites need per-suite opt-in/fixture/guard/non-skipping reporter decisions",
+    "Changed Python generators are outside the current platform default JS/TS CodeQL language choice",
+    "Original content/HOLD/P0/baseline merge scope and independent candidate review remain open",
+    "A single supported activation event and final exact head/merge tree must be frozen before activation"
+  ],
+  "priorLocalEvidenceIndex": "docs/evidence/pr356-review-fixes-20261026.json",
+  "notes": [
+    "Preparation documentation and AGENTS updates are a later commit, with identical backend/frontend application trees. Re-read final source/head/tree before actual activation.",
+    "Prior local application checks are not relabelled official CI or automatically accepted. Empty type logs alone are not cross-node execution proof; no retroactive signatures.",
+    "The initial route-inventory invocation accidentally used a relocation-only test fixture and failed ENOENT; the actual maintained checker passed. This is a local preparation error, not a CI incident."
+  ],
+  "notExecuted": [
+    "CI dispatch",
+    "ready_for_review transition",
+    "application tests repeated",
+    "production build/scan",
+    "stress/full regression",
+    "production database",
+    "merge",
+    "deployment",
+    "Notion incident append"
+  ]
+}

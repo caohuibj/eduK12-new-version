@@ -5,7 +5,7 @@ export interface ReferenceGovernanceV1 {
   kind: 'THEORETICAL_RANGE' | 'LOCAL_PILOT' | 'LOCAL_REFERENCE' | 'MULTISITE_REFERENCE' | 'VALIDATED_NORM' | 'CRITERION'
   measurementHash: string
   subjectKey: string
-  schoolStage: 'junior_secondary' | 'upper_secondary'
+  schoolStage: 'junior_secondary' | 'upper_secondary' | 'adult'
   locale: string
   populationKey: string
   effectiveFrom: string
@@ -32,8 +32,20 @@ export function validateReferenceGovernance(entry: Partial<AssessmentReferenceEn
   if (g.schemaVersion !== 1 || !['THEORETICAL_RANGE','LOCAL_PILOT','LOCAL_REFERENCE','MULTISITE_REFERENCE','VALIDATED_NORM','CRITERION'].includes(g.kind)) errors.push('REFERENCE_KIND_INVALID')
   if (![g.subjectKey,g.locale,g.populationKey,g.sourceDataset,g.sourceSnapshot,g.effectiveFrom].every(text) || !Number.isFinite(Date.parse(g.effectiveFrom))) errors.push('REFERENCE_PROVENANCE_REQUIRED')
   if(typeof g.crossStageReReferenceAllowed!=='boolean') errors.push('REFERENCE_CROSS_STAGE_DECISION_REQUIRED')
-  const grades = g.schoolStage === 'junior_secondary' ? ['7','8','9'] : g.schoolStage === 'upper_secondary' ? ['10','11','12'] : []
-  if (!grades.length || JSON.stringify(entry.population?.match?.gradeLevels) !== JSON.stringify(grades) || entry.population?.language !== g.locale) errors.push('REFERENCE_POPULATION_IDENTITY_INVALID')
+  // Adult references carry an explicit age-window population identity; they
+  // never borrow school grades, and cross-stage re-referencing stays a
+  // school-stage-only concept.
+  if (g.schoolStage === 'adult') {
+    const match = entry.population?.match
+    const min = match?.minAgeMonthsInclusive, max = match?.maxAgeMonthsExclusive
+    if ((match?.gradeLevels?.length ?? 0) > 0
+      || !Number.isInteger(min) || !Number.isInteger(max) || (min as number) < 216 || (max as number) > 1440 || (min as number) >= (max as number)
+      || entry.population?.language !== g.locale) errors.push('REFERENCE_POPULATION_IDENTITY_INVALID')
+    if (g.crossStageReReferenceAllowed === true) errors.push('ADULT_CROSS_STAGE_FORBIDDEN')
+  } else {
+    const grades = g.schoolStage === 'junior_secondary' ? ['7','8','9'] : g.schoolStage === 'upper_secondary' ? ['10','11','12'] : []
+    if (!grades.length || JSON.stringify(entry.population?.match?.gradeLevels) !== JSON.stringify(grades) || entry.population?.language !== g.locale) errors.push('REFERENCE_POPULATION_IDENTITY_INVALID')
+  }
   const bands = g.bands
   if (!g.scoreRange || !Number.isFinite(g.scoreRange.min) || !Number.isFinite(g.scoreRange.max) || g.scoreRange.min >= g.scoreRange.max) return [...errors, 'REFERENCE_RANGE_INVALID']
   // Empirical intervals are optional; no universal count or per-band sample quota.

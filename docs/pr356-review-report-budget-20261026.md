@@ -1,0 +1,5 @@
+# PR356 review: explicit report budget format
+
+Removed the unverified 2026-10-25 midnight cutoff. New package artifacts use plaintext schemaVersion 2 / budgetVersion 1, bind that format in the existing report hash, and store budget_version=1 for ciphertext preflight. The additive nullable column has no default or backfill: all existing rows retain NULL and original integrity checks/readability regardless of creation time. Unknown versions, inconsistent format markers, tampered hashes and changed source FINAL remain refused. Existing append-only protection also covers the marker.
+
+Local checks: report read/worst-case budget 15/15, additional real writer-to-reader contract 1/1; isolated schema upgrade and PostgreSQL NULL/default, supported-version CHECK and append-only marker protection passed. Existing rows were not modified. Evidence: `/workspace/scratch/pr356-review-history/` (`test.json`, `writer.json`, `migration.log`, `schema.log`). No full regression, formal CI, production DB, merge or deployment. This migration must accompany the new application code; node template was preserved and only a new isolated DB was upgraded.

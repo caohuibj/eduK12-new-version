@@ -1,0 +1,1217 @@
+{
+  "recordedAt": "2026-10-25T06:04:53.149226+00:00",
+  "kind": "isolated-contract-checkpoint-not-ci-http-db-or-training-delivery-qualification",
+  "baseCommit": "e9e66fd6b41e55f398006fd1f2d9f64d8371b668",
+  "codeCommit": "be67440f52dba90576e3640a8d3987ae5b7d7c19",
+  "codeTree": "fa6f5fd568fe309b9fe9913343f5a471ca2d3c8b",
+  "newDistinctPassedCases": 59,
+  "caseExecutions": 114,
+  "failedExecutionsPreserved": 20,
+  "acceptedResults": "51 unchanged passes from source attempt2 + 2 affected stop cases from attempt3 + 4 service + 2 existing issuance boundary; do not treat attempt1 generic fixture rejections as authority proof",
+  "reports": [
+    {
+      "id": "source-attempt1",
+      "exitCode": 1,
+      "rawReport": "/workspace/tool-onboarding-training-source-attempt1.json",
+      "rawReportSha256": "a58123d17f1ab3cea33d33ddf3b5d4bcb50ce17024898ac7145905d5183d697c",
+      "passed": 35,
+      "failed": 18,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards pins the same shared combination, axes and formal C while keeping HIDDEN and writing no business data",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:12:72\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-material authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-use-grant authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-entry authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-entry authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for system-issuer authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-product authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-course authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-combo authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-subject authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for no-use-capability authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for expired-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for future-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-parent authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-course-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-course-type",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: library-course",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: frozen-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: survey-realm",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-item",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-scale-version",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: changed-source",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in WITHDRAWN",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'STANDARD_COMBINATION_NOT_CURRENT' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:59:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_FAILED",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'STANDARD_COMBINATION_NOT_CURRENT' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:59:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in APPROVED",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'STANDARD_COMBINATION_NOT_CURRENT' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:59:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_RUNNING",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'STANDARD_COMBINATION_NOT_CURRENT' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:59:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: missing-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: revoked-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: expired-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: wrong-rights-mode",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: changed-policy-hash",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: missing-measurement",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: revoked-measurement",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: axis-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: compiled-report-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: parameters-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: emergency-stop",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks UTC use-grant expiry after a source/stop lock wait",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'CONTENT_AUTHORITY_DENIED' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:84:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks real source license expiry after the same lock wait",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'DEPLOYMENT_OR_RIGHTS_UNAVAILABLE' but got 'values.includes is not a function'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:88:24\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rejects client-supplied axes, self-authored labels and public visibility fields",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized serializes an immutable reference and verifies the same ids without latest or implicit grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:99:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed attemptId container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed epoch container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed publicationHash container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed compositeId container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed actorId container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed courseId container scope before reading source/grants",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at Module.freezeTrainingStandardBinding (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:136:16)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:106:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not let a matching recomputed hash replace current authority",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:113:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects a later grant version and never silently renews the frozen reference",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:118:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized preserves start-only hold semantics while DB emergency stops and combo withdrawal still block collection",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:122:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not reinterpret in-flight source identity as a new deployment approval",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: values.includes is not a function\n    at Object.<anonymous> (/workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts:70:136)\n    at Object.Mock [as $queryRaw] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/spy/dist/index.js:332:34)\n    at assertEntryAdmin (/workspace/eduK12-new-version/server-version/backend/src/modules/admin-permissions/service.ts:14:25)\n    at resolveTrainingStandardReference (/workspace/eduK12-new-version/server-version/backend/src/modules/composite/training-standard-combination.ts:67:9)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:132:44\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "source-attempt2",
+      "exitCode": 1,
+      "rawReport": "/workspace/tool-onboarding-training-source-attempt2.json",
+      "rawReportSha256": "651512b23f61e18a7ebd46975f11d969d90fec63b256c5d2e13895a16ad1c0a1",
+      "passed": 51,
+      "failed": 2,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards pins the same shared combination, axes and formal C while keeping HIDDEN and writing no business data",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-material authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-use-grant authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-entry authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-entry authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for system-issuer authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-product authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-course authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-combo authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-subject authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for no-use-capability authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for expired-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for future-use authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-parent authorization",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-course-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-course-type",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: library-course",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: frozen-owner",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: survey-realm",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-item",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-scale-version",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: changed-source",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in WITHDRAWN",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_FAILED",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in APPROVED",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_RUNNING",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: missing-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: revoked-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: expired-license",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: wrong-rights-mode",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: changed-policy-hash",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: missing-measurement",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: revoked-measurement",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: axis-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: compiled-report-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: parameters-tamper",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: emergency-stop",
+          "status": "failed",
+          "failureMessages": [
+            "Error: promise resolved \"{ reference: { …(10) }, …(1) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:90:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks UTC use-grant expiry after a source/stop lock wait",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks real source license expiry after the same lock wait",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rejects client-supplied axes, self-authored labels and public visibility fields",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized serializes an immutable reference and verifies the same ids without latest or implicit grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed attemptId container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed epoch container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed publicationHash container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed compositeId container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed actorId container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed courseId container scope before reading source/grants",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not let a matching recomputed hash replace current authority",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects a later grant version and never silently renews the frozen reference",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized preserves start-only hold semantics while DB emergency stops and combo withdrawal still block collection",
+          "status": "failed",
+          "failureMessages": [
+            "Error: expected [Function] to throw error including 'SCALE_EMERGENCY_STOPPED' but got '该量表版本已紧急停用，停止新增进入和采集；历史结果保留'\n    at _Assertion.__VITEST_REJECTS__ (file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1607:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///workspace/eduK12-new-version/server-version/backend/node_modules/chai/index.js:1696:22)\n    at /workspace/eduK12-new-version/server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts:137:93\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///workspace/eduK12-new-version/server-version/backend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not reinterpret in-flight source identity as a new deployment approval",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "source-attempt3-targeted",
+      "exitCode": 0,
+      "rawReport": "/workspace/tool-onboarding-training-source-attempt3-targeted.json",
+      "rawReportSha256": "ef472546d877f3cb62c5e183d6a7b50144226c036abb75d80d985f1c6c37ac07",
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 51,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards pins the same shared combination, axes and formal C while keeping HIDDEN and writing no business data",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-material authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-use-grant authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-entry authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-entry authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for system-issuer authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-product authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-course authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-combo authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for wrong-subject authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for no-use-capability authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for revoked-use authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for expired-use authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for future-use authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards ONLINE cannot substitute for missing-parent authorization",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-owner",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: foreign-course-owner",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-course-type",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: library-course",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: frozen-owner",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: survey-realm",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-item",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: wrong-scale-version",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards retains actual project and source scope: changed-source",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in WITHDRAWN",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_FAILED",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in APPROVED",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards refuses a shared combination in TRIAL_RUNNING",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: missing-license",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: revoked-license",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: expired-license",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: wrong-rights-mode",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards keeps the actual deployment/third-party license boundary: changed-policy-hash",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: missing-measurement",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: revoked-measurement",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: axis-tamper",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: compiled-report-tamper",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: parameters-tamper",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards does not accept a broken or stopped frozen source: emergency-stop",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks UTC use-grant expiry after a source/stop lock wait",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rechecks real source license expiry after the same lock wait",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "Training consumes one exact shared C/P/R reference under real current authority guards rejects client-supplied axes, self-authored labels and public visibility fields",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized serializes an immutable reference and verifies the same ids without latest or implicit grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed attemptId container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed epoch container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed publicationHash container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed compositeId container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed actorId container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects changed courseId container scope before reading source/grants",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not let a matching recomputed hash replace current authority",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized rejects a later grant version and never silently renews the frozen reference",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized preserves start-only hold semantics while DB emergency stops and combo withdrawal still block collection",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source.test.ts",
+          "name": "frozen Training combination reference is exact and independently reauthorized does not reinterpret in-flight source identity as a new deployment approval",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "source-service-attempt1",
+      "exitCode": 0,
+      "rawReport": "/workspace/tool-onboarding-training-source-service-attempt1.json",
+      "rawReportSha256": "2d71ad9a594ae74f58df42bcf846dedeca85ac3893232270c67e920af1669c5d",
+      "passed": 4,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source-service.test.ts",
+          "name": "Training exact-source preflight service returns a guarded reference with explicit non-persistence and non-publication in one lock-bearing transaction",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source-service.test.ts",
+          "name": "Training exact-source preflight service propagates current entry rejection instead of converting ONLINE into a ready response",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source-service.test.ts",
+          "name": "Training exact-source preflight service uses the authenticated actor and retains the owned-project check",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-source-service.test.ts",
+          "name": "Training exact-source preflight service refuses a client-supplied owner before any source, authority or deployment read",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "id": "issuance-boundary-attempt1",
+      "exitCode": 0,
+      "rawReport": "/workspace/tool-onboarding-training-issuance-boundary-attempt1.json",
+      "rawReportSha256": "b9a025eb9a9dc40cfe1bf840da1d0d7fe657ad464378b3e31a2bb6e0d4c6d241",
+      "passed": 2,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "cases": [
+        {
+          "file": "src/__tests__/measurement-content/training-standard-issuance-boundary.test.ts",
+          "name": "existing 21B issuance boundary remains explicit does not claim the current root issuer supports a Training combination use grant: exact-key",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-standard-issuance-boundary.test.ts",
+          "name": "existing 21B issuance boundary remains explicit does not claim the current root issuer supports a Training combination use grant: uuid-only",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "source-types-attempt1",
+      "exitCode": 0,
+      "file": "/workspace/tool-onboarding-training-source-types-attempt1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": [],
+      "currentEvidence": false
+    },
+    {
+      "id": "source-types-attempt2",
+      "exitCode": 0,
+      "file": "/workspace/tool-onboarding-training-source-types-attempt2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": [],
+      "currentEvidence": true
+    },
+    {
+      "id": "source-test-types-attempt1",
+      "exitCode": 0,
+      "file": "/workspace/tool-onboarding-training-source-test-types-attempt1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": [],
+      "currentEvidence": true
+    },
+    {
+      "id": "source-service-test-types-attempt1",
+      "exitCode": 0,
+      "file": "/workspace/tool-onboarding-training-source-service-test-types-attempt1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diagnostics": [],
+      "currentEvidence": true
+    }
+  ],
+  "directInputs": {
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-issuance-boundary.test.ts": "18f58baa9730d908492e2454fe0f5cd51921926f3300926ef97105d5f21bc316",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source-service.test.ts": "2ba8e8f531486225081fe52afe920a342b390142765b5adbcb093d027874a09d",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.fixture.ts": "59c40da582157b5af905fdf3d724f8d3c56a9706f640b5f5d3ada270e920a851",
+    "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": "e7af8d33980ef049ed4115e4fd06ef2bae75ce669fbc41f173da9f34ee3d1f4c",
+    "server-version/backend/src/index.ts": "5df3df6199ef8790154ced2f6a8f693c3f5a7a0417ab2a97dd66e287c556262d",
+    "server-version/backend/src/middleware/auth.ts": "63a53c9e448f7b171a0139d9ae9491694bbf3b94cfe07bfc586c37242901b214",
+    "server-version/backend/src/modules/admin-permissions/service.ts": "251b80e0ea247751b85bb614f98cb911b155e5dcee97cf7a8397bc9b1639c00a",
+    "server-version/backend/src/modules/assessment-authorization/source-identity-lock.ts": "4bff28c3d32102e90ea1a372f4b20ad84fde5dd767392b8b59c62fe87f685316",
+    "server-version/backend/src/modules/composite/training-report-selection.ts": "ea5caf6c98b4be4d3ac601f03dcbfdf09a4ca354f3a998202778aa4688465aeb",
+    "server-version/backend/src/modules/composite/training-standard-combination.ts": "e3f16e5e15e20e3e72a082ec1deb4a739c508f93c1925de2b225be9967d744d5",
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": "e56f33598a157cef45c009ff9159d71dd539962997e9726a39e8d103b46b254f",
+    "server-version/backend/src/modules/measurement-content/content-authority.repository.ts": "0ca17d2000286382945e589c2dc2ce2121a0785356e9a0668325bfd754c01313",
+    "server-version/backend/src/modules/measurement-content/content-authority.ts": "370af7c2a84e1cafef60790e30d1513bd194dd15f52b49e6a7aed5ea2de0abb7",
+    "server-version/backend/src/modules/measurement-content/repository.ts": "df801abdbbd7f0c344a401eba78417ae811dc1a72cd9bb36d7e55ca0ca98e78a",
+    "server-version/backend/src/modules/measurement-content/standard-combination-source.ts": "db29753a72c9979c71cca40c738c87f034f06169234f22dfdbe55a3e0a713d2a",
+    "server-version/backend/src/modules/measurement-content/standard-combination.ts": "096bf8d0bf05ff69b3e3b65f14331ddeea324da989f4ee2e2a9e08d2577edeab",
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": "42df11b680657326a123975687300a4870d73c376bc6664b66c3c4b64dacf655",
+    "server-version/backend/src/modules/questionnaire-product/standard-source.service.ts": "52986ae466560f7618412158829c1c015f0bf2a104086c218ed22f5ab62d6b9a",
+    "server-version/backend/src/modules/scale-library-governance/collection-guard.ts": "3c4ea44cba4c62da004a0760821e96e1f2e6dea184cfc629446d5762f0b72c6d",
+    "server-version/backend/src/modules/scale/deployment/repository.ts": "534c1bca8fa3b5d1c854a386faac6dd1b847eb2c748e2f760b4ee1018e62ee16",
+    "server-version/backend/src/modules/scale/deployment/service.ts": "bac974a71c420cab7657ad46b39147aefada46e8ea437530d60afb0b45e32d73",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "55c9be87179e100fee5d34b8fde1f70ec04f137212dc750d142f2fea147cb2e7",
+    "server-version/backend/src/modules/scale/scale-workflow.service.ts": "2f1a9fd892ef220a7a939b3e08460a1ab8b1f0cdf60efa2b997356e537b8add5",
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": "2a1b61592b6fe136dc9e3b73cd3407c4b487e498ddc3062e104cece2d4a63686",
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": "2bc7fcce6ddd2479561ac0876977828b7f8c09e0d20ff95511fbd2f8bc93eb3f",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+  },
+  "interfaceFiles": {
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+      "beforeBlob": "04bd4daaf5e97261b17baa03921e9a456037d6af",
+      "afterBlob": "e2805fb3ea3995008585d549915756dc73b888af"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.model.ts": {
+      "beforeBlob": "9784b320c319f3a2b52ab2a76dc4658e0128c0c9",
+      "afterBlob": "9784b320c319f3a2b52ab2a76dc4658e0128c0c9"
+    },
+    "server-version/backend/src/modules/survey/standard-triplet.service.ts": {
+      "beforeBlob": "75a3ae48228fca86d1f9f423c486db29c385489c",
+      "afterBlob": "75a3ae48228fca86d1f9f423c486db29c385489c"
+    }
+  },
+  "baselineFailures": {
+    "file": "docs/evidence/tool-onboarding-next-20261025/preflight-validation.json",
+    "sha256": "c3c479ddc8b3da6531a52e0d782aa704f782736f4838f1ca6e81452c1e48c6f8",
+    "failures": 11,
+    "status": "unchanged and not rerun"
+  },
+  "scope": {
+    "authenticatedPreflightRoute": "POST /api/questionnaire-products/:id/standard-combination-source",
+    "databaseBusinessWrites": 0,
+    "preflightPersisted": false,
+    "publicationReady": false,
+    "nativeTrainingDeliveryConnected": false,
+    "selectionOrAttemptPersistenceConnected": false,
+    "productionIssuerSupportsProposedCombinationUseGrant": false,
+    "parameterReportConsumerConnected": false,
+    "existingSourceParserOrSurveyConsumerChanged": false,
+    "publicLibraryUiOrBulkReadModelChanged": false,
+    "historicalReportsPolicyChanged": false,
+    "actualOnboardingPerformed": false
+  },
+  "limitations": [
+    "Current root issuance intentionally still rejects TRAINING COURSE material.use and non-UUID exact resource keys. Grant rows in source fixtures are record doubles, never evidence of authorized issuance.",
+    "Internal binding context must be supplied by an authorized parent; hash is integrity, never authorization. No existing attempt/item schema writes or participant runtime calls this new verifier yet.",
+    "Source locks and all domain guards are real functions; database/SQL results are in-memory doubles. No real PostgreSQL concurrency, HTTP or full student workflow qualified.",
+    "First source attempt failed 18 cases on fixture tagged-template values parsing; source attempt2 failed 2 stop fixtures; fix only affected fixtures/assertions, retain both originals.",
+    "Final fixture dispatch changes only the two enabled emergency flags; other 51 attempt2 inputs and returned values are unchanged and reused.",
+    "Direct input hashes recorded after execution; no signed full transitive runtime or CI attestation.",
+    "No frontend build, actual installation, publish, trial, migration, DB cleanup, push, CI, merge, deployment, production or user Mac operation."
+  ],
+  "notionCheckpoint": {
+    "id": "404d27635a388114a958e99c51e2ead4",
+    "url": "https://app.notion.com/p/404d27635a388114a958e99c51e2ead4",
+    "readbackVerified": true
+  },
+  "runtimeVersions": {
+    "node": "v24.21.0",
+    "vitest": "4.1.11",
+    "zod": "4.6.7",
+    "typescript": "5.9.3",
+    "prisma": "5.22.0"
+  }
+}
