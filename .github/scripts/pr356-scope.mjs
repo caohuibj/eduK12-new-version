@@ -8,7 +8,7 @@ export const binding=JSON.parse(readFileSync(new URL('./pr356-bindings.json',imp
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 export function verifyCandidate(entries,base,head,read=git){
  assert.equal(base,binding.base,'PR356 main base drift');assert.equal(binding.base,'ff8471e529e7b3c56e1e20f17d1e2581040fc896');
- assert.equal(binding.product,'9c43502680fe28c57c1edd64cc22a364beccb8e6');assert.match(head,/^[a-f0-9]{40}$/);
+ assert.equal(binding.product,'862c324be459c6ab6f0daabb4798034388c0410c');assert.match(head,/^[a-f0-9]{40}$/);
  const wanted=new Set([...Object.keys(binding.source),...binding.controls]);
  assert.equal(wanted.size,Object.keys(binding.source).length+binding.controls.length,'Controls overlap product source');
  assert.equal(entries.length,wanted.size,'Complete PR356 raw diff required');assert.equal(new Set(entries.map(e=>e.file)).size,entries.length);

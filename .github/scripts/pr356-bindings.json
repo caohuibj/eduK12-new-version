@@ -4,7 +4,7 @@
   "pr": 356,
   "branch": "fix/runtime-time-and-validation-20261025",
   "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
-  "product": "9c43502680fe28c57c1edd64cc22a364beccb8e6",
+  "product": "862c324be459c6ab6f0daabb4798034388c0410c",
   "source": {
     "AGENTS.md": {
       "status": "M",
@@ -452,7 +452,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "acf322c63f9ca73fec7a0a8f8836e12bb4b670fe"
+      "after": "a227807eda34ab1f10dad07e69e7869e85d297d6"
     },
     "docs/evidence/pr356-standard-dual-entry-20261026.json": {
       "status": "A",
@@ -578,7 +578,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "2357e3e2dd27c555488c9b23fe94ab1ca065987b"
+      "after": "aa7cd20667c93c45a176fb494a2d57df1fff8125"
     },
     "docs/pr356-review-instructions-20261026.md": {
       "status": "A",
@@ -804,12 +804,26 @@
       "before": null,
       "after": "814e9db14008c6db9b39fbf3eff7be5f57334b79"
     },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bd2e57655805cb2e2561c603c35ee4fea702d0ab"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d95dad51c6054323fc0daf74b55adb3a43552522"
+    },
     "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "1bd956c3e0c62b517877b9a3feb7ab46260b1bfa"
+      "after": "2641fd107147602ef1b2430e88dcf5abe9807c39"
     },
     "server-version/backend/src/__tests__/composite/training-content-service.test.ts": {
       "status": "M",
@@ -2405,7 +2419,7 @@
     ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522"
   },
   "components": {
-    "backend": "ec0e23bec3398992883f30125e380a845c0a9337",
+    "backend": "ff7edd58e3824178075aaaf74730e2fa2367a5fe",
     "frontend": "87590586f2902baf14f0a94e8d444ac9e4b2e7e8"
   },
   "protectedInputs": {
