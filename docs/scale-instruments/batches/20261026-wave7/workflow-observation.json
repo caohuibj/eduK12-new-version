@@ -1,0 +1,28 @@
+{
+  "kind": "READ_ONLY_GITHUB_API_OBSERVATION",
+  "observedAt": "2026-10-26T07:24:21.111244+00:00",
+  "checks": [
+    {
+      "label": "ffmq15-revision",
+      "commit": "74abc20779b0ec505af371128266e27b389a607b",
+      "totalCount": 0
+    },
+    {
+      "label": "chime-revision",
+      "commit": "1b9f6249e79d602fe033bc0baac635760cd607f7",
+      "totalCount": 0
+    },
+    {
+      "label": "maia2",
+      "commit": "1bed41bfe3211a49008cc5bb70f47e5e2286e9de",
+      "totalCount": 0
+    },
+    {
+      "label": "bat23",
+      "commit": "26625201cc365fe75ca50d97a42902c8f9e3a495",
+      "totalCount": 0
+    }
+  ],
+  "workflowDispatched": false,
+  "notCiQualification": true
+}

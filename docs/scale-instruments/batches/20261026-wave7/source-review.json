@@ -1,0 +1,78 @@
+{
+  "status": "REVIEWED_PRIMARY_SOURCE_AND_RIGHTS",
+  "tools": [
+    {
+      "tool": "aaq_us",
+      "privateAuditSha256": "fb957319e7b3133e84b9899aa0d1fe0eeb104317705c45f5caede2510cb4547c",
+      "primaryAuditFile": "aaq_us/source-audit.json"
+    },
+    {
+      "tool": "maia2",
+      "privateAuditSha256": "e2230df375c5cd7f996eb8a639bf7839b00096d104529f26059d340ffb7755a2",
+      "primaryAuditFile": "maia2/source-audit.json"
+    },
+    {
+      "tool": "bat23",
+      "privateAuditSha256": "4ca4bb47a87d5eaf3127fc9848065a288fb541a78986f9f824e7f8dbf248616c",
+      "primaryAuditFile": "bat23/source-audit.json"
+    }
+  ],
+  "AAQ-US": {
+    "classification": "THIRD_RETAINED",
+    "developerDoi": "10.1016/j.jcbs.2018.03.004",
+    "year": 2019,
+    "authorForm": "https://www.utahact.com/uploads/5/1/3/4/51340265/aaq-us_1.doc",
+    "authorFormSha256": "fe7dbbb9af0301b4ea2ae95dd1f758910d3f705c84c8100d7f26b7c6cff36452",
+    "sumRange": [
+      12,
+      84
+    ],
+    "reverse": [],
+    "docOrderToManuscriptTableRows": [
+      12,
+      5,
+      4,
+      6,
+      11,
+      8,
+      3,
+      1,
+      2,
+      10,
+      9,
+      7
+    ],
+    "rights": "Author public download and hearsay licence claims not affirmative four-action grant; no new source"
+  },
+  "MAIA-2": {
+    "classification": "FIRST_FOR_NEW_CC_DERIVATIVE; SECOND_FOR_EXISTING_PANG_LI2020_TRANSLATION",
+    "doi": "10.1371/journal.pone.0208034",
+    "carrier": "2018 Table2 original publisher JATS",
+    "carrierSha256": "dc9bbd5654a68cc14090002747a468e74e5d9b0edf8fd7071ec7fdefd97157f1",
+    "license": "CC BY4.0, table has no separate exclusion",
+    "items": 37,
+    "facets": 8,
+    "noTotal": true,
+    "item9": "Selected Table2 ends something; no else from article body inserted.",
+    "officialChineseCorrection": "UCSF Mainland now links2020 Pang/Li37, not original32; webpage preparation footer stale. Teng2022 separate31/7 validation not inherited."
+  },
+  "BAT": {
+    "classification": "FIRST_FOR2020_PAPER_ENGLISH; SECOND_FOR_EXISTING_OFFICIAL_CHINESE",
+    "doi": "10.3390/ijerph17249495",
+    "carrier": "2020 AppendixB TableA2 pp17–18",
+    "carrierSha256": "76090c93830f60cac2c9098c9456d8c5d69d7208f4c20858b33451c23e0c4803",
+    "license": "CC BY4.0, TableA2 no separate exclusion",
+    "items": 23,
+    "dimensions": [
+      8,
+      5,
+      5,
+      5
+    ],
+    "total": "mean23 equally weighted, not mean4 dimension means",
+    "generalVersionCorrection": "Manual explicitly keeps mental-distance work context; old apparent Chinese inconsistency is author design",
+    "report": "actual English primary plus Chinese parallel; separate official Chinese question text not copied"
+  },
+  "notAuthorContacted": true,
+  "noNormTransfer": true
+}

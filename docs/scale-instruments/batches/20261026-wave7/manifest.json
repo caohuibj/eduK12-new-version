@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave7-primary-sources-20261026",
+  "sources": [
+    {
+      "instrumentKey": "maia2_37_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "3d1fc6192db0261518b8d85c6bea2eed7219d7f3e7ca73a5e0010d7a3292c3cb"
+    },
+    {
+      "instrumentKey": "bat23_2020_en",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f"
+    }
+  ]
+}

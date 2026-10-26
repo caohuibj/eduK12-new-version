@@ -1,0 +1,17 @@
+{
+  "kind": "LOCAL_READABLE_ORIGINAL_EVIDENCE_ARCHIVE",
+  "fileName": "independent-review-originals.zip",
+  "localWorkspacePath": "/workspace/eduk12-scale-evidence/20261026-wave7/coordinator/private/independent-review-originals.zip",
+  "bytes": 764385,
+  "sha256": "65c08f2e388ba9abbd6a8b2c8d11f6dcbc77b203adb1ce7410ae940739526d9c",
+  "priorOriginalFiles": 190,
+  "currentOriginalFiles": 82,
+  "rawTestInvocationsNotReplayed": true,
+  "originalFailuresAndFiltersPreserved": true,
+  "publicGithubRawInputs": "BLOCKED_BY_AUTOMATIC_APPROVAL_REVIEW_NOT_UPLOADED_TO_BRANCH",
+  "privateDriveUpload": "BLOCKED_PENDING_EXPLICIT_USER_DESTINATION_APPROVAL",
+  "publicDelivery": "This receipt and non-sensitive validation summaries only; no historical source/input snapshot directories in this commit",
+  "previousDetachedTrees": "Unreferenced partial tree objects were created before rejection; no rejected complete payload committed or branch ref moved",
+  "approvalReason": "Automatic review did not find trusted explicit authorization for these exact historical input/source payloads at GitHub/Drive destinations",
+  "notFakeEvidence": "Original executable metadata, tests and source files already individually committed remain unchanged."
+}

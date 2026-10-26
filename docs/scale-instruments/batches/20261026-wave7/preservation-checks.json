@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "baseline": "ad30e83d9486d9eb584620508ab32bf864532100",
+  "allPriorGlobalSourceJsonByteUnchanged": 88,
+  "includesResCatalogV2": true,
+  "contentLineOldAddedSourceVersionsByteUnchanged": 52,
+  "original37Unchanged": true,
+  "protectedGeneratorDependencyAndPolicyFilesUnchanged": true,
+  "rawOldUnitEvidence": "evidence-archive.json",
+  "rawNewExecutionEvidence": "evidence-archive.json",
+  "existingSourcesNotOverwritten": true,
+  "evidenceDelivery": "Complete original records local ZIP; raw input/source egress blocked, only safe summary/index public"
+}

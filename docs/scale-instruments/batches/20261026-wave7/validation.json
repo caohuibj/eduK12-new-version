@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DEVELOPMENT_AND_REVIEWED_CASE_EVIDENCE_NOT_CI",
+  "baseline": "ad30e83d9486d9eb584620508ab32bf864532100",
+  "sourceCommit": "26625201cc365fe75ca50d97a42902c8f9e3a495",
+  "mainHeadObserved": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+  "research": {
+    "knownFamiliesReexamined": 3,
+    "newDiscoveryFamilies": 0,
+    "newFirstCategoryTools": 2,
+    "newFirstCategorySourceVersions": 4,
+    "newSecondCategoryArchives": 2,
+    "newThirdCategoryArchives": 0,
+    "thirdCategoryExistingArchiveUpdated": 1
+  },
+  "units": {
+    "status": "PASS_UNIQUE_CASE_UNION",
+    "uniquePassedCases": 43,
+    "byTool": {
+      "MAIA2": 19,
+      "BAT23": 18,
+      "FFMQ1.0.1": 5,
+      "CHIME1.0.1": 1
+    },
+    "BATInvocation": "Original17pass1fail; one expectation corrected and only1rerun pass,17filtered. Source unchanged.",
+    "CHIMERevisionInvocation": "Initial unsupported CLI option failed before0cases; repaired invocation1pass; original retained.",
+    "FFMQRevisionPreparation": "Original path preparation error before any source/test/check; corrected,5pass single invocation.",
+    "rawOriginals": "evidence-archive.json",
+    "noOldUnitReplayForEvidence": true
+  },
+  "types": {
+    "status": "PASS",
+    "scope": "four new/revision test closures plus coordinator final113registry DB-test closure",
+    "coordinatorReceipt": "evidence-archive.json (actual coordinator types receipt inside local ZIP)",
+    "historicalTypesNotInferredFromEmptyLogs": true
+  },
+  "database": {
+    "status": "PASS",
+    "assertions": 14,
+    "rawReporterSha256": "40287a8dce40f1eb7c2672dcf52d4eb05f95881f039ee3dcbd8000b76014d007",
+    "actualAppRole": "scale_app",
+    "nonOwner": true,
+    "restoredOldDefinitions": 10,
+    "restoredOldSnapshots": 12,
+    "finalRows": 12,
+    "finalSnapshots": 14,
+    "newRows": 2,
+    "allRowsDraftHidden": true,
+    "preservedOldDefinitionsAndSnapshots": true,
+    "existingRevisionVersionConflictsVerified": 2,
+    "newRevisionUpgradeSuccessClaimed": false,
+    "referenceSetCount": 0,
+    "deploymentPolicyCount": 0,
+    "productionTouched": false
+  },
+  "reports": {
+    "actualSavedSamples": 14,
+    "completeSamples": 11,
+    "missingInvalidSamples": 3,
+    "actualInterpretationSections": 77,
+    "newReportConfigurations": 2,
+    "unchangedReportConfigurationsUsedByRevisions": 2,
+    "newImages": 0,
+    "scorePersonalized": "NOT_IMPLEMENTED; fixed facet reflection text",
+    "normsThresholds": "NONE; score_only is intentional and no fake completeness claim"
+  },
+  "inventory": {
+    "addedSourceVersions": 56,
+    "toolIdentityCount": 52,
+    "unit": "source versions, not constructs/activated tools",
+    "formal20261026PublicCloneAcceptance": "NOTRUN",
+    "developmentSnapshot": "candidate-56.json"
+  },
+  "priorRoundIndependentReviewEvidence": {
+    "uniqueCases": 104,
+    "rawOriginalFiles": 190,
+    "rawOriginalManifest": "evidence-archive.json",
+    "reexecutedCases": 0,
+    "originalEnvironmentSignature": "NOT_AVAILABLE; not fabricated",
+    "wave5StructuredCommandExitReceipt": "NOT_RECORDED originally; actual report/log/input records retained; original tool response exit0 is separate observation"
+  },
+  "notion": "notion-archives.json",
+  "blocked": {
+    "AAQ-US": "Affirmative system/translation/public redistribution/commercial rights not established; remains third category",
+    "existingMAIA2020ChineseAndBATChinese": "Existing translation public redistribution scope unresolved; second category only",
+    "runtimeFeatures": "Instruction presentation, independent none parameter version, independent report language, and existing-content version upgrade remain functional backlog; no engine patch here"
+  },
+  "notRun": [
+    "human expert scientific/localization approval",
+    "China validation",
+    "browser and dual product entry use",
+    "activation",
+    "CI",
+    "production",
+    "newly saved dump restoration qualification"
+  ],
+  "unresolvedImplementationFailInBoundedContent": false,
+  "failureHistoryPreserved": true,
+  "nextBatch": "WAIT_FOR_INDEPENDENT_REVIEW_NO_EXPANSION",
+  "evidenceDelivery": "Complete original records local ZIP; raw input/source egress blocked, only safe summary/index public"
+}

@@ -1,0 +1,97 @@
+{
+  "parent": "1bed41bfe3211a49008cc5bb70f47e5e2286e9de",
+  "commit": "26625201cc365fe75ca50d97a42902c8f9e3a495",
+  "tree": "53df4fc57b5935b7dc07b614015b75aa25a9d63a",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T07:21:32.351586+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/README.md",
+      "remoteBlob": "5420f11b2a55ac42a33848fea1ad6b186d738124",
+      "sha256": "4e502b9a0f6c49be5281858cd5f2b7cf45d284d3f336f5c2a468413281ebf613",
+      "bytes": 548
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/administration-sidecar.prepared.json",
+      "remoteBlob": "c7525e9dcf456fcde269c671ae247134a3b4663e",
+      "sha256": "5911639d19516927de415c47a076a1766635e99cab548abaf3869efcc2aa1646",
+      "bytes": 480
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/content-manifest.json",
+      "remoteBlob": "c5ed0ad927691a560252252497205beced64d320",
+      "sha256": "6d3fa794c6f0c89961a3ac5bf675189d2dd28231cf32bbef92c71342d86afd97",
+      "bytes": 6938
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/references.md",
+      "remoteBlob": "24ba5e5b4990df5197f229fbd251a36ce642e70d",
+      "sha256": "98c5fe52d24d87bc9e513abdf74dd83f58bf2130ff68fbd5430599c8bca0e6d5",
+      "bytes": 1295
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/report-example.md",
+      "remoteBlob": "a13d8babc39042fe60b2f83d74bfe3b66e51c408",
+      "sha256": "98aa881300b4cbb6b0eccadfa0363662c4bb5dc35c0135213731f769ac4cfe61",
+      "bytes": 1352
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/report-results.synthetic.json",
+      "remoteBlob": "287f22979067d35a3772ca7278da48c503ac0744",
+      "sha256": "b4064f1d3295ae3120fd9030f50236cb6c8f5b28d31f805c3a54c3ef2a1aeca9",
+      "bytes": 95801
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "3e1f0bb9146f86f5776681a1ff0ed75e967e86a6",
+      "sha256": "7be01806e5080b2439ac73ee293094a9cdc1e563adf3c45147f786edfc393a2a",
+      "bytes": 671
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/validation.json",
+      "remoteBlob": "34eed83f5722a37dd9de8955c8f7f1b6030dc23b",
+      "sha256": "47c805b6256d1e470522b87572538980ee0096d3631aff8eb5be14831a7a123a",
+      "bytes": 2665
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/bat23_2020_en/1.0.0/validation.md",
+      "remoteBlob": "f17e78a1d7b2cb9c1ca6130dc58f42abb414a00e",
+      "sha256": "56eef0e1082290057a570a1b03196567f9e9c924de1fa7a3647e4aec36f23d7d",
+      "bytes": 839
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/bat23_2020_en.test.ts",
+      "remoteBlob": "20c13b70516fab7f709dd3b311379a513e92a677",
+      "sha256": "f51a9607d28ec0857e56ab99c5cc2620d0e0757531d59224d4bae77cbb7899cb",
+      "bytes": 7406
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "9c28cc9a07b9e80f0cbc2f2624264cc89c20c9de",
+      "sha256": "f16a74b94ce26930c3747b3cc12c83602319cf37c95013101575214638c5b2b2",
+      "bytes": 1696
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/instrument.ts",
+      "remoteBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "bytes": 193
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/bat23_2020_en/1.0.0/source.json",
+      "remoteBlob": "abe02fe4d7876c0cf00fb400160305389b911bea",
+      "sha256": "de5a26557659539d3f94caa049efeb7a467d42e83c7357f833c5b89f6a55e89f",
+      "bytes": 68844
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "0a8d311dda6bfb384c8876a0ed0198bed26c1309",
+      "sha256": "492a450666dbf3000a832ce95264e34f5e576dea9db46d8e3f3e2eef6ecd7b39",
+      "bytes": 14601
+    }
+  ]
+}

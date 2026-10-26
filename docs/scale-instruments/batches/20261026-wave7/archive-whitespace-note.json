@@ -1,0 +1,30 @@
+{
+  "rawArchiveDiffCheck": "FAIL expected preserved historical trailing whitespace; not a candidate code change",
+  "originalSource": "server-version/backend/src/utils/encryption.ts",
+  "originalBaseline": "ad30e83d9486d9eb584620508ab32bf864532100",
+  "originalSha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+  "byteExactCopies": [
+    "docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/brcs4/saved-input-bytes/input-bytes/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+    "docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/brcs4/saved-input-bytes/input-bytes-attempt2/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+    "docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/ips9_2021/saved-input-bytes/own-unit_inputs/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+  ],
+  "archiveBytesModified": false,
+  "candidateDiffCheck": {
+    "status": "PASS",
+    "exitCode": 0,
+    "exactCommand": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/brcs4/saved-input-bytes/input-bytes/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+      ":(exclude)docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/brcs4/saved-input-bytes/input-bytes-attempt2/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+      ":(exclude)docs/scale-instruments/batches/20261026-wave7/prior-unit-originals/ips9_2021/saved-input-bytes/own-unit_inputs/2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+    ]
+  },
+  "scopeReason": "Only three byte-exact historical input snapshot copies are data evidence. Do not reformat source snapshots or alter hashes merely to satisfy a new-code whitespace convention. All other staged code/docs/records checked.",
+  "initialStagingShell": "Python check exited2; subsequent snapshot-preparation command still ran, outer shell exit0 did not mean original check passed.",
+  "finalPublicDelivery": "All historical source/input snapshots removed from candidate index and retained locally; no whitespace exclusions needed for final public diff"
+}

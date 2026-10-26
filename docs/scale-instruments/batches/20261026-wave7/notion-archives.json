@@ -1,0 +1,21 @@
+{
+  "AAQ-US": {
+    "classification": "THIRD",
+    "action": "updated existing archive, not newly created",
+    "page": "https://app.notion.com/p/405d27635a38815a9fccf8af6451f841",
+    "readBack": true,
+    "authorContacted": false
+  },
+  "MAIA-2 official2020Chinese37": {
+    "classification": "SECOND",
+    "page": "https://app.notion.com/p/405d27635a3881a4872fd924b8c9a1a1",
+    "readBack": true,
+    "existingTranslationPublicSource": false
+  },
+  "BAT officialChinese23": {
+    "classification": "SECOND",
+    "page": "https://app.notion.com/p/405d27635a38816dae3fe731c2bacb51",
+    "readBack": true,
+    "existingTranslationPublicSource": false
+  }
+}
