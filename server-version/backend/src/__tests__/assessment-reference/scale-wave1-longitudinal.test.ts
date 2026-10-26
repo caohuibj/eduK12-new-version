@@ -192,7 +192,7 @@ describe('frozen reference kind',()=>{
 })
 
 it('freezes the selected result kind into canonical metric identity',async()=>{
- const {projectScaleCanonicalUnitResult,createCanonicalUnitResultEnvelope}=await import('../../modules/assessment-runtime/unit-result')
+ const {projectScaleCanonicalUnitResult,createCanonicalUnitResultEnvelope,parseCanonicalUnitResultEnvelope}=await import('../../modules/assessment-runtime/unit-result')
  const r=testReference(),g=r.entries[0].governance!,hash=referenceSetHash(r)
  const core=projectScaleCanonicalUnitResult({contextHash:'b'.repeat(64),participantContext:{gradeLevel:'8'},
   runtime:{instrumentKey:r.instrumentKey,instrumentVersion:'1.0.0',sourceDefinitionHash:'a'.repeat(64),compilerVersion:'test',compiledRuntimeHash:'c'.repeat(64),scorerVersion:'1.0.0',aggregateProjection:{allowedMetricKeys:['wellbeing'],allowedFactKeys:[],allowedReferenceClassifications:['criterion_threshold']}} as any,
@@ -200,7 +200,7 @@ it('freezes the selected result kind into canonical metric identity',async()=>{
   result:{method:{scoringVersion:'1.0.0',reportVersion:'1.0.0'},quality:{status:'interpretable',flags:[]},scores:[{key:'wellbeing',value:3,direction:'higher_is_more',status:'calculated'}],references:[{scoreKey:'wellbeing',referenceVersion:r.referenceVersion,referenceKind:'criterion_threshold',status:'available',bandProvenance:g}]} as any})
  expect(core.metrics[0].scaleReference).toMatchObject({originalReferenceKind:'criterion_threshold',originalReferenceHash:hash})
  const envelope=()=>createCanonicalUnitResultEnvelope({core,completedAt:'2026-10-01T00:00:00Z',persistenceProvenance:{sourceType:'ASSESSMENT',sourceAttemptId:'synthetic'}})
- expect(envelope).not.toThrow()
+ expect(()=>parseCanonicalUnitResultEnvelope(envelope())).not.toThrow()
  core.metrics[0].scaleReference!.originalReferenceKind='normative_distribution'
- expect(envelope).toThrow()
+ expect(()=>parseCanonicalUnitResultEnvelope(envelope())).toThrow('SCALE_REFERENCE_IDENTITY_MISMATCH')
 })
