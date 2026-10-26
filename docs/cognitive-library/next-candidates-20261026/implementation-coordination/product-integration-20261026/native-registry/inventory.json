@@ -1,0 +1,42 @@
+{
+  "legacyCount": 29,
+  "native": [
+    {
+      "testType": "mot",
+      "engineVersion": "1.1.1",
+      "scoringVersion": "1.1.0",
+      "profiles": [
+        "research",
+        "experience"
+      ]
+    },
+    {
+      "testType": "enumeration",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.2.0",
+      "profiles": [
+        "research",
+        "experience"
+      ]
+    },
+    {
+      "testType": "continuous-recognition",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.2.0",
+      "profiles": [
+        "research",
+        "experience"
+      ]
+    },
+    {
+      "testType": "ant",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.1.0",
+      "profiles": [
+        "research",
+        "experience"
+      ]
+    }
+  ],
+  "combinedCount": 33
+}

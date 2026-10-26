@@ -1,3 +1,4 @@
+import { getNativeCognitiveTaskDefinition } from '../content-candidates/native-registry/definitions'
 import { computeProtocolSignature } from './canonical'
 import type { MetricDefinition, TaskDefinition } from './types'
 
@@ -40,7 +41,18 @@ export const validateTaskDefinition = <TConfig, TTrial>(definition: TaskDefiniti
   if (definition.protocol.phases.length === 0 || !definition.protocol.phases.some((phase) => phase.persists && phase.required)) {
     issues.push(issue('protocol.phases', 'at least one required persisted phase is needed'))
   }
-  if (definition.profiles.standard === undefined) {
+  const native = getNativeCognitiveTaskDefinition(definition.testType, definition.engineVersion, definition.scoringVersion)
+  if (native) {
+    // These exact native tuples implement two real profiles; a standard alias would invent a third contract.
+    for (const profile of ['research', 'experience'] as const) {
+      if (!definition.profiles[profile]) issues.push(issue(`profiles.${profile}`, `native ${profile} profile is required`))
+    }
+    for (const profile of Object.keys(definition.profiles)) {
+      if (profile !== 'research' && profile !== 'experience') {
+        issues.push(issue(`profiles.${profile}`, 'native task profiles must be exactly research and experience'))
+      }
+    }
+  } else if (definition.profiles.standard === undefined) {
     issues.push(issue('profiles', 'standard profile is required'))
   }
 

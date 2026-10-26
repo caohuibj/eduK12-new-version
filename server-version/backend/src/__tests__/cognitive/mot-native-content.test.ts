@@ -37,8 +37,10 @@ const score=(trials:TrialEnvelope<MotTrial>[],profile:'experience'|'research'='e
  runAuthoritativeScorer({definition:motDefinition,session:createMotSnapshot(profile),trials,randomSeed})
 
 describe('MOT native content candidate',()=>{
- it('preserves the real platform rejection of a two-profile candidate without manufacturing a standard profile',()=>{
-  expect(validateTaskDefinition(motDefinition).filter(i=>i.severity==='error')).toEqual([{path:'profiles',message:'standard profile is required',severity:'error'}])
+ it('accepts the real native two-profile contract without manufacturing a standard profile',()=>{
+  expect(validateTaskDefinition(motDefinition).filter(i=>i.severity==='error')).toEqual([])
+  expect(Object.keys(motDefinition.profiles).sort()).toEqual(['experience','research'])
+  expect(motDefinition.profiles.standard).toBeUndefined()
   const trials=records(),core=trials[0].payload,envelope=motTrialEnvelope(core)
   expect(envelope.startedAtPerfMs).toBe(core.startedAtPerfMs)
   expect(envelope.endedAtPerfMs).toBe(core.endedAtPerfMs)
