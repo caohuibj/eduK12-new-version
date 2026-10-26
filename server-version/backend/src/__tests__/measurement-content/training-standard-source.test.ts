@@ -270,3 +270,25 @@ it('projects only validated frozen version labels into teacher summaries without
  expect(()=>trainingStandardCombinationSummary(null)).toThrow()
  expect(f.h.calls).toEqual([])
 })
+
+it('continues past 100 stale grants using the last scanned cursor, retaining current use checks',async()=>{
+ const f=trainingSourceHarness(),original=f.db.$queryRaw.getMockImplementation()!
+ const {prisma}=await import('../../config/database'),client=prisma as any,previous=client.$transaction
+ client.$transaction=async(fn:any)=>fn(f.db)
+ let pages=0
+ f.db.$queryRaw.mockImplementation(async(query:any,...args:any[])=>{
+  if(query.sql.includes('FROM material_grants g JOIN survey_standard_releases')){
+   const [valid]=await original(query,...args)
+   if(++pages===1)return Array.from({length:100},(_,i)=>({...valid,use_id:tid(1000+i)}))
+   expect(query.sql).toContain('(r.tool_key,r.id,g.id)>')
+   expect(query.values.slice(-3)).toEqual([valid.tool_key,valid.id,tid(1099)])
+   return [valid]
+  }
+  return original(query,...args)
+ })
+ try{
+  const {listTrainingStandardCombinationChoices}=await import('../../modules/measurement-content/standard-combination-use')
+  const choices=await listTrainingStandardCombinationChoices(ids.owner)
+  expect(pages).toBe(2);expect(choices).toHaveLength(1);expect(choices[0].useGrantId).toBe(ids.leaf)
+ }finally{client.$transaction=previous}
+})
