@@ -1895,12 +1895,25 @@ pins. Partial success inside a failed producer job, including an upload failure
 after a build, is a stop for independent targeted continuation planning; there is
 no automatic rebuild or fallback to an older successful attempt.
 
-The standalone small-Q/fixed-metadata adapter is implemented and directly
-verified, but is not wired into admission/gate/main. The proposed narrow caller
-patch remains pending after automatic review rejected an earlier broad rewrite
-(the rejected command did not execute). The current reader still downloads
-original phase archives. Therefore the required lightweight same-tree regular
-main-merge follow-up is not yet complete and this checkpoint cannot activate CI.
-No CI, Ready, merge, protection change, new credentials or deployment is executed
-by these implementation commits. Final exact HEAD/tree/base and executable budget
-must be independently reviewed before any activation.
+The small-Q/fixed-metadata adapter is now wired through the exact independently
+reviewed B caller patch and three actual reader/CLI controls, following new
+substantive authorization and actual approval. First qualify-result retains full
+original phase ZIP/history/raw SARIF validation. Admit authenticates Q and only
+the two necessary original CodeQL archives; gate/main authenticate official
+aggregate/Q archives, preserved reviews and fixed original phase/role metadata.
+They do not download original image/DB/browser/dist archives or replay application
+qualification. The earlier broad denied operation remains known not executed;
+that denial was not treated as automatically lifted by the new authorization.
+
+Supported reuse is same-head original successful attempts and exact same-tree
+regular-main-merge observation. Acceptance, bindings and ci.yml are complete
+shared phase inputs; changing them changes multiple inputs digests. This route
+does not promise arbitrary cross-commit producer/image reuse. A real failure
+requires exact impact review before continuation; no generic cache or broad
+fallback is introduced.
+
+All readiness, historical admission and SARIF policy states remain pending.
+No actual CI, Ready, merge, protection change, new credentials or deployment is
+executed by these implementation commits. The three reader/CLI groups use only
+synthetic Git/ZIP/API fixtures. Final exact HEAD/tree/base and executable budget
+require independent review before activation.

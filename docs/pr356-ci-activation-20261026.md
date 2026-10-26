@@ -1,6 +1,6 @@
 # PR356 修复收口与合并资格接线（待独立审查，未激活）
 
-> 当前状态：已接入16个独立 phase、Q 汇总、admit 预检、稳定 required gate 和 main 入口；Ready 只观察、不走宽路线。全部 ready/历史 approved/SARIF policy 仍 pending。只读 A 已验证但尚未接 CLI，B 只有待审 patch，当前 main 仍重新读取原 phase ZIP，轻量复用未完成。下方小步是各次事实记录；最终完整HEAD/tree/base在提交后实读交付，旧锚点不代表当前候选。没有激活 CI，不能合并。
+> 当前状态：已接入16个独立 phase、Q 汇总、admit 预检、稳定 required gate 和 main 入口；Ready 只观察、不走宽路线。全部 ready/历史 approved/SARIF policy 仍 pending。B精确调用点经新独审授权和实际审批接入A，三组实际reader/CLI合成控制通过；gate/main只读官方aggregate/Q及固定原phase元数据。正式资格与激活仍待审。下方小步是各次事实记录；最终完整HEAD/tree/base在提交后实读交付，旧锚点不代表当前候选。没有激活 CI，不能合并。
 
 > 实施阶段小步①：新增固定PR356入口检测及真实legacy CLI的Ready/main拒绝，7个直接控制契约通过，原件见E A157–158。仅此防护已实现；下方其余计划仍在接线。新控制路径使58c43e22阶段的旧冻结不再代表当前中间提交，最终完成后重新列全差异、逐名control及完整head/tree/base。未运行应用检查/CI，没有Ready/合并/部署；本小步不是可激活候选。
 
@@ -384,7 +384,7 @@ CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏�
 或单个DB作业20分钟的总链承诺；这不是已测耗时。最终激活前应独审这个真实
 预算和队列/下载等待，5分钟仅为定位等待项阈值。没有为预算去运行应用或压测。
 
-当前阻碍：B调用点未获单独实施授权且未应用；phase/历史精确接纳及SARIF既有
+当前阻碍：phase/历史精确接纳及SARIF既有
 标准待dot核定；保护读取403仍由有现成能力的dot核对。精确非空CONTENT指导语
 没有已批准的浏览器seed，不虚构科学批准。NFC10/HOLD、原Training范围和
 356-01仍按原表开放；普通ACK已走安全事务callback，旧atomic性能/SQL基线不再
@@ -427,3 +427,24 @@ CodeQL/应用/CI执行。原376条原件未改，新总数380；source342与逐�
 B仅收到根dot对精确20887字节/SHA835fa5d7补丁的新增独审实施方向授权；原审批
 拒绝没有解除。须携该新证据和三组实际reader/CLI控制计划提交实际审批，允许后
 才能实施，仍拒则停止、不分拆规避。当前B未应用，全部ready/approved/policy待审。
+
+
+### B精确调用点：本次实际审批允许后完成
+
+原20887字节/SHA835fa5d7调用点补丁经根dot独审明确新增授权，并与仅三组直接
+reader/CLI控制组成55b222审批包。本次实际审批允许，已完整应用；原广泛拒绝
+与已知未执行事实保留，不视作自动解除。仅新三组3PASS/0FAIL/0skip，约10.67秒。
+没有重跑旧A/admission或实际应用资格。独立临时Git、fixed fake token/API及
+真实ZIP verifier/WeakSet被实际reader/CLI消费；11次原trace/proof/payload保留，
+其中admit成功只下载Q+两CodeQL；gate只precheck+Q；main只stable+Q。八次错误
+finding/review/phase/attempt/source/checkout调用均拒绝且无成功proof。
+
+原TAP165645字节不变；只读副本明确移除一层Node TAP comment转义后解码JSON，
+没有把解析失败当成测试失败或重跑绿项。命令/退出/完整相关源hash与原raw均保留。
+原380记录未改，新增10条后当前390条。上文B未接入文字记录此前检查点，以本节为新状态。
+首次qualify完整验证分支保留，本轮没有执行首次资格或任何真实API/CI。
+
+复用只包括同HEAD成功producer原attempt，以及同tree常规main合并的接纳；
+不是任意跨候选复用。phase输入含完整acceptance/bindings/ci.yml，改共享控制会
+改变多个inputsSHA256，不能承诺任意修复后仍复用旧镜像。实际失败由精确影响
+决定下一步，不新增通用缓存架构。所有ready/approved/SARIF policy仍pending。
