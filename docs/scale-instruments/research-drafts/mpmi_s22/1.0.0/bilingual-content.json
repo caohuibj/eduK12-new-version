@@ -1,0 +1,215 @@
+{
+  "identity": {
+    "instrumentKey": "mpmi_s22_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "originalAdministrationLanguage": "de",
+  "authorPublishedTranslationLanguage": "en",
+  "platformTranslationLanguage": "zh-CN",
+  "authorAppendix": "https://media.springernature.com/original/springer-static/esm/art%3A10.1186%2Fs42409-019-0008-6/MediaObjects/42409_2019_8_MOESM1_ESM.pdf",
+  "questions": [
+    {
+      "number": 1,
+      "itemCode": "MPMI_01",
+      "authorPublishedEnglish": "I forget to cancel contracts on time, like trial subscriptions for newspapers.",
+      "platformChinese": "我会忘记在截止日期前取消合约，比如报纸的试订服务。",
+      "dimension": "pma",
+      "reverse": true
+    },
+    {
+      "number": 2,
+      "itemCode": "MPMI_02",
+      "authorPublishedEnglish": "I remember to run errands that need to be completed within a specific timeframe, like picking up my laundry from the dry cleaner before it closes.",
+      "platformChinese": "我会记得在规定时间内办好事情，比如在干洗店关门前取回衣物。",
+      "dimension": "pma",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "MPMI_03",
+      "authorPublishedEnglish": "If I´ve borrowed something from someone for a while, I remember to give it back to that person the next time we see each other.",
+      "platformChinese": "如果向别人借东西有一段时间了，下次见面时我会记得还给对方。",
+      "dimension": "pma",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "MPMI_04",
+      "authorPublishedEnglish": "I forget to call a friend again after I couldn´t reach him or her on the first try.",
+      "platformChinese": "第一次没打通朋友的电话后，我会忘记再打一次。",
+      "dimension": "pma",
+      "reverse": true
+    },
+    {
+      "number": 5,
+      "itemCode": "MPMI_05",
+      "authorPublishedEnglish": "I receive overdue notifications because I forget to pay bills on time.",
+      "platformChinese": "我会因为忘记按时支付账单而收到催缴通知。",
+      "dimension": "pma",
+      "reverse": true
+    },
+    {
+      "number": 6,
+      "itemCode": "MPMI_06",
+      "authorPublishedEnglish": "I am able to remind myself of phone calls I need to make, such as calling a friend on his or her birthday.",
+      "platformChinese": "我能够自己想起还没打的电话，比如今天需要给过生日的朋友打电话。",
+      "dimension": "pma",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "MPMI_07",
+      "authorPublishedEnglish": "I remember my appointments which are coming up in a few days without writing them down.",
+      "platformChinese": "即使没有写下来，我也会及时想起这几天要赴的约。",
+      "dimension": "pma",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "itemCode": "MPMI_08",
+      "authorPublishedEnglish": "I don´t send e-mails or letters on time, even when I wrote myself a reminder to do so.",
+      "platformChinese": "即使已经写下提醒，我还是没能按时发出该发的邮件或信件。",
+      "dimension": "pma",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "itemCode": "MPMI_09",
+      "authorPublishedEnglish": "Even when I´m busy doing other things, I deliberately try to keep unfinished tasks in mind so that I don´t forget them.",
+      "platformChinese": "即使正在忙别的事，我也会有意识地反复想着还没做完的事情，以免忘记。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "itemCode": "MPMI_10",
+      "authorPublishedEnglish": "In the morning, I go through the day‘s tasks in my head so that I don´t forget to remember something.",
+      "platformChinese": "早上我会在脑中把当天要做的事情过一遍，以免忘记。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "MPMI_11",
+      "authorPublishedEnglish": "When I have to complete steps in a specific order, such as when I am baking, I visualize the sequence of steps before starting.",
+      "platformChinese": "如果有几件事需要按顺序完成，比如烘焙，我会在开始前想象整个步骤。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "MPMI_12",
+      "authorPublishedEnglish": "After completing a task, I check once again whether I took care of everything, like turning off the stove after cooking.",
+      "platformChinese": "做完一件事后，我会再检查是否都处理好了，比如做完饭后是否关了炉灶。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "MPMI_13",
+      "authorPublishedEnglish": "In my mind, I make a list of things that I still have to complete.",
+      "platformChinese": "我会在脑中列一份还有哪些事情没做的清单。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "MPMI_14",
+      "authorPublishedEnglish": "I think of my to-do list while I am busy doing something else, like washing dishes or working out.",
+      "platformChinese": "忙着做其他事情时，比如洗碗或运动，我会在脑中回想待办清单。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "MPMI_15",
+      "authorPublishedEnglish": "Before I go shopping, I picture where the products I need are located in the store, so that I don´t forget to pick them up when I walk through the aisles.",
+      "platformChinese": "购物前，我会想象需要的商品在店里的什么位置，以免经过货架时忘记拿。",
+      "dimension": "pmsi",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "MPMI_16",
+      "authorPublishedEnglish": "I write myself a to-do list to remind me of things that I still need to accomplish.",
+      "platformChinese": "我会写一份待办清单，提醒自己还有哪些事情要做。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "itemCode": "MPMI_17",
+      "authorPublishedEnglish": "I write shopping lists.",
+      "platformChinese": "我会写购物清单。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "itemCode": "MPMI_18",
+      "authorPublishedEnglish": "When I have to take something with me the next morning, like a letter or a library book, I put it in my bag the evening before so that I won´t forget it the next day.",
+      "platformChinese": "第二天早上要带的东西，比如信件或借的图书，我会在前一晚放进包里，以免早上忘记。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "itemCode": "MPMI_19",
+      "authorPublishedEnglish": "I keep a calendar with all of my appointments.",
+      "platformChinese": "我会用日历记下所有约定和安排。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "itemCode": "MPMI_20",
+      "authorPublishedEnglish": "To help me remember to do things, I stick \"Post-It \" notes in obvious places.",
+      "platformChinese": "我会把写有待办事项的便条贴在显眼的地方，提醒自己。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 21,
+      "itemCode": "MPMI_21",
+      "authorPublishedEnglish": "I put things in prominent places so that I´m reminded of tasks I need to do (for example, putting a full trash bag in front of the door so I don´t forget to take it out).",
+      "platformChinese": "我会把物品放在显眼的位置，提醒自己要做的事，比如把装满的垃圾袋放在门口，以免忘记拿出去。",
+      "dimension": "pmse",
+      "reverse": false
+    },
+    {
+      "number": 22,
+      "itemCode": "MPMI_22",
+      "authorPublishedEnglish": "For things that I need to do on a regular basis, I plan to do them at the same time each day (for example, always taking my medication in the evening before brushing my teeth).",
+      "platformChinese": "对于需要定期做的事情，我会安排在每天同一时间做，比如每天晚上刷牙前服药。",
+      "dimension": "pmse",
+      "reverse": false
+    }
+  ],
+  "options": [
+    {
+      "value": "1",
+      "label": "很少",
+      "score": 1
+    },
+    {
+      "value": "2",
+      "label": "比较少",
+      "score": 2
+    },
+    {
+      "value": "3",
+      "label": "有时",
+      "score": 3
+    },
+    {
+      "value": "4",
+      "label": "比较经常",
+      "score": 4
+    },
+    {
+      "value": "5",
+      "label": "经常",
+      "score": 5
+    }
+  ]
+}

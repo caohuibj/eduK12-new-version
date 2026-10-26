@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "assetVersion": "1.0.0",
+  "reportVersion": "1.0.0",
+  "kind": "OPTIONAL_TAKE_HOME_CARD",
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "maximumCardsPerReport": 1,
+  "brand": "EDUK12.TOP",
+  "headline": "不用全靠脑袋记",
+  "message": "把一件要做的事写下来，放到看得见的地方。",
+  "alt": "一只手在清单上写字，旁边有提醒铃。带走的话：不用全靠脑袋记，把一件要做的事写下来，放到看得见的地方。EDUK12.TOP。",
+  "file": "assets/take-home-v1.png",
+  "sha256": "eed3128d7aa5031d5735d4c6b3d9ebe9fa6b9e56a63f8c2863e48b27fd83c9e2",
+  "pixelWidth": 2161,
+  "pixelHeight": 728,
+  "intendedDisplayWidthCssPx": 440,
+  "requiredForScoring": false,
+  "generatedPerParticipant": false,
+  "provenance": "AI-generated platform explanatory artwork, visually checked for Chinese text and exact EDUK12.TOP wordmark; not an original study figure or author endorsement."
+}

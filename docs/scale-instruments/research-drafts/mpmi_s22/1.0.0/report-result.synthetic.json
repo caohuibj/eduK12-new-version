@@ -1,0 +1,346 @@
+{
+  "kind": "ACTUAL_BUILD_SCALE_RESULT_SYNTHETIC_EXAMPLE",
+  "sourceSha256": "edb6d9f9a8da1995a92674a4520d6cafd45896f31312b878d9435df88d1e2879",
+  "measurementHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+  "fixture": "mixed_independent",
+  "result": {
+    "schemaVersion": 2,
+    "instrument": {
+      "scaleId": "synthetic-batch-mpmi_s22_zh_cn_research",
+      "code": "mpmi_s22_zh_cn_research",
+      "name": "日常记事与提醒习惯问卷（MPMI-s，22题中文工作稿）",
+      "instrumentVersion": "1.0.0"
+    },
+    "method": {
+      "scaleId": "synthetic-batch-mpmi_s22_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "scoringVersion": "1.0.0",
+      "reportVersion": "1.0.0",
+      "definitionHash": "7dba74254e90bc8435c5f487a682a3342a6e5b3b585636b04eac84dce32e700c",
+      "referenceVersions": [],
+      "assessmentContext": null,
+      "reportAudience": "student",
+      "localizationVersion": "1.0.0"
+    },
+    "quality": {
+      "status": "interpretable",
+      "flags": []
+    },
+    "itemScores": [
+      {
+        "itemCode": "MPMI_01",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 5
+      },
+      {
+        "itemCode": "MPMI_02",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "MPMI_03",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "MPMI_04",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 2
+      },
+      {
+        "itemCode": "MPMI_05",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 1
+      },
+      {
+        "itemCode": "MPMI_06",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "MPMI_07",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "MPMI_08",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "MPMI_09",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "MPMI_10",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "MPMI_11",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "MPMI_12",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "MPMI_13",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "MPMI_14",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "MPMI_15",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "MPMI_16",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "MPMI_17",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      },
+      {
+        "itemCode": "MPMI_18",
+        "responseValue": "3",
+        "baseScore": 3,
+        "score": 3
+      },
+      {
+        "itemCode": "MPMI_19",
+        "responseValue": "4",
+        "baseScore": 4,
+        "score": 4
+      },
+      {
+        "itemCode": "MPMI_20",
+        "responseValue": "5",
+        "baseScore": 5,
+        "score": 5
+      },
+      {
+        "itemCode": "MPMI_21",
+        "responseValue": "1",
+        "baseScore": 1,
+        "score": 1
+      },
+      {
+        "itemCode": "MPMI_22",
+        "responseValue": "2",
+        "baseScore": 2,
+        "score": 2
+      }
+    ],
+    "scores": [
+      {
+        "key": "pma",
+        "type": "dimension",
+        "label": "记住要做的事",
+        "description": "更多表示你自述较常记住原本打算做的事情，不是客观记忆能力测验。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 2.375,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "MPMI_01",
+          "MPMI_02",
+          "MPMI_03",
+          "MPMI_04",
+          "MPMI_05",
+          "MPMI_06",
+          "MPMI_07",
+          "MPMI_08"
+        ],
+        "answeredItems": [
+          "MPMI_01",
+          "MPMI_02",
+          "MPMI_03",
+          "MPMI_04",
+          "MPMI_05",
+          "MPMI_06",
+          "MPMI_07",
+          "MPMI_08"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "pmsi",
+        "type": "dimension",
+        "label": "在脑中过一遍",
+        "description": "更多表示较常在脑中排练或回想待办事项，不能当作能力高低。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 3.4285714285714284,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "MPMI_09",
+          "MPMI_10",
+          "MPMI_11",
+          "MPMI_12",
+          "MPMI_13",
+          "MPMI_14",
+          "MPMI_15"
+        ],
+        "answeredItems": [
+          "MPMI_09",
+          "MPMI_10",
+          "MPMI_11",
+          "MPMI_12",
+          "MPMI_13",
+          "MPMI_14",
+          "MPMI_15"
+        ],
+        "status": "calculated",
+        "prorated": false
+      },
+      {
+        "key": "pmse",
+        "type": "dimension",
+        "label": "借助身边的提醒",
+        "description": "更多表示较常使用清单、日历和环境提示，不表示记忆更差或更好。",
+        "direction": "higher_is_more",
+        "canonical": true,
+        "displayPrecision": 2,
+        "value": 2.5714285714285716,
+        "range": {
+          "min": 1,
+          "max": 5
+        },
+        "expectedItems": [
+          "MPMI_16",
+          "MPMI_17",
+          "MPMI_18",
+          "MPMI_19",
+          "MPMI_20",
+          "MPMI_21",
+          "MPMI_22"
+        ],
+        "answeredItems": [
+          "MPMI_16",
+          "MPMI_17",
+          "MPMI_18",
+          "MPMI_19",
+          "MPMI_20",
+          "MPMI_21",
+          "MPMI_22"
+        ],
+        "status": "calculated",
+        "prorated": false
+      }
+    ],
+    "references": [],
+    "interpretations": [
+      {
+        "scoreKey": "pma",
+        "headline": "记住要做的事",
+        "label": null,
+        "interpretation": "这些问题关注你在日常生活中，能不能在合适的时候想起原本打算做的事，例如回电话、还东西或赴约。它记录的是你对自己习惯的描述，不能代替实际的记忆测试。忙碌、疲惫、事情是否重要，以及有没有合适的提醒，都可能影响回答。不必用一次结果给自己贴上“记性好”或“记性差”的标签。可以挑一个最近差点忘记的小事，想想当时是什么帮你记住了它。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "最近一次你及时想起要做的事，是什么线索提醒了你？"
+          },
+          {
+            "category": "strategy",
+            "text": "选一件小事，把它和一个稳定的日常动作联系起来，比如出门前看一眼待办清单。"
+          }
+        ],
+        "limitations": [
+          "这是一份日常习惯的自我描述，不能用来判断是否患有记忆方面的疾病。",
+          "中文题目是平台工作译稿，目前没有适合直接与中国人群比较的依据。",
+          "少量漏答时，只按已经回答的题目整理结果；信息不足时会提示，不能把没回答当作很少发生。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "pmsi",
+        "headline": "在脑中过一遍",
+        "label": null,
+        "interpretation": "有些人会在脑中把待办事项过一遍，想象做事的步骤，或在开始一天前先排一排。这部分关注你有多常使用这些心里的小提醒，并不是越常想就一定越好。当事情很多时，反复惦记也可能让人觉得累。你可以观察这种做法什么时候帮到了自己，什么时候需要换一种更轻松的提醒办法。选择一个适合自己的方法，比要求自己始终记着所有事情更实际。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "在脑中排练事情时，你是更清楚了，还是更容易反复担心？"
+          },
+          {
+            "category": "strategy",
+            "text": "明天开始前，只挑一件重要的小事，在脑中想一遍第一步怎么做。"
+          }
+        ],
+        "limitations": [
+          "这是一份日常习惯的自我描述，不能用来判断是否患有记忆方面的疾病。",
+          "中文题目是平台工作译稿，目前没有适合直接与中国人群比较的依据。",
+          "少量漏答时，只按已经回答的题目整理结果；信息不足时会提示，不能把没回答当作很少发生。"
+        ],
+        "referenceVersion": null
+      },
+      {
+        "scoreKey": "pmse",
+        "headline": "借助身边的提醒",
+        "label": null,
+        "interpretation": "清单、日历、便条或提前放好的物品，都可以替我们承担一部分记事的负担。这部分关注你有多常借助身边的提醒，并不表示依赖提醒就是记性不好。就像出门前把要带的东西放到顺手的位置，一点准备有时能减少临时找东西的麻烦。你可以试着把提醒放在真正会看到、也方便行动的地方。方法是否合适，要看它有没有帮到自己的日常生活，而不是看用了多少种工具。",
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "你现在的提醒，通常是在什么地方、什么时刻被自己看见的？"
+          },
+          {
+            "category": "strategy",
+            "text": "把一件要做的事写下来，放在行动前会看见的地方，试一天再调整。"
+          }
+        ],
+        "limitations": [
+          "这是一份日常习惯的自我描述，不能用来判断是否患有记忆方面的疾病。",
+          "中文题目是平台工作译稿，目前没有适合直接与中国人群比较的依据。",
+          "少量漏答时，只按已经回答的题目整理结果；信息不足时会提示，不能把没回答当作很少发生。"
+        ],
+        "referenceVersion": null
+      }
+    ],
+    "caveats": [
+      "这是一份日常习惯的自我描述，不能用来判断是否患有记忆方面的疾病。",
+      "中文题目是平台工作译稿，目前没有适合直接与中国人群比较的依据。",
+      "少量漏答时，只按已经回答的题目整理结果；信息不足时会提示，不能把没回答当作很少发生。",
+      "未提供群体参考。"
+    ],
+    "disclaimer": "用于回顾成年人的日常记事与提醒习惯，不是考试，也不能用于诊断。中文为平台工作译稿。"
+  }
+}
