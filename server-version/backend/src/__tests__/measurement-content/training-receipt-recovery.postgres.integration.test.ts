@@ -8,7 +8,7 @@ suite('accepted STANDARD whole receipt actual report-worker recovery',()=>{
  async function finish(prior:any,expired:any,input:any,studentId:string,scaleIds:string[],itemIds:string[]){
   const id=prior.attemptId,outbox=await import('../../modules/assessment-runtime/report-outbox.service'),whole=await import('../../modules/composite/whole-questionnaire.service')
   const guard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
-  await expect(db.$transaction((tx:any)=>guard(tx,scaleIds,{compositeAttemptId:id,compositeItemIds:itemIds,acceptedReceipt:{submissionId:input.submissionId,payloadHash:prior.wholePayloadHash,acceptedAtMs:prior.wholeAcceptedAt.getTime(),leaseToken:expired!.leaseToken!}}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+  await expect(db.$transaction((tx:any)=>guard(tx,scaleIds,{compositeAttemptId:id,compositeAttemptEpoch:prior.attemptEpoch,compositeItemIds:itemIds,acceptedReceipt:{submissionId:input.submissionId,payloadHash:prior.wholePayloadHash,acceptedAtMs:prior.wholeAcceptedAt.getTime(),leaseToken:expired!.leaseToken!}}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
   process.env.ASSESSMENT_REPORT_LEASE_MS='60000';const job=await outbox.claimCompositeReportJob();expect(job?.id).toBe(prior.id);expect(job!.leaseToken).not.toBe(expired!.leaseToken)
   await expect(whole.processWholeQuestionnaireAnswers({...job!,wholePayloadHash:'f'.repeat(64)})).rejects.toThrow('封存内容无法验证')
   await (await import('../../workers/compositeReportWorker')).processCompositeReportJob(job!)
@@ -88,6 +88,14 @@ suite('accepted STANDARD whole receipt actual report-worker recovery',()=>{
   await call(student,`${path}/form-sections/${section.id}/submit`,{submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:section.definitionHash,contextSnapshotHash:state.contextSnapshotHash,answers:section.answers.map((a:any)=>({formItemId:a.formItemId??a.id,value:'7'}))})
   state=await call(student,path);expect(state.currentItem.type).toBe('SCALE')
   const whole=await import('../../modules/composite/whole-questionnaire.service'),definition=await whole.getWholeQuestionnaireDefinition(id,{userId:student.id})
+  // New snapshots freeze an absent instruction as null. Metadata edits must
+  // not become instructions after whole-form or current-unit delivery reloads.
+  expect(definition.units[0].scale.instruction).toBeNull()
+  await db.scale.update({where:{id:installed.scaleId!},data:{instruction:'Later mutable instruction must not enter this attempt'}})
+  const refreshed=await whole.getWholeQuestionnaireDefinition(id,{userId:student.id})
+  expect(refreshed.units[0].scale.instruction).toBeNull()
+  const currentUnit=await (await import('../../modules/composite/composite.service')).getAttemptState(id,{userId:student.id},undefined,'current-unit')
+  expect(currentUnit.currentItem.scale.instruction).toBeNull()
   const answers=source.executable!.definition.items.map(i=>({itemCode:i.itemCode,responseValue:'3'})),input={submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,slotSetHash:definition.slotSetHash!,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map(unit=>({itemId:unit.itemId,definitionHash:unit.definitionHash,answers}))}
   const ack=await whole.submitWholeQuestionnaire(id,input,{userId:student.id});expect(ack.status).toBe('ACCEPTED')
   const prior=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:id,attemptEpoch:state.attemptEpoch}}})

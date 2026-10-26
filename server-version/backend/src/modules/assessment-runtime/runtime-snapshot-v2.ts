@@ -1,3 +1,4 @@
+import {frozenScaleInstructionSchema,type FrozenScaleInstruction} from './frozen-scale-instruction'
 import { frozenScalePresentationSchema, type FrozenScalePresentation } from '../scale/scale-presentation'
 import { z } from 'zod'
 import { createHash } from 'node:crypto'
@@ -14,17 +15,7 @@ import {
 } from '../scale/policy/compile'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
 
-/** Frozen administration instruction of the distributed version. Presentation
- * content only: outside the definition/measurement hash, immutable per
- * attempt once frozen, and resumed sessions read it instead of the live
- * Scale row. */
-export const frozenScaleInstructionSchema = z.object({
-  text: z.string().min(1),
-  language: z.string().min(2).optional(),
-  version: z.string().min(1).optional(),
-  origin: z.enum(['INSTRUMENT_SOURCE', 'SCALE_FIELD']),
-}).strict()
-export type FrozenScaleInstruction = z.infer<typeof frozenScaleInstructionSchema>
+export {frozenScaleInstructionSchema,type FrozenScaleInstruction} from './frozen-scale-instruction'
 
 export interface FrozenScaleRuntimeSnapshotV2 {
   schemaVersion: 2

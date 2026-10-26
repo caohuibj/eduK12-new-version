@@ -23,6 +23,7 @@ import { assertUnifiedScaleDelivery, submitUnifiedScaleAssessmentFinal, submitUn
 import { preloadFrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { runnerDefinition } from '../scale/scale-definition'
 import {assertTrainingScaleCollectionAllowed} from '../scale/scale-collection-guard'
+import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 
 const encryptWholeRawPayload = (value: unknown): string => encryptUnifiedRuntimePayload(compactAssessmentStorageEnabled() ? packWholeRawEnvelope(value) : value)
 
@@ -199,7 +200,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
       presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
       ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
+      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })
   }
   const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))
@@ -351,12 +352,16 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
-  },parent.hasStandardCombination?async tx=>{
-    const children=await tx.assessment.findMany({where:{compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
-      compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{scaleId:true,compositeItemId:true}})
-    if(children.length!==prepared.length)throw failure('整卷工具来源已变化')
-    await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),{compositeAttemptId:parent.id,compositeItemIds:children.map(child=>child.compositeItemId!)})
-  }:undefined)
+  },async tx=>{
+    // A new durable ACK is still collection. Resolve and lock every selected
+    // real child/source in this same receipt transaction, including ordinary
+    // questionnaires. A previously accepted replay returned above.
+    const children=await tx.assessment.findMany({where:{id:{in:prepared.map(unit=>unit.assessmentId)},compositeAttemptId:parent.id,attemptEpoch:parent.attemptEpoch,
+      compositeItemId:{in:prepared.map(unit=>unit.itemId)}},select:{id:true,scaleId:true,compositeItemId:true}})
+    if(children.length!==prepared.length||children.some(child=>!prepared.some(unit=>unit.assessmentId===child.id&&unit.itemId===child.compositeItemId)))throw failure('整卷工具来源已变化')
+    if(parent.hasStandardCombination)await assertTrainingScaleCollectionAllowed(tx,children.map(child=>child.scaleId),{compositeAttemptId:parent.id,compositeItemIds:children.map(child=>child.compositeItemId!)})
+    else await assertScaleLibraryCollectionAllowed(tx,[],children.map(child=>child.scaleId))
+  })
   const feedback = rememberWholeReportFeedbackHint(attemptId, input.submissionId, detachedWholeReceiptsEnabled() && !receipt.replayed ? recordWholeReceiptStored() : receipt.queueDepth)
   return receiptResponse(attemptId, input.submissionId, canonical.hash, receipt.acceptedAt, receipt.replayed, feedback.profile)
 })

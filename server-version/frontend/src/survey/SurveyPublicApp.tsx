@@ -697,7 +697,7 @@ export default function SurveyPublicApp(){
   const confirmSavedAndStart=()=>beginAnswering(true)
   const currentFlow=useMemo(()=>task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null,[task,answers])
   const timedScaleUnits=useMemo(()=>new Map((task?.units??[]).filter(unit=>unit.kind==='SCALE').map(unit=>[
-    unit.instrumentKey,{instrumentKey:unit.instrumentKey,title:unit.title,
+    unit.instrumentKey,{instrumentKey:unit.instrumentKey,title:unit.title,instruction:unit.instruction,
       items:unit.items??[],responseOptions:unit.responseOptions??[]},
   ])),[task])
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]

@@ -6,11 +6,12 @@ import {verifyStoredTrainingStandardItem} from './training-standard-combination'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import type {WholeReceiptExecution} from './whole-questionnaire.service'
+import {assertVerifiedTrainingFlowScaleMaterialization,type VerifiedTrainingFlowMaterialization} from './training-flow-scope'
 
 /** Invoked after normal participant/receipt checks, inside the protected write.
  * New admission checks current use; admitted children retain frozen rules.
  * Saved FINAL replay and historical report reads do not call this guard. */
-export async function assertTrainingStandardCollectionAllowed(tx:Prisma.TransactionClient,parentId:string,scaleIds:readonly string[],itemIds:readonly string[]=[],acceptedReceipt?:WholeReceiptExecution){
+export async function assertTrainingStandardCollectionAllowed(tx:Prisma.TransactionClient,parentId:string,scaleIds:readonly string[],itemIds:readonly string[]=[],acceptedReceipt?:WholeReceiptExecution,verifiedFlowMaterialization?:VerifiedTrainingFlowMaterialization){
  const [header]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT a.id FROM composite_assessment_attempts a WHERE a.id=${parentId}
   AND (EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=a.composite_assessment_id
    AND i.standard_combination_source IS NOT NULL AND i.scale_id=ANY(${[...scaleIds]}::text[])
@@ -22,6 +23,10 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
  const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:parentId},include:{scaleAssessments:{select:{compositeItemId:true,attemptEpoch:true,scaleId:true}},
   compositeAssessment:{include:{questionnaireCourses:true,items:{include:{scale:true}}}}}})
  if(!parent)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_PARENT_MISSING')
+ const materializingScaleId=verifiedFlowMaterialization
+  ?assertVerifiedTrainingFlowScaleMaterialization(tx,verifiedFlowMaterialization,{compositeAttemptId:parentId,
+   compositeAttemptEpoch:parent.attemptEpoch,compositeItemIds:itemIds,scaleIds}):null
+ if(materializingScaleId&&parent.status!=='IN_PROGRESS')throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
  const content=trainingBoundContent(parent)
  if(!content)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_BINDING_REQUIRED')
  const selectedIds=itemIds.length?itemIds:parent.scaleAssessments.filter(a=>a.attemptEpoch===parent.attemptEpoch&&scaleIds.includes(a.scaleId)).map(a=>a.compositeItemId)
@@ -41,12 +46,14 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
   if(!item?.standardCombinationSource||!unit?.source.standardCombination||item.type!=='SCALE'||item.scaleId!==unit.source.id
    ||canonicalHash(item.standardCombinationSource)!==canonicalHash(unit.source.standardCombination))
    throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
-  const admitted=parent.scaleAssessments.some(child=>child.compositeItemId===id&&child.scaleId===item.scaleId&&child.attemptEpoch===parent.attemptEpoch)
-  if(acceptedReceipt&&!admitted)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
+  const materialized=parent.scaleAssessments.some(child=>child.compositeItemId===id&&child.scaleId===item.scaleId&&child.attemptEpoch===parent.attemptEpoch)
+  const admitted=materialized||materializingScaleId===item.scaleId&&itemIds.length===1&&itemIds[0]===id
+  if(acceptedReceipt&&!materialized)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
   if(admitted){
-   // START already committed this exact child/epoch. A durable whole FINAL also
-   // has to own the matching receipt/hash/lease above. Neither path is a new
-   // admission: lifecycle and emergency stops cannot strand accepted answers.
+   // START committed this child or the parent-frozen exact flow candidate,
+   // whose original proof authenticates this same pending unit/transaction.
+   // A durable whole FINAL additionally owns the receipt/hash/lease above.
+   // These executions retain the existing frozen exact-content contract.
    await readTrainingStandardContentIdentity(tx,unit,{compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy!})
   }else{
    const current=await verifyStoredTrainingStandardItem(tx,parent.compositeAssessment,item,'COLLECTION')

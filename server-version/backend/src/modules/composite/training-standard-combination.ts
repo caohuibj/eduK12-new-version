@@ -1,3 +1,4 @@
+import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash,retainImmutableCanonicalValue} from '../assessment-runtime/canonical'
@@ -8,7 +9,7 @@ import {standardAxisHashes,standardCombinationHash} from '../measurement-content
 import {assertTrainingStandardUse,standardCombinationPointerSchema,trainingStandardUseAuthoritySchema} from '../measurement-content/standard-combination-use'
 import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
-import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
+import {frozenTripletInstruction} from '../survey/standard-triplet.model'
 import {scaleMeasurementRelease} from '../measurement-content/scale'
 import {assertCurrentTrainingContentOwner} from './training-report-selection'
 import {resolveScaleStartDeployment} from '../scale/deployment/service'
@@ -51,6 +52,7 @@ export async function prepareTrainingStandardItemSource(tx:Prisma.TransactionCli
  const authority=await assertTrainingStandardUse(tx,{userId:actorId,combination:pointer,measurementReleaseId:header.measurement_release.releaseId,useGrantId,useGrantVersion})
  if(purpose==='NEW_REFERENCE')await tx.$queryRaw(Prisma.sql`SELECT id FROM scale_deployment_policies WHERE scale_id=${scale.id} AND status='ACTIVE' FOR SHARE`)
  const resolved=await readCurrentStandardCombination(tx,pointer,purpose),t=resolved.row.snapshot
+ await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+pointer.releaseId,fingerprint:pointer.combinationHash},'TRAINING')
  if(resolved.measurement.releaseId!==header.measurement_release.releaseId||header.tool_key!==t.toolKey||header.instrument_version!==t.instrumentVersion)fail('TOOL_VERSION_MISMATCH')
  if(purpose==='NEW_REFERENCE'){
   const installed=prepareRelease(scaleMeasurementRelease({localId:scale.code,version:resolved.measurement.version,instrumentVersion:scale.instrumentVersion,
@@ -89,6 +91,14 @@ export function decodeTrainingStandardItemSource(raw:unknown,context?:{composite
  return source
 }
 
+/** Teacher display after the caller's container/data ACL. This is a frozen
+ * identity summary, never current authority or a source body. */
+export function trainingStandardCombinationSummary(raw:unknown){
+ const {combination}=decodeTrainingStandardItemSource(raw).reference
+ return {instrumentVersion:combination.instrumentVersion,axisVersions:{
+  CONTENT:combination.axes.CONTENT.version,PARAMETERS:combination.axes.PARAMETERS.version,REPORT:combination.axes.REPORT.version}}
+}
+
 export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClient,composite:any,item:any,purpose:Purpose='NEW_REFERENCE'){
  const stored=decodeTrainingStandardItemSource(item.standardCombinationSource,{compositeId:composite.id,itemId:item.id,scaleId:item.scaleId,ownerId:composite.createdBy})
  const r=stored.reference,current=await prepareTrainingStandardItemSource(tx,r.ownerId,composite,item,r.combination,purpose,r.authority.useGrantId,r.authority.useGrantVersion)
@@ -115,7 +125,7 @@ export async function freezeTrainingStandardScaleRuntime(tx:Prisma.TransactionCl
  // Standard combinations freeze the versioned source instruction with the
  // exact approved tool version (presentation content, outside the P/R hash).
  const frozen=await freezeScaleRuntimeAtAttemptStart(tx,{instrumentKey:t.toolKey,instrumentVersion:t.instrumentVersion,definition:t.definition,requestedMode:'COMPOSITE',
-  instruction:resolveFrozenScaleInstructionForScale({code:t.toolKey,instrumentVersion:t.instrumentVersion,instrumentClass:'STANDARD'})})
+  instruction:frozenTripletInstruction(t)})
  assertNativeParameters(t.references,frozen.referenceBindings)
  return frozen
 }

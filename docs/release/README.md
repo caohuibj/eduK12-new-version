@@ -1851,3 +1851,131 @@ production. Insecure/lookalike origins are refused. No browser security flag,
 application fallback, weakened response validation or source rebuild is used.
 The new fixed secure browser origin is part of the candidate binding and scope
 contract; its direct control consumers and changed SAST run with those new inputs.
+
+
+## PR356 exact-source qualification and admission (implementation pending review)
+
+The fixed same-repository PR356 branch uses `pr356-entry.mjs`, the complete
+`pr356-bindings.json` raw diff, normal modes, source blobs, component trees and
+protected lock/schema inputs. Unknown paths, drift or unavailable official
+identity stop this route; Ready, an input flag or main does not select platform,
+media, performance or Ops fallback. Every later control change changes the full
+candidate HEAD and invalidates an earlier independent activation release.
+
+Ready/open/synchronize events only observe the exact source/merge identity and
+complete selected table. They do not run application qualifications or emit a
+skipped success under the required `merge gate / ready PR` name. Explicit
+`qualify` dispatch selects sixteen independent, named producer/consumer phases;
+its aggregate is qualification-only. Both CodeQL languages preserve original
+SARIF and all findings. Analyze success with `upload: never` does not dispose of
+findings or authorize merge.
+
+All sixteen phase states, thirteen historical evidence groups and the SARIF
+policy currently remain pending. Historical candidate rows are an inventory for
+independent case selection/admission, not a request to rerun every listed test.
+The existing raw failures, filters, missing contemporaneous manifests and
+unsigned execution identities remain retained. No old application evidence is
+accepted by digest alone, retroactively signed or silently granted a new source.
+Original content/HOLD, Training P/R and 356-01 obligations remain separate.
+
+After exact-source independent review and real qualification, explicit `admit`
+dispatch requires the actual current non-Draft PR and exact Q JSON coordinates
+`{runId,attempt,artifactId,zipSHA256}`. It verifies every selected case and input,
+original successful official run/job/attempt/artifact ID/digest/expiry, actual
+upstream graph, admitted historical evidence and explicit SARIF dispositions.
+The unchanged required context independently recomputes the complete current
+source and verifies the official precheck. Missing, skipped, failed, cancelled,
+expired or changed evidence cannot qualify. Required protection and strict
+up-to-date rules are not modified; independent human release is not authenticated
+by a dispatch string or a self-reported review record.
+
+Producers are separate jobs. A failed-job retry can reuse only an original
+successful official producer with unchanged complete inputs and exact artifact
+pins. Partial success inside a failed producer job, including an upload failure
+after a build, is a stop for independent targeted continuation planning; there is
+no automatic rebuild or fallback to an older successful attempt.
+
+The small-Q/fixed-metadata adapter is now wired through the exact independently
+reviewed B caller patch and three actual reader/CLI controls, following new
+substantive authorization and actual approval. First qualify-result retains full
+original phase ZIP/history/raw SARIF validation. Admit authenticates Q and only
+the two necessary original CodeQL archives; gate/main authenticate official
+aggregate/Q archives, preserved reviews and fixed original phase/role metadata.
+They do not download original image/DB/browser/dist archives or replay application
+qualification. The earlier broad denied operation remains known not executed;
+that denial was not treated as automatically lifted by the new authorization.
+
+Supported reuse is same-head original successful attempts and exact same-tree
+regular-main-merge observation. Acceptance, bindings and ci.yml are complete
+shared phase inputs; changing them changes multiple inputs digests. This route
+does not promise arbitrary cross-commit producer/image reuse. A real failure
+requires exact impact review before continuation; no generic cache or broad
+fallback is introduced.
+
+All readiness, historical admission and SARIF policy states remain pending.
+No actual CI, Ready, merge, protection change, new credentials or deployment is
+executed by these implementation commits. The three reader/CLI groups use only
+synthetic Git/ZIP/API fixtures. Final exact HEAD/tree/base and executable budget
+require independent review before activation.
+
+
+Nine affected-review historical fullNames are also exact fresh-phase targets:
+vertical4 (four), exact-worker1 (one), ordinary-harness4 (four). Their sole required
+qualification source is now explicitly mapped by freshPhaseCoverageTransfers;
+all fresh case requirements remain unchanged and NOTRUN. The 413 original
+historical declarations/raw/statuses remain retained, while the mandatory
+historical case set contains the other 404. No assertion is removed and no
+historical group is approved by this transfer. All other original obligations
+remain subject to independent case review.
+
+
+PR356 CodeQL budgets match main's established30 minutes per language. CI-014's
+independently reviewed20-minute87/89-query timeout and approved30-minute success
+are retained as the reason; security-extended, both languages, complete findings
+and all other job limits remain unchanged. The targeted actual-YAML value check
+does not execute CodeQL or repeat existing green controls.
+
+At2026-10-26 13:14UTC root dot independently read the public ruleset list and
+23665026 using its existing read-only connection: the sole active default-branch
+rule has strict_required_status_checks_policy=true, required context
+merge gate / ready PR with integration_id15368, no bypass actors and
+current_user_can_bypass=never. No protection changed. This ruleset review is
+complete; the current node's earlier403/unread traditional branch-protection
+endpoint remains a separate boundary and was not retried.
+
+
+PR356 received only the independently authorized local15 supplement: complete
+connected8 first produced7PASS/1FAIL; its stale issuance-vs-frozen-use test
+consumer was corrected without changing production authorization, then only
+that case was reexecuted (1PASS/7filtered). Catalog2 and HTTP5 each passed once.
+Original failures, filtered cases and old HTTP/catalog observations remain.
+The raw reporters, exact commands/exits, contemporaneous source/Prisma/tool/
+fixture/environment records are indexed under local15Supplement in the retained
+evidence JSON. Large manifests use explicitly labelled lossless gzip transport;
+decode base64, decompress, and verify original bytes/SHA. This supplements only
+these four actual invocations, never backfills historical manifests or signs
+old runs. The connected fixture remains APPROVED_WITHOUT_TRIAL.
+
+The source binding now pins the small test-only commit feb5f12d678af008dcc2397ba752889c0f4350cd,
+342 source paths,41 controls and the actual updated backend tree. All16 phase
+readiness,13 history groups and SARIF policy remain pending independent exact
+candidate review. No other opt-in suites/types/build/browser/CI were executed;
+no Ready/merge/deploy/protection/credential action occurred. Detailed per-case
+mapping, portable pointers and remaining decisions are in
+[the activation record](../pr356-ci-activation-20261026.md).
+
+### PR356 eligible PR-event bridge (2026-10-26 correction)
+
+GitHub branch rulesets do not accept workflow_dispatch-created job checks as
+required PR checks. A successful manual PR356 admission is evidence, not the
+platform's final merge authorization. On a non-Draft pull_request event, the
+existing stable gate now recomputes the actual merge-preview and source plan,
+reads one canonical `pr356-admission-pin:v1` JSON marker from the live PR body,
+and authenticates that exact same-head manual admission plus Q and fixed original
+phase metadata. The marker supplies coordinates only; no status is inferred from
+PR prose, an input boolean, or a skipped job. Missing/stale/ambiguous pins refuse.
+This eligible consumer never runs application producers or tests. Main reuses the
+same explicit pin after validating the normal merge parents and exact tree.
+Keep the manual source proof distinct from the eligible merge-preview consumer.
+The final source commit must not carry skip-ci, because GitHub otherwise leaves
+its PR checks pending. No protection, credential, query or finding policy changes.

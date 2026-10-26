@@ -236,12 +236,12 @@ describe('explicit standard product entry selection',()=>{
   await screen.findByText('已上线；未创建研究者授权。')
  })
  it('fetches onboarding status only after selecting the read-only tab',async()=>{
-  await open();expect(mock.api).not.toHaveBeenCalledWith('/onboarding-status')
-  mock.api.mockImplementation(async(path:string)=>{if(path==='/onboarding-status')return {list:[]};throw new Error('Unexpected request '+path)})
+  await open();expect(mock.api.mock.calls.some(call=>String(call[0]).startsWith('/onboarding-status'))).toBe(false)
+  mock.api.mockImplementation(async(path:string)=>{if(path==='/onboarding-status?limit=25')return {list:[],hasMore:false,nextCursor:null};throw new Error('Unexpected request '+path)})
   fireEvent.click(screen.getByRole('button',{name:'接入状态'}))
   expect(await screen.findByRole('heading',{name:'标准量表接入状态'})).toBeVisible()
   expect(await screen.findByText('尚无标准量表接入记录。')).toBeVisible()
-  expect(mock.api.mock.calls.filter(call=>call[0]==='/onboarding-status')).toEqual([['/onboarding-status']])
+  expect(mock.api.mock.calls.filter(call=>String(call[0]).startsWith('/onboarding-status'))).toEqual([['/onboarding-status?limit=25']])
  })
 })
 

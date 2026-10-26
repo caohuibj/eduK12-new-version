@@ -1,4 +1,4 @@
-import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
+import { assertScaleNewEntryAllowed } from './scale-collection-guard'
 import { requiredScaleContextKeys } from './policy/context-preflight'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { prisma } from '../../config/database'
@@ -71,7 +71,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     if (current.userId !== userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此量表测评', 403)
-    await assertTrainingScaleCollectionAllowed(tx, [current.scaleId])
+    await assertScaleNewEntryAllowed(tx, [current.scaleId], userId)
     if (current.questionnaireAssessmentId || current.compositeAttemptId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '嵌入式量表必须重启所属问卷或综合测评', 409)
     }

@@ -1,3 +1,4 @@
+import {frozenScaleInstructionSchema,type FrozenScaleInstruction} from '../assessment-runtime/frozen-scale-instruction'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {standardAxisHashes,standardCombinationHash,compileStandardCombinationReport} from '../measurement-content/standard-combination'
 import {getScaleInstrumentSource,listScaleInstrumentSources} from '../scale/onboarding/instrument-registry'
@@ -62,8 +63,19 @@ export function composeTriplet(key:string,parts:Record<Axis,Part>):Triplet{
  const reference=toolReference('SCALE',key,{content:parts.CONTENT.reference,parameters:parts.PARAMETERS.reference,report:parts.REPORT.reference})
  return {schemaVersion:1,toolKey:key,title:source.catalog.identity.canonicalName,instrumentVersion:parts.CONTENT.sourceVersion,parts:json(parts),definition,references:json(parameters.references),template,combinationHash:standardCombinationHash(key,standardAxisHashes(parts)),blockers:[...new Set(blockers)],reference}
 }
+/** The approved CONTENT source already contains its versioned instruction.
+ * Resolve from that immutable record; registry/default changes are not inputs. */
+export function frozenTripletInstruction(triplet:Triplet):FrozenScaleInstruction|null{
+ const reference=triplet.parts.CONTENT.reference
+ if(canonicalHash(reference.metadata)!==reference.metadataHash)throw new Error('STANDARD_CONTENT_REFERENCE_HASH_MISMATCH')
+ const instruction=reference.metadata.instruction
+ if(instruction===undefined)return null
+ if(!instruction||typeof instruction!=='object')throw new Error('STANDARD_INSTRUCTION_SOURCE_INVALID')
+ const value=instruction as Record<string,unknown>
+ return frozenScaleInstructionSchema.parse({text:value.text,language:value.language,version:value.version,origin:'INSTRUMENT_SOURCE'})
+}
 export function tripletSnapshot(triplet:Triplet,releaseId:string,measurement?:{releaseId:string;contentHash:string}):CatalogSourceSnapshot{
- const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE')
- return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
+ const {display,mapping}=canonicalScalePresentation(triplet.definition,'ONE_BY_ONE'),instruction=frozenTripletInstruction(triplet)
+ return {ref:{kind:'SCALE',sourceId:'survey-standard:'+releaseId,sourceVersion:triplet.combinationHash},title:triplet.title,...(instruction?{instruction:instruction.text}:{}),displayDefinition:display,compiledDefinition:json(triplet.definition),definitionDigest:canonicalHash(triplet.definition),scoringDigest:canonicalHash(triplet.definition.scoring),adapterVersion:'survey-catalog-scale-v2',answerMapping:mapping,
  provenance:{instrumentClass:'STANDARD',standardInstrumentVersion:triplet.instrumentVersion,surveyStandardReleaseId:releaseId,code:triplet.toolKey,triplet:standardAxisHashes(triplet.parts),toolReference:triplet.reference,reportConfigured:triplet.parts.REPORT.payload!==null,parametersConfigured:triplet.parts.PARAMETERS.payload!==null,...(measurement?{sourceMeasurementRelease:measurement}:{})}}
 }

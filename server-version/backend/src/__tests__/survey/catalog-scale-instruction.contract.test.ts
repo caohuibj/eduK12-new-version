@@ -26,3 +26,23 @@ describe('frozen administration instruction threading through the Survey catalog
     expect(unit.instruction).toBe('冻结版本指导语')
   })
 })
+
+
+describe('approved exact combination instruction source',()=>{
+ it('threads the frozen CONTENT source instruction into Survey and Training without reading a later registry default',async()=>{
+  const {getScaleInstrumentSource}=await import('../../modules/scale/onboarding/instrument-registry')
+  const {sourceParts,composeTriplet,tripletSnapshot,frozenTripletInstruction}=await import('../../modules/survey/standard-triplet.model')
+  const {toolReference}=await import('../../modules/survey/tool-reference')
+  const source=getScaleInstrumentSource('academic_self_concept_biology_zh_cn','1.0.0')!
+  expect(source).toBeTruthy()
+  const parts=Object.fromEntries(sourceParts(source.identity.instrumentKey,source.identity.instrumentVersion).map(p=>[p.axis,p])) as Parameters<typeof composeTriplet>[1]
+  parts.CONTENT.reference=toolReference('SCALE',source.identity.instrumentKey,{...parts.CONTENT.reference.metadata,instruction:{schemaVersion:1,text:'This exact approved wording',language:'zh-CN',version:'instruction-approved-1',source:'Synthetic approved source'}})
+  const triplet=composeTriplet(source.identity.instrumentKey,parts),content=triplet.parts.CONTENT
+  expect(frozenTripletInstruction(triplet)).toMatchObject({text:'This exact approved wording',version:'instruction-approved-1',origin:'INSTRUMENT_SOURCE'})
+  const snapshot=tripletSnapshot(triplet,'approved-release')
+  expect(snapshot.instruction).toBe('This exact approved wording')
+  expect(snapshotUnit(snapshot,'exact-unit','tool').instruction).toBe('This exact approved wording')
+  content.reference.metadata.instruction={text:'Changed without approved source hash'}
+  expect(()=>tripletSnapshot(triplet,'approved-release')).toThrow('STANDARD_CONTENT_REFERENCE_HASH_MISMATCH')
+ })
+})

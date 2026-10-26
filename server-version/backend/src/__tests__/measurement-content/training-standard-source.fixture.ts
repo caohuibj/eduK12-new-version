@@ -40,7 +40,7 @@ export function trainingSourceHarness(){
   const deployment:any={id:ids.deployment,scaleId:ids.scale,revision:1,status:'ACTIVE',policyJson:policy,policyHash:hashScaleDeploymentPolicy(policy),authorizationRefs:[ids.auth],createdByUserId:ids.system,
     createdAt:new Date('2020-01-01'),activatedAt:new Date('2020-01-01'),retiredAt:null}
   const h={row,release,scale,composite,principal,grants,use,auth,policy,deployment,rows:new Map([[row.id,row]]),now:new Date('2026-10-25T06:00:00Z'),
-    materialActive:true,entryActive:true,entryProduct:'TRAINING',entryRole:'STANDARD',entryGrantId:tid(90),entryGrantVersion:1,owned:true,courseOwner:ids.owner,courseType:'TRAINING_COURSE',courseLibrary:false,
+    trainingDecision:'APPROVED' as 'APPROVED'|'RETURNED'|'PENDING',trainingPaused:false,materialActive:true,entryActive:true,entryProduct:'TRAINING',entryRole:'STANDARD',entryGrantId:tid(90),entryGrantVersion:1,owned:true,courseOwner:ids.owner,courseType:'TRAINING_COURSE',courseLibrary:false,
     emergency:false,scaleStop:false,missingMeasurement:false,expireDuringStop:false,expireLicenseDuringStop:false,sourceChanged:false,writes:[] as string[],calls:[] as string[]}
   const db:any={
     compositeAssessment:{findUnique:vi.fn(async()=>({...structuredClone(h.composite),...(!h.owned?{createdBy:'foreign'}:{})}))},
@@ -50,7 +50,7 @@ export function trainingSourceHarness(){
     assessmentReferenceSet:{findMany:vi.fn(async()=>h.row.snapshot.references.map((definition:any)=>({instrumentType:'SCALE',instrumentKey:'who5',referenceVersion:definition.referenceVersion,status:definition.status,definition})))},
     $executeRaw:vi.fn(async(query:any)=>{
       const sql=(query.sql??query.join('?')).replace(/\s+/g,' ').trim();h.calls.push(sql)
-      if(sql.includes('SELECT pg_advisory_xact_lock_shared'))return 1
+      if(sql.includes('SELECT pg_advisory_xact_lock_shared')||sql.includes('SELECT pg_advisory_xact_lock('))return 1
       h.writes.push(sql);throw new Error('Unexpected business write: '+sql)
     }),
     $queryRaw:vi.fn(async(query:any,...args:any[])=>{
@@ -65,6 +65,11 @@ export function trainingSourceHarness(){
       if(sql.includes('SELECT library_entry_id FROM scales'))return [{library_entry_id:null}]
       if(sql.includes('FROM scale_library_use_grants g'))return []
       if(sql.includes('SELECT e.id FROM scale_library_entries'))return []
+      if(sql.includes('FROM material_grants g JOIN survey_standard_releases'))return h.use&&!h.use.revoked_at?[{
+        id:h.row.id,combination_hash:h.row.combination_hash,title:h.row.snapshot.title,tool_key:h.row.tool_key,instrument_version:h.row.snapshot.instrumentVersion,
+        content_version:h.row.snapshot.parts.CONTENT.version,parameters_version:h.row.snapshot.parts.PARAMETERS.version,report_version:h.row.snapshot.parts.REPORT.version,
+        scale_id:h.scale.id,measurement_release:structuredClone(h.row.measurement_release),use_id:h.use.id,use_version:h.use.version,
+      }]:[]
       if(sql.includes('FROM material_grants WHERE teacher_id='))return h.use&&h.use.teacher_id===values[0]&&h.use.resource_id===values[1]&&(!values[2]||h.use.id===values[2])?[structuredClone(h.use)]:[]
       if(sql.includes('FROM material_grants WHERE id='))return h.use?.id===values[0]?[structuredClone(h.use)]:[]
       if(sql.includes('FROM content_capability_grants leaf'))return values[0]===ids.root?structuredClone(h.grants):[]
@@ -72,6 +77,7 @@ export function trainingSourceHarness(){
       if(sql.includes('JOIN "admin_entry_grants"'))return h.entryActive&&h.entryProduct==='TRAINING'&&h.entryRole==='STANDARD'&&values.includes(ids.issuer)?[{id:ids.issuer,grantId:h.entryGrantId,grantVersion:h.entryGrantVersion}]:[]
       if(sql.includes('SELECT id FROM scale_deployment_policies'))return h.deployment?.status==='ACTIVE'?[{id:ids.deployment}]:[]
       if(sql.includes('FROM "scale_deployment_policies"'))return h.deployment?.status==='ACTIVE'?[structuredClone(h.deployment)]:[]
+      if(sql.includes('FROM survey_tool_policies'))return values[0]==='TRAINING'&&values[1]==='standard-release:'+h.row.id&&values[2]===h.row.combination_hash?[{decision:h.trainingDecision,paused:h.trainingPaused,version:1,reason:'Synthetic exact Training decision'}]:[]
       if(sql.includes('FROM survey_standard_releases')){
         const found=h.rows.get(values[0]);if(!found)return []
         return sql.includes('SELECT tool_key')?[{tool_key:found.tool_key,instrument_version:found.snapshot.instrumentVersion,measurement_release:structuredClone(found.measurement_release)}]:[structuredClone(found)]
