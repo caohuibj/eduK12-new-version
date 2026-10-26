@@ -175,3 +175,54 @@
 .hs-app .education-private-tools--school .education-form-import-preview li strong{font-size:14px;color:var(--hs-ink);font-weight:500}
 .hs-app .education-private-tools--school .education-form-import-preview [role=alert]{padding-left:18px;color:var(--survey-ui-danger,#963f3a)}
 @media(max-width:600px){.hs-app .education-private-tools--school .education-form-import-settings{grid-template-columns:minmax(0,1fr);gap:12px}.hs-app .education-private-tools--school .education-form-import-actions>button{flex:1 1 100%}}
+
+/* Keep the authoring controls compact across desktop, tablet and phone widths. */
+.hs-professional .hs-workspace-content:has(.education-private-tools--school)>.hs-workspace-page-heading{margin-bottom:16px}
+.hs-professional .hs-workspace-content:has(.education-private-tools--school)>.hs-workspace-page-heading h1{margin-bottom:0}
+.hs-app .education-private-tools--school .education-private-top{align-items:center;gap:4px 16px;padding-bottom:8px}
+.hs-app .education-private-tools--school .education-private-heading{flex-basis:180px}
+.hs-app .education-private-tools--school .education-private-heading .education-private-badge{font-size:11px;padding:3px 9px}
+.hs-app .education-private-tools--school .education-private-top summary{font-size:12px}
+.hs-app .education-private-tools--school .education-private-editor-overview{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;min-width:0}
+.hs-app .education-private-tools--school .education-private-navigation{display:flex;align-items:center;gap:8px;margin:0}
+.hs-app .education-private-tools--school .education-private-navigation>button:first-child{margin-right:auto}
+.hs-app .education-private-tools--school .education-private-navigation>.education-private-reload{width:44px;min-width:44px;flex:none;padding:0;order:1}
+.hs-app .education-private-tools--school .education-private-navigation>.education-private-save-state{flex:0 1 auto;min-width:0;max-width:55%;margin:0;line-height:1.6;font-size:12px;text-align:right}
+.hs-app .education-private-tools--school .education-private-editor-controls{grid-template-columns:minmax(220px,1fr) auto;gap:12px 20px}
+.hs-app .education-private-tools--school .education-private-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;gap:8px}
+.hs-app .education-private-tools--school .education-private-actions>button{padding-inline:10px;white-space:nowrap}
+.hs-app .education-private-tools--school .education-private-step-help{font-size:12px;line-height:1.7}
+.hs-app .education-private-tools--school .education-private-notice{margin:0;padding:8px 12px;border-left:3px solid var(--hs-primary);border-radius:4px;background:var(--hs-surface-soft);font-size:12px}
+.hs-app .education-private-tools--school .education-form-import>summary{font-weight:500}
+.hs-app .education-private-tools--school .education-form-import-settings{margin:12px 0;gap:12px 20px}
+.hs-app .education-private-tools--school .education-form-import-help{margin:0 0 12px}
+.hs-app .education-private-tools--school .education-form-import-workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;min-width:0}
+.hs-app .education-private-tools--school .education-form-import-input{min-width:0}
+.hs-app .education-private-tools--school .education-form-import-input textarea{min-height:180px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:14px;line-height:1.7}
+.hs-app .education-private-tools--school .education-form-import-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.hs-app .education-private-tools--school .education-form-import-preview{margin:0;padding:16px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);min-width:0}
+.hs-app .education-private-tools--school .education-form-import-preview>p:first-child{margin-top:0}
+.hs-app .education-private-tools--school .education-form-import-preview>button{width:100%}
+.hs-app .education-private-tools--school .education-form-import-preview>ol{margin:12px 0;max-height:360px}
+@container education-editor (min-width:950px){
+ .hs-app .education-private-tools--school .education-form-import-workspace:has(.education-form-import-preview){grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+}
+@container education-editor (max-width:1000px){
+ .hs-app .education-private-tools--school .education-private-editor-controls{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:700px){
+ .hs-app.hs-professional .education-private-tools--school{padding:16px;gap:12px}
+ .hs-app .education-private-tools--school .education-private-heading{flex-basis:100%}
+ .hs-app .education-private-tools--school .education-private-boundary>summary{padding-block:6px}
+ .hs-app .education-private-tools--school .education-private-editor-controls{grid-template-columns:minmax(0,1fr)}
+ .hs-app .education-private-tools--school .education-private-navigation>.education-private-save-state{flex:0 1 auto;max-width:46%;font-size:11px}
+ .hs-app .education-private-tools--school .education-private-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hs-app .education-private-tools--school .education-form-import{padding-inline:12px}
+ .hs-app .education-private-tools--school .education-form-import-input textarea{font-size:16px}
+ .hs-app .education-private-tools--school .education-form-import-preview{padding:12px}
+}
+@media(max-width:400px){
+ .hs-app .education-private-tools--school .education-private-navigation{flex-wrap:wrap}
+ .hs-app .education-private-tools--school .education-private-navigation>.education-private-save-state{order:2;flex-basis:100%;max-width:none;text-align:left}
+ .hs-app .education-private-tools--school .education-form-import-actions{grid-template-columns:minmax(0,1fr)}
+}
