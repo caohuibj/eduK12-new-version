@@ -163,10 +163,16 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
 }
 
 /** Training's owned-source picker only, not a public/bulk catalog read model.
+ * Returns at most 100 currently usable choices, not the first 100 raw grants.
+ * Keyset batches keep memory bounded; the existing transaction timeout bounds work.
  * Metadata is a hint; add/publish repeat exact source and current rights checks. */
 export async function listTrainingStandardCombinationChoices(userId:string){
  return prisma.$transaction(async tx=>{
   await assertTrainingStandardRecipient(tx,userId)
+  const choices=[]
+  let cursor:{toolKey:string;releaseId:string;useId:string}|undefined
+  const pageSize=100
+  while(choices.length<pageSize){
   const rows=await tx.$queryRaw<Array<{id:string;combination_hash:string;title:string;tool_key:string;instrument_version:string;content_version:string;parameters_version:string;report_version:string;scale_id:string;measurement_release:{releaseId:string};use_id:string;use_version:number}>>(Prisma.sql`
    SELECT r.id,r.combination_hash,r.snapshot->>'title' AS title,r.tool_key,r.snapshot->>'instrumentVersion' AS instrument_version,
     r.snapshot#>>'{parts,CONTENT,version}' AS content_version,r.snapshot#>>'{parts,PARAMETERS,version}' AS parameters_version,r.snapshot#>>'{parts,REPORT,version}' AS report_version,
@@ -175,13 +181,18 @@ export async function listTrainingStandardCombinationChoices(userId:string){
    JOIN scales s ON s.code=r.tool_key AND s.instrument_version=r.snapshot->>'instrumentVersion'
    WHERE g.teacher_id=${userId} AND g.resource_type='STANDARD_COMBINATION' AND g.revoked_at IS NULL AND r.state='ONLINE'
     AND s.status='PUBLISHED' AND s.instrument_class='STANDARD' AND s.library_entry_id IS NULL
-   ORDER BY r.tool_key,r.id LIMIT 100`)
-  const choices=[]
+    ${cursor?Prisma.sql`AND (r.tool_key,r.id,g.id)>(${cursor.toolKey},${cursor.releaseId},${cursor.useId})`:Prisma.empty}
+   ORDER BY r.tool_key,r.id,g.id LIMIT 100`)
   for(const row of rows){
    try{await assertToolEntryPolicy(tx,{resourceKey:'standard-release:'+row.id,fingerprint:row.combination_hash},'TRAINING');await assertTrainingStandardUse(tx,{userId,combination:{releaseId:row.id,combinationHash:row.combination_hash},measurementReleaseId:row.measurement_release.releaseId,useGrantId:row.use_id,useGrantVersion:row.use_version})}
    catch(e){if(e instanceof AdminPermissionError||(e instanceof Error&&'statusCode'in e&&e.statusCode===403))continue;throw e}
    choices.push({combination:{releaseId:row.id,combinationHash:row.combination_hash},scaleId:row.scale_id,title:row.title,
     toolKey:row.tool_key,instrumentVersion:row.instrument_version,axisVersions:{CONTENT:row.content_version,PARAMETERS:row.parameters_version,REPORT:row.report_version},useGrantId:row.use_id,useGrantVersion:row.use_version})
+   if(choices.length===pageSize)break
+  }
+  if(rows.length<pageSize)break
+  const last=rows[rows.length-1]
+  cursor={toolKey:last.tool_key,releaseId:last.id,useId:last.use_id}
   }
   return choices
  },options)

@@ -165,3 +165,42 @@ describe('adult population-specific reference effective dates',()=>{
   expect(timeMatched.points.every(p=>p.reference?.status==='available')).toBe(true)
  })
 })
+
+// The selected interpretation kind is part of the measurement identity, not
+// the incidental ordering of entries in an immutable reference set.
+describe('frozen reference kind',()=>{
+ const mixed=()=>{const r=structuredClone(refs[0]);const threshold=structuredClone(r.entries[0]);threshold.referenceKind='criterion_threshold';threshold.governance!.kind='CRITERION';threshold.governance!.bandSource='CRITERION';threshold.statistics={thresholds:[{key:'high',label:'High',minInclusive:3}]};r.entries.push(threshold);return r}
+ const input=(r:ReturnType<typeof mixed>,kind?:'criterion_threshold')=>({points:points.slice(0,2).map(p=>({...p,identity:{...identity(1),originalReferenceHash:referenceSetHash(r),...(kind?{originalReferenceKind:kind}:{})}})),references:[r],generatedAt:'2026-10-01T00:00:00Z'})
+ it.each(['ORIGINAL','TIME_MATCHED','LATER_REFERENCE'] as const)('retains the explicit kind independent of entry order in %s',mode=>{
+  const r=mixed();expect(validateReferenceSetDefinition(r).issues.filter(x=>x.severity==='error')).toEqual([])
+  for(const ordered of [r,{...r,entries:[...r.entries].reverse()}]){
+   const result=buildLongitudinalReferenceSnapshot({...input(ordered,'criterion_threshold'),mode})
+   expect(result.points.every(p=>p.reference?.referenceKind==='criterion_threshold'&&p.reference.status==='available')).toBe(true)
+  }
+ })
+ it.each(['ORIGINAL','TIME_MATCHED','LATER_REFERENCE'] as const)('does not guess a kind for ambiguous historical identities in %s',mode=>{
+  const r=mixed();const result=buildLongitudinalReferenceSnapshot({...input(r),mode})
+  expect(result.points.map(p=>p.reference)).toEqual([null,null])
+ })
+ it('keeps unambiguous legacy identities readable',()=>{
+  const r=structuredClone(refs[0]);expect(buildLongitudinalReferenceSnapshot(input(r)).points.every(p=>p.reference?.referenceKind==='theoretical_range')).toBe(true)
+ })
+ it('never substitutes another kind when the frozen one is absent',()=>{
+  const r=structuredClone(refs[0]);const result=buildLongitudinalReferenceSnapshot(input(r,'criterion_threshold'))
+  expect(result.points.every(p=>p.reference?.status==='unavailable')).toBe(true)
+ })
+})
+
+it('freezes the selected result kind into canonical metric identity',async()=>{
+ const {projectScaleCanonicalUnitResult,createCanonicalUnitResultEnvelope,parseCanonicalUnitResultEnvelope}=await import('../../modules/assessment-runtime/unit-result')
+ const r=testReference(),g=r.entries[0].governance!,hash=referenceSetHash(r)
+ const core=projectScaleCanonicalUnitResult({contextHash:'b'.repeat(64),participantContext:{gradeLevel:'8'},
+  runtime:{instrumentKey:r.instrumentKey,instrumentVersion:'1.0.0',sourceDefinitionHash:'a'.repeat(64),compilerVersion:'test',compiledRuntimeHash:'c'.repeat(64),scorerVersion:'1.0.0',aggregateProjection:{allowedMetricKeys:['wellbeing'],allowedFactKeys:[],allowedReferenceClassifications:['criterion_threshold']}} as any,
+  referenceBindings:[{referenceVersion:r.referenceVersion,referenceHash:hash}] as any,
+  result:{method:{scoringVersion:'1.0.0',reportVersion:'1.0.0'},quality:{status:'interpretable',flags:[]},scores:[{key:'wellbeing',value:3,direction:'higher_is_more',status:'calculated'}],references:[{scoreKey:'wellbeing',referenceVersion:r.referenceVersion,referenceKind:'criterion_threshold',status:'available',bandProvenance:g}]} as any})
+ expect(core.metrics[0].scaleReference).toMatchObject({originalReferenceKind:'criterion_threshold',originalReferenceHash:hash})
+ const envelope=()=>createCanonicalUnitResultEnvelope({core,completedAt:'2026-10-01T00:00:00Z',persistenceProvenance:{sourceType:'ASSESSMENT',sourceAttemptId:'synthetic'}})
+ expect(()=>parseCanonicalUnitResultEnvelope(envelope())).not.toThrow()
+ core.metrics[0].scaleReference!.originalReferenceKind='normative_distribution'
+ expect(()=>parseCanonicalUnitResultEnvelope(envelope())).toThrow('SCALE_REFERENCE_IDENTITY_MISMATCH')
+})
