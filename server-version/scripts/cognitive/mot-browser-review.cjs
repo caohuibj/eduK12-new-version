@@ -1,7 +1,9 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=process.env.MOT_REVIEW_ROOT||path.resolve(__dirname,'../../..'),front=path.join(root,'server-version/frontend');
-const temp=path.join(front,'.mot-review'),out=path.join(root,'docs/cognitive-library/implementation-20261026/runtime-evidence');
+const temp=fs.mkdtempSync(path.join(front,'.mot-review-')),out=path.join(root,'docs/cognitive-library/implementation-20261026/runtime-evidence');
+let server,browser;
 (async()=>{
+ try{
  fs.mkdirSync(temp,{recursive:true});fs.mkdirSync(out,{recursive:true});
  fs.writeFileSync(path.join(temp,'index.html'),'<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0"><div id="root"></div><script type="module" src="./app.tsx"></script></body></html>');
  fs.writeFileSync(path.join(temp,'app.tsx'),`import React,{useMemo,useState} from 'react';import{createRoot}from'react-dom/client';
@@ -54,8 +56,8 @@ const temp=path.join(front,'.mot-review'),out=path.join(root,'docs/cognitive-lib
   }
 };
  const result={quality:{state,flags:{unreliableSpeed1:false,unreliableSpeed4:state!=='interpretable',unreliableSpeed8:false},reasons:[]},metrics:{meanTrackedTargets:3.4,meanTargetsSpeed1:4.2,meanTargetsSpeed4:3.4,meanTargetsSpeed8:2.6,validTrialsSpeed1:3,totalTrialsSpeed1:3,validTrialsSpeed4:3,totalTrialsSpeed4:3,validTrialsSpeed8:3,totalTrialsSpeed8:3,internalSecret:98765}};
- function App(){const [index,setIndex]=useState(query.has('resume')?8:0),[done,setDone]=useState(false),[scored,setScored]=useState(null);const calls=React.useRef({core:0,archive:0});const draft=useMemo(()=>createMotDraft({sessionId:query.get('sid')||'synthetic-review-session',attemptNo:1,protocolKey:'mot/1.1.0/1.1.0',resolvedConfigHash:'synthetic-only-frozen-hash',randomSeed:seed}),[]);
- Object.assign(window,{motReview:{config,seed,index,plan:(i,p=false)=>motTrialPlan(config,seed,i,p),position:(o)=>motPosition(o,8000,config),draft}});
+ function App(){const [index,setIndex]=useState(query.has('resume')?8:0),[done,setDone]=useState(false),[scored,setScored]=useState(null);const calls=React.useRef({core:0,archive:0});const draft=useMemo(()=>{const port=createMotDraft({sessionId:query.get('sid')||'synthetic-review-session',attemptNo:1,protocolKey:'mot/1.1.0/1.1.0',resolvedConfigHash:'synthetic-only-frozen-hash',randomSeed:seed});const append=port.appendPractice;let practiceCalls=0;port.appendPractice=async record=>{practiceCalls++;(window as any).practiceSaveCalls=practiceCalls;if(query.has('failPracticeOnce')&&practiceCalls===1)throw new Error('synthetic precommit practice save failure');return append(record)};return port},[]);
+ Object.assign(window,{motReview:{config,seed,index,createDraft:createMotDraft,plan:(i,p=false)=>motTrialPlan(config,seed,i,p),position:(o)=>motPosition(o,8000,config),draft}});
  return query.has('report')||done?<MotReportCard result={(scored||(query.has('actual')?authoritySnapshot:result)) as any} profile="experience" language={language}/>:<MotTask config={config} randomSeed={seed} trialIndex={index} language={language} draft={draft} prepareFinalArchive={async(records)=>{calls.current.archive++;if(query.has('failArchiveOnce')&&calls.current.archive===1)throw new Error('synthetic upload failure');(window as any).archiveFixtureRecords=records;/* synthetic port: no COS */}} onTrialComplete={async(core)=>{calls.current.core++;if(query.has('failCoreOnce')&&calls.current.core===1)throw new Error('synthetic lost ACK');if(core.trialIndex===8){const records=await draft.records();const response=await fetch('/__mot_review_score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(records.map(r=>r.core))});if(!response.ok){const detail=await response.text();console.error(detail);throw new Error('score fixture failure '+detail)};setScored(await response.json());setDone(true)}else setIndex(core.trialIndex+1);return true}}/>};
  createRoot(document.getElementById('root')!).render(<App/>);`);
  const {createServer}=await import(path.join(front,'node_modules/vite/dist/node/index.js'));
@@ -63,17 +65,20 @@ const backend=path.join(root,'server-version/backend');require(path.join(backend
  const {motDefinition,createMotSnapshot,motTrialEnvelope}=require(path.join(backend,'src/modules/cognitive/content-candidates/mot/package.ts'));
  const {runAuthoritativeScorer}=require(path.join(backend,'src/modules/cognitive/v2/authoritative-scorer.ts'));
  const serveScore=(req,res)=>{let size=0;const chunks=[];req.on('data',chunk=>{size+=chunk.length;if(size>1500000)req.destroy();else chunks.push(chunk)});req.on('end',()=>{try{const cores=JSON.parse(Buffer.concat(chunks).toString());const result=runAuthoritativeScorer({definition:motDefinition,session:createMotSnapshot('experience'),randomSeed:'browser-mot-contract',trials:cores.map(motTrialEnvelope)});res.setHeader('Content-Type','application/json');res.end(JSON.stringify(result))}catch(error){res.statusCode=400;res.end(JSON.stringify({error:String(error)}))}})};
- const server=await createServer({configFile:path.join(front,'vite.config.ts'),root:front,plugins:[{name:'mot-native-score-fixture',configureServer(server){server.middlewares.use('/__mot_review_score',serveScore)}}],server:{host:'127.0.0.1',port:5196,strictPort:true}});
+ server=await createServer({configFile:path.join(front,'vite.config.ts'),root:front,plugins:[{name:'mot-native-score-fixture',configureServer(server){server.middlewares.use('/__mot_review_score',serveScore)}}],server:{host:'127.0.0.1',port:5196,strictPort:true}});
  await server.listen();
  const {chromium}=require(process.env.MOT_PLAYWRIGHT_MODULE||'/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
- let browser;
  try{browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,chromiumSandbox:true,args:['--disable-dev-shm-usage']})}
  catch(e){fs.writeFileSync(path.join(out,'sandbox-launch-failure.txt'),String(e));await server.close();throw e}
  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,locale:'zh-CN',timezoneId:'UTC',acceptDownloads:true});
  await context.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
  const page=await context.newPage(),errors=[],shots=[];page.on('pageerror',e=>errors.push(e.message));
  async function shot(name){await page.evaluate(()=>document.fonts.ready);const file=path.join(out,name+'.png');await page.screenshot({path:file,fullPage:true});shots.push({name,file:path.relative(root,file),sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')})}
- const url='http://127.0.0.1:5196/.mot-review/index.html';
+ const url='http://127.0.0.1:5196/'+path.basename(temp)+'/index.html';
+ if(process.argv.includes('--draft-recovery')||process.argv.includes('--practice-retry')){
+  await require('./mot-draft-browser-cases.cjs')({browser,url,out,only:process.argv.includes('--practice-retry')?'practice-original-save-retry':null});return;
+ }
+
  if(process.argv.includes('--small-layout')){
   await page.setViewportSize({width:390,height:530});await page.goto(url+'?sid=small-layout-fixture');
   await page.getByRole('button',{name:'校准屏幕'}).click();await page.getByRole('checkbox').check();await page.getByRole('button',{name:'确认校准'}).click();await page.getByRole('button',{name:'开始',exact:true}).click();
@@ -144,4 +149,8 @@ const backend=path.join(root,'server-version/backend');require(path.join(backend
  if(errors.length)throw Error(JSON.stringify(errors));
  fs.writeFileSync(path.join(out,'browser-review.json'),JSON.stringify({kind:'REAL_CLOUD_CHROMIUM_COMPONENT_AND_INDEXEDDB_NOT_PRODUCT_API_OR_COS',browser:browser.version(),chromiumSandbox:true,shots,practiceCount:practice.length,frames:practice[0].raw.motionFrameTimesMs.length,reportPNG:true,zoom200:true,realProductEntrances:false,realCOS:false,hardwareTimingValidated:false,errors},null,2));
  await browser.close();await server.close();fs.rmSync(temp,{recursive:true,force:true});console.log(JSON.stringify({out,shots:shots.length,practiceFrames:practice[0].raw.motionFrameTimesMs.length,png:true}));
-})().catch(e=>{console.error(e);process.exit(1)});
+ }finally{
+   await browser?.close().catch(()=>{});await server?.close().catch(()=>{});
+   fs.rmSync(temp,{recursive:true,force:true});
+ }
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -36,3 +36,10 @@ PR356现有指导语、独立轴版本、真实年龄参照和冻结完成语义
 脚本server-version/scripts/cognitive/mot-browser-review.cjs使用已安装Vite/tsx与云端Playwright，不修改产品入口。--report-only只生成报告截图/PNG；--small-layout只验小屏几何；--flow为新合成采集；--resume-final复用已保存正式记录续验。不得把其中的合成归档端口用于产品。
 
 未部署，不连接生产，无force push。下一步先完成清单中的原生准入/显式profile、冻结协议、可靠归档/FINAL和真实消费者，然后首次完整导入；在此之前不展开第二个认知任务。
+
+
+## 客户端可靠性续作
+
+本轮只修改草稿/重试：IndexedDB v2保留旧记录并增加固定身份别名，冲突与进度不匹配不继续曝光；练习失败保存重试原core/raw；并发重试串行化。7个新增独立单测、5个分次执行的真实浏览器场景、变化类型/lint通过，详见runtime-evidence/persistence-validation-20261026.json。
+
+浏览器工具 --draft-recovery 执行存储/恢复场景，--practice-retry 仅执行新增的练习重试。宿主使用独占临时目录并始终关闭浏览器/服务；不重跑无输入变化的计分/报告测试。v1旧读取代码无法直接打开v2库，回退须保留兼容读取器，禁止靠删除草稿降级。

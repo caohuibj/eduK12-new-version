@@ -35,5 +35,14 @@
     "default/latest reference or report substitution"
   ],
   "releaseGate": "BLOCKED: current platform requires standard profile and has no native registry/archive consumer",
-  "migration": "new candidate only; never overwrite historical frozen records; explicit reanalysis creates a new revision"
+  "migration": "new candidate only; never overwrite historical frozen records; explicit reanalysis creates a new revision",
+  "clientDraftStorage": {
+    "databaseName": "eduk12-mot-drafts-v1",
+    "indexedDbVersion": 2,
+    "migration": "Add canonical binding to original-key aliases; no old rows deleted or overwritten",
+    "legacyVersion1DataReadable": true,
+    "oldVersion1CodeCanOpenVersion2Database": false,
+    "ambiguousAliases": "Reject access and retain every original record",
+    "rollback": "Keep v2-aware reader; no automatic database downgrade/reset"
+  }
 }
