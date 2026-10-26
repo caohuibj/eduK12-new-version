@@ -2147,7 +2147,7 @@ jobs:
           retention-days: 7
 
   pr356-audit:
-    name: PR356 / production dependency audit
+    name: PR356 / locked dependency audit
     needs: pr356-source
     runs-on: ubuntu-24.04
     timeout-minutes: 8
@@ -2240,6 +2240,8 @@ jobs:
       dist_artifact_id: ${{ steps.dist-upload.outputs.artifact-id }}
       images_artifact_name: ${{ steps.producer.outputs.images }}
       dist_artifact_name: ${{ steps.producer.outputs.dist }}
+      producer_run: ${{ steps.producer.outputs.run }}
+      producer_head: ${{ steps.producer.outputs.head }}
       producer_attempt: ${{ steps.producer.outputs.attempt }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -2250,6 +2252,8 @@ jobs:
       - name: bind the actual producer attempt
         id: producer
         run: |
+          echo "run=$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "head=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
           echo "attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
           echo "images=pr356-images-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
           echo "dist=pr356-dist-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
@@ -2283,11 +2287,32 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
+      - name: require exact original producer artifact input
+        env:
+          PR356_ARTIFACT_KIND: images
+          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.images_artifact_name }}
+          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.images_artifact_id }}
+          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
+          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
+          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+        shell: python
+        run: |
+          import os,re
+          e=os.environ
+          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
+          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
+          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
+          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
+          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
+          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
+          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
+          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
       - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.pr356-images.outputs.images_artifact_name }}
           path: pr356-evidence
       - name: load original producer bytes without rebuilding
+        id: runtime-load
         env:
           SOURCE_HEAD: ${{ github.sha }}
           PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
@@ -2321,6 +2346,7 @@ jobs:
           severity: CRITICAL,HIGH
           skip-setup-trivy: true
       - name: scan frontend runtime
+        if: ${{ !cancelled() && steps.runtime-load.outcome == 'success' }}
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: pr356-frontend:${{ github.sha }}
@@ -2355,6 +2381,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: require exact original producer artifact input
+        env:
+          PR356_ARTIFACT_KIND: dist
+          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.dist_artifact_name }}
+          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.dist_artifact_id }}
+          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
+          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
+          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
+        shell: python
+        run: |
+          import os,re
+          e=os.environ
+          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
+          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
+          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
+          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
+          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
+          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
+          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
+          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
       - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.pr356-images.outputs.dist_artifact_name }}
@@ -2396,9 +2442,24 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended
+          ram: 3500
+          threads: 2
       - uses: github/codeql-action/analyze@v3
         with:
           category: pr356/${{ matrix.language }}
+          # Same repository setting as the established main CodeQL job: analysis
+          # runs locally and SARIF is retained without unavailable endpoint upload.
+          upload: never
+          upload-database: false
+          output: pr356-evidence/codeql-${{ matrix.language }}
+      - name: retain actual language analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr356-codeql-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: pr356-evidence/codeql-${{ matrix.language }}/*.sarif
+          if-no-files-found: error
+          retention-days: 7
 
   pr356-result:
     name: PR356 / affected qualification (no merge eligibility)

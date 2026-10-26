@@ -95,5 +95,5 @@ elif mode=='images':
  manifest={'components':B['components'],'head':git('rev-parse','HEAD'),'files':{str(p.relative_to(OUT/'dist')):{'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size} for p in sorted((OUT/'dist').rglob('*')) if p.is_file()}}
  receipt('frontend-dist',manifest)
 elif mode=='audits':
- for component in ['backend','frontend']:run('audit-'+component,['npm','audit','--package-lock-only','--omit=dev','--audit-level=high'],ROOT/'server-version'/component)
+ for component in ['backend','frontend']:run('audit-'+component,['npm','audit','--package-lock-only','--audit-level=high'],ROOT/'server-version'/component)
 else:raise ValueError('Unknown mode')

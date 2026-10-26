@@ -4,7 +4,7 @@
   "pr": 356,
   "branch": "fix/runtime-time-and-validation-20261025",
   "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
-  "product": "48516ef5900cf9f711ea3cc852ac148cd221d7f8",
+  "product": "9c43502680fe28c57c1edd64cc22a364beccb8e6",
   "source": {
     "AGENTS.md": {
       "status": "M",
@@ -447,6 +447,13 @@
       "before": null,
       "after": "42b0ae6ace167760956d671e014412f35ba75b2c"
     },
+    "docs/evidence/pr356-review-followup-20261026.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "acf322c63f9ca73fec7a0a8f8836e12bb4b670fe"
+    },
     "docs/evidence/pr356-standard-dual-entry-20261026.json": {
       "status": "A",
       "oldMode": "000000",
@@ -565,6 +572,13 @@
       "newMode": "100644",
       "before": null,
       "after": "bdab3a35a67cbebfc65531b3df35a85ab38e7897"
+    },
+    "docs/pr356-review-followup-20261026.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2357e3e2dd27c555488c9b23fe94ab1ca065987b"
     },
     "docs/pr356-review-instructions-20261026.md": {
       "status": "A",
@@ -760,7 +774,14 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3d9ddf86f231bd3c42b907c87684992129a6cf9f",
-      "after": "8c0d3c45730cd030ef51ded32e21f4f8116d5ccf"
+      "after": "f2456e2a8e3d6f40e479ae95ce019899ade047a6"
+    },
+    "server-version/backend/src/__tests__/assessment-runtime/report-outbox-whole-receipt-boundary.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bf86f4493967e38c73f2c8545f5d1b50b488d1d6"
     },
     "server-version/backend/src/__tests__/assessment-runtime/v32-1.contract.test.ts": {
       "status": "M",
@@ -776,12 +797,33 @@
       "before": "08a189072922a4f271325293e1c5d4ca90c31d49",
       "after": "07ec8f0f804a752fa0c7d7cd062f8592cd25b744"
     },
+    "server-version/backend/src/__tests__/composite/pr356-child-parent-shape.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "814e9db14008c6db9b39fbf3eff7be5f57334b79"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1bd956c3e0c62b517877b9a3feb7ab46260b1bfa"
+    },
     "server-version/backend/src/__tests__/composite/training-content-service.test.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "0fd01f862f925f64ae94a9c8be9ac123217afc98",
       "after": "639ec8e1af5bbd7e73bf7981a521421f0f782e20"
+    },
+    "server-version/backend/src/__tests__/composite/training-flow-materialization-reuse.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae9ab28f1a4f297f98b11d83d07d73b81add5c04",
+      "after": "bb044f7e10d954d4af9e799c62961fabfddfbfbf"
     },
     "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts": {
       "status": "M",
@@ -837,7 +879,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "7d386f80ad09e9da03bbb00e96e54bd94e825947"
+      "after": "7464f1578f5020ae06115fcad462a071e4f84728"
     },
     "server-version/backend/src/__tests__/measurement-content/reference-governance.test.ts": {
       "status": "M",
@@ -874,12 +916,19 @@
       "before": null,
       "after": "9f2ca3b96f574863fff6797cc91bc90488a7f345"
     },
+    "server-version/backend/src/__tests__/measurement-content/training-exact-flow-materialization-guard.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6cc90146579a81af33e97e9c4a14c227513121b0"
+    },
     "server-version/backend/src/__tests__/measurement-content/training-receipt-recovery.postgres.integration.test.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "24d341d1b9cc1b49449422495d17df64c585da33"
+      "after": "49121a087aceb259d510c5e394600986bfa141e1"
     },
     "server-version/backend/src/__tests__/measurement-content/training-standard-combination-boundary.test.ts": {
       "status": "A",
@@ -907,14 +956,14 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "4a566bbd873e798aff7918746b963b61c30166ad"
+      "after": "864bee4ed8754b81e4c24db02fa2deafc4516353"
     },
     "server-version/backend/src/__tests__/measurement-content/training-standard-source.test.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "4ae122813a4eab432ddec3b3aec9c8e7afff5153"
+      "after": "6f39dfc2081e4596d266165b3e5e2582418042ec"
     },
     "server-version/backend/src/__tests__/measurement-content/training-standard-sql.fixture.ts": {
       "status": "A",
@@ -1007,12 +1056,40 @@
       "before": null,
       "after": "cd11dc301b1acdef6135ef5e9929f57f75e4cc89"
     },
+    "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05"
+    },
+    "server-version/backend/src/__tests__/scale/pr356-entry-lifecycle.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "711a5eeefd2c979979988c78d224253b8b4189d0"
+    },
+    "server-version/backend/src/__tests__/scale/scale-governance-boundaries.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67e90b50ba10eceb6f7f6c78c018118e9a5f4609",
+      "after": "6d1eae5a6c23d93d2dd659f29171e8debc796f94"
+    },
     "server-version/backend/src/__tests__/scale/scale-library-discovery-controller.test.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
       "after": "53c7b14a6f0879aa9ab24f8c2bb5d075f1abf596"
+    },
+    "server-version/backend/src/__tests__/scale/scale-publication-guard.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7c12e655641788fd7fc12ccaedf5224b7c2e44fd",
+      "after": "a5d2b6b5986e639736913ce21eb0113aa47d5f4f"
     },
     "server-version/backend/src/__tests__/scale/self-authored-onboarding.test.ts": {
       "status": "A",
@@ -1027,6 +1104,20 @@
       "newMode": "100644",
       "before": null,
       "after": "f28f49c91192d7c98b0a001060651e96f086a779"
+    },
+    "server-version/backend/src/__tests__/scale/standalone-instruction-envelope.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a1b4f48e4df3a08b58d64eb84b4395c2da93b1da"
+    },
+    "server-version/backend/src/__tests__/scale/training-flow-materialization-guard.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "535e0c5eed36e7a85ed681d6f3c8d3eed0e1932b"
     },
     "server-version/backend/src/__tests__/survey/catalog-classification.test.ts": {
       "status": "A",
@@ -1054,7 +1145,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "88e9fa95905cdf634ba9b4dd809d99e22ac1f5e8"
+      "after": "d243b36010a5e91f9f21cc9d0ccff9f31829a17f"
     },
     "server-version/backend/src/__tests__/survey/governed-package-read-budget.test.ts": {
       "status": "M",
@@ -1126,6 +1217,20 @@
       "before": null,
       "after": "5c484c04e592e3d25e6f9e544206bb0da41f2358"
     },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "19dc85021812c42c17e5560bfead6ae591e46856",
+      "after": "5633cff587cf2eee14cdb0e8b86f4e6b0cebcbd5"
+    },
+    "server-version/backend/src/controllers/questionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae96977617ced60417060fbdf67ff018cfa7e80a",
+      "after": "8f9681e6a34310f832e5161c66367696213aa509"
+    },
     "server-version/backend/src/controllers/scaleController.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -1152,7 +1257,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "a799a392a0390abda19c90585f495c73b4582dcf",
-      "after": "a49ae4924948e016c2c80a9ba635dd2dc2f56ebe"
+      "after": "8ff2bec833d22e3a3b7d123306e2b56339882166"
     },
     "server-version/backend/src/modules/assessment-reference/reference.ts": {
       "status": "M",
@@ -1160,6 +1265,13 @@
       "newMode": "100644",
       "before": "1c8a7255c9a7bcac2897f6b5c5abef1515008de4",
       "after": "376c9673d33be5f4987c3ad1e033f81a4ce647c0"
+    },
+    "server-version/backend/src/modules/assessment-runtime/frozen-scale-instruction.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1b30b4281a99a52d90dae08a27b28d02dae2bebc"
     },
     "server-version/backend/src/modules/assessment-runtime/reference-binding.ts": {
       "status": "M",
@@ -1173,14 +1285,14 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "116407b030545936ba24b74fc4403b1d4ff9b762",
-      "after": "9afa5abaed7be8f8ccd3bb4917dc8146d3517c16"
+      "after": "b40595ab461fca8c08c1efbe81ea969184691528"
     },
     "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3e971112a976ddbdbd690b138c07bdb16f75faca",
-      "after": "7e93c2e2389b3c011bfe7edd5a65d388691f7a6e"
+      "after": "c47895db811ddbe8dc0f907103b3df8092075b60"
     },
     "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts": {
       "status": "M",
@@ -1208,7 +1320,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "b0830c392a1d243f4acf89fb902ee4b9e1b0c536",
-      "after": "2894c747f6d32c9daea8d36a092ba4b6b569bc83"
+      "after": "dc8bde2502e05527293c39731b03757586c4aba4"
     },
     "server-version/backend/src/modules/composite/training-content-binding.ts": {
       "status": "M",
@@ -1231,6 +1343,13 @@
       "before": "f026d701e70916e26853866cd92d6b75a72de2aa",
       "after": "646a13684869f060fc053f44145772f05f4c7dcb"
     },
+    "server-version/backend/src/modules/composite/training-flow-scope.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0f90c9173b51582c97bba2f570b881b5055e902",
+      "after": "2265226ca6ecf776d14fbf5c0c1ca2c365267e76"
+    },
     "server-version/backend/src/modules/composite/training-reference-selection.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -1250,14 +1369,14 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "24aa98b89206cea9cdb5676bc42fa5279e0cac4e"
+      "after": "5b59b9feb7edea9b334c9fcedb0b2e3d24361346"
     },
     "server-version/backend/src/modules/composite/training-standard-combination.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "40cb23c5b820679a844abf6563c0344009efbf75"
+      "after": "e45b0aa4d7a11929000c74f53bda9beac8afaecb"
     },
     "server-version/backend/src/modules/composite/training-standard-content.ts": {
       "status": "A",
@@ -1271,7 +1390,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "95b053332a2bf7aba6abfa146e882ee0336ad649",
-      "after": "34865a518ffaeff29a9a52985f29b85284281acd"
+      "after": "59c9834b601719a892174eaec9b3703b4a392f15"
     },
     "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
       "status": "M",
@@ -1313,7 +1432,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "d0e4d66fec82b34decf4ad8c3cd3072b0b8514ad"
+      "after": "ce8ebabc61e7eef7413145a65e33159e80db26dc"
     },
     "server-version/backend/src/modules/measurement-content/standard-combination.ts": {
       "status": "A",
@@ -1341,7 +1460,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "364ccecd653de415a9ae41bb0bc33c78f1fdacce",
-      "after": "40e42fcbac4a8ff88b0741ecd0f5e09b65088e62"
+      "after": "283bee076da8a0ec3a0ada197085be8fb8a9932e"
     },
     "server-version/backend/src/modules/scale-library-governance/catalog-adapter.ts": {
       "status": "M",
@@ -1761,14 +1880,14 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "448d98a4a8a972a097973931cb817ab155153858",
-      "after": "2b13ee1c9150e4c36bb7ca9cfe6a9c3eec81c298"
+      "after": "cb927b0ec31851dc307a0ba1075e4cb1f8e4854c"
     },
     "server-version/backend/src/modules/scale/scale-collection-guard.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "ff33e018dc15b9a5edee7da6deab2afe52309570",
-      "after": "896f0921a63a23e229515e922f824e8311576d0d"
+      "after": "04c2e757a9edf2178bf12a3f49455fb38469d703"
     },
     "server-version/backend/src/modules/scale/scale-definition.ts": {
       "status": "M",
@@ -1777,19 +1896,26 @@
       "before": "c0c3ac1bc2a5c4f71eb3c15d28ae61f5379a578d",
       "after": "4131d844d4c29d3813a5c5d1b55709825e1c437b"
     },
+    "server-version/backend/src/modules/scale/scale-publication-guard.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "de1ac0bfd2584c265ead1d9b29ef9e2606e0cbb4",
+      "after": "61902f066814f52c79967c9c1bf8b8167b12a7cd"
+    },
     "server-version/backend/src/modules/scale/scale-restart.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "e78ae1250d8bbe88312439770ae3f407bfc10c2c",
-      "after": "50b68e69ba2d509dd88f82389ead42a30eef56dc"
+      "after": "9b8f252095068544a57624c9943830b06eff3784"
     },
     "server-version/backend/src/modules/scale/scale-start.controller.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "c9b483cae2b44c210057984816fb85d1d18a78c7",
-      "after": "779b541173cb19c70728bc4d52cacb66ae3cd4e3"
+      "after": "ed3a7020e54b843117094421b738cdc236c833ef"
     },
     "server-version/backend/src/modules/scale/scale-workflow.service.ts": {
       "status": "M",
@@ -1803,7 +1929,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "95282ce7a82becf8feec9dd663ace923906c230f",
-      "after": "f9b11ee3bd417506aae090a774739769285103aa"
+      "after": "d853dcaeee37f392aff2d88616ff951453b85f67"
     },
     "server-version/backend/src/modules/situational/entry-authority.ts": {
       "status": "M",
@@ -1908,7 +2034,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "91b15e0e3c7da634e9e21df9272036c5f3d44f5f",
-      "after": "e2416125dfc2f17f0a7fef1e22099bcab93acace"
+      "after": "373ddecfc1f017070dcd577a78c7a566d66f8f0a"
     },
     "server-version/backend/src/modules/survey/standard-triplet.routes.ts": {
       "status": "M",
@@ -1951,6 +2077,13 @@
       "newMode": "100644",
       "before": "c214de17d3ba939bbc07d6998473082578a271ad",
       "after": "525ab08fbaec46ea073ea77fd5ff273ae01fba0a"
+    },
+    "server-version/backend/src/services/questionnaire-form-section.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2ac38515768e3a80d7bde15887b18413c9e05905",
+      "after": "30577ddd1544d90737a4fa194ff710451c1d1be8"
     },
     "server-version/frontend/src/api/__tests__/scaleLibrary.test.ts": {
       "status": "M",
@@ -2146,7 +2279,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "1fcaa1b53445c6d639500e48ecbd51012d2be956",
-      "after": "dd2481d49e54324c7b3cceee477c772392d825c2"
+      "after": "5dabfd32d0b7a34a22853b76e6f4ed952f148307"
     },
     "server-version/frontend/src/pages/admin/StandardTripletWorkspace.tsx": {
       "status": "M",
@@ -2183,6 +2316,20 @@
       "before": "54d60c2e9907639a340a8a1e8075e341475c0e8b",
       "after": "7bb00477b7d6a24a8f77eb1273757cb1166b2207"
     },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b0cd1e3d1daf4ae67296e7d719980bafa931c01",
+      "after": "af8e61c47ea3329107e40fd396a41132ca4080e4"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ad91bf491662bb719e08700a7c893a4a1fa2caf1",
+      "after": "a6956cde3649f62eb02db3616fa0ac464416ead1"
+    },
     "server-version/frontend/src/product-entry.development.test.ts": {
       "status": "A",
       "oldMode": "000000",
@@ -2218,12 +2365,26 @@
       "before": "e1cf93562c1802da57f26af987a1e4b669580a71",
       "after": "b3f152369c0a39b68875dfd9d86655ce15f7430a"
     },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0d09ab90e39b2f629cf567d4ff0b540bd23ecb0e",
+      "after": "f536e86ad257cd81a13f83e6485dc7753590cb02"
+    },
     "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "64f2b9efab4951d3fe5cd1360d7cf17157c1e213",
-      "after": "3a1ef759f6d460554244a896c825ebf9e3dd2259"
+      "after": "6d04b2baa0c9bec2d1075728608655e81ef314d0"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aa219d53091998f6406217384952914c6475f744",
+      "after": "c33594be8c37fb26427c58b7708a5535a6e3edca"
     }
   },
   "controls": [
@@ -2240,12 +2401,12 @@
     ".github/scripts/pr356-restore-fixture.cjs"
   ],
   "controlBefore": {
-    ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522",
-    ".github/scripts/content-scope.mjs": "5ca40b23e43117aa45eef80b2bf54b6f8641bfbb"
+    ".github/scripts/content-scope.mjs": "5ca40b23e43117aa45eef80b2bf54b6f8641bfbb",
+    ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522"
   },
   "components": {
-    "backend": "c7ddfa4134b511706c8514c25deacee0856db331",
-    "frontend": "160d8bd143b6c27a87dade8b787e206be7b60b35"
+    "backend": "ec0e23bec3398992883f30125e380a845c0a9337",
+    "frontend": "87590586f2902baf14f0a94e8d444ac9e4b2e7e8"
   },
   "protectedInputs": {
     "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",

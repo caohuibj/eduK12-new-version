@@ -2,11 +2,13 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {changedEntries} from './content-scope.mjs';
+export {refuseUnplannedPR356} from './content-scope.mjs';
 export const binding=JSON.parse(readFileSync(new URL('./pr356-bindings.json',import.meta.url)));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 export function verifyCandidate(entries,base,head,read=git){
  assert.equal(base,binding.base,'PR356 main base drift');assert.equal(binding.base,'ff8471e529e7b3c56e1e20f17d1e2581040fc896');
- assert.equal(binding.product,'48516ef5900cf9f711ea3cc852ac148cd221d7f8');assert.match(head,/^[a-f0-9]{40}$/);
+ assert.equal(binding.product,'9c43502680fe28c57c1edd64cc22a364beccb8e6');assert.match(head,/^[a-f0-9]{40}$/);
  const wanted=new Set([...Object.keys(binding.source),...binding.controls]);
  assert.equal(wanted.size,Object.keys(binding.source).length+binding.controls.length,'Controls overlap product source');
  assert.equal(entries.length,wanted.size,'Complete PR356 raw diff required');assert.equal(new Set(entries.map(e=>e.file)).size,entries.length);
@@ -21,10 +23,6 @@ export function verifyCandidate(entries,base,head,read=git){
  for(const[p,blob]of Object.entries(binding.protectedInputs))assert.equal(read('rev-parse',head+':'+p),blob,'PR356 protected input drift');
  return {schemaVersion:1,route:'pr356-qualification',base,head,product:binding.product,components:binding.components,qualificationOnly:true,mergeEligible:false};
 }
-export function refuseUnplannedPR356(env=process.env){
- const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
- if(ref===binding.branch)throw new Error('PR356 uses its explicitly authorized bounded qualification dispatch; no legacy/full/probe fallback or merge eligibility');
-}
 export async function officialCandidate(env=process.env,fetcher=fetch){
  assert.equal(env.GITHUB_ACTIONS,'true');assert.equal(env.GITHUB_REPOSITORY,binding.repository);
  assert.equal(env.GITHUB_EVENT_NAME,'workflow_dispatch');assert.equal(env.GITHUB_REF,'refs/heads/'+binding.branch);
@@ -36,7 +34,6 @@ export async function officialCandidate(env=process.env,fetcher=fetch){
  assert.equal(pr.head.sha,env.GITHUB_SHA,'A newer PR head exists; do not qualify stale source');assert.equal(pr.base.sha,binding.base);assert.equal(main.object.sha,binding.base);
  assert.match(pr.merge_commit_sha||'',/^[a-f0-9]{40}$/);const merge=await api('git/commits/'+pr.merge_commit_sha);
  assert.deepEqual(merge.parents.map(p=>p.sha).sort(),[binding.base,env.GITHUB_SHA].sort(),'PR merge preview parent drift');assert.equal(merge.tree.sha,git('rev-parse','HEAD^{tree}'),'PR merge tree drift');
- const {changedEntries}=await import('./content-scope.mjs');
  const plan=verifyCandidate(changedEntries(binding.base,env.GITHUB_SHA),binding.base,env.GITHUB_SHA);
  return {...plan,pr:356,actualDraft:pr.draft,mergePreview:pr.merge_commit_sha,mergeTree:merge.tree.sha,parents:merge.parents.map(p=>p.sha),run:env.GITHUB_RUN_ID,attempt:env.GITHUB_RUN_ATTEMPT,authorization:'User explicitly requested closure, submission and CI activation in this conversation. No merge/deployment authorization.'};
 }
