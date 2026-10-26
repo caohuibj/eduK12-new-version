@@ -1,0 +1,34 @@
+{
+  "status": "SERVICE_SOURCE_STOPPED_FOR_REVIEW",
+  "sourceHashes": {
+    "server-version/backend/src/modules/cognitive/raw-archive.service.ts": "1b60f75301acbe146b53bd66798e53e7cd31e1f3533490b20ff9b9b95e35a740",
+    "server-version/backend/src/__tests__/cognitive/raw-archive.postgres.integration.test.ts": "5ef3690f8d50603b37d289fa99254a9b1b939349d14f1987f9c80f5934d12b08"
+  },
+  "checks": [
+    {
+      "path": "postgres-core-contracts.json",
+      "passed": 6,
+      "exitCode": 0
+    },
+    {
+      "path": "postgres-two-boundaries.json",
+      "passed": 2,
+      "skippedPriorQualified": 6,
+      "exitCode": 0
+    },
+    {
+      "path": "types.json",
+      "exitCode": 1,
+      "reason": "manual root omitted original auth ambient augmentation; retained"
+    },
+    {
+      "path": "types-continued.json",
+      "exitCode": 0
+    }
+  ],
+  "realPostgres": true,
+  "realExternalCOS": false,
+  "production": false,
+  "schemaChanged": false,
+  "headAtEvidence": "4b91b5acff3f9830722c65107e60f188be297909"
+}

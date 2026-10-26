@@ -1,0 +1,52 @@
+[96msrc/modules/organization/access.ts[0m:[93m222[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m222[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m225[0m:[93m79[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m225[0m     const context = await resolveAssessmentDeliveryAuthority({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                              ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m236[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m236[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m239[0m:[93m77[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m239[0m     const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m263[0m:[93m14[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m263[0m     if (!req.user) return unauthorized(res)
+[7m   [0m [91m             ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m266[0m:[93m77[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m266[0m     const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m268[0m:[93m13[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m268[0m     if (req.user.platformRole !== 'SYSTEM_ADMIN' && !context.canGovern) {
+[7m   [0m [91m            ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m281[0m:[93m16[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m281[0m       if (!req.user) return unauthorized(res)
+[7m   [0m [91m               ~~~~[0m
+[96msrc/modules/organization/access.ts[0m:[93m284[0m:[93m79[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m284[0m       const context = await resolveOrganizationAccessContext({ principal: req.user, organizationId })
+[7m   [0m [91m                                                                              ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m10[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m         ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m48[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m                                               ~~~~[0m
+[96msrc/modules/survey/admin-role.ts[0m:[93m21[0m:[93m71[0m - [91merror[0m[90m TS7006: [0mParameter 'g' implicitly has an 'any' type.
+
+[7m21[0m   if(req.user?.platformRole!=='STANDARD'||!req.user.entryGrants?.some(g=>g.entry==='SURVEY'))
+[7m  [0m [91m                                                                      ~[0m
+[96msrc/services/assetStorage.ts[0m:[93m700[0m:[93m46[0m - [91merror[0m[90m TS2339: [0mProperty 'user' does not exist on type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+
+[7m700[0m   if (!(await canReadPrivateAsset(asset, req.user))) return forbidden(res, '无权限访问此文件')
+[7m   [0m [91m                                             ~~~~[0m
