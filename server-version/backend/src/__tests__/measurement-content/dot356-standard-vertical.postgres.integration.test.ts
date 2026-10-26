@@ -20,6 +20,7 @@ const enabled=process.env.DOT356_STANDARD_VERTICAL==='1',suite=enabled?describe:
 // Explicit continuation runs only the previously failed authority case against
 // retained synthetic ONLINE facts; it never counts the skipped main flow as new.
 const authorityContinuation=process.env.DOT356_STANDARD_AUTHORITY_CONTINUE==='1'
+const receiptContinuation=process.env.DOT356_STANDARD_RECEIPT_CONTINUE==='1'
 const KEY='academic_self_concept_biology_zh_cn',VERSION='1.0.0'
 /** Fence runs before importing any application module. No acceptance DB access. */
 export function assertDot356VerticalIsolation(){
@@ -54,7 +55,7 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
    if(!matched)v.tableAccess.other=(v.tableAccess.other??0)+1
   })
   generateToken=(await import('../../utils/jwt')).generateToken
-  if(authorityContinuation){
+  if(authorityContinuation||receiptContinuation){
    const users=await db.user.findMany();if(users.length!==5)throw new Error('Continuation requires the retained five-user synthetic fixture')
    const exact=(name:string)=>{const matches=users.filter((u:any)=>u.username.startsWith('dot356-'+name+'-'));if(matches.length!==1)throw new Error('Missing unique retained fixture actor');return matches[0]}
    system=exact('system');issuer=exact('issuer');teacher=exact('teacher');student=exact('student');outsider=exact('outsider')
@@ -78,14 +79,14 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   server=createServer(app);await new Promise<void>(r=>server!.listen(0,'127.0.0.1',r));base='http://127.0.0.1:'+(server.address() as {port:number}).port
  },60000)
  afterAll(async()=>{
-  summary.status=completedCases===(authorityContinuation?1:3)?'PASS':'FAIL';summary.passedCases=completedCases
+  summary.status=completedCases===(authorityContinuation||receiptContinuation?1:4)?'PASS':'FAIL';summary.passedCases=completedCases
   summary.lastStage=stage;summary.http=events
   summary.processObservation={elapsedMs:performance.now()-startedAt,cpuMicroseconds:process.cpuUsage(cpuStart),memoryStart,memoryEnd:process.memoryUsage(),maxRssKiB:process.resourceUsage().maxRSS,scope:'whole test process, not per-request performance'}
   await writeFile(process.env.DOT356_VERTICAL_OUTPUT??'/tmp/dot356-standard-vertical-result.json',JSON.stringify(summary,null,2),{mode:0o600})
   if(server)await new Promise<void>(r=>server!.close(()=>r()))
   if(db){await (await import('../../config/queue')).closeQueues(true);await db.$disconnect()}
  })
- it.skipIf(authorityContinuation)('real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R',async()=>{
+ it.skipIf(authorityContinuation||receiptContinuation)('real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R',async()=>{
   summary.status='IN_PROGRESS';stage='install-hidden-publish'
   const registry=await import('../../modules/scale/onboarding/instrument-registry')
   const onboarding=await import('../../modules/scale/onboarding/install'),publication=await import('../../modules/scale/onboarding/publish')
@@ -169,7 +170,7 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   Object.assign(summary,{combination:pointer,trials:3,...stored.safe,parentStatus:parent.status,teacherReportStatus:report.contentReports[0].status,httpRequestCount:events.length})
   completedCases++
  },180000)
- it.skipIf(authorityContinuation)('stores exactly one role/delegation basis and protects active use identity in PostgreSQL',async()=>{
+ it.skipIf(authorityContinuation||receiptContinuation)('stores exactly one role/delegation basis and protects active use identity in PostgreSQL',async()=>{
   stage='persisted-use-authority-constraints'
   expect(summary.combination).toBeTruthy()
   const use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:summary.combination.releaseId}}})
@@ -184,7 +185,7 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   expect(await db.materialGrant.findUniqueOrThrow({where:{id:use.id}})).toEqual(use)
   completedCases++
  })
- it('keeps entry-role revocation separate from explicit reissue through the original exact 21B root',async()=>{
+ it.skipIf(receiptContinuation)('keeps entry-role revocation separate from explicit reissue through the original exact 21B root',async()=>{
   stage='entry-role-and-delegation-lifecycle'
   expect(summary.combination).toBeTruthy()
   const pointer=summary.combination,use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:pointer.releaseId}}})
@@ -211,8 +212,68 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
   expect(await assertUse()).toMatchObject({authorityGrantId:root.id,useGrantVersion:3})
   const stored=await db.materialGrant.findUniqueOrThrow({where:{id:use.id}})
   expect(stored.authorityGrantId).toBe(root.id);expect(stored.authorityEntryGrantId).toBeNull();expect(stored.authorityEntryGrantVersion).toBeNull()
+  await request(outsider,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:3,reason:'Foreign issuer cannot revoke'},403)
+  expect(await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:3,reason:'Original exact delegate revokes own use'})).toMatchObject({version:4,revoked:true})
+  await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,grantId:root.id,expectedUseVersion:4})
   await request(system,`/api/admin/permissions/content-grants/${root.id}/revoke`,{expectedVersion:root.version,reason:'Synthetic delegated root withdrawal'})
+  await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:5,reason:'Revoked root cannot revoke use'},403)
   await expect(assertUse()).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
   completedCases++
  })
+ it.skipIf(authorityContinuation)('keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop',async()=>{
+  stage='admitted-final-and-durable-receipt'
+  const pointer=summary.combination,use=await db.materialGrant.findUniqueOrThrow({where:{teacherId_resourceType_resourceId:{teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:pointer.releaseId}}})
+  if(receiptContinuation)await request(issuer,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:use.version,reason:'Revoked exact root cannot revoke'},403)
+  const {changeEntryGrant}=await import('../../modules/admin-permissions/service')
+  await changeEntryGrant({actorUserId:system.id,targetUserId:issuer.id,entry:'TRAINING',active:true,expectedVersion:4,reason:'Synthetic current role for receipt scenario',actorSession:{...proof,tokenVersion:system.tokenVersion}})
+  issuer=await db.user.findUniqueOrThrow({where:{id:issuer.id}})
+  await request(system,`/api/questionnaire-products/standard-combination-use-grants/${use.id}/revoke`,{expectedVersion:use.version,reason:'Explicit role-basis reissue'})
+  await request(issuer,`/api/questionnaire-products/standard-combinations/${pointer.releaseId}/use-grants`,{requestId:randomUUID(),userId:teacher.id,combinationHash:pointer.combinationHash,expectedUseVersion:use.version+1})
+  const scale=await db.scale.findFirstOrThrow({where:{code:KEY,instrumentVersion:VERSION}})
+  const source=(await import('../../modules/scale/onboarding/instrument-registry')).getScaleInstrumentSource(KEY,VERSION)!
+  const course=await db.course.findFirstOrThrow({where:{creatorId:teacher.id}})
+  await db.courseStudent.create({data:{courseId:course.id,studentId:outsider.id,status:'ACTIVE'}})
+  let q=await request(teacher,'/api/questionnaire-products',{requestId:randomUUID(),name:'Receipt survival synthetic',questionnaireType:'COURSE',courseIds:[course.id]})
+  q=await request(teacher,`/api/questionnaire-products/${q.id}/items`,{revision:q.revision,item:{type:'FORM',formType:'single_choice',formLabel:'年级',contextKey:'gradeLevel',required:true,formOptions:[{value:'7',label:'七年级'}]}})
+  q=await request(teacher,`/api/questionnaire-products/${q.id}/items`,{revision:q.revision,item:{type:'SCALE',scaleId:scale.id,required:true,standardCombination:pointer}})
+  q=await request(teacher,`/api/questionnaire-products/${q.id}/publish`,{revision:q.revision})
+  const enter=async(user:any)=>{
+   const start=await request(user,`/api/composite-assessments/${q.id}/attempts`,{}),path=`/api/composite-assessments/attempts/${start.attempt.id}`
+   let state=await request(user,path);const section=state.currentItem
+   await request(user,`${path}/form-sections/${section.id}/submit`,{submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:section.definitionHash,contextSnapshotHash:state.contextSnapshotHash,answers:section.answers.map((a:any)=>({formItemId:a.formItemId??a.id,value:'7'}))})
+   state=await request(user,path);expect(state.currentItem.type).toBe('SCALE')
+   return {path,state,attemptId:start.attempt.id,user}
+  }
+  const individual=await enter(student)
+  process.env.ASSESSMENT_REPORT_ASYNC_ENABLED='true';process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED='true'
+  try{
+   const received=await enter(outsider),whole=await import('../../modules/composite/whole-questionnaire.service')
+   const definition=await whole.getWholeQuestionnaireDefinition(received.attemptId,{userId:outsider.id})
+   const answers=source.executable!.definition.items.map((i:any)=>({itemCode:i.itemCode,responseValue:'3'}))
+   const input={submissionId:randomUUID(),attemptEpoch:received.state.attemptEpoch,slotSetHash:definition.slotSetHash!,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map(u=>({itemId:u.itemId,definitionHash:u.definitionHash,answers}))}
+   const ack=await whole.submitWholeQuestionnaire(received.attemptId,input,{userId:outsider.id});expect(ack.status).toBe('ACCEPTED')
+   const row=await (await import('../../modules/survey/standard-triplet.service')).standardReleaseRow(db,pointer.releaseId)
+   await request(system,`/api/platform/survey-standard/${pointer.releaseId}/withdraw`,{expectedVersion:row.version,reason:'Synthetic withdrawal after durable ACK'})
+   const stop=(await import('../../modules/scale-library-governance/service')).stopCollection
+   await db.$transaction((tx:any)=>stop(tx,system.id,'TRAINING_SCALE',scale.id,'Synthetic stop after START and ACK'))
+   await expect(db.$transaction((tx:any)=>(import('../../modules/measurement-content/standard-combination-source')).then(m=>m.readCurrentStandardCombination(tx,pointer,'COLLECTION')))).rejects.toThrow('NOT_CURRENT')
+   const outbox=await import('../../modules/assessment-runtime/report-outbox.service'),job=await outbox.claimCompositeReportJob()
+   expect(job?.attemptId).toBe(received.attemptId);expect(job?.wholePayloadHash).toBe(ack.payloadHash)
+   const execution={submissionId:input.submissionId,payloadHash:ack.payloadHash,acceptedAtMs:job!.wholeAcceptedAt!.getTime(),leaseToken:job!.leaseToken!}
+   const guard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
+   for(const bad of [{...execution,payloadHash:'f'.repeat(64)},{...execution,leaseToken:randomUUID()}]){
+    await expect(db.$transaction((tx:any)=>guard(tx,[scale.id],{compositeAttemptId:received.attemptId,compositeItemIds:definition.units.map(u=>u.itemId),acceptedReceipt:bad}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+   }
+   expect(await db.assessmentResultFact.count({where:{assessment:{compositeAttemptId:received.attemptId}}})).toBe(0)
+   expect(await whole.processWholeQuestionnaireAnswers(job!)).toBe(true)
+   expect(await whole.processWholeQuestionnaireAnswers(job!)).toBe(true)
+   expect(await db.assessment.findMany({where:{compositeAttemptId:received.attemptId},select:{status:true}})).toEqual([{status:'COMPLETED'}])
+   expect(await whole.submitWholeQuestionnaire(received.attemptId,input,{userId:outsider.id})).toMatchObject({replayed:true,payloadHash:ack.payloadHash})
+   process.env.ASSESSMENT_REPORT_ASYNC_ENABLED='false'
+   const item=individual.state.currentItem
+   await request(student,`${individual.path}/items/${item.id}/scale/submit?response=receipt`,{submissionId:randomUUID(),attemptEpoch:individual.state.attemptEpoch,definitionHash:item.definitionHash,contextSnapshotHash:individual.state.contextSnapshotHash,answers})
+   expect((await request(student,individual.path)).status).toBe('COMPLETED')
+   completedCases++
+  }finally{process.env.ASSESSMENT_REPORT_ASYNC_ENABLED='false';delete process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED}
+ },180000)
 })

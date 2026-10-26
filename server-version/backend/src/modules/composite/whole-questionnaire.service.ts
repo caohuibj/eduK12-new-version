@@ -35,7 +35,7 @@ export const wholeQuestionnaireSubmitSchema = z.object({
 }).strict()
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
-export type WholeReceiptExecution = { submissionId: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
+export type WholeReceiptExecution = { submissionId: string; payloadHash: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
 /** Invocation-scoped verified scientific data; never an authorization cache. */
 export type WholeQuestionnaireReportContext = {
   attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null;
@@ -369,7 +369,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   const receipt = job
   if (!receipt.wholeSubmissionId) return false
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
-  const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
+  const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, payloadHash: receipt.wholePayloadHash!, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
     timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch

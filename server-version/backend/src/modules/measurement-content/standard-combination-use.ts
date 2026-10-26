@@ -133,13 +133,28 @@ export async function revokeTrainingStandardCombinationUse(actorId:string,useId:
   const actor=await libraryActor(tx,actorId)
   const grant=await tx.materialGrant.findUnique({where:{id}})
   if(!grant||grant.resourceType!==MaterialResourceType.STANDARD_COMBINATION||!actor.systemAdmin&&grant.grantedBy!==actorId)deny()
-  if(!actor.systemAdmin)await assertEntryAdmin(tx,actorId,'TRAINING')
+  const assertRevokeAuthority=async()=>{
+   const currentActor=await libraryActor(tx,actorId)
+   if(currentActor.systemAdmin)return
+   if(grant.grantedBy!==actorId)deny()
+   const basis=binding(grant)
+   if('authorityEntryGrantId'in basis){
+    const current=await assertEntryAdmin(tx,actorId,'TRAINING')
+    if(current.grantId!==basis.authorityEntryGrantId||current.grantVersion!==basis.authorityEntryGrantVersion)deny('入口分配依据已变化')
+   }else{
+    const [source]=await tx.$queryRaw<Array<{combination_hash:string;measurement_release:{releaseId:string}|null}>>(Prisma.sql`
+     SELECT combination_hash,measurement_release FROM survey_standard_releases WHERE id=${grant.resourceId} FOR SHARE`)
+    if(!source?.measurement_release||source.combination_hash!==grant.standardCombinationHash)deny()
+    // Original issuer, original exact root and original measurement only.
+    await assertLibraryAuthority(tx,actorId,source.measurement_release.releaseId,'material.distribute','TRAINING',basis.authorityGrantId)
+   }
+  }
+  await assertRevokeAuthority()
   const rows=await tx.$queryRaw<Array<{version:number}>>(Prisma.sql`UPDATE material_grants
    SET revoked_at=(clock_timestamp() AT TIME ZONE 'UTC'),version=version+1
    WHERE id=${id} AND version=${input.expectedVersion} AND revoked_at IS NULL RETURNING version`)
   if(!rows[0])throw new AdminPermissionError(409,'使用权已撤销或版本已变化')
-  await libraryActor(tx,actorId)
-  if(!actor.systemAdmin)await assertEntryAdmin(tx,actorId,'TRAINING')
+  await assertRevokeAuthority()
   await tx.assessmentManagementEvent.create({data:{actorId,resourceId:grant.resourceId,action:'STANDARD_COMBINATION_USE_REVOKED',
    metadata:{grantId:id,userId:grant.teacherId,version:rows[0].version,reason:input.reason}}})
   return {id,version:rows[0].version,revoked:true}

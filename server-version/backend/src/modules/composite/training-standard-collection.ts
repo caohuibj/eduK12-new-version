@@ -4,13 +4,11 @@ import {ContentReleaseError} from '../measurement-content/release'
 import {trainingBoundContent} from './training-reference-binding'
 import {verifyStoredTrainingStandardItem} from './training-standard-combination'
 import {readTrainingStandardContentIdentity} from './training-standard-content'
-import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
-import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/collection-guard'
 import type {WholeReceiptExecution} from './whole-questionnaire.service'
 
 /** Invoked after normal participant/receipt checks, inside the protected write.
- * The saved source use is current; courses remain owned business containers.
+ * New admission checks current use; admitted children retain frozen rules.
  * Saved FINAL replay and historical report reads do not call this guard. */
 export async function assertTrainingStandardCollectionAllowed(tx:Prisma.TransactionClient,parentId:string,scaleIds:readonly string[],itemIds:readonly string[]=[],acceptedReceipt?:WholeReceiptExecution){
  const [header]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT a.id FROM composite_assessment_attempts a WHERE a.id=${parentId}
@@ -43,12 +41,13 @@ export async function assertTrainingStandardCollectionAllowed(tx:Prisma.Transact
   if(!item?.standardCombinationSource||!unit?.source.standardCombination||item.type!=='SCALE'||item.scaleId!==unit.source.id
    ||canonicalHash(item.standardCombinationSource)!==canonicalHash(unit.source.standardCombination))
    throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')
-  if(acceptedReceipt){
-   const source=await readTrainingStandardContentIdentity(tx,unit,{compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy!})
-   await readCurrentStandardCombination(tx,{releaseId:source.row.id,combinationHash:source.row.combination_hash},'COLLECTION')
-   await assertScaleLibraryCollectionAllowed(tx,[source.measurement.releaseId])
-   const stops=await tx.$queryRaw<Array<{target_id:string}>>(Prisma.sql`SELECT target_id FROM scale_library_emergency_stops WHERE target_kind='TRAINING_SCALE' AND target_id=${item.scaleId}`)
-   if(stops.length)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_SCALE_EMERGENCY_STOPPED')
+  const admitted=parent.scaleAssessments.some(child=>child.compositeItemId===id&&child.scaleId===item.scaleId&&child.attemptEpoch===parent.attemptEpoch)
+  if(acceptedReceipt&&!admitted)throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_CHILD_IDENTITY_REQUIRED')
+  if(admitted){
+   // START already committed this exact child/epoch. A durable whole FINAL also
+   // has to own the matching receipt/hash/lease above. Neither path is a new
+   // admission: lifecycle and emergency stops cannot strand accepted answers.
+   await readTrainingStandardContentIdentity(tx,unit,{compositeId:parent.compositeAssessmentId,ownerId:parent.compositeAssessment.createdBy!})
   }else{
    const current=await verifyStoredTrainingStandardItem(tx,parent.compositeAssessment,item,'COLLECTION')
    if(canonicalHash(current.reference.measurement)!==canonicalHash(unit.measurement))throw new ContentReleaseError('CONTENT_TRAINING_STANDARD_FROZEN_IDENTITY_CHANGED')

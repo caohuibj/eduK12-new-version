@@ -103,7 +103,8 @@ export const enqueueCompositeReportForUnit = async (
         AND parent."async_report_epoch" = parent."attempt_epoch"
         AND job."slot_set_hash" = parent."frozen_active_slot_set_hash"
         AND job."context_hash" IS NOT DISTINCT FROM parent."context_snapshot_hash"
-        AND job."whole_submission_id" = ${receipt.submissionId} AND job."whole_accepted_at" = ${new Date(receipt.acceptedAtMs)}
+        AND job."whole_submission_id" = ${receipt.submissionId} AND job."whole_payload_hash" = ${receipt.payloadHash}
+        AND job."whole_accepted_at" = ${new Date(receipt.acceptedAtMs)}
         AND job."status" = 'PROCESSING' AND job."lease_token" = ${receipt.leaseToken}
         AND job."lease_expires_at" > (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') FOR UPDATE OF job
     `
