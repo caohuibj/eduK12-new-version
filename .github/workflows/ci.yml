@@ -5,7 +5,8 @@
 #   Presentation-only CSS/design-doc PR: frontend lint + typecheck + production build only.
 #   Routing always runs; the stable aggregate check completes for every selected route.
 #   Draft platform PR: lightweight compile/type gate only; development commits do not consume Full Gate capacity.
-#   Ready platform PR: existing full backend/frontend/browser/docker/CodeQL merge gate.
+#   Ready platform PR: existing full route, except fixed PR356 observation-only entry.
+#   PR356: explicit qualify dispatch; admit verifies the same official source and evidence under the stable required gate.
 #   Ready PR debug: synchronize continues to re-run Full Gate after a failed merge-gate attempt.
 #   workflow_dispatch: one component probe; Full Gate requires explicit full_acceptance=true.
 #   push main: short post-merge integrity smoke only; do not repeat the already-green Full Gate.
@@ -71,6 +72,20 @@ on:
         type: boolean
         default: false
         description: 'Explicitly opt into whole-platform CI; otherwise choose a step_probe'
+      pr356_phase:
+        type: choice
+        options: [none, qualify, admit]
+        default: none
+        description: 'PR356 only: reviewed qualification or same-source evidence admission; never full CI'
+      pr356_qualification:
+        type: string
+        default: ''
+        description: 'Exact Q JSON: runId, attempt, artifactId, zipSHA256; no latest-success fallback'
+      pr356_security_review:
+        type: string
+        default: ''
+        description: 'Bound SARIF disposition record; does not authenticate independent human release'
+
 
 permissions:
   contents: read
@@ -79,13 +94,29 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.step_probe || 'none' }}-${{ inputs.step_probe == 'images' && inputs.probe_frontend_only && 'frontend' || 'all' }}${{ github.event.pull_request.head.ref == 'work/survey-training-branding-20261023' && '-trainer-repair' || '' }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event.pull_request.head.ref != 'fix/runtime-time-and-validation-20261025' && github.ref_name != 'fix/runtime-time-and-validation-20261025' }}
 
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 
 jobs:
+  pr356-refuse-unsupported:
+    name: PR356 / refuse unsupported activation parameters
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' &&
+          ((github.ref_name == 'fix/runtime-time-and-validation-20261025' &&
+            ((inputs.pr356_phase != 'qualify' && inputs.pr356_phase != 'admit') ||
+             inputs.step_probe != 'none' || inputs.complete_training || inputs.full_acceptance)) ||
+           (github.ref_name != 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase != 'none')) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Stop without a broad, probe or alternate candidate fallback
+        run: |
+          echo 'PR356 requires its exact reviewed branch, qualify/admit, no probe/full/completion flags. No alternate route is authorized.' >&2
+          exit 1
+
   exact-candidate-manual-refusal:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)
     runs-on: ubuntu-24.04
@@ -264,10 +295,14 @@ jobs:
 
   scope:
     name: classify changed content
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))) }}
+    if: ${{ (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
+      post_merge: ${{ steps.scope.outputs.post_merge }}
+      pr356_phase: ${{ steps.scope.outputs.pr356_phase }}
+      pr356_plan: ${{ steps.scope.outputs.pr356_plan }}
+      pr356_candidate_inputs_sha256: ${{ steps.scope.outputs.pr356_candidate_inputs_sha256 }}
       exact_candidate_plan: ${{ steps.scope.outputs.exact_candidate_plan }}
       admin_permissions_functional_only: ${{ steps.scope.outputs.admin_permissions_functional_only }}
       admin_permissions_functional_plan: ${{ steps.scope.outputs.admin_permissions_functional_plan }}
@@ -360,6 +395,11 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - id: pr356-entry
+        name: detect the fixed PR356 entry before any legacy classification
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node .github/scripts/pr356-entry.mjs --detect
       - name: fetch exact two-candidate PR source for checkout-tree comparison
         if: github.event_name == 'pull_request' && contains(fromJSON('["backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
         env:
@@ -506,6 +546,7 @@ jobs:
           if(!/^[a-f0-9]{40}$/.test(process.env.SOURCE||''))throw Error('Invalid PR source');
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',process.env.SOURCE],{stdio:'inherit'});
       - id: documentation-scope
+        if: steps.pr356-entry.outputs.candidate != 'true'
         name: select dependency-free documentation or tooling classification
         env:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -525,10 +566,17 @@ jobs:
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
-        if: steps.documentation-scope.outputs.lightweight != 'true'
+        if: steps.pr356-entry.outputs.candidate != 'true' && steps.documentation-scope.outputs.lightweight != 'true'
         run: npm ci --ignore-scripts --prefix .github/release-tools
       - id: scope
         env:
+          GH_TOKEN: ${{ github.token }}
+          PR356_ENTRY: ${{ steps.pr356-entry.outputs.candidate }}
+          PR356_PHASE: ${{ inputs.pr356_phase }}
+          PR356_STEP_PROBE: ${{ inputs.step_probe }}
+          PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance }}
+          PR356_COMPLETE_TRAINING: ${{ inputs.complete_training }}
+          PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/source
           CI_HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
           CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
           CI_IS_DRAFT: ${{ github.event.pull_request.draft }}
@@ -548,7 +596,20 @@ jobs:
           CI_FULL_ACCEPTANCE: ${{ inputs.full_acceptance }}
           CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-        run: node .github/scripts/content-scope.mjs
+        run: |
+          if [ "$PR356_ENTRY" = "true" ]; then
+            node .github/scripts/pr356-scope.mjs --outputs
+          else
+            node .github/scripts/content-scope.mjs
+          fi
+      - name: retain PR356 source identity and complete selected input table
+        if: always() && steps.pr356-entry.outputs.candidate == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr356-source-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/pr356/source/
+          if-no-files-found: warn
+          retention-days: 7
       - name: Survey Mac exact scope, refusal and aggregate contracts
         if: steps.scope.outputs.application_route == 'survey-mac-ui' && github.event_name == 'pull_request'
         run: |
@@ -1056,7 +1117,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ ((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-polish' || needs.scope.outputs.application_route == 'survey-governance')) }}
+    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-polish' || needs.scope.outputs.application_route == 'survey-governance'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -2055,9 +2116,81 @@ jobs:
       plan: ${{ needs.scope.outputs.exact_candidate_plan }}
 
   merge-gate:
-    name: merge gate / ready PR
-    needs: [scope, survey-governance, training-polish, sjt-native, survey-review, training-entry, training-teacher-management, training-admin-integration, participant-capacity, survey-assessment, training-manual-ui, survey-manual-ui, training-assessment, school-teacher-visual, participant-access, shared-authoring, school-teacher, survey-cloud, admin-authenticator, training-appearance, survey-workspace, survey-experience, scale-library-governance, composite-csv-memory, training-workspace, exact-candidate, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, assessment-capacity, access-efficiency, backend-security-efficiency, shared-asset-storage, survey-candidate, reviewed-candidate, survey-mac-ui, release-tools, campus, teacher-home, survey-home, teacher-survey]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'))) }}
+    name: ${{ (((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
+      || github.ref_name == 'fix/runtime-time-and-validation-20261025') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
+      && inputs.pr356_phase == 'admit')) && 'PR356 / no merge eligibility' || 'merge gate / ready PR' }}
+    needs:
+    - scope
+    - survey-governance
+    - training-polish
+    - sjt-native
+    - survey-review
+    - training-entry
+    - training-teacher-management
+    - training-admin-integration
+    - participant-capacity
+    - survey-assessment
+    - training-manual-ui
+    - survey-manual-ui
+    - training-assessment
+    - school-teacher-visual
+    - participant-access
+    - shared-authoring
+    - school-teacher
+    - survey-cloud
+    - admin-authenticator
+    - training-appearance
+    - survey-workspace
+    - survey-experience
+    - scale-library-governance
+    - composite-csv-memory
+    - training-workspace
+    - exact-candidate
+    - maintenance
+    - documentation
+    - content
+    - visual
+    - pr-light-backend
+    - pr-light-frontend
+    - backend
+    - backend-browser-build
+    - backend-regression
+    - frontend-build
+    - frontend
+    - browser
+    - docker
+    - codeql
+    - miniprogram
+    - accept-media
+    - accept-ui
+    - accept-visual
+    - accept-perf
+    - accept-ops
+    - scoped-release
+    - homepage-copy
+    - assessment-capacity
+    - access-efficiency
+    - backend-security-efficiency
+    - shared-asset-storage
+    - survey-candidate
+    - reviewed-candidate
+    - survey-mac-ui
+    - release-tools
+    - campus
+    - teacher-home
+    - survey-home
+    - teacher-survey
+    - pr356-admission
+    if: ${{ always() && ((github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
+      || (!((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
+      || github.ref_name == 'fix/runtime-time-and-validation-20261025') && needs.scope.outputs.application_route != 'pr356' && (!(github.event_name == 'workflow_dispatch'
+      && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'),
+      github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch'
+      && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020')
+      && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch'
+      && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name
+      != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch'
+      || github.event_name == 'pull_request')))))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
@@ -2072,104 +2205,713 @@ jobs:
       CI_PR_NUMBER: ${{ github.event.pull_request.number }}
       CI_SURVEY_MAC_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
       SURVEY_MAC_UI_REVIEWED_HEAD: ${{ vars.SURVEY_MAC_UI_REVIEWED_HEAD }}
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ inputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: materialize complete merge-gate inputs
-        shell: node {0}
-        run: |
-          const fs = require('node:fs');
-          // The generated Node script receives a JSON string literal, never shell code.
-          const serialized = ${{ toJSON(toJSON(needs)) }};
-          if (Buffer.byteLength(serialized, 'utf8') > 4 * 1024 * 1024) throw new Error('Merge-gate inputs exceed 4 MiB');
-          const path = require('node:path');
-          const file = path.join(process.env.RUNNER_TEMP, `merge-gate-needs-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}.json`);
-          if (/[\r\n]/.test(file)) throw new Error('Invalid merge-gate input path');
-          fs.writeFileSync(file, serialized, { mode: 0o600, flag: 'wx' });
-          fs.appendFileSync(process.env.GITHUB_ENV, `NEEDS_JSON_FILE=${file}\n`);
-      - name: install pinned release classification tools
-        if: needs.scope.outputs.application_route != 'survey-governance' && needs.scope.outputs.application_route != 'training-polish' && needs.scope.outputs.application_route != 'survey-review' && needs.scope.outputs.application_route != 'training-entry' && needs.scope.outputs.application_route != 'training-teacher-management' && needs.scope.outputs.application_route != 'training-admin-integration' && needs.scope.outputs.application_route != 'participant-capacity' && needs.scope.outputs.application_route != 'survey-assessment' && needs.scope.outputs.application_route != 'training-assessment' && needs.scope.outputs.application_route != 'school-teacher-visual' && needs.scope.outputs.application_route != 'participant-access' && needs.scope.outputs.application_route != 'training-manual-ui' && needs.scope.outputs.application_route != 'survey-manual-ui' && needs.scope.outputs.application_route != 'shared-authoring' && needs.scope.outputs.application_route != 'school-teacher' && needs.scope.outputs.application_route != 'survey-workspace' && needs.scope.outputs.application_route != 'training-appearance' && needs.scope.outputs.application_route != 'survey-cloud' && needs.scope.outputs.documentation != 'true' && needs.scope.outputs.scenario != 'release-tooling' && !(needs.scope.outputs.application_route == 'training-workspace' && fromJSON(needs.scope.outputs.training_workspace_plan || '{}').candidate == 'mac-followup')
-        run: npm ci --ignore-scripts --prefix .github/release-tools
-      - name: require exact success for the selected route
-        if: ${{ !inputs.complete_training }}
-        run: node .github/scripts/merge-gate.mjs
-      - name: verify approved frozen Training receipt and refusal cases
-        if: inputs.complete_training
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: |
-          python3 -m unittest discover -s .github/scripts -p test_training_completion.py
-          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
-          python3 .github/scripts/training-completion.py
-      - name: upload current-head evidence receipt
-        if: always() && inputs.complete_training
-        uses: actions/upload-artifact@v4
-        with:
-          name: training-completion-${{ github.sha }}
-          path: training-completion.json
-          retention-days: 3
-          if-no-files-found: error
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ github.sha }}
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/merge-admission/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/merge-admission/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/merge-admission"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+      if: ${{ github.ref_name == 'fix/runtime-time-and-validation-20261025' || github.event.pull_request.number == 356 || needs.scope.outputs.application_route == 'pr356'
+        }}
+    - name: materialize complete merge-gate inputs
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        // The generated Node script receives a JSON string literal, never shell code.
+        const serialized = ${{ toJSON(toJSON(needs)) }};
+        if (Buffer.byteLength(serialized, 'utf8') > 4 * 1024 * 1024) throw new Error('Merge-gate inputs exceed 4 MiB');
+        const path = require('node:path');
+        const file = path.join(process.env.RUNNER_TEMP, `merge-gate-needs-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}.json`);
+        if (/[\r\n]/.test(file)) throw new Error('Invalid merge-gate input path');
+        fs.writeFileSync(file, serialized, { mode: 0o600, flag: 'wx' });
+        fs.appendFileSync(process.env.GITHUB_ENV, `NEEDS_JSON_FILE=${file}\n`);
+    - name: install pinned release classification tools
+      if: '!((github.event_name == ''pull_request'' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == ''fix/runtime-time-and-validation-20261025''))
+        || github.ref_name == ''fix/runtime-time-and-validation-20261025'') && needs.scope.outputs.application_route != ''pr356'' && (needs.scope.outputs.application_route
+        != ''survey-governance'' && needs.scope.outputs.application_route != ''training-polish'' && needs.scope.outputs.application_route != ''survey-review'' && needs.scope.outputs.application_route
+        != ''training-entry'' && needs.scope.outputs.application_route != ''training-teacher-management'' && needs.scope.outputs.application_route != ''training-admin-integration''
+        && needs.scope.outputs.application_route != ''participant-capacity'' && needs.scope.outputs.application_route != ''survey-assessment'' && needs.scope.outputs.application_route
+        != ''training-assessment'' && needs.scope.outputs.application_route != ''school-teacher-visual'' && needs.scope.outputs.application_route != ''participant-access''
+        && needs.scope.outputs.application_route != ''training-manual-ui'' && needs.scope.outputs.application_route != ''survey-manual-ui'' && needs.scope.outputs.application_route
+        != ''shared-authoring'' && needs.scope.outputs.application_route != ''school-teacher'' && needs.scope.outputs.application_route != ''survey-workspace'' && needs.scope.outputs.application_route
+        != ''training-appearance'' && needs.scope.outputs.application_route != ''survey-cloud'' && needs.scope.outputs.documentation != ''true'' && needs.scope.outputs.scenario
+        != ''release-tooling'' && !(needs.scope.outputs.application_route == ''training-workspace'' && fromJSON(needs.scope.outputs.training_workspace_plan || ''{}'').candidate
+        == ''mac-followup''))'
+      run: npm ci --ignore-scripts --prefix .github/release-tools
+    - name: require exact success for the selected route
+      if: ${{ !inputs.complete_training || (github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref ==
+        'fix/runtime-time-and-validation-20261025')) || github.ref_name == 'fix/runtime-time-and-validation-20261025' }}
+      run: node .github/scripts/merge-gate.mjs
+    - name: verify approved frozen Training receipt and refusal cases
+      if: ${{ !((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
+        || github.ref_name == 'fix/runtime-time-and-validation-20261025') && (inputs.complete_training) }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PYTHONDONTWRITEBYTECODE: '1'
+      run: |
+        python3 -m unittest discover -s .github/scripts -p test_training_completion.py
+        node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+        python3 .github/scripts/training-completion.py
+    - name: upload current-head evidence receipt
+      if: ${{ !((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
+        || github.ref_name == 'fix/runtime-time-and-validation-20261025') && (always() && inputs.complete_training) }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: training-completion-${{ github.sha }}
+        path: training-completion.json
+        retention-days: 3
+        if-no-files-found: error
+    - name: Stage actual successful stable PR356 admission only
+      if: ${{ needs.scope.outputs.application_route == 'pr356' }}
+      run: node .github/scripts/pr356-artifacts.mjs stage merge-admission --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/merge-admission"
+    - name: Retain stable required admission for exact main reuse
+      if: ${{ needs.scope.outputs.application_route == 'pr356' }}
+      id: pr356-stable-upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-merge-admission-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/artifacts/merge-admission
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain failed stable PR356 public diagnostics
+      if: ${{ failure() && (github.ref_name == 'fix/runtime-time-and-validation-20261025' || needs.scope.outputs.application_route == 'pr356') }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-merge-admission-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/merge-admission
+        if-no-files-found: warn
+        retention-days: 7
 
-  pr356-source:
-    name: PR356 / immutable candidate
-    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
+  pr356-backend-image:
+    name: pr356-backend-image
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/backend-image/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/backend-image/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/backend-image"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/backend-image
+      run: node .github/scripts/pr356-scope.mjs --phase-spec backend-image
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-backend-image-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: execute only the independent backend-image producer
+      run: python3 .github/scripts/pr356-qualification.py backend-image
+    - name: stage backend-image original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage backend-image --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/backend-image"
+    - name: upload backend-image as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/backend-image/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 3
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-backend-image-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/backend-image/
+          ${{ runner.temp }}/pr356/specs/backend-image/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-frontend-image:
+    name: pr356-frontend-image
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      dist_artifact_id: ${{ steps.dist-upload.outputs.artifact-id }}
+      dist_artifact_name: ${{ steps.identity.outputs.dist_artifact_name }}
+      dist_artifact_digest: ${{ steps.dist-upload.outputs.artifact-digest }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/frontend-image/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/frontend-image/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/frontend-image"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/frontend-image
+      run: node .github/scripts/pr356-scope.mjs --phase-spec frontend-image
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-frontend-image-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+          'dist_artifact_name=pr356-frontend-dist-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: execute only the independent frontend-image producer
+      run: python3 .github/scripts/pr356-qualification.py frontend-image
+    - name: stage frontend-image original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage frontend-image --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/frontend-image"
+    - name: upload frontend-image as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/frontend-image/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 0
+        retention-days: 3
+        overwrite: false
+    - name: stage frontend-dist original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage frontend-dist --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/frontend-dist"
+    - name: upload frontend-dist as an independent official artifact
+      id: dist-upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.dist_artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/frontend-dist/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-frontend-image-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/frontend-image/
+          ${{ runner.temp }}/pr356/specs/frontend-image/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-backend-audit:
+    name: pr356-backend-audit
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.sha }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify official head, base and complete product diff
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR356_STEP_PROBE: ${{ inputs.step_probe }}
-          PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance }}
-          PR356_COMPLETE_TRAINING: ${{ inputs.complete_training }}
-        run: |
-          mkdir -p pr356-evidence
-          node .github/scripts/pr356-scope.mjs > pr356-evidence/candidate.json
-          node .github/scripts/pr356-evidence.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr356-source-${{ github.run_id }}-${{ github.run_attempt }}
-          path: pr356-evidence/
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-audit:
-    name: PR356 / locked dependency audit
-    needs: pr356-source
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/backend-audit/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/backend-audit/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/backend-audit"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/backend-audit
+      run: node .github/scripts/pr356-scope.mjs --phase-spec backend-audit
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-backend-audit-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: execute only the independent backend-audit producer
+      run: python3 .github/scripts/pr356-qualification.py backend-audit
+    - name: stage backend-audit original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage backend-audit --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/backend-audit"
+    - name: upload backend-audit as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/backend-audit/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-backend-audit-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/backend-audit/
+          ${{ runner.temp }}/pr356/specs/backend-audit/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-frontend-audit:
+    name: pr356-frontend-audit
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - run: python3 .github/scripts/pr356-qualification.py audits
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr356-audits-${{ github.run_id }}-${{ github.run_attempt }}
-          path: pr356-evidence/
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-database:
-    name: PR356 / upgrade restore and unfinished receipt journeys
-    needs: pr356-source
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/frontend-audit/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/frontend-audit/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/frontend-audit"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/frontend-audit
+      run: node .github/scripts/pr356-scope.mjs --phase-spec frontend-audit
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-frontend-audit-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: execute only the independent frontend-audit producer
+      run: python3 .github/scripts/pr356-qualification.py frontend-audit
+    - name: stage frontend-audit original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage frontend-audit --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/frontend-audit"
+    - name: upload frontend-audit as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/frontend-audit/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-frontend-audit-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/frontend-audit/
+          ${{ runner.temp }}/pr356/specs/frontend-audit/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-backend-scan:
+    name: pr356-backend-scan
+    needs:
+    - scope
+    - pr356-backend-image
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      PR356_ARTIFACT_ID: ${{ needs.pr356-backend-image.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-backend-image.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-backend-image.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-backend-image.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-backend-image.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-backend-image.outputs.producer_attempt }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/backend-scan/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/backend-scan/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/backend-scan","PR356_UPSTREAM_DIRECTORY":"/pr356/upstream/backend-image","PR356_UPSTREAM_PHASE_SPEC":"/pr356/specs/backend-image/phase-spec.json","PR356_TRIVY_CACHE_DIR":"/pr356/cache/trivy-backend","TRIVY_CACHE_DIR":"/pr356/cache/trivy-backend"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/backend-scan
+      run: node .github/scripts/pr356-scope.mjs --phase-spec backend-scan
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-backend-scan-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream producer specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/backend-image
+      run: node .github/scripts/pr356-scope.mjs --phase-spec backend-image
+    - name: download the pinned successful original image producer artifact
+      run: node .github/scripts/pr356-artifacts.mjs download backend-image --directory "$PR356_UPSTREAM_DIRECTORY" --phase-spec "$PR356_UPSTREAM_PHASE_SPEC"
+    - name: install the fixed official Trivy release
+      uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+      with:
+        version: v0.70.0
+        cache: false
+    - name: reverify retained original image and collect one runtime scan proof
+      run: node .github/scripts/pr356-runtime-scan.mjs backend
+    - name: stage backend-scan original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage backend-scan --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/backend-scan"
+    - name: upload backend-scan as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/backend-scan/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-backend-scan-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/backend-scan/
+          ${{ runner.temp }}/pr356/specs/backend-scan/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-frontend-scan:
+    name: pr356-frontend-scan
+    needs:
+    - scope
+    - pr356-frontend-image
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      PR356_ARTIFACT_ID: ${{ needs.pr356-frontend-image.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-frontend-image.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-frontend-image.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-frontend-image.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-frontend-image.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-frontend-image.outputs.producer_attempt }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/frontend-scan/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/frontend-scan/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/frontend-scan","PR356_UPSTREAM_DIRECTORY":"/pr356/upstream/frontend-image","PR356_UPSTREAM_PHASE_SPEC":"/pr356/specs/frontend-image/phase-spec.json","PR356_TRIVY_CACHE_DIR":"/pr356/cache/trivy-frontend","TRIVY_CACHE_DIR":"/pr356/cache/trivy-frontend"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/frontend-scan
+      run: node .github/scripts/pr356-scope.mjs --phase-spec frontend-scan
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-frontend-scan-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream producer specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/frontend-image
+      run: node .github/scripts/pr356-scope.mjs --phase-spec frontend-image
+    - name: download the pinned successful original image producer artifact
+      run: node .github/scripts/pr356-artifacts.mjs download frontend-image --directory "$PR356_UPSTREAM_DIRECTORY" --phase-spec "$PR356_UPSTREAM_PHASE_SPEC"
+    - name: install the fixed official Trivy release
+      uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+      with:
+        version: v0.70.0
+        cache: false
+    - name: reverify retained original image and collect one runtime scan proof
+      run: node .github/scripts/pr356-runtime-scan.mjs frontend
+    - name: stage frontend-scan original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage frontend-scan --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/frontend-scan"
+    - name: upload frontend-scan as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/frontend-scan/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-frontend-scan-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/frontend-scan/
+          ${{ runner.temp }}/pr356/specs/frontend-scan/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-schema-upgrade:
+    name: pr356-schema-upgrade
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -2180,18 +2922,26 @@ jobs:
           POSTGRES_PASSWORD: pr356-synthetic-only
           POSTGRES_DB: pr356_ci_upgrade
         ports:
-          - 55439:5432
+        - 55439:5432
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
       redis:
         image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
         ports:
-          - 56380:6379
+        - 56380:6379
     env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
       NODE_ENV: test
       TZ: UTC
       DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
       PR356_SCHEMA_ISOLATED: '1'
-      PR356_EVIDENCE_DIR: ${{ github.workspace }}/pr356-evidence
       REDIS_URL: redis://127.0.0.1:56380/14
       JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
       DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
@@ -2201,279 +2951,1738 @@ jobs:
       ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
       SURVEY_PUBLICATION_ENABLED: 'true'
       SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.sha }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: install native build requirements from signed Ubuntu sources
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
-      - name: install locked backend dependencies with normal lifecycle
-        working-directory: server-version/backend
-        run: npm ci
-      - name: run missing upgrade restore and current-source full receipt cases
-        env:
-          PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-        run: python3 .github/scripts/pr356-qualification.py database
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr356-database-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            pr356-evidence/
-            !pr356-evidence/*.dump
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-images:
-    name: PR356 / build each affected production component once
-    needs: pr356-source
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/schema-upgrade/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/schema-upgrade/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/schema-upgrade","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/schema-upgrade"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-upgrade
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-upgrade
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-schema-upgrade-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the schema-upgrade database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py schema-upgrade
+    - name: stage schema-upgrade original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage schema-upgrade --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/schema-upgrade"
+    - name: upload schema-upgrade as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/schema-upgrade/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-schema-upgrade-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/schema-upgrade/
+          ${{ runner.temp }}/pr356/specs/schema-upgrade/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-schema-restore:
+    name: pr356-schema-restore
+    needs:
+    - scope
+    - pr356-schema-upgrade
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
     outputs:
-      images_artifact_id: ${{ steps.images-upload.outputs.artifact-id }}
-      dist_artifact_id: ${{ steps.dist-upload.outputs.artifact-id }}
-      images_artifact_name: ${{ steps.producer.outputs.images }}
-      dist_artifact_name: ${{ steps.producer.outputs.dist }}
-      producer_run: ${{ steps.producer.outputs.run }}
-      producer_head: ${{ steps.producer.outputs.head }}
-      producer_attempt: ${{ steps.producer.outputs.attempt }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
+      PR356_ARTIFACT_ID: ${{ needs.pr356-schema-upgrade.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-schema-upgrade.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-schema-upgrade.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-schema-upgrade.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-schema-upgrade.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-schema-upgrade.outputs.producer_attempt }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-      - name: bind the actual producer attempt
-        id: producer
-        run: |
-          echo "run=$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
-          echo "head=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
-          echo "attempt=$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
-          echo "images=pr356-images-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
-          echo "dist=pr356-dist-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_OUTPUT"
-      - name: compile and retain backend worker and frontend images
-        run: python3 .github/scripts/pr356-qualification.py images
-      - uses: actions/upload-artifact@v4
-        id: images-upload
-        if: always()
-        with:
-          name: pr356-images-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            pr356-evidence/
-            !pr356-evidence/dist/**
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 3
-      - uses: actions/upload-artifact@v4
-        id: dist-upload
-        if: success()
-        with:
-          name: pr356-dist-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            pr356-evidence/dist/
-            pr356-evidence/frontend-dist.json
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-image-security:
-    name: PR356 / scan retained runtime images
-    needs: pr356-images
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/schema-restore/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/schema-restore","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/schema-restore","PR356_DATABASE_INPUT_DIR":"/pr356/upstream/schema-upgrade","PR356_DATABASE_INPUT_PHASE_SPEC":"/pr356/specs/schema-upgrade/phase-spec.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-restore
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-restore
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-schema-restore-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-upgrade
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-upgrade
+    - name: download only the pinned original schema-upgrade artifact
+      run: |
+        node .github/scripts/pr356-artifacts.mjs download schema-upgrade \
+          --directory "$PR356_DATABASE_INPUT_DIR" \
+          --phase-spec "$PR356_DATABASE_INPUT_PHASE_SPEC"
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the schema-restore database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py schema-restore
+    - name: stage schema-restore original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage schema-restore --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/schema-restore"
+    - name: upload schema-restore as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/schema-restore/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-schema-restore-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/schema-restore/
+          ${{ runner.temp }}/pr356/specs/schema-restore/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-vertical4:
+    name: pr356-vertical4
+    needs:
+    - scope
+    - pr356-schema-restore
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
+      PR356_ARTIFACT_ID: ${{ needs.pr356-schema-restore.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-schema-restore.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-schema-restore.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-schema-restore.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-schema-restore.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-schema-restore.outputs.producer_attempt }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/vertical4/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/vertical4/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/vertical4","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/vertical4","PR356_DATABASE_INPUT_DIR":"/pr356/upstream/schema-restore","PR356_DATABASE_INPUT_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/vertical4
+      run: node .github/scripts/pr356-scope.mjs --phase-spec vertical4
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-vertical4-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-restore
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-restore
+    - name: download only the pinned original schema-restore artifact
+      run: |
+        node .github/scripts/pr356-artifacts.mjs download schema-restore \
+          --directory "$PR356_DATABASE_INPUT_DIR" \
+          --phase-spec "$PR356_DATABASE_INPUT_PHASE_SPEC"
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the vertical4 database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py vertical4
+    - name: stage vertical4 original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage vertical4 --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/vertical4"
+    - name: upload vertical4 as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/vertical4/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-vertical4-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/vertical4/
+          ${{ runner.temp }}/pr356/specs/vertical4/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-exact-worker1:
+    name: pr356-exact-worker1
+    needs:
+    - scope
+    - pr356-schema-restore
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
+      PR356_ARTIFACT_ID: ${{ needs.pr356-schema-restore.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-schema-restore.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-schema-restore.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-schema-restore.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-schema-restore.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-schema-restore.outputs.producer_attempt }}
     steps:
-      - name: require exact original producer artifact input
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/exact-worker1/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/exact-worker1/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/exact-worker1","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/exact-worker1","PR356_DATABASE_INPUT_DIR":"/pr356/upstream/schema-restore","PR356_DATABASE_INPUT_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/exact-worker1
+      run: node .github/scripts/pr356-scope.mjs --phase-spec exact-worker1
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-exact-worker1-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-restore
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-restore
+    - name: download only the pinned original schema-restore artifact
+      run: |
+        node .github/scripts/pr356-artifacts.mjs download schema-restore \
+          --directory "$PR356_DATABASE_INPUT_DIR" \
+          --phase-spec "$PR356_DATABASE_INPUT_PHASE_SPEC"
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the exact-worker1 database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py exact-worker1
+    - name: stage exact-worker1 original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage exact-worker1 --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/exact-worker1"
+    - name: upload exact-worker1 as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/exact-worker1/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-exact-worker1-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/exact-worker1/
+          ${{ runner.temp }}/pr356/specs/exact-worker1/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-ordinary-harness4:
+    name: pr356-ordinary-harness4
+    needs:
+    - scope
+    - pr356-schema-restore
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
         env:
-          PR356_ARTIFACT_KIND: images
-          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.images_artifact_name }}
-          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.images_artifact_id }}
-          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
-          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
-          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
-        shell: python
-        run: |
-          import os,re
-          e=os.environ
-          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
-          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
-          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
-          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
-          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
-          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
-          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
-          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
-      - uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.pr356-images.outputs.images_artifact_name }}
-          path: pr356-evidence
-      - name: load original producer bytes without rebuilding
-        id: runtime-load
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
+      PR356_ARTIFACT_ID: ${{ needs.pr356-schema-restore.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-schema-restore.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-schema-restore.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-schema-restore.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-schema-restore.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-schema-restore.outputs.producer_attempt }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/ordinary-harness4/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/ordinary-harness4/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/ordinary-harness4","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/ordinary-harness4","PR356_DATABASE_INPUT_DIR":"/pr356/upstream/schema-restore","PR356_DATABASE_INPUT_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/ordinary-harness4
+      run: node .github/scripts/pr356-scope.mjs --phase-spec ordinary-harness4
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-ordinary-harness4-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-restore
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-restore
+    - name: download only the pinned original schema-restore artifact
+      run: |
+        node .github/scripts/pr356-artifacts.mjs download schema-restore \
+          --directory "$PR356_DATABASE_INPUT_DIR" \
+          --phase-spec "$PR356_DATABASE_INPUT_PHASE_SPEC"
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the ordinary-harness4 database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py ordinary-harness4
+    - name: stage ordinary-harness4 original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage ordinary-harness4 --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "${{ runner.temp
+        }}/pr356/artifacts/ordinary-harness4"
+    - name: upload ordinary-harness4 as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/ordinary-harness4/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-ordinary-harness4-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/ordinary-harness4/
+          ${{ runner.temp }}/pr356/specs/ordinary-harness4/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-exact-lazy-current-child:
+    name: pr356-exact-lazy-current-child
+    needs:
+    - scope
+    - pr356-schema-restore
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
         env:
-          SOURCE_HEAD: ${{ github.sha }}
-          PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
-        run: |
-          python3 - <<'PYCODE'
-          import json,hashlib,os
-          from pathlib import Path
-          for c in ['backend','frontend']:
-              proof=json.loads(Path('pr356-evidence/'+c+'-archive.json').read_text())
-              assert proof['sourceHead']==os.environ['SOURCE_HEAD'] and proof['run']==os.environ['GITHUB_RUN_ID']
-              assert proof['tag']=='pr356-'+c+':'+os.environ['SOURCE_HEAD']
-              assert proof['attempt']==os.environ['PRODUCER_ATTEMPT']
-              with Path('pr356-evidence/'+c+'.tar').open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()==proof['sha256']
-          PYCODE
-          docker load --input pr356-evidence/backend.tar
-          docker load --input pr356-evidence/frontend.tar
-          docker run --rm --network none --entrypoint node "pr356-backend:$SOURCE_HEAD" -e "require('canvas');require('sharp');if(!require('fs').existsSync('/app/dist/workers/main.js'))throw Error('Missing worker runtime');console.log('Native modules and worker entry present')"
-      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-        with:
-          version: v0.70.0
-          cache: false
-      - name: scan backend and worker runtime
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: pr356-backend:${{ github.sha }}
-          format: json
-          output: pr356-evidence/backend-trivy.json
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          skip-setup-trivy: true
-      - name: scan frontend runtime
-        if: ${{ !cancelled() && steps.runtime-load.outcome == 'success' }}
-        uses: aquasecurity/trivy-action@v0.36.0
-        with:
-          image-ref: pr356-frontend:${{ github.sha }}
-          format: json
-          output: pr356-evidence/frontend-trivy.json
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
-          severity: CRITICAL,HIGH
-          skip-setup-trivy: true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr356-runtime-scans-${{ github.run_id }}-${{ github.run_attempt }}
-          path: pr356-evidence/*trivy.json
-          if-no-files-found: warn
-          retention-days: 7
-
-  pr356-browser:
-    name: PR356 / same-image onboarding browser
-    needs: pr356-images
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_ci_upgrade
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: ${{ needs.scope.outputs.pr356_phase }}
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+      CI: 'true'
+      NODE_ENV: test
+      TZ: UTC
+      DATABASE_URL: postgresql://postgres:pr356-synthetic-only@127.0.0.1:55439/pr356_ci_upgrade
+      PR356_SCHEMA_ISOLATED: '1'
+      REDIS_URL: redis://127.0.0.1:56380/14
+      JWT_SECRET: pr356-synthetic-ci-jwt-20261026-only
+      DATA_ENCRYPTION_KEY: '1111111111111111111111111111111111111111111111111111111111111111'
+      ADMIN_AUTH_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:5173
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      ASSESSMENT_REPORT_ASYNC_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      PR356_ORDINARY_RECEIPT_MODE: fresh
+      PR356_ORDINARY_RECEIPT_REPLAY_LEDGERS: ''
+      DOT356_STANDARD_AUTHORITY_CONTINUE: ''
+      DOT356_STANDARD_RECEIPT_CONTINUE: ''
+      PR356_RECEIPT_WORKER_CONTINUE: ''
+      PR356_RECEIPT_VERIFY_ONLY: ''
+      PR356_ARTIFACT_ID: ${{ needs.pr356-schema-restore.outputs.artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs.pr356-schema-restore.outputs.artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs.pr356-schema-restore.outputs.artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs.pr356-schema-restore.outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs.pr356-schema-restore.outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-schema-restore.outputs.producer_attempt }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        registry-url: https://registry.npmjs.org
+        cache: npm
+        cache-dependency-path: server-version/backend/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/exact-lazy-current-child/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/exact-lazy-current-child/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/exact-lazy-current-child","PR356_DATABASE_OUTPUT_DIR":"/pr356/results/exact-lazy-current-child","PR356_DATABASE_INPUT_DIR":"/pr356/upstream/schema-restore","PR356_DATABASE_INPUT_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: materialize the exact source-plan phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/exact-lazy-current-child
+      run: node .github/scripts/pr356-scope.mjs --phase-spec exact-lazy-current-child
+    - name: record the actual current producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        const env = process.env;
+        fs.appendFileSync(env.GITHUB_OUTPUT, [
+          'producer_run=' + env.GITHUB_RUN_ID,
+          'producer_head=' + env.GITHUB_SHA,
+          'producer_attempt=' + env.GITHUB_RUN_ATTEMPT,
+          'artifact_name=pr356-exact-lazy-current-child-' + env.GITHUB_RUN_ID + '-' + env.GITHUB_RUN_ATTEMPT,
+        ].join('\n') + '\n');
+    - name: materialize the exact upstream phase specification
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/schema-restore
+      run: node .github/scripts/pr356-scope.mjs --phase-spec schema-restore
+    - name: download only the pinned original schema-restore artifact
+      run: |
+        node .github/scripts/pr356-artifacts.mjs download schema-restore \
+          --directory "$PR356_DATABASE_INPUT_DIR" \
+          --phase-spec "$PR356_DATABASE_INPUT_PHASE_SPEC"
+    - name: install native build requirements from signed Ubuntu sources
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends build-essential python3 pkg-config libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - name: install locked backend dependencies with normal lifecycle from official npm
+      working-directory: server-version/backend
+      run: npm ci
+    - name: generate the current Prisma client as setup only
+      working-directory: server-version/backend
+      run: npm run db:generate
+    - name: execute only the exact-lazy-current-child database phase with every required case
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+      run: python3 .github/scripts/pr356-database.py exact-lazy-current-child
+    - name: stage exact-lazy-current-child original producer bytes for upload
+      run: node .github/scripts/pr356-artifacts.mjs stage exact-lazy-current-child --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination
+        "${{ runner.temp }}/pr356/artifacts/exact-lazy-current-child"
+    - name: upload exact-lazy-current-child as an independent official artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/exact-lazy-current-child/
+        include-hidden-files: true
+        if-no-files-found: error
+        compression-level: 6
+        retention-days: 7
+        overwrite: false
+    - name: explain the failed-producer preservation and stop boundary
+      if: ${{ failure() && !cancelled() }}
+      shell: node {0}
+      run: |
+        const fs = require('node:fs');
+        fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+          'PR356 stopped after an unsuccessful phase or upload. Original local results and any official normal/failure artifacts must be preserved. A failed producer job is not qualified by a successful internal build or partial role upload. Do not rerun the producer to rebuild successful work. dot must first verify original artifact IDs, digests, successful phase facts and complete inputs, then define only the missing continuation. A failed-job partial adapter is not implemented; there is no automatic fallback.\n');
+    - name: preserve unsuccessful raw execution evidence without a qualification role
+      if: ${{ failure() && !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-failure-exact-lazy-current-child-${{ github.run_id }}-${{ github.run_attempt }}
+        path: |
+          ${{ runner.temp }}/pr356/results/exact-lazy-current-child/
+          ${{ runner.temp }}/pr356/specs/exact-lazy-current-child/
+        include-hidden-files: true
+        if-no-files-found: warn
+        compression-level: 0
+        retention-days: 7
+        overwrite: false
+  pr356-status-browser:
+    name: pr356-status-browser
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    needs:
+    - scope
+    - pr356-frontend-image
     runs-on: ubuntu-24.04
     timeout-minutes: 12
-    env:
-      PR356_EVIDENCE_DIR: pr356-evidence
-      CI_SOURCE_HEAD: ${{ github.sha }}
-      PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: require exact original producer artifact input
-        env:
-          PR356_ARTIFACT_KIND: dist
-          PR356_ARTIFACT_NAME: ${{ needs.pr356-images.outputs.dist_artifact_name }}
-          PR356_ARTIFACT_ID: ${{ needs.pr356-images.outputs.dist_artifact_id }}
-          PR356_PRODUCER_RUN: ${{ needs.pr356-images.outputs.producer_run }}
-          PR356_PRODUCER_HEAD: ${{ needs.pr356-images.outputs.producer_head }}
-          PR356_PRODUCER_ATTEMPT: ${{ needs.pr356-images.outputs.producer_attempt }}
-        shell: python
-        run: |
-          import os,re
-          e=os.environ
-          numeric=['GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','PR356_ARTIFACT_ID','PR356_PRODUCER_ATTEMPT']
-          assert all(re.fullmatch(r'[1-9][0-9]{0,19}',e.get(k,'')) for k in numeric),'Missing/invalid producer output; no implicit download or rebuild'
-          assert re.fullmatch(r'[a-f0-9]{40}',e.get('GITHUB_SHA','')),'Invalid source head'
-          assert e.get('PR356_PRODUCER_RUN')==e['GITHUB_RUN_ID'],'Producer belongs to a different run'
-          assert e.get('PR356_PRODUCER_HEAD')==e['GITHUB_SHA'],'Producer belongs to a different source'
-          assert int(e['PR356_PRODUCER_ATTEMPT'])<=int(e['GITHUB_RUN_ATTEMPT']),'Producer attempt is newer than consumer'
-          kind=e.get('PR356_ARTIFACT_KIND');assert kind in ['images','dist'],'Unknown artifact kind'
-          assert e.get('PR356_ARTIFACT_NAME')=='pr356-'+kind+'-'+e['GITHUB_RUN_ID']+'-'+e['PR356_PRODUCER_ATTEMPT'],'Missing/wrong producer artifact name'
-      - uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.pr356-images.outputs.dist_artifact_name }}
-          path: pr356-evidence
-      - name: prepare pinned browser tools from official sources
-        run: |
-          npm ci --ignore-scripts --prefix .github/release-tools
-          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: verify secure Chromium status paging and distinct lifecycle states
-        run: node .github/scripts/pr356-browser.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr356-browser-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            pr356-evidence/*.json
-            pr356-evidence/*.png
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-codeql:
-    name: PR356 / CodeQL (${{ matrix.language }})
-    needs: pr356-source
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
     permissions:
       contents: read
       actions: read
-      security-events: write
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [javascript-typescript, python]
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: qualify
+      PR356_STEP_PROBE: none
+      PR356_FULL_ACCEPTANCE: 'false'
+      PR356_COMPLETE_TRAINING: 'false'
+      PR356_SOURCE_HEAD: ${{ github.sha }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs['scope'].outputs.pr356_candidate_inputs_sha256 }}
+      PR356_ARTIFACT_ID: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs['pr356-frontend-image'].outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs['pr356-frontend-image'].outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs['pr356-frontend-image'].outputs.producer_attempt }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          queries: security-extended
-          ram: 3500
-          threads: 2
-      - uses: github/codeql-action/analyze@v3
-        with:
-          category: pr356/${{ matrix.language }}
-          # Same repository setting as the established main CodeQL job: analysis
-          # runs locally and SARIF is retained without unavailable endpoint upload.
-          upload: never
-          upload-database: false
-          output: pr356-evidence/codeql-${{ matrix.language }}
-      - name: retain actual language analysis
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr356-codeql-${{ matrix.language }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: pr356-evidence/codeql-${{ matrix.language }}/*.sarif
-          if-no-files-found: error
-          retention-days: 7
-
-  pr356-result:
-    name: PR356 / affected qualification (no merge eligibility)
-    needs: [pr356-source, pr356-audit, pr356-database, pr356-images, pr356-image-security, pr356-browser, pr356-codeql]
-    if: always() && github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025'
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        cache: npm
+        cache-dependency-path: .github/release-tools/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/status-browser/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/status-browser/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/status-browser","PR356_FRONTEND_PHASE_SPEC":"/pr356/specs/frontend-image/phase-spec.json","PR356_FRONTEND_ARTIFACT_DIR":"/pr356/upstream/frontend-dist"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Bind exact phase specs outside empty result directories
+      id: identity
+      run: |
+        set -euo pipefail
+        install -d -m 700 "$RUNNER_TEMP/pr356/specs" "$RUNNER_TEMP/pr356/results" "$RUNNER_TEMP/pr356/upstream"
+        for phase in status-browser frontend-image; do
+          PR356_EVIDENCE_DIR="$RUNNER_TEMP/pr356/specs/$phase" node .github/scripts/pr356-scope.mjs --phase-spec "$phase" > "$RUNNER_TEMP/pr356/specs/$phase.plan.json"
+        done
+        python3 - <<'PYCODE'
+        import os,re
+        e=os.environ
+        assert re.fullmatch('[1-9][0-9]*',e['GITHUB_RUN_ID']) and re.fullmatch('[1-9][0-9]*',e['GITHUB_RUN_ATTEMPT'])
+        values={'artifact_name':'pr356-status-browser-'+e['GITHUB_RUN_ID']+'-'+e['GITHUB_RUN_ATTEMPT'],'producer_run':e['GITHUB_RUN_ID'],'producer_head':e['GITHUB_SHA'],'producer_attempt':e['GITHUB_RUN_ATTEMPT']}
+        with open(e['GITHUB_OUTPUT'],'a') as f:
+            for key,value in values.items():f.write(key+'='+value+'\n')
+        PYCODE
+    - name: Download and verify the original frontend dist producer
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs download frontend-dist --directory "$PR356_FRONTEND_ARTIFACT_DIR" --phase-spec "$PR356_FRONTEND_PHASE_SPEC"
+    - name: Install locked official release tools and Chromium only
+      run: |
+        set -euo pipefail
+        npm ci --ignore-scripts --prefix .github/release-tools --registry=https://registry.npmjs.org
+        node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+    - name: Run original four synthetic status views from verified production dist
+      run: node .github/scripts/pr356-browser.mjs
+    - name: Stage the successful original phase bytes
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs stage status-browser --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/status-browser"
+    - name: Upload original passing phase proof and payload
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/status-browser
+        if-no-files-found: error
+        retention-days: 7
+    - name: Retain failed public diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-status-browser-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/status-browser
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-product-browser:
+    name: pr356-product-browser
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    needs:
+    - scope
+    - pr356-frontend-image
+    - pr356-backend-image
+    - pr356-schema-restore
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
-    steps:
-      - name: require actual success for every selected job
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+    services:
+      postgres:
+        image: postgres:16.15@sha256:efedf3595f1d6f415c08568ba171029bf54052e754cc9f030e3f2412b21f3d67
         env:
-          RESULTS: ${{ toJSON(needs) }}
-        shell: node {0}
-        run: |
-          const fs=require('node:fs'),jobs=JSON.parse(process.env.RESULTS);
-          const bad=Object.entries(jobs).filter(([,v])=>v.result!=='success');
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,JSON.stringify({qualification:'PR356 affected fixes',jobs,mergeEligible:false,contentAcceptance:'HOLD/NOTRUN preserved',productionDeployment:false},null,2));
-          if(bad.length)throw Error('Missing/failed/skipped/cancelled selected qualification: '+bad.map(([k,v])=>k+':'+v.result).join(', '));
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: pr356-synthetic-only
+          POSTGRES_DB: pr356_browser_0000000000
+        ports:
+        - 55439:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11@sha256:c6eabf748fc7a61dbb5a705c78bcf3d6377b1127a97d0ce965c11c44ba46896f
+        ports:
+        - 56380:6379
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: qualify
+      PR356_STEP_PROBE: none
+      PR356_FULL_ACCEPTANCE: 'false'
+      PR356_COMPLETE_TRAINING: 'false'
+      PR356_SOURCE_HEAD: ${{ github.sha }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs['scope'].outputs.pr356_candidate_inputs_sha256 }}
+      PR356_ARTIFACT_ID: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_id }}
+      PR356_ARTIFACT_NAME: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_name }}
+      PR356_ARTIFACT_DIGEST: ${{ needs['pr356-frontend-image'].outputs.dist_artifact_digest }}
+      PR356_PRODUCER_RUN: ${{ needs['pr356-frontend-image'].outputs.producer_run }}
+      PR356_PRODUCER_HEAD: ${{ needs['pr356-frontend-image'].outputs.producer_head }}
+      PR356_PRODUCER_ATTEMPT: ${{ needs['pr356-frontend-image'].outputs.producer_attempt }}
+      PR356_BACKEND_ARTIFACT_ID: ${{ needs['pr356-backend-image'].outputs.artifact_id }}
+      PR356_BACKEND_ARTIFACT_NAME: ${{ needs['pr356-backend-image'].outputs.artifact_name }}
+      PR356_BACKEND_ARTIFACT_DIGEST: ${{ needs['pr356-backend-image'].outputs.artifact_digest }}
+      PR356_BACKEND_PRODUCER_RUN: ${{ needs['pr356-backend-image'].outputs.producer_run }}
+      PR356_BACKEND_PRODUCER_HEAD: ${{ needs['pr356-backend-image'].outputs.producer_head }}
+      PR356_BACKEND_PRODUCER_ATTEMPT: ${{ needs['pr356-backend-image'].outputs.producer_attempt }}
+      PR356_SCHEMA_ARTIFACT_ID: ${{ needs['pr356-schema-restore'].outputs.artifact_id }}
+      PR356_SCHEMA_ARTIFACT_NAME: ${{ needs['pr356-schema-restore'].outputs.artifact_name }}
+      PR356_SCHEMA_ARTIFACT_DIGEST: ${{ needs['pr356-schema-restore'].outputs.artifact_digest }}
+      PR356_SCHEMA_PRODUCER_RUN: ${{ needs['pr356-schema-restore'].outputs.producer_run }}
+      PR356_SCHEMA_PRODUCER_HEAD: ${{ needs['pr356-schema-restore'].outputs.producer_head }}
+      PR356_SCHEMA_PRODUCER_ATTEMPT: ${{ needs['pr356-schema-restore'].outputs.producer_attempt }}
+      PR356_RUNTIME_CONTAINER: pr356-browser-runtime-${{ github.run_id }}-${{ github.run_attempt }}
+      PR356_CONTAINER_FIXTURE_FILE: /qualification-private/fixture.json
+      PR356_API_BASE_URL: http://127.0.0.1:3100
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+        cache: npm
+        cache-dependency-path: .github/release-tools/package-lock.json
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_PHASE_SPEC":"/pr356/specs/product-browser/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/product-browser/phase-inputs.json","PR356_EVIDENCE_DIR":"/pr356/results/product-browser","PR356_FRONTEND_PHASE_SPEC":"/pr356/specs/frontend-image/phase-spec.json","PR356_FRONTEND_ARTIFACT_DIR":"/pr356/upstream/frontend-dist","PR356_BACKEND_PHASE_SPEC":"/pr356/specs/backend-image/phase-spec.json","PR356_BACKEND_ARTIFACT_DIR":"/pr356/upstream/backend-image","PR356_SCHEMA_PHASE_SPEC":"/pr356/specs/schema-restore/phase-spec.json","PR356_SCHEMA_ARTIFACT_DIR":"/pr356/upstream/schema-restore","PR356_FIXTURE_FILE":"/pr356/private/fixture.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Bind exact phase specs outside empty result directories
+      id: identity
+      run: |
+        set -euo pipefail
+        install -d -m 700 "$RUNNER_TEMP/pr356/specs" "$RUNNER_TEMP/pr356/results" "$RUNNER_TEMP/pr356/upstream"
+        for phase in product-browser frontend-image backend-image schema-restore; do
+          PR356_EVIDENCE_DIR="$RUNNER_TEMP/pr356/specs/$phase" node .github/scripts/pr356-scope.mjs --phase-spec "$phase" > "$RUNNER_TEMP/pr356/specs/$phase.plan.json"
+        done
+        python3 - <<'PYCODE'
+        import os,re
+        e=os.environ
+        assert re.fullmatch('[1-9][0-9]*',e['GITHUB_RUN_ID']) and re.fullmatch('[1-9][0-9]*',e['GITHUB_RUN_ATTEMPT'])
+        values={'artifact_name':'pr356-product-browser-'+e['GITHUB_RUN_ID']+'-'+e['GITHUB_RUN_ATTEMPT'],'producer_run':e['GITHUB_RUN_ID'],'producer_head':e['GITHUB_SHA'],'producer_attempt':e['GITHUB_RUN_ATTEMPT']}
+        with open(e['GITHUB_OUTPUT'],'a') as f:
+            for key,value in values.items():f.write(key+'='+value+'\n')
+        PYCODE
+    - name: Download and verify the original frontend dist producer
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs download frontend-dist --directory "$PR356_FRONTEND_ARTIFACT_DIR" --phase-spec "$PR356_FRONTEND_PHASE_SPEC"
+    - name: Download and verify original backend-image
+      env:
+        PR356_ARTIFACT_ID: ${{ needs['pr356-backend-image'].outputs.artifact_id }}
+        PR356_ARTIFACT_NAME: ${{ needs['pr356-backend-image'].outputs.artifact_name }}
+        PR356_ARTIFACT_DIGEST: ${{ needs['pr356-backend-image'].outputs.artifact_digest }}
+        PR356_PRODUCER_RUN: ${{ needs['pr356-backend-image'].outputs.producer_run }}
+        PR356_PRODUCER_HEAD: ${{ needs['pr356-backend-image'].outputs.producer_head }}
+        PR356_PRODUCER_ATTEMPT: ${{ needs['pr356-backend-image'].outputs.producer_attempt }}
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs download backend-image --directory "$PR356_BACKEND_ARTIFACT_DIR" --phase-spec "$PR356_BACKEND_PHASE_SPEC"
+    - name: Download and verify original schema-restore
+      env:
+        PR356_ARTIFACT_ID: ${{ needs['pr356-schema-restore'].outputs.artifact_id }}
+        PR356_ARTIFACT_NAME: ${{ needs['pr356-schema-restore'].outputs.artifact_name }}
+        PR356_ARTIFACT_DIGEST: ${{ needs['pr356-schema-restore'].outputs.artifact_digest }}
+        PR356_PRODUCER_RUN: ${{ needs['pr356-schema-restore'].outputs.producer_run }}
+        PR356_PRODUCER_HEAD: ${{ needs['pr356-schema-restore'].outputs.producer_head }}
+        PR356_PRODUCER_ATTEMPT: ${{ needs['pr356-schema-restore'].outputs.producer_attempt }}
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs download schema-restore --directory "$PR356_SCHEMA_ARTIFACT_DIR" --phase-spec "$PR356_SCHEMA_PHASE_SPEC"
+    - name: Install locked official release tools and Chromium only
+      run: |
+        set -euo pipefail
+        npm ci --ignore-scripts --prefix .github/release-tools --registry=https://registry.npmjs.org
+        node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+    - name: Restore verified schema-only setup and migration history into owned empty DB
+      env:
+        PR356_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        PR356_REDIS_CONTAINER: ${{ job.services.redis.id }}
+      run: |
+        set -euo pipefail
+        python3 - <<'PYCODE'
+        import hashlib,json,os,re,subprocess
+        from pathlib import Path
+        e=os.environ
+        clean={k:v for k,v in e.items() if k not in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']}
+        def docker(*args,**kw):return subprocess.run(['docker','--host=unix:///var/run/docker.sock',*args],env=clean,check=True,**kw)
+        for key in ['PR356_POSTGRES_CONTAINER','PR356_REDIS_CONTAINER']:assert re.fullmatch('[a-f0-9]{12,64}',e[key])
+        directory=Path(e['PR356_SCHEMA_ARTIFACT_DIR']);metadata=json.loads((directory/'migrations.json').read_text())
+        assert metadata['schemaVersion']==1 and metadata['setupOnly'] is True and metadata['applicationDataIncluded'] is False and metadata['migrationCount']==237 and metadata['sourcePhase']=='schema-restore'
+        expected=[{'migration_name':p.parent.name,'checksum':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(Path('server-version/backend/prisma/migrations').glob('*/migration.sql'))]
+        assert len(expected)==237 and metadata['migrations']==expected
+        db='pr356_browser_0000000000'
+        def sql(q):
+            r=docker('exec','-i',e['PR356_POSTGRES_CONTAINER'],'psql','-X','-v','ON_ERROR_STOP=1','-U','postgres','-d',db,'-At','-f','-',input=q.encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            return r.stdout.decode().strip()
+        assert sql("SELECT count(*) FROM pg_tables WHERE schemaname='public'")=='0'
+        with (directory/'setup-schema.dump').open('rb') as f:docker('exec','-i',e['PR356_POSTGRES_CONTAINER'],'pg_restore','--schema-only','--no-owner','--no-acl','--exit-on-error','-U','postgres','-d',db,stdin=f)
+        with (directory/'migration-history.sql').open('rb') as f:docker('exec','-i',e['PR356_POSTGRES_CONTAINER'],'psql','-X','-v','ON_ERROR_STOP=1','-U','postgres','-d',db,'-f','-',stdin=f,stdout=subprocess.DEVNULL)
+        got=json.loads(sql("SELECT json_agg(x ORDER BY migration_name) FROM (SELECT migration_name,checksum FROM _prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL)x"))
+        assert got==metadata['migrations']
+        for table in ['users','scales','survey_projects']:assert sql('SELECT count(*) FROM '+table)=='0'
+        def networks(container):return json.loads(docker('inspect','--format','{{json .NetworkSettings.Networks}}',container,stdout=subprocess.PIPE).stdout)
+        pgnet,redisnet=networks(e['PR356_POSTGRES_CONTAINER']),networks(e['PR356_REDIS_CONTAINER'])
+        assert len(pgnet)==1 and set(pgnet)==set(redisnet)
+        network=next(iter(pgnet));assert re.fullmatch('github_network_[a-f0-9]+',network)
+        backend=json.loads((Path(e['PR356_BACKEND_ARTIFACT_DIR'])/'phase-receipt.json').read_text())['outputs']['image']
+        frontend=json.loads((Path(e['PR356_FRONTEND_ARTIFACT_DIR'])/'phase-receipt.json').read_text())['outputs']['image']
+        for value in [backend['imageId'],frontend['imageId']]:assert re.fullmatch('sha256:[a-f0-9]{64}',value)
+        assert backend['archive']=='backend.tar'
+        values={'PR356_BACKEND_IMAGE_ID':backend['imageId'],'PR356_FRONTEND_IMAGE_ID':frontend['imageId'],'PR356_SCHEMA_SHA256':hashlib.sha256((directory/'setup-schema.dump').read_bytes()).hexdigest(),'PR356_SERVICE_NETWORK':network}
+        with open(e['GITHUB_ENV'],'a') as f:
+            for key,value in values.items():f.write(key+'='+value+'\n')
+        PYCODE
+    - name: Start exact backend image and provision only isolated synthetic fixtures
+      run: |
+        set -euo pipefail
+        unset DOCKER_HOST DOCKER_CONTEXT DOCKER_TLS DOCKER_TLS_VERIFY DOCKER_CERT_PATH
+        install -d -m 700 "$RUNNER_TEMP/pr356/private"
+        python3 - <<'PYCODE'
+        import json,os
+        from pathlib import Path
+        e=os.environ;p=Path(e['RUNNER_TEMP'])/'pr356/private/.owned.json'
+        p.write_text(json.dumps({'run':e['GITHUB_RUN_ID'],'attempt':e['GITHUB_RUN_ATTEMPT']}));p.chmod(0o600)
+        PYCODE
+        docker --host=unix:///var/run/docker.sock load --input "$PR356_BACKEND_ARTIFACT_DIR/backend.tar"
+        docker --host=unix:///var/run/docker.sock run --detach --name "$PR356_RUNTIME_CONTAINER" --network "$PR356_SERVICE_NETWORK" --publish 127.0.0.1:3100:3000 \
+          --label "pr356.fixture.run=$GITHUB_RUN_ID" --label "pr356.fixture.attempt=$GITHUB_RUN_ATTEMPT" \
+          --tmpfs /qualification-private:rw,noexec,nosuid,mode=0700,uid=1000,gid=1000 \
+          --mount "type=bind,src=$GITHUB_WORKSPACE/.github/scripts/pr356-browser-fixture.cjs,dst=/qualification/pr356-browser-fixture.cjs,readonly" \
+          --env NODE_ENV=test --env PORT=3000 --env CORS_ORIGIN=https://training.eduk12.top --env ADMIN_AUTH_ORIGIN=https://training.eduk12.top --env COOKIE_SECURE=true \
+          --env DATABASE_URL=postgresql://postgres:pr356-synthetic-only@postgres:5432/pr356_browser_0000000000 --env REDIS_URL=redis://redis:6379/14 --env SOCKET_REDIS_REQUIRED=true \
+          --env JWT_SECRET=pr356-synthetic-ci-jwt-20261026-only --env JWT_EXPIRES_IN=15m --env DATA_ENCRYPTION_KEY=1111111111111111111111111111111111111111111111111111111111111111 --env DATA_PSEUDONYM_KEY=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb \
+          --env BACKGROUND_WORKERS_ENABLED=false --env ASSESSMENT_REPORT_ASYNC_ENABLED=false --env SURVEY_WORKSPACE_ENABLED=true --env SURVEY_PUBLICATION_ENABLED=true --env MATERIAL_GRANTS_ENABLED=true \
+          --env PR356_BROWSER_FIXTURE_ISOLATED=1 --env PR356_RUNTIME_ROOT=/app --env PR356_FIXTURE_FILE=/qualification-private/fixture.json \
+          --env "PR356_SOURCE_HEAD=$PR356_SOURCE_HEAD" --env "PR356_BACKEND_IMAGE_ID=$PR356_BACKEND_IMAGE_ID" --env "PR356_FRONTEND_IMAGE_ID=$PR356_FRONTEND_IMAGE_ID" --env "PR356_SCHEMA_SHA256=$PR356_SCHEMA_SHA256" \
+          --env "GITHUB_RUN_ID=$GITHUB_RUN_ID" --env "GITHUB_RUN_ATTEMPT=$GITHUB_RUN_ATTEMPT" "$PR356_BACKEND_IMAGE_ID"
+        python3 - <<'PYCODE'
+        import json,os,subprocess,time,urllib.request
+        e=os.environ
+        clean={k:v for k,v in e.items() if k not in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']}
+        image=subprocess.check_output(['docker','--host=unix:///var/run/docker.sock','inspect','--format','{{.Image}}',e['PR356_RUNTIME_CONTAINER']],env=clean,text=True).strip()
+        assert image==e['PR356_BACKEND_IMAGE_ID']
+        deadline=time.monotonic()+60
+        while True:
+            try:
+                with urllib.request.urlopen(e['PR356_API_BASE_URL']+'/ready',timeout=2) as response:value=json.load(response)
+                if value.get('status')=='ok' and value.get('dependencies',{}).get('database')=='ready' and value.get('dependencies',{}).get('cacheRedis')=='ready':break
+            except Exception:pass
+            if time.monotonic()>=deadline:raise RuntimeError('Owned compiled backend did not become ready within 60 seconds; no fixture retry')
+            time.sleep(1)
+        PYCODE
+        docker --host=unix:///var/run/docker.sock exec "$PR356_RUNTIME_CONTAINER" node /qualification/pr356-browser-fixture.cjs prepare
+        docker --host=unix:///var/run/docker.sock cp "$PR356_RUNTIME_CONTAINER:/qualification-private/fixture.json" "$PR356_FIXTURE_FILE"
+        chmod 600 "$PR356_FIXTURE_FILE"
+    - name: Run four real HTTP product journeys without rebuilding or mocking successful APIs
+      run: node .github/scripts/pr356-product-browser.mjs
+    - name: Remove only this run owned runtime and private fixture material
+      if: ${{ always() }}
+      run: |
+        set -euo pipefail
+        python3 - <<'PYCODE'
+        import json,os,re,shutil,subprocess
+        from pathlib import Path
+        e=os.environ;name=e['PR356_RUNTIME_CONTAINER'];assert re.fullmatch('pr356-browser-[a-z0-9-]{1,60}',name)
+        clean={k:v for k,v in e.items() if k not in ['DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH']}
+        command=['docker','--host=unix:///var/run/docker.sock']
+        found=subprocess.run(command+['inspect','--format','{{json .Config.Labels}}',name],env=clean,text=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+        if found.returncode==0:
+            labels=json.loads(found.stdout)
+            assert labels.get('pr356.fixture.run')==e['GITHUB_RUN_ID'] and labels.get('pr356.fixture.attempt')==e['GITHUB_RUN_ATTEMPT'],'Refusing unrelated runtime cleanup'
+            subprocess.run(command+['rm','--force',name],env=clean,check=True,stdout=subprocess.DEVNULL)
+        else:
+            listing=subprocess.run(command+['ps','-a','--filter','name=^/'+name+'$','--format','{{.Names}}'],env=clean,check=True,text=True,stdout=subprocess.PIPE)
+            assert listing.stdout.strip()=='','Uncertain runtime state; no repeated destructive action'
+        private=Path(e['RUNNER_TEMP'])/'pr356/private'
+        if private.exists():
+            assert private.resolve()==private and private.is_dir() and not private.is_symlink()
+            assert json.loads((private/'.owned.json').read_text())=={'run':e['GITHUB_RUN_ID'],'attempt':e['GITHUB_RUN_ATTEMPT']},'Refusing unrelated private material cleanup'
+            shutil.rmtree(private)
+        PYCODE
+    - name: Stage the successful original phase bytes
+      run: |
+        set -euo pipefail
+        node .github/scripts/pr356-artifacts.mjs stage product-browser --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/product-browser"
+    - name: Upload original passing phase proof and payload
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/product-browser
+        if-no-files-found: error
+        retention-days: 7
+    - name: Retain failed public diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-product-browser-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/product-browser
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-codeql-javascript-typescript:
+    name: pr356-codeql-javascript-typescript
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      head: ${{ steps.identity.outputs.head }}
+      base: ${{ steps.identity.outputs.base }}
+      tree: ${{ steps.identity.outputs.tree }}
+      candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: qualify
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-javascript-typescript","PR356_PHASE_SPEC":"/pr356/specs/codeql-javascript-typescript/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-javascript-typescript/phase-inputs.json","PR356_CODEQL_CONFIG":"/pr356/specs/codeql-javascript-typescript/codeql-config.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Bind exact source inputs before actual CodeQL Action
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/codeql-javascript-typescript
+      run: node .github/scripts/pr356-scope.mjs --phase-spec codeql-javascript-typescript
+    - name: Write the frozen CodeQL configuration and producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs=require('node:fs');
+        const spec=JSON.parse(fs.readFileSync(process.env.PR356_codeql-javascript-typescript_SPEC,'utf8'));
+        fs.writeFileSync(process.env.PR356_CODEQL_CONFIG,JSON.stringify(spec.inputs.configuration.codeql,null,2)+'\n',{flag:'wx',mode:0o600});
+        const p={artifact_name:'pr356-codeql-javascript-typescript-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT};
+        fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(p).map(([k,v])=>k+'='+v+'\n').join(''));
+    - name: initialize CodeQL
+      id: codeql-init
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript-typescript
+        build-mode: none
+        queries: security-extended
+        config-file: ${{ runner.temp }}/pr356/specs/codeql-javascript-typescript/codeql-config.json
+        ram: '3500'
+        threads: '2'
+    - name: Capture actual initialized CLI, packs and source metadata
+      env:
+        PR356_CODEQL_PATH: ${{ steps.codeql-init.outputs.codeql-path }}
+        PR356_CODEQL_INIT_OUTCOME: ${{ steps.codeql-init.outcome }}
+      run: node .github/scripts/pr356-codeql.mjs begin javascript-typescript
+    - name: analyze with CodeQL
+      id: codeql-analyze
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: pr356/javascript-typescript
+        upload: never
+        upload-database: false
+        output: ${{ runner.temp }}/pr356/codeql-sarif/javascript-typescript
+        ram: '3500'
+        threads: '2'
+    - name: Retain real Action outcome, database metadata, original SARIF and every finding
+      if: ${{ always() }}
+      env:
+        PR356_CODEQL_PATH: ${{ steps.codeql-init.outputs.codeql-path }}
+        PR356_CODEQL_INIT_OUTCOME: ${{ steps.codeql-init.outcome }}
+        PR356_CODEQL_ANALYZE_OUTCOME: ${{ steps.codeql-analyze.outcome }}
+        PR356_CODEQL_DB_LOCATIONS: ${{ steps.codeql-analyze.outputs.db-locations }}
+        PR356_CODEQL_SARIF_OUTPUT: ${{ steps.codeql-analyze.outputs.sarif-output }}
+      run: node .github/scripts/pr356-codeql.mjs finish javascript-typescript
+    - name: Stage successful exact artifact payload
+      run: node .github/scripts/pr356-artifacts.mjs stage codeql-javascript-typescript --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination
+        "$RUNNER_TEMP/pr356/artifacts/codeql-javascript-typescript"
+    - name: Upload exact original passing evidence
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/codeql-javascript-typescript
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain public failure diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-codeql-javascript-typescript-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/codeql-javascript-typescript
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-codeql-python:
+    name: pr356-codeql-python
+    needs: scope
+    if: ${{ needs.scope.outputs.pr356_phase == 'qualify' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      head: ${{ steps.identity.outputs.head }}
+      base: ${{ steps.identity.outputs.base }}
+      tree: ${{ steps.identity.outputs.tree }}
+      candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: qualify
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/codeql-python","PR356_PHASE_SPEC":"/pr356/specs/codeql-python/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/codeql-python/phase-inputs.json","PR356_CODEQL_CONFIG":"/pr356/specs/codeql-python/codeql-config.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Bind exact source inputs before actual CodeQL Action
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/codeql-python
+      run: node .github/scripts/pr356-scope.mjs --phase-spec codeql-python
+    - name: Write the frozen CodeQL configuration and producer identity
+      id: identity
+      shell: node {0}
+      run: |
+        const fs=require('node:fs');
+        const spec=JSON.parse(fs.readFileSync(process.env.PR356_codeql-python_SPEC,'utf8'));
+        fs.writeFileSync(process.env.PR356_CODEQL_CONFIG,JSON.stringify(spec.inputs.configuration.codeql,null,2)+'\n',{flag:'wx',mode:0o600});
+        const p={artifact_name:'pr356-codeql-python-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT};
+        fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(p).map(([k,v])=>k+'='+v+'\n').join(''));
+    - name: initialize CodeQL
+      id: codeql-init
+      uses: github/codeql-action/init@v3
+      with:
+        languages: python
+        build-mode: none
+        queries: security-extended
+        config-file: ${{ runner.temp }}/pr356/specs/codeql-python/codeql-config.json
+        ram: '3500'
+        threads: '2'
+    - name: Capture actual initialized CLI, packs and source metadata
+      env:
+        PR356_CODEQL_PATH: ${{ steps.codeql-init.outputs.codeql-path }}
+        PR356_CODEQL_INIT_OUTCOME: ${{ steps.codeql-init.outcome }}
+      run: node .github/scripts/pr356-codeql.mjs begin python
+    - name: analyze with CodeQL
+      id: codeql-analyze
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: pr356/python
+        upload: never
+        upload-database: false
+        output: ${{ runner.temp }}/pr356/codeql-sarif/python
+        ram: '3500'
+        threads: '2'
+    - name: Retain real Action outcome, database metadata, original SARIF and every finding
+      if: ${{ always() }}
+      env:
+        PR356_CODEQL_PATH: ${{ steps.codeql-init.outputs.codeql-path }}
+        PR356_CODEQL_INIT_OUTCOME: ${{ steps.codeql-init.outcome }}
+        PR356_CODEQL_ANALYZE_OUTCOME: ${{ steps.codeql-analyze.outcome }}
+        PR356_CODEQL_DB_LOCATIONS: ${{ steps.codeql-analyze.outputs.db-locations }}
+        PR356_CODEQL_SARIF_OUTPUT: ${{ steps.codeql-analyze.outputs.sarif-output }}
+      run: node .github/scripts/pr356-codeql.mjs finish python
+    - name: Stage successful exact artifact payload
+      run: node .github/scripts/pr356-artifacts.mjs stage codeql-python --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/codeql-python"
+    - name: Upload exact original passing evidence
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/codeql-python
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain public failure diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-codeql-python-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/codeql-python
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-result:
+    name: pr356-result
+    needs:
+    - scope
+    - pr356-backend-image
+    - pr356-frontend-image
+    - pr356-backend-audit
+    - pr356-frontend-audit
+    - pr356-schema-upgrade
+    - pr356-schema-restore
+    - pr356-vertical4
+    - pr356-exact-worker1
+    - pr356-ordinary-harness4
+    - pr356-exact-lazy-current-child
+    - pr356-status-browser
+    - pr356-product-browser
+    - pr356-backend-scan
+    - pr356-frontend-scan
+    - pr356-codeql-javascript-typescript
+    - pr356-codeql-python
+    if: ${{ always() && needs.scope.result == 'success' && needs.scope.outputs.pr356_phase == 'qualify' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      head: ${{ steps.identity.outputs.head }}
+      base: ${{ steps.identity.outputs.base }}
+      tree: ${{ steps.identity.outputs.tree }}
+      candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: qualify
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      PR356_SOURCE_PLAN: ${{ needs.scope.outputs.pr356_plan }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/qualification-result","PR356_PHASE_SPEC":"/pr356/specs/qualification-result/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/qualification-result/phase-inputs.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Recompute full official head/base/tree and complete selected plan
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/qualification-result/source
+      run: node .github/scripts/pr356-scope.mjs --outputs
+    - name: Bind stable source identity and aggregate role
+      id: identity
+      env:
+        PR356_FULL_PLAN: ${{ runner.temp }}/pr356/specs/qualification-result/source/plan.json
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),assert=require('node:assert/strict');
+        const plan=JSON.parse(fs.readFileSync(process.env.PR356_FULL_PLAN,'utf8')),source=JSON.parse(process.env.PR356_SOURCE_PLAN);
+        for(const key of ['phase','head','base','tree','checkout','inventorySHA256','bindingSHA256','acceptanceSHA256','candidateInputsSHA256'])assert.deepEqual(plan[key],source[key],key+' changed after source');
+        const values={artifact_name:'pr356-qualification-result-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT,head:plan.head,base:plan.base,tree:plan.tree,candidate_inputs_sha256:plan.candidateInputsSHA256};
+        fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(values).map(([k,v])=>k+'='+v+'\n').join(''));
+    - name: Materialize exact aggregate recipe outside empty result directory
+      run: |-
+        node .github/scripts/pr356-admission.mjs aggregate-spec --plan "$RUNNER_TEMP/pr356/specs/qualification-result/source/plan.json" --role qualification-result > "$PR356_PHASE_SPEC"
+        node -e 'const fs=require("node:fs"); const s=JSON.parse(fs.readFileSync(process.env.PR356_PHASE_SPEC));fs.writeFileSync(process.env.PR356_PHASE_INPUTS,JSON.stringify(s.inputs,null,2)+"\n",{flag:"wx",mode:0o600})'
+    - name: Verify every selected original outcome and source without application replay
+      run: node .github/scripts/pr356-admission.mjs qualify-result --plan "$RUNNER_TEMP/pr356/specs/qualification-result/source/plan.json" --evidence .github/scripts/pr356-local-evidence.json
+        --out "$PR356_EVIDENCE_DIR"
+    - name: Stage successful exact artifact payload
+      run: node .github/scripts/pr356-artifacts.mjs stage qualification-result --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/qualification-result"
+    - name: Upload exact original passing evidence
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/qualification-result
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain public failure diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-qualification-result-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/qualification-result
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-admission:
+    name: pr356-admission
+    needs:
+    - scope
+    if: ${{ always() && needs.scope.result == 'success' && needs.scope.outputs.pr356_phase == 'admit' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      head: ${{ steps.identity.outputs.head }}
+      base: ${{ steps.identity.outputs.base }}
+      tree: ${{ steps.identity.outputs.tree }}
+      candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: admit
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      PR356_SOURCE_PLAN: ${{ needs.scope.outputs.pr356_plan }}
+      PR356_SECURITY_REVIEW: ${{ inputs.pr356_security_review }}
+      PR356_Q_PIN: ${{ inputs.pr356_qualification }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/merge-admission-precheck","PR356_PHASE_SPEC":"/pr356/specs/merge-admission-precheck/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/merge-admission-precheck/phase-inputs.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Recompute full official head/base/tree and complete selected plan
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/merge-admission-precheck/source
+      run: node .github/scripts/pr356-scope.mjs --outputs
+    - name: Bind stable source identity and aggregate role
+      id: identity
+      env:
+        PR356_FULL_PLAN: ${{ runner.temp }}/pr356/specs/merge-admission-precheck/source/plan.json
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),assert=require('node:assert/strict');
+        const plan=JSON.parse(fs.readFileSync(process.env.PR356_FULL_PLAN,'utf8')),source=JSON.parse(process.env.PR356_SOURCE_PLAN);
+        for(const key of ['phase','head','base','tree','checkout','inventorySHA256','bindingSHA256','acceptanceSHA256','candidateInputsSHA256'])assert.deepEqual(plan[key],source[key],key+' changed after source');
+        const values={artifact_name:'pr356-merge-admission-precheck-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT,head:plan.head,base:plan.base,tree:plan.tree,candidate_inputs_sha256:plan.candidateInputsSHA256};
+        fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(values).map(([k,v])=>k+'='+v+'\n').join(''));
+    - name: Materialize exact aggregate recipe outside empty result directory
+      run: |-
+        node .github/scripts/pr356-admission.mjs aggregate-spec --plan "$RUNNER_TEMP/pr356/specs/merge-admission-precheck/source/plan.json" --role merge-admission-precheck > "$PR356_PHASE_SPEC"
+        node -e 'const fs=require("node:fs"); const s=JSON.parse(fs.readFileSync(process.env.PR356_PHASE_SPEC));fs.writeFileSync(process.env.PR356_PHASE_INPUTS,JSON.stringify(s.inputs,null,2)+"\n",{flag:"wx",mode:0o600})'
+    - name: Parse explicit official Q coordinates and finding reviews as data
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const e=process.env,q=JSON.parse(e.PR356_Q_PIN||'null');assert(q&&typeof q==='object'&&!Array.isArray(q));assert.deepEqual(Object.keys(q).sort(),['artifactId','attempt','runId','zipSHA256']);for(const k of ['runId','attempt','artifactId'])assert.match(String(q[k]||''),/^[1-9][0-9]*$/);
+        const zipSHA256=String(q.zipSHA256||'').replace(/^sha256:/,'');assert.match(zipSHA256,/^[a-f0-9]{64}$/);
+        const root=path.dirname(e.PR356_PHASE_SPEC),review=JSON.parse(e.PR356_SECURITY_REVIEW||'{}');assert(review&&typeof review==='object'&&!Array.isArray(review));
+        for(const [name,data]of [['qualification-pin.json',{runId:String(q.runId),attempt:String(q.attempt),artifactId:String(q.artifactId),zipSHA256}],['security-reviews.json',review]])fs.writeFileSync(path.join(root,name),JSON.stringify(data,null,2)+'\n',{flag:'wx',mode:0o600});
+    - name: Verify every selected original outcome and source without application replay
+      run: node .github/scripts/pr356-admission.mjs admit --plan "$RUNNER_TEMP/pr356/specs/merge-admission-precheck/source/plan.json" --evidence .github/scripts/pr356-local-evidence.json
+        --out "$PR356_EVIDENCE_DIR" --qualification-pin "$RUNNER_TEMP/pr356/specs/merge-admission-precheck/qualification-pin.json" --reviews "$RUNNER_TEMP/pr356/specs/merge-admission-precheck/security-reviews.json"
+    - name: Stage successful exact artifact payload
+      run: node .github/scripts/pr356-artifacts.mjs stage merge-admission-precheck --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination
+        "$RUNNER_TEMP/pr356/artifacts/merge-admission-precheck"
+    - name: Upload exact original passing evidence
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/merge-admission-precheck
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain public failure diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-merge-admission-precheck-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/merge-admission-precheck
+        if-no-files-found: warn
+        retention-days: 7
+  pr356-postmerge:
+    name: pr356-postmerge
+    needs:
+    - scope
+    if: ${{ always() && needs.scope.result == 'success' && needs.scope.outputs.pr356_phase == 'postmerge' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+      artifact_digest: ${{ steps.upload.outputs.artifact-digest }}
+      artifact_name: ${{ steps.identity.outputs.artifact_name }}
+      producer_run: ${{ steps.identity.outputs.producer_run }}
+      producer_head: ${{ steps.identity.outputs.producer_head }}
+      producer_attempt: ${{ steps.identity.outputs.producer_attempt }}
+      head: ${{ steps.identity.outputs.head }}
+      base: ${{ steps.identity.outputs.base }}
+      tree: ${{ steps.identity.outputs.tree }}
+      candidate_inputs_sha256: ${{ steps.identity.outputs.candidate_inputs_sha256 }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PR356_PHASE: postmerge
+      PR356_STEP_PROBE: ${{ inputs.step_probe || 'none' }}
+      PR356_FULL_ACCEPTANCE: ${{ inputs.full_acceptance || 'false' }}
+      PR356_COMPLETE_TRAINING: ${{ inputs.complete_training || 'false' }}
+      PR356_EXPECTED_CANDIDATE_INPUTS_SHA256: ${{ needs.scope.outputs.pr356_candidate_inputs_sha256 }}
+      PR356_SOURCE_PLAN: ${{ needs.scope.outputs.pr356_plan }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+        persist-credentials: false
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24.21.0
+    - name: Bind controlled runner paths after runner allocation
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+        const root=fs.realpathSync(process.env.RUNNER_TEMP),paths={"PR356_EVIDENCE_DIR":"/pr356/results/main-reuse","PR356_PHASE_SPEC":"/pr356/specs/main-reuse/phase-spec.json","PR356_PHASE_INPUTS":"/pr356/specs/main-reuse/phase-inputs.json"};
+        const lines=Object.entries(paths).map(([key,suffix])=>{assert(/^[A-Z][A-Z0-9_]*$/.test(key));const value=path.resolve(root,'.'+suffix);assert(value.startsWith(root+path.sep)&&!/[\r\n]/.test(value));return key+'='+value+'\n';});
+        fs.appendFileSync(process.env.GITHUB_ENV,lines.join(''));
+    - name: Recompute full official head/base/tree and complete selected plan
+      env:
+        PR356_EVIDENCE_DIR: ${{ runner.temp }}/pr356/specs/main-reuse/source
+      run: node .github/scripts/pr356-scope.mjs --outputs
+    - name: Bind stable source identity and aggregate role
+      id: identity
+      env:
+        PR356_FULL_PLAN: ${{ runner.temp }}/pr356/specs/main-reuse/source/plan.json
+      shell: node {0}
+      run: |
+        const fs=require('node:fs'),assert=require('node:assert/strict');
+        const plan=JSON.parse(fs.readFileSync(process.env.PR356_FULL_PLAN,'utf8')),source=JSON.parse(process.env.PR356_SOURCE_PLAN);
+        for(const key of ['phase','head','base','tree','checkout','inventorySHA256','bindingSHA256','acceptanceSHA256','candidateInputsSHA256'])assert.deepEqual(plan[key],source[key],key+' changed after source');
+        const values={artifact_name:'pr356-main-reuse-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT,head:plan.head,base:plan.base,tree:plan.tree,candidate_inputs_sha256:plan.candidateInputsSHA256};
+        fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(values).map(([k,v])=>k+'='+v+'\n').join(''));
+    - name: Materialize exact aggregate recipe outside empty result directory
+      run: |-
+        node .github/scripts/pr356-admission.mjs aggregate-spec --plan "$RUNNER_TEMP/pr356/specs/main-reuse/source/plan.json" --role main-reuse > "$PR356_PHASE_SPEC"
+        node -e 'const fs=require("node:fs"); const s=JSON.parse(fs.readFileSync(process.env.PR356_PHASE_SPEC));fs.writeFileSync(process.env.PR356_PHASE_INPUTS,JSON.stringify(s.inputs,null,2)+"\n",{flag:"wx",mode:0o600})'
+    - name: Verify every selected original outcome and source without application replay
+      run: node .github/scripts/pr356-admission.mjs postmerge --plan "$RUNNER_TEMP/pr356/specs/main-reuse/source/plan.json" --evidence .github/scripts/pr356-local-evidence.json
+        --out "$PR356_EVIDENCE_DIR"
+    - name: Stage successful exact artifact payload
+      run: node .github/scripts/pr356-artifacts.mjs stage main-reuse --directory "$PR356_EVIDENCE_DIR" --phase-spec "$PR356_PHASE_SPEC" --destination "$RUNNER_TEMP/pr356/artifacts/main-reuse"
+    - name: Upload exact original passing evidence
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.identity.outputs.artifact_name }}
+        path: ${{ runner.temp }}/pr356/artifacts/main-reuse
+        if-no-files-found: error
+        include-hidden-files: true
+        retention-days: 7
+        overwrite: false
+    - name: Retain public failure diagnostics without qualification
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr356-main-reuse-failure-${{ github.run_id }}-${{ github.run_attempt }}
+        path: ${{ runner.temp }}/pr356/results/main-reuse
+        if-no-files-found: warn
+        retention-days: 7

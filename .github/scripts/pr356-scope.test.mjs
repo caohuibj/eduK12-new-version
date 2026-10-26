@@ -23,19 +23,27 @@ test('legacy source CLI refuses PR356 before routing without a verifier import c
  assert(error);assert.equal(error.status,1);assert.match(error.stderr.toString(),/explicitly authorized bounded qualification dispatch/);assert.doesNotMatch(error.stderr.toString(),/unsettled top-level await|PR356 official candidate metadata unavailable/);
 });
 
-// Exercise the actual pre-download Python block, so an empty needs output can
-// never silently turn a failed consumer retry into download-all or a rebuild.
-test('producer retry inputs accept the successful old attempt and reject missing or unrelated output before download',()=>{
+// Preserve the original old-attempt/missing/cross-run/head/future/name negative
+// contract against the replacement shared verifier and its actual download CLI.
+test('producer retry inputs accept the successful old attempt and reject missing or unrelated output before download',async t=>{
+ const {expectedFromEnvironment,inputsSHA256}=await import('./pr356-artifacts.mjs');
+ const {mkdtempSync,writeFileSync,rmSync}=await import('node:fs');const {tmpdir}=await import('node:os');const {join}=await import('node:path');
+ const directory=mkdtempSync(join(tmpdir(),'pr356-current-producer-control-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
- const guards=[...workflow.matchAll(/      - name: require exact original producer artifact input\n[\s\S]*?        shell: python\n        run: \|\n([\s\S]*?)(?=      - uses: actions\/download-artifact@v4)/g)];
- assert.equal(guards.length,2);
- const input={...process.env,GITHUB_RUN_ID:'40100000001',GITHUB_RUN_ATTEMPT:'2',GITHUB_SHA:'a'.repeat(40),PR356_ARTIFACT_ID:'90001',PR356_PRODUCER_RUN:'40100000001',PR356_PRODUCER_HEAD:'a'.repeat(40),PR356_PRODUCER_ATTEMPT:'1'};
- for(const[fixture,kind]of [[guards[0],'images'],[guards[1],'dist']]){
-  const script=fixture[1].split('\n').map(line=>line.startsWith('          ')?line.slice(10):line).join('\n');
-  const good={...input,PR356_ARTIFACT_KIND:kind,PR356_ARTIFACT_NAME:'pr356-'+kind+'-40100000001-1'};
-  const invoke=env=>execFileSync('python3',['-c',script],{env,stdio:'pipe'});
-  assert.doesNotThrow(()=>invoke(good));assert.doesNotThrow(()=>invoke({...good,GITHUB_RUN_ATTEMPT:'1'}));
-  for(const patch of [{PR356_ARTIFACT_NAME:''},{PR356_ARTIFACT_ID:''},{PR356_PRODUCER_RUN:'40100000002'},{PR356_PRODUCER_HEAD:'b'.repeat(40)},{PR356_PRODUCER_ATTEMPT:'3'},{PR356_ARTIFACT_NAME:'pr356-'+kind+'-40100000001-2'}])assert.throws(()=>invoke({...good,...patch}));
+ const input={...process.env,GITHUB_ACTIONS:'true',GITHUB_REPOSITORY:binding.repository,GITHUB_RUN_ID:'40100000001',GITHUB_RUN_ATTEMPT:'2',GITHUB_SHA:'a'.repeat(40),PR356_ARTIFACT_ID:'90001',PR356_ARTIFACT_DIGEST:'sha256:'+'d'.repeat(64),PR356_PRODUCER_RUN:'40100000001',PR356_PRODUCER_HEAD:'a'.repeat(40),PR356_PRODUCER_ATTEMPT:'1'};
+ const noNetwork='data:text/javascript,'+encodeURIComponent('globalThis.fetch=()=>{throw Error("UNEXPECTED_NETWORK_BEFORE_GUARD")};');
+ for(const[role,job]of [['backend-image','pr356-backend-scan'],['frontend-dist','pr356-status-browser']]){
+  const phase=role==='frontend-dist'?'frontend-image':role,inputs={schemaVersion:1,files:[{path:'.github/scripts/pr356-artifacts.mjs',mode:'100644',blob:'f'.repeat(40)}],configuration:{syntheticOnly:true},tools:{node:'24.21.0'},dependencies:{syntheticOnly:true}},spec={id:phase,jobName:'pr356-'+phase,caseIds:['synthetic-source-guard'],inputs,inputsSHA256:inputsSHA256(inputs)};
+  const specFile=join(directory,role+'.json');writeFileSync(specFile,JSON.stringify(spec));
+  const begin=workflow.indexOf('\n  '+job+':'),end=workflow.indexOf('\n  pr356-',begin+1),block=workflow.slice(begin,end===-1?undefined:end);
+  assert(begin>=0);assert(block.includes('pr356-artifacts.mjs download '+role),'Actual consumer must use central pre-download verifier');
+  const good={...input,PR356_ARTIFACT_NAME:'pr356-'+role+'-40100000001-1'};
+  assert.equal(expectedFromEnvironment(role,spec,good).producerAttempt,1);assert.equal(expectedFromEnvironment(role,spec,{...good,GITHUB_RUN_ATTEMPT:'1'}).producerAttempt,1);
+  for(const patch of [{PR356_ARTIFACT_NAME:''},{PR356_ARTIFACT_ID:''},{PR356_PRODUCER_RUN:'40100000002'},{PR356_PRODUCER_HEAD:'b'.repeat(40)},{PR356_PRODUCER_ATTEMPT:'3'},{PR356_ARTIFACT_NAME:'pr356-'+role+'-40100000001-2'},{PR356_ARTIFACT_DIGEST:''}]){
+   assert.throws(()=>expectedFromEnvironment(role,spec,{...good,...patch}));
+   let error;try{execFileSync(process.execPath,['--import',noNetwork,new URL('./pr356-artifacts.mjs',import.meta.url).pathname,'download',role,'--directory',join(directory,role+'-uncreated'),'--phase-spec',specFile],{env:{...good,...patch},stdio:'pipe',timeout:5000})}catch(e){error=e}
+   assert(error);assert.equal(error.status,1);assert.doesNotMatch(error.stderr.toString(),/UNEXPECTED_NETWORK_BEFORE_GUARD/);
+  }
  }
 });
 

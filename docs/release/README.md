@@ -1851,3 +1851,56 @@ production. Insecure/lookalike origins are refused. No browser security flag,
 application fallback, weakened response validation or source rebuild is used.
 The new fixed secure browser origin is part of the candidate binding and scope
 contract; its direct control consumers and changed SAST run with those new inputs.
+
+
+## PR356 exact-source qualification and admission (implementation pending review)
+
+The fixed same-repository PR356 branch uses `pr356-entry.mjs`, the complete
+`pr356-bindings.json` raw diff, normal modes, source blobs, component trees and
+protected lock/schema inputs. Unknown paths, drift or unavailable official
+identity stop this route; Ready, an input flag or main does not select platform,
+media, performance or Ops fallback. Every later control change changes the full
+candidate HEAD and invalidates an earlier independent activation release.
+
+Ready/open/synchronize events only observe the exact source/merge identity and
+complete selected table. They do not run application qualifications or emit a
+skipped success under the required `merge gate / ready PR` name. Explicit
+`qualify` dispatch selects sixteen independent, named producer/consumer phases;
+its aggregate is qualification-only. Both CodeQL languages preserve original
+SARIF and all findings. Analyze success with `upload: never` does not dispose of
+findings or authorize merge.
+
+All sixteen phase states, thirteen historical evidence groups and the SARIF
+policy currently remain pending. Historical candidate rows are an inventory for
+independent case selection/admission, not a request to rerun every listed test.
+The existing raw failures, filters, missing contemporaneous manifests and
+unsigned execution identities remain retained. No old application evidence is
+accepted by digest alone, retroactively signed or silently granted a new source.
+Original content/HOLD, Training P/R and 356-01 obligations remain separate.
+
+After exact-source independent review and real qualification, explicit `admit`
+dispatch requires the actual current non-Draft PR and exact Q JSON coordinates
+`{runId,attempt,artifactId,zipSHA256}`. It verifies every selected case and input,
+original successful official run/job/attempt/artifact ID/digest/expiry, actual
+upstream graph, admitted historical evidence and explicit SARIF dispositions.
+The unchanged required context independently recomputes the complete current
+source and verifies the official precheck. Missing, skipped, failed, cancelled,
+expired or changed evidence cannot qualify. Required protection and strict
+up-to-date rules are not modified; independent human release is not authenticated
+by a dispatch string or a self-reported review record.
+
+Producers are separate jobs. A failed-job retry can reuse only an original
+successful official producer with unchanged complete inputs and exact artifact
+pins. Partial success inside a failed producer job, including an upload failure
+after a build, is a stop for independent targeted continuation planning; there is
+no automatic rebuild or fallback to an older successful attempt.
+
+The standalone small-Q/fixed-metadata adapter is implemented and directly
+verified, but is not wired into admission/gate/main. The proposed narrow caller
+patch remains pending after automatic review rejected an earlier broad rewrite
+(the rejected command did not execute). The current reader still downloads
+original phase archives. Therefore the required lightweight same-tree regular
+main-merge follow-up is not yet complete and this checkpoint cannot activate CI.
+No CI, Ready, merge, protection change, new credentials or deployment is executed
+by these implementation commits. Final exact HEAD/tree/base and executable budget
+must be independently reviewed before any activation.

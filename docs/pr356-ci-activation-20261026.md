@@ -1,4 +1,6 @@
-# PR356 修复收口与合并资格方案（待独立审查，未激活）
+# PR356 修复收口与合并资格接线（待独立审查，未激活）
+
+> 当前状态：已接入16个独立 phase、Q 汇总、admit 预检、稳定 required gate 和 main 入口；Ready 只观察、不走宽路线。全部 ready/历史 approved/SARIF policy 仍 pending。只读 A 已验证但尚未接 CLI，B 只有待审 patch，当前 main 仍重新读取原 phase ZIP，轻量复用未完成。下方小步是各次事实记录；最终完整HEAD/tree/base在提交后实读交付，旧锚点不代表当前候选。没有激活 CI，不能合并。
 
 > 实施阶段小步①：新增固定PR356入口检测及真实legacy CLI的Ready/main拒绝，7个直接控制契约通过，原件见E A157–158。仅此防护已实现；下方其余计划仍在接线。新控制路径使58c43e22阶段的旧冻结不再代表当前中间提交，最终完成后重新列全差异、逐名control及完整head/tree/base。未运行应用检查/CI，没有Ready/合并/部署；本小步不是可激活候选。
 
@@ -353,3 +355,37 @@ A23 `/sourceSHA256` 七项全部与c064当前一致：
 | Survey standard-triplet十例 | B `/artifacts/standard_triplet_report`（解码cases0..9）、`/artifacts/standard_triplet_log` | 待逐case影响闭包独审，10pass不变成当前候选的整次正式CI资格 |
 | Survey原runner、原退出、schema模板日志、原后置输入记录 | B `/artifacts/standard_triplet_run_script`、`/artifacts/standard_triplet_exit_record`（解码`/survey/exitCode=0`，`/training/exitCode=1`原失败保持）、`/artifacts/standard_triplet_schema_log`、`/artifacts/standard_triplet_existing_input_record` | runner只引用环境构造DB URL，未复制任何真实环境值；未执行脚本。源码hash仍为原后置记录，原工具/完整生成物缺口未补造 |
 | connected旧八例 | B `/connectedOriginals` | 原raw/log/migration/Prisma八路径均MISSING；没有用T摘要冒充原件 |
+
+
+## 本轮实际编排检查点（未获得激活资格）
+
+实际 `ci.yml` 已有16个独立 phase 与3个汇总入口；required gate 仅 manual
+admit 使用原稳定名称，qualify/Ready 使用无合并资格的观察名称。源失败仍使
+正式 admit gate 失败，不能用 job skipped 代替成功。完整16/13非空表、精确
+H/B/tree/checkout、两组件、inventory/binding/acceptance/candidate摘要和官方
+precheck固定pin先由纯契约核对，再以实际官方source/core重算。未修改保护。
+
+直接控制检查：新 gate pure 15项、真实适配器4项分别通过；旧 producer retry
+负例移到实际新 verifier/CLI，14次带网络陷阱的拒绝及原正例由一个定向用例
+通过。原 first/second attempt语义没有删除。当前 workflow 的208项静态解析、
+16phase选择/Ready拒绝/完整 legacy排除/20个合成runner路径初始化契约通过，
+actionlint修订后退出0。先前本地context/alias错误和解释器连字符错误原件
+保留；这些不是正式CI失败，正式轮次仍0，不向Notion伪写CI事故。
+
+运行位置：只执行新或直接改变的控制逻辑；本轮没有PG、迁移、正式应用检查、
+真实Docker构建/审计/扫描、真实浏览器或CodeQL。已有同输入通过项没有为了
+汇总重跑。四ordinary新库、exact lazy实际child、两种真实产品网页仍是正式
+放行后唯一隔离位置的NOTRUN项，不用控制stub替代。
+
+当前上限须据实际YAML核算：共用source job 8分钟、各image 25、audit 5、scan 15、
+CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏览器12、
+产品浏览器15、Q汇总10、admit预检/required gate各8。拆分后的DB关键依赖链
+最坏预算为source→upgrade→restore→vertical→Q，即78分钟，不再沿用旧48分钟
+或单个DB作业20分钟的总链承诺；这不是已测耗时。最终激活前应独审这个真实
+预算和队列/下载等待，5分钟仅为定位等待项阈值。没有为预算去运行应用或压测。
+
+当前阻碍：B调用点未获单独实施授权且未应用；phase/历史精确接纳及SARIF既有
+标准待dot核定；保护读取403仍由有现成能力的dot核对。精确非空CONTENT指导语
+没有已批准的浏览器seed，不虚构科学批准。NFC10/HOLD、原Training范围和
+356-01仍按原表开放；普通ACK已走安全事务callback，旧atomic性能/SQL基线不再
+代表当前候选，只保留计划内单次cold/hot与SQL归因，不追加并发压测或新MOT。
