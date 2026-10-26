@@ -7,15 +7,16 @@ type Activity={courseId:string;title:string;purpose:string;status:string;partici
 const states:Record<string,string>={DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束'}
 const purposes:Record<string,string>={STUDENT_WELLBEING:'学生心理健康',LEARNING_ADAPTATION:'学习适应',SCHOOL_CLIMATE:'学校氛围与关系',FAMILY_SUPPORT:'家庭与学校支持'}
 const rank=['DRAFT','SUBMITTED','OPEN','PAUSED','CLOSED']
-export function SchoolActivityCollection({items,selectedId,busy,loading,error,hasMore,onRefresh,onMore,onSelect,createControl,helpControl}:{items:Activity[];selectedId?:string;busy:boolean;loading:boolean;error:string;hasMore:boolean;onRefresh:()=>void;onMore:()=>void;onSelect:(id:string)=>void;createControl:ReactNode;helpControl?:ReactNode}){
+export function SchoolActivityCollection({items,selectedId,selectedTitle,busy,loading,error,hasMore,onRefresh,onMore,onSelect,createControl,helpControl}:{items:Activity[];selectedId?:string;selectedTitle?:string;busy:boolean;loading:boolean;error:string;hasMore:boolean;onRefresh:()=>void;onMore:()=>void;onSelect:(id:string)=>void;createControl:ReactNode;helpControl?:ReactNode}){
  const [query,setQuery]=useState(''),[sort,setSort]=useState('default'),[view,setView]=useState<SchoolCollectionView>('list')
  const shown=items.filter(item=>schoolSearchText([item.title,purposes[item.purpose]??item.purpose,states[item.status]??item.status].join(' ')).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='status'?rank.indexOf(a.status)-rank.indexOf(b.status):sort==='participants'?b.participantCount-a.participantCount:0)
  return <div className="hs-activity-catalog">
   <div className="hs-activity-catalog-toolbar">
    <p className="hs-collection-summary" role="status" hidden={Boolean(selectedId)}>{!items.length&&loading?'正在读取活动…':!items.length&&error?'活动目录暂不可用':query?`找到 ${shown.length} 项活动`:`${items.length} 项活动`}</p>
-   {selectedId&&<button type="button" className="hs-activity-back" disabled={busy} onClick={()=>onSelect('')}><ArrowLeft size={16} aria-hidden="true"/>返回活动列表</button>}
+   {selectedId&&<button type="button" className="hs-activity-back" aria-label="返回活动列表" title="返回活动列表" disabled={busy} onClick={()=>onSelect('')}><ArrowLeft size={16} aria-hidden="true"/><span>返回活动列表</span></button>}
+   {selectedId&&selectedTitle&&<h2 className="hs-activity-current-title">{selectedTitle}</h2>}
    <div className="hs-activity-catalog-filters" hidden={Boolean(selectedId)}><SchoolCollectionControls query={query} onQuery={setQuery} sort={sort} onSort={setSort} view={view} onView={setView} searchLabel={hasMore?'检索已加载的活动':'检索活动'} placeholder="搜索活动名称、主题或状态" sorts={[{value:'default',label:'默认顺序'},{value:'title',label:'活动名称 A–Z'},{value:'status',label:'活动状态'},{value:'participants',label:'授权人数由多到少'}]} actions={<button type="button" aria-label="刷新活动列表" title="刷新活动列表" disabled={busy||loading} onClick={onRefresh}><RefreshCw size={18} aria-hidden="true"/></button>}/></div>
-   <div className="hs-activity-catalog-commands">{helpControl}{createControl}</div>
+   <div className="hs-activity-catalog-commands">{helpControl}<div className="hs-activity-catalog-create" hidden={Boolean(selectedId)}>{createControl}</div></div>
   </div>
   {error&&<p role="alert" className="hs-alert">{error}</p>}
   <div className="hs-activity-catalog-index" hidden={Boolean(selectedId)}>

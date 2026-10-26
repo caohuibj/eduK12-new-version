@@ -1,4 +1,4 @@
-import type {MouseEvent,ReactNode} from 'react'
+import {useEffect,useRef,type MouseEvent,type ReactNode} from 'react'
 import {ArrowRight} from 'lucide-react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import {workspaceHref,type SchoolNavigationItem} from './school-navigation'
@@ -15,13 +15,28 @@ function follow(event:MouseEvent<HTMLAnchorElement>,id:string,onNavigate:(id:str
 export function SchoolProfessionalNavigation({items,page,onNavigate}:{items:SchoolNavigationItem[];page:string;onNavigate:(id:string)=>void}){
  const groups=sections(items)
  const active=groups.find(section=>section.items.some(item=>item.id===page))
- return <>
+ const pages=useRef<HTMLElement>(null)
+ useEffect(()=>{
+  const nav=pages.current,link=nav?.querySelector<HTMLAnchorElement>('[aria-current="page"]')
+  if(!nav||!link)return
+  const reveal=()=>{
+   if(!nav.clientWidth)return
+   if(link.offsetLeft<nav.scrollLeft)nav.scrollLeft=link.offsetLeft
+   else if(link.offsetLeft+link.offsetWidth>nav.scrollLeft+nav.clientWidth)nav.scrollLeft=link.offsetLeft+link.offsetWidth-nav.clientWidth
+  }
+  reveal()
+  const resize=typeof ResizeObserver==='undefined'?null:new ResizeObserver(reveal)
+  resize?.observe(nav)
+  return()=>resize?.disconnect()
+ },[page,items])
+ if(!groups.length)return null
+ return <div className="hs-professional-navigation">
   <nav className="hs-professional-groups" aria-label="校园功能分组">{groups.map(section=>{
    const destination=section.items.find(item=>item.id===page)||section.items.find(item=>item.id==='activities')||section.items[0]
    return <a key={section.group} href={workspaceHref(destination.id)} aria-current={active?.group===section.group?'true':undefined} onClick={event=>follow(event,destination.id,onNavigate)}>{section.group}</a>
   })}</nav>
-  {active&&active.items.length>1&&<nav className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
- </>
+  {active&&active.items.length>1&&<nav ref={pages} className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
+ </div>
 }
 
 export function SchoolProfessionalHome({items,username,schoolName,onNavigate,administrator=false}:{items:SchoolNavigationItem[];username:string;schoolName?:string;onNavigate:(id:string)=>void;administrator?:boolean}){
