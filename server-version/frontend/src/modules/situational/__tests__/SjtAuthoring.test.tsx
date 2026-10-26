@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { sessionFetch } from '../../../api/client'
 import SjtAuthoring from '../pages/SjtAuthoring'
 import { newOnlineDocument } from '../OnlineAuthorEditor'
+import { MemoryRouter } from 'react-router-dom'
 
 vi.mock('../../../api/client', () => ({ sessionFetch: vi.fn() }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'author-1', role: 'TEACHER' } }) }))
@@ -17,7 +18,7 @@ describe('SJT author workbench course policy', () => {
       if (String(url).endsWith('/drafts/draft-1')) return json(draft('COURSE_GRANT_V1'))
       return String(url).includes('/releases?') ? json({ items: [], nextCursor: null }) : json([])
     })
-    render(<SjtAuthoring/>)
+    render(<MemoryRouter><SjtAuthoring/></MemoryRouter>)
     fireEvent.click(screen.getByRole('button', { name: '在线创建图文题包' }))
     expect(screen.getByLabelText('题包发布策略')).toHaveValue('COURSE_GRANT_V1')
     fireEvent.click(screen.getByRole('button', { name: '保存在线新草稿' }))
@@ -34,7 +35,7 @@ describe('SJT author workbench course policy', () => {
       if (String(url).endsWith('/drafts/draft-1')) return json(draft(controlled ? 'COURSE_GRANT_V1' : null))
       return String(url).includes('/releases?') ? json({ items: [], nextCursor: null }) : json([])
     })
-    render(<SjtAuthoring/>)
+    render(<MemoryRouter><SjtAuthoring/></MemoryRouter>)
     fireEvent.click(await screen.findByRole('button', { name: '打开题包 online-new 1.0.0' }))
     await waitFor(() => expect(screen.getByLabelText('题包发布策略')).toHaveValue('LEGACY'))
     fireEvent.change(screen.getByLabelText('题包发布策略'), { target: { value: 'COURSE_GRANT_V1' } })

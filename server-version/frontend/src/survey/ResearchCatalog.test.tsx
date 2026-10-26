@@ -42,12 +42,12 @@ describe('original source catalog grants',()=>{
     await waitFor(()=>expect(api).toHaveBeenLastCalledWith('/projects/project-1/catalog?page=2'))
     await waitFor(()=>expect(screen.getByLabelText('筛选当前页授权工具')).toHaveValue(''))
   })
-  it('looks up only administrator-owned published Form sections without requesting institution access',async()=>{
+  it('looks up approved Survey Form versions without scanning private drafts or requesting institution access',async()=>{
     const api=vi.fn(async()=>({list:[],page:1,hasMore:false,terminalReason:'END_OF_CATALOG'}))
     render(<SurveyCatalogGrants api={api as CatalogApi} password="test-password" researchers={[]}/>)
     fireEvent.change(screen.getByLabelText('来源类型'),{target:{value:'FORM'}})
     expect(screen.getByRole('button',{name:'查询可授权版本'})).toBeEnabled()
-    expect(screen.getByText(/仅显示本管理员创建并已发布/)).toBeInTheDocument()
+    expect(screen.getByText(/须已完成系统审批、自动保存验证和 Survey 范围准入/)).toHaveTextContent('不会扫描其他研究者未提交的私有草稿')
     expect(api).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button',{name:'查询可授权版本'}))
     await waitFor(()=>expect(api).toHaveBeenCalledWith('/source-catalog?kind=FORM&page=1'))

@@ -1,0 +1,262 @@
+{
+  "source": {
+    "original": "materials-survey-legacy.json",
+    "validator": "zod@4.6.7",
+    "note": "Only error representation changes; original captures and all successful values/digests retained."
+  },
+  "flows": {
+    "extra-field": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"extra\"\n    ],\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0\n    ],\n    \"message\": \"Unrecognized key: \\\"extra\\\"\"\n  }\n]",
+        "issues": [
+          {
+            "code": "unrecognized_keys",
+            "keys": [
+              "extra"
+            ],
+            "path": [
+              "experiment",
+              "groups",
+              0
+            ],
+            "message": "Unrecognized key: \"extra\""
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0",
+            "message": "Unrecognized key: \"extra\""
+          }
+        ]
+      }
+    },
+    "invalid-mode-and-groups": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"invalid_value\",\n    \"values\": [\n      \"QUESTIONNAIRE_VARIANTS\"\n    ],\n    \"path\": [\n      \"experiment\",\n      \"mode\"\n    ],\n    \"message\": \"Invalid input: expected \\\"QUESTIONNAIRE_VARIANTS\\\"\"\n  },\n  {\n    \"origin\": \"number\",\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"inclusive\": true,\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ],\n    \"message\": \"Too small: expected number to be >=1\"\n  },\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      1,\n      \"materialTitle\"\n    ],\n    \"message\": \"Invalid input: expected string, received number\"\n  }\n]",
+        "issues": [
+          {
+            "code": "invalid_value",
+            "values": [
+              "QUESTIONNAIRE_VARIANTS"
+            ],
+            "path": [
+              "experiment",
+              "mode"
+            ],
+            "message": "Invalid input: expected \"QUESTIONNAIRE_VARIANTS\""
+          },
+          {
+            "origin": "number",
+            "code": "too_small",
+            "minimum": 1,
+            "inclusive": true,
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ],
+            "message": "Too small: expected number to be >=1"
+          },
+          {
+            "expected": "string",
+            "code": "invalid_type",
+            "path": [
+              "experiment",
+              "groups",
+              1,
+              "materialTitle"
+            ],
+            "message": "Invalid input: expected string, received number"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.mode",
+            "message": "Invalid input: expected \"QUESTIONNAIRE_VARIANTS\""
+          },
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Too small: expected number to be >=1"
+          },
+          {
+            "path": "experiment.groups.1.materialTitle",
+            "message": "Invalid input: expected string, received number"
+          }
+        ]
+      }
+    },
+    "wrong-key": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"origin\": \"string\",\n    \"code\": \"invalid_format\",\n    \"format\": \"regex\",\n    \"pattern\": \"/^[a-z][a-z0-9_-]{0,79}$/\",\n    \"path\": [\n      \"experiment\",\n      \"experimentKey\"\n    ],\n    \"message\": \"Invalid string: must match pattern /^[a-z][a-z0-9_-]{0,79}$/\"\n  }\n]",
+        "issues": [
+          {
+            "origin": "string",
+            "code": "invalid_format",
+            "format": "regex",
+            "pattern": "/^[a-z][a-z0-9_-]{0,79}$/",
+            "path": [
+              "experiment",
+              "experimentKey"
+            ],
+            "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]{0,79}$/"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.experimentKey",
+            "message": "Invalid string: must match pattern /^[a-z][a-z0-9_-]{0,79}$/"
+          }
+        ]
+      }
+    },
+    "fractional-weight": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"expected\": \"int\",\n    \"format\": \"safeint\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ],\n    \"message\": \"Invalid input: expected int, received number\"\n  }\n]",
+        "issues": [
+          {
+            "expected": "int",
+            "format": "safeint",
+            "code": "invalid_type",
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ],
+            "message": "Invalid input: expected int, received number"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Invalid input: expected int, received number"
+          }
+        ]
+      }
+    },
+    "too-large-weight": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"origin\": \"number\",\n    \"code\": \"too_big\",\n    \"maximum\": 100,\n    \"inclusive\": true,\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ],\n    \"message\": \"Too big: expected number to be <=100\"\n  }\n]",
+        "issues": [
+          {
+            "origin": "number",
+            "code": "too_big",
+            "maximum": 100,
+            "inclusive": true,
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ],
+            "message": "Too big: expected number to be <=100"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Too big: expected number to be <=100"
+          }
+        ]
+      }
+    },
+    "one-group": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"origin\": \"array\",\n    \"code\": \"too_small\",\n    \"minimum\": 2,\n    \"inclusive\": true,\n    \"path\": [\n      \"experiment\",\n      \"groups\"\n    ],\n    \"message\": \"Too small: expected array to have >=2 items\"\n  }\n]",
+        "issues": [
+          {
+            "origin": "array",
+            "code": "too_small",
+            "minimum": 2,
+            "inclusive": true,
+            "path": [
+              "experiment",
+              "groups"
+            ],
+            "message": "Too small: expected array to have >=2 items"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups",
+            "message": "Too small: expected array to have >=2 items"
+          }
+        ]
+      }
+    },
+    "nine-groups": {
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"origin\": \"array\",\n    \"code\": \"too_big\",\n    \"maximum\": 8,\n    \"inclusive\": true,\n    \"path\": [\n      \"experiment\",\n      \"groups\"\n    ],\n    \"message\": \"Too big: expected array to have <=8 items\"\n  }\n]",
+        "issues": [
+          {
+            "origin": "array",
+            "code": "too_big",
+            "maximum": 8,
+            "inclusive": true,
+            "path": [
+              "experiment",
+              "groups"
+            ],
+            "message": "Too big: expected array to have <=8 items"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups",
+            "message": "Too big: expected array to have <=8 items"
+          }
+        ]
+      }
+    }
+  }
+}

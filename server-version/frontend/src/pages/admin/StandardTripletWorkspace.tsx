@@ -1,3 +1,4 @@
+import {EntryAdmissionChoices} from '../../components/scale-governance/EntryAdmissionChoices'
 import GovernedToolsWorkspace from './GovernedToolsWorkspace'
 import {useCallback,useEffect,useState,type ReactNode} from 'react'
 import {BookOpen,ChevronDown,RefreshCw,ShieldCheck,FlaskConical,Search,Archive} from 'lucide-react'
@@ -23,12 +24,12 @@ export default function StandardTripletWorkspace({authored}:{authored:ReactNode}
   const storageKey='survey-triplet-approval:'+p.combinationHash
   let requestId=sessionStorage.getItem(storageKey)
   if(!requestId){requestId=crypto.randomUUID();sessionStorage.setItem(storageKey,requestId)}
-  const result=await api<StandardState>('/approve',{...s,requestId,expectedCombinationHash:p.combinationHash,reason:reason.trim()})
+  const result=await api<StandardState>('/approve',{...s,requestId,expectedCombinationHash:p.combinationHash,reason:reason.trim(),allowedProducts:['SURVEY']})
   sessionStorage.removeItem(storageKey)
   setNotice(states[result.state]+'；未创建研究者授权。');await refresh();await inspect(r)
  })
  const transition=(r:StandardItem,state:StandardState,action:'retry'|'withdraw')=>run(async()=>{
-  if(!window.confirm(action==='retry'?'重新试运行同一份已批准版本？通过后上线，不产生研究者授权。':'停止这份组合的新增分配和投放？已有答卷及历史报告保留。'))return
+  if(!window.confirm(action==='retry'?'重新试运行同一份已批准版本？通过后上线，不产生研究者授权。':'停止这份精确组合的分配、准入和后续采集／提交？已保存数据保留。'))return
   const result=await api<StandardState>('/'+state.id+'/'+action,{expectedVersion:state.version,...(action==='withdraw'?{reason:reason.trim()}:{})})
   setNotice(action==='retry'?(states[result.state]??'试运行完成'):'已停止新增使用，历史数据保留。');await refresh();await inspect(r)
  })
@@ -43,7 +44,7 @@ export default function StandardTripletWorkspace({authored}:{authored:ReactNode}
   return <article className="sys-record" key={k}><details onToggle={e=>{if(e.currentTarget.open&&!detail[k])void inspect(r)}}><summary><span className="sys-record-avatar"><BookOpen size={20}/></span><span className="sys-record-heading"><strong>{r.title}</strong><small>{r.versions.map(v=>labels[v.axis]+' '+v.version).join(' · ')||'当前只有目录资料'}</small></span><span className="sys-record-state"><span className="sys-badge" data-status={current?.state??'PENDING'}>{current?states[current.state]:online?'已有其他上线组合':'待审核'}</span><ChevronDown size={17}/></span></summary><div className="sys-record-body">
  {r.blockers.length>0&&<div className="sys-message sys-error"><strong>当前版本需补齐</strong><ul>{r.blockers.map((b,i)=><li key={i}>{b}</li>)}</ul></div>}
  {!d?<p>展开后读取版本和 Reference…</p>:<><div className="sys-triplet-versions">{axes.map(axis=><label key={axis}>{labels[axis]}版本<select disabled={busy} value={s?.[axis]??''} onChange={e=>{setSelection(old=>({...old,[k]:{...old[k],[axis]:e.target.value}}));setPreview(old=>{const next={...old};delete next[k];return next})}}>{d.available.filter(v=>v.axis===axis).map(v=><option key={v.hash} value={v.hash}>{v.payload===null?(axis==='PARAMETERS'?'未配置（无阈值/常模）':'不反馈（无报告）'):v.version} · {v.hash.slice(0,8)}</option>)}</select></label>)}</div>
- <div className="system-actions"><button disabled={busy||d.available.length<3} onClick={()=>void check(r)}>核对三份版本</button><button disabled={busy||!p||p.blockers.length>0||!reason.trim()||r.releases.some(x=>x.combinationHash===p.combinationHash)} onClick={()=>void approve(r)}>批准并试运行，通过后上线</button></div>
+ <EntryAdmissionChoices label="此批准组合的允许入口" value={['SURVEY']} supported={['SURVEY']} disabled onChange={()=>{}} unavailableReason="当前 Training 编排尚不能绑定此 C/P/R 组合；此处只批准 Survey。"/><div className="system-actions"><button disabled={busy||d.available.length<3} onClick={()=>void check(r)}>核对三份版本</button><button disabled={busy||!p||p.blockers.length>0||!reason.trim()||r.releases.some(x=>x.combinationHash===p.combinationHash)} onClick={()=>void approve(r)}>批准并试运行，通过后上线</button></div>
  {p&&<div className="sys-message"><strong>{p.blockers.length?'版本对应关系存在问题':'三份版本对应关系已核对'}</strong>{p.blockers.length?<ul>{p.blockers.map((b,i)=><li key={i}>{b}</li>)}</ul>:<p>批准后仍须自动试运行通过；尚未上线，也未授权任何研究者。</p>}<details className="sys-technical"><summary>查看所选内容、参数和报告</summary>{axes.map(a=><details key={a}><summary>{labels[a]} · {p.parts[a].version}</summary><pre>{JSON.stringify(p.parts[a].payload,null,2)}</pre></details>)}</details></div>}
  <details className="sys-technical"><summary>工具 Reference：作者、文献、标签及完整附加信息</summary><p>保留原始资料，不作为额外上线门槛。阈值与常模在参数版本中。</p><pre>{JSON.stringify(d.reference,null,2)}</pre></details>
  <details className="sys-technical"><summary>申请、批准及试运行记录（{d.history.length}）</summary>{!d.history.length?<p>尚无本流程的审批记录。</p>:d.history.map(h=><section key={h.id} className="sys-standard-history"><h3>{states[h.state]}</h3><p>批准人：{h.approvedBy} · {new Date(h.approvedAt).toLocaleString()}</p><p>内容 {h.versions.CONTENT.version} / 参数 {h.versions.PARAMETERS.version} / 报告 {h.versions.REPORT.version}</p>{h.blockers.map((b,i)=><p role="status" key={i}>{b}</p>)}<div className="system-actions">{(h.state==='TRIAL_FAILED'||h.state==='APPROVED'||h.state==='TRIAL_RUNNING')&&<button disabled={busy} onClick={()=>void transition(r,h,'retry')}>重试同一批准版本</button>}{h.state==='ONLINE'&&<button disabled={busy||!reason.trim()} onClick={()=>void transition(r,h,'withdraw')}>停止新增使用</button>}</div><details><summary>完整审批 Reference</summary><pre>{JSON.stringify(h.reference,null,2)}</pre></details></section>)}{d.trials.map(t=><details key={t.runId+':'+t.caseIndex}><summary>试运行 {t.caseIndex+1} · 数据库记录已提交</summary><p>记录摘要：{t.recordHash}</p><pre>{JSON.stringify({scores:t.scores,report:t.report},null,2)}</pre></details>)}</details>

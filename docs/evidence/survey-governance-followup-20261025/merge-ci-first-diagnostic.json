@@ -1,0 +1,1199 @@
+{
+  "schemaVersion": 1,
+  "kind": "merge355-first-official-ci-diagnostic",
+  "qualification": "A failed official run plus targeted local baseline comparisons; no CI admission, success union, or final-head merge qualification. Only 88 of the 203 failed assertions were compared on main; no attribution is made for the other 115 or all suite setup errors. Local main comparisons did not claim to be GitHub-hosted execution. No raw logs, headers, URLs carrying tokens, credentials, answers or report payloads are included.",
+  "official": {
+    "runId": 40159337918,
+    "head": "896bf9276eafedadbb4d301fb69cac2b114778fa",
+    "conclusion": "failure",
+    "independentPublicationRun": 40159337789,
+    "independentPublicationConclusion": "success",
+    "backendJob": 121067458783,
+    "artifactId": 12586341016,
+    "zipSha256": "6d14a9a01bce7ee188ec05075df300568cdf918bb56fb8fe8d5b628a8ebfdb1f",
+    "reportSha256": "4f75782c2c0af295f58c6bc2c37730ba2f0078184a57f211481315a2a8b43108",
+    "passed": 8060,
+    "failed": 203,
+    "skipped": 236,
+    "passedFiles": 930,
+    "failedFiles": 84,
+    "skippedFiles": 33,
+    "failedFilesSummary": [
+      {
+        "file": "src/__tests__/training-workspace-governance.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/bundle-onboarding/content.postgres.integration.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/composite/composite.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/bundle-onboarding/lifecycle.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/composite/composite.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/bundle-product/product.postgres.integration.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/composite/composite.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/campus/report.routes.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/campus/teacher-tasks.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/authenticated-admission.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/student-archived-availability.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/training-feedback-runtime-source.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/training-flow-final-admission.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/training-persistence-admission-behavior.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/composite/training-variant-markers.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/controllers/addScale.grant.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/controllers/streamingTaskExport.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/education-tools/private-tool.definition.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/education-tools/private-tool.media-upload.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/education-tools/private-tool.media.routes.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/hotpath/final-route-inventory.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/measurement-content/admin-authority-route.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+        "failedAssertions": 11,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/content-binding.service.ts",
+          "src/modules/survey/scale-collection-guard.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/measurement-content/training-reference-unified-context.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/middleware/completion-busy-transport.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/anonymousStudy.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationLibraryPublication.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateCsv.postgres.integration.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateMaterials.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScaleDraft.postgres.integration.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScalePublication.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScaleRuntime.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateScaleSharing.postgres.integration.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/educationPrivateTools.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/miniprogramOperationsHttp.postgres.integration.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/miniprogramRuntimeHttp.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/reportingHttp.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/training-mac-export.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/questionnaire/product.postgres.integration.test.ts",
+        "failedAssertions": 14,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/composite/composite.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/questionnaire/training-feedback-authoring.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/scale-library-governance/education-runtime-resources.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+        "failedAssertions": 8,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/admin-role.ts",
+          "src/modules/survey/tool-policy.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/admin-role.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/scale/scale-draft-write-guard.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/scale/training-feedback-native.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/situational/situation-definition.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/situational/training-feedback-native.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/situational/situational-runtime.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/training-analysis/scale-source-discovery.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/training-analysis/source.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/catalog-sjt-online.contract.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/scale-collection-guard.ts",
+          "src/modules/survey/task.public.ts",
+          "src/modules/survey/tool-policy.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/survey/governed-native.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": true,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/materials-assignment-adapter.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/materials-core.test.ts",
+        "failedAssertions": 7,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/memorable-code.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/project-directory.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-catalog.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/admin-role.ts",
+          "src/modules/survey/catalog.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/survey/research-cognitive.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-draft-validation.contract.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-flow.postgres.integration.test.ts",
+        "failedAssertions": 4,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/final.service.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/survey/research-media.postgres.integration.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-operations.contract.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-preview-transport.contract.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-raw-descriptors.contract.test.ts",
+        "failedAssertions": 2,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-wave-final.postgres.integration.test.ts",
+        "failedAssertions": 23,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/research-wave-prepare-transport.contract.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-flow.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-image.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-staged.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-termination.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/situational-native-variants.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts",
+        "failedAssertions": 0,
+        "testSourceChangedInPR": true,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/survey/survey-realm.postgres.integration.test.ts",
+        "failedAssertions": 6,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": [
+          "src/modules/survey/admin-role.ts"
+        ]
+      },
+      {
+        "file": "src/__tests__/survey/tool-publication.postgres.integration.test.ts",
+        "failedAssertions": 3,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/cognitive/library-catalog.test.ts",
+        "failedAssertions": 1,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      },
+      {
+        "file": "src/__tests__/cognitive/training-feedback-session.test.ts",
+        "failedAssertions": 7,
+        "testSourceChangedInPR": false,
+        "changedProductionFileAppearsInStack": []
+      }
+    ]
+  },
+  "missingDatabaseSetup": [
+    {
+      "file": "src/__tests__/composite/authenticated-admission.postgres.integration.test.ts",
+      "requiredVariable": "AUTHENTICATED_ADMISSION_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/composite/student-archived-availability.postgres.integration.test.ts",
+      "requiredVariable": "TRAINING_ARCHIVE_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+      "requiredVariable": "TRAINING_PARTICIPATION_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts",
+      "requiredVariable": "TRAINING_PARTICIPATION_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "requiredVariable": "TRAINING_PARTICIPATION_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/governed-native.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_FOLLOWUP_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/memorable-code.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_MEMORABLE_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/project-directory.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_DIRECTORY_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/situational-entry-authority.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_SJT_ENTRY_AUTHORITY_TEST_DATABASE_URL or SURVEY_NATIVE_SJT_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/situational-native-binding.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_SJT_BINDING_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/situational-native-image.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_NATIVE_SJT_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/situational-native-staged.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_NATIVE_SJT_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/situational-native-v1.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_NATIVE_SJT_TEST_DATABASE_URL"
+    },
+    {
+      "file": "src/__tests__/survey/standard-catalog-fingerprint.postgres.integration.test.ts",
+      "requiredVariable": "SURVEY_FOLLOWUP_TEST_DATABASE_URL"
+    }
+  ],
+  "baselineComparisons": [
+    {
+      "report": "merge355-main-failures-selected.json",
+      "kind": "local-targeted-main-comparison",
+      "source": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+      "sha256": "2308dd93908ec8abb8a00e5eb275b77393ea6aadbe504148be2de93c798a1060",
+      "passed": 1,
+      "failed": 48,
+      "filtered": 118,
+      "files": [
+        {
+          "file": "src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+          "cases": [
+            {
+              "test": "selected variant aggregate finalization reuses an already verified committed selected graph without a second union load",
+              "status": "failed"
+            },
+            {
+              "test": "selected variant aggregate finalization accepts a copied committed graph only when it retains the authoritative publication union",
+              "status": "failed"
+            },
+            {
+              "test": "committed aggregate graph to Training FINAL receipt persists a nonempty bound receipt after completion CAS in the same transaction without reloading the graph",
+              "status": "failed"
+            },
+            {
+              "test": "committed aggregate graph to Training FINAL receipt propagates a receipt-write failure out of the completion transaction rather than accepting a receiptless success",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/cognitive/training-feedback-session.test.ts",
+          "cases": [
+            {
+              "test": "Cognitive native Training feedback reads preserves completion and hides result before scheduled release (public=false)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads preserves completion and hides result before scheduled release (public=true)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads keeps malformed configured history closed (public=false)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads keeps malformed configured history closed (public=true)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads releases existing frozen result exactly at the preset boundary (public=false)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads releases existing frozen result exactly at the preset boundary (public=true)",
+              "status": "failed"
+            },
+            {
+              "test": "Cognitive native Training feedback reads keeps a completed unit hidden until the current parent async report is READY",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/education-tools/private-tool.definition.test.ts",
+          "cases": [
+            {
+              "test": "Education private draft contracts keeps incomplete native drafts editable but not freeze-ready",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/controllers/addScale.grant.test.ts",
+          "cases": [
+            {
+              "test": "questionnaire addScale grant combinations allows the teacher own DRAFT scale",
+              "status": "failed"
+            },
+            {
+              "test": "questionnaire addScale grant combinations forbids another teacher published scale without a grant",
+              "status": "failed"
+            },
+            {
+              "test": "questionnaire addScale grant combinations allows a granted published scale",
+              "status": "failed"
+            },
+            {
+              "test": "questionnaire addScale grant combinations forbids a granted DRAFT",
+              "status": "failed"
+            },
+            {
+              "test": "general questionnaire addScale forbids another teacher published scale without a grant",
+              "status": "failed"
+            },
+            {
+              "test": "general questionnaire addScale allows a granted published scale",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/composite/training-feedback-runtime-source.test.ts",
+          "cases": [
+            {
+              "test": "C22 runtime wiring source contracts (not concurrency/HTTP evidence) binds feedback under the existing publication/course/round locks and atomic attempt insert",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/composite/training-flow-final-admission.test.ts",
+          "cases": [
+            {
+              "test": "C19 four FINAL transaction wiring situational/situational-final-submit.service.ts gates before child writes",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/composite/training-persistence-admission-behavior.test.ts",
+          "cases": [
+            {
+              "test": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits checkpoint only with schema-shaped publication and default FINAL_ONLY",
+              "status": "failed"
+            },
+            {
+              "test": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits local cognitive only with schema-shaped publication and default FINAL_ONLY",
+              "status": "failed"
+            },
+            {
+              "test": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits both with schema-shaped publication and default FINAL_ONLY",
+              "status": "failed"
+            },
+            {
+              "test": "C23 persistence admission projection (schema-aware mock DB, actual start service) admits policy off with schema-shaped publication and default FINAL_ONLY",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/survey-content-binding.test.ts",
+          "cases": [
+            {
+              "test": "Survey START exact encrypted content binding stores only exact selected pointers, empty population and report availability under CAS",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding keeps frozen SUPERSEDED measurement/report identities for START",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding keeps frozen RETIRED measurement/report identities for START",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding denies revoked measurement but records revoked report as unavailable without blocking collection",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding records reference REVOKED as unavailable",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding records reference RETIRED as unavailable",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding preserves superseded reference candidate and refuses to infer missing population",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding binds new native measurement without selections to empty references and leaves legacy/FORM-only rows null",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding recovers original binding without reselecting or rewriting after release retirement/revocation",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding fails changed stored hash, wrong Attempt, corrupted publication, and CAS conflict",
+              "status": "failed"
+            },
+            {
+              "test": "Survey START exact encrypted content binding pure recovery validates report and selected reference membership without choosing again",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/situational/situation-definition.test.ts",
+          "cases": [
+            {
+              "test": "situation definition schema rejects more than three channels per scene (Decision C)",
+              "status": "failed"
+            },
+            {
+              "test": "static visual stimulus contract rejects empty comics, missing alt text, unsupported MIME, and external asset URLs",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/situational/training-feedback-native.test.ts",
+          "cases": [
+            {
+              "test": "native SJT Training feedback reads withholds results but preserves terminal receipt with one existing parent projection",
+              "status": "failed"
+            },
+            {
+              "test": "native SJT Training feedback reads withholds results but preserves terminal receipt with one existing parent projection",
+              "status": "failed"
+            },
+            {
+              "test": "native SJT Training feedback reads releases the existing frozen scored result at the exact boundary",
+              "status": "failed"
+            },
+            {
+              "test": "native SJT Training feedback reads fails closed for malformed binding and preserves owner checks",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/catalog-sjt-online.contract.test.ts",
+          "cases": [
+            {
+              "test": "authorized online SJT uses the shared Training protocol core public task preserves multi-select/refusal/scenes but never discloses scoring contributions",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/materials-core.test.ts",
+          "cases": [
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: extra-field",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: invalid-mode-and-groups",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: wrong-key",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: fractional-weight",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: too-large-weight",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: one-group",
+              "status": "failed"
+            },
+            {
+              "test": "Shared material core preserves pre-C20 Survey contracts legacy parse, errors and exact hash: nine-groups",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report": "merge355-main-failures-more.json",
+      "kind": "local-targeted-main-comparison",
+      "source": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+      "sha256": "f27e599ea2925f51f533901edfe6b389e2fc1991f6026731769386c5fa0f36f3",
+      "passed": 1,
+      "failed": 35,
+      "filtered": 280,
+      "files": [
+        {
+          "file": "src/__tests__/campus/teacher-tasks.test.ts",
+          "cases": [
+            {
+              "test": "Huischool teacher observer task boundary uses live school/class/teacher/approved-student constraints and only projects aliases",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/composite/training-variant-markers.test.ts",
+          "cases": [
+            {
+              "test": "Training variant marker projection contract keeps both generated Prisma selectors on the complete marker shape",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "cases": [
+            {
+              "test": "stops the row producer when ZIP output stalls instead of queuing the entire sheet",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/education-tools/private-tool.media-upload.test.ts",
+          "cases": [
+            {
+              "test": "Education image upload staged finalization (mocked storage only) stores privately without a usable reference, then registers only after reauthorization",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/cognitive/library-catalog.test.ts",
+          "cases": [
+            {
+              "test": "catalog single-source-of-truth boundaries catalog metadata is not imported by any runtime/scorer/hash path (hash stability by construction)",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/hotpath/final-route-inventory.test.ts",
+          "cases": [
+            {
+              "test": "FINAL route inventory matches mounted assessment submit routes to the maintained cost ledger",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/middleware/completion-busy-transport.test.ts",
+          "cases": [
+            {
+              "test": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2024 without exposing internals",
+              "status": "failed"
+            },
+            {
+              "test": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified P2034 without exposing internals",
+              "status": "failed"
+            },
+            {
+              "test": "'Survey parent FINAL' retryable completion error transport returns 503 with Retry-After for classified 40001 without exposing internals",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/admin-authority-route.test.ts",
+          "cases": [
+            {
+              "test": "system content grant routes reuse real management router boundaries blocks untrusted origin and recent-key denial without entering the mutation",
+              "status": "failed"
+            },
+            {
+              "test": "protects /static-sjt/prepare with existing strong session, origin and exact body",
+              "status": "failed"
+            },
+            {
+              "test": "protects /static-sjt/publish with existing strong session, origin and exact body",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/measurement-content/training-reference-unified-context.test.ts",
+          "cases": [
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction writes authentic context and selected binding before section completion/snapshot or next-runner delivery",
+              "status": "failed"
+            },
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction rolls back fresh private reuse when completed-unit writes cross the owner expiry",
+              "status": "failed"
+            },
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction replays accepted context without reading candidates or selecting again",
+              "status": "failed"
+            },
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction rolls back context and section when exact reference identity fails",
+              "status": "failed"
+            },
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction rejects a lost context CAS before reference selection or accepted facts",
+              "status": "failed"
+            },
+            {
+              "test": "actual UNIFIED composite context FINAL freezes references inside its transaction rejects missing required demographics before opening the write transaction",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/questionnaire/training-feedback-authoring.test.ts",
+          "cases": [
+            {
+              "test": "Training feedback authoring contract requires the actual author to own the Training course unless administrator",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/scale/scale-draft-write-guard.test.ts",
+          "cases": [
+            {
+              "test": "Scale draft mutation atomic guards publishes only the exact validated draft snapshot",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/scale/training-feedback-native.test.ts",
+          "cases": [
+            {
+              "test": "native Scale Training feedback reads checks frozen release before result projection without re-reading the parent",
+              "status": "failed"
+            },
+            {
+              "test": "native Scale Training feedback reads opens at the exact boundary while retaining the existing result projection",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/training-analysis/scale-source-discovery.test.ts",
+          "cases": [
+            {
+              "test": "Training Scale source discovery uses frozen runtime dictionaries keeps ADMIN at teacher numericScores disclosure despite researcher access",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/training-analysis/source.test.ts",
+          "cases": [
+            {
+              "test": "authorized Training numeric source adapter ADMIN discovery cannot bypass frozen Cognitive research-only profile restrictions",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/materials-assignment-adapter.test.ts",
+          "cases": [
+            {
+              "test": "Survey adapter retains its identity, quota CAS and persistence boundary locks and rechecks credentials before returning a persisted assignment without reserving quota again",
+              "status": "failed"
+            },
+            {
+              "test": "Survey adapter retains its identity, quota CAS and persistence boundary keeps history ordering/bounds and reserves the inherited group with exact CAS before encrypting",
+              "status": "failed"
+            },
+            {
+              "test": "Survey adapter retains its identity, quota CAS and persistence boundary surfaces quota CAS conflicts using the existing error class without assignment writes",
+              "status": "failed"
+            },
+            {
+              "test": "Survey adapter retains its identity, quota CAS and persistence boundary refuses full inherited quotas without switching groups",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-draft-validation.contract.test.ts",
+          "cases": [
+            {
+              "test": "Survey assertion shares validation without an unused draft digest keeps FORM normalization and public digest while assertion skips the draft hash",
+              "status": "failed"
+            },
+            {
+              "test": "Survey assertion shares validation without an unused draft digest keeps the exact UTF-8 480 KB definition limit with legacy=false",
+              "status": "failed"
+            },
+            {
+              "test": "Survey assertion shares validation without an unused draft digest keeps the exact UTF-8 480 KB definition limit with legacy=true",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-operations.contract.test.ts",
+          "cases": [
+            {
+              "test": "Survey PR4 operations authoring and bounded Flow contracts requires exact, typed non-prototype group quotas and keeps checkpoint disabled by default",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-preview-transport.contract.test.ts",
+          "cases": [
+            {
+              "test": "Survey SJT preview transport passes exact refusal and explicit null to per-kind semantic validation",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-raw-descriptors.contract.test.ts",
+          "cases": [
+            {
+              "test": "Request-local frozen Survey raw descriptors constructs each unit descriptor and option table once across schema and participant projection",
+              "status": "failed"
+            },
+            {
+              "test": "Request-local frozen Survey raw descriptors enumerates dictionary definitions once and never constructs unused option tables",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-wave-prepare-transport.contract.test.ts",
+          "cases": [
+            {
+              "test": "Survey wave prepare draft-validation transport returns actionable 400 for a saved one-question SJT that cannot be frozen for publication",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "report": "merge355-main-pg-selected.json",
+      "kind": "local-targeted-main-comparison",
+      "source": "25215dcc71dd7b4b205ebdef4c92ce9c5785836b",
+      "sha256": "1be2a9cbc8eb491db3b5d327d53a836379522907f2cce1e6de7484635b6042d6",
+      "passed": 0,
+      "failed": 3,
+      "filtered": 43,
+      "files": [
+        {
+          "file": "src/__tests__/training-workspace-governance.postgres.integration.test.ts",
+          "cases": [
+            {
+              "test": "Training workspace uses authoritative exact-version library permissions lists only the granted exact version, never confuses author provenance with ownership or adaptation rights",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+          "cases": [
+            {
+              "test": "Scale library governance / real isolated PostgreSQL requires the recipient target-entry identity and ordinary withdrawal preserves frozen collection",
+              "status": "failed"
+            }
+          ]
+        },
+        {
+          "file": "src/__tests__/survey/research-wave-final.postgres.integration.test.ts",
+          "cases": [
+            {
+              "test": "Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract computes Survey sources outside business transactions and rechecks current authority before returning",
+              "status": "failed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "newProjectionFixtureCheck": {
+    "passed": 12,
+    "failed": 0,
+    "reportSha256": "1de596068c284b5a9530cee76fa56b4b7a3c875176915c41fe66f42a923c71df",
+    "semantics": "Explicitly models the fresh collection boundary in a DTO unit test and asserts both invocation and refusal. No product collection guard is bypassed."
+  },
+  "isolatedStreamingThresholdCheck": {
+    "passed": 1,
+    "failed": 0,
+    "filtered": 9,
+    "reportSha256": "85f4827751ac7011adb887f3917240fb2932816b215e6b480a1f29fd960c92f7",
+    "thresholdChanged": false,
+    "qualification": "One main and one candidate local point cannot establish a capacity or speedup conclusion."
+  },
+  "codeql": {
+    "job": 121067458499,
+    "conclusion": "cancelled",
+    "reason": "20-minute job timeout during query evaluation; no completed SAST qualification",
+    "observedEvaluationCompleted": "87/89",
+    "querySetChanged": false
+  },
+  "repositoryChanges": "Workflow/required gate/product authority/schema/dependencies/timezone unchanged. Minor route predicate contract and deterministic route inventory fixes are commit 47d7484f; the fixture fix and this diagnosis are the follow-up."
+}

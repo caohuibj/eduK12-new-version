@@ -15,7 +15,7 @@ describe('Survey SJT preview transport',()=>{
     const simulate=vi.spyOn(service,'simulateSurveyDraft').mockResolvedValue({ok:true} as any)
     const answers={q1:{_surveyRefusal:true},q2:null,q3:['a','b'],q4:'a'},res=response(),next=vi.fn()
     await handler(request(answers),res,next)
-    expect(simulate).toHaveBeenCalledWith('actor',expect.any(String),expect.any(String),answers)
+    expect(simulate).toHaveBeenCalledWith('actor',expect.any(String),expect.any(String),answers,undefined)
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({code:0,data:{ok:true}}))
     expect(next).not.toHaveBeenCalled()
   })

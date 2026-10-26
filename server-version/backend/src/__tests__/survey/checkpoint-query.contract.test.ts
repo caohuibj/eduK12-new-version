@@ -38,17 +38,21 @@ describe('checkpoint request-local publication and bounded save reads',()=>{
   await saveSurveyCheckpoint(proof,{revision:1,answers:{}})
   expect(m.prior).toHaveBeenCalledWith({where:{attemptId:'attempt'},select:{id:true,version:true,expiresAt:true}});expect(m.update).toHaveBeenCalledOnce()
  })
- for(const state of ['revoked','withdrawn','completed','hard-stop','expired','participant-changed']){
+ for(const state of ['revoked','withdrawn','completed','expired','participant-changed']){
   it(`rejects current ${state} after locator authorization`,async()=>{
    if(state==='revoked')attempt.sessionHash='new'
    if(state==='withdrawn')attempt.excludedAt=new Date()
    if(state==='completed')attempt.status='COMPLETED'
-   if(state==='hard-stop')attempt.wave.hardStopAt=new Date()
    if(state==='expired')attempt.wave.finishUntil=new Date(0)
    if(state==='participant-changed')attempt.participantId='other'
    await expect(saveSurveyCheckpoint(proof,{revision:0,answers:{}})).rejects.toMatchObject({statusCode:403});expect(m.create).not.toHaveBeenCalled()
   })
  }
+ it('continues saving an established attempt after hard stop',async()=>{
+  attempt.wave.hardStopAt=new Date()
+  await expect(saveSurveyCheckpoint(proof,{revision:0,answers:{}})).resolves.toBeDefined()
+  expect(m.create).toHaveBeenCalled()
+ })
  for(const state of ['payload','digest','publication','runtime','missing']){
   it(`rejects changed ${state} under locks`,async()=>{
    if(state==='payload')snapshot.units.push({kind:'FORM'})

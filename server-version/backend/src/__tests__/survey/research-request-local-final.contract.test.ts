@@ -273,10 +273,9 @@ describe('Survey first-success GENERAL receipt allowlist',()=>{
     expect(mocks.verified).toHaveBeenCalledTimes(3)
     expect(mocks.readFinal).toHaveBeenCalledTimes(1)
   })
-  it.each(['hard stop','expired window','missing consent','withdrawn','revoked linked identity','changed unlinked credential'])(
+  it.each(['expired window','missing consent','withdrawn','revoked linked identity','changed unlinked credential'])(
     'rejects first completion after %s without writing or returning a receipt',async(reason)=>{
       start()
-      if(reason==='hard stop')current.wave.hardStopAt=new Date()
       if(reason==='expired window')current.wave.finishUntil=new Date(0)
       if(reason==='missing consent')mocks.consent.mockResolvedValue(null)
       if(reason==='withdrawn'){current.status='WITHDRAWN';current.excludedAt=new Date()}
@@ -290,6 +289,12 @@ describe('Survey first-success GENERAL receipt allowlist',()=>{
       expect(mocks.createFinal).not.toHaveBeenCalled()
       expect(mocks.encrypt).not.toHaveBeenCalled()
     })
+  it('completes an established attempt after hard stop under frozen rules',async()=>{
+    start()
+    current.wave.hardStopAt=new Date()
+    await expect(submitResearchFinal({...input(),researchCode:'R-12345678'})).resolves.toBeDefined()
+    expect(mocks.createFinal).toHaveBeenCalled()
+  })
   it('does not report completion or a receipt before the transaction commits',async()=>{
     start()
     const execute=mocks.transaction.getMockImplementation()!

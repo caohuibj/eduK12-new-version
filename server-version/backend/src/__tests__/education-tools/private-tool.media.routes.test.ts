@@ -23,7 +23,8 @@ vi.mock('../../modules/education-tools/private-tool.media',()=>({
  assertPrivateToolMediaAdmission:m.admission,uploadPrivateToolImage:m.upload,
  listPrivateToolImages:m.list,readPrivateToolImage:m.read,
 }))
-vi.mock('../../modules/assessment-media/assessment-image-delivery',()=>({serveAssessmentImageContent:m.serve}))
+vi.mock('../../modules/assessment-media/material-delivery',()=>({serveAssessmentMaterial:(reference:unknown,res:express.Response)=>m.serve({reference,res})}))
+vi.mock('../../modules/assessment-media/assessment-image-delivery',async importOriginal=>({...await importOriginal<any>(),serveAssessmentImageContent:m.serve}))
 vi.mock('../../middleware/auth', () => ({
   authenticateSchool: (req: any, res: any, next: any) => {
     if (req.headers['x-session-entry'] !== 'SCHOOL') return res.status(401).json({ data: null })

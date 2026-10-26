@@ -2,7 +2,7 @@ import {fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 import {MemoryRouter,Route,Routes} from 'react-router-dom'
 import StudentProfile from './StudentProfile'
-const state=vi.hoisted(()=>({user:{id:'admin-1',username:'training_manager',nickname:'测试管理员',role:'STUDENT',businessRole:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}],isActive:true,isFrozen:false,createdAt:'2026-10-01T00:00:00Z'},setUser:vi.fn()}))
+const state=vi.hoisted(()=>({user:{id:'admin-1',username:'training_manager',nickname:'测试管理员',role:'STUDENT',businessRole:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}],isActive:true,isFrozen:false,createdAt:'2026-10-01T00:00:00Z'},setUser:vi.fn()}))
 const api=vi.hoisted(()=>({get:vi.fn(),put:vi.fn(),post:vi.fn()}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>state}))
 vi.mock('../../api/client',()=>({default:api}))

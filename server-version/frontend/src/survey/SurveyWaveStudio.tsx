@@ -13,6 +13,8 @@ import type { FlowDraft } from './flow.client'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, createInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
+import {usePackageMemberships} from './package-memberships'
+import {planPackageSelection,packageFlowChangeAllowed,restorePackage,type PackageMembership} from './package-arrangement'
 import './survey-publish.css'
 
 // Load researcher authoring/preview code only when its existing control is opened.
@@ -113,6 +115,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   const [wavePage,setWavePage]=useState(1),[waveError,setWaveError]=useState('')
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
+  const packageFacts=usePackageMemberships(projectId,form.instrumentIds)
+  const [existingToolsOpen,setExistingToolsOpen]=useState(false)
+  const existingSelectableTools=tools.filter(t=>t.status==='DRAFT'&&(!onNavigateLibrary||editing?.instrumentIds.includes(t.id)||form.instrumentIds.includes(t.id))||t.kind==='SCALE'&&t.status==='PUBLISHED')
+  // Only unresolved candidates on the visible checkbox page need another read.
+  // Removed/unselected members must not become ordinary tools on re-selection.
+  const candidatePackages=usePackageMemberships(projectId,existingToolsOpen?existingSelectableTools.filter(t=>!form.instrumentIds.includes(t.id)).map(t=>t.id):[])
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   useEffect(()=>{onLeaveRiskChange?.({dirty:toolRisk.dirty||librarySelectionDirty,busy:toolRisk.busy||busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[onLeaveRiskChange,toolRisk,librarySelectionDirty,busy])
@@ -315,9 +323,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
     const wave=editing
     if(operation==='open'&&!productOrigins()){setError('当前地址不支持生成招募链接');return}
     if(['close','hard-stop'].includes(operation)&&
-      !window.confirm(operation==='hard-stop'
-        ?'确认紧急停止此波次？已经开始但尚未提交的作答也将禁止 FINAL。'
-        :'确认关闭本波次？新的被试将无法开始。'))return
+      !window.confirm('确认停止本波次的新参与？所有招募入口将关闭；已开始的作答仍可在原完成期限内提交。'))return
     void act(async()=>{
       const epoch=projectEpoch.current,selection=selectionEpoch.current
       if(operation==='open')setShareLink('')
@@ -399,12 +405,25 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
       setNotice('已读取受控 Flow 样本统计。若包含实验分组，小样本详情仍不可公开转发。')
     })
   }
-  const toggle=(id:string,checked:boolean)=>{
-    setForm(old=>({...old,
-      instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
-    }))
-  }
   const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
+  const arrangeSelection=(ids:string[],extra?:PackageMembership,extraTools:InstrumentDetails[]=[])=>{
+    if(packageFacts.loading||packageFacts.error){setError('整包身份尚未读取完成，请先重试读取；草稿未改变。');return false}
+    const memberships=extra?[...packageFacts.list.filter(p=>p.id!==extra.id),extra]:packageFacts.list
+    const plan=planPackageSelection(form.instrumentIds,ids,memberships,[...flowTools,...extraTools],form.flowDefinition)
+    if(plan.error){setError(plan.error);return false}
+    setForm(old=>({...old,instrumentIds:plan.ids,flowDefinition:plan.flow}))
+    setError('');setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null);return true
+  }
+  const checkboxPackages=[...new Map([...packageFacts.list,...candidatePackages.list].map(p=>[p.id,p])).values()]
+  const checkboxPending=packageFacts.loading||candidatePackages.loading||Boolean(packageFacts.error||candidatePackages.error)
+  const toggle=(id:string,checked:boolean)=>{
+    if(checkboxPending)return
+    const pack=checkboxPackages.find(p=>p.bindings.some(b=>b.draftId===id)),own=pack?.bindings.map(b=>b.draftId)??[id]
+    const next=checked?pack&&own.some(member=>form.instrumentIds.includes(member))?restorePackage(form.instrumentIds,pack)
+      :[...form.instrumentIds,...own.filter(member=>!form.instrumentIds.includes(member))]
+      :form.instrumentIds.filter(member=>!own.includes(member))
+    arrangeSelection(next,pack)
+  }
   const flowQuestions:FormQuestionInfo[]=Object.values(details)
     .filter(d=>d.kind==='FORM').flatMap(d=>{
       const form=d.definition as FormDraft
@@ -440,12 +459,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
   // The legacy embedded builder can still manage its existing draft selection.
   // The independent-library workspace offers only saved wave members or published
   // scales here; new authored content enters through completed library revisions.
-  const existingSelectableTools=tools.filter(t=>t.status==='DRAFT'&&(!onNavigateLibrary||editing?.instrumentIds.includes(t.id)||form.instrumentIds.includes(t.id))||t.kind==='SCALE'&&t.status==='PUBLISHED')
   const showOverview=wavesLoaded&&waves.length>0&&!editing&&!creatingWave
   const showDraft=wavesLoaded&&!showOverview&&(!editing||editing.status==='DRAFT'&&!editing.publicationId)
   const waveStatus=(wave:Wave)=>wave.hardStopAt?'已终止':wave.status==='OPEN'?'采集中':wave.status==='PAUSED'?'已暂停':wave.status==='CLOSED'?'已结束':wave.publicationId?'待开放':'编制中'
   const identityLabel=project?.collectionMode==='SINGLE_UNLINKED'?'单次独立匿名':project?.participantIdentityMode==='SELF_CODE'?'随机研究编码':project?.participantIdentityMode==='MEMORABLE_CODE'?'研究者编号＋私人后缀':'专属链接与二维码'
-  const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.hardStopAt?'已紧急终止':editing.status==='CLOSED'?'已结束招募':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
+  const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.status==='CLOSED'?'已停止新参与':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
   const nextStep=activePending?'请先核对原冻结请求，不要重复创建或重新选择版本。':busy?'正在等待本次操作结果；请勿据此重复提交或开始下一步。':!editing?'填写本轮内容并保存草稿，再检查研究定义。':editing.hardStopAt?'已停止本轮作答，请到研究数据查看既有记录。':editing.status==='CLOSED'?'不再招募；在途作答仍以服务端完成窗口为准。':editing.status==='PAUSED'?'需要继续招募时可恢复开放；在途作答遵循原完成窗口。':editing.status==='OPEN'?'核对招募链接后再分享；是否允许新参与仍受项目状态、时间窗口和配额约束。':editing.publicationId?'确认冻结内容后，可显式正式开放本轮。':'先保存内容，再检查知情同意与所有工具，通过后冻结研究定义。'
   return <section className="survey-studio-surface survey-publish-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <SurveySectionHeader compact section="publish" title="发布与采集" goal="安排每次问卷，查看采集进度与参与入口。" showNavigation={false} policyLabel="采集与版本说明">
@@ -518,16 +536,20 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         </section>}
 
         {showDraft&&<SurveyProjectTools projectId={projectId} projectStatus={project?.status||'DRAFT'} instrumentLibrary={sharedLibrary}
+          selectionIds={form.instrumentIds} memberships={packageFacts.list} membershipLoading={packageFacts.loading} membershipError={packageFacts.error} onRetryMembership={packageFacts.retry}
           selectedTools={form.instrumentIds.map(id=>flowTools.find(tool=>tool.id===id)).filter((tool):tool is typeof flowTools[number]=>!!tool)}
-          onReorder={ids=>{if(form.flowDefinition&&!window.confirm('调整内容会重置当前流程与实验组配额，继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}
+          onReorder={ids=>{arrangeSelection(ids)}}
           onLeaveRiskChange={toolRiskChanged} onNavigateLibrary={onNavigateLibrary||(()=>{window.location.assign('/workspace/tools')})}
-          onBeforeSelect={()=>{if(busy||activePending)return false;if(form.flowDefinition&&!window.confirm('添加工具会重置当前问卷的流程与实验组配额，请随后重新编排。继续？'))return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
-          onSelected={async ids=>{
+          onBeforeSelect={()=>{if(busy||activePending||packageFacts.loading||packageFacts.error)return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
+          onSelected={async(ids,options)=>{
             if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current){setNotice('工具已加入本研究；当前波次已切换，请在当前问卷中重新选择。');return}
-            setForm(old=>({...old,instrumentIds:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
-            setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)
+            const next=options?.wholePackage?[...form.instrumentIds.filter(id=>!ids.includes(id)),...ids]:[...form.instrumentIds,...ids.filter(id=>!form.instrumentIds.includes(id))]
+            const missing=form.flowDefinition?ids.filter(id=>!flowTools.some(t=>t.id===id)&&!options?.membership?.bindings.some(b=>b.draftId===id)):[]
+            const exact=await Promise.all(missing.map(id=>surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
+            if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current)return
+            if(!arrangeSelection(next,options?.membership,exact))throw new Error('工具已导入；当前问卷编排未改变，请核对整包身份或材料位置后重试选择。')
           }}/>}
-        {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy} onSelect={ids=>{if(form.flowDefinition&&!window.confirm('整包加入会重置当前流程，请随后重新编排。继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}/>}
+        {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy||packageFacts.loading||Boolean(packageFacts.error)} onSelect={(ids,p)=>{arrangeSelection(ids,p)}}/>}
         {showDraft&&<form className="survey-wave-form survey-task-card space-y-4" onSubmit={save}>
           <div className="survey-wave-draft-heading"><h3>{editing?'修改未发布波次':'创建波次草稿'}</h3>
           <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button></div>
@@ -550,10 +572,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
           </fieldset>
-          <details className="survey-library-help survey-existing-tools"><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
-            {existingSelectableTools.map(t=><label key={t.id} className="block text-sm my-2">
-              <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
-                onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
+          <details className="survey-library-help survey-existing-tools" onToggle={e=>setExistingToolsOpen(e.currentTarget.open)}><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
+            {checkboxPending&&<p role="status">正在核对复选工具的整包身份…</p>}
+            {candidatePackages.error&&<p role="alert">{candidatePackages.error}<button type="button" onClick={candidatePackages.retry}>重试复选工具整包身份</button></p>}
+            {existingSelectableTools.map(t=>{const pack=checkboxPackages.find(p=>p.bindings.some(b=>b.draftId===t.id));return <label key={t.id} className="block text-sm my-2">
+              <input type="checkbox" disabled={checkboxPending} checked={form.instrumentIds.includes(t.id)}
+                onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}{pack&&<small>（整包 {pack.title} #{pack.id.slice(0,8)}：整体选择或取消）</small>}</label>})}
             {!existingSelectableTools.length&&<p className="text-xs">从上方工具集添加问卷内容，或勾选已加入本研究的工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
@@ -565,8 +589,13 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           </fieldset></details>
 <details className="survey-workflow-disclosure" open={!!form.flowDefinition}><summary><span>实验与流程</span><span className="survey-workflow-summary">{form.flowDefinition?'已配置':'可选 · 默认按工具顺序作答'}</span></summary>
           <SurveyFlowStudio value={form.flowDefinition}
-            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition,
-              quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}))}
+            packages={packageFacts.list} membershipPending={packageFacts.loading||Boolean(packageFacts.error)}
+            onArrange={ids=>{arrangeSelection(ids)}}
+            onChange={flowDefinition=>{if(packageFacts.loading||packageFacts.error||!packageFlowChangeAllowed(form.flowDefinition,flowDefinition,packageFacts.list)){setError('整包流程约束未满足；原草稿保留，请先核对整包身份与批准顺序。');return}setForm(old=>{
+              const keys=flowDefinition?.blocks.filter(b=>b.kind==='INSTRUMENT').map(b=>b.instrumentKey)??[],ordered=keys.flatMap(key=>{const id=flowTools.find(t=>t.instrumentKey===key)?.id;return id?[id]:[]})
+              const complete=ordered.length===old.instrumentIds.length&&keys.length===ordered.length&&new Set(ordered).size===old.instrumentIds.length&&ordered.every(id=>old.instrumentIds.includes(id))
+              return {...old,flowDefinition,...(complete?{instrumentIds:ordered}:{}),quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}
+            })}}
             tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
             collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/></details>
           <details className="survey-workflow-disclosure" open={!!(form.quotaPolicy||form.checkpointPolicy||form.groupIpPolicy)}><summary><span>采集策略</span><span className="survey-workflow-summary">配额 · 临时保存 · 集体作答</span></summary><div className="survey-wave-policies">
@@ -651,17 +680,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               <button type="button" className="btn-primary" disabled={busy} onClick={()=>lifecycle('open')}>正式开放本轮</button>}
             {editing.status==='OPEN'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('pause')}>暂停新参与</button>}
             {editing.status==='PAUSED'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('resume')}>恢复开放</button>}
-            {editing.status==='CLOSED'&&!editing.hardStopAt&&editing.finishUntil
-              &&new Date(editing.finishUntil).getTime()>Date.now()&&
-              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
-                onClick={()=>lifecycle('hard-stop')}>紧急终止剩余在途作答</button>}
             {['OPEN','PAUSED'].includes(editing.status)&&<>
               <button type="button" className="btn-secondary" disabled={busy}
                 onClick={()=>entryToken('rotate')}>轮换招募链接</button>
               <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
                 onClick={()=>entryToken('revoke')}>撤销全部招募链接</button>
               <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('close')}>结束招募</button>
-              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
             </>}
           </div>
           {editing.publicationId&&<section className="survey-publish-frozen-summary" aria-label="本波次问卷概要">

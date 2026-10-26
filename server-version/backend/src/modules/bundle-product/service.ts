@@ -13,6 +13,7 @@ import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { freezeDataForWrite, freezeAssignmentProfile } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
+import { publishAssignmentMeasurementRelease } from '../cognitive/assignment-measurement-release'
 import { BundleDefinitionProvider, freezeBundleProductionDefinition, readFrozenBundleProductionDefinition } from './definition-provider'
 import { createCodeBundleDefinitionProvider } from './code-catalog'
 
@@ -174,7 +175,15 @@ export function createBundleProductService(provider: BundleDefinitionProvider) {
       const items = await tx.compositeAssessmentItem.findMany({ where: { compositeAssessmentId: id }, include: { cognitiveAssignment: { include: { config: true } } } })
       for (const item of items) {
         if (item.type === 'SCALE') await assertValidItem({ type: 'SCALE', required: true, scaleId: item.scaleId! }, actor.userId, actor.role, row, tx)
-        if (item.type === 'COGNITIVE' && (!item.cognitiveAssignment || !await canInstantiateConfig(actor.userId, actor.role, item.cognitiveAssignment.config))) throw compositeForbidden('认知配置授权已失效')
+        if (item.type === 'COGNITIVE') {
+          if (!item.cognitiveAssignment || !await canInstantiateConfig(actor.userId, actor.role, item.cognitiveAssignment.config)) throw compositeForbidden('认知配置授权已失效')
+          // Creation already froze this owned copy's scientific configuration.
+          // Explicit bundle publication supplies its missing measurement pointer
+          // on this same transaction; existing pointers remain validated by the
+          // normal composite publisher, without substituting a newer version.
+          if (!item.cognitiveAssignment.measurementReleaseId)
+            await publishAssignmentMeasurementRelease(tx, actor.userId, item.cognitiveAssignment.id)
+        }
       }
       await publishComposite(actor.userId, actor.role, id, tx)
       await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })

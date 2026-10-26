@@ -1,3 +1,4 @@
+import {approveToolEntryPolicies,exactToolEntryProducts} from '../assessment-governance/tool-entry-policy'
 import {ownGovernedMedia,retainGovernedMedia} from './governed-tool.media'
 import {randomUUID} from 'node:crypto'
 import {Prisma,type PrismaClient} from '@prisma/client'
@@ -7,7 +8,7 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import type {AdminSessionProof} from '../admin-permissions/proof'
 import {assertStandardSystem} from './standard-triplet.service'
 import {assertSurveyLibraryManager} from './admin-role'
-import {assertSurveyToolPolicy,readToolPolicy} from './tool-policy'
+import {assertSurveyToolPolicy,readToolPolicies} from './tool-policy'
 import {getContentRelease,publishContentRelease} from '../measurement-content/repository'
 import {reportTemplateSchema,type ReportTemplate} from '../measurement-content/report-template'
 import {getCatalogSourceSnapshot,listCatalogSources,type CatalogSourceRef} from './catalog.sources'
@@ -17,6 +18,7 @@ import {compileFrozenResearchUnit} from './publication.service'
 import {isAssessmentOperationallyPaused} from '../assessment-governance/operational-hold'
 import {artifactBlockers,artifactMetrics,artifactReference,clone,governedMeasurementInput,governedPolicyIdentity,governedSnapshot,packageFamily,packageReportSchema,snapshotUnit,type GovernedArtifact,type GovernedFamily,type GovernedParameter,type GovernedRow,type PackageReport} from './governed-tool.model'
 import {computeGovernedTrial} from './governed-tool.trial'
+import {governedSummaryColumns,summaryView,type GovernedSummaryRow} from './governed-tool.summary'
 type Db=PrismaClient|Prisma.TransactionClient
 export function governedFail(status:number,message:string):never{throw new AdminPermissionError(status,message)}
 export async function governedRow(db:Db,id:string,lock=false){
@@ -98,38 +100,54 @@ export async function submitGovernedPackage(actor:string,input:{requestId:string
  const a:GovernedArtifact={schemaVersion:1,family:input.family,toolKey:input.toolKey,version:input.version,title:input.title,unit:null,parameters:null,report:null,components,packageReport:input.report?packageReportSchema.parse(input.report):null,reference:artifactReference(input.family,input.toolKey,{annotations:clone(input.reference),components:components.map(c=>({slotKey:c.slotKey,source:c.source,reference:c.unit.provenance.toolReference??c.unit.provenance}))})}
  return insertSubmission(tx,actor,input.requestId,a)
 },{timeout:20000})}
-export async function governedSources(actor:string,kind:'SCALE'|'COGNITIVE'|'SJT'|'FORM',page:number){await assertStandardSystem(prisma,actor);const result=await listCatalogSources({actorUserId:actor,kind,page},prisma);return {...result,list:result.list.filter(r=>!r.ref.sourceId.startsWith('survey-tool:')&&!r.ref.sourceId.startsWith('survey-standard:'))}}
-export async function governedCatalog(actor:string,input:{family?:GovernedFamily;page:number},system=true){
+export async function governedSources(actor:string,kind:'SCALE'|'COGNITIVE'|'SJT'|'FORM',page:number,query=''){await assertStandardSystem(prisma,actor);return listCatalogSources({actorUserId:actor,kind,page,query,includeGoverned:false},prisma)}
+export async function governedCatalog(actor:string,input:{family?:GovernedFamily;page:number;query?:string},system=true){
  if(system)await assertStandardSystem(prisma,actor);else await prisma.$transaction(tx=>assertSurveyLibraryManager(tx,actor))
- const rows=await prisma.$queryRaw<GovernedRow[]>(Prisma.sql`SELECT * FROM survey_governed_tools WHERE (${input.family??null}::text IS NULL OR family=${input.family??null}) ${system?Prisma.empty:Prisma.sql`AND state IN ('ONLINE','WITHDRAWN')`} ORDER BY submitted_at DESC,id LIMIT 26 OFFSET ${(input.page-1)*25}`)
- const list=[]
- for(const r of rows.slice(0,25)){
-  const policy=await readToolPolicy(prisma,governedPolicyIdentity(r)),contentReasons=artifactBlockers(r.snapshot),approvalReasons=r.state==='ONLINE'?[]:[r.state==='TRIAL_FAILED'?'自动试运行未通过':r.state==='WITHDRAWN'?'已停止新增使用':'尚未通过系统批准及自动试运行',...r.blockers]
-  const assignmentReasons=[...approvalReasons,...(policy.decision==='APPROVED'?[]:['尚未批准 Survey 使用范围']),...(policy.paused?['Survey 新增使用已暂停：'+policy.reason]:[])]
-  list.push({...governedView(r),policy,states:{content:{ready:!contentReasons.length,reasons:contentReasons},assignment:{ready:!assignmentReasons.length,reasons:assignmentReasons},deployment:{ready:false,reasons:[...assignmentReasons,'投放时还需核对研究者的精确版本授权和冻结绑定']}}})
+ const query=input.query?.trim()??'',pattern='%'+query.replace(/[\\%_]/g,'\\$&')+'%'
+ const rows=await prisma.$queryRaw<GovernedSummaryRow[]>(Prisma.sql`SELECT ${governedSummaryColumns} FROM survey_governed_tools t WHERE (${input.family??null}::text IS NULL OR t.family=${input.family??null}) AND (${query}='' OR t.title ILIKE ${pattern} OR t.tool_key ILIKE ${pattern} OR t.snapshot_hash ILIKE ${pattern}) ${system?Prisma.empty:Prisma.sql`AND t.state IN ('ONLINE','WITHDRAWN')`} ORDER BY t.submitted_at DESC,t.id LIMIT 26 OFFSET ${(input.page-1)*25}`)
+ const selected=rows.slice(0,25),policies=await readToolPolicies(prisma,selected.map(governedPolicyIdentity)),list=[]
+ for(const r of selected){
+  const policy=policies.get('governed-release:'+r.id+':'+r.snapshot_hash)!,contentReasons=r.blockers,approvalReasons=r.state==='ONLINE'?[]:[r.state==='TRIAL_FAILED'?'自动试运行未通过':r.state==='WITHDRAWN'?'已停止新增使用':'尚未通过系统批准及自动试运行',...r.blockers]
+  const assignmentReasons=[...approvalReasons,...contentReasons,...(policy.decision==='APPROVED'?[]:['尚未批准 Survey 使用范围']),...(policy.paused?['Survey 新增使用已暂停：'+policy.reason]:[])]
+  list.push({...summaryView(r),policy,states:{content:{ready:!contentReasons.length,reasons:contentReasons},assignment:{ready:!assignmentReasons.length,reasons:assignmentReasons},deployment:{ready:false,reasons:[...assignmentReasons,'投放时还需核对研究者的精确版本授权和冻结绑定']}}})
  }
  return {list,page:input.page,hasMore:rows.length>25}
 }
 export async function governedDetail(actor:string,id:string){await assertStandardSystem(prisma,actor);const row=await governedRow(prisma,id);const trials=await prisma.$queryRaw<Array<{id:string;run_id:string;case_index:number;result_hash:string;created_at:Date;report:unknown}>>`SELECT id,run_id,case_index,result_hash,created_at,result->'report' AS report FROM survey_governed_trials WHERE tool_id=${id} ORDER BY created_at DESC LIMIT 60`;return {...governedView(row),snapshot:row.snapshot,reference:{...row.reference,applications:[...row.reference.applications,{submittedBy:row.submitted_by,submittedAt:row.submitted_at}],approvals:[...row.reference.approvals,...(row.approved_by?[{approvedBy:row.approved_by,approvedAt:row.approved_at,reason:row.approval_reason}]:[])]},trials}}
-export async function governedComponentOptions(actor:string){
+export async function governedComponentOptions(actor:string,page=1,query=''){
  await assertStandardSystem(prisma,actor)
- const rows=await prisma.$queryRaw<GovernedRow[]>`SELECT * FROM survey_governed_tools WHERE state='ONLINE' AND family NOT IN ('COMBINATION','BUNDLE') ORDER BY title,id LIMIT 200`
- const standard=await prisma.$queryRaw<Array<{id:string;combination_hash:string;snapshot:{title:string;parts:unknown}}>>`SELECT id,combination_hash,snapshot FROM survey_standard_releases WHERE state='ONLINE' ORDER BY tool_key,id LIMIT 200`
+ const pattern='%'+query.trim().replace(/[\\%_]/g,'\\$&')+'%'
+ const selected=await prisma.$queryRaw<Array<{type:'GOVERNED'|'STANDARD';id:string;hash:string}>>(Prisma.sql`SELECT type,id,hash FROM (
+  SELECT 0 AS rank,'GOVERNED' AS type,id,snapshot_hash AS hash,title AS sort_key FROM survey_governed_tools WHERE state='ONLINE' AND family NOT IN ('COMBINATION','BUNDLE') AND (${query}='' OR title ILIKE ${pattern} OR snapshot_hash ILIKE ${pattern})
+  UNION ALL SELECT 1 AS rank,'STANDARD' AS type,id,combination_hash AS hash,tool_key AS sort_key FROM survey_standard_releases WHERE state='ONLINE' AND (${query}='' OR snapshot->>'title' ILIKE ${pattern} OR tool_key ILIKE ${pattern} OR combination_hash ILIKE ${pattern})
+ ) options ORDER BY rank,sort_key,id LIMIT 26 OFFSET ${(page-1)*25}`)
  const list=[]
- for(const r of rows){const unit=governedSnapshot(r);list.push({source:{type:'GOVERNED',id:r.id,hash:r.snapshot_hash},title:r.title,kind:r.family,metrics:artifactMetrics(r.snapshot),fields:r.family==='FORM'?(unit.displayDefinition as import('./builder.definition').FormDraft).pages.flatMap(p=>p.questions.map(q=>({itemKey:q.itemKey,label:q.prompt}))):[]})}
- for(const r of standard){const unit=await readOnlineStandardSnapshot(prisma,'survey-standard:'+r.id,r.combination_hash),measurement=governedMeasurementInput(snapshotUnit(unit),{kind:'PLATFORM'},r.id,'1');list.push({source:{type:'STANDARD',id:r.id,hash:r.combination_hash},title:r.snapshot.title,kind:'SCALE',metrics:measurement.layer==='MEASUREMENT'?measurement.content.metrics:[],fields:[]})}
- return {list}
+ for(const s of selected.slice(0,25)){
+  if(s.type==='GOVERNED'){
+   const r=await governedRow(prisma,s.id),unit=r.snapshot.unit!
+   if(r.snapshot_hash!==s.hash||r.state!=='ONLINE')governedFail(409,'组件版本状态已变化，请刷新')
+   list.push({source:s,title:r.title,kind:r.family,versions:{content:unit.ref.sourceVersion,parameters:r.snapshot.parameters?.version??null,report:r.snapshot.report?.version??null},metrics:artifactMetrics(r.snapshot),fields:r.family==='FORM'?(unit.displayDefinition as import('./builder.definition').FormDraft).pages.flatMap(p=>p.questions.map(q=>({itemKey:q.itemKey,label:q.prompt}))):[]})
+  }else{
+   const unit=await readOnlineStandardSnapshot(prisma,'survey-standard:'+s.id,s.hash),measurement=governedMeasurementInput(snapshotUnit(unit),{kind:'PLATFORM'},s.id,'1')
+   const [axis]=await prisma.$queryRaw<Array<{content:string;parameters:string|null;report:string|null}>>`SELECT snapshot#>>'{parts,CONTENT,version}' AS content,CASE WHEN snapshot#>'{parts,PARAMETERS,payload}'='null'::jsonb THEN NULL ELSE snapshot#>>'{parts,PARAMETERS,version}' END AS parameters,CASE WHEN snapshot#>'{parts,REPORT,payload}'='null'::jsonb THEN NULL ELSE snapshot#>>'{parts,REPORT,version}' END AS report FROM survey_standard_releases WHERE id=${s.id} AND combination_hash=${s.hash}`
+   list.push({source:s,title:unit.title,kind:'SCALE',versions:axis,metrics:measurement.layer==='MEASUREMENT'?measurement.content.metrics:[],fields:[]})
+  }
+ }
+ return {list,page,hasMore:selected.length>25}
 }
-export async function approveGovernedTool(actor:string,id:string,input:{expectedVersion:number;hash:string;reason:string;decision:'APPROVE'|'RETURN'},proof:AdminSessionProof){
+export async function approveGovernedTool(actor:string,id:string,input:{expectedVersion:number;hash:string;reason:string;decision:'APPROVE'|'RETURN';allowedProducts?:unknown},proof:AdminSessionProof){
  const row=await prisma.$transaction(async tx=>{
   await assertStandardSystem(tx,actor,proof);const r=await governedRow(tx,id,true)
   if(r.version!==input.expectedVersion||r.snapshot_hash!==input.hash||r.state!=='SUBMITTED')governedFail(409,'审批内容或状态已变化，请刷新')
   if(input.decision==='APPROVE'){
+   const products=exactToolEntryProducts(input.allowedProducts)
+   if(products.some(product=>product!=='SURVEY'))governedFail(409,'此治理版本当前仅有 Survey 执行适配，不能将全局上线视为 Training 准入')
    const blockers=artifactBlockers(r.snapshot);if(blockers.length)governedFail(409,blockers.join('；'))
    await assertGovernedDependencies(tx,r.snapshot)
+   await approveToolEntryPolicies(tx,governedPolicyIdentity(r),products,actor,input.reason)
   }
   await tx.$executeRaw`UPDATE survey_governed_tools SET state=${input.decision==='APPROVE'?'APPROVED':'RETURNED'},version=version+1,approved_by=${input.decision==='APPROVE'?actor:null},approved_at=${input.decision==='APPROVE'?new Date():null},approval_reason=${input.decision==='APPROVE'?input.reason:null},reason=${input.reason} WHERE id=${id}`
-  await audit(tx,actor,'GOVERNED_TOOL_'+input.decision,{id,hash:r.snapshot_hash,reason:input.reason,researcherGrantsCreated:0})
+  await audit(tx,actor,'GOVERNED_TOOL_'+input.decision,{id,hash:r.snapshot_hash,reason:input.reason,allowedProducts:input.allowedProducts??[],researcherGrantsCreated:0})
   return governedRow(tx,id)
  },{timeout:20000})
  return row.state==='APPROVED'?runGovernedTrial(actor,id,row.version,proof):governedView(row)
@@ -186,7 +204,6 @@ export type OriginalSjtSubmission={requestId:string;toolKey:string;version:strin
 /** New authored material only. Never rewrites registry examples or their source rights. */
 export function originalSjtArtifact(actor:string,input:OriginalSjtSubmission):GovernedArtifact{
  const definition=input.definition as {licenseStatus?:string;redistribution?:string;author?:string;sourceNote?:string}
- if(definition.licenseStatus!=='self_authored'||definition.redistribution!=='allowed')governedFail(409,'原创入口仅接收明确声明原创且允许 Survey 展示的新内容；不得重新标注受限示例')
  const compiled=compileFrozenResearchUnit({id:input.requestId,instrumentKey:input.toolKey,kind:'SJT',title:input.title,revision:1,definition})
  const unit={ref:{kind:'SJT' as const,sourceId:'original-sjt:'+input.toolKey,sourceVersion:input.version},title:input.title,displayDefinition:compiled.displayDefinition,compiledDefinition:compiled.compiledDefinition,definitionDigest:compiled.sourceDigest,scoringDigest:compiled.scoringDigest,adapterVersion:'survey-catalog-v1' as const,provenance:{instrumentKey:input.toolKey,originalAuthor:definition.author,originalSourceNote:definition.sourceNote,submittedBy:actor,licenseStatus:definition.licenseStatus,redistribution:definition.redistribution}}
  return {schemaVersion:1,family:'SJT',toolKey:'SJT:original:'+input.toolKey,version:input.version,title:input.title,unit,parameters:null,report:input.report,components:[],packageReport:null,reference:artifactReference('SJT',input.toolKey,{annotations:clone(input.reference),author:definition.author,sourceNote:definition.sourceNote,licenseStatus:definition.licenseStatus,redistribution:definition.redistribution,submissionStatement:input.statement,originalContent:true})}

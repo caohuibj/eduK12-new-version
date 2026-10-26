@@ -107,7 +107,10 @@ describe('online SJT authoring shared-core contract',()=>{
       expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(d))).not.toThrow()
     }
   })
-  it('allows empty-golden and unknown-license drafts but never releases them',()=>{
+  it('retains the golden gate while unknown copyright metadata does not block a qualified release',()=>{
+    const qualified=fixture();qualified.display.licenseStatus='unknown';qualified.display.redistribution='unknown'
+    expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(qualified))).not.toThrow()
+    expect(qualified.display.licenseStatus).toBe('unknown')
     const d=fixture();d.goldenCases=[]
     expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(d))).toThrow(SjtTemplateError)
     d.display.licenseStatus='unknown'

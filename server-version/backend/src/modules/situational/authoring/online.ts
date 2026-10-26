@@ -191,8 +191,6 @@ export function assertSjtOnlineReleaseReady(compiled:ReturnType<typeof compileSj
   const checked=compileSjtOnlineDocument(compiled.template)
   if(checked.contentDigest!==compiled.contentDigest||canonicalHash(checked.package)!==canonicalHash(compiled.package))
     fail('contentDigest','在线编制快照已变化','INTEGRITY')
-  if(checked.template.display.licenseStatus==='unknown'||checked.template.display.redistribution==='unknown')
-    fail('display.licenseStatus','发布前需明确内容来源与使用授权','SOURCE')
   const covered=new Set<string>()
   for(const c of checked.template.goldenCases){
     const n=normalizeSjtOnlineResponses(checked.template.display,checked.package.definition,c.responses)

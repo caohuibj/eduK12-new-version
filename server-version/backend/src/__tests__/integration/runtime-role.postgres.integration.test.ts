@@ -90,6 +90,56 @@ suite('actual restricted runtime role and exact release identity', () => {
     expect(actual.map(row=>row.name).sort()).toEqual(Object.keys(runtimeTablePolicy.tables).sort())
     expect(Object.values(runtimeTablePolicy.tables).filter(value=>value==='OPERATOR_ONLY')).toHaveLength(2)
   })
+  it('reconciles the full migrated schema with a restricted runtime and rejects the old missing-table policy',async()=>{
+    const source=readFileSync(new URL('../../../scripts/runtime-role-defaults.sql',import.meta.url),'utf8')
+    const client=new Client({connectionString:selected}),runtimeUrl=new URL(selected!)
+    runtimeUrl.username=role;runtimeUrl.password=password
+    const full=new PrismaClient({datasources:{db:{url:runtimeUrl.href}}})
+    const unknown='unclassified_runtime_probe_'+suffix
+    let unknownCreated=false
+    const literal=(v:string)=>"'"+v.replaceAll("'","''")+"'"
+    await client.connect()
+    try{
+      const {rows:[identity]}=await client.query('SELECT current_user AS owner,current_database() AS database')
+      const sql=(policy:typeof runtimeTablePolicy)=>source.replaceAll(":'target_database'",literal(identity.database))
+        .replaceAll(":'migration_owner'",literal(identity.owner)).replaceAll(":'runtime_role'",literal(role))
+        .replaceAll(":'table_policy'",literal(JSON.stringify(policy)))
+      await client.query(`GRANT USAGE ON SCHEMA public TO "${role}"`)
+      const old=structuredClone(runtimeTablePolicy)
+      delete old.tables.anonymous_study_codes;delete old.tables.anonymous_study_participation_events
+      await expect(client.query(sql(old))).rejects.toMatchObject({code:'P0001',message:'UNCLASSIFIED_RUNTIME_TABLE'})
+      await client.query('ROLLBACK')
+      await client.query(sql(runtimeTablePolicy))
+      expect(await verifyRuntimePrivileges(full)).toMatchObject({runtimeTables:Object.keys(runtimeTablePolicy.tables).length,restrictedRuntimeRole:true})
+      // This reads the actual complete migration ledger, not the synthetic one above.
+      expect((await verifyReleaseSchema(full)).migrationCount).toBeGreaterThanOrEqual(229)
+      const user=await full.user.create({data:{username:'runtime-participation-'+suffix,passwordHash:'synthetic-only',accountDomain:'TRAINING'}})
+      const study=randomUUID(),code=randomUUID(),participant=randomUUID(),event=randomUUID()
+      await full.$executeRaw`INSERT INTO anonymous_studies(id,owner_user_id,title,participation_mode) VALUES(${study},${user.id},'Synthetic restricted runtime','SELF_CODE')`
+      await full.$executeRaw`INSERT INTO anonymous_study_codes(id,study_id,prefix) VALUES(${code},${study},'001')`
+      await full.$executeRaw`UPDATE anonymous_study_codes SET credential_version=1 WHERE id=${code}`
+      expect(await full.$queryRaw`SELECT credential_version FROM anonymous_study_codes WHERE id=${code}`).toEqual([{credential_version:1}])
+      await full.$executeRaw`INSERT INTO anonymous_study_participants(id,study_id,credential_hash,display_code) VALUES(${participant},${study},${'a'.repeat(64)},'synthetic-runtime-participant')`
+      await full.$executeRaw`UPDATE anonymous_study_codes SET participant_id=${participant} WHERE id=${code}`
+      await full.$executeRaw`INSERT INTO anonymous_study_participation_events(id,study_id,participant_id,actor_user_id,action) VALUES(${event},${study},${participant},${user.id},'CONFIGURED')`
+      await expect(full.$executeRaw`UPDATE anonymous_study_codes SET prefix='002' WHERE id=${code}`).rejects.toThrow('immutable')
+      await expect(full.$executeRaw`DELETE FROM anonymous_study_codes WHERE id=${code}`).rejects.toThrow('retained')
+      await expect(full.$executeRaw`UPDATE anonymous_study_participation_events SET action='RESET_ISSUED' WHERE id=${event}`).rejects.toThrow('immutable')
+      await expect(full.$executeRaw`DELETE FROM anonymous_study_participation_events WHERE id=${event}`).rejects.toThrow('immutable')
+      await client.query(`CREATE TABLE "${unknown}" (id text)`);unknownCreated=true
+      await expect(client.query(sql(runtimeTablePolicy))).rejects.toMatchObject({code:'P0001',message:'UNCLASSIFIED_RUNTIME_TABLE'})
+      await client.query('ROLLBACK')
+      await expect(full.$queryRawUnsafe(`SELECT * FROM "${unknown}"`)).rejects.toThrow('permission denied')
+      await expect(full.$executeRawUnsafe(`INSERT INTO "${unknown}" VALUES ('synthetic')`)).rejects.toThrow('permission denied')
+    }finally{
+      await client.query('ROLLBACK')
+      if(unknownCreated)await client.query(`DROP TABLE "${unknown}"`)
+      await full.$disconnect()
+      // Only this test's temporary principal; no runtime/account in any other environment.
+      await client.query(`DROP OWNED BY "${role}"`)
+      await client.end()
+    }
+  },60000)
   it('rejects owner credentials and an elevated runtime principal', async () => {
     await expect(verifyRuntimePrivileges(owner)).rejects.toThrow('RUNTIME_ROLE_NOT_RESTRICTED')
     await admin.$executeRawUnsafe(`ALTER ROLE "${role}" CREATEDB`)

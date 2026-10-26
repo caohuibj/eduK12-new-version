@@ -30,6 +30,17 @@ function setup(native=false) {
 }
 beforeEach(() => vi.clearAllMocks())
 describe('catalog SJT media authority is release-bound, not asset-ID borrowing', () => {
+  it('matches the pinned grant added by current compilation without borrowing an identical replacement',async()=>{
+    const {db,unit,snapshot}=setup(true)
+    unit.sourceProvenance!.sourceGrantId='grant'
+    db.$queryRaw.mockResolvedValue([{id:'replacement',snapshot},{id:'grant',snapshot}])
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).resolves.toEqual([identity])
+    expect(h.snapshots).toHaveBeenCalledWith(db,'researcher',['grant'])
+    h.snapshots.mockClear()
+    db.$queryRaw.mockResolvedValue([{id:'replacement',snapshot}])
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+    expect(h.snapshots).not.toHaveBeenCalled()
+  })
   it('uses the same exact grant and release-pin policy for native upload images, not just their asset IDs',async()=>{
     const {db,unit,asset}=setup(true)
     expect(await assertSurveyMediaOwned(db as never,'researcher','project',[unit])).toEqual([identity])

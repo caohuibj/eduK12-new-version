@@ -161,7 +161,7 @@ describe('Wave 1 P1 scale-library integration', () => {
       authorizations: [approvedAuthorization('gse_zh_cn', '1.0.0')],
     })
     const gse = model.entries.find((entry) => entry.identity.instrumentKey === 'gse_zh_cn')!
-    expect(gse.rights.status).toBe('EVIDENCE_PENDING')
+    expect(gse.rights.status).toBe('NOT_EVALUATED')
     expect(gse.availability.status).toBe('NOT_AVAILABLE')
     expect(gse.availability.launch).toBeUndefined()
     expect(gse.availability.reasons.join(' ')).toContain('EXECUTABLE_NOT_REGISTERED')

@@ -42,14 +42,15 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
     await middleware(request(),response(),next);expect(standard).toHaveBeenCalledTimes(1);expect(next).toHaveBeenCalledTimes(1)
     expect(JSON.stringify(lookup.mock.calls)).not.toContain(credential)
   })
-  it('performs narrow frozen publication, live owner/window and credential query',async()=>{
+  it('checks frozen policy/window and participant proof without reapproving the publisher',async()=>{
     vi.mocked(prisma.$queryRaw).mockResolvedValue([{id:waveId}])
     expect(await lookupSurveyGroupRateScope(surveyGroupRateScope(request())!)).toBe(true)
     const call=vi.mocked(prisma.$queryRaw).mock.calls[0],sql=call[0] as unknown as string[]
     const text=sql.join('?')
     expect(text).toContain('SELECT w.id');expect(text).toContain("w.group_ip_policy IS NOT NULL");expect(text).not.toContain("compiled_snapshot")
     expect(text).toContain("interval '48 hours'");expect(text).toContain('w.finish_until>statement_timestamp()')
-    expect(text).toContain("g.status='ACTIVE'");expect(text).not.toContain('SELECT pub.compiled_snapshot')
+    expect(text).not.toContain('survey_researcher_grants');expect(text).not.toContain('survey_mfa_credentials')
+    expect(text).not.toContain('SELECT pub.compiled_snapshot')
     expect(prisma.$queryRaw).toHaveBeenCalledTimes(1)
   })
   it('holds timed-out live SQL slots and expires queued work before execution',async()=>{

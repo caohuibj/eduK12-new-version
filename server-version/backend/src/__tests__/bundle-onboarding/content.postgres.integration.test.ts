@@ -1,3 +1,4 @@
+import {publishTrainingSourcesFixture,publishStaticMeasurementFixture} from '../fixtures/published-measurement'
 import { beforeAll, afterAll, describe, it, expect, vi } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
 import crypto, { createHmac, randomUUID, randomBytes } from 'node:crypto'
@@ -68,7 +69,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
     for (const [id, role] of [[actor.userId, 'ADMIN'], [reviewer, 'ADMIN'], [student, 'STUDENT']] as const) {
       await db.user.create({ data: { id, username: id, passwordHash: 'synthetic-only', role } })
     }
-    courseId = (await db.course.create({ data: { creatorId: actor.userId, title: 'C4 synthetic content smoke', courseCode: 'C4-' + suffix, status: 'PUBLISHED' } })).id
+    courseId = (await db.course.create({ data: { creatorId: actor.userId, title: 'C4 synthetic content smoke', courseCode: 'C4-' + suffix, courseType:'TRAINING_COURSE', status: 'PUBLISHED' } })).id
     await db.courseStudent.create({ data: { courseId, studentId: student, status: 'ACTIVE' } })
   }, 60000)
   afterAll(async () => {
@@ -88,6 +89,7 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
       await db.scale.deleteMany({ where: { creatorId: actor.userId } })
       await db.course.deleteMany({ where: { creatorId: actor.userId } })
       await db.bundlePackageRelease.deleteMany({ where: { installedBy: actor.userId } })
+      await db.$executeRaw`DELETE FROM survey_tool_policies WHERE reviewed_by IN (${actor.userId},${reviewer},${student})`
       await db.user.deleteMany({ where: { id: { in: [actor.userId, reviewer, student] } } })
       await db.$disconnect()
     }
@@ -119,6 +121,9 @@ suite('actual content packages: install, FINAL, canonical report and audiences',
         const frozen = freezeAssignmentProfile({ entry, profile: dep.profile, baseConfig: cfg.config as any })
         binding.resourceId = (await db.cognitiveAssignment.create({ data: { configId: cfg.id, courseId, createdBy: actor.userId, title: slot.slotKey, status: 'PUBLISHED', listedStandalone: true, ...freezeDataForWrite(frozen) } })).id
       }
+      if(slot.unitType==='SCALE')await publishTrainingSourcesFixture(db,actor.userId,{scaleIds:[binding.resourceId!]})
+      else if(slot.unitType==='COGNITIVE')await publishTrainingSourcesFixture(db,actor.userId,{assignmentIds:[binding.resourceId!]})
+      else if(slot.unitType==='SITUATIONAL')await publishStaticMeasurementFixture(db,{instrumentKey:slot.instrumentKey,instrumentVersion:slot.instrumentVersion})
       bindings.push(binding)
     }
     const material = { contentHash: hashDeclarativePackage(pack), reviewerId: reviewer, expiresAt: new Date(Date.now() + 3600000).toISOString(), claims: ['independent_summary', 'cross_source_condition', 'joint_conclusion'], scientific: true, rights: true, language: true, report: true }

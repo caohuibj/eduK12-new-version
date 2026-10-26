@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { beforeEach, expect, it, vi } from 'vitest'
 const m = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: m, sessionFetch: vi.fn() }))
@@ -11,9 +11,17 @@ vi.mock('../../components/MediaSelector', () => ({ default: () => null }))
 vi.mock('../../components/CheckinTokenManager', () => ({ default: () => null }))
 import AssignmentList from '../AssignmentList'
 import CheckinList from '../CheckinList'
+import type {Course} from '../../types'
 
 const sourceCourse = { id: 'source', title: '以往课程', creatorId: 'trainer' }
 const targetCourse = { id: 'target', title: '当前课程', creatorId: 'trainer' }
+function ReuseRoute(){const location=useLocation();return <output data-testid="reuse-route">{location.pathname}{location.search}</output>}
+function mount(kind:string,Page:typeof AssignmentList|typeof CheckinList){
+  render(<MemoryRouter initialEntries={[`/${kind}?reuse=true&courseId=target`]}><ReuseRoute/><Routes>
+    <Route path={'/'+kind} element={<Page/>}/>
+    <Route path="/courses/:id/detail" element={<Page embeddedCourse={targetCourse as Course}/>}/>
+  </Routes></MemoryRouter>)
+}
 const source = {
   id: 'old-task', title: '旧任务内容', courseId: 'source', course: sourceCourse,
   description: '课程任务介绍', content: '<p>教学正文</p>', tags: ['教学'],
@@ -36,8 +44,9 @@ it.each([
     if (path.endsWith('/tags')) return { code: 0, data: { tags: [] } }
     return { code: 0, data: { list: path.includes('courseId=target') ? [] : [source], total: 1 } }
   })
-  render(<MemoryRouter initialEntries={[`/${kind}?reuse=true&courseId=target`]}><Page /></MemoryRouter>)
+  mount(kind,Page)
   await screen.findByRole('dialog', { name: '复用' + label })
+  expect(screen.getByTestId('reuse-route')).toHaveTextContent('/courses/target/detail?section='+kind)
   fireEvent.click(await screen.findByRole('button', { name: '使用此内容' }))
   const title = await screen.findByLabelText(label + '标题 *')
   expect(title).toHaveValue(source.title)
@@ -61,7 +70,7 @@ it.each([['assignments', AssignmentList], ['checkins', CheckinList]] as const)('
   m.get.mockImplementation(async (path: string) => path === '/courses' ? { code: 0, data: { list: [targetCourse] } }
     : path === `/${kind}/old-task?courseId=source` ? { code: 0, data: { ...source, course: { ...sourceCourse, creatorId: 'other' } } }
       : { code: 0, data: { list: path.includes('courseId=target') ? [] : [source], total: 1, tags: [] } })
-  render(<MemoryRouter initialEntries={[`/${kind}?reuse=true&courseId=target`]}><Page /></MemoryRouter>)
+  mount(kind,Page)
   fireEvent.click(await screen.findByRole('button', { name: '使用此内容' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('无法复用此任务')
   expect(screen.queryByLabelText('选择课程 *')).toBeNull()

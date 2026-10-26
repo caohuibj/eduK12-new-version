@@ -120,9 +120,12 @@ describe('exact independent SJT Survey entry authority', () => {
   })
   it.each([
     { licenseStatus: 'unknown' }, { redistribution: 'restricted' }, { redistribution: 'unknown' },
-  ])('rejects internally consistent original sources with unavailable redistribution rights %j', async defect => {
+  ])('retains unknown/restricted license metadata without replacing exact entry authority %j', async defect => {
     replaceOriginalDocument({ ...onlineExample, display: { ...onlineExample.display, ...defect } })
-    await expect(readSjtEntryDistributionSource(tx, measurementId)).rejects.toMatchObject({ code: 'SOURCE_SJT_ENTRY_SOURCE_INVALID' })
+    await expect(readSjtEntryDistributionSource(tx, measurementId)).resolves.toBeTruthy()
+    await expect(assertSjtEntryDistributionAuthority(tx, input())).resolves.toBeTruthy()
+    candidates=[]
+    await expect(assertSjtEntryDistributionAuthority(tx, input())).rejects.toMatchObject({statusCode:403})
   })
   it.each(['unknown', undefined])('rejects unknown or missing author policy %s', async policy => {
     source.authorizationPolicy = policy

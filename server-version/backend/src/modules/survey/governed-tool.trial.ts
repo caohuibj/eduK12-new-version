@@ -10,6 +10,8 @@ import {surveySjtQuestions} from './sjt-structure'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import type {FormDraft,AnySjtDraft} from './builder.definition'
 import {snapshotUnit,type GovernedArtifact} from './governed-tool.model'
+import {SURVEY_NATIVE_SJT_PROTOCOL} from './situational-native.contract'
+import {computeGovernedNativeTrial} from './governed-tool.native-trial'
 import {resultMetrics,renderGovernedUnitReport,renderPackageReport} from './governed-tool.reports'
 import type {ResearchFrozenPublication,ResearchFrozenUnit} from './publication.service'
 export function syntheticFormAnswers(form:FormDraft,index:number){
@@ -39,6 +41,7 @@ export function syntheticCognitiveTrials(seed:string,index=1){return gonogoSeque
 export function syntheticUnitAnswers(unit:ResearchFrozenUnit,index:number):Record<string,unknown>{
  if(unit.kind==='FORM')return syntheticFormAnswers(unit.displayDefinition as FormDraft,index)
  if(unit.kind==='COGNITIVE')return {}
+ if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)return {}
  if(unit.kind==='SCALE'){
   const display=readSurveyScalePresentation(unit.displayDefinition)
   return Object.fromEntries(display.items.map(item=>{const options=scalePresentationOptions(display,item);return [item.itemKey,options[Math.floor((options.length-1)*index/2)].optionKey]}))
@@ -47,9 +50,11 @@ export function syntheticUnitAnswers(unit:ResearchFrozenUnit,index:number):Recor
 }
 export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:number){
  const entries=a.unit?[{slotKey:'tool',unit:a.unit}]:a.components
- const units=entries.map((c,i)=>snapshotUnit(c.unit,toolId+'-'+i,c.slotKey)),answers:Record<string,unknown>={},timings:Record<string,unknown>={},cognitive=new Map<string,FrozenUnitResult>(),rawCognitive:Record<string,unknown>={}
+ const frozenAt=new Date().toISOString()
+ const units=entries.map((c,i)=>{const unit=snapshotUnit(c.unit,toolId+'-'+i,c.slotKey);return unit.nativeSituational?{...unit,nativeSituational:{...unit.nativeSituational,attemptEpoch:1 as const,frozenAt}}:unit}),answers:Record<string,unknown>={},timings:Record<string,unknown>={},cognitive=new Map<string,FrozenUnitResult>(),rawCognitive:Record<string,unknown>={},native=new Map<string,FrozenUnitResult>(),rawNative:Record<string,unknown>={}
  for(const unit of units){
   answers[unit.instrumentKey]=syntheticUnitAnswers(unit,index)
+  if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){const trial=computeGovernedNativeTrial(unit,index);native.set(unit.instrumentKey,trial.unitResult);rawNative[unit.instrumentKey]=trial.evidence}
   if(unit.kind==='SCALE'&&(unit.displayDefinition as {presentationMode?:string}).presentationMode==='ONE_BY_ONE')timings[unit.instrumentKey]=Object.fromEntries(readSurveyScalePresentation(unit.displayDefinition).items.map(i=>[i.itemKey,{schemaVersion:1,firstResponseMs:1000,activeTimeMs:1500,changeCount:0,visits:1,revisitCount:0,interrupted:false,recoveredWithoutClock:false}]))
   if(unit.kind==='COGNITIVE'){
    const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),seed='survey-governance-synthetic:'+toolId+':'+index,trials=syntheticCognitiveTrials(seed,index)
@@ -61,10 +66,10 @@ export function computeGovernedTrial(a:GovernedArtifact,toolId:string,index:numb
  }
  const publication:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'isolated-trial',waveId:'isolated-trial',collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,consentDigest:canonicalHash('synthetic'),units,runtimeStatus:'SURVEY_FINAL_V1'}
  // The same controlled child scorer and parent FINAL closure, without creating a human Attempt.
- const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive)
+ const calculated=verifySurveyFinalPublication(publication,canonicalHash(publication))!.compute(answers,null,undefined,'FINAL',Object.keys(timings).length?timings:undefined,cognitive,native)
  for(const unit of calculated.units)if(unit.kind!=='FORM'&&!resultMetrics(unit).some(m=>m.value!==null))throw new Error('试运行没有生成有效评分指标：'+unit.instrumentKey)
  const report=a.unit?renderGovernedUnitReport(a,calculated.units[0]):a.packageReport?renderPackageReport(a.packageReport,a.components,calculated,Object.fromEntries(entries.map(c=>[c.slotKey,c.slotKey]))):null
  if((a.report||a.packageReport)&&!report)throw new Error('已配置报告但试运行没有生成报告')
- const result={synthetic:true,caseIndex:index,answers,rawCognitive,calculated,report}
+ const result={synthetic:true,caseIndex:index,answers,rawCognitive,rawNative,calculated,report}
  return {result,hash:canonicalHash(result)}
 }

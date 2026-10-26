@@ -66,7 +66,7 @@ async function approvedEntry(administrations:EducationAdministration[],withRepor
  }
  const application=await submit(owner.id,'SURVEY',{requestId:randomUUID(),releaseId:release.releaseId,metadata,dependencyReleaseIds:dependencies,
   educationApplicability:{schemaVersion:1,administrations}})
- const result=await review(admin.id,application.id,{expectedVersion:1,decision:'APPROVE',reason:'Isolated synthetic HTTP approval'})
+ const result=await review(admin.id,application.id,{expectedVersion:1,decision:'APPROVE',allowedProducts:['TRAINING','SURVEY'],reason:'Isolated synthetic HTTP approval'})
  const [frozen]=await db.$queryRaw<Array<{snapshot_hash:string}>>`SELECT snapshot_hash FROM scale_library_submissions WHERE id=${application.id}`
  return {entryId:result.entryId!,releaseId:release.releaseId,contentHash:release.contentHash,submissionId:application.id,snapshotHash:frozen.snapshot_hash}
 }

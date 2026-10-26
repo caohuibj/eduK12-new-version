@@ -9,7 +9,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {assertSurveyManager} from './admin-role'
 import {SurveyGovernanceError} from './governance.service'
-import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,recheckCatalogSjtSourceAuthority,recheckCatalogScaleSourceExpiry,type CatalogSourceRef} from './catalog.sources'
+import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,recheckCatalogSjtSourceAuthority,type CatalogSourceRef} from './catalog.sources'
 import type {ResearchFrozenUnit} from './publication.service'
 
 type Tx=Prisma.TransactionClient
@@ -53,7 +53,8 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
       if(source?.instrument_class==='CUSTOM_DESCRIPTIVE')fail(403,'自编量表新分配必须通过已批准的共用库精确版本；旧授权不能扩大')
     }
     const snapshot=await getCatalogSourceSnapshot({actorUserId,ref},tx)
-    await assertSurveyToolPolicy(tx,await snapshotPolicyIdentity(tx,snapshot),ref.kind==='SCALE'&&!snapshot.provenance.surveyStandardReleaseId)
+    // Intake approval includes entry scope; ONLINE alone is not entry admission.
+    if(!isGovernedSource(ref.sourceId))await assertSurveyToolPolicy(tx,await snapshotPolicyIdentity(tx,snapshot),true)
     const snapshotDigest=canonicalHash(snapshot)
     const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants
       (id,user_id,status,snapshot,snapshot_digest,created_by)
@@ -62,7 +63,6 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
       RETURNING id,user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"`
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,
       action:'CATALOG_TOOL_GRANTED',metadata:{grantId:rows[0].id,source:ref,snapshotDigest}}})
-    await recheckCatalogScaleSourceExpiry(tx,[snapshot])
     await recheckCatalogSjtSourceAuthority(tx,[snapshot])
     return view(rows[0])
   })
@@ -83,7 +83,7 @@ export async function revokeToolGrant(actorUserId:string,id:string){
       WHERE id=${id} AND status='ACTIVE' RETURNING user_id AS "userId"`
     if(!rows.length)fail(404,'授权不存在或已撤销')
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:rows[0].userId,
-      action:'CATALOG_TOOL_REVOKED',metadata:{grantId:id,policy:'FUTURE_IMPORT_AND_PUBLICATION_ONLY'}}})
+      action:'CATALOG_TOOL_REVOKED',metadata:{grantId:id,policy:'STOP_NEW_ADMISSION_AND_COLLECTION_KEEP_SAVED_DATA'}}})
     return {revoked:true}
   })
 }
@@ -128,7 +128,7 @@ export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:st
     compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,
     ...(snapshot.nativeSituational?{executionProtocol:snapshot.nativeSituational.protocol,
       nativeSituational:snapshot.nativeSituational}:{}),
-    sourceProvenance:{...snapshot.provenance,...(snapshot.provenance.surveyToolReleaseId&&draft.catalogGrantId?{sourceGrantId:draft.catalogGrantId}:{}),originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
+    sourceProvenance:{...snapshot.provenance,...(draft.catalogGrantId?{sourceGrantId:draft.catalogGrantId}:{}),originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
       adapterVersion:snapshot.adapterVersion},...(snapshot.answerMapping?{sourceAnswerMapping:snapshot.answerMapping}:{})}
 }
 export async function researcherCatalog(tx:Tx,userId:string,page:number){

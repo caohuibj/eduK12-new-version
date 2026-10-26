@@ -1,29 +1,18 @@
-import {lockInstrumentSourceIdentity,lockAuthorizationSource} from './source-identity-lock'
 /**
  * Durable Prisma AuthorizationRepository.
  * Maps domain authorizationId ↔ DB authorizationKey; version-row id is separate.
- * Transactional create/approve/amend/revoke + append-only audit.
+ * Legacy read-only decoder. All mutations fail before database access.
  * No physical delete of auth/audit rows.
  */
-import { randomUUID } from 'node:crypto'
-import type { Prisma, PrismaClient } from '@prisma/client'
+import type { PrismaClient } from '@prisma/client'
 import { authorizationFail } from './errors'
-import {
-  amendApprovedInstrumentAuthorization,
-  approveInstrumentAuthorization,
-  attachAuthorizationEvidence,
-  createInstrumentAuthorizationDraft,
-  hashInstrumentAuthorizationRecord,
-  revokeAuthorizationLineage,
-  revokeInstrumentAuthorization,
-} from './records'
+import type { amendApprovedInstrumentAuthorization } from './records'
 import { parseInstrumentAuthorizationRecord } from './records-schema'
 import type {
   InstrumentAuthorizationAuditEventV1,
   InstrumentAuthorizationRecordV1,
 } from './types'
 
-type Db = PrismaClient | Prisma.TransactionClient
 
 const toIso = (value: Date): string => value.toISOString()
 
@@ -85,58 +74,6 @@ const rowToDomain = (row: {
   updatedAt: toIso(row.updatedAt),
 })
 
-const domainToCreateData = (
-  record: InstrumentAuthorizationRecordV1,
-  versionRowId: string,
-): Prisma.InstrumentAuthorizationUncheckedCreateInput => ({
-  id: versionRowId,
-  authorizationKey: record.authorizationId,
-  version: record.version,
-  instrumentKey: record.instrumentKey,
-  instrumentVersion: record.instrumentVersion,
-  grantor: record.grantor,
-  grantee: record.grantee,
-  electronicAdministration: record.scope.electronicAdministration,
-  scoring: record.scope.scoring,
-  translation: record.scope.translation,
-  display: record.scope.display,
-  territories: record.scope.territories,
-  locales: record.scope.locales,
-  commercialNature: record.scope.commercialNature,
-  validFrom: new Date(record.validFrom),
-  validTo: new Date(record.validTo),
-  basis: record.basis,
-  status: record.status,
-  evidenceAssetId: record.evidenceAssetId,
-  evidenceSha256: record.evidenceSha256,
-  selfApprovalDeclaration: record.selfApprovalDeclaration,
-  approvedByUserId: record.approvedByUserId,
-  approvedAt: record.approvedAt ? new Date(record.approvedAt) : null,
-  createdByUserId: record.createdByUserId,
-  recordHash: hashInstrumentAuthorizationRecord(record),
-  createdAt: new Date(record.createdAt),
-  updatedAt: new Date(record.updatedAt),
-})
-
-const appendAuditRow = async (
-  db: Db,
-  audit: InstrumentAuthorizationAuditEventV1,
-  versionRowId: string,
-): Promise<void> => {
-  await db.instrumentAuthorizationAudit.create({
-    data: {
-      id: audit.auditId,
-      authorizationId: versionRowId,
-      authorizationVersion: audit.authorizationVersion,
-      action: audit.action,
-      actorUserId: audit.actorUserId,
-      at: new Date(audit.at),
-      note: audit.note,
-      recordHash: audit.recordHash,
-    },
-  })
-}
-
 export class PrismaAuthorizationRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
@@ -175,26 +112,7 @@ export class PrismaAuthorizationRepository {
     createdByUserId: string
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
-    const record = createInstrumentAuthorizationDraft(input)
-    const versionRowId = randomUUID()
-    const audit: InstrumentAuthorizationAuditEventV1 = {
-      auditId: randomUUID(),
-      authorizationId: record.authorizationId,
-      authorizationVersion: record.version,
-      action: 'CREATE',
-      actorUserId: input.createdByUserId,
-      at: record.createdAt,
-      note: 'draft created',
-      recordHash: hashInstrumentAuthorizationRecord(record),
-    }
-    await this.prisma.$transaction(async (tx) => {
-      await lockInstrumentSourceIdentity(tx,input,'WRITE')
-      await tx.instrumentAuthorization.create({
-        data: domainToCreateData(record, versionRowId),
-      })
-      await appendAuditRow(tx, audit, versionRowId)
-    })
-    return { record, audit }
+    return authorizationFail('AUTHORIZATION_RECORDS_RETIRED', '版权许可台账已退役，不再保存或变更许可记录。')
   }
 
   async approve(input: {
@@ -203,37 +121,7 @@ export class PrismaAuthorizationRepository {
     selfApprovalDeclaration?: string | null
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
-    return this.prisma.$transaction(async (tx) => {
-      await lockAuthorizationSource(tx,input.authorizationId)
-      const currentRow = await tx.instrumentAuthorization.findFirst({
-        where: { authorizationKey: input.authorizationId },
-        orderBy: { version: 'desc' },
-      })
-      if (!currentRow) {
-        return authorizationFail('AUTH_STATE', 'authorization not found')
-      }
-      const current = rowToDomain(currentRow)
-      const approved = approveInstrumentAuthorization({
-        record: current,
-        actorUserId: input.actorUserId,
-        selfApprovalDeclaration: input.selfApprovalDeclaration,
-        now: input.now,
-      })
-      // Same version row is updated in place on approve (status transition).
-      const updated = await tx.instrumentAuthorization.update({
-        where: { id: currentRow.id },
-        data: {
-          status: approved.record.status,
-          selfApprovalDeclaration: approved.record.selfApprovalDeclaration,
-          approvedByUserId: approved.record.approvedByUserId,
-          approvedAt: approved.record.approvedAt ? new Date(approved.record.approvedAt) : null,
-          recordHash: hashInstrumentAuthorizationRecord(approved.record),
-          updatedAt: new Date(approved.record.updatedAt),
-        },
-      })
-      await appendAuditRow(tx, approved.audit, updated.id)
-      return { record: rowToDomain(updated), audit: approved.audit }
-    })
+    return authorizationFail('AUTHORIZATION_RECORDS_RETIRED', '版权许可台账已退役，不再保存或变更许可记录。')
   }
 
   async amend(input: {
@@ -242,29 +130,7 @@ export class PrismaAuthorizationRepository {
     actorUserId: string
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
-    return this.prisma.$transaction(async (tx) => {
-      await lockAuthorizationSource(tx,input.authorizationId)
-      const currentRow = await tx.instrumentAuthorization.findFirst({
-        where: { authorizationKey: input.authorizationId },
-        orderBy: { version: 'desc' },
-      })
-      if (!currentRow) {
-        return authorizationFail('AUTH_STATE', 'authorization not found')
-      }
-      const amended = amendApprovedInstrumentAuthorization({
-        previous: rowToDomain(currentRow),
-        patch: input.patch,
-        actorUserId: input.actorUserId,
-        now: input.now,
-      })
-      const versionRowId = randomUUID()
-      // Prior approved row is retained (no physical delete); new version row inserted.
-      await tx.instrumentAuthorization.create({
-        data: domainToCreateData(amended.record, versionRowId),
-      })
-      await appendAuditRow(tx, amended.audit, versionRowId)
-      return { record: amended.record, audit: amended.audit }
-    })
+    return authorizationFail('AUTHORIZATION_RECORDS_RETIRED', '版权许可台账已退役，不再保存或变更许可记录。')
   }
 
   async revoke(input: {
@@ -277,66 +143,7 @@ export class PrismaAuthorizationRepository {
     audit: InstrumentAuthorizationAuditEventV1
     lineage: InstrumentAuthorizationRecordV1[]
   }> {
-    return this.prisma.$transaction(async (tx) => {
-      await lockAuthorizationSource(tx,input.authorizationId)
-      const rows = await tx.instrumentAuthorization.findMany({
-        where: { authorizationKey: input.authorizationId },
-        orderBy: { version: 'desc' },
-      })
-      if (rows.length === 0) {
-        return authorizationFail('AUTH_STATE', 'authorization not found')
-      }
-      const lineage = rows.map(rowToDomain)
-      const revoked = revokeAuthorizationLineage({
-        lineage,
-        actorUserId: input.actorUserId,
-        note: input.note,
-        now: input.now,
-      })
-      const updatedDomain: InstrumentAuthorizationRecordV1[] = []
-      let latestAudit: InstrumentAuthorizationAuditEventV1 | null = null
-      for (const record of revoked.records) {
-        const row = rows.find((candidate) => candidate.version === record.version)
-        if (!row) {
-          return authorizationFail('AUTH_STATE', `lineage version row missing: v${record.version}`)
-        }
-        if (record.status === 'REVOKED' && row.status !== 'REVOKED') {
-          const updated = await tx.instrumentAuthorization.update({
-            where: { id: row.id },
-            data: {
-              status: 'REVOKED',
-              recordHash: hashInstrumentAuthorizationRecord(record),
-              updatedAt: new Date(record.updatedAt),
-            },
-          })
-          updatedDomain.push(rowToDomain(updated))
-        } else {
-          updatedDomain.push(record)
-        }
-      }
-      for (const audit of revoked.audits) {
-        const row = rows.find((candidate) => candidate.version === audit.authorizationVersion)
-        if (!row) continue
-        await appendAuditRow(tx, audit, row.id)
-        latestAudit = audit
-      }
-      if (!latestAudit) {
-        // Entire lineage already REVOKED — still emit a revoke audit on latest.
-        const fallback = revokeInstrumentAuthorization({
-          record: lineage[0]!,
-          actorUserId: input.actorUserId,
-          note: input.note,
-          now: input.now,
-        })
-        latestAudit = fallback.audit
-        await appendAuditRow(tx, latestAudit, rows[0]!.id)
-      }
-      return {
-        record: updatedDomain[0]!,
-        audit: latestAudit,
-        lineage: updatedDomain,
-      }
-    })
+    return authorizationFail('AUTHORIZATION_RECORDS_RETIRED', '版权许可台账已退役，不再保存或变更许可记录。')
   }
 
   async attachEvidence(input: {
@@ -347,50 +154,7 @@ export class PrismaAuthorizationRepository {
     actorUserId: string
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1; mintedNewVersion: boolean }> {
-    return this.prisma.$transaction(async (tx) => {
-      await lockAuthorizationSource(tx,input.authorizationId)
-      const currentRow = await tx.instrumentAuthorization.findFirst({
-        where: { authorizationKey: input.authorizationId },
-        orderBy: { version: 'desc' },
-      })
-      if (!currentRow) {
-        return authorizationFail('AUTH_STATE', 'authorization not found')
-      }
-      const asset = await tx.storedAsset.findUnique({ where: { id: input.evidenceAssetId } })
-      if (!asset || asset.deletedAt) {
-        return authorizationFail('AUTH_EVIDENCE_INVALID', 'StoredAsset not found for evidence')
-      }
-      // Authoritative hash is from StoredAsset — reject client-declared mismatch.
-      if (input.evidenceSha256 && input.evidenceSha256 !== asset.sha256) {
-        return authorizationFail('AUTH_EVIDENCE_INVALID', 'client-declared evidenceSha256 does not match StoredAsset.sha256')
-      }
-      const attached = attachAuthorizationEvidence({
-        record: rowToDomain(currentRow),
-        evidenceAssetId: input.evidenceAssetId,
-        evidenceSha256: asset.sha256,
-        actorUserId: input.actorUserId,
-        now: input.now,
-      })
-      if (attached.mintedNewVersion) {
-        const created = await tx.instrumentAuthorization.create({
-          data: domainToCreateData(attached.record, randomUUID()),
-        })
-        await appendAuditRow(tx, attached.audit, created.id)
-        return { record: rowToDomain(created), audit: attached.audit, mintedNewVersion: true }
-      }
-      const updated = await tx.instrumentAuthorization.update({
-        where: { id: currentRow.id },
-        data: {
-          evidenceAssetId: attached.record.evidenceAssetId,
-          evidenceSha256: attached.record.evidenceSha256,
-          status: attached.record.status,
-          recordHash: hashInstrumentAuthorizationRecord(attached.record),
-          updatedAt: new Date(attached.record.updatedAt),
-        },
-      })
-      await appendAuditRow(tx, attached.audit, updated.id)
-      return { record: rowToDomain(updated), audit: attached.audit, mintedNewVersion: false }
-    })
+    return authorizationFail('AUTHORIZATION_RECORDS_RETIRED', '版权许可台账已退役，不再保存或变更许可记录。')
   }
 }
 

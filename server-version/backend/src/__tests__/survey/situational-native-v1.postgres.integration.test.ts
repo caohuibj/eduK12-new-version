@@ -1,3 +1,4 @@
+import {grantGovernedCatalogFixture,revokeGovernedCatalogFixture} from '../fixtures/governed-catalog'
 import { randomBytes, randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -157,7 +158,7 @@ suite('Survey native V1 TEXT with real PostgreSQL and synthetic registry only', 
     await db.surveyAccount.create({ data: { userId: owner, loginName: login, normalizedLogin: login } })
     await db.surveyResearcherGrant.create({ data: { userId: owner, status: 'ACTIVE', grantedBy: admin } })
     await db.surveyMfaCredential.create({ data: { userId: owner, enabled: true, secretCipher: 'synthetic-only' } })
-    const grant = await grantCatalogSource(admin, owner, { kind: 'SJT',
+    const grant = await grantGovernedCatalogFixture(db,admin, owner, { kind: 'SJT',
       sourceId: 'registry:' + compiled.package.key, sourceVersion: compiled.package.instrumentVersion })
     projectId = randomUUID(); publicId = randomUUID()
     await db.surveyProject.create({ data: { id: projectId, publicId, ownerUserId: owner,
@@ -286,12 +287,18 @@ suite('Survey native V1 TEXT with real PostgreSQL and synthetic registry only', 
       expect(source.raw.find(row => row.itemKey === `${response.sceneKey}:${response.channelKey}`)?.value).toBe(response.responseValue)
     }
     if (caseName === 'path-A-A') {
-      // Actual publication boundary remains closed to parent-level flow. The
-      // invalid empty flow must fail at the native-host guard, not its parser.
-      const blockedWave = await wave()
-      await db.surveyWave.update({ where: { id: blockedWave }, data: { flowDefinition: {} } })
-      await expect(freezeResearchWaveDraft(publicationInput(blockedWave))).rejects.toThrow(/研究级条件流程/)
-      expect((await db.surveyWave.findUniqueOrThrow({ where: { id: blockedWave } })).publicationId).toBeNull()
+      // A valid unconditional host flow preserves the whole exact native
+      // protocol. Invalid references still fail the actual shared compiler.
+      const flowWave = await wave()
+      await db.surveyWave.update({ where: { id: flowWave }, data: { flowDefinition: {schemaVersion:1,embeddedData:[],blocks:[{blockKey:'linear',kind:'INSTRUMENT',instrumentKey:'linear'}]} } })
+      const frozen=await freezeResearchWaveDraft(publicationInput(flowWave))
+      const published=await db.surveyPublication.findUniqueOrThrow({where:{id:frozen.publicationId}})
+      expect((published.compiledSnapshot as any).units[0].nativeSituational.definitionHash).toBe(compiled.definitionHash)
+      expect((published.compiledSnapshot as any).flow.blocks).toEqual([{blockKey:'linear',kind:'INSTRUMENT',instrumentKey:'linear'}])
+      const blockedWave=await wave()
+      await db.surveyWave.update({where:{id:blockedWave},data:{flowDefinition:{schemaVersion:1,embeddedData:[],blocks:[{blockKey:'missing',kind:'INSTRUMENT',instrumentKey:'missing'}]}}})
+      await expect(freezeResearchWaveDraft(publicationInput(blockedWave))).rejects.toThrow(/Flow/)
+      expect((await db.surveyWave.findUniqueOrThrow({where:{id:blockedWave}})).publicationId).toBeNull()
     }
   })
 })

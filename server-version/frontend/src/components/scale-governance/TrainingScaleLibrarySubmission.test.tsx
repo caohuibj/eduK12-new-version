@@ -18,7 +18,7 @@ describe('Training exact-version library submission', () => {
     expect(api.source).not.toHaveBeenCalled()
     await open()
     fireEvent.change(screen.getByLabelText('已发布版本'), { target: { value: 'release-v1' } })
-    expect(screen.getByLabelText('版权与授权依据（沿用已有资料）')).toHaveAttribute('readonly')
+    expect(screen.getByLabelText('版权说明（可选资料）（沿用已有资料）')).toHaveAttribute('readonly')
     fireEvent.click(screen.getByRole('button', { name: '提交入库申请' }))
     await waitFor(() => expect(api.submit).toHaveBeenCalledWith('release-v1', metadata, expect.any(String), undefined))
     expect(screen.getByText(/批准不代表全员可用/)).toBeInTheDocument()

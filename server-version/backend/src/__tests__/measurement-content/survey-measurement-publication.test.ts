@@ -29,7 +29,7 @@ describe('explicit private measurement publication',()=>{
   expect(m.sources).toHaveBeenCalledWith(m.tx,'owner',['catalog'])
   expect(m.catalogCompile).toHaveBeenCalledWith(expect.objectContaining({catalogGrantId:'catalog'}),{original:true})
   expect(m.compile).not.toHaveBeenCalled()
-  expect(m.expiry.mock.invocationCallOrder[0]).toBeGreaterThan(m.retain.mock.invocationCallOrder[0])
+  expect(m.expiry).not.toHaveBeenCalled()
   expect(m.authorize).toHaveBeenCalledTimes(2)
  })
  it.each(['unconverted source','revoked source license','source release withdrawn'])('refuses catalog publication when %s',async(message)=>{
@@ -38,10 +38,10 @@ describe('explicit private measurement publication',()=>{
   await expect(publishSurveyMeasurementDraft('owner','project','draft',2)).rejects.toThrow(message)
   expect(m.publish).not.toHaveBeenCalled()
  })
- it('fails a catalog source license that expires while publication waits',async()=>{
+ it('publishes even when the retired license expiry flag fires while publication waits',async()=>{
   m.tx.surveyInstrumentDraft.findUniqueOrThrow.mockResolvedValue({...draft(),catalogGrantId:'catalog'})
   m.expiry.mockRejectedValue(new Error('SOURCE_SCALE_LICENSE_EXPIRED'))
-  await expect(publishSurveyMeasurementDraft('owner','project','draft',2)).rejects.toThrow('SOURCE_SCALE_LICENSE_EXPIRED')
+  await expect(publishSurveyMeasurementDraft('owner','project','draft',2)).resolves.toBeDefined()
   expect(m.publish).toHaveBeenCalledTimes(1)
  })
 

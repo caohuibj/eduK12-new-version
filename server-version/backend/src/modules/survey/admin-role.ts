@@ -7,8 +7,8 @@ import { AdminPermissionError, assertEntryAdmin } from '../admin-permissions/ser
  * A system administrator never inherits researcher-management authority. */
 export async function assertSurveyManager(db:Prisma.TransactionClient,userId:string){
   await assertEntryAdmin(db,userId,'SURVEY')
-  const [row]=await db.$queryRaw<Array<{role:string}>>`SELECT platform_role::text AS role FROM users WHERE id=${userId} FOR SHARE`
-  if(row?.role!=='STANDARD')throw new AdminPermissionError(403,'研究者管理与工具分配仅限独立 Survey 管理员')
+  // assertEntryAdmin locks this user/grant and requires STANDARD, a valid
+  // account and this exact entry. Its proof lives only in this transaction.
 }
 export async function assertSurveyLibraryManager(db:Prisma.TransactionClient,userId:string){
   const [row]=await db.$queryRaw<Array<{role:string}>>`SELECT platform_role::text AS role FROM users WHERE id=${userId}

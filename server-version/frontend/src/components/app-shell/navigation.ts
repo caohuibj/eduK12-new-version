@@ -46,7 +46,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
     { path: '/admin/training', label: '培训版管理', section: 'system' },
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
     { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
-    { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
+    { path: '/admin/material-grants', label: '材料授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
@@ -133,7 +133,7 @@ export function isStaffWorkspacePath(pathname: string): boolean {
   if (pathname.endsWith('/report')) return false
   return ['/assessment-workbench','/assessment-templates','/assessment-management','/dashboard','/courses','/students','/assignments','/checkins','/scales','/scale-library','/questionnaires','/questionnaire-products',
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
-    '/users','/teacher-codes','/admin/training','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
+    '/users','/teacher-codes','/admin/training','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))
 }
 

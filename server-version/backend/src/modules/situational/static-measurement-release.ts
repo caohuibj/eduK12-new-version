@@ -6,16 +6,17 @@ import {createSituationalInstrumentRegistry} from './onboarding/instrument-regis
 import {publicationContentDigest} from './onboarding/schema'
 import {assertAssessmentOperationallyActive} from '../assessment-governance/operational-hold'
 import {lockInstrumentSourceIdentity} from '../assessment-authorization/source-identity-lock'
-import {mapAuthorizationRowToDomain} from '../assessment-authorization/repository'
-import {resolveEffectiveAuthorization,assertLocaleTerritoryMatch,evaluateAuthorizationOverlayStatus} from '../assessment-authorization/publish-gates'
-import {hashInstrumentAuthorizationRecord} from '../assessment-authorization/records'
 import {sjtMeasurementRelease} from '../measurement-content/sjt'
 import {getContentRelease,publishContentRelease,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError,prepareRelease} from '../measurement-content/release'
 import {canonicalHash} from '../assessment-runtime/canonical'
 const registry=createSituationalInstrumentRegistry(GENERATED_SITUATIONAL_INSTRUMENT_SOURCES)
 export type StaticSjtRegistryMapping={id:string;instrument_key:string;instrument_version:string;content_digest:string;measurement_release_id:string|null;deployment:unknown|null;deployment_hash:string|null}
-export const staticSjtDeploymentSchema=z.object({locale:z.string().trim().min(1).max(240),territory:z.string().trim().min(1).max(240),commercialNature:z.enum(['NON_COMMERCIAL','COMMERCIAL']),grantee:z.string().trim().min(1).max(240)}).strict()
+export const staticSjtDeploymentSchema=z.object({locale:z.string().trim().min(1).max(240),territory:z.string().trim().min(1).max(240)}).strict()
+// Parse old immutable rows without stripping their hashed legacy fields. New writes
+// accept only the non-license deployment schema above.
+const historicalStaticSjtDeploymentSchema=staticSjtDeploymentSchema.extend({commercialNature:z.enum(['NON_COMMERCIAL','COMMERCIAL']),grantee:z.string().trim().min(1).max(240)}).strict()
+const storedStaticSjtDeploymentSchema=z.union([staticSjtDeploymentSchema,historicalStaticSjtDeploymentSchema])
 export type StaticSjtDeployment=z.infer<typeof staticSjtDeploymentSchema>
 class StaticSjtError extends ContentReleaseError {readonly statusCode=409}
 function fail(code:string):never{throw new StaticSjtError('CONTENT_STATIC_SJT_'+code)}
@@ -52,24 +53,6 @@ export async function validateStaticSjtRegistryMappings(tx:Prisma.TransactionCli
  rows.forEach(check);return rows
 }
 export async function validateStaticSjtRegistryMapping(tx:Prisma.TransactionClient,id:string,mode:'READ'|'PUBLISH'='READ'){return (await validateStaticSjtRegistryMappings(tx,[id],mode))[0]}
-async function rights(tx:Prisma.TransactionClient,row:StaticSjtRegistryMapping,raw:StaticSjtDeployment,authorizationId?:string){
- const deployment=staticSjtDeploymentSchema.parse(raw)
- // Source READ lock held by caller prevents fresh lineages and amendments until
- // transaction end. All writers share source-identity-lock.ts's EXCLUSIVE lock.
- const rows=await tx.instrumentAuthorization.findMany({where:{instrumentKey:row.instrument_key,instrumentVersion:row.instrument_version},orderBy:[{authorizationKey:'asc'},{version:'desc'}]})
- const records=rows.map(r=>{const record=mapAuthorizationRowToDomain(r);if(hashInstrumentAuthorizationRecord(record)!==r.recordHash)fail('LICENSE_HASH');return record})
- const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
- if(!clock)fail('CLOCK_MISSING')
- for(const id of [...new Set(records.map(r=>r.authorizationId))].filter(id=>!authorizationId||id===authorizationId)){
-  const record=resolveEffectiveAuthorization({authorizations:records.filter(r=>r.authorizationId===id),instrumentKey:row.instrument_key,instrumentVersion:row.instrument_version,nowIso:clock.now.toISOString()})
-  if(!record||!['APPROVED','EVIDENCE_PENDING'].includes(evaluateAuthorizationOverlayStatus(record,clock.now.toISOString()))||record.grantee!==deployment.grantee
-   ||!record.scope.electronicAdministration||!record.scope.scoring||!record.scope.display
-   ||!assertLocaleTerritoryMatch({record,locale:deployment.locale,territory:deployment.territory}).ok
-   ||record.scope.commercialNature==='UNSPECIFIED'||record.scope.commercialNature==='NON_COMMERCIAL'&&deployment.commercialNature!=='NON_COMMERCIAL')continue
-  return {authorizationId:record.authorizationId,authorizationVersion:record.version,recordHash:hashInstrumentAuthorizationRecord(record)}
- }
- fail('SOURCE_LICENSE_DENIED')
-}
 function active(row:StaticSjtRegistryMapping,purpose:'PUBLISH'|'START'='PUBLISH'){
  const source=check(row)
  if(source.publication.releaseStatus==='DRAFT'||purpose==='PUBLISH'&&source.publication.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
@@ -97,30 +80,30 @@ function verify(release:StoredRelease|null,row:StaticSjtRegistryMapping,purpose:
 }
 /** Caller must authenticate the real system actor and assert exact independent
  * measurement.publish capability in this transaction, after source/mapping locks
- * and before invoking this function. Deployment is explicitly declared by the strongly authenticated publisher and matched against one actual source license. */
+ * and before invoking this function. Deployment identity is declared by the strongly authenticated publisher; copyright permission is not a runtime gate. */
 export async function publishStaticSjtMeasurement(tx:Prisma.TransactionClient,input:{actorId:string;mappingId:string;deployment:StaticSjtDeployment}){
  if(!input.actorId)fail('ACTOR_REQUIRED')
  const row=await validateStaticSjtRegistryMapping(tx,input.mappingId,'PUBLISH');active(row)
  const deployment=staticSjtDeploymentSchema.parse(input.deployment)
- if(row.measurement_release_id&&(row.deployment_hash!==canonicalHash(deployment)||canonicalHash(row.deployment)!==row.deployment_hash))fail('DEPLOYMENT_IMMUTABLE')
+ if(row.measurement_release_id){
+  const stored=storedStaticSjtDeploymentSchema.parse(row.deployment)
+  if(canonicalHash(stored)!==row.deployment_hash||stored.locale!==deployment.locale||stored.territory!==deployment.territory)fail('DEPLOYMENT_IMMUTABLE')
+ }
  if(row.measurement_release_id){
   const release=verify(await getContentRelease(tx,row.measurement_release_id,true),row)
-  await rights(tx,row,deployment,sourceAuthorization(release).authorizationId)
   return {mapping:row,release}
  }
- const authorization=await rights(tx,row,deployment)
  const projected=projection(row)
- projected.provenance={...projected.provenance,sourceAuthorization:authorization}
  const release=verify(await publishContentRelease(tx,projected,input.actorId),row)
- // Recheck validity after release/advisory lock waits, before committing the mapping.
- await rights(tx,row,deployment,authorization.authorizationId)
+ // Recheck operational/source identity after release/advisory lock waits.
+ active(row)
  const count=await tx.$executeRaw(Prisma.sql`UPDATE static_sjt_measurement_mappings SET measurement_release_id=${release.releaseId},deployment=${JSON.stringify(deployment)}::jsonb,deployment_hash=${canonicalHash(deployment)}
   WHERE id=${row.id} AND (measurement_release_id IS NULL OR measurement_release_id=${release.releaseId})`)
  if(count!==1)fail('MAPPING_CHANGED')
  return {mapping:{...row,measurement_release_id:release.releaseId,deployment,deployment_hash:canonicalHash(deployment)},release}
 }
 /** Exact source read for new publication/START or historical report authoring.
- * HISTORY does not reacquire source rights; frozen FINAL/report reads do not call
+ * HISTORY preserves legacy provenance verbatim; frozen FINAL/report reads do not call
  * this registry resolver at all and retain their immutable source provenance. */
 const validatedConsumerReads=new WeakMap<object,{tx:Prisma.TransactionClient;mapping:StaticSjtRegistryMapping;release:StoredRelease;purpose:'PUBLISH'|'START'|'HISTORY'}>()
 export async function readStaticSjtMeasurementForStart(tx:Prisma.TransactionClient,input:{instrumentKey:string;instrumentVersion:string},purpose:'PUBLISH'|'START'|'HISTORY'='START'){
@@ -128,27 +111,21 @@ export async function readStaticSjtMeasurementForStart(tx:Prisma.TransactionClie
  const rows=await tx.$queryRaw<StaticSjtRegistryMapping[]>(Prisma.sql`SELECT * FROM static_sjt_measurement_mappings WHERE instrument_key=${input.instrumentKey} AND instrument_version=${input.instrumentVersion} FOR SHARE`)
  if(rows.length!==1)fail('MAPPING_MISSING')
  const mapping=rows[0];if(purpose!=='HISTORY')active(mapping,purpose);else check(mapping)
- const deployment=staticSjtDeploymentSchema.parse(mapping.deployment)
+ const deployment=storedStaticSjtDeploymentSchema.parse(mapping.deployment)
  if(!mapping.deployment_hash||canonicalHash(deployment)!==mapping.deployment_hash)fail('DEPLOYMENT_INVALID')
  if(!mapping.measurement_release_id)fail('RELEASE_MISSING')
  const release=verify(await getContentRelease(tx,mapping.measurement_release_id,true),mapping,purpose)
- if(purpose!=='HISTORY')await rights(tx,mapping,deployment,sourceAuthorization(release).authorizationId)
  const result={mapping,release};validatedConsumerReads.set(result,{tx,mapping,release,purpose});return result
 }
 
-/** Final clock fence for a source already validated and locked in this exact
- * transaction. It does not recompile or silently switch authorization lineage. */
+/** Final source/deployment fence for a validated receipt in this exact transaction.
+ * Legacy function name is retained for callers; no license table is consulted. */
 export async function recheckStaticSjtConsumerLicense(tx:Prisma.TransactionClient,receipt:Awaited<ReturnType<typeof readStaticSjtMeasurementForStart>>){
  const validated=validatedConsumerReads.get(receipt)
- if(!validated||validated.tx!==tx)fail('SOURCE_LICENSE_RECEIPT_INVALID')
+ if(!validated||validated.tx!==tx)fail('SOURCE_RECEIPT_INVALID')
  if(validated.purpose==='HISTORY')return
- const {mapping,release}=validated,deployment=staticSjtDeploymentSchema.parse(mapping.deployment)
+ const {mapping,release}=validated,deployment=storedStaticSjtDeploymentSchema.parse(mapping.deployment)
  if(mapping.measurement_release_id!==release.releaseId||canonicalHash(deployment)!==mapping.deployment_hash)fail('DEPLOYMENT_INVALID')
- await rights(tx,mapping,deployment,sourceAuthorization(release).authorizationId)
-}
-
-function sourceAuthorization(release:StoredRelease){
- const parsed=z.object({authorizationId:z.string().guid(),authorizationVersion:z.number().int().positive(),recordHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().safeParse(release.provenance.sourceAuthorization)
- if(!parsed.success)fail('SOURCE_LICENSE_IDENTITY_INVALID')
- return parsed.data
+ active(mapping,validated.purpose)
+ verify(release,mapping,validated.purpose)
 }

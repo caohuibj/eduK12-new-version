@@ -90,7 +90,7 @@ describe('Training feedback authoring contract', () => {
   it('requires the actual author to own the Training course unless administrator', async () => {
     db.course.findMany.mockResolvedValue([{ id: 'course', courseType: 'TRAINING_COURSE', isLibrary: false, creatorId: 'other' }])
     await expect(validateTrainingFeedbackAuthoring(db as any, current, policy)).rejects.toMatchObject({ statusCode: 403 })
-    db.$queryRaw.mockResolvedValue([{userId:actor.userId,role:'STUDENT',accountDomain:'TRAINING',isActive:true,isFrozen:false,expiresAt:null,
+    db.$queryRaw.mockResolvedValue([{userId:actor.userId,role:'STUDENT',platformRole:'STANDARD',accountDomain:'TRAINING',isActive:true,isFrozen:false,expiresAt:null,
       mustChangePassword:false,entryGrants:[{entry:'TRAINING',version:1}]}])
     expect((await validateTrainingFeedbackAuthoring(db as any, current, policy)).trainingFeedbackPolicyHash).toBe(canonicalHash(policy))
     db.$queryRaw.mockResolvedValue([])

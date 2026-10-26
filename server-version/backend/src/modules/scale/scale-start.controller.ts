@@ -120,7 +120,6 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       // Resume is governed by the already-frozen admission. Current product
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
-      await prisma.$transaction(tx => assertTrainingScaleCollectionAllowed(tx, [existing.scaleId]))
       if (existing.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...existing, scale } as any)
       const stored = (await loadScaleAnswers(existing.answers, existing))
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')

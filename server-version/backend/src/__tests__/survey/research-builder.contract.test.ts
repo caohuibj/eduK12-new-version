@@ -131,7 +131,8 @@ describe('Survey research builder contracts without formal publication authority
   it('compiles shared-stimulus two-question SJT with nonuniform multi-construct weights',()=>{
     const invalidSource=sjt()
     invalidSource.licenseStatus='unknown'
-    expect(validateSurveyDraft('SJT',invalidSource,true).issues.some(x=>x.path==='licenseStatus')).toBe(true)
+    expect(validateSurveyDraft('SJT',invalidSource,true).issues.some(x=>x.path==='licenseStatus')).toBe(false)
+    expect(invalidSource.licenseStatus).toBe('unknown')
     const compiled=compileResearchSjt('sjtstudy',sjt())
     expect(compiled.package.definition.scoring.model?.modelKey).toBe('AUTHOR_KEY_SUM')
     const r=previewResearchInstrument({kind:'SJT',instrumentKey:'sjtstudy',
