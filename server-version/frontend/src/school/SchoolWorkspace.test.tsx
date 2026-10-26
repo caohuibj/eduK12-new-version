@@ -192,3 +192,40 @@ it.each(['ADMIN','TEACHER'])('retains existing grade and class controls for scho
   expect(screen.queryByRole('region',{name:'学校与班级选择'})).not.toBeInTheDocument()
  }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
 })
+
+
+it.each(['ADMIN','TEACHER'])('uses grouped navigation and preserves governor forms for a school administrator (%s)',async role=>{
+ window.history.replaceState(null,'','/workspace?organizationId=admin-school&classUnitId=admin-class')
+ vi.stubGlobal('scrollTo',vi.fn())
+ const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
+ const fetcher=vi.fn(async(url:string,options?:RequestInit)=>{
+  if(options?.method&&options.method!=='GET')throw Error('Unexpected administrator navigation write')
+  if(url.endsWith('/auth/me'))return reply({id:'admin',username:'学校管理员',role,accountDomain:'SCHOOL'})
+  if(url.endsWith('/organizations'))return reply({list:[{id:'admin-school',name:'管理学校',orgRole:'ORG_ADMIN'}]})
+  if(url.endsWith('/context'))return reply({access:{orgRole:'ORG_ADMIN',canGovern:true,personas:[],capabilities:[],explicitDenies:[]}})
+  if(url.endsWith('/units'))return reply({list:[{id:'admin-class',name:'管理班级',unitKind:'CLASS'}]})
+  return reply({list:[],canAuthor:false,parentReportsEnabled:false})
+ })
+ vi.stubGlobal('fetch',fetcher)
+ try{
+  const view=render(<SchoolApp/>)
+  await screen.findByRole('heading',{name:'学校管理工作台'})
+  expect(view.container.querySelector('.hs-workspace-welcome')).toBeNull()
+  expect(screen.queryByRole('button',{name:'功能导航'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('navigation',{name:'工作台功能导航'})).not.toBeInTheDocument()
+  expect(screen.getByRole('region',{name:'学校管理'})).toContainElement(screen.getByRole('heading',{name:'人员邀请'}))
+  expect(screen.queryByRole('heading',{name:'保护性反馈'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('heading',{name:'专业报告'})).not.toBeInTheDocument()
+  expect(fetcher.mock.calls.some(([url])=>url.includes('/reports/groups/')||url.includes('/reports/professional/'))).toBe(false)
+  fireEvent.click(within(screen.getByRole('navigation',{name:'校园功能分组'})).getByRole('link',{name:'学校管理'}))
+  await screen.findByRole('button',{name:'增加班级'})
+  expect(screen.getByRole('button',{name:'增加年级'})).toBeInTheDocument()
+  const tabs=within(screen.getByRole('navigation',{name:'学校管理功能入口'}))
+  expect(tabs.getByRole('link',{name:'人员邀请'})).toHaveAttribute('href','/workspace/staff?organizationId=admin-school&classUnitId=admin-class')
+  fireEvent.click(tabs.getByRole('link',{name:'人员邀请'}))
+  await screen.findByRole('heading',{name:'邀请校园教职员工'})
+  expect(window.location.pathname).toBe('/workspace/staff')
+  expect(window.location.search).toBe('?organizationId=admin-school&classUnitId=admin-class')
+  expect(fetcher.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)
+ }finally{vi.unstubAllGlobals();window.history.replaceState(null,'','/')}
+})

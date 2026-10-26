@@ -24,9 +24,9 @@ export function SchoolProfessionalNavigation({items,page,onNavigate}:{items:Scho
  </>
 }
 
-export function SchoolProfessionalHome({items,username,schoolName,onNavigate}:{items:SchoolNavigationItem[];username:string;schoolName?:string;onNavigate:(id:string)=>void}){
+export function SchoolProfessionalHome({items,username,schoolName,onNavigate,administrator=false}:{items:SchoolNavigationItem[];username:string;schoolName?:string;onNavigate:(id:string)=>void;administrator?:boolean}){
  return <div className="hs-overview hs-professional-home">
-  <header className="hs-professional-home-heading"><div><h1>心理教师工作台</h1><p>你好，{username}。从校园活动、学校事务与专业支持开始今天的工作。</p></div>{schoolName&&<p className="hs-professional-school"><span>当前学校</span>{schoolName}</p>}</header>
+  <header className="hs-professional-home-heading"><div><h1>{administrator?'学校管理工作台':'心理教师工作台'}</h1><p>你好，{username}。{administrator?'查看校园活动，处理学校事务与授权范围内的群体报告。':'从校园活动、学校事务与专业支持开始今天的工作。'}</p></div>{schoolName&&<p className="hs-professional-school"><span>当前学校</span>{schoolName}</p>}</header>
   {sections(items).map(section=><section key={section.group} className="hs-professional-section" aria-label={section.group}><h2>{section.group}</h2><div className="hs-workspace-shortcuts">{section.items.map(item=><a key={item.id} href={workspaceHref(item.id)} onClick={event=>follow(event,item.id,onNavigate)}><span className="hs-professional-card-icon"><item.icon size={22} aria-hidden="true"/></span><div><h3>{item.label}</h3><p>{item.description}</p></div><ArrowRight size={17} aria-hidden="true"/></a>)}</div></section>)}
  </div>
 }

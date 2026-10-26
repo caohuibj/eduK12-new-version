@@ -41,3 +41,24 @@ describe('School professional workspace navigation',()=>{
   expect(screen.queryByRole('navigation',{name:'报告与支持功能入口'})).not.toBeInTheDocument()
  })
 })
+
+
+it('shows the governor home using only actual authorized entries and keeps school/class links',()=>{
+ window.history.replaceState(null,'','/workspace?organizationId=school-a&classUnitId=class-a')
+ const adminAccess:SchoolAccess={orgRole:'ORG_ADMIN',canGovern:true,personas:[],capabilities:[],explicitDenies:['ORG_GROUP_REPORT_V1']}
+ const adminItems=schoolNavigation('ADMIN','',adminAccess,false)
+ const navigate=vi.fn()
+ render(<SchoolProfessionalHome administrator items={adminItems} username="示例管理员" schoolName="管理学校" onNavigate={navigate}/>)
+ expect(screen.getByRole('heading',{name:'学校管理工作台'})).toBeInTheDocument()
+ expect(screen.queryByRole('heading',{name:'心理教师工作台'})).not.toBeInTheDocument()
+ const expected=adminItems.filter(item=>!['overview','account'].includes(item.id))
+ expect(screen.getAllByRole('link')).toHaveLength(expected.length)
+ for(const item of expected){
+  const card=screen.getByRole('heading',{name:item.label}).closest('a')!
+  expect(card).toHaveAttribute('href',`/workspace/${item.id}?organizationId=school-a&classUnitId=class-a`)
+  fireEvent.click(card)
+  expect(navigate).toHaveBeenLastCalledWith(item.id)
+ }
+ expect(screen.queryByRole('heading',{name:'群体报告'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('heading',{name:'专业报告'})).not.toBeInTheDocument()
+})

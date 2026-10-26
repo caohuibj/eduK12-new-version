@@ -210,6 +210,8 @@ export default function SchoolApp(){
   const ordinaryTeacher=user?.role==='TEACHER'&&!schoolAdmin&&!psychologyStaff
   const parentWorkspace=user?.role==='PARENT'
   const professionalWorkspace=user?.role==='TEACHER'&&psychologyStaff
+  const administratorWorkspace=(user?.role==='TEACHER'||user?.role==='ADMIN')&&schoolAdmin
+  const groupedWorkspace=professionalWorkspace||administratorWorkspace
   const educatorEntries=user?schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools).filter(item=>!['overview','account'].includes(item.id)):[]
   const singleTeacherTaskPage=ordinaryTeacher&&educatorEntries.length===1&&educatorEntries[0].id==='tasks'
   const workspaceHome=singleTeacherTaskPage?'tasks':'overview'
@@ -384,7 +386,7 @@ export default function SchoolApp(){
     {professionalScopePage&&contextSecurity}
   </section>:undefined
 
-  return <div className={`hs-app${user?' hs-workspace':''}${user?.role==='STUDENT'?' hs-learner':''}${ordinaryTeacher?' hs-educator':''}${parentWorkspace?' hs-parent':''}${professionalWorkspace?' hs-professional':''}`} data-theme={appearance.theme}>
+  return <div className={`hs-app${user?' hs-workspace':''}${user?.role==='STUDENT'?' hs-learner':''}${ordinaryTeacher?' hs-educator':''}${parentWorkspace?' hs-parent':''}${groupedWorkspace?' hs-professional':''}${administratorWorkspace?' hs-school-admin':''}`} data-theme={appearance.theme}>
     <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
       onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome} appearance={appearance}/>:<header className="hs-header">
@@ -393,7 +395,7 @@ export default function SchoolApp(){
         {educatorEntries.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined}
           onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace(item.id)}}><item.icon size={18} aria-hidden="true"/>{item.label}</a>)}
       </nav>}
-      {professionalWorkspace&&<SchoolProfessionalNavigation items={educatorEntries} page={page} onNavigate={navigateWorkspace}/>}
+      {groupedWorkspace&&<SchoolProfessionalNavigation items={educatorEntries} page={page} onNavigate={navigateWorkspace}/>}
       <nav className="hs-account-actions" aria-label="校园导航">
         <span className="hs-account">{user.username}</span>
         {user.role==='STUDENT'&&<SchoolLearnerMenu items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
@@ -473,10 +475,10 @@ export default function SchoolApp(){
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(professionalWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||professionalWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
+      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell contextPlacement={(ordinaryTeacher&&page==='tasks')||(professionalWorkspace&&!['classes','admission','recovery'].includes(page))?'after':'before'} homePage={workspaceHome} compactNavigation={ordinaryTeacher||parentWorkspace||groupedWorkspace} learner={user.role==='STUDENT'} page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={professionalScopePage?undefined:workspaceContext}>
         {page==='overview'&&user.role==='STUDENT'&&studentStatus==='APPROVED'&&<SchoolLearnerHome key={user.id} api={api} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace}/>}
-        {page==='overview'&&professionalWorkspace&&<SchoolProfessionalHome items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
-        {page==='overview'&&!professionalWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
+        {page==='overview'&&groupedWorkspace&&<SchoolProfessionalHome administrator={administratorWorkspace} items={educatorEntries} username={user.username} schoolName={orgs.find(org=>org.id===schoolId)?.name} onNavigate={navigateWorkspace}/>}
+        {page==='overview'&&!groupedWorkspace&&!(user.role==='STUDENT'&&studentStatus==='APPROVED')&&<SchoolWorkspaceOverview compact={ordinaryTeacher||parentWorkspace} parent={parentWorkspace} username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
         {page==='account'&&<section className={'hs-panel hs-account-panel'+(user.role==='STUDENT'?' hs-student-account':'')}><div><h2>校园账号</h2><p>用户名：{user.username}</p>
           <p>你使用的是独立校园账号。可用功能由学校授权决定。</p></div>
           <div><h3>修改密码</h3>
