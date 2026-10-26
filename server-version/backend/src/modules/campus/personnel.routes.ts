@@ -1,6 +1,8 @@
+import {requireTeacherProductAdmin,requireRecentTeacherMfa} from '../huiteacher/authority'
+import {requireSchoolPersonnelGovernor} from '../education-roster/school-personnel-authority'
 import {Router} from 'express'
 import {z,ZodError} from 'zod'
-import {authenticateSchool} from '../../middleware/auth'
+import {authenticateSchool,authenticateHuiteacher} from '../../middleware/auth'
 import {requireRecentSchoolMfa} from './mfa.middleware'
 import {asyncHandler} from '../../middleware/asyncHandler'
 import {success} from '../../utils/response'
@@ -9,8 +11,12 @@ import {previewPersonnel,importPersonnel,listPersonnel,issuePersonnelCredential,
 import {directoryQuery,directoryEntryId,listPersonnelDirectory,readPersonnelDirectoryEntry} from './personnel.directory'
 import {registerCampusStaff} from './staff.service'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
+export function educationPersonnelRouter(entry:'SCHOOL'|'TEACHER'){
 const router=Router(),uuid=z.string().guid()
+const base='/organizations/:organizationId/personnel'
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+if(entry==='SCHOOL')router.use(base,authenticateSchool,requireRecentSchoolMfa)
+else router.use(base,authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,requireSchoolPersonnelGovernor)
 const rate=createRedisRateLimiter({name:'campus-personnel',limit:40,windowSeconds:900})
 const handle=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
  try{return await fn(req,res)}catch(error){
@@ -20,25 +26,26 @@ const handle=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>
   throw error
  }
 })
-const base='/organizations/:organizationId/personnel'
-router.get(base+'/directory',authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await listPersonnelDirectory({actor:req.user,organizationId:uuid.parse(req.params.organizationId),query:directoryQuery.parse(req.query)}))))
-router.get(base+'/directory/:entryId',authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await readPersonnelDirectoryEntry({actor:req.user,organizationId:uuid.parse(req.params.organizationId),entryId:directoryEntryId.parse(req.params.entryId)}))))
-router.get(base,authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await listPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),after:z.string().guid().optional().parse(req.query.after)}))))
-router.post(base+'/preview',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>success(res,await previewPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),input:personnelInput.parse(req.body)}))))
-router.post(base+'/import',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>{
+router.get(base+'/directory',handle(async(req,res)=>success(res,await listPersonnelDirectory({actor:req.user,organizationId:uuid.parse(req.params.organizationId),query:directoryQuery.parse(req.query)}))))
+router.get(base+'/directory/:entryId',handle(async(req,res)=>success(res,await readPersonnelDirectoryEntry({actor:req.user,organizationId:uuid.parse(req.params.organizationId),entryId:directoryEntryId.parse(req.params.entryId)}))))
+router.get(base,handle(async(req,res)=>success(res,await listPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),after:z.string().guid().optional().parse(req.query.after)}))))
+router.post(base+'/preview',rate,handle(async(req,res)=>success(res,await previewPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),input:personnelInput.parse(req.body)}))))
+router.post(base+'/import',rate,handle(async(req,res)=>{
  const body=z.object({input:personnelInput,batchId:uuid,previewToken:z.string().regex(/^[a-f0-9]{64}$/),verifiedOffline:z.boolean().default(false)}).strict().parse(req.body)
  return success(res,await importPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),...body}))
 }))
-router.post(base+'/:personId/credential',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>{
+router.post(base+'/:personId/credential',rate,handle(async(req,res)=>{
  z.object({}).strict().parse(req.body)
  return success(res,await issuePersonnelCredential({actor:req.user,organizationId:uuid.parse(req.params.organizationId),personId:uuid.parse(req.params.personId)}))
 }))
-router.post(base+'/:personId/bind-existing',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>{
+router.post(base+'/:personId/bind-existing',rate,handle(async(req,res)=>{
  const body=z.object({username:z.string().trim().min(4).max(32),verifiedOffline:z.literal(true)}).strict().parse(req.body)
  return success(res,await bindExistingPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),personId:uuid.parse(req.params.personId),...body}))
 }))
-router.post('/personnel/claim-staff',authenticateSchool,rate,handle(async(req,res)=>{
+if(entry==='SCHOOL')router.post('/personnel/claim-staff',authenticateSchool,rate,handle(async(req,res)=>{
  const {inviteCode}=z.object({inviteCode:z.string().min(28).max(64)}).strict().parse(req.body)
  return success(res,await registerCampusStaff({inviteCode,username:'',password:'',actorUserId:req.user.userId}),'已由本人确认，继续使用原校园账号')
 }))
-export default router
+return router
+}
+export default educationPersonnelRouter('SCHOOL')
