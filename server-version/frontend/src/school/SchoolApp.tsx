@@ -11,6 +11,7 @@ import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspace
 import {SchoolProfessionalHome,SchoolProfessionalNavigation,SchoolProfessionalClassScope} from './SchoolProfessionalWorkspace'
 import {SchoolProfessionalAdmission,SchoolAdmissionProgress} from './SchoolProfessionalAdmission'
 import {SchoolStructureImport} from './SchoolStructureImport'
+import {SchoolPersonnelImport,SchoolPersonnelClaim} from './SchoolPersonnelImport'
 import {SchoolAdminPanel,SchoolAdminSections} from './SchoolAdministratorWorkspace'
 import {SchoolReportHeader} from './SchoolReportPresentation'
 import { canManageSchoolActivities, canReadSchoolClasses, schoolNavigation, workspaceHref, workspacePage, workspacePath } from './school-navigation'
@@ -494,6 +495,7 @@ export default function SchoolApp(){
           <div><h3>修改密码</h3>
           <ProductPasswordChange product="school" busy={working} onChangePassword={changeAccountPassword}/></div>
         </section>}
+        {page==='account'&&['STUDENT','TEACHER','ADMIN'].includes(user.role)&&<SchoolPersonnelClaim key={user.id} api={api} student={user.role==='STUDENT'} onComplete={()=>void refresh()}/>}
         {page==='account'&&(user.role==='TEACHER'||user.role==='ADMIN')&&<section className={'hs-panel hs-account-security'+(administratorWorkspace?' hs-admin-panel hs-admin-security':'')}>
           <SchoolReportHeader compact title="敏感操作二次验证" label="二次验证使用说明"><p>学校管理员与心理专业人员在执行名册、人员授权或整班审批前，需要最近五分钟内的动态验证码。普通教师无需使用此功能。</p></SchoolReportHeader>
           <div className="hs-actions">
@@ -516,6 +518,7 @@ export default function SchoolApp(){
             null:
         user.role==='TEACHER'||user.role==='ADMIN'?<>
           {administratorClassPage&&<div className="hs-professional-recovery"><SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope><SchoolAdminPanel title="年级与班级维护" label="年级与班级管理说明" help={<p>先建立年级，再将新班级归入对应年级。学校与班级选择用于切换当前管理范围。</p>}><SchoolStructureImport api={api} organizationId={schoolId} units={units} onUnits={setUnits} onBusy={setWorking} disabled={working}/><div className="hs-admin-create-grid"><section><h3>新增年级</h3>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></section><section><h3>新增班级</h3>{field('新建班级名称',className,setClassName)}<label className="hs-field"><span>所属年级</span><select value={parentGrade} onChange={e=>setParentGrade(e.target.value)}><option value="">请选择年级</option>{units.filter(x=>x.unitKind==='GRADE').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label><button disabled={working||!parentGrade} onClick={()=>void createUnit('CLASS')}>增加班级</button></section></div></SchoolAdminPanel></div>}
+          {administratorClassPage&&schoolId&&<SchoolPersonnelImport api={api} organizationId={schoolId} disabled={working}/>}
           {page==='classes'&&professionalClassPage&&<SchoolProfessionalClassScope>{workspaceContext}</SchoolProfessionalClassScope>}
           {page==='classes'&&!professionalClassPage&&!administratorClassPage&&<section className="hs-panel"><h2>学校与班级</h2>
             {schoolAdmin&&<div className="hs-grid"><div>{field('新建年级名称',gradeName,setGradeName)}<button disabled={working||!schoolId} onClick={()=>void createUnit('GRADE')}>增加年级</button></div>

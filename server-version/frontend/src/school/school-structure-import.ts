@@ -5,7 +5,7 @@ export type StructureImportPreview={rows:StructureImportRow[];errors:string[]}
 export const STRUCTURE_IMPORT_LIMIT=100
 
 // Small, bounded CSV/TSV reader. Physical line numbers remain attached to records.
-function records(source:string):Array<{line:number;cells:string[]}>{
+export function readSchoolDelimitedRecords(source:string):Array<{line:number;cells:string[]}>{
  const text=source.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n')
  const first=text.split('\n').find(line=>line.trim())??''
  const delimiter=first.includes('\t')?'\t':','
@@ -36,8 +36,8 @@ const classHeaders=new Set(['班级','班级名称','class','class_name','name']
 export function previewSchoolStructure(text:string,kind:StructureImportKind,units:SchoolUnit[],defaultGradeId=''):StructureImportPreview{
  const errors:string[]=[],rows:StructureImportRow[]=[]
  if(text.length>64000)return {rows,errors:['内容过长，请分批导入（每批最多 100 条）。']}
- let parsed:ReturnType<typeof records>
- try{parsed=records(text)}catch(error){return {rows,errors:[(error as Error).message]}}
+ let parsed:ReturnType<typeof readSchoolDelimitedRecords>
+ try{parsed=readSchoolDelimitedRecords(text)}catch(error){return {rows,errors:[(error as Error).message]}}
  const first=parsed[0]?.cells.map(value=>value.toLowerCase())
  if(first&&(kind==='GRADE'?first.length===1&&gradeHeaders.has(first[0]):first.length===1&&classHeaders.has(first[0])||first.length===2&&gradeHeaders.has(first[0])&&classHeaders.has(first[1])))parsed.shift()
  if(!parsed.length)return {rows,errors:['请先填写要导入的名称。']}
