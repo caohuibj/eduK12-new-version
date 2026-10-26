@@ -375,9 +375,10 @@ export default function HuiteacherApp(){
   const publicHome=screen==='home'
   const publicAuth=!me&&screen!=='home'
   const workspaceNavigation=Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role!=='STUDENT'&&!assessmentPageOpen)
+  const compactWorkspaceHeader=workspaceNavigation||assessmentPageOpen||Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role==='STUDENT')
   return <main ref={appRoot} className={`ht-app${!me||publicHome?' ht-app-public':''}${me?' ht-app-signed-in':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
-    <header className={`ht-topbar${workspaceNavigation||assessmentPageOpen?' ht-topbar-workspace':''}`}>
+    <header className={`ht-topbar${compactWorkspaceHeader?' ht-topbar-workspace':''}`}>
       <button type="button" className="ht-brand-home" aria-label="Teacher 首页"
         onClick={()=>changeScreen('home')}><TeacherBrand/></button>
       {workspaceNavigation&&me&&<div className="ht-header-workspaces">
@@ -478,7 +479,7 @@ export default function HuiteacherApp(){
       <h1>首次登录 · 修改教育账号密码</h1>
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
-    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={workspaceTab==='teacher'?personalSection:workspaceTab==='expert'?'ht-professional-practice':'other'}><div className={'ht-workspace'+(workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
+    me&&screen==='workspace'?<TeacherAssessmentProvider onActiveChange={setAssessmentPageOpen} scope={me.role==='STUDENT'?'ht-personal-tasks':workspaceTab==='teacher'?personalSection:workspaceTab==='expert'?'ht-professional-practice':'other'}><div className={'ht-workspace'+(me.role==='STUDENT'?' ht-student-workspace':workspaceTab==='school'?' ht-workspace-admin':'')} hidden={assessmentPageOpen}>
       <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
@@ -576,9 +577,10 @@ export default function HuiteacherApp(){
       </>}
       </>}
       {me.organizations.length>0&&<div className="ht-workspace-school">
+        {me.role==='STUDENT'?<div className="ht-student-schools"><span>已加入学校</span><div>{me.organizations.map(school=><span key={school.organizationId}>{school.organizationName}</span>)}</div></div>:
         <label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
           {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
-        </select></label>
+        </select></label>}
       </div>}
     </div></TeacherAssessmentProvider>:null}
     </div>

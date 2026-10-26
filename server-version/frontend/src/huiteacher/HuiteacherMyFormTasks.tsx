@@ -1,3 +1,5 @@
+import {ClipboardList} from 'lucide-react'
+import {SchoolTaskHelp as StudentTaskHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentPage} from './TeacherAssessmentPage'
 import { useCallback,useEffect,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
@@ -147,24 +149,23 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
       setNotice('评价已完成正式 FINAL；教师只能在满足隐私条件后查看群体反馈。')
     })
   }
-  return <section className={unified?"ht-assessment-source":"ht-panel"} aria-label={unified?undefined:student?'我的学生评教':'我的教师发展评价任务'}>
-    {!unified&&<><h2>{student?'我的学生评教':'我的评价任务'}</h2>
-    <p>{student
-      ?'使用原有教育账号参与已获授权的教师评教。身份用于确认资格，教师不能查看逐人作答；这属于身份受保护评价，不是绝对匿名。'
-      :'使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。'}</p></>}
+  return <section className={unified?"ht-assessment-source":student?"ht-panel ht-student-task-inbox":"ht-panel"} aria-label={unified?undefined:student?'我的学生评教':'我的教师发展评价任务'}>
+    {!unified&&(student?<>
+      <header className="ht-section-heading"><h2>我的评教任务</h2><StudentTaskHelp label="学生评教与隐私说明" buttonText=""><p>使用原有教育账号参与已获授权的教师评教。身份用于确认资格，教师不能查看逐人作答；这属于身份受保护评价，不是绝对匿名。</p></StudentTaskHelp></header>
+      <p className="ht-muted">完成学校安排的教师评价，按任务逐项填写。</p>
+    </>:<><h2>我的评价任务</h2><p>使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。</p></>)}
+    {student&&listReady&&!listPending&&!listError&&<p className="ht-student-task-count" role="status">已加载 {tasks.length} 项评教任务</p>}
     {!unified&&listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
     {notice&&!active&&<p role="status" className="ht-notice">{notice}</p>}
     {listReady&&!listPending&&!listError&&tasks.length===0&&!unified?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
-      <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
-        <strong>{item.formTitle}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span>
-        <p>{item.eventTitle}{student&&item.teacherName?' · '+item.teacherName:''}</p>
-        {student&&item.deadline&&<p>截止：{new Date(item.deadline).toLocaleString('zh-CN')}</p>}
+      <div className="ht-event-list">{tasks.map(item=><article className={'ht-event'+(student?' ht-student-task-card':'')} key={item.executionId}>
+        {student?<><span className="ht-student-task-icon" aria-hidden="true"><ClipboardList size={20}/></span><div className="ht-student-task-copy"><h3>{item.formTitle}</h3><p>{item.eventTitle}{item.teacherName?' · '+item.teacherName:''}</p><div className="ht-student-task-meta"><span className="ht-tag" data-status={item.status}>{assessmentStatus(item.status)}</span>{item.deadline&&<span>截止：{new Date(item.deadline).toLocaleString('zh-CN')}</span>}</div></div></>:<><strong>{item.formTitle}</strong> <span className="ht-tag">{unified?assessmentStatus(item.status):item.status}</span><p>{item.eventTitle}</p></>}
         <button disabled={busy||item.status==='COMPLETED'}
           onClick={()=>void open(item)}>
-          {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(item.status==='ASSIGNED'?'开始评价':'继续评价')}
+          {unified?(item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始测评':'继续测评'):(student&&item.status==='COMPLETED'?'已完成':item.status==='ASSIGNED'?'开始评价':'继续评价')}
         </button>
       </article>)}</div>}
     {active&&<TeacherAssessmentPage kind="answer" title={active.title} onBack={()=>{if(active.status==='STARTED')storeDraft(active,answers);setActive(null)}}><div className="ht-task">
@@ -173,7 +174,7 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
       {active.status==='COMPLETED'?<p role="status">本次评价已正式提交。</p>:
       <>
         <p>答案仅在本标签页短时暂存；按整份表单一次性提交。</p>
-        <TaskForm purpose="HUITEACHER" advanceSingleChoiceFocus
+        <TaskForm purpose="HUITEACHER"
           unit={{kind:'FORM',instrumentKey:active.formId,title:active.title,pages:active.pages}}
           answer={answers} onChange={updateAnswer} pageIndex={page}
           onPageChange={setPage}/>

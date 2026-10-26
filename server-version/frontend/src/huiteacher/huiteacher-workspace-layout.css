@@ -259,3 +259,21 @@
 .ht-practice-form progress::-webkit-progress-value{background:var(--ht-copper)}
 .ht-practice-form progress::-moz-progress-bar{background:var(--ht-copper)}
 @media(max-width:640px){.ht-practice-form>section{padding:14px}.ht-practice-form fieldset{padding:12px}.ht-workspace .ht-practice-form>section>h3{font-size:16px}}
+
+/* Students use the same compact banner and task hierarchy with Teacher colors. */
+.ht-student-workspace .ht-student-task-inbox>.ht-muted{margin:0 0 12px;font-size:13px}
+.ht-student-task-count{margin:0 0 14px;font-size:13px;color:var(--ht-quiet)}
+.ht-app[data-theme] .ht-student-task-card{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:14px;margin:0;padding:18px 0;border:0;border-bottom:1px solid var(--ht-line);border-radius:0;background:transparent;box-shadow:none}
+.ht-app[data-theme] .ht-student-task-card:last-child{border-bottom:0;padding-bottom:0}
+.ht-student-task-icon{display:grid;place-items:center;align-self:start;width:36px;height:40px;color:var(--ht-copper);background:var(--ht-workspace-soft);border-radius:9px}
+.ht-student-task-copy{min-width:0}
+.ht-workspace .ht-student-task-copy h3{font-size:15px;font-weight:600;margin:0 0 5px}
+.ht-workspace .ht-student-task-copy p{margin:0 0 9px;font-size:13px;color:var(--ht-quiet)}
+.ht-student-task-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;color:var(--ht-quiet);font-size:12px}
+.ht-student-task-meta .ht-tag{padding:3px 9px;font-size:12px;font-weight:500}
+.ht-student-task-meta .ht-tag[data-status=STARTED]{border-color:var(--ht-copper);color:var(--ht-copper)}
+.ht-student-task-card>button{font-size:14px;min-width:94px}
+.ht-student-schools{display:flex;align-items:baseline;gap:10px;min-width:0;color:var(--ht-quiet);font-size:12px}
+.ht-student-schools>span{flex:none}
+.ht-student-schools>div{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
+@media(max-width:640px){.ht-app[data-theme] .ht-student-task-card{grid-template-columns:32px minmax(0,1fr);gap:10px 12px;padding-block:16px}.ht-student-task-icon{width:32px;height:36px}.ht-student-task-card>button{grid-column:2;justify-self:start}.ht-student-schools{align-items:flex-start}}
