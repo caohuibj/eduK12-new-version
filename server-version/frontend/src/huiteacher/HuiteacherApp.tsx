@@ -363,12 +363,28 @@ export default function HuiteacherApp(){
   },[workspaceTab,loading,me?.id,selectedOrg])
   const publicHome=screen==='home'
   const publicAuth=!me&&screen!=='home'
+  const workspaceNavigation=Boolean(me&&screen==='workspace'&&!me.mustChangePassword&&me.role!=='STUDENT')
   return <main ref={appRoot} className={`ht-app${!me||publicHome?' ht-app-public':''}${me?' ht-app-signed-in':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
     <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
-    <header className="ht-topbar">
+    <header className={`ht-topbar${workspaceNavigation?' ht-topbar-workspace':''}`}>
       <button type="button" className="ht-brand-home" aria-label="Teacher 首页"
         onClick={()=>changeScreen('home')}><TeacherBrand/></button>
-      <nav aria-label="产品导航">
+      {workspaceNavigation&&me&&<div className="ht-header-workspaces">
+      <div className="ht-workspace-switcher">
+      <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
+        <button type="button" aria-pressed={workspaceTab==='teacher'}
+          onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
+        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
+        {me.organizations.some(o=>o.productAdmin)&&<button type="button"
+          aria-pressed={workspaceTab==='school'}
+          onClick={()=>changeWorkspaceTab('school')}><UsersRound size={18} aria-hidden="true"/>学校改进</button>}
+        <button type="button" aria-pressed={workspaceTab==='expert'}
+          onClick={()=>changeWorkspaceTab('expert')}><Compass size={18} aria-hidden="true"/>专业实践</button>
+      </nav>
+      {workspaceTab==='teacher'&&<PersonalSpaceInfo/>}
+      </div>
+      </div>}
+      <nav className="ht-account-actions" aria-label="产品导航">
         {!me&&<>
           {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
           <button type="button" className="ht-login-entry" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
@@ -452,7 +468,7 @@ export default function HuiteacherApp(){
       <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
     </section>:
     me&&screen==='workspace'?<div className="ht-workspace">
-      <section className="ht-panel ht-workspace-header">
+      <section className="ht-workspace-header">
         <div className="ht-workspace-heading">
           <h1>我的教育发展空间</h1>
           <p className="ht-workspace-welcome">欢迎，{me.username}</p>
@@ -460,19 +476,7 @@ export default function HuiteacherApp(){
       </section>
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
-      <div className="ht-workspace-switcher">
-      <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
-        <button type="button" aria-pressed={workspaceTab==='teacher'}
-          onClick={()=>changeWorkspaceTab('teacher')}><BookOpen size={18} aria-hidden="true"/>教师成长</button>
-        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}><FileText size={18} aria-hidden="true"/>我的工具</button>}
-        {me.organizations.some(o=>o.productAdmin)&&<button type="button"
-          aria-pressed={workspaceTab==='school'}
-          onClick={()=>changeWorkspaceTab('school')}><UsersRound size={18} aria-hidden="true"/>学校改进</button>}
-        <button type="button" aria-pressed={workspaceTab==='expert'}
-          onClick={()=>changeWorkspaceTab('expert')}><Compass size={18} aria-hidden="true"/>专业实践</button>
-      </nav>
-      {workspaceTab==='teacher'&&<PersonalSpaceInfo/>}
-      </div>
+
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <div className="ht-workspace-body">

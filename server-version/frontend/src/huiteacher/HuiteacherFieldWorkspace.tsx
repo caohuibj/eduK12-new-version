@@ -119,6 +119,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     <h2>我的现场观察与专家反思</h2>
     <p>课堂、会议和教研观察使用限定活动授权。私人反思与正式提交给学校的专业意见严格分离。</p>
     {notice&&<p className="ht-notice" role="status">{notice}</p>}
+    <details className="ht-practice-disclosure"><summary>使用活动邀请码</summary>
     <div className="ht-inline">
       <label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
         <input value={expertInviteCode} maxLength={60}
@@ -128,6 +129,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
       <button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())}
         onClick={joinExpert}>使用当前账号领取专家任务</button>
     </div>
+    </details>
     <h3>受邀任务</h3>
     {!invitations.length?<p className="ht-empty">尚未收到现场评价邀请。</p>:
       <div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId}
@@ -136,7 +138,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
         <p className="ht-muted">到期：{new Date(inv.expiresAt).toLocaleString()}</p>
         {inv.status==='INVITED'&&<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>}
       </article>)}</div>}
-    <h3>新的现场记录</h3>
+    <details className="ht-practice-disclosure" open={active.length>0}><summary>新的现场记录</summary>
     <div className="ht-inline">
       <label className="ht-field"><span>本次活动</span><select
         value={newEvent} onChange={e=>setNewEvent(e.target.value)}>
@@ -154,6 +156,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
       <textarea maxLength={12000} rows={5} value={content}
         onChange={e=>setContent(e.target.value)} aria-label="观察记录草稿"/></label>
     <button disabled={busy||!newEvent||!content.trim()} onClick={create}>保存加密草稿</button>
+    </details>
     <h3>我的记录</h3>
     {!notes.length?<p className="ht-empty">尚未创建现场记录。</p>:
       <div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event">

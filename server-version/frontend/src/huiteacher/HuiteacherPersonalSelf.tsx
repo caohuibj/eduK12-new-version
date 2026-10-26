@@ -141,7 +141,7 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
     <h3 className="ht-assessment-section-title">可用测评工具{listReady&&<span className="ht-tag">{catalog.length} 项</span>}</h3>
     {listReady&&!listPending&&!listError&&!catalog.length?<p className="ht-empty">暂未获得个人测评工具授权。可继续使用学校安排的其他评价任务。</p>:
       <div className="ht-event-list ht-personal-catalog">{catalog.map(x=><div key={x.resourceId} className="ht-event">
-        <div className="ht-personal-tool-copy"><strong>{x.title}</strong><span className="ht-muted">个人作答 · 反馈仅本人可见</span><span className="ht-tag">Pilot · {x.version}</span></div>
+        <div className="ht-personal-tool-copy"><strong>{x.title}</strong><div className="ht-personal-tool-meta"><span className="ht-muted">个人作答 · 反馈仅本人可见</span><span className="ht-tag">Pilot · {x.version}</span></div></div>
         <button disabled={busy} onClick={()=>begin(x.resourceId)}>发起个人测评</button>
       </div>)}</div>}
     <h3 className="ht-assessment-section-title">我的个人测评记录{listReady&&<span className="ht-tag">{attempts.length} 条</span>}</h3>

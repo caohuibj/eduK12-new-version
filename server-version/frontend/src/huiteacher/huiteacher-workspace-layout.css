@@ -1,7 +1,7 @@
 /* Teacher workspaces retain their warm journal palette and compact account banner. */
-.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1120px,100%);padding:24px clamp(16px,3vw,32px) 48px;gap:18px}
+.ht-app .ht-workspace{--ht-workspace-soft:#f5ede2;display:grid;align-content:start;width:min(1120px,100%);padding:18px clamp(16px,3vw,32px) 40px;gap:14px}
 .ht-app[data-theme=dark] .ht-workspace{--ht-workspace-soft:#382d26}
-.ht-app .ht-workspace .ht-workspace-header{padding:10px 16px}
+.ht-app .ht-workspace .ht-workspace-header{padding:0 2px;border:0;border-radius:0;background:transparent;box-shadow:none}
 .ht-workspace-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 16px;min-width:0}
 .ht-workspace-heading h1{font-size:clamp(1.05rem,1.7vw,1.2rem);line-height:1.4;margin:0}
 .ht-workspace-heading .ht-workspace-welcome{min-width:0;max-width:100%;margin:0;color:var(--ht-quiet);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -12,36 +12,43 @@
 .ht-workspace-switcher{display:flex;align-items:center;gap:8px;min-width:0}
 .ht-workspace-info{position:relative;flex:none}
 .ht-app .ht-workspace-info-trigger{display:inline-flex;align-items:center;justify-content:center;width:36px;min-height:36px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--ht-quiet)}
-.ht-app .ht-workspace-info-trigger:hover{background:var(--ht-workspace-soft);color:var(--ht-copper)}
-.ht-workspace .ht-workspace-info-copy{position:absolute;z-index:10;top:100%;right:0;width:300px;max-width:calc(100vw - 48px);margin:0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper);color:var(--ht-ink);box-shadow:0 8px 24px #211c1a26;font-size:13px;line-height:1.8}
+.ht-app .ht-workspace-info-trigger:hover{background:var(--ht-surface-soft);color:var(--ht-copper)}
+.ht-app .ht-workspace-info-copy{position:absolute;z-index:10;top:100%;right:0;width:300px;max-width:calc(100vw - 48px);margin:0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper);color:var(--ht-ink);box-shadow:0 8px 24px #211c1a26;font-size:13px;line-height:1.8}
 
-/* Main workspaces are distinct from the quieter task navigation. */
-.ht-app .ht-workspace-tabs{display:flex;align-self:start;width:fit-content;max-width:100%;margin:0;padding:5px;gap:4px;border:1px solid var(--ht-line);border-radius:13px;background:var(--ht-paper)}
-.ht-app .ht-workspace-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:9px;flex:0 1 auto;min-width:0;min-height:44px;padding:10px 22px;border:0;border-radius:9px;background:transparent;color:var(--ht-quiet);font-size:14px;font-weight:600}
+/* The same navigation stays mounted once, beside the brand on desktop. */
+.ht-app .ht-topbar-workspace{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px 24px;padding-block:10px}
+.ht-app .ht-topbar-workspace .ht-brand-home{min-height:44px;min-width:0;display:flex;align-items:center}
+.ht-topbar-workspace .ht-header-workspaces{min-width:0;justify-self:center}
+.ht-topbar-workspace .ht-workspace-switcher{gap:6px}
+.ht-app .ht-topbar-workspace .ht-account-actions{grid-column:3;display:flex;width:auto;margin:0;gap:8px}
+.ht-topbar-workspace .ht-account-actions>.ht-welcome{display:none}
+.ht-app .ht-workspace-tabs{display:flex;width:fit-content;max-width:100%;margin:0;padding:0;gap:4px;border:0;background:transparent;overflow-x:auto;scrollbar-width:thin}
+.ht-app .ht-topbar .ht-workspace-tabs{margin:0;justify-content:flex-start;flex-wrap:nowrap}
+.ht-app .ht-workspace-tabs button{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:44px;padding:10px 14px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--ht-quiet);font-size:14px;font-weight:600;white-space:nowrap}
 .ht-app .ht-workspace-tabs button[aria-pressed=true]{background:var(--ht-copper);color:var(--ht-on-primary,#fff);box-shadow:0 2px 6px #211c1a12}
-.ht-app .ht-workspace-tabs button:not([aria-pressed=true]):hover{background:var(--ht-workspace-soft);color:var(--ht-ink)}
+.ht-app .ht-workspace-tabs button:not([aria-pressed=true]):hover{background:var(--ht-surface-soft);color:var(--ht-ink)}
 .ht-workspace-tabs svg,.ht-workspace-jumps svg,.ht-workspace-context svg{flex:none}
 .ht-workspace .ht-workspace-context{display:flex;align-items:flex-start;gap:8px;margin:0;padding:0 2px;color:var(--ht-quiet);font-size:13px;line-height:1.7}
 .ht-workspace-context svg{margin-top:3px;color:var(--ht-copper)}
 
 /* Sections remain mounted so navigation never discards in-progress answers. */
-.ht-workspace-body{display:grid;grid-template-columns:180px minmax(0,1fr);gap:22px;align-items:start;min-width:0}
-.ht-workspace-body>.ht-workspace-jumps{position:sticky;top:20px;display:grid;align-content:start;gap:4px;max-height:calc(100dvh - 40px);overflow:auto;margin:0;padding:10px;border:1px solid var(--ht-line);border-radius:14px;background:var(--ht-paper)}
-.ht-workspace-nav-label{display:block;padding:6px 12px 10px;color:var(--ht-quiet);font-size:12px;letter-spacing:.05em}
-.ht-workspace-jumps a{position:relative;display:flex;align-items:center;gap:10px;min-width:0;min-height:46px;padding:10px 12px;border-radius:9px;color:var(--ht-quiet);text-decoration:none;font-size:14px;font-weight:500;line-height:1.6;overflow-wrap:anywhere}
-.ht-workspace-jumps a:hover{background:var(--ht-workspace-soft);color:var(--ht-ink)}
-.ht-workspace-jumps a[aria-current=location]{background:var(--ht-workspace-soft);color:var(--ht-copper);font-weight:650}
-.ht-workspace-jumps a[aria-current=location]:before{content:'';position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:3px;background:var(--ht-copper)}
+.ht-workspace-body{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;min-width:0}
+.ht-workspace-body>.ht-workspace-jumps{position:static;display:flex;align-items:center;gap:18px;overflow-x:auto;scrollbar-width:thin;margin:0;padding:0 2px;border:0;border-bottom:1px solid var(--ht-line);background:transparent}
+.ht-workspace-nav-label{display:none}
+.ht-workspace-jumps a{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:46px;padding:10px 6px 12px;color:var(--ht-quiet);text-decoration:none;font-size:14px;font-weight:500;line-height:1.6;white-space:nowrap}
+.ht-workspace-jumps a:hover{color:var(--ht-ink)}
+.ht-workspace-jumps a[aria-current=location]{color:var(--ht-copper);font-weight:650}
+.ht-workspace-jumps a[aria-current=location]:after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--ht-copper)}
 .ht-workspace-sections{display:grid;gap:18px;min-width:0}
 .ht-workspace-sections>.ht-panel{margin:0}
 .ht-workspace-section{min-width:0;scroll-margin-top:24px}
 .ht-workspace-section[hidden]{display:none}
 .ht-workspace :is(h1,h2,h3,h4,p,.ht-tag,.ht-welcome){overflow-wrap:anywhere}
 .ht-workspace :is(h2,h3){line-height:1.5}
-.ht-workspace h2{font-size:clamp(1.15rem,2vw,1.35rem);margin:0 0 12px}
+.ht-workspace h2{font-size:clamp(1.1rem,1.7vw,1.25rem);margin:0 0 8px}
 .ht-workspace h3{font-size:16px;margin-top:24px;margin-bottom:12px}
 .ht-workspace p{line-height:1.8}
-.ht-workspace .ht-panel{min-width:0;padding:26px;border-radius:16px;box-shadow:0 4px 20px #6e392005}
+.ht-workspace .ht-panel{min-width:0;padding:22px;border-radius:14px;box-shadow:0 4px 20px #6e392005}
 .ht-workspace .ht-panel>p{max-width:76ch}
 .ht-workspace .ht-panel .ht-panel{box-shadow:none}
 .ht-workspace .ht-empty{margin:20px 0 0;padding:22px 24px;border:1px dashed var(--ht-line);border-radius:12px;background:var(--ht-workspace-soft);color:var(--ht-quiet);font-size:14px;line-height:1.8}
@@ -64,26 +71,33 @@
  .ht-practice-layout{grid-template-columns:minmax(0,1fr);gap:18px}
  .ht-practice-layout>.ht-panel:nth-child(2){position:static}
 }
-@media(max-width:900px){
- .ht-workspace-body{grid-template-columns:minmax(0,1fr);gap:14px}
- .ht-workspace-body>.ht-workspace-jumps{position:static;display:flex;flex-wrap:wrap;gap:4px;max-height:none;padding:5px;border-radius:12px}
- .ht-workspace-nav-label{display:none}
- .ht-workspace-jumps a{flex:1 1 auto;justify-content:center;gap:8px;padding:9px 12px;font-size:13px}
- .ht-workspace-jumps a[aria-current=location]:before{display:none}
+@media(max-width:1100px){
+ .ht-app .ht-topbar-workspace{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding-inline:24px}
+ .ht-app .ht-topbar-workspace .ht-account-actions{grid-column:2;grid-row:1}
+ .ht-topbar-workspace .ht-header-workspaces{grid-column:1/-1;grid-row:2;width:100%;justify-self:stretch}
+ .ht-topbar-workspace .ht-workspace-switcher{justify-content:space-between;border-top:1px solid var(--ht-line);padding-top:8px}
+ .ht-app .ht-workspace-tabs button{padding-inline:14px}
 }
 @media(max-width:640px){
- .ht-app .ht-workspace{padding:20px 16px 32px;gap:16px}
- .ht-app .ht-workspace .ht-workspace-header{padding:10px 12px}
- .ht-app .ht-workspace-switcher .ht-workspace-tabs{width:auto;flex:1}
- .ht-app .ht-workspace-tabs button{flex:1 1 auto;padding:10px 8px;gap:7px}
+ .ht-app .ht-workspace{padding:14px 16px 28px;gap:12px}
+ .ht-app .ht-topbar-workspace{padding:12px 16px 8px;gap:8px}
+ .ht-topbar-workspace .ht-brand-wordmark{width:102px}
+ .ht-app .ht-topbar-workspace .ht-brand-b3{width:34px;height:40px}
+ .ht-workspace-heading h1{font-size:15px}
+ .ht-workspace-heading .ht-workspace-welcome{font-size:12px}
+ .ht-workspace-body{gap:12px}
+ .ht-app .ht-workspace .ht-workspace-header{padding:0 2px}
+ .ht-app .ht-workspace-switcher .ht-workspace-tabs{width:auto;min-width:0;flex:1}
+ .ht-app .ht-workspace-tabs button{flex:none;padding:8px 12px;gap:7px;font-size:13px}
  .ht-app .ht-workspace-info-trigger{width:44px;min-height:44px}
- .ht-workspace .ht-panel{padding:20px 18px;border-radius:14px}
+ .ht-workspace .ht-panel{padding:18px 16px;border-radius:12px}
  .ht-workspace .ht-empty{padding:18px;margin-top:18px}
  .ht-workspace-sections{gap:16px}
  .ht-workspace .ht-inline{align-items:stretch}
  .ht-workspace .ht-inline>.ht-field{flex-basis:100%}
  .ht-workspace .ht-inline button{margin-bottom:0}
- .ht-workspace-jumps a{flex:1 1 calc(50% - 4px);justify-content:flex-start;gap:7px;padding:9px 10px;font-size:13px}
+ .ht-workspace-body>.ht-workspace-jumps{gap:18px}
+ .ht-workspace-jumps a{flex:none;gap:7px;padding:9px 4px 11px;font-size:13px}
  .ht-workspace h2{font-size:19px}
 }
 
@@ -113,20 +127,26 @@
 /* Assigned assessments share one inbox regardless of the authorized answer format. */
 .ht-assessment-items{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;min-width:0}
 .ht-assessment-source,.ht-assessment-source>.ht-event-list{display:contents}
-.ht-assessment-source>.ht-event-list>.ht-event{margin:0;padding:18px;min-width:0}
-.ht-assessment-source>.ht-event-list>.ht-event>strong{display:inline-block;margin-right:10px;font-size:16px}
-.ht-assessment-source>.ht-event-list>.ht-event>p{margin:8px 0 12px;color:var(--ht-quiet);font-size:13px}
+.ht-assessment-source>.ht-event-list>.ht-event{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:7px 18px;margin:0;padding:16px 18px;min-width:0}
+.ht-assessment-source>.ht-event-list>.ht-event>strong{grid-column:1;min-width:0;margin:0;font-size:15px;line-height:1.6}
+.ht-assessment-source>.ht-event-list>.ht-event>.ht-tag{grid-column:2;justify-self:start;grid-row:1;font-size:12px;padding:3px 9px}
+.ht-assessment-source>.ht-event-list>.ht-event>:is(button,.ht-inline){grid-column:3;grid-row:1/3;margin:0;align-self:center}
+.ht-assessment-source>.ht-event-list>.ht-event>.ht-inline button{margin:0}
+.ht-assessment-source>.ht-event-list>.ht-event>.ht-personal-report{grid-column:1/-1}
+.ht-assessment-source>.ht-event-list>.ht-event>p{grid-column:1/3;grid-row:2;margin:0;color:var(--ht-quiet);font-size:13px;line-height:1.6}
 .ht-assessment-source>:not(.ht-event-list){grid-column:1/-1;min-width:0}
 .ht-assessment-source>.ht-task{margin-top:6px;padding-top:18px;border-top:1px solid var(--ht-line)}
 
 /* Personal launch tools and assigned assessments share a compact card rhythm. */
 .ht-workspace .ht-assessment-section-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
 .ht-assessment-section-title>.ht-tag{font-size:12px;font-weight:500;line-height:1.5}
-.ht-personal-workbench .ht-personal-catalog{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px}
-.ht-personal-catalog>.ht-event{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0;padding:18px}
+.ht-personal-workbench .ht-personal-catalog{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;margin-top:12px}
+.ht-personal-catalog>.ht-event{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0;padding:16px 18px}
 .ht-personal-tool-copy{display:grid;justify-items:start;gap:7px;min-width:0}
 .ht-personal-tool-copy>strong{font-size:15px;line-height:1.6}
-.ht-personal-tool-copy>.ht-muted{font-size:12px}
+.ht-personal-tool-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px}
+.ht-personal-tool-meta>.ht-muted{font-size:12px}
+.ht-personal-tool-meta>.ht-tag{padding:2px 8px;font-size:11px;line-height:1.6}
 .ht-personal-catalog>.ht-event>button{flex:none;margin:0}
 .ht-personal-workbench>.ht-task{margin-top:24px;padding-top:20px;border-top:1px solid var(--ht-line)}
 .ht-personal-workbench .ht-scale-item{margin:14px 0;padding:16px;border:1px solid var(--ht-line);border-radius:12px}
@@ -141,9 +161,38 @@
  .ht-personal-workbench .ht-scale-item{padding:12px}
 }
 
-.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px}
+.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px 14px;align-items:center;padding:16px 18px}
 .ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>strong{min-width:0;line-height:1.7}
-.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-tag{align-self:start;white-space:nowrap}
-.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>:is(.ht-inline,.ht-personal-report){grid-column:1/-1}
+.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-tag{align-self:start;white-space:nowrap;padding:3px 9px;font-size:12px}
+.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-inline{grid-column:3;grid-row:1;margin:0}
+.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-inline button{margin:0}
+.ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-personal-report{grid-column:1/-1}
 .ht-workspace .ht-task:focus{outline:none}
 .ht-workspace .ht-task:focus-visible{outline:2px solid var(--ht-copper);outline-offset:4px}
+
+/* Compact lists keep the task action adjacent to its title until a narrow screen needs stacking. */
+@media(max-width:600px){
+ .ht-assessment-source>.ht-event-list>.ht-event{grid-template-columns:minmax(0,1fr);padding:16px;gap:7px}
+ .ht-assessment-source>.ht-event-list>.ht-event>.ht-tag{grid-column:1;grid-row:3}
+ .ht-assessment-source>.ht-event-list>.ht-event>p{grid-column:1}
+ .ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event{grid-template-columns:minmax(0,1fr) auto}
+ .ht-personal-workbench>.ht-event-list:not(.ht-personal-catalog)>.ht-event>.ht-inline{grid-column:1/-1;grid-row:auto;margin-top:4px}
+ .ht-assessment-source>.ht-event-list>.ht-event>:is(button,.ht-inline){grid-column:1;grid-row:auto;justify-self:start;margin-top:5px}
+ .ht-personal-catalog>.ht-event{gap:12px}
+}
+
+@media(max-width:360px){
+ .ht-app .ht-topbar-workspace{padding-inline:12px;column-gap:6px}
+ .ht-app .ht-topbar-workspace .ht-brand{gap:8px}
+ .ht-app .ht-topbar-workspace .ht-brand-wordmark{width:82px}
+ .ht-app .ht-topbar-workspace .ht-brand-b3{width:28px;height:34px}
+ .ht-app .ht-topbar-workspace .ht-account-actions{gap:4px}
+ .ht-app .ht-topbar-workspace .ht-account-actions>button:not(.ht-account-entry){padding:8px;font-size:12px}
+}
+
+.ht-practice-disclosure{margin-top:18px;border-block:1px solid var(--ht-line)}
+.ht-practice-disclosure>summary{min-height:46px;padding:12px 2px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ht-copper)}
+.ht-practice-disclosure>summary:focus-visible{outline:2px solid var(--ht-copper);outline-offset:3px}
+.ht-practice-disclosure[open]{padding-bottom:16px}
+.ht-practice-disclosure .ht-inline{margin-top:4px}
+.ht-practice-disclosure .ht-inline button{margin-bottom:0}
