@@ -1,8 +1,9 @@
-import type { TaskDefinition, MetricDefinition, QualityDefinition } from '../../v2/types'
+import type { TaskDefinition, MetricDefinition, QualityDefinition, ReportDefinition } from '../../v2/types'
 import { createSessionConfigSnapshot } from '../../v2/session-snapshot'
 import { MOT_IDENTITY, motConfig, type MotConfig, type MotProfile, type MotTrial } from './protocol'
 import { motConfigSchema, motTrialSchema } from './schema'
 import { scoreMot } from './scorer'
+import historicalReport110 from './report-bundle-1.1.0.json'
 
 const allGates = ['unreliableSpeed1','unreliableSpeed4','unreliableSpeed8']
 const metric = (key:string,label:string,unit:MetricDefinition['unit'],role:MetricDefinition['role'],
@@ -35,6 +36,20 @@ for (const speed of [1,4,8]) {
   for (const prefix of ['validTrialsSpeed','totalTrialsSpeed','observedTrialsSpeed'])
     metrics[prefix+speed]=metric(prefix+speed,prefix+speed,'count','quality')
 }
+export interface MotReportBundle { report: ReportDefinition; metrics: Record<string, MetricDefinition>; quality: Record<string, QualityDefinition> }
+export const MOT_REPORT_VERSION = '1.1.1' as const
+// Display-only rounding; the scorer and all stored metric numbers remain unchanged.
+for (const key of ['meanTrackedTargets', 'meanTargetsSpeed1', 'meanTargetsSpeed4', 'meanTargetsSpeed8']) metrics[key].precision = 1
+const currentReport: ReportDefinition = { ...structuredClone(historicalReport110.report) as ReportDefinition, version: MOT_REPORT_VERSION }
+const reportBundles: Record<string, MotReportBundle> = {
+  '1.1.0': historicalReport110 as unknown as MotReportBundle,
+  '1.1.1': { report: currentReport, metrics, quality },
+}
+/** Exact historical descriptor lookup. Copies prevent a consumer from mutating the allowlisted bytes. */
+export function getMotReportBundle(version: string): MotReportBundle | undefined {
+  if (!Object.prototype.hasOwnProperty.call(reportBundles, version)) return undefined
+  return structuredClone(reportBundles[version])
+}
 /** Native v2 candidate only: intentionally absent from the legacy/generated registry. */
 export const motDefinition:TaskDefinition<MotConfig,MotTrial> = {
   schemaVersion:1,testType:'mot',name:'多目标追踪',category:'attention',
@@ -52,11 +67,7 @@ export const motDefinition:TaskDefinition<MotConfig,MotTrial> = {
       reportCaveats:['每速度仅3次，是项目暂定短版；记录不代表稳定能力。']},
   },
   metrics,quality,references:[],
-  report:{schemaVersion:1,version:'1.1.0',title:'这次的追踪记录',
-    headlineMetrics:['meanTrackedTargets'],userMetrics:[1,4,8].map(s=>'meanTargetsSpeed'+s),
-    detailMetrics:['trackingAccuracy','validTrialCount','excludedTrialCount'],
-    practicalTips:['把设备放稳，关闭通知，让目光能持续留在画面上。'],
-    disclaimer:'这里只描述本轮任务，不代表日常最多能同时注意几件事。'},
+  report:currentReport,
   publication:{status:'DRAFT',referenceRequired:false,evidenceNote:'未注册候选；产品准入由平台真实生命周期决定。'},
 }
 export const createMotSnapshot = (profile:MotProfile,frozenAt='2026-10-26T00:00:00.000Z') =>

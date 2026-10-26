@@ -4,6 +4,7 @@ import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cogni
 import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions } from './content-candidates/native-registry/definitions'
 import { ANT_IDENTITY } from './content-candidates/ant/protocol'
 import { ENUMERATION_IDENTITY } from './content-candidates/enumeration/protocol'
+import { getMotReportBundle } from './content-candidates/mot/package'
 import { MOT_IDENTITY } from './content-candidates/mot/protocol'
 import { NATIVE_IDENTITY } from './content-candidates/continuous-recognition/native'
 import { BAD_REQUEST } from './cognitive.errors'
@@ -69,4 +70,17 @@ export function assertNativeDeliverySupported(resource: CognitiveTaskResource, p
   if (resource.kind !== 'native') return
   if (purpose !== 'authenticated' || resource.testType !== 'mot')
     throw BAD_REQUEST('This native Cognitive identity is not enabled for this delivery path')
+}
+
+/** Report-only compatibility is independent from measurement/scorer identity. Unknown bundles never fall back. */
+export function resolveNativeReportBundle(resource: Extract<CognitiveTaskResource, { kind: 'native' }>, version: string) {
+  if (resource.testType === MOT_IDENTITY.testType && resource.engineVersion === MOT_IDENTITY.engineVersion
+    && resource.scoringVersion === MOT_IDENTITY.scoringVersion) return getMotReportBundle(version)
+  return version === resource.definition.report.version
+    ? { report: resource.definition.report, metrics: resource.definition.metrics, quality: resource.definition.quality } : undefined
+}
+export function nativeDefinitionForFrozenReport(resource: Extract<CognitiveTaskResource, { kind: 'native' }>, version: string) {
+  const bundle = resolveNativeReportBundle(resource, version)
+  if (!bundle) throw BAD_REQUEST('Unknown native frozen report version')
+  return { ...resource.definition, metrics: bundle.metrics, quality: bundle.quality, report: bundle.report }
 }

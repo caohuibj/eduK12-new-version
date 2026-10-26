@@ -1,5 +1,5 @@
 import { resolveParticipantPresentation, type CognitiveParticipantPresentationV1 } from './participant-presentation'
-import { getCognitiveTaskResource, type CognitiveTaskResource } from './task-resource'
+import { getCognitiveTaskResource, resolveNativeReportBundle, type CognitiveTaskResource } from './task-resource'
 import { buildCognitiveV2TaskDefinition } from './v2/registry'
 import { computeProtocolSignature } from './v2/canonical'
 import type { TaskDefinition } from './v2/types'
@@ -170,21 +170,29 @@ export const readFrozenReport = (encrypted?: string | null): FrozenReportSnapsho
     || snapshot.participantPresentation.presentationVersion !== snapshot.presentationVersion
     || !snapshot.v2ReportDefinition || !snapshot.v2MetricDefinitions || !snapshot.v2QualityDefinitions
   )) throw new Error('COG_PRESENTATION_SNAPSHOT_INVALID')
+  assertNativeFrozenReport(snapshot)
+  return snapshot
+}
+
+/** Validate the exact persisted descriptor version, including its full bytes, without finding latest. */
+export function assertNativeFrozenReport(snapshot: FrozenReportSnapshot): Extract<CognitiveTaskResource, { kind: 'native' }> | undefined {
   if (snapshot.nativeIdentity) {
     const identity = snapshot.nativeIdentity
     const resource = getCognitiveTaskResource(identity.testType, identity.engineVersion, identity.scoringVersion)
-    if (!resource || resource.kind !== 'native' || identity.configVersion !== resource.configVersion
+    const bundle = resource?.kind === 'native' ? resolveNativeReportBundle(resource, snapshot.reportDefinitionVersion) : undefined
+    if (!resource || resource.kind !== 'native' || !bundle || identity.configVersion !== resource.configVersion
       || identity.protocolSignature !== computeProtocolSignature(resource.definition.protocol)
       || snapshot.profileDefinitionVersion !== resource.profileDefinitionVersion
       || snapshot.metricDefinitionVersion !== resource.metricDefinitionVersion
       || snapshot.qualityDefinitionVersion !== resource.qualityDefinitionVersion
-      || snapshot.reportDefinitionVersion !== resource.reportDefinitionVersion || !resource.profiles[snapshot.profile]
-      || hashResolvedConfig(snapshot.v2ReportDefinition) !== hashResolvedConfig(resource.definition.report)
-      || hashResolvedConfig(snapshot.v2MetricDefinitions) !== hashResolvedConfig(resource.definition.metrics)
-      || hashResolvedConfig(snapshot.v2QualityDefinitions) !== hashResolvedConfig(resource.definition.quality))
+      || snapshot.v2ReportDefinition?.version !== snapshot.reportDefinitionVersion || !resource.profiles[snapshot.profile]
+      || hashResolvedConfig(snapshot.v2ReportDefinition) !== hashResolvedConfig(bundle.report)
+      || hashResolvedConfig(snapshot.v2MetricDefinitions) !== hashResolvedConfig(bundle.metrics)
+      || hashResolvedConfig(snapshot.v2QualityDefinitions) !== hashResolvedConfig(bundle.quality))
       throw new Error('COG_NATIVE_FROZEN_REPORT_IDENTITY_INVALID')
+    return resource
   }
-  return snapshot
+  return undefined
 }
 
 export interface FrozenMeasurementContext {

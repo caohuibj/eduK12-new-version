@@ -25,7 +25,7 @@ export const motContent = {
     'Technical gates and the complete-valid-condition requirement are provisional project rules, not empirical clinical cutoffs.',
     'Online scorer uses client-reported frame summaries; complete frame logs are archived for later independent research verification.',
   ],
-  versionBindings:{engine:'1.1.1',scoring:'1.1.0',config:'1.0.0',report:'1.1.0',presentation:'1.1.1',
+  versionBindings:{engine:'1.1.1',scoring:'1.1.0',config:'1.0.0',report:'1.1.1',presentation:'1.1.1',
     metricDefinition:'1.1.0',qualityDefinition:'1.1.0',profileDefinition:'1.0.0',
     randomization:'mot-fnv1a-mulberry32-v1'},
   productAdmission:'blocked_on_platform_native_runtime_and_archive_contract',

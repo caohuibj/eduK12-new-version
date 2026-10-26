@@ -13,8 +13,8 @@ import {
   decryptCognitivePayload,
   getParticipantKey,
 } from './cognitive.security'
-import { getCognitiveTaskResource, requireCognitiveTaskResource, assertResourceConfigVersion, assertNativeDeliverySupported } from './task-resource'
-import { hashResolvedConfig, readFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
+import { getCognitiveTaskResource, requireCognitiveTaskResource, resolveNativeReportBundle, nativeDefinitionForFrozenReport, assertResourceConfigVersion, assertNativeDeliverySupported } from './task-resource'
+import { hashResolvedConfig, readFrozenReport, assertNativeFrozenReport, type FrozenReportSnapshot } from './profile-freeze'
 import { lockSession } from './session-lock'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from './attempt-quota'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
@@ -114,15 +114,25 @@ export const prepareUnifiedCognitiveSessionConfigSnapshot = async (input: {
   engineVersion: string
   scoringVersion: string
   config: unknown
+  frozenReport?: FrozenReportSnapshot | null
   db?: ExactReferenceDb & AssetDatabase
 }) => {
   assertCognitiveProductEligible(input.testType)
-  const definition = getCognitiveV2TaskDefinition(
+  let definition = getCognitiveV2TaskDefinition(
     input.testType,
     input.engineVersion,
     input.scoringVersion,
   )
   if (!definition) throw new Error(`No Cognitive v2 definition for ${input.testType}/${input.engineVersion}/${input.scoringVersion}`)
+  if (input.frozenReport?.nativeIdentity) {
+    const frozen = input.frozenReport, identity = frozen.nativeIdentity!
+    const resource = assertNativeFrozenReport(frozen)
+    if (!resource || identity.testType !== input.testType || identity.engineVersion !== input.engineVersion
+      || identity.scoringVersion !== input.scoringVersion || identity.configVersion !== input.configVersion
+      || (input.config as Record<string, unknown>).profile !== frozen.profile)
+      throw CONFLICT('Native Cognitive frozen runtime/report tuple mismatch')
+    definition = nativeDefinitionForFrozenReport(resource, frozen.reportDefinitionVersion)
+  }
   const compiledRuntime = compileCognitiveRuntime({
     definition,
     instrumentVersion: input.engineVersion,
@@ -334,7 +344,7 @@ const buildRunnerPayload = async (session: {
     if (!snapshot || !report?.nativeIdentity
       || report.nativeIdentity.testType !== snapshot.testType || report.nativeIdentity.engineVersion !== snapshot.engineVersion
       || report.nativeIdentity.scoringVersion !== snapshot.scoringVersion || report.nativeIdentity.configVersion !== snapshot.configVersion
-      || report.nativeIdentity.protocolSignature !== snapshot.protocolSignature || report.reportDefinitionVersion !== resource.reportDefinitionVersion
+      || report.nativeIdentity.protocolSignature !== snapshot.protocolSignature || !resolveNativeReportBundle(resource, report.reportDefinitionVersion)
       || report.profileDefinitionVersion !== resource.profileDefinitionVersion || report.metricDefinitionVersion !== resource.metricDefinitionVersion
       || report.qualityDefinitionVersion !== resource.qualityDefinitionVersion
       || !resource.profiles[report.profile] || (validatedConfig as Record<string, unknown>).profile !== report.profile)
@@ -407,6 +417,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
     engineVersion: ctx.config.engineVersion,
     scoringVersion: ctx.config.scoringVersion,
     config: ctx.validatedConfig,
+    frozenReport: ctx.frozenReport,
   })
   const randomSeed = randomBytes(16).toString('hex')
 
@@ -674,6 +685,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
     engineVersion: ctx.config.engineVersion,
     scoringVersion: ctx.config.scoringVersion,
     config: ctx.validatedConfig,
+    frozenReport: ctx.frozenReport,
   })
   const randomSeed = randomBytes(16).toString('hex')
 

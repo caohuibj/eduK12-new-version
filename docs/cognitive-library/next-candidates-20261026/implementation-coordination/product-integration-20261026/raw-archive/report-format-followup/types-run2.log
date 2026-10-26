@@ -1,0 +1,1 @@
+src/modules/cognitive/profile-freeze.ts(178,17): error TS4058: Return type of exported function has or is using name 'ResourceMetadata' from external module "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/task-resource" but cannot be named.
