@@ -266,7 +266,7 @@ export const projectScaleCanonicalUnitResult = (input: {
       const scaleReference: ScaleReferenceIdentityV1 | undefined = g && ref && binding ? {
         instrumentKey:input.runtime.instrumentKey,instrumentVersion:input.runtime.instrumentVersion,scoringVersion:input.result.method.scoringVersion,measurementHash:input.runtime.sourceDefinitionHash,
         subjectKey:g.subjectKey,locale:g.locale,schoolStage:g.schoolStage,scoreKey:score.key,direction:score.direction,range:g.scoreRange,reportVersion:input.result.method.reportVersion,
-        originalReferenceVersion:ref.referenceVersion,originalReferenceHash:binding.referenceHash,
+        originalReferenceKind:ref.referenceKind,originalReferenceVersion:ref.referenceVersion,originalReferenceHash:binding.referenceHash,
         ...(input.contextHash&&input.participantContext?{frozenContext:freezeLongitudinalContext(input.participantContext)}:{})
       } : undefined
       return {
@@ -503,7 +503,7 @@ const canonicalUnitResultCoreSchema = z.object({
  core.metrics.forEach((metric,i)=>{
   const id=metric.scaleReference
   if(!id)return
-  if(core.unitType!=='SCALE' || id.instrumentKey!==core.instrumentKey || id.instrumentVersion!==core.instrumentVersion || id.scoringVersion!==core.scorerVersion || id.measurementHash!==core.sourceDefinitionHash || id.scoreKey!==metric.key || !core.references.some(r=>r.scoreKey===metric.key && r.referenceVersion===id.originalReferenceVersion && r.referenceHash===id.originalReferenceHash))ctx.addIssue({code:z.ZodIssueCode.custom,path:['metrics',i,'scaleReference'],message:'SCALE_REFERENCE_IDENTITY_MISMATCH'})
+  if(core.unitType!=='SCALE' || id.instrumentKey!==core.instrumentKey || id.instrumentVersion!==core.instrumentVersion || id.scoringVersion!==core.scorerVersion || id.measurementHash!==core.sourceDefinitionHash || id.scoreKey!==metric.key || !core.references.some(r=>r.scoreKey===metric.key && r.referenceVersion===id.originalReferenceVersion && r.referenceHash===id.originalReferenceHash && (!id.originalReferenceKind || r.classification===id.originalReferenceKind)))ctx.addIssue({code:z.ZodIssueCode.custom,path:['metrics',i,'scaleReference'],message:'SCALE_REFERENCE_IDENTITY_MISMATCH'})
  })
 })
 
