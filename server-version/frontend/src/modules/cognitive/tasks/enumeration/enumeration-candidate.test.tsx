@@ -216,9 +216,9 @@ describe('enumeration candidate frontend closed loop', () => {
     const { port } = fixturePort()
     vi.mocked(port.retain).mockRejectedValueOnce(Error('quota'))
     await startUI(port); await confirmUI('practice')
-    expect((await screen.findByRole('alert')).textContent).toContain('不会重复呈现')
+    expect((await screen.findByRole('alert')).textContent).toContain('无需重复作答')
     const before = vi.mocked(requestAnimationFrame).mock.calls.length, original = vi.mocked(port.retain).mock.calls[0][0]
-    const retryButton = screen.getByRole('button', { name: '重试保存' })
+    const retryButton = screen.getByRole('button', { name: '重试提交' })
     act(() => { fireEvent.click(retryButton); fireEvent.click(retryButton) })
     await screen.findByRole('heading', { name: '练习记录' })
     expect(port.retain).toHaveBeenCalledTimes(2)
@@ -277,17 +277,17 @@ describe('enumeration candidate frontend closed loop', () => {
     for (let index = 0; index < 3; index++) {
       if (index > 0) { fireEvent.click(screen.getByRole('button', { name: '开始练习' })); await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull()) }
       await confirmUI('practice'); await screen.findByRole('heading', { name: '练习记录' })
-      fireEvent.click(screen.getByRole('button', { name: index < 2 ? '下一次练习' : '准备候选正式序列' }))
+      fireEvent.click(screen.getByRole('button', { name: index < 2 ? '下一次练习' : '准备开始作答' }))
     }
     for (let index = 0; index < 25; index++) {
-      fireEvent.click(screen.getByRole('button', { name: '开始候选正式轮' }))
+      fireEvent.click(screen.getByRole('button', { name: '开始这一轮' }))
       await waitFor(() => expect(document.querySelector('[data-enumeration-view="running"]')).not.toBeNull())
       await confirmUI('test')
-      if (index < 24) await screen.findByRole('button', { name: '开始候选正式轮' })
+      if (index < 24) await screen.findByRole('button', { name: '开始这一轮' })
     }
     await waitFor(() => expect(port.complete).toHaveBeenCalledTimes(1))
-    expect(screen.getByRole('status').textContent).toContain('等待主机确认')
-    expect(screen.queryByRole('heading', { name: '这次的候选记录' })).toBeNull()
+    expect(screen.getByRole('status').textContent).toContain('正在提交')
+    expect(screen.queryByRole('heading', { name: '这次的记录' })).toBeNull()
     const request = vi.mocked(port.complete).mock.calls[0][0]
     await act(async () => final.resolve({ ...request, confirmed: true }))
     expect(await screen.findByRole('heading', { name: '本次不提供表现结论' })).toBeTruthy()

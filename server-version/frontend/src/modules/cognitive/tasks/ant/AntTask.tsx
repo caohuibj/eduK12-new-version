@@ -113,23 +113,28 @@ function AntTaskSession(props:AntTaskProps){
       <h1>{en?'Follow the middle arrow':'看中间箭头，判断它的方向'}</h1>
       <p>{en?'Keep looking at the center. Brief cues may appear, then arrows appear above or below. Choose the direction of the middle arrow and ignore its neighbors.':'请注视中央。画面可能先出现短暂提示，随后在上方或下方出现箭头。判断中间箭头朝向，忽略两侧箭头。'}</p>
       <svg className="ant-svg-example" viewBox="0 0 240 80" aria-hidden="true"><text x="120" y="50" textAnchor="middle" fontSize="32" fill="#000">← ← → ← ←</text></svg>
-      <p>{en?'Use the fixed left/right areas. Touch and mouse are supported. The keyboard mapping is shown below; changing input during an attempt limits RT comparisons.':'使用固定左右回应区，支持触控与鼠标。键盘映射见下方；一次作答中混用输入会限制用时比较。'}</p>
+      <p>{en?'Use the fixed left/right areas by touch or mouse. Keyboard controls are shown below. Try to use the same response method throughout.':'轻触或点击固定左右回应区，键盘操作见下方。请尽量全程使用同一种回应方式，便于比较用时。'}</p>
       <details><summary>{en?'Timing, controls and session length':'时序、操作与时长'}</summary>
         <p>{en?'24 practice trials are saved separately. The research profile has 288 formal trials; experience has 48. Each trial starts 4 seconds after the previous start, including the response period.':'24次练习单独记录。文献次数对照版288次正式，体验版48次。每次起点相隔4秒，包含作答时间。'}</p>
         <p>{en?'Formal minimum: 19.2 / 3.2 minutes; practice adds 1.6 minutes, plus instructions, calibration and breaks.':'正式理论最短19.2 / 3.2分钟；练习另需1.6分钟，还需说明、校准与休息。'}</p>
         <p>{en?'Keyboard':'键盘'}：{d?.inputMap.leftKey??'—'} / {d?.inputMap.rightKey??'—'}。{en?'Release between responses.':'每次回应后请松开。'}</p>
       </details>
-      <p>{en?'An approved, frozen physical display calibration is required. A CSS demonstration does not provide calibration.':'正式启动需要宿主提供已确认的冻结物理几何。CSS示意不代替校准。'}</p>
-      <button onClick={()=>void start('practice')}>{en?'Check setup and start practice':'核验设置并开始练习'}</button>
+      <p>{en?'First complete the screen and viewing-distance calibration. Keep the same distance while responding.':'开始前，请先完成屏幕与观看距离校准。作答时请保持相同的观看距离。'}</p>
+      <button onClick={()=>void start('practice')}>{en?'Start practice':'开始练习'}</button>
     </>}
     {view==='practice-feedback'&&<><h1>{en?'Practice records are ready':'24次练习已记录'}</h1><p>{en?'Practice is separate from the formal result. Continuing means you understand the response method; it is not a practice accuracy pass mark.':'练习与正式结果分开。继续表示你已理解回应方式，不是练习正确率达标判定。'}</p><button onClick={()=>void start('test')}>{en?'Start formal trials':'开始正式作答'}</button></>}
     {view==='break'&&<><h1>{en?'Take a short break':'休息一下'}</h1><p>{en?'Keep the same viewing distance and input. Continue when ready.':'请保持观看距离与输入方式，准备好后继续。'}</p><button onClick={()=>void start('continue')}>{en?'Continue next block':'继续下一组'}</button></>}
-    {view==='saving'&&<p role="status">{en?'Confirming the local draft…':'正在确认本机草稿…'}</p>}
-    {(view==='error'||view==='terminated')&&<><h1>{en?'This attempt has stopped':'本次作答已停止'}</h1><p className="ant-error">{en?'The exposed records are retained. Retrying only saves the same records; it never repeats an exposure or silently resumes the 4-second stream.':'已曝光记录会保留。重试只保存同一份记录，不会重复呈现，也不会静默接着运行并假装4秒连续。'}</p><p>{en?'Reason':'原因'}：{current?.reason}</p>
-      {view==='error'?<button onClick={()=>void current?.retryLocal()}>{en?'Retry saving cached records':'重试保存缓存记录'}</button>:<button onClick={()=>void current?.finalize()}>{en?'Submit the limited record':'提交本次受限记录'}</button>}</>}
+    {view==='saving'&&<p role="status">{en?'Saving your records on this device…':'正在这台设备上保存记录…'}</p>}
+    {(view==='error'||view==='terminated')&&<><h1>{en?'This attempt has stopped':'本次作答已停止'}</h1><p className="ant-error">{en?'Completed and interrupted responses are retained. Retrying saves these same records without starting the task again.':'已经完成或中断的作答会保留。重试只保存这些记录，不会重新开始作答。'}</p><details><summary>{en?'Technical details for support':'需要帮助时可查看技术诊断'}</summary><code>{current?.reason}</code></details>
+      {view==='error'?<button onClick={()=>void current?.retryLocal()}>{en?'Retry saving these records':'重试保存记录'}</button>:<button onClick={()=>void current?.finalize()}>{en?'Submit the retained records':'提交已保留的记录'}</button>}</>}
     {view==='complete'&&<h1>{en?'This session is complete':'本轮作答已结束'}</h1>}
-    {(view==='terminated'||view==='complete')&&<p role="status">{current?.serverSaved?(en?'The host confirmed server saving.':'宿主已确认服务器保存。'):(current?.queue.pendingCount===0&&!current?.queue.failed?(en?'Local draft confirmed; server saving has not been confirmed. This does not indicate COS archival.':'本机草稿已确认；服务器保存尚未确认。这不表示COS归档完成。'):(en?'Local durability and server saving are still unconfirmed.':'本机耐久保存与服务器保存均尚未确认。'))}</p>}
-    {view!=='intro'&&<p className="ant-small">{en?'Durable local records':'本机已确认草稿'}：{localStatus}</p>}
-    {problem&&<p role="alert">{en?'The frozen display is unavailable or does not match. Ask the host to calibrate and freeze the display before starting.':'冻结几何缺失或不匹配。请由宿主完成校准并冻结后再开始。'} <small>{problem}</small></p>}
+    {(view==='terminated'||view==='complete')&&<p role="status">{current?.serverSaved?(en?'Submitted successfully.':'提交成功。'):(current?.queue.pendingCount===0&&!current?.queue.failed?(en?'Your records are saved on this device, but submission has not been confirmed. Keep this page open.':'记录已保存在这台设备上，尚未确认提交成功。请保持页面打开。'):(en?'Saving and submission are not confirmed yet. Keep this page open.':'记录保存与提交尚未确认，请保持页面打开。'))}</p>}
+    {view!=='intro'&&<p className="ant-small">{en?'Records saved on this device':'这台设备上已保存的记录'}：{localStatus}</p>}
+    {problem&&<><p role="alert">{problem==='fresh_durable_attempt_marker_required'
+      ?(en?'This attempt has already been started or could not be confirmed. Keep this page open and contact the publisher.':'这次作答已启动过，或启动状态尚未确认。请保持页面打开，联系发布者处理。')
+      :problem==='missing_durable_attempt_marker'
+        ?(en?'This task cannot start yet. Keep this page open and try again later or contact the publisher.':'暂时无法开始作答。请保持页面打开，稍后重试或联系发布者。')
+        :(en?'Please complete the screen and viewing-distance calibration before starting.':'请先完成屏幕与观看距离校准，再开始作答。')}</p>
+      <details><summary>{en?'Technical details for support':'需要帮助时可查看技术诊断'}</summary><code>{problem}</code></details></>}
   </div></main>
 }

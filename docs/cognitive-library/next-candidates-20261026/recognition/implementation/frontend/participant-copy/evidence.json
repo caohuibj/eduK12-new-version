@@ -1,0 +1,137 @@
+{
+  "candidateId": "continuous-recognition",
+  "kind": "PARTICIPANT_COPY_ONLY",
+  "baseCommit": "94152032885d5cbaf149a15ec03d5a0c72ea2c67",
+  "createdUtc": "2026-10-26T07:37:52.414179+00:00",
+  "changedProductTsx": [
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx"
+  ],
+  "checks": [
+    {
+      "command": "/workspace/eduk12-cloud/tools/node_modules/node/bin/node server-version/scripts/cognitive/recognition-browser-review.cjs --copy-only",
+      "cwd": "/workspace/eduK12-new-version",
+      "exitCode": 0,
+      "cases": 14,
+      "report": "browser/copy-browser.json",
+      "syntheticStateInjectionOnly": true,
+      "captureSequenceExecuted": false,
+      "backendScorerExecuted": false
+    },
+    {
+      "kind": "byte-scope-review",
+      "exitCode": 0,
+      "report": "scope-proof.json"
+    }
+  ],
+  "types": "Not run in this patch; main agent to select only changed Task/Report entries using actual frontend tsconfig. Isolated browser compilation is not the project type gate.",
+  "priorEvidencePreserved": {
+    "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/evidence.json",
+    "sha256": "c7fe7bc253dda0add0fa0c628fbdbc1861941b8ab357cf5531602fda4a00dd1c",
+    "identicalToBase": true
+  },
+  "files": [
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/README.md",
+      "sha256": "52ee6299a0e0fccd69eb159365ae96c39d898f2c42d5273673246cb808c0f1a3"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/copy-browser.json",
+      "sha256": "fc6a4f0621d3bcde7bfa58161a38e8a502ece51fb67f85edddf8f053cf76a714"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/index.html",
+      "sha256": "2ce7e2aa94a5f375b9850a872be49f4447da2a8593c5d5635771bde8a4f9579e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-en-loading.png",
+      "sha256": "9b4f24469533c0fb7529cc06c64231a40f694a9cfb40f2932b48e6b2b773a2e6"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-en-retry.png",
+      "sha256": "e5f1f99f55122927797e6e2e3bd5e6d07a3ff21689771904834cf0cae9bcf98e"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-en-saving.png",
+      "sha256": "cb8d41c1f337624a836b4405ce0993974904e059bb901565218daf56a9af5c27"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-en-settings.png",
+      "sha256": "2bae7a816585585c709e89e87f65250939a4e586fce4e6bde7d61685d23b6077"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-en-stopped.png",
+      "sha256": "fae7949bd397d72d443199f03567daaaba13661164d9bc8305d339c68518cc63"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-zh-loading.png",
+      "sha256": "0781d8c43e11764948f1b6622d54c0a9cd56ae23a3664efaf96e0e9fbb7a51d9"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-zh-retry.png",
+      "sha256": "81d15b758fc79a104abf94ec42d8c49b08dcb37c072c992155a76fc919770963"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-zh-saving.png",
+      "sha256": "99fd466602e30b9c174fa327e0d8336071cb9d330b7d3e62455dca8d6d75e623"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-zh-settings.png",
+      "sha256": "a1250198312065508b02c966ab05b122265779a8e0403d2e2a97454d6fafbb3a"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/phone-zh-stopped.png",
+      "sha256": "95f5d3a62f0d267d69c7082e4b297fca0fa293113eb609e0319b16e95836a9b4"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/review.css",
+      "sha256": "4f7fa630857182433c94a3ee67792de6105126a18177c302fbf77a47bf3a75ab"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/review.js",
+      "sha256": "7fac7773ee30e7fe0a5e85fdb148f5b333f5c8b8f780e7242a2af39d38c5dfd7"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/zoom-en-invalid.png",
+      "sha256": "2aa709744515dc12c31108cc574e9089c0c3c124dc16e8385cc3f92ab28493e1"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/zoom-en-limited.png",
+      "sha256": "4932ae59f792691f5887461fb8c19860af59d777059e8e42bd0c1541de735d13"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/zoom-zh-invalid.png",
+      "sha256": "959a77ca9b1df7e0cebc09e983d63b825d074179930c5e044e32abd3e8a2d1d4"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser/zoom-zh-limited.png",
+      "sha256": "e98eba887925e010ac73637c4c7a81cb63d35220ceb6f083dbaf3cda6be1a4fe"
+    },
+    {
+      "file": "docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/scope-proof.json",
+      "sha256": "2acbb8fe69f99638fb5a3669d67f4698f8ba0ee3b2d434a83c04f3ff342edad5"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx",
+      "sha256": "12155d942b44750536640b1f88b701a570e48aa367ddcb6bf544901b35e1b00d"
+    },
+    {
+      "file": "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx",
+      "sha256": "465a1981f21f179b06db541ee1dbb7a4dd5cde727df7bbf8597b6893b55d0e44"
+    },
+    {
+      "file": "server-version/scripts/cognitive/recognition-browser-review.cjs",
+      "sha256": "0feeec023f366654dcdc2b40f7ecd5545f788bbcb426b97debfc40c94e707ca0"
+    }
+  ],
+  "notRepeated": [
+    "backend84",
+    "8+100 complete flow",
+    "asset/capture tests",
+    "unaffected stimulus geometry/timing checks"
+  ],
+  "licensesChanged": false,
+  "selfCheckOnly": true,
+  "newHardwareOrApiDbCosClaims": false,
+  "commitPushNotionCiDeployPerformed": false
+}

@@ -13,12 +13,12 @@ export interface EnumerationTaskProps {
   result?: EnumerationPublicResult
 }
 const blockedText: Record<string, [string, string]> = {
-  missing_calibration: ['主机尚未提供带来源的屏幕与观看距离校准，不能开始。', 'The host has not supplied sourced screen and viewing-distance calibration.'],
-  missing_recipe: ['主机尚未提供明确的候选刺激配方，不能开始。', 'The host has not supplied an explicit candidate stimulus recipe.'],
-  display_changed: ['屏幕、缩放或方向已变化，需要主机重新校准；不会自动缩小刺激。', 'Display, zoom or orientation changed. Host recalibration is required; stimuli will not shrink.'],
-  field_does_not_fit: ['校准后的刺激区域放不下，请更换合适的屏幕或观看设置；不会自动缩小。', 'The calibrated field does not fit. Use an appropriate display or viewing setup; it will not shrink.'],
-  attempt_ended: ['本次候选序列已因中断结束。原记录保留供保存重试；不能继续曝光，请由主机另开施测。', 'This candidate attempt ended after interruption. Keep its records for saving retries; the host must start a new attempt.'],
-  invalid_context: ['候选配置或配方不兼容，不能开始。', 'The candidate configuration or recipe is incompatible.'],
+  missing_calibration: ['请先完成屏幕与观看距离设置。', 'Please complete the screen and viewing-distance setup first.'],
+  missing_recipe: ['当前测验尚未完成施测设置，请联系发布者。', 'This assessment is not ready yet. Please contact its publisher.'],
+  display_changed: ['屏幕、缩放或方向变了，请重新完成屏幕与观看距离设置。', 'The screen, zoom or orientation changed. Please repeat the screen and viewing-distance setup.'],
+  field_does_not_fit: ['当前屏幕放不下测验画面。请调整观看设置或更换设备后重试。', 'The assessment display does not fit this screen. Adjust the viewing setup or use another device.'],
+  attempt_ended: ['这次作答已因中断结束。请保持页面打开以便完成提交；如需重新作答，请联系发布者。', 'This attempt ended after an interruption. Keep the page open to finish submitting. Contact the publisher if you need to try again.'],
+  invalid_context: ['当前测验尚未完成施测设置，请联系发布者。', 'This assessment is not ready yet. Please contact its publisher.'],
 }
 /** Keying the whole immutable context prevents callbacks from one attempt migrating into another. */
 export function EnumerationTask(props: EnumerationTaskProps) {
@@ -27,7 +27,7 @@ export function EnumerationTask(props: EnumerationTaskProps) {
     if (!props.persistence?.id || props.persistence.id.length > 256
       || props.persistence.durability?.kind !== 'host_verified_browser_durable' || !props.persistence.durability.verificationId) throw Error('Missing explicit persistence port')
   } catch {
-    return <section className="enumeration-candidate"><p role="alert">内部候选配置或保存端口不兼容，无法开始。 / Invalid candidate context or persistence port.</p></section>
+    return <section className="enumeration-candidate"><p role="alert">内部审阅版暂未就绪，请联系发布者。 / This internal review version is not ready. Please contact its publisher.</p></section>
   }
   const key = enumerationDigest({ context: props.context, portId: props.persistence.id })
   return <EnumerationSession key={key} {...props} />
@@ -88,7 +88,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     if (busy.current || !alive.current) return
     busy.current = true; setView('saving')
     try { await owned.finalize(); if (!alive.current) return; retry.current = null; setView('report') }
-    catch { if (alive.current) { retry.current = () => finalSave(owned); setError(en ? 'Final saving is not confirmed. Retry the same submission; no trial will be shown again.' : '最终保存尚未确认。请重试同一份提交，不会重复呈现任何试次。'); setView('error') } }
+    catch { if (alive.current) { retry.current = () => finalSave(owned); setError(en ? 'Submission is not confirmed. Keep this page open and retry. You will not need to answer again.' : '提交尚未确认，请保持页面打开并重试。无需重复作答。'); setView('error') } }
     finally { busy.current = false }
   }
   async function saveRecord(snapshot: EnumerationRecord) {
@@ -108,7 +108,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     } catch {
       if (alive.current && gate.current === owned) {
         retry.current = () => saveRecord(snapshot)
-        setError(en ? 'Saving is not confirmed. The captured record is retained; retry saving without repeating the exposure.' : '保存尚未确认。原记录已交给本机保存端口保留，请重试保存，不会重复呈现。'); setView('error')
+        setError(en ? 'Submission is not confirmed. Keep this page open and retry. Your answers remain here, so you do not need to answer again.' : '提交尚未确认，请保持页面打开并重试。已作答内容仍在此页面等待提交，无需重复作答。'); setView('error')
       }
     } finally { busy.current = false }
   }
@@ -131,7 +131,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     } catch {
       if (alive.current && gate.current === owned) {
         retry.current = null
-        setError(en ? 'The exposure has not started, or its reservation is unresolved. Keep this page open and ask the host to recover it; do not repeat it.' : '呈现尚未开始，或该曝光已有未决记录。请保留页面并由主机恢复，不要重复呈现。'); setView('error')
+        setError(en ? 'This attempt cannot start right now. Keep the page open and contact the publisher before trying again.' : '这次作答暂时无法开始。请保持页面打开并联系发布者，避免重复作答。'); setView('error')
       }
     } finally { busy.current = false }
   }
@@ -178,24 +178,24 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
   return <div ref={root} className="enumeration-candidate" data-cognitive-task-root="true" data-stage={stage} data-enumeration-view={view}
     onPointerDownCapture={event => { if (event.isPrimary && event.button === 0) premature(event.pointerType === 'touch' ? 'touch' : 'pointer') }}
     onKeyDownCapture={event => { if (['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) premature('keyboard') }}>
-    <div className="enum-badge">{synthetic ? (en ? 'Actual candidate component · Synthetic host fixture · Internal review only' : '实际候选组件 · 合成主机fixture · 仅内部审阅')
-      : (en ? 'Internal candidate · Not authorized for formal administration' : '内部候选 · 尚未授权正式施测')}</div>
+    <div className="enum-badge">{synthetic ? (en ? 'Actual interface · Synthetic setup · Internal review only' : '实际界面 · 合成设置演示 · 仅供内部审阅')
+      : (en ? 'Internal review version · Not for formal use' : '内部审阅版 · 暂不用于正式施测')}</div>
     {view === 'intro' && <section className="enum-reading"><h1>{en ? 'How many dots did you see?' : '刚才有几个点？'}</h1>
-      <p>{en ? 'Keep looking at the centre. White dots briefly appear on a mid-grey field, followed by a noise mask. Report the number you saw.' : '请注视画面中央。白色圆点会在中灰背景上短暂出现，随后被噪声遮罩覆盖。请报告刚才看到的点数。'}</p>
+      <p>{en ? 'Keep looking at the centre. White dots briefly appear on a mid-grey background, followed by a black-and-white pattern. Report how many dots you saw.' : '请注视画面中央。白色圆点会在中灰背景上短暂出现，随后画面变成黑白纹理。请报告刚才看到的点数。'}</p>
       <p>{en ? 'Use the integer slider from 1 to 15, then confirm. Its initial value changes each trial; it is not a hint.' : '拖动1–15整数滑杆，再点击确认。每轮初值随机变化，它不是答案提示。'}</p>
-      <p>{en ? `First complete 3 practice trials. This ${context.config.profile} sequence contains ${context.config.totalTrials} formal trials. Formal trials give no correctness feedback.`
-        : `先完成3次练习。本次${formal ? '候选' : context.config.profile === 'research' ? '文献对照' : '体验'}序列含${context.config.totalTrials}次正式记录，正式阶段不提示对错。`}</p>
-      <details><summary>{en ? 'Keyboard and screen setup' : '键盘操作与屏幕设置'}</summary><p>{en ? 'Arrow keys adjust the slider; Home and End select 1 and 15. Tab to Confirm and press Enter or Space. Screen size, viewing distance and mask recipe must come from the host. This candidate does not validate physical luminance or display timing.' : '方向键调整滑杆，Home/End选择1/15；Tab切到确认后按回车或空格。屏幕尺寸、观看距离与遮罩配方须由主机明确提供；本候选不验证物理亮度或显示时序。'}</p></details>
-      <p className="enum-notice">{en ? 'This is an internal candidate. The interface and 100/25 trial counts were approved; timing, calibration and individual interpretation still require validation.' : '这是内部候选。界面与100/25次数已确认，真实时序、校准和个体解释仍待验证。'}</p>
+      <p>{en ? `First complete 3 practice trials. This ${context.config.profile} version has ${context.config.totalTrials} assessment trials. You will not receive correctness feedback during the assessment.`
+        : `先完成3次练习。本次${formal ? '测验' : context.config.profile === 'research' ? '文献对照版' : '体验版'}共${context.config.totalTrials}轮作答，作答阶段不提示对错。`}</p>
+      <details><summary>{en ? 'Keyboard and screen setup' : '键盘操作与屏幕设置'}</summary><p>{en ? 'Arrow keys adjust the slider; Home and End select 1 and 15. Tab to Confirm and press Enter or Space. Keep the screen and viewing distance consistent with your setup. This internal review version still needs further validation.' : '方向键调整滑杆，Home/End选择1/15；Tab切到确认后按回车或空格。请保持设置时的屏幕和观看距离。本内部审阅版仍待进一步验证。'}</p></details>
+      <p className="enum-notice">{en ? 'This version is for internal review only, not formal assessment. Its screen presentation and result interpretation still need validation.' : '仅供内部审阅，暂不用于正式施测；呈现效果与结果解释仍待验证。'}</p>
       <div className="enum-actions"><button onClick={() => setView('ready')}>{en ? 'Review readiness' : '查看准备状态'}</button></div></section>}
-    {view === 'ready' && <section className="enum-reading"><h1>{formal ? ((formalIndex > 0 && formalIndex % 25 === 0) ? (en ? 'Take a short break' : '休息一下') : (en ? 'Ready for the next candidate trial' : '准备下一轮候选记录')) : (en ? 'Try the practice' : '先来练习')}</h1>
+    {view === 'ready' && <section className="enum-reading"><h1>{formal ? ((formalIndex > 0 && formalIndex % 25 === 0) ? (en ? 'Take a short break' : '休息一下') : (en ? 'Ready for the next trial' : '准备开始下一轮')) : (en ? 'Try the practice' : '先来练习')}</h1>
       <p>{formal ? `${formalIndex + 1} / ${context.config.totalTrials}` : `${practiceIndex + 1} / 3`}</p>
-      <p>{en ? 'Keep the device still and maintain the calibrated viewing distance. Start when ready.' : '请放稳设备，保持校准时的观看距离，准备好后再开始。'}</p>
-      {lastInterrupted && <p className="enum-notice">{en ? 'The previous interrupted record was retained. It will not be silently repeated.' : '上一轮中断记录已保留，不会自动补做或重复曝光。'}</p>}
+      <p>{en ? 'Keep the device still and maintain the viewing distance used during setup. Start when ready.' : '请放稳设备，保持屏幕设置时的观看距离，准备好后再开始。'}</p>
+      {lastInterrupted && <p className="enum-notice">{en ? 'The previous trial was interrupted. It will not be repeated automatically.' : '上一轮因中断结束，不会自动重复作答。'}</p>}
       {issue && <p role="alert">{issue[en ? 1 : 0]}</p>}
-      <div className="enum-actions"><button disabled={!!block || !artifact} onClick={() => void start()}>{formal ? (en ? 'Start candidate trial' : '开始候选正式轮') : (en ? 'Start practice' : '开始练习')}</button></div></section>}
+      <div className="enum-actions"><button disabled={!!block || !artifact} onClick={() => void start()}>{formal ? (en ? 'Start trial' : '开始这一轮') : (en ? 'Start practice' : '开始练习')}</button></div></section>}
     {view === 'running' && geometry && <section>
-      <div className="enum-progress"><span>{formal ? (en ? 'Candidate formal sequence' : '候选正式序列') : (en ? 'Practice' : '练习')}</span><span>{(formal ? formalIndex : practiceIndex) + 1} / {formal ? context.config.totalTrials : 3}</span></div>
+      <div className="enum-progress"><span>{formal ? (en ? 'Assessment' : '作答') : (en ? 'Practice' : '练习')}</span><span>{(formal ? formalIndex : practiceIndex) + 1} / {formal ? context.config.totalTrials : 3}</span></div>
       <div className="enum-field-space"><canvas ref={canvas} width={Math.ceil(geometry.fieldCssPx * context.calibration!.devicePixelRatio)} height={Math.ceil(geometry.fieldCssPx * context.calibration!.devicePixelRatio)}
         style={{ width: geometry.fieldCssPx, height: geometry.fieldCssPx }} aria-hidden="true" /></div>
       <div className="enum-response"><label htmlFor="enumeration-slider">{en ? 'How many dots?' : '刚才有几个点？'}</label>
@@ -214,15 +214,15 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
         if (!practiceConfirmed) { setPracticeRepeat(value => value + 1); setView('ready') }
         else if (practiceIndex < 2) { setPracticeIndex(value => value + 1); setPracticeRepeat(0); setView('ready') }
         else { setFormal(true); setFormalIndex(0); setView('ready') }
-      }}>{!practiceConfirmed ? (en ? 'Retry this practice explicitly' : '重新做这轮练习') : practiceIndex < 2 ? (en ? 'Next practice' : '下一次练习') : (en ? 'Prepare candidate formal sequence' : '准备候选正式序列')}</button></div>
+      }}>{!practiceConfirmed ? (en ? 'Retry this practice explicitly' : '重新做这轮练习') : practiceIndex < 2 ? (en ? 'Next practice' : '下一次练习') : (en ? 'Prepare to continue' : '准备开始作答')}</button></div>
       {gate.current?.attemptEnded && <p role="alert">{blockedText.attempt_ended[en ? 1 : 0]}</p>}
-      {practiceRepeat >= 11 && <p role="alert">{en ? 'The practice exposure budget is reached. Ask the host to review the interruptions.' : '已达到练习曝光预算，请由主机检查中断情况。'}</p>}</section>}
-    {view === 'saving' && <p role="status">{en ? 'Waiting for the host saving receipt…' : '正在等待主机确认保存…'}</p>}
-    {view === 'error' && <section><p role="alert">{error}</p>{retry.current && <button onClick={() => { if (!busy.current) void retry.current?.() }}>{en ? 'Retry saving' : '重试保存'}</button>}</section>}
-    {view === 'report' && <section className="enum-reading"><h1>{en ? 'Your candidate record' : '这次的候选记录'}</h1>
-      <p>{synthetic ? (en ? 'Synthetic host receipt only; no production persistence is demonstrated.' : '当前仅为合成主机回执，不代表生产后台已保存。') : (en ? 'The host confirmed this candidate submission.' : '主机已确认本次候选提交。')}</p>
-      <div className="enum-state" data-report-state={report.state}><h2>{en ? 'No performance conclusion yet' : '本次不提供表现结论'}</h2><p>{en ? 'Presentation and interpretation quality rules are still awaiting validation. Research metrics are hidden.' : report.reasons.join(' ')}</p></div>
+      {practiceRepeat >= 11 && <p role="alert">{en ? 'Practice has been interrupted repeatedly. Please contact the publisher before continuing.' : '练习多次中断，请联系发布者后再继续。'}</p>}</section>}
+    {view === 'saving' && <p role="status">{en ? 'Submitting… Please keep this page open.' : '正在提交，请保持页面打开…'}</p>}
+    {view === 'error' && <section><p role="alert">{error}</p>{retry.current && <button onClick={() => { if (!busy.current) void retry.current?.() }}>{en ? 'Retry submission' : '重试提交'}</button>}</section>}
+    {view === 'report' && <section className="enum-reading"><h1>{en ? 'Your record' : '这次的记录'}</h1>
+      <p>{synthetic ? (en ? 'This is a synthetic demonstration. It does not confirm submission of a real assessment.' : '当前为合成演示，不代表真实作答已提交。') : (en ? 'Your submission is confirmed.' : '本次作答已确认提交。')}</p>
+      <div className="enum-state" data-report-state={report.state}><h2>{en ? 'No performance conclusion yet' : '本次不提供表现结论'}</h2><p>{en ? 'This attempt has no performance interpretation yet. Screen presentation and result interpretation still need validation.' : '这次暂不解释作答表现。测验的呈现方式和结果解释还需要进一步验证。'}</p></div>
       <p>{en ? 'For next time: keep the device still, reduce interruptions and maintain your viewing position.' : '下次可把设备放稳，减少通知干扰，并保持观看位置。'}</p>
-      <p className="enum-muted">{en ? 'No applicable norms, ranks, ability grades or diagnostic conclusions. No decorative chart is generated.' : '暂无适用常模，不提供排名、能力等级或诊断结论。本页不生成装饰性图表。'}</p></section>}
+      <p className="enum-muted">{en ? 'No applicable norms, rankings, ability grades or diagnostic conclusions are available.' : '目前没有适用常模，不提供排名、能力等级或诊断结论。'}</p></section>}
   </div>
 }

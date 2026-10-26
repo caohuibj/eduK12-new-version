@@ -63,12 +63,12 @@ export function RecognitionTask({context,ports,language='zh',syntheticReview=fal
     if(!current||invalid.current||!alive.current)return
     startFrame.current=requestAnimationFrame(()=>{startFrame.current=null;if(invalid.current||!alive.current||generation.current!==token||session.current!==current)return;flushSync(()=>current.begin(performance.now()));paint()})
   }
-  if(blocked||invalid.current)return <section className="recognition-task recognition-reading" role="alert">{initial.current.syntheticReview&&<p className="recognition-note">{en?'Synthetic review remains non-formal':'合成审阅始终为非正式测验'}</p>}<h1>{en?'This attempt cannot start':'本次暂不能开始'}</h1><p>{en?'The frozen context, licensed images or display requirements are not confirmed. No formal exposure has started. Keep this page open and contact the publisher.':'冻结信息、获权图片或显示要求尚未确认。请保留页面并联系发布者。'}</p><code>{blocked||'frozen-context-language-or-port-changed'}</code></section>
+  if(blocked||invalid.current)return <section className="recognition-task recognition-reading" role="alert">{initial.current.syntheticReview&&<p className="recognition-note">{en?'Synthetic review remains non-formal':'合成审阅始终为非正式测验'}</p>}<h1>{en?'This attempt cannot continue':'本次暂时无法继续'}</h1><p>{en?'The test settings or pictures are not ready. Keep this page open and contact the publisher.':'测验设置或图片尚未准备好，请保留页面并联系发布者。'}</p><details><summary>{en?'View diagnostic details':'查看诊断信息'}</summary><code>{blocked||'frozen-context-language-or-port-changed'}</code></details></section>
   if(view==='report'&&s?.receipt)return <RecognitionReport report={s.receipt.report} language={language} synthetic={initial.current.syntheticReview}/>
   const running=view==='practice'||view==='formal'
   return <main className={'recognition-task '+(!running?'recognition-reading':'recognition-stage')} data-cognitive-task-root data-recognition-view={view}>
     {initial.current.syntheticReview&&<p className="recognition-note">{en?'Synthetic design review · not a formal test':'合成设计审阅 · 非正式测验'}</p>}
-    {!loaded?<p role="status">{en?'Checking and decoding all images…':'正在核验并解码全部图片…'}</p>:null}
+    {!loaded?<p role="status">{en?'Preparing the pictures…':'正在准备图片…'}</p>:null}
     {view==='intro'&&<><h1>{en?'Have you seen this picture?':'这张图，你见过吗？'}</h1>
       <p>{en?'If a picture has appeared before in this run, tap Seen once or press R. Do nothing for a new picture.':'如果图片在本轮已经出现过，轻触“见过”或按R键；第一次出现时不操作。'}</p>
       <p>{en?'You may respond while the picture or the following + is shown. Keep watching; responding does not end the display early.':'图片显示时和紧随其后的“+”期间都可以回应。回应不会让图片提前结束，请持续观看。'}</p>
@@ -84,9 +84,9 @@ export function RecognitionTask({context,ports,language='zh',syntheticReview=fal
         const kind=e.pointerType==='touch'?'touch':e.pointerType==='pen'?'pen':'mouse'
         s?.input(performance.now(),kind,null,false,e.isPrimary)}} onContextMenu={e=>e.preventDefault()}>{en?'Seen':'见过'}</button>
         <span>{en?'New picture: do nothing · R also works':'新图片不操作 · 也可按R'}</span></div></>}
-    {['preparing','practice-saving','saving'].includes(view)&&<p role="status">{en?'Waiting for the host’s save confirmation…':'正在等待宿主保存确认…'}</p>}
-    {view==='retry'&&<><h1>{en?'The stream has stopped':'图片呈现已停止'}</h1><p role="alert">{en?'Records are retained in this page. Retry saving the same records; the images will not be shown again.':'当前页面保留了原始记录。请重试保存同一记录，不会再次展示图片。'}</p>
+    {['preparing','practice-saving','saving'].includes(view)&&<p role="status">{en?'Checking whether your submission was saved…':'正在确认提交是否成功…'}</p>}
+    {view==='retry'&&<><h1>{en?'The stream has stopped':'图片呈现已停止'}</h1><p role="alert">{en?'Keep this page open and retry saving. Your existing answers will be kept, and pictures will not be shown again.':'请保留当前页面并重试保存。原有作答记录会保留，不会再次展示图片。'}</p>
       <button onClick={()=>void s?.retry()}>{en?'Retry saving':'重试保存'}</button></>}
-    {view==='blocked'&&<p role="alert">{en?'Practice or attempt preparation was interrupted. Do not restart this exposure identity; contact the publisher.':'练习或施测准备被中断。请勿重复本施测身份的曝光，联系发布者处理。'}</p>}
+    {view==='blocked'&&<p role="alert">{en?'This attempt has stopped. Please do not start again. Your existing answers will be kept for saving retries; contact the publisher if you need help.':'本次作答已停止，请勿重新开始，原记录会保留供保存重试。如需帮助，请联系发布者。'}</p>}
   </main>
 }

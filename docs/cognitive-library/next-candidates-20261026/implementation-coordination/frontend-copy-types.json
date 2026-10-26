@@ -1,0 +1,26 @@
+{
+  "kind": "CHANGED_FRONTEND_ENTRY_CLOSURES_ACTUAL_TSCONFIG",
+  "startedUtc": "2026-10-26T07:41:37.649262+00:00",
+  "durationSeconds": 3.825955590000376,
+  "exitCode": 0,
+  "command": [
+    "/workspace/eduk12-cloud/tools/node_modules/node/bin/node",
+    "-e",
+    "const ts=require('typescript');const config=ts.readConfigFile('tsconfig.app.json',ts.sys.readFile);if(config.error)throw new Error('frontend config unreadable');const parsed=ts.parseJsonConfigFileContent(config.config,ts.sys,process.cwd());const roots=JSON.parse(process.env.CANDIDATE_ROOTS);const program=ts.createProgram(roots,parsed.options);const diagnostics=ts.getPreEmitDiagnostics(program);if(diagnostics.length){const host={getCanonicalFileName:f=>f,getCurrentDirectory:()=>process.cwd(),getNewLine:()=>\"\\n\"};process.stdout.write(ts.formatDiagnosticsWithColorAndContext(diagnostics,host));process.exitCode=1;}"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+  "config": "server-version/frontend/tsconfig.app.json",
+  "rootFiles": 5,
+  "sourceSha256": {
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntTask.tsx": "ef5e970714895db6a37a9b9d9b76a5e98e3d542f06ee37c263f961edc435e712",
+    "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx": "1e3747000eb1025dd81e5789559dbc0c52e6b5140e9bbfe15edc19df4f89a162",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx": "465a1981f21f179b06db541ee1dbb7a4dd5cde727df7bbf8597b6893b55d0e44",
+    "server-version/frontend/src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx": "12155d942b44750536640b1f88b701a570e48aa367ddcb6bf544901b35e1b00d",
+    "server-version/frontend/src/modules/cognitive/tasks/enumeration/EnumerationTask.tsx": "a2cacadbed917ae742a285a8818e060ee07be284b42938a88ee061d9eaacf463"
+  },
+  "inputStableDuringCheck": true,
+  "configSha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+  "includesChangedAntSessionDependency": true,
+  "notWholeApplication": true,
+  "notRepeated": "backend147,unchanged capture/sequence/browser streams and unchanged root inputs not separately rerun"
+}

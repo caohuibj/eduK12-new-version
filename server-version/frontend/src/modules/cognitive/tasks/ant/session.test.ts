@@ -106,6 +106,19 @@ describe('ANT serial durable-local draft and attempt isolation',()=>{
     await s.retryLocal();expect(s.view).toBe('terminated');expect(saved[1]).toEqual(saved[0])
     s.tick(9000);s.startFormal();expect(s.capture).toBeNull();expect(s.records()).toHaveLength(2)
   })
+  it('a deferred local failure after blur termination exposes retry without changing the sealed interruption',async()=>{
+    const pending=deferred<ReturnType<typeof receipt>>(),seen:ReturnType<typeof raw>[]=[],{s}=make({persistLocalDraft:async record=>{
+      seen.push(structuredClone(record));return seen.length===1?pending.promise:receipt(record)
+    }})
+    s.startPractice();s.tick(0);s.stop('window_blur',30)
+    const sealed=structuredClone(s.records()[0]);await Promise.resolve()
+    pending.reject(Error('synthetic deferred write failure'));await s.queue.wait()
+    expect(s.view).toBe('error')
+    expect(s.reason).toBe('window_blur');expect(s.records()).toEqual([sealed])
+    await s.retryLocal();expect(s.view).toBe('terminated');expect(seen[1]).toEqual(seen[0])
+    expect(s.reason).toBe('window_blur');expect(s.records()).toEqual([sealed])
+    s.tick(10000);s.startFormal();expect(s.capture).toBeNull();expect(s.records()).toHaveLength(1)
+  })
   it('only resumes at the real research block boundary, preserving planned indices',async()=>{
     const {s}=make({config:antConfig('research')});await finishPractice(s);s.startFormal();s.tick(100000)
     for(let i=0;i<96;i++)await finishTrial(s)

@@ -1,0 +1,167 @@
+{
+  "synthetic": true,
+  "copyOnly": true,
+  "stateInjectionOnly": true,
+  "noCaptureSequenceExecuted": true,
+  "noBackendScorerExecuted": true,
+  "chromiumSandbox": true,
+  "cases": [
+    {
+      "language": "zh",
+      "state": "loading",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "zh",
+      "state": "saving",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "zh",
+      "state": "retry",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "zh",
+      "state": "stopped",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "zh",
+      "state": "settings",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": false
+    },
+    {
+      "language": "en",
+      "state": "loading",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "saving",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "retry",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "stopped",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "settings",
+      "width": 390,
+      "zoom": 1,
+      "syntheticStateInjection": false
+    },
+    {
+      "language": "zh",
+      "state": "limited",
+      "width": 820,
+      "zoom": 2,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "zh",
+      "state": "invalid",
+      "width": 820,
+      "zoom": 2,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "limited",
+      "width": 820,
+      "zoom": 2,
+      "syntheticStateInjection": true
+    },
+    {
+      "language": "en",
+      "state": "invalid",
+      "width": 820,
+      "zoom": 2,
+      "syntheticStateInjection": true
+    }
+  ],
+  "errors": [],
+  "screenshots": [
+    {
+      "file": "phone-zh-loading.png",
+      "sha256": "0781d8c43e11764948f1b6622d54c0a9cd56ae23a3664efaf96e0e9fbb7a51d9"
+    },
+    {
+      "file": "phone-zh-saving.png",
+      "sha256": "99fd466602e30b9c174fa327e0d8336071cb9d330b7d3e62455dca8d6d75e623"
+    },
+    {
+      "file": "phone-zh-retry.png",
+      "sha256": "81d15b758fc79a104abf94ec42d8c49b08dcb37c072c992155a76fc919770963"
+    },
+    {
+      "file": "phone-zh-stopped.png",
+      "sha256": "95f5d3a62f0d267d69c7082e4b297fca0fa293113eb609e0319b16e95836a9b4"
+    },
+    {
+      "file": "phone-zh-settings.png",
+      "sha256": "a1250198312065508b02c966ab05b122265779a8e0403d2e2a97454d6fafbb3a"
+    },
+    {
+      "file": "phone-en-loading.png",
+      "sha256": "9b4f24469533c0fb7529cc06c64231a40f694a9cfb40f2932b48e6b2b773a2e6"
+    },
+    {
+      "file": "phone-en-saving.png",
+      "sha256": "cb8d41c1f337624a836b4405ce0993974904e059bb901565218daf56a9af5c27"
+    },
+    {
+      "file": "phone-en-retry.png",
+      "sha256": "e5f1f99f55122927797e6e2e3bd5e6d07a3ff21689771904834cf0cae9bcf98e"
+    },
+    {
+      "file": "phone-en-stopped.png",
+      "sha256": "fae7949bd397d72d443199f03567daaaba13661164d9bc8305d339c68518cc63"
+    },
+    {
+      "file": "phone-en-settings.png",
+      "sha256": "2bae7a816585585c709e89e87f65250939a4e586fce4e6bde7d61685d23b6077"
+    },
+    {
+      "file": "zoom-zh-limited.png",
+      "sha256": "e98eba887925e010ac73637c4c7a81cb63d35220ceb6f083dbaf3cda6be1a4fe"
+    },
+    {
+      "file": "zoom-zh-invalid.png",
+      "sha256": "959a77ca9b1df7e0cebc09e983d63b825d074179930c5e044e32abd3e8a2d1d4"
+    },
+    {
+      "file": "zoom-en-limited.png",
+      "sha256": "4932ae59f792691f5887461fb8c19860af59d777059e8e42bd0c1541de735d13"
+    },
+    {
+      "file": "zoom-en-invalid.png",
+      "sha256": "2aa709744515dc12c31108cc574e9089c0c3c124dc16e8385cc3f92ab28493e1"
+    }
+  ]
+}

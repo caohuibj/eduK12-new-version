@@ -28,24 +28,24 @@ describe('ANT candidate UI and report boundary',()=>{
  const paint=async(time:number)=>{now=time;const ready=[...frames.values()];frames.clear();await act(async()=>ready.forEach(cb=>cb(time)))}
  it('blocks first exposure without frozen physical geometry or a durable attempt marker',async()=>{
   const p=props();p.display=null
-  const {rerender}=render(<AntTask {...p}/>);fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'}))
-  expect(screen.getByRole('alert')).toHaveTextContent('missing_frozen_geometry');expect(screen.queryByLabelText('固定回应区')).toBeNull()
+  const {rerender}=render(<AntTask {...p}/>);fireEvent.click(screen.getByRole('button',{name:'开始练习'}))
+  expect(screen.getByRole('alert')).toHaveTextContent('请先完成屏幕与观看距离校准');expect(screen.queryByLabelText('固定回应区')).toBeNull()
   const missing=props();missing.claimAttemptExposure=undefined as never
-  rerender(<AntTask {...missing}/>);fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'}))
-  expect(screen.getByRole('alert')).toHaveTextContent('missing_durable_attempt_marker')
+  rerender(<AntTask {...missing}/>);fireEvent.click(screen.getByRole('button',{name:'开始练习'}))
+  expect(screen.getByRole('alert')).toHaveTextContent('暂时无法开始作答')
  })
  it('requires explicit fixture mode for synthetic calibration and a fresh marker',async()=>{
   const p=props();p.allowSyntheticFixture=false
-  const {rerender}=render(<AntTask {...p}/>);fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'}))
-  expect(screen.getByRole('alert')).toHaveTextContent('physical_calibration_required')
+  const {rerender}=render(<AntTask {...p}/>);fireEvent.click(screen.getByRole('button',{name:'开始练习'}))
+  expect(screen.getByRole('alert')).toHaveTextContent('请先完成屏幕与观看距离校准')
   const stale=props();stale.claimAttemptExposure=async()=>({contextId:'A',durable:true,fresh:false,claimId:'stale'} as never)
-  rerender(<AntTask {...stale}/>);await act(async()=>fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'})))
-  expect(screen.getByRole('alert')).toHaveTextContent('fresh_durable_attempt_marker_required')
+  rerender(<AntTask {...stale}/>);await act(async()=>fireEvent.click(screen.getByRole('button',{name:'开始练习'})))
+  expect(screen.getByRole('alert')).toHaveTextContent('启动状态尚未确认')
  })
  it('shows fixed left/right areas, records keyboard repeats and stops on viewport changes',async()=>{
   const p=props(),saved:Parameters<AntTaskProps['persistLocalDraft']>[0][]=[]
   p.persistLocalDraft=async record=>{saved.push(record);return {durable:true,contextId:record.contextId,key:record.key,recordDigest:antRecordDigest(record)}}
-  render(<AntTask {...p}/>);await act(async()=>fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'})))
+  render(<AntTask {...p}/>);await act(async()=>fireEvent.click(screen.getByRole('button',{name:'开始练习'})))
   await paint(0)
   const left=screen.getByRole('button',{name:'向左回应'}),right=screen.getByRole('button',{name:'向右回应'})
   expect(left).toHaveStyle({width:'130px',height:'78px'});expect(right).toHaveStyle({width:'130px',height:'78px'})
@@ -56,16 +56,26 @@ describe('ANT candidate UI and report boundary',()=>{
   expect(screen.getByRole('heading',{name:'本次作答已停止'})).toBeInTheDocument()
   expect(saved[0].core.events).toHaveLength(2);expect(saved[0].core.events[0].direction).toBe('left');expect(saved[0].core.events[1]).toMatchObject({input:'keyboard',repeat:true,held:true})
   expect(saved[0].core.interruptions[0].kind).toBe('viewport_changed')
-  expect(screen.getByRole('status')).toHaveTextContent('服务器保存尚未确认')
+  expect(screen.getByRole('status')).toHaveTextContent('尚未确认提交成功')
  })
  it('isolates a late first-exposure claim from the next context',async()=>{
   let resolve!:(value:Awaited<ReturnType<AntTaskProps['claimAttemptExposure']>>)=>void
   const old=props();old.claimAttemptExposure=()=>new Promise(yes=>{resolve=yes})
-  const {rerender}=render(<AntTask {...old}/>);fireEvent.click(screen.getByRole('button',{name:'核验设置并开始练习'}))
+  const {rerender}=render(<AntTask {...old}/>);fireEvent.click(screen.getByRole('button',{name:'开始练习'}))
   rerender(<AntTask {...props()} contextId="B"/>)
   await act(async()=>resolve({contextId:'A',durable:true,fresh:true,claimId:'late'}))
   expect(screen.getByRole('heading',{name:'看中间箭头，判断它的方向'})).toBeInTheDocument()
   expect(screen.queryByLabelText('固定回应区')).toBeNull()
+ })
+ it('keeps implementation terms and raw reason codes out of participant copy',()=>{
+  const p=props();p.display=null
+  const {container}=render(<AntTask {...p}/>)
+  fireEvent.click(screen.getByRole('button',{name:'开始练习'}))
+  const copy=container.cloneNode(true) as HTMLElement
+  copy.querySelectorAll('details').forEach(element=>element.remove())
+  expect(copy.textContent).not.toMatch(/宿主|冻结|CSS|COS|missing_frozen_geometry/)
+  const diagnostics=screen.getByText('missing_frozen_geometry').closest('details')!
+  expect(diagnostics.open).toBe(false)
  })
  it('shows only projected condition values, preserves negative differences and needs no decorative picture',()=>{
   render(<AntReportCard data={projection()} contextId="A" configHash={ANT_FIXTURE_HASH} protocolSignature={ANT_FIXTURE_SIGNATURE}/>)

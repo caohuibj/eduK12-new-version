@@ -7,7 +7,7 @@ const {scoreNativeRecognition,projectNativeRecognitionReport}=req(path.join(back
 const {sha256}=req(path.join(backend,'src/modules/cognitive/v2/canonical.ts'));
 const esbuild=require(path.join(front,'node_modules/esbuild'));
 const {chromium}=require('/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
-const out=path.join(root,'docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser');fs.mkdirSync(out,{recursive:true});
+const out=path.join(root,process.argv.includes('--copy-only')?'docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/participant-copy/browser':'docs/cognitive-library/next-candidates-20261026/recognition/implementation/frontend/browser');fs.mkdirSync(out,{recursive:true});
 const request={profile:'experience',seed:'recognition-golden',formalAssetIds:Array.from({length:184},(_,i)=>'logic-'+i),practiceAssetIds:Array.from({length:6},(_,i)=>'practice-'+i)};
 const frozen=freezeCandidate(request),session=createRecognitionSnapshot(request.profile,request.formalAssetIds,request.practiceAssetIds);
 const ids=[...new Set([...frozen.manifest.formal.map(r=>r.assetId),...request.practiceAssetIds])];
@@ -19,9 +19,12 @@ let browser,server;const errors=[],shots=[],checks=[],finals=[];
  const source=`import React from 'react';import{createRoot}from'react-dom/client';
  import{RecognitionTask}from ${JSON.stringify(path.join(front,'src/modules/cognitive/tasks/continuous-recognition/RecognitionTask.tsx'))};
  import{RecognitionReport}from ${JSON.stringify(path.join(front,'src/modules/cognitive/tasks/continuous-recognition/RecognitionReport.tsx'))};
+ import{RecognitionSession}from ${JSON.stringify(path.join(front,'src/modules/cognitive/tasks/continuous-recognition/session.ts'))};
  import{sealDigest}from ${JSON.stringify(path.join(front,'src/modules/cognitive/tasks/continuous-recognition/digest.ts'))};
  const query=new URLSearchParams(location.search),context=${JSON.stringify(context)},report=${JSON.stringify(report)};
  context.contextKey+=':'+query.get('sid');if(query.has('missing'))context.assetManifest.assets.pop();if(query.has('hashFail'))context.assetManifest.assets[0].sha256='0'.repeat(64);
+ if(query.has('copyLoading'))Image.prototype.decode=()=>new Promise(()=>{});
+ if(query.has('copyView'))RecognitionSession.prototype.prepare=async function(){this.view=query.get('copyView');this.changed()};
  const records=[];let saveCalls=0;const attempts=[];const ports={
   prepareLocalAttempt:async c=>{const key='active:'+c.contextKey;if(localStorage.getItem(key))throw Error('Already exposed identity');localStorage.setItem(key,sealDigest(c));return{contextKey:c.contextKey,bindingDigest:sealDigest(c),fresh:true}},
   persistLocalDraft:async r=>{saveCalls++;attempts.push(r);if(query.has('failSave')&&saveCalls===1)throw Error('Synthetic local-save failure');localStorage.setItem(r.contextKey+':'+r.recordKey,JSON.stringify(r));if(!records.some(x=>x.recordKey===r.recordKey))records.push(r);return{contextKey:r.contextKey,recordKey:r.recordKey,recordDigest:r.recordDigest,retained:true}},
@@ -46,6 +49,26 @@ let browser,server;const errors=[],shots=[],checks=[],finals=[];
  const ctx=await browser.newContext({hasTouch:true});await ctx.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
  async function pageAt(viewport,suffix){const page=await ctx.newPage();await page.setViewportSize(viewport);page.on('pageerror',e=>errors.push(e.message));await page.clock.install({time:new Date('2026-10-26T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-26T00:00:01Z'));await page.goto(base+'/?sid='+suffix);await page.getByRole('button',{name:'准备练习'}).waitFor();return page}
  async function shot(page,name){await page.screenshot({path:path.join(out,name+'.png'),fullPage:true});shots.push(name+'.png')}
+ if(process.argv.includes('--copy-only')){
+  const cases=[];
+  for(const language of ['zh','en'])for(const state of ['loading','saving','retry','stopped','settings']){
+   const page=await ctx.newPage();await page.setViewportSize({width:390,height:844});page.on('pageerror',e=>errors.push(e.message));
+   const query=state==='loading'?'&copyLoading=1':state==='settings'?'&missing=1':'&copyView='+(state==='saving'?'preparing':state==='stopped'?'blocked':'retry');
+   await page.goto(base+'/?sid=copy-'+language+'-'+state+'&lang='+language+query);
+   if(state==='loading')await page.getByRole('status').waitFor();
+   else if(state==='settings')await page.getByRole('alert').waitFor();
+   else{await page.getByRole('button',{name:language==='zh'?'准备练习':'Prepare practice'}).click();await page.locator('[data-recognition-view="'+(state==='saving'?'preparing':state==='stopped'?'blocked':'retry')+'"]').waitFor()}
+   const text=await page.locator('body').innerText();if(/宿主|冻结|曝光|核验|解码|\bhost\b|frozen|decod|manifest|exposure identity/i.test(text))throw Error('Implementation language remains in visible participant copy');
+   if(await page.locator('.recognition-board').count())throw Error('Copy-only state harness unexpectedly exposed an image');
+   if(state==='settings'){if(await page.locator('details').getAttribute('open')!==null)throw Error('Diagnostics not collapsed');await page.getByText(language==='zh'?'查看诊断信息':'View diagnostic details').waitFor()}
+   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Participant state horizontal overflow');await shot(page,'phone-'+language+'-'+state);cases.push({language,state,width:390,zoom:1,syntheticStateInjection:state!=='settings'});await page.close();
+  }
+  for(const language of ['zh','en'])for(const state of ['limited','invalid']){
+   const page=await ctx.newPage();await page.setViewportSize({width:820,height:1180});page.on('pageerror',e=>errors.push(e.message));await page.goto(base+'/?sid=copy-report-'+language+'-'+state+'&lang='+language+'&report=1&state='+state);await page.locator('[data-recognition-report]').waitFor();await page.evaluate(()=>{document.body.style.zoom='2'});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('200% report copy horizontal overflow');const text=await page.locator('body').innerText();if(/时序|素材与|stimulus and timing/i.test(text))throw Error('Report implementation copy remains');await shot(page,'zoom-'+language+'-'+state);cases.push({language,state,width:820,zoom:2,syntheticStateInjection:true});await page.close();
+  }
+  if(errors.length)throw Error(errors.join('\n'));fs.writeFileSync(path.join(out,'copy-browser.json'),JSON.stringify({synthetic:true,copyOnly:true,stateInjectionOnly:true,noCaptureSequenceExecuted:true,noBackendScorerExecuted:true,chromiumSandbox:true,cases,errors,screenshots:shots.map(file=>({file,sha256:crypto.createHash('sha256').update(fs.readFileSync(path.join(out,file))).digest('hex')}))},null,2));console.log(JSON.stringify({copyScreenshots:shots.length,cases:cases.length,errors,noCaptureSequenceExecuted:true}));return;
+ }
  if(process.argv.includes('--input-only')){
   const p=await pageAt({width:390,height:844},'actual-inputs');await p.getByRole('button',{name:'准备练习'}).click();await p.getByRole('button',{name:'开始练习'}).click();await p.clock.runFor(32);await p.touchscreen.tap(195,490);await p.mouse.click(195,490);await p.keyboard.down('r');await p.keyboard.down('r');await p.keyboard.up('r');await p.clock.runFor(1700);
   const records=await p.evaluate(()=>window.recognitionBrowser.records()),events=records[0]?.note.allEvents??[];for(const input of ['touch','mouse','keyboard'])if(!events.some(e=>e.input===input))throw Error('Missing actual browser '+input+' raw');if(!events.some(e=>e.input==='keyboard'&&e.isRepeat))throw Error('Missing actual key repeat raw');if(events.length!==4)throw Error('Unexpected browser response duplicate');

@@ -36,7 +36,13 @@ export class AntSession {
     this.options={...options,config:freezeAntValue(structuredClone(options.config)),display:freezeAntValue(structuredClone(options.display))}
     options=this.options
     this.practice=antPlan(options.config,options.seed,'practice');this.formal=antPlan(options.config,options.seed)
-    this.queue=new AntLocalQueue(options.contextId,options.persistLocalDraft,reason=>this.stop(reason,options.now()))
+    this.queue=new AntLocalQueue(options.contextId,options.persistLocalDraft,reason=>{
+      if(this.closed)return
+      // A later local failure must still expose retry after an earlier blur/resize stop.
+      // Keep the original interruption, sealed raw record and digest unchanged.
+      if(this.terminated){this.view='error';this.change();return}
+      this.stop(reason,options.now())
+    })
   }
   private change(){if(!this.closed)this.options.onChange()}
   startPractice(){if(this.view!=='intro'||this.closed)return;if(!this.exposureAuthorized)throw Error('ANT fresh durable attempt marker required');this.arm('practice',0)}

@@ -1,0 +1,84 @@
+{
+  "status": "PASS",
+  "scope": "Only participant copy and changed status/report screens; prior capture/full browser checks reused",
+  "checks": [
+    {
+      "name": "Chinese intro copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Calibration required copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Old attempt support copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Unconfirmed local saving copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Local saved server unconfirmed copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Null server receipt remains unconfirmed copy",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Report copy interpretable zh 1",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Report copy limited zh 1",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Report copy invalid zh 1",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "Report copy interpretable en 2",
+      "viewport": 390,
+      "scrollWidth": 390,
+      "implementationTermsVisible": false
+    },
+    {
+      "name": "English tablet intro copy",
+      "implementationTermsVisible": false
+    }
+  ],
+  "screenshots": [
+    "phone-intro-copy.png",
+    "phone-calibration-required-copy.png",
+    "phone-old-attempt-copy.png",
+    "phone-save-failure-copy.png",
+    "phone-local-saved-copy.png",
+    "phone-submission-unconfirmed-copy.png",
+    "phone-report-copy.png",
+    "phone-report-limited-copy.png",
+    "phone-report-invalid-copy.png",
+    "phone-report-en-200-copy.png",
+    "tablet-intro-en-copy.png"
+  ],
+  "errors": []
+}

@@ -62,3 +62,17 @@ rAF内每帧最多推进一个阶段，后台停顿不会倒填从未显示过�
 - `phone-refresh-blocked.png`、`phone-save-failure.png`、`phone-after-retry.png`：耐久marker与保存失败状态。
 
 此前非responsive手机报告图片保留为修订前证据，最终窄屏使用responsive后缀；tablet原图的主要布局未受窄屏media规则影响，正常流程/刺激/保存检查复用，不机械重跑。
+
+## 9415203安全快照后的定向续接
+
+安全快照commit `94152032885d5cbaf149a15ec03d5a0c72ea2c67` / tree `a8b69c99eebf966e0f5c8e51f8c21314f62a85f7` 已由主线保留。该快照后的修改仅限参与者copy与一个获准的本机保存恢复性修复，刺激、单次时序、geometry、随机序列、scorer、原始字段与旧截图/JSON均未改写。
+
+参与者可见文案改为“先完成屏幕与观看距离校准”“记录已保存在这台设备上，尚未确认提交成功”等；只有真实匹配的服务器回执才显示“提交成功”。host/冻结/CSS/COS与raw reason code移出普通层，必要诊断默认折叠。报告将RT/input等显示标签换成“正确平均用时”、触屏/鼠标或触控笔/键盘等普通用语，数值、条件门控和source来源不变。仅受影响UI单文件8项通过，新增1项检查可见层不泄漏实现术语/默认不展开技术码。
+
+另按主线明确授权修复：当blur/resize先终止本轮，随后尚未完成的本机写入再失败时，原先terminated guard会吞掉显示重试的机会。新增deferred→blur→reject用例先真实复现（`vitest-post-stop-save-repro.json`，预期error、实际terminated），保存原source/test绑定后再修`session.ts`的queue fault回调：已terminated且未closed时进入error，保留原中断reason与sealed record/digest；retry成功后仍结束，不重新曝光。仅新例、原running写失败和closed context三项定向复验通过。没有修改完成判定或质量语义。
+
+最终可复用的不同前端病例数为**32**（capture9＋session15＋UI8），不是将各轮执行次数相加。后端41和完整浏览器流程均未重跑。新的copy状态/阅读检查11项、11张图通过；新“先中断、后写失败”界面再定向检查并保存2张图，Chrome实际可见重试、原window_blur与recordDigest保留、不重新曝光。旧截图保留，最终普通用户界面请用`*-copy.png`，刺激图仍使用之前的cue/target图。200%仍明确为CSS阅读代理而非真实物理校准。
+
+主线依据真实frontend tsconfig对改动Task/Card入口及session依赖补类型闭包，退出0，输入检查前后hash稳定；见相邻`implementation-coordination/frontend-copy-types.json`。原11根类型记录和原错误证据保留，未重跑其他不受影响根或全应用。
+
+最终源码与截图hash、完整原始运行、旧输入绑定、证据复用边界见本目录`evidence.json`。开发自查和主线类型检查不等于独立审计、真实设备科学验证、正式入库或上线。
