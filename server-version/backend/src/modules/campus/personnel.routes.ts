@@ -6,6 +6,7 @@ import {asyncHandler} from '../../middleware/asyncHandler'
 import {success} from '../../utils/response'
 import {CampusAdmissionError} from './admission.error'
 import {previewPersonnel,importPersonnel,listPersonnel,issuePersonnelCredential,bindExistingPersonnel,personnelInput} from './personnel.service'
+import {directoryQuery,directoryEntryId,listPersonnelDirectory,readPersonnelDirectoryEntry} from './personnel.directory'
 import {registerCampusStaff} from './staff.service'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 const router=Router(),uuid=z.string().guid()
@@ -20,6 +21,8 @@ const handle=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>
  }
 })
 const base='/organizations/:organizationId/personnel'
+router.get(base+'/directory',authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await listPersonnelDirectory({actor:req.user,organizationId:uuid.parse(req.params.organizationId),query:directoryQuery.parse(req.query)}))))
+router.get(base+'/directory/:entryId',authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await readPersonnelDirectoryEntry({actor:req.user,organizationId:uuid.parse(req.params.organizationId),entryId:directoryEntryId.parse(req.params.entryId)}))))
 router.get(base,authenticateSchool,requireRecentSchoolMfa,handle(async(req,res)=>success(res,await listPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),after:z.string().guid().optional().parse(req.query.after)}))))
 router.post(base+'/preview',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>success(res,await previewPersonnel({actor:req.user,organizationId:uuid.parse(req.params.organizationId),input:personnelInput.parse(req.body)}))))
 router.post(base+'/import',authenticateSchool,requireRecentSchoolMfa,rate,handle(async(req,res)=>{
