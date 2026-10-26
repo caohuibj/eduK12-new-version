@@ -114,7 +114,7 @@ export async function listPersonnelDirectory(input:Input&{query:Query}){
   const rows=await tx.$queryRaw<Row[]>(Prisma.sql`${cte} SELECT ${selection} FROM directory d WHERE ${conditions}
     ORDER BY CASE WHEN ${q.sort}='pending' AND d.user_id IS NULL THEN 0 ELSE 1 END,d.created_at DESC,d.id
     LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`)
-  return {list:rows.map(row=>project(org,row)),total:count[0].total,page:q.page,pageSize:q.pageSize}
+  return {list:rows.map(row=>project(org,row)),total:count[0].total,page:q.page,pageSize:q.pageSize,batchImport:true}
  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,timeout:15000})
 }
 export async function readPersonnelDirectoryEntry(input:Input&{entryId:string}){

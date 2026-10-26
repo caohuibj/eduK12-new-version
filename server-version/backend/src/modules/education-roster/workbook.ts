@@ -17,9 +17,10 @@ export async function createRosterWorkbook(kind:RosterKind){
 }
 export type RosterSheet={name:string;rows:{line:number;cells:string[];numeric:number[]}[]}
 /** Bounded inert OOXML, decoded in memory only; no upload retention. */
-export async function readRosterWorkbook(bytes:Buffer):Promise<{sheets:RosterSheet[]}>{
- if(bytes.length>64000)throw Error('文件超过 64 KB，请拆分后导入。')
- const files=validateBoundedXlsxContainer(bytes,{bytes:64000,entries:100,part:512*1024,total:2*1024*1024})
+export async function readRosterWorkbook(bytes:Buffer,mode:'single'|'job'='single'):Promise<{sheets:RosterSheet[]}>{
+ const job=mode==='job',maxBytes=job?1000000:64000,maxRows=job?5000:100
+ if(bytes.length>maxBytes)throw Error(job?'文件超过 1 MB，请拆分后导入。':'文件超过 64 KB，请拆分后导入。')
+ const files=validateBoundedXlsxContainer(bytes,{bytes:maxBytes,entries:job?200:100,part:job?4*1024*1024:512*1024,total:job?8*1024*1024:2*1024*1024})
  for(const [name,value] of files)if(/\.xml$|\.rels$/.test(name)&&/<!DOCTYPE|<!ENTITY/i.test(value.toString('utf8')))throw Error('Excel 文件不能包含实体或外部定义。')
  const wb=new ExcelJS.Workbook()
  try{await wb.xlsx.load(Uint8Array.from(bytes).buffer)}catch{throw Error('无法读取此 Excel 文件，请另存为普通 .xlsx 文件。')}
@@ -27,7 +28,7 @@ export async function readRosterWorkbook(bytes:Buffer):Promise<{sheets:RosterShe
  const sheets:RosterSheet[]=[]
  for(const sheet of wb.worksheets){
   if(sheet.state!=='visible')throw Error('文件包含隐藏工作表，请移除后重选。')
-  if(sheet.rowCount>1000||sheet.columnCount>20)throw Error('工作表范围过大；每批最多 100 条、20 列。')
+  if(sheet.rowCount>(job?10000:1000)||sheet.columnCount>20)throw Error(`工作表范围过大；最多 ${maxRows} 行、20 列。`)
   const rows:RosterSheet['rows']=[]
   for(let row=1;row<=sheet.rowCount;row++){
    const cells:string[]=[],numeric:number[]=[]
@@ -41,10 +42,10 @@ export async function readRosterWorkbook(bytes:Buffer):Promise<{sheets:RosterShe
    }
    if(cells.some(Boolean))rows.push({line:row,cells,numeric})
   }
-  if(rows.length>101)throw Error(`${sheet.name} 每批最多 100 行名单，请拆分后导入。`)
+  if(rows.length>maxRows+1)throw Error(`${sheet.name} 最多 ${maxRows} 行名单，请拆分后导入。`)
   if(rows.length)sheets.push({name:sheet.name,rows})
  }
  if(!sheets.length)throw Error('文件没有可读取的名单。')
- if(Buffer.byteLength(JSON.stringify(sheets),'utf8')>128000)throw Error('工作表内容过大，请分开导入。')
+ if(Buffer.byteLength(JSON.stringify(sheets),'utf8')>(job?2300000:128000))throw Error('工作表内容过大，请分开导入。')
  return {sheets}
 }

@@ -12,7 +12,7 @@ type Entry={id:string;personId:string|null;kind:'STUDENT'|'STAFF';persona:string
  activation:string;account:string;membership:string;admission:string;existingAccount:boolean;
  classUnitId:string|null;className:string|null;grade:string|null}
 type Detail=Entry&{classes:{className:string;grade:string;role:string;pending:boolean}[]}
-type Page={list:Entry[];total:number;page:number;pageSize:number}
+type Page={list:Entry[];total:number;page:number;pageSize:number;batchImport?:boolean}
 type Unit={id:string;unitKind:string;name:string;parentUnitId?:string|null}
 type Props={api:SchoolApi;organizationId:string;units:Unit[];disabled?:boolean;onUnits?:(units:RosterUnit[])=>void;entry?:'SCHOOL'|'TEACHER'}
 const activation:Record<string,string>={ACTIVATED:'已激活',PENDING:'待激活',OWNER_CONFIRMATION:'待本人确认'}
@@ -22,6 +22,7 @@ const admissions:Record<string,string>={APPROVED:'已通过班级审批',PENDING
 const title=(p:Entry)=>p.name||p.number||p.reference||p.username||'校园成员'
 export function EducationPersonnelDirectory(props:Props){return <Directory key={props.organizationId} {...props}/>}
 function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Props){
+ const [batchImport,setBatchImport]=useState(false)
  const [kind,setKind]=useState('ALL'),[state,setState]=useState('ALL'),[member,setMember]=useState('ALL')
  const [classId,setClassId]=useState(''),[sort,setSort]=useState('recent'),[query,setQuery]=useState(''),[draft,setDraft]=useState('')
  const [searchOpen,setSearchOpen]=useState(false),[page,setPage]=useState(1),[version,setVersion]=useState(0)
@@ -44,7 +45,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
   setBusy(true);setError('');setNotice('')
   const params=new URLSearchParams({kind,activation:state,membership:member,sort,query,page:String(page),pageSize:'25'})
   if(classId)params.set('classUnitId',classId)
-  void api<Page>(base+'?'+params).then(result=>{if(alive.current&&request===listRequest.current){const last=Math.max(1,Math.ceil(result.total/result.pageSize));if(page>last)setPage(last);else setData(result)}})
+  void api<Page>(base+'?'+params).then(result=>{if(alive.current&&request===listRequest.current){if(result.batchImport)setBatchImport(true);const last=Math.max(1,Math.ceil(result.total/result.pageSize));if(page>last)setPage(last);else setData(result)}})
    .catch(cause=>{if(alive.current&&request===listRequest.current)report(cause)})
    .finally(()=>{if(alive.current&&request===listRequest.current)setBusy(false)})
  },[api,base,disabled,kind,state,member,classId,sort,query,page,version])
@@ -84,7 +85,7 @@ function Directory({api,organizationId,units,disabled,onUnits,entry='SCHOOL'}:Pr
   {query&&<div className="hs-directory-query">检索：{query}<button type="button" aria-label="清除全校检索" onClick={()=>{setDraft('');change(setQuery,'')}}><X size={15}/></button></div>}
   {error&&<p role="alert" className="hs-alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {mfa&&<form className="hs-directory-search" aria-label="目录身份验证" onSubmit={e=>{e.preventDefault();void verify()}}><label className="hs-field"><span>6 位动态验证码</span><input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/></label><button disabled={verifying||!/^\d{6}$/.test(code)}>验证身份</button></form>}
-  {importStarted&&<div hidden={!importOpen}><EducationRosterWorkbench api={api} organizationId={organizationId} disabled={disabled} units={units.filter(u=>u.unitKind==='GRADE'||u.unitKind==='CLASS').map(u=>({...u,unitKind:u.unitKind as RosterUnit['unitKind'],parentUnitId:u.parentUnitId??null}))} onUnits={onUnits} entry={entry} onChanged={()=>setVersion(v=>v+1)}/></div>}
+  {importStarted&&<div hidden={!importOpen}><EducationRosterWorkbench batchImport={batchImport} api={api} organizationId={organizationId} disabled={disabled} units={units.filter(u=>u.unitKind==='GRADE'||u.unitKind==='CLASS').map(u=>({...u,unitKind:u.unitKind as RosterUnit['unitKind'],parentUnitId:u.parentUnitId??null}))} onUnits={onUnits} entry={entry} onChanged={()=>setVersion(v=>v+1)}/></div>}
   {busy&&<p role="status">正在读取全校人员…</p>}
   {data&&<>
    <div className="hs-directory-meta"><span>共 {data.total} 人</span>{filtered&&<button type="button" onClick={reset}>清除筛选</button>}<details><summary>名单与状态说明</summary><p>汇总导入名单、已有学校成员及注册学生。仅合并本人已确认的账号；待确认记录保留独立条目。账号激活、成员关系和学生审批分别显示，不代表报告权限。旧记录不补造姓名。</p></details></div>

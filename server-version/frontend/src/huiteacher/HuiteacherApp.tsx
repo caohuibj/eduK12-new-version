@@ -65,7 +65,7 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{re
   })
   if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
   const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status})
+  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
 const Field=({label,value,set,type='text',required=true}:{

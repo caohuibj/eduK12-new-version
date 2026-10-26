@@ -23,7 +23,7 @@ describe('shared School / Teacher roster preparation',()=>{
   expect(()=>mappedRosterText(rows,'STAFF',{...mapping,name:0})).toThrow(/重复/)
   expect(()=>mappedRosterText(readRosterText('工号,姓名\nT1,'),'STAFF',mapping)).toThrow(/第 2 行缺少姓名/)
  })
- it.each(['密码','administrator','手机号','permission','身份证号'])('rejects sensitive %s columns before mapping or preview',header=>{
+ it.each(['密码','administrator','手机号','permission','身份证号','系统角色','联系手机'])('rejects sensitive %s columns before mapping or preview',header=>{
   expect(()=>inspectRosterHeader(readRosterText(`工号,姓名,${header}\nT1,示例,unsafe`),'STAFF')).toThrow(/不能包含/)
  })
  it('rejects duplicate aliases, replacement decoding, wide files and over 100 rows',()=>{

@@ -19,7 +19,7 @@ type Input={actor:AuthenticatedPrincipal;organizationId:string;input:PersonnelIn
 type Unit={id:string;unitKind:string;name:string;parentUnitId:string|null}
 type Admission={status:string;rosterVersion:number;claimed:number}
 type Checked={line:number;number:string;name:string;state:'add'|'skip'|'error';message:string;classUnitId?:string;person?:PersonnelRow;expectedUserId?:string;eligibilityId?:string;numberDigest:string;persona:string;username:string;staffRole:string}
-async function check(tx:Tx,params:Input){
+export async function checkPersonnelBatch(tx:Tx,params:Input){
  await assertPersonnelGovernor(tx,params.actor,params.organizationId)
  const {input,organizationId:org}=params
  const units=await tx.$queryRaw<Unit[]>`SELECT id,unit_kind AS "unitKind",name,parent_unit_id AS "parentUnitId" FROM organization_units WHERE organization_id=${org}`
@@ -96,23 +96,22 @@ async function check(tx:Tx,params:Input){
  const token=personnelHash([org,input,rows.map(r=>[r.state,r.classUnitId,r.person?.id,r.person?.claimedUserId,r.expectedUserId,r.eligibilityId,r.message])])
  return {rows,token,add:rows.filter(r=>r.state==='add').length,skip:rows.filter(r=>r.state==='skip').length,errors:rows.filter(r=>r.state==='error').length}
 }
-function publicPreview(checked:Awaited<ReturnType<typeof check>>){return {...checked,rows:checked.rows.map(({line,number,name,state,message})=>({line,number,name,state,message}))}}
-export async function previewPersonnel(input:Input){return publicPreview(await prisma.$transaction(tx=>check(tx,input),{timeout:15000}))}
-export async function importPersonnel(params:Input&{batchId:string;previewToken:string;verifiedOffline:boolean}){
+function publicPreview(checked:Awaited<ReturnType<typeof checkPersonnelBatch>>){return {...checked,rows:checked.rows.map(({line,number,name,state,message})=>({line,number,name,state,message}))}}
+export async function previewPersonnel(input:Input){return publicPreview(await prisma.$transaction(tx=>checkPersonnelBatch(tx,input),{timeout:15000}))}
+export async function importPersonnelInTransaction(tx:Tx,params:Input&{batchId:string;previewToken:string;verifiedOffline:boolean}){
  const hash=personnelHash([params.input,params.verifiedOffline])
- return prisma.$transaction(async tx=>{
   await assertPersonnelGovernor(tx,params.actor,params.organizationId)
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${params.organizationId},7926))`
   const prior=await tx.$queryRaw<Array<{hash:string;receipt:any;org:string}>>`SELECT request_hash AS hash,receipt,organization_id AS org FROM campus_personnel_import_batches WHERE id=${params.batchId}`
   if(prior.length){if(prior[0].hash!==hash||prior[0].org!==params.organizationId)personnelFail('PERSONNEL_BATCH_CONFLICT');return prior[0].receipt}
   // Share class admission locks with existing roster/window/registration paths.
-  const pre=await check(tx,params)
+  const pre=await checkPersonnelBatch(tx,params)
   const classes=[...new Set(pre.rows.filter(r=>r.state==='add'&&params.input.kind==='STUDENT').map(r=>r.classUnitId).filter((x):x is string=>!!x))].sort()
   for(const classId of classes){
    await tx.$executeRaw`INSERT INTO campus_class_admissions(class_unit_id,organization_id) VALUES(${classId},${params.organizationId}) ON CONFLICT(class_unit_id) DO NOTHING`
    await tx.$queryRaw`SELECT class_unit_id FROM campus_class_admissions WHERE class_unit_id=${classId} AND organization_id=${params.organizationId} FOR UPDATE`
   }
-  const checked=await check(tx,params)
+  const checked=await checkPersonnelBatch(tx,params)
   if(checked.errors||checked.token!==params.previewToken)personnelFail('PERSONNEL_PREVIEW_CHANGED')
   if(checked.rows.some(x=>x.state==='add'&&x.expectedUserId)&&!params.verifiedOffline)personnelFail('PERSONNEL_OFFLINE_VERIFICATION_REQUIRED',400)
   const receipt={batchId:params.batchId,added:checked.add,skipped:checked.skip}
@@ -141,7 +140,10 @@ export async function importPersonnel(params:Input&{batchId:string;previewToken:
   }
   await appendAudit(tx,{organizationId:params.organizationId,actorUserId:params.actor.userId,action:'CAMPUS_PERSONNEL_IMPORTED',targetType:'PERSONNEL_BATCH',targetId:params.batchId,domainEventId:randomUUID(),payload:{kind:params.input.kind,added:checked.add,skipped:checked.skip}})
   return receipt
- },{timeout:20000,isolationLevel:Prisma.TransactionIsolationLevel.Serializable})
+
+}
+export async function importPersonnel(params:Input&{batchId:string;previewToken:string;verifiedOffline:boolean}){
+ return prisma.$transaction(tx=>importPersonnelInTransaction(tx,params),{timeout:20000,isolationLevel:Prisma.TransactionIsolationLevel.Serializable})
 }
 export async function listPersonnel(params:{actor:AuthenticatedPrincipal;organizationId:string;after?:string}){
  return prisma.$transaction(async tx=>{
