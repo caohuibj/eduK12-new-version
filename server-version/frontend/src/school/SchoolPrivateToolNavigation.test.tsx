@@ -20,6 +20,7 @@ it('preserves a new private tool name when School navigation or school change is
  const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
  render(<SchoolApp/> )
  await waitFor(()=>expect(screen.getByLabelText('工具名称')).toBeEnabled())
+ fireEvent.click(screen.getByText('新建工具'))
  fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'尚未创建的工具'}})
  fireEvent.change(screen.getByLabelText('当前学校'),{target:{value:'b'}})
  expect(screen.getByLabelText('当前学校')).toHaveValue('a')

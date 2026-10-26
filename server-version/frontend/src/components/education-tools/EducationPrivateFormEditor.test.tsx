@@ -71,3 +71,16 @@ it('pairs shared form row and bulk tokens inside each education dark surface onl
   expect(rule).toContain('--survey-ui-success:#b8e6c2')
  }
 })
+
+
+it('keeps optional School settings mounted but collapsed without changing the form definition',()=>{
+ const changed=vi.fn()
+ render(<EducationPrivateFormEditor compactSettings value={initial()} onChange={changed} renderMaterials={()=><button>读取已有素材</button>}/> )
+ expect(screen.getByText('编制说明').closest('details')).not.toHaveAttribute('open')
+ expect(screen.getByText('题目展示素材').closest('details')).not.toHaveAttribute('open')
+ expect(screen.getByRole('button',{name:'读取已有素材'})).not.toBeVisible()
+ fireEvent.click(screen.getByText('题目展示素材'))
+ expect(screen.getByRole('button',{name:'读取已有素材'})).toBeInTheDocument()
+ expect(screen.getByLabelText('题干')).toHaveValue('第一题')
+ expect(changed).not.toHaveBeenCalled()
+})

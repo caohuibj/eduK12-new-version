@@ -18,12 +18,12 @@ const types:Record<FormQuestion['type'],string>={
 function FormSettings({compact,title,children}:{compact:boolean;title:string;children:ReactNode}){return compact?<details className="survey-form-question-settings"><summary>{title}</summary>{children}</details>:<>{children}</>}
 export type FormEditorFocus={pageKey:string;itemKey:string|null}
 type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode;renderMaterials?:(question:FormQuestion,onChange:(question:FormQuestion)=>void)=>ReactNode;bulkPending?:boolean;onPendingChange?:(id:string,pending:boolean)=>void;
-  focusedItem?:FormEditorFocus;variant?:'education';renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}
+  focusedItem?:FormEditorFocus;variant?:'education';compactSettings?:boolean;renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}
 type Props=FieldsProps&({appearance:'studio';onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean}|{appearance?:'standard'})
 export function ResearchFormEditor(props:Props){
-  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl,onPendingChange,bulkPending)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} renderMaterials={props.renderMaterials} questionMeta={pageControl} bulkPending={bulkPending} onPendingChange={onPendingChange} focusedItem={props.focusedItem} variant={props.variant} renderImageField={props.renderImageField}/>}/>:<FormFields {...props}/>
+  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl,onPendingChange,bulkPending)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} renderMaterials={props.renderMaterials} questionMeta={pageControl} bulkPending={bulkPending} onPendingChange={onPendingChange} focusedItem={props.focusedItem} variant={props.variant} compactSettings={props.compactSettings} renderImageField={props.renderImageField}/>}/>:<FormFields {...props}/>
 }
-function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedItem,variant,renderImageField,renderMaterials,bulkPending,onPendingChange}:FieldsProps){
+function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedItem,variant,renderImageField,renderMaterials,bulkPending,onPendingChange,compactSettings=false}:FieldsProps){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -71,7 +71,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
             }}>{Object.entries(types).filter(([kind])=>value.schemaVersion===2||
               !professionalTypes.has(kind as FormQuestion['type']))
               .map(([kind,name])=><option key={kind} value={kind}>{name}</option>)}</select>
-        const mediaFields=<FormSettings compact={!!questionKey} title="题目配图">
+        const mediaFields=<FormSettings compact={!!questionKey||compactSettings} title="题目配图">
           {renderImageField ? renderImageField({image:q.image,onChange:image=>setQuestion(pi,qi,x=>({...x,image}))}) : projectId ? <SurveyImageField projectId={projectId} image={q.image}
             onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
             : q.image ? <p className="text-sm" role="status">
@@ -113,11 +113,11 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               {questionKey?'允许选择“不愿回答”':'允许明确选择「不愿回答」（单独记为 REFUSED）'}
             </label>
           </div>
-          {renderMaterials ? renderMaterials(q,next=>setQuestion(pi,qi,()=>next)) : projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
+          {renderMaterials ? <FormSettings compact={compactSettings} title="题目展示素材">{renderMaterials(q,next=>setQuestion(pi,qi,()=>next))}</FormSettings> : projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
           {!questionKey&&mediaFields}
           {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} protectedKeys={referencedOptions} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {questionKey&&mediaFields}
-          {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
+          {(!questionKey&&!compactSettings||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey||compactSettings} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
             <div className="border rounded-lg p-3 space-y-3">
               <label className="block text-sm">选择后填写文字
@@ -150,7 +150,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
             </div>}
           </FormSettings>}
           {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'rows'} question={q} kind="矩阵行" limit={Math.min(40,500-fieldCount+q.rows.length)} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
-          {(!questionKey||['NUMBER','SLIDER','TIME','SHORT_TEXT','LONG_TEXT','CONSTANT_SUM','MULTIPLE','MATRIX_MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="作答规则与格式"><div className="space-y-3">
+          {(!questionKey&&!compactSettings||['NUMBER','SLIDER','TIME','SHORT_TEXT','LONG_TEXT','CONSTANT_SUM','MULTIPLE','MATRIX_MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey||compactSettings} title="作答规则与格式"><div className="space-y-3">
           <BasicFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>
           {value.schemaVersion===2&&<StructuredFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>}
           {value.schemaVersion===2&&['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&
@@ -162,7 +162,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               <option value="DIGITS">仅数字</option><option value="ALPHANUMERIC">英文字母与数字</option>
             </select></label>}
           </div></FormSettings>}
-          {(!questionKey||previous.length>0)&&<FormSettings compact={!!questionKey} title="条件显示">
+          {(!questionKey&&!compactSettings||previous.length>0)&&<FormSettings compact={!!questionKey||compactSettings} title="条件显示">
           {previous.length>0&&<div className="space-y-3">
             <p className="survey-form-setting-note" id={'survey-form-'+q.itemKey+'-condition-help'}>满足以下条件时显示本题。例如：前题“是否参加过培训”选择“是”，才显示本题“参加过哪些培训”。选择“始终显示”则不受前题答案影响。</p>
             <div className="grid sm:grid-cols-2 gap-3">
