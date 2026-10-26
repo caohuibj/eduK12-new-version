@@ -1,0 +1,56 @@
+{
+  "status": "PROPOSED_NOT_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "baseHead": "162db124919801532c2b08e9b55d911f8e1e8652",
+  "candidateId": "attention-enumeration-flower",
+  "testType": "enumeration",
+  "recommendation": {
+    "recipeId": "enumeration-square5deg-circle-white-grey-mask48-r1",
+    "recipeHash": "1aee9b741bbdd8d8ca64cded52bed2bcc294f78be1415ebe1fcd5b4a3130acf1",
+    "hashScheme": "CANONICAL_JSON_SHA256_V1",
+    "calibrationFreeze": "Existing self-reported fields, first durable local freeze before practice; server first receives the lightweight binding at FINAL.",
+    "coreCarrier": "Proposed presentationContext only in formal trial 0, per-trial presentationBindingHash and existing calibration/stimulus references; no global FINAL/provenance extension.",
+    "authorityValidation": "Proposed task helper called only for exact new tuple before prepareAuthoritativeScorerContext in unified-final-submit.service.ts, using actual authorized child/session fields.",
+    "serverPreExposureAck": false,
+    "newSampling": false,
+    "extraTimingAnalysis": false,
+    "versions": {
+      "engineVersion": "0.2.0",
+      "scoringVersion": "0.3.0",
+      "configVersion": "0.3.0",
+      "profileDefinitionVersion": "0.3.0",
+      "protocolKey": "enumeration/0.2.0/0.3.0",
+      "protocolVersion": "0.2.0",
+      "presentationVersion": "0.1.0",
+      "metricDefinitionVersion": "0.2.0",
+      "qualityDefinitionVersion": "0.2.0",
+      "reportDefinitionVersion": "0.2.0",
+      "nativeArtifactAndRecordSchemaVersion": 2
+    },
+    "versionCaveat": "Candidate numbers only; existing constants/schema/resolvers untouched. Presentation unchanged because render/instructions/input/timing are unchanged; any later real visual/interaction change requires its own classification/review."
+  },
+  "preserved": [
+    "approved 100/25 formal and 3 practice",
+    "5deg field/0.5deg dots, existing square background/circular point sampling",
+    "white/grey, original 48x48 fixed mask",
+    "50ms nominal policy including user accepted occasional one-frame error",
+    "1-15 integer slider+explicit confirm, unlimited response",
+    "existing finite/positive/viewport-fit/canvas memory checks",
+    "old tuples/raw/hash identity",
+    "MOT audit limitations"
+  ],
+  "currentPhaseChanges": [
+    "This documentation directory only"
+  ],
+  "notImplemented": [
+    "new seed",
+    "new delivery admission",
+    "new runtime package registration",
+    "calibration UI",
+    "native runner",
+    "new bound tuple/scorer/schema",
+    "new metadata freeze method",
+    "FINAL binding helper",
+    "COS enumeration schema",
+    "CI/merge/deploy"
+  ]
+}

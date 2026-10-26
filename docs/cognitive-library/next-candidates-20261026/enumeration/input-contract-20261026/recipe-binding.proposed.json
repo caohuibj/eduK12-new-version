@@ -1,0 +1,10 @@
+{
+  "status": "PROPOSED_NOT_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "recipeId": "enumeration-square5deg-circle-white-grey-mask48-r1",
+  "hashScheme": "CANONICAL_JSON_SHA256_V1",
+  "recipeHash": "1aee9b741bbdd8d8ca64cded52bed2bcc294f78be1415ebe1fcd5b4a3130acf1",
+  "canonicalBytes": 512,
+  "canonicalFile": "recipe.canonical.json",
+  "definitionFile": "recipe-definition.proposed.json",
+  "definitionFileSha256": "896c3762d5dac2d06f816a2cde8d49629a7bf06356f0107fc5ee9e4e7dd04776"
+}
