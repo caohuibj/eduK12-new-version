@@ -1,12 +1,12 @@
 import type { TaskDefinition } from '../../v2/types'
 import { motDefinition } from '../mot/package'
-import { enumerationDefinition } from '../enumeration/package'
+import { enumerationDefinition, enumerationRecipeDefinition } from '../enumeration/package'
 import { recognitionDefinition } from '../continuous-recognition/package'
 import { antDefinition } from '../ant/package'
 
 /** Explicit native implementations, not RegistryEntry adapters or publication/lifecycle authority. */
 const nativeDefinitions:readonly TaskDefinition<unknown,unknown>[]=[
-  motDefinition,enumerationDefinition,recognitionDefinition,antDefinition,
+  motDefinition,enumerationDefinition,enumerationRecipeDefinition,recognitionDefinition,antDefinition,
 ] as unknown as readonly TaskDefinition<unknown,unknown>[]
 
 export const listNativeCognitiveTaskDefinitions=():TaskDefinition<unknown,unknown>[]=>[...nativeDefinitions]

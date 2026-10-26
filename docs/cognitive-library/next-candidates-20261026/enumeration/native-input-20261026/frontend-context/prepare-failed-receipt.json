@@ -1,0 +1,4 @@
+{
+  "reason": "Repo-relative write path used while cwd was frontend; no test file created and zero assertions executed. Correct only path; product code unchanged.",
+  "exitCode": 1
+}

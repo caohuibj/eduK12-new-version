@@ -1,3 +1,4 @@
+import { ENUMERATION_RECIPE_IDENTITY } from './protocol'
 /** Research metadata only, intentionally not a backend tag DTO or search registration. */
 export const enumerationContent = {
   candidateId: 'attention-enumeration-flower', status: 'DESIGN_PROPOSAL',
@@ -42,3 +43,8 @@ export const enumerationContent = {
     occasionalFrameDeviationAloneInvalidates: false, physicalTimingValidated: false },
   notInferred: ['IQ', 'mathematical_ability', 'dyscalculia', 'subitizing_span', 'age_percentile', 'stable_attention_capacity'],
 } as const
+
+/** Additive metadata for the exact complete-recipe tuple; historical content metadata above is retained. */
+export const enumerationRecipeContent = { ...enumerationContent, versionBindings: ENUMERATION_RECIPE_IDENTITY,
+  configurationContract: 'complete_recipe_directly_in_stimulusRecipe',
+  rollout: { seeded: false, deliveryEnabled: false, hostConnected: false } } as const

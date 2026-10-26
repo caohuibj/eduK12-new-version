@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256'
 import { bytesToHex } from '@noble/hashes/utils'
-import { enumerationConfig, enumerationPlan, type EnumerationConfig, type EnumerationPlan } from './generated/protocol'
+import { enumerationConfig, enumerationPlan, enumerationRecipeConfig, enumerationRecipePlan, enumerationConfigEqual, type EnumerationConfig, type EnumerationRecipeConfig, type EnumerationPlan } from './generated/protocol'
 export interface EnumerationCalibration {
   id: string
   source: 'self_reported_ruler_and_distance' | 'synthetic_fixture'
@@ -29,26 +29,36 @@ export interface EnumerationRecipe {
   practiceExposureMs: number
   maskMs: number
 }
-export interface EnumerationContext {
+interface EnumerationContextBase {
   contextId: string
   attemptId: string
-  usage: 'INTERNAL_REVIEW_ONLY'
-  config: EnumerationConfig
   randomSeed: string
   language: 'zh' | 'en'
   calibration: EnumerationCalibration | null
   recipe: EnumerationRecipe | null
 }
+/** The native variant is fed by an authorized frozen session, never a scope-string authorization. */
+export type EnumerationContext = EnumerationContextBase & (
+  { usage: 'INTERNAL_REVIEW_ONLY'; config: EnumerationConfig } |
+  { usage: 'AUTHENTICATED_CONTENT_CANDIDATE'; config: EnumerationRecipeConfig }
+)
+export function enumerationContextPlan(c: EnumerationContext, index: number, phase: 'test' | 'practice' = 'test'): EnumerationPlan {
+  return c.usage === 'AUTHENTICATED_CONTENT_CANDIDATE'
+    ? enumerationRecipePlan(c.config, c.randomSeed, index, phase)
+    : enumerationPlan(c.config, c.randomSeed, index, phase)
+}
 const boundedId = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 256
 const positive = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0
 export function validateEnumerationContext(c: EnumerationContext): void {
-  if (!boundedId(c.contextId) || !boundedId(c.attemptId) || c.usage !== 'INTERNAL_REVIEW_ONLY'
+  if (!boundedId(c.contextId) || !boundedId(c.attemptId) || !['INTERNAL_REVIEW_ONLY', 'AUTHENTICATED_CONTENT_CANDIDATE'].includes(c.usage)
     || !['zh', 'en'].includes(c.language)) throw Error('Invalid internal enumeration context')
-  const expected = enumerationConfig(c.config.profile)
-  if (Object.keys(c.config).length !== Object.keys(expected).length
-    || Object.keys(expected).some(key => c.config[key as keyof EnumerationConfig] !== expected[key as keyof EnumerationConfig]))
-    throw Error('Unsupported enumeration config tuple')
-  enumerationPlan(c.config, c.randomSeed, 0)
+  const expected = c.usage === 'AUTHENTICATED_CONTENT_CANDIDATE'
+    ? enumerationRecipeConfig(c.config.profile) : enumerationConfig(c.config.profile)
+  if (!enumerationConfigEqual(c.config, expected)) throw Error('Unsupported enumeration config tuple')
+  enumerationContextPlan(c, 0)
+  if (c.usage === 'AUTHENTICATED_CONTENT_CANDIDATE'
+    && ((c.recipe !== null && !enumerationConfigEqual(c.recipe, c.config.stimulusRecipe))
+      || c.calibration?.source === 'synthetic_fixture')) throw Error('Native enumeration requires its frozen recipe and self-reported calibration')
   if (c.calibration) {
     const a = c.calibration
     if (!boundedId(a.id) || !['self_reported_ruler_and_distance', 'synthetic_fixture'].includes(a.source)

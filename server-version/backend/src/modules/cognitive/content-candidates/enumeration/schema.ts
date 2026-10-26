@@ -1,22 +1,33 @@
 import { z } from 'zod'
-import { ENUMERATION_IDENTITY, type EnumerationConfig, type EnumerationTrial } from './protocol'
+import { ENUMERATION_IDENTITY, type EnumerationConfig, type EnumerationRecipeConfig, type EnumerationTrial } from './protocol'
 const finiteTime = z.number().finite().nonnegative()
 const integerResponse = z.number().int().min(1).max(15)
 const input = z.enum(['touch', 'pointer', 'keyboard'])
-export const enumerationConfigSchema = z.object({
+const enumerationConfigFields = {
   status: z.literal('DESIGN_PROPOSAL'), profile: z.enum(['research', 'experience']),
   sequenceKey: z.enum(['research100', 'experience25']), totalTrials: z.union([z.literal(100), z.literal(25)]),
   blocks: z.union([z.literal(4), z.literal(1)]), repetitionsPerQuantityPerBlock: z.literal(5),
   responseMin: z.literal(1), responseMax: z.literal(15), interpretationPolicy: z.literal('session_descriptive_v1'),
   metricDefinitionVersion: z.literal('0.2.0'), qualityDefinitionVersion: z.literal('0.2.0'),
   reportDefinitionVersion: z.literal('0.2.0'), presentationVersion: z.literal('0.1.0'),
-  minimumValidPerCondition: z.null(), timingToleranceMs: z.null(), stimulusRecipe: z.null(),
-}).strict().superRefine((config, context) => {
+  minimumValidPerCondition: z.null(), timingToleranceMs: z.null(),
+}
+const refineProfile = (config: { profile: string; totalTrials: number; blocks: number; sequenceKey: string }, context: z.RefinementCtx) => {
   const research = config.profile === 'research'
   if (config.totalTrials !== (research ? 100 : 25) || config.blocks !== (research ? 4 : 1)
     || config.sequenceKey !== (research ? 'research100' : 'experience25'))
     context.addIssue({ code: 'custom', message: 'Profile and count tuple must match exactly' })
-})
+}
+export const enumerationStimulusRecipeSchema = z.object({
+  id: z.literal('enumeration-square5deg-circle-white-grey-mask48-r1'), source: z.literal('host_reviewed_candidate'),
+  status: z.literal('CANDIDATE_RECIPE_NOT_VALIDATED'), fieldShape: z.literal('square_background_circular_sampling_proposal'),
+  fieldDiameterDeg: z.literal(5), dotDiameterDeg: z.literal(0.5), fieldColor: z.literal('#808080'), dotColor: z.literal('#FFFFFF'),
+  mask: z.object({ rows: z.literal(48), columns: z.literal(48), values: z.tuple([z.literal('#141414'), z.literal('#EBEBEB')]),
+    seed: z.literal(20261026), algorithm: z.literal('lcg1664525-1013904223-u32-topbit'), scope: z.literal('session_fixed') }).strict(),
+  fixationMs: z.literal(1000), formalExposureMs: z.literal(50), practiceExposureMs: z.literal(1000), maskMs: z.literal(1000),
+}).strict()
+export const enumerationConfigSchema = z.object({ ...enumerationConfigFields, stimulusRecipe: z.null() }).strict().superRefine(refineProfile)
+export const enumerationRecipeConfigSchema = z.object({ ...enumerationConfigFields, stimulusRecipe: enumerationStimulusRecipeSchema }).strict().superRefine(refineProfile)
 export const enumerationTrialSchema = z.object({
   phase: z.literal('test'),
   plan: z.object({ phase: z.literal('test'), trialIndex: z.number().int().min(0).max(99),
@@ -60,3 +71,5 @@ export const enumerationTrialSchema = z.object({
 })
 export const parseEnumerationConfig = (value: unknown): EnumerationConfig => enumerationConfigSchema.parse(value)
 export const parseEnumerationTrial = (value: unknown): EnumerationTrial => enumerationTrialSchema.parse(value)
+
+export const parseEnumerationRecipeConfig = (value: unknown): EnumerationRecipeConfig => enumerationRecipeConfigSchema.parse(value)

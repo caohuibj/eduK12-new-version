@@ -2,9 +2,9 @@ import type { AuthoritativeScorerInput, CognitiveScoreResult, ProtocolDefinition
 import { computeConfigSnapshotHash, computeProtocolSignature } from '../../v2/canonical'
 import { parseTrialEnvelope } from '../../v2/trial-envelope'
 import { parseSessionConfigSnapshot } from '../../v2/session-snapshot'
-import { ENUMERATION_IDENTITY, ENUMERATION_QUANTITIES, enumerationPlan, assertEnumerationSeed,
-  type EnumerationConfig, type EnumerationTrial } from './protocol'
-import { parseEnumerationConfig, parseEnumerationTrial } from './schema'
+import { ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY, ENUMERATION_QUANTITIES, enumerationPlan, enumerationRecipePlan, assertEnumerationSeed,
+  type EnumerationConfig, type EnumerationRecipeConfig, type EnumerationIdentity, type EnumerationPlan, type EnumerationTrial } from './protocol'
+import { parseEnumerationConfig, parseEnumerationRecipeConfig, parseEnumerationTrial } from './schema'
 export const ENUMERATION_PROTOCOL: ProtocolDefinition = {
   schemaVersion: 1, key: ENUMERATION_IDENTITY.protocolKey, version: '0.1.0', clock: 'performance',
   randomizationAlgorithmVersion: ENUMERATION_IDENTITY.randomizationAlgorithmVersion,
@@ -17,8 +17,10 @@ function median(values: number[]): number | null {
   return sorted.length % 2 ? sorted[middle] : sorted[middle - 1] + (sorted[middle] - sorted[middle - 1]) / 2
 }
 /** Session-only descriptive arithmetic. No timing tolerance, norm or diagnostic inference. */
-export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConfig, EnumerationTrial>): CognitiveScoreResult {
-  const id = ENUMERATION_IDENTITY, config = parseEnumerationConfig(input.config)
+function scoreEnumerationForIdentity<TConfig extends EnumerationConfig>(input: AuthoritativeScorerInput<TConfig, EnumerationTrial>,
+  id: EnumerationIdentity, parseConfig: (value: unknown) => TConfig,
+  planForConfig: (config: TConfig, seed: string, index: number) => EnumerationPlan): CognitiveScoreResult {
+  const config = parseConfig(input.config)
   const session = parseSessionConfigSnapshot<EnumerationConfig>(input.session)
   assertEnumerationSeed(input.randomSeed)
   if (session.testType !== id.testType || session.engineVersion !== id.engineVersion
@@ -35,7 +37,7 @@ export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConf
   let previousEnd = 0
   for (let index = 0; index < input.trials.length; index++) {
     const envelope = parseTrialEnvelope<EnumerationTrial>(input.trials[index])
-    const trial = parseEnumerationTrial(envelope.payload), expected = enumerationPlan(config, input.randomSeed, index)
+    const trial = parseEnumerationTrial(envelope.payload), expected = planForConfig(config, input.randomSeed, index)
     if (envelope.phase !== 'test' || envelope.trialIndex !== index || trial.plan.trialIndex !== index)
       throw new Error('Enumeration requires contiguous formal records, without practice')
     if ((Object.keys(expected) as Array<keyof typeof expected>).some(key => expected[key] !== trial.plan[key]))
@@ -108,5 +110,12 @@ export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConf
     : [...(incompleteRecords ? ['本次记录未完成，只描述已记录的有效作答。'] : []),
       ...(technicalExclusions ? ['部分记录因中断、缺失或其他技术问题未纳入，分母已注明。'] : [])] },
   audit: { trialCount: input.trials.length, scorerVersion: id.scoringVersion } }
+}
+/** Each entry validates its real frozen identity; neither rewrites an input tuple to call the other. */
+export function scoreEnumeration(input: AuthoritativeScorerInput<EnumerationConfig, EnumerationTrial>): CognitiveScoreResult {
+  return scoreEnumerationForIdentity(input, ENUMERATION_IDENTITY, parseEnumerationConfig, enumerationPlan)
+}
+export function scoreEnumerationRecipe(input: AuthoritativeScorerInput<EnumerationRecipeConfig, EnumerationTrial>): CognitiveScoreResult {
+  return scoreEnumerationForIdentity(input, ENUMERATION_RECIPE_IDENTITY, parseEnumerationRecipeConfig, enumerationRecipePlan)
 }
 export { projectEnumerationReport } from './report'

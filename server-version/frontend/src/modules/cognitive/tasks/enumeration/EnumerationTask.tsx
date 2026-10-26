@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { enumerationPlan, type EnumerationInput } from './generated/protocol'
+import { type EnumerationInput } from './generated/protocol'
 import type { EnumerationPublicResult, EnumerationStoredSnapshot } from './generated/report'
 import { EnumerationReport } from './EnumerationReport'
 import { enumerationArtifact, enumerationDigest, enumerationGeometry, enumerationStartBlock,
-  readEnumerationViewport, validateEnumerationContext, type EnumerationContext } from './display'
+  readEnumerationViewport, validateEnumerationContext, enumerationContextPlan, type EnumerationContext } from './display'
 import { EnumerationCapture, drawEnumerationFrame, type EnumerationRecord, type EnumerationStage } from './capture'
 import { EnumerationPersistence, type EnumerationPersistencePort } from './persistence'
 import './enumeration.css'
@@ -125,7 +125,7 @@ function EnumerationSession({ context: incoming, persistence: incomingPort, resu
     const exposureId = phase + '-' + index + '-' + (formal ? 0 : practiceRepeat) + '-'
       + enumerationDigest([context.attemptId, phase, index, formal ? 0 : practiceRepeat]).slice(0, 32)
     try {
-      const value = new EnumerationCapture(context, enumerationPlan(context.config, context.randomSeed, index, phase), exposureId, artifact.artifactHash, formal ? 0 : practiceRepeat)
+      const value = new EnumerationCapture(context, enumerationContextPlan(context, index, phase), exposureId, artifact.artifactHash, formal ? 0 : practiceRepeat)
       await owned.prepare({ contextId: context.contextId, attemptId: context.attemptId, exposureId, artifactHash: artifact.artifactHash, phase, trialIndex: index, exposureOrdinal: formal ? 0 : practiceRepeat })
       if (!alive.current || gate.current !== owned) return
       const changed = readBlock(); if (changed) { setBlock(changed); throw Error('Display changed after reservation') }

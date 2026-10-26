@@ -1,0 +1,6 @@
+{
+  "exitCode": 1,
+  "reason": "Parent selected freeze continuation omitted synthetic encryption environment; real encryption failed before snapshot assertion. No product fix required.",
+  "failedCases": 1,
+  "passedCases": 0
+}

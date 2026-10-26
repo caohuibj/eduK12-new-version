@@ -1,4 +1,4 @@
-import { ENUMERATION_IDENTITY, ENUMERATION_QUANTITIES, enumerationConfig, type EnumerationConfig } from './protocol'
+import { ENUMERATION_IDENTITY, ENUMERATION_QUANTITIES, getEnumerationIdentity, enumerationConfigForIdentity, enumerationValuesEqual, type EnumerationConfig } from './protocol'
 /** Host-owned authoritative result; this structural projection does not authenticate a host or replace frozen storage. */
 export interface EnumerationPublicResult {
   metrics: Record<string, unknown>
@@ -12,12 +12,14 @@ function projectBoundEnumerationReport(result: EnumerationPublicResult, requireA
   const hidden = { state: 'invalid' as const, headline: null, rows: [],
     interpretationPolicy: 'session_descriptive_v1' as const, summary: null,
     reasonCode: 'no_usable_or_compatible_result' }
-  const m = result.metrics, binding = object(m.reportBinding), id = ENUMERATION_IDENTITY
+  const m = result.metrics, binding = object(m.reportBinding)
   const config = object(binding?.config)
   if (!binding || !config || !['research', 'experience'].includes(String(config.profile))) return hidden
-  const canonical = enumerationConfig(config.profile as 'research' | 'experience')
+  const id = getEnumerationIdentity(String(binding.engineVersion), String(binding.scoringVersion), String(binding.configVersion))
+  if (!id) return hidden
+  const canonical = enumerationConfigForIdentity(config.profile as 'research' | 'experience', id)
   if (Object.keys(config).length !== Object.keys(canonical).length
-    || Object.entries(canonical).some(([key, value]) => config[key] !== value)
+    || !enumerationValuesEqual(config, canonical)
     || binding.candidateId !== id.candidateId || binding.engineVersion !== id.engineVersion
     || binding.scoringVersion !== id.scoringVersion || binding.configVersion !== id.configVersion
     || typeof binding.configHash !== 'string' || !/^[a-f0-9]{64}$/.test(binding.configHash)
@@ -25,7 +27,7 @@ function projectBoundEnumerationReport(result: EnumerationPublicResult, requireA
     || typeof binding.randomSeed !== 'string' || !binding.randomSeed.length || binding.randomSeed.length > 256
     || (requireAudit && result.audit?.scorerVersion !== id.scoringVersion)
     || (expected && (binding.randomSeed !== expected.randomSeed
-      || Object.entries(canonical).some(([key, value]) => expected.config[key as keyof EnumerationConfig] !== value)))) return hidden
+      || Object.entries(canonical).some(([key, value]) => !enumerationValuesEqual(expected.config[key as keyof EnumerationConfig], value))))) return hidden
   const names = ['expectedTrialCount', 'receivedTrialCount', 'includedTrialCount', 'excludedTrialCount',
     'correctTrialCount', 'overReportedTrialCount', 'underReportedTrialCount'] as const
   if (names.some(key => !count(m[key]))) return hidden

@@ -3,7 +3,7 @@ import type { TaskDefinition } from './v2/types'
 import { getCognitiveRegistryEntry, listCognitiveRegistryEntries } from './cognitive.registry'
 import { getNativeCognitiveTaskDefinition, listNativeCognitiveTaskDefinitions } from './content-candidates/native-registry/definitions'
 import { ANT_IDENTITY } from './content-candidates/ant/protocol'
-import { ENUMERATION_IDENTITY } from './content-candidates/enumeration/protocol'
+import { getEnumerationIdentity } from './content-candidates/enumeration/protocol'
 import { getMotReportBundle } from './content-candidates/mot/package'
 import { MOT_IDENTITY } from './content-candidates/mot/protocol'
 import { NATIVE_IDENTITY } from './content-candidates/continuous-recognition/native'
@@ -24,8 +24,12 @@ export type CognitiveTaskResource = ResourceMetadata & (
 const nativeVersionFacts = (d: TaskDefinition) => {
   if (d.testType === 'ant') return { configVersion: ANT_IDENTITY.configVersion, profileDefinitionVersion: ANT_IDENTITY.configVersion,
     metricDefinitionVersion: ANT_IDENTITY.metricDefinitionVersion, qualityDefinitionVersion: ANT_IDENTITY.qualityDefinitionVersion }
-  if (d.testType === 'enumeration') return { configVersion: ENUMERATION_IDENTITY.configVersion, profileDefinitionVersion: ENUMERATION_IDENTITY.configVersion,
-    metricDefinitionVersion: ENUMERATION_IDENTITY.metricDefinitionVersion, qualityDefinitionVersion: ENUMERATION_IDENTITY.qualityDefinitionVersion }
+  if (d.testType === 'enumeration') {
+    const identity = getEnumerationIdentity(d.engineVersion, d.scoringVersion)
+    if (!identity) throw BAD_REQUEST('No exact enumeration version metadata')
+    return { configVersion: identity.configVersion, profileDefinitionVersion: identity.configVersion,
+      metricDefinitionVersion: identity.metricDefinitionVersion, qualityDefinitionVersion: identity.qualityDefinitionVersion }
+  }
   if (d.testType === 'mot') return { configVersion: MOT_IDENTITY.configVersion, profileDefinitionVersion: MOT_IDENTITY.configVersion,
     metricDefinitionVersion: MOT_IDENTITY.scoringVersion, qualityDefinitionVersion: MOT_IDENTITY.scoringVersion }
   if (d.testType === 'continuous-recognition') return { configVersion: NATIVE_IDENTITY.configVersion, profileDefinitionVersion: NATIVE_IDENTITY.configVersion,

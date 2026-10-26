@@ -1,9 +1,9 @@
 import type { MetricDefinition, QualityDefinition, TaskDefinition } from '../../v2/types'
 import { createSessionConfigSnapshot } from '../../v2/session-snapshot'
-import { ENUMERATION_IDENTITY, enumerationConfig, type EnumerationConfig, type EnumerationProfile,
+import { ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY, enumerationConfig, enumerationRecipeConfig, type EnumerationConfig, type EnumerationRecipeConfig, type EnumerationProfile,
   type EnumerationTrial } from './protocol'
-import { enumerationConfigSchema, enumerationTrialSchema } from './schema'
-import { ENUMERATION_PROTOCOL, scoreEnumeration } from './scorer'
+import { enumerationConfigSchema, enumerationRecipeConfigSchema, enumerationTrialSchema } from './schema'
+import { ENUMERATION_PROTOCOL, scoreEnumeration, scoreEnumerationRecipe } from './scorer'
 const labels: Record<string, string> = { correctTrialCount: '判断正确次数', includedTrialCount: '纳入作答次数',
   overReportedTrialCount: '点数偏多次数', underReportedTrialCount: '点数偏少次数', overallAccuracy: '本次正确比例',
   signedMeanError: '平均点数偏差', meanAbsoluteError: '平均绝对偏差', byQuantity: '各点数的作答记录' }
@@ -61,6 +61,20 @@ export function createEnumerationSnapshot(profile: EnumerationProfile, frozenAt 
   return createSessionConfigSnapshot({ definition: enumerationDefinition,
     configVersion: ENUMERATION_IDENTITY.configVersion, config: enumerationConfig(profile), frozenAt: new Date(frozenAt) })
 }
-export { enumerationContent } from './metadata'
+/** Complete-recipe identity: same arithmetic/protocol/report; distinct frozen configuration and engine. */
+export const enumerationRecipeDefinition: TaskDefinition<EnumerationRecipeConfig, EnumerationTrial> = {
+  ...enumerationDefinition, engineVersion: ENUMERATION_RECIPE_IDENTITY.engineVersion,
+  configSchema: enumerationRecipeConfigSchema, scorer: scoreEnumerationRecipe,
+  profiles: {
+    research: { ...enumerationDefinition.profiles.research!, configPatch: { ...enumerationRecipeConfig('research') } },
+    experience: { ...enumerationDefinition.profiles.experience!, configPatch: { ...enumerationRecipeConfig('experience') } },
+  },
+  publication: { ...enumerationDefinition.publication, evidenceNote: '完整配方内容定义已接精确 native resolver；未 seed、未启用 delivery、未接真实宿主。' },
+}
+export function createEnumerationRecipeSnapshot(profile: EnumerationProfile, frozenAt = '2026-10-26T00:00:00.000Z') {
+  return createSessionConfigSnapshot({ definition: enumerationRecipeDefinition,
+    configVersion: ENUMERATION_RECIPE_IDENTITY.configVersion, config: enumerationRecipeConfig(profile), frozenAt: new Date(frozenAt) })
+}
+export { enumerationContent, enumerationRecipeContent } from './metadata'
 export { enumerationTrialEnvelope } from './trial-envelope'
 export { projectEnumerationReport, projectStoredEnumerationReport } from './report'

@@ -1,5 +1,5 @@
-import { enumerationPlan, type EnumerationTrial } from './generated/protocol'
-import { enumerationDigest, type EnumerationArtifact, type EnumerationPageOrigin } from './display'
+import { type EnumerationTrial } from './generated/protocol'
+import { enumerationDigest, enumerationContextPlan, type EnumerationArtifact, type EnumerationPageOrigin } from './display'
 import type { EnumerationRecord } from './capture'
 export interface EnumerationReservation { contextId: string; attemptId: string; exposureId: string; artifactHash: string;
   phase: 'test' | 'practice'; trialIndex: number; exposureOrdinal: number }
@@ -92,8 +92,7 @@ export class EnumerationPersistence {
     const snapshot = structuredClone(record), recordHash = enumerationDigest(snapshot)
     if (snapshot.contextId !== this.artifact.context.contextId || snapshot.attemptId !== this.artifact.context.attemptId
       || snapshot.artifactHash !== this.artifact.artifactHash) return Promise.reject(Error('Record context mismatch'))
-    const expected = enumerationPlan(this.artifact.context.config, this.artifact.context.randomSeed,
-      snapshot.core.plan.trialIndex, snapshot.core.phase)
+    const expected = enumerationContextPlan(this.artifact.context, snapshot.core.plan.trialIndex, snapshot.core.phase)
     if (snapshot.core.phase !== snapshot.core.plan.phase
       || Object.keys(expected).some(key => expected[key as keyof typeof expected] !== snapshot.core.plan[key as keyof typeof expected]))
       return Promise.reject(Error('Record truth mismatch'))

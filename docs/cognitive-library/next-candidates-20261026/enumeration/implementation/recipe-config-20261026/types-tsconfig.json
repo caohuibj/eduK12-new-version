@@ -1,0 +1,22 @@
+{
+  "extends": "/workspace/eduK12-new-version/server-version/backend/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false
+  },
+  "files": [
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/scorer.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/report.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/protocol.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/metadata.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/trial-envelope.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/package.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/enumeration/schema.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/task-resource.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/enumeration-recipe-config.test.ts",
+    "/workspace/eduK12-new-version/server-version/backend/src/middleware/auth.ts"
+  ],
+  "include": [],
+  "exclude": []
+}

@@ -1,0 +1,33 @@
+{
+  "pr": {
+    "head": "cb0181a045e318e9ddb30b6df336c6417a494711",
+    "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+    "draft": true,
+    "state": "open"
+  },
+  "delta": {
+    "from": "392b8128b9f4b9d9d4b6375279ea5e0e559e0554",
+    "to": "cb0181a045e318e9ddb30b6df336c6417a494711",
+    "ahead": 6,
+    "files": [
+      ".github/scripts/merge-gate.mjs",
+      ".github/scripts/pr356-acceptance.json",
+      ".github/scripts/pr356-admission.mjs",
+      ".github/scripts/pr356-admission.test.mjs",
+      ".github/scripts/pr356-bindings.json",
+      ".github/scripts/pr356-codeql.test.mjs",
+      ".github/scripts/pr356-gate-contract.mjs",
+      ".github/scripts/pr356-gate-contract.test.mjs",
+      ".github/scripts/pr356-local-evidence.json",
+      ".github/scripts/pr356-scope.mjs",
+      ".github/scripts/pr356-scope.test.mjs",
+      ".github/scripts/pr356-stable-gate.mjs",
+      ".github/scripts/pr356-stable-gate.test.mjs",
+      ".github/workflows/ci.yml",
+      "docs/pr356-ci-activation-20261026.md",
+      "docs/release/README.md"
+    ]
+  },
+  "applicationDelta": false,
+  "note": "No server-version changes since prior shared source review; task-resource was introduced by this content branch and is absent from main/PR. No PR356 edits/CI/merge."
+}

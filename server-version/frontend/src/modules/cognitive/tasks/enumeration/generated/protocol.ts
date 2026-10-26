@@ -1,4 +1,4 @@
-// Generated from frozen pure enumeration protocol. Source SHA256: b7c61565dfc2182327fa8d25368d4435d75669452d30c50240915a5f3080ad69
+// Generated from frozen pure enumeration protocol. Source SHA256: 3c947be5c15444357fb01f556cd9cafa70bc976dd87ab39de6672cf7eb629a31
 /** Internal pure logic candidate. This file renders no stimuli and establishes no timing tolerance. */
 export const ENUMERATION_IDENTITY = Object.freeze({
   candidateId: 'attention-enumeration-flower', testType: 'enumeration',
@@ -8,6 +8,44 @@ export const ENUMERATION_IDENTITY = Object.freeze({
   protocolKey: 'enumeration/0.1.0/0.1.0',
   randomizationAlgorithmVersion: 'enumeration-fnv1a-utf16-mulberry32-fisher-yates-v1',
 })
+/** New complete-recipe configuration; historical exports above deliberately keep their frozen tuple. */
+export const ENUMERATION_RECIPE_IDENTITY = Object.freeze({ ...ENUMERATION_IDENTITY,
+  engineVersion: '0.2.0', configVersion: '0.3.0' })
+export type EnumerationIdentity = typeof ENUMERATION_IDENTITY | typeof ENUMERATION_RECIPE_IDENTITY
+export function getEnumerationIdentity(engineVersion: string, scoringVersion: string, configVersion?: string): EnumerationIdentity | undefined {
+  return [ENUMERATION_IDENTITY, ENUMERATION_RECIPE_IDENTITY].find(id => id.engineVersion === engineVersion
+    && id.scoringVersion === scoringVersion && (configVersion === undefined || id.configVersion === configVersion))
+}
+/** Approved candidate recipe content. It is configuration, not an extra id/hash wrapper or physical validation. */
+export interface EnumerationStimulusRecipe {
+  id: 'enumeration-square5deg-circle-white-grey-mask48-r1'
+  source: 'host_reviewed_candidate'
+  status: 'CANDIDATE_RECIPE_NOT_VALIDATED'
+  fieldShape: 'square_background_circular_sampling_proposal'
+  fieldDiameterDeg: 5; dotDiameterDeg: 0.5; fieldColor: '#808080'; dotColor: '#FFFFFF'
+  mask: { rows: 48; columns: 48; values: ['#141414', '#EBEBEB']; seed: 20261026;
+    algorithm: 'lcg1664525-1013904223-u32-topbit'; scope: 'session_fixed' }
+  fixationMs: 1000; formalExposureMs: 50; practiceExposureMs: 1000; maskMs: 1000
+}
+export function enumerationStimulusRecipe(): EnumerationStimulusRecipe {
+  return { id: 'enumeration-square5deg-circle-white-grey-mask48-r1', source: 'host_reviewed_candidate',
+    status: 'CANDIDATE_RECIPE_NOT_VALIDATED', fieldShape: 'square_background_circular_sampling_proposal',
+    fieldDiameterDeg: 5, dotDiameterDeg: 0.5, fieldColor: '#808080', dotColor: '#FFFFFF',
+    mask: { rows: 48, columns: 48, values: ['#141414', '#EBEBEB'], seed: 20261026,
+      algorithm: 'lcg1664525-1013904223-u32-topbit', scope: 'session_fixed' },
+    fixationMs: 1000, formalExposureMs: 50, practiceExposureMs: 1000, maskMs: 1000 }
+}
+/** JSON content equality: own keys and array order matter; object insertion order does not. */
+export function enumerationValuesEqual(left: unknown, right: unknown): boolean {
+  if (left === right) return true
+  if (left === null || right === null || typeof left !== 'object' || typeof right !== 'object') return false
+  if (Array.isArray(left) || Array.isArray(right)) return Array.isArray(left) && Array.isArray(right)
+    && left.length === right.length && Array.from({ length: left.length }, (_, i) => i).every(i => enumerationValuesEqual(left[i], right[i]))
+  const a = left as Record<string, unknown>, b = right as Record<string, unknown>
+  return Object.keys(a).length === Object.keys(b).length && Object.keys(a).every(key =>
+    Object.prototype.hasOwnProperty.call(b, key) && enumerationValuesEqual(a[key], b[key]))
+}
+export const enumerationConfigEqual = enumerationValuesEqual
 export type EnumerationProfile = 'research' | 'experience'
 export type EnumerationInput = 'touch' | 'pointer' | 'keyboard'
 export const ENUMERATION_QUANTITIES = [5, 6, 7, 8, 9] as const
@@ -29,7 +67,7 @@ export interface EnumerationConfig {
   /** No normative or minimum-valid-count inference is made. */
   minimumValidPerCondition: null
   timingToleranceMs: null
-  stimulusRecipe: null
+  stimulusRecipe: EnumerationStimulusRecipe | null
 }
 export function enumerationConfig(profile: EnumerationProfile): EnumerationConfig {
   if (profile !== 'research' && profile !== 'experience') throw new Error('Unsupported enumeration profile')
@@ -43,6 +81,13 @@ export function enumerationConfig(profile: EnumerationProfile): EnumerationConfi
     reportDefinitionVersion: ENUMERATION_IDENTITY.reportDefinitionVersion,
     presentationVersion: ENUMERATION_IDENTITY.presentationVersion, minimumValidPerCondition: null,
     timingToleranceMs: null, stimulusRecipe: null }
+}
+export type EnumerationRecipeConfig = EnumerationConfig & { stimulusRecipe: EnumerationStimulusRecipe }
+export function enumerationRecipeConfig(profile: EnumerationProfile): EnumerationRecipeConfig {
+  return { ...enumerationConfig(profile), stimulusRecipe: enumerationStimulusRecipe() }
+}
+export function enumerationConfigForIdentity(profile: EnumerationProfile, identity: EnumerationIdentity): EnumerationConfig {
+  return identity.engineVersion === ENUMERATION_IDENTITY.engineVersion ? enumerationConfig(profile) : enumerationRecipeConfig(profile)
 }
 export interface EnumerationPlan {
   phase: 'test' | 'practice'
@@ -106,14 +151,13 @@ export function assertEnumerationSeed(seed: string): void {
   if (typeof seed !== 'string' || seed.length === 0 || seed.length > 256)
     throw new Error('Enumeration requires an explicit bounded seed')
 }
-export function enumerationPlan(config: EnumerationConfig, seed: string, trialIndex: number,
-  phase: 'test' | 'practice' = 'test'): EnumerationPlan {
+function generateEnumerationPlan(config: EnumerationConfig, canonical: EnumerationConfig, seed: string, trialIndex: number,
+  phase: 'test' | 'practice'): EnumerationPlan {
   assertEnumerationSeed(seed)
   if (phase !== 'test' && phase !== 'practice') throw new Error('Unsupported enumeration phase')
   // Fixed approved count proposal; no hidden adaptation or omission of a quantity.
-  const canonical = enumerationConfig(config.profile)
   for (const key of Object.keys(canonical) as Array<keyof EnumerationConfig>) {
-    if (config[key] !== canonical[key]) throw new Error('Unsupported enumeration configuration')
+    if (!enumerationValuesEqual(config[key], canonical[key])) throw new Error('Unsupported enumeration configuration')
   }
   if (!Number.isInteger(trialIndex) || trialIndex < 0 || trialIndex >= (phase === 'practice' ? 3 : config.totalTrials))
     throw new Error('Enumeration index exceeds the frozen phase budget')
@@ -127,6 +171,19 @@ export function enumerationPlan(config: EnumerationConfig, seed: string, trialIn
   return { phase, trialIndex, blockIndex, positionInBlock, targetValue: quantities[positionInBlock],
     sliderInitialValue, sequenceSeed: seed,
     randomizationAlgorithmVersion: ENUMERATION_IDENTITY.randomizationAlgorithmVersion }
+}
+/** Historical null-recipe generator remains bound to its historical configuration contract. */
+export function enumerationPlan(config: EnumerationConfig, seed: string, trialIndex: number,
+  phase: 'test' | 'practice' = 'test'): EnumerationPlan {
+  return generateEnumerationPlan(config, enumerationConfig(config.profile), seed, trialIndex, phase)
+}
+export function enumerationRecipePlan(config: EnumerationRecipeConfig, seed: string, trialIndex: number,
+  phase: 'test' | 'practice' = 'test'): EnumerationPlan {
+  return generateEnumerationPlan(config, enumerationRecipeConfig(config.profile), seed, trialIndex, phase)
+}
+export function enumerationRecipeSequence(config: EnumerationRecipeConfig, seed: string, phase: 'test' | 'practice' = 'test') {
+  return Array.from({ length: phase === 'practice' ? 3 : config.totalTrials },
+    (_, index) => enumerationRecipePlan(config, seed, index, phase))
 }
 export function enumerationSequence(config: EnumerationConfig, seed: string, phase: 'test' | 'practice' = 'test') {
   return Array.from({ length: phase === 'practice' ? 3 : config.totalTrials },
