@@ -45,14 +45,13 @@ describe('native participant presentation', () => {
       byQuantity: [{ targetValue: 5, expected: 5, observed: 5, included: 5, correct: 2, overReported: 2, underReported: 1,
         accuracy: 0.4, signedMeanError: 0.4, meanAbsoluteError: 0.8, medianReportOperationMs: 2400 }],
       signedMeanError: 1.2, meanAbsoluteError: 1.6 }
-    const report = projectThreeLayerReport({
-      participantPresentation: presentation, testType: 'enumeration', configVersion: '0.3.0',
-      protocolSignature: 'a'.repeat(64), engineVersion: '0.2.0', scoringVersion: '0.2.0', profile: 'experience',
-      definition: enumerationRecipeDefinition.report, metrics, metricDefinitions: enumerationRecipeDefinition.metrics,
-      qualityDefinitions: enumerationRecipeDefinition.quality,
-      score: { metrics, quality: { state: 'interpretable', flags: { descriptiveOnly: true, noIncludedRecords: false,
-        incompleteRecords: false, technicalExclusions: false }, reasons: [] }, audit: { trialCount: 25, scorerVersion: '0.2.0' } },
-    })
+    const base = { testType: 'enumeration', configVersion: '0.3.0', protocolSignature: 'a'.repeat(64),
+      engineVersion: '0.2.0', scoringVersion: '0.2.0', profile: 'experience' as const,
+      metrics, metricDefinitions: enumerationRecipeDefinition.metrics, qualityDefinitions: enumerationRecipeDefinition.quality,
+      score: { metrics, quality: { state: 'interpretable' as const, flags: { descriptiveOnly: true, noIncludedRecords: false,
+        incompleteRecords: false, technicalExclusions: false }, reasons: [] }, audit: { trialCount: 25, scorerVersion: '0.2.0' } } }
+    const report = projectThreeLayerReport({ ...base, definition: enumerationRecipeDefinition.report,
+      participantPresentation: presentation })
     const shown = [...report.headline, ...report.user]
     expect(shown.map(view => view.key)).toEqual(['correctTrialCount', 'includedTrialCount', 'overReportedTrialCount', 'underReportedTrialCount'])
     const explanations = shown.map(view => view.explanation)
@@ -60,5 +59,24 @@ describe('native participant presentation', () => {
     expect(new Set(explanations).size).toBe(explanations.length)
     expect(explanations).not.toContain(FALLBACK)
     expect(shown[2].participantLabel).toBe('点数偏多次数')
+    // Opted-in rows layout is readable, and the array metric stays out of raw JSON.
+    expect(report.detail.find(view => view.key === 'byQuantity')?.formatted)
+      .toBe('实际 5 个：出现 5 次，纳入 5 次，正确 2 次，偏多 2 次，偏少 1 次')
+    // A task without the opt-in rule keeps its historical rendering, so nothing else changes silently.
+    const withoutRule = projectThreeLayerReport({ ...base, definition: enumerationRecipeDefinition.report })
+    expect(withoutRule.detail.find(view => view.key === 'byQuantity')?.formatted).toBe(JSON.stringify(metrics.byQuantity))
+  })
+  it('falls back to the historical array rendering when a rule does not match the rows', () => {
+    const presentation = resolveNativeParticipantPresentation({ testType: 'enumeration', engineVersion: '0.2.0', scoringVersion: '0.2.0', configVersion: '0.3.0' })!
+    presentation.metricFormats = { byQuantity: { kind: 'rows', targetKey: 'missingKey', targetLabel: '实际', columns: [] } }
+    const metrics = { correctTrialCount: 1, includedTrialCount: 1, overReportedTrialCount: 0, underReportedTrialCount: 0,
+      byQuantity: [{ targetValue: 5, observed: 1 }], signedMeanError: 0, meanAbsoluteError: 0 }
+    const report = projectThreeLayerReport({ participantPresentation: presentation, testType: 'enumeration', configVersion: '0.3.0',
+      protocolSignature: 'a'.repeat(64), engineVersion: '0.2.0', scoringVersion: '0.2.0', profile: 'experience',
+      definition: enumerationRecipeDefinition.report, metrics, metricDefinitions: enumerationRecipeDefinition.metrics,
+      qualityDefinitions: enumerationRecipeDefinition.quality,
+      score: { metrics, quality: { state: 'interpretable', flags: { descriptiveOnly: true, noIncludedRecords: false,
+        incompleteRecords: false, technicalExclusions: false }, reasons: [] }, audit: { trialCount: 1, scorerVersion: '0.2.0' } } })
+    expect(report.detail.find(view => view.key === 'byQuantity')?.formatted).toBe(JSON.stringify(metrics.byQuantity))
   })
 })

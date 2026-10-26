@@ -31,6 +31,17 @@ export function createEnumerationParticipantPresentation(): CognitiveParticipant
     },
     hiddenMetrics: [],
     singleHiddenMetrics: [],
+    // Opt-in rows layout: other tasks keep their historical array rendering untouched.
+    metricFormats: {
+      byQuantity: { kind: 'rows', targetKey: 'targetValue', targetLabel: '实际', targetSuffix: ' 个',
+        columns: [
+          { key: 'observed', label: '出现', suffix: ' 次' },
+          { key: 'included', label: '纳入', suffix: ' 次' },
+          { key: 'correct', label: '正确', suffix: ' 次' },
+          { key: 'overReported', label: '偏多', suffix: ' 次' },
+          { key: 'underReported', label: '偏少', suffix: ' 次' },
+        ] },
+    },
     disclaimer: '仅描述本次作答；无适用常模，不提供排名、能力等级或诊断结论。',
     suppressTips: false,
     practicalTips: ['把设备放稳，减少通知干扰，并保持观看位置。'],
