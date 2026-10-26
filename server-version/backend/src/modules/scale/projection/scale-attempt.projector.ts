@@ -58,10 +58,10 @@ export const projectScaleAttemptForResume = (input: {
   includeAnswers: boolean
   decryptError?: boolean
   /** Frozen instruction of the distributed version; overrides the live Scale field. */
-  frozenInstruction?: { text: string }
+  frozenInstruction?: { text: string } | null
 }) => {
   const base = attemptBase(input.assessment)
-  const scale = base.scale && input.frozenInstruction ? { ...base.scale, instruction: input.frozenInstruction.text } : base.scale
+  const scale = base.scale && input.frozenInstruction !== undefined ? { ...base.scale, instruction: input.frozenInstruction?.text ?? null } : base.scale
   return ({
   ...base,
   ...(scale !== base.scale && scale ? { scale } : {}),
@@ -79,10 +79,10 @@ export const projectScaleCompletedResponse = (input: {
   context: ScaleProjectionContext
   decryptError?: boolean
   /** Frozen instruction of the distributed version; overrides the live Scale field. */
-  frozenInstruction?: { text: string }
+  frozenInstruction?: { text: string } | null
 }) => {
-  const scale = input.frozenInstruction
-    ? { ...scaleMetadata(input.assessment?.scale, input.result), instruction: input.frozenInstruction.text }
+  const scale = input.frozenInstruction !== undefined
+    ? { ...scaleMetadata(input.assessment?.scale, input.result), instruction: input.frozenInstruction?.text ?? null }
     : scaleMetadata(input.assessment?.scale, input.result)
   const instrument = {
     scaleId: scale?.id ?? input.result?.instrument.scaleId ?? input.assessment?.scaleId ?? 'unknown',
@@ -100,6 +100,7 @@ export const projectScaleCompletedResponse = (input: {
   })
   return {
     ...attemptBase(input.assessment, input.result),
+    ...(scale ? { scale } : {}),
     report,
     // External completed responses are report-first. Returning a ScaleResultV2
     // compatibility alias would require reconstructing raw-answer-bearing

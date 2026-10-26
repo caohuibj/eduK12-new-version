@@ -1,7 +1,7 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
 import { createScaleInstrumentRegistry, resolveFrozenScaleInstructionForScale, SCALE_INSTRUMENT_REGISTRY } from '../../modules/scale/onboarding/instrument-registry'
 import { GENERATED_SCALE_INSTRUMENT_SOURCES } from '../../modules/scale/onboarding/instruments.generated'
-import { projectScaleAttemptForResume } from '../../modules/scale/projection/scale-attempt.projector'
+import { projectScaleCompletedResponse, projectScaleAttemptForResume } from '../../modules/scale/projection/scale-attempt.projector'
 import type { ScaleInstrumentSourceV1 } from '../../modules/scale/onboarding/types'
 
 vi.mock('../../modules/scale/onboarding/instrument-registry', async original => ({
@@ -67,7 +67,40 @@ describe('frozen scale instruction content contract', () => {
     expect(resolveFrozenScaleInstructionForScale({ code: 'std', instrumentVersion: '1', instrumentClass: 'STANDARD', instruction: '行内文本' }, createScaleInstrumentRegistry([])))
       .toEqual({ text: '行内文本', origin: 'SCALE_FIELD' })
     expect(resolveFrozenScaleInstructionForScale({ code: 'std', instrumentVersion: '1', instrumentClass: 'STANDARD', instruction: null }, createScaleInstrumentRegistry([])))
-      .toBeUndefined()
+      .toBeNull()
+  })
+
+  it('projects identical frozen text/empty in resume and completed, retaining the legacy missing-field fallback',async()=>{
+    const {createFrozenScaleRuntimeSnapshot,parseFrozenScaleRuntimeSnapshot}=await import('../../modules/assessment-runtime/runtime-snapshot')
+    const {canonicalHashObjectParts}=await import('../../modules/assessment-runtime/canonical')
+    const {compileResearchScale}=await import('../../modules/survey/builder.compiler')
+    const definition=compileResearchScale('Empty',{schemaVersion:1,respondentType:'participant_self_report',responseOptions:[{optionKey:'low',label:'Low',score:0},{optionKey:'high',label:'High',score:2}],dimensions:[{dimensionKey:'sum',label:'Sum',direction:'descriptive'}],aggregation:'sum',items:[{itemKey:'i',prompt:'I',required:true,reverse:false,dimensionKeys:['sum']}]})
+    const snapshot=createFrozenScaleRuntimeSnapshot({instrumentKey:'empty',instrumentVersion:'1',definition})
+    expect(parseFrozenScaleRuntimeSnapshot(snapshot).instruction).toBeNull()
+    const legacy:any=structuredClone(snapshot);delete legacy.instruction;delete legacy.snapshotHash
+    legacy.snapshotHash=canonicalHashObjectParts(legacy)
+    expect(parseFrozenScaleRuntimeSnapshot(legacy).instruction).toBeUndefined()
+    const assessment={id:'a1',scaleId:'s1',scale:{id:'s1',code:'x',name:'X',instruction:'Later live text'}}
+    for(const instruction of [{text:'Frozen original'},null,undefined]){
+      const resumed=projectScaleAttemptForResume({assessment,answers:[],includeAnswers:false,frozenInstruction:instruction})
+      const completed=projectScaleCompletedResponse({assessment,result:null,context:{frozenPolicy:{disposition:'UNKNOWN'}} as never,frozenInstruction:instruction})
+      expect(completed.scale.instruction).toBe(resumed.scale.instruction)
+      expect(completed.scale.instruction).toBe(instruction===undefined?'Later live text':instruction?.text??null)
+    }
+  })
+
+  it('updates instruction alone and records its independent source version without rebuilding scoring',async()=>{
+    getScaleInstrumentSource.mockReturnValue(source({instruction:{...instruction,version:'1.0.1',text:'Revised administration wording'}}))
+    const {materializeScaleInstrumentContent}=await import('../../modules/scale/onboarding/materialize')
+    const {hashScaleDefinition}=await import('../../modules/scale/scale-definition')
+    const row={id:'s',status:'PUBLISHED',instrumentClass:'STANDARD',instrumentVersion:'1.0.0',definition:source().executable!.definition,definitionHash:hashScaleDefinition(source().executable!.definition),instruction:instruction.text}
+    const db={scale:{findUnique:vi.fn(async()=>row),update:vi.fn(async({data}:any)=>({...row,...data}))},assessmentReferenceSet:{}}
+    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'})
+    expect(db.scale.update).toHaveBeenCalledExactlyOnceWith({where:{id:'s'},data:{instruction:'Revised administration wording'}})
+    getScaleInstrumentSource.mockReturnValue(source({instruction:undefined}))
+    db.scale.update.mockClear()
+    await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'})
+    expect(db.scale.update).toHaveBeenCalledExactlyOnceWith({where:{id:'s'},data:{instruction:null}})
   })
 
   it('materializes the source instruction onto the Scale row and keeps it through axis revision', async () => {

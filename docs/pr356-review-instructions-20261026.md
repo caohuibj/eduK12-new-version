@@ -1,0 +1,7 @@
+# PR356 review: exact administration instruction
+
+Ordinary published SCALE catalog reads resolve the exact STANDARD source instruction, falling back to that version's Scale row when the source declares none. Catalog compilation now retains the instruction into the published/frozen Survey unit. Resume and Completed use the same frozen text. New runtime snapshots include explicit `instruction: null` when empty; old missing fields retain their original hash and fallback behavior, including V1-to-V2 conversion. Source instruction version participates in new axis snapshot identities; instruction-only materialization updates wording without rewriting scoring/lifecycle.
+
+Local targeted validation only: original instruction/catalog contracts 8 passed, 1 new fixture failed; its corrected frozen-empty/legacy-hash/Completed case passed in isolation (`unit-recheck2.json`). Real PostgreSQL ordinary SCALE source read -> grant -> import -> publish -> wave freeze -> public task display passed (`integration-recheck2.json`), after changing the live row post-freeze. The real chain first exposed an additional dropped instruction in compileCatalogUnit; failure evidence retained. Existing generated biology source has no declared instruction, so this DB chain verifies the exact row fallback; the source-version resolver has its separate contract. All evidence under `/workspace/scratch/pr356-review-instructions/`.
+
+No formal CI, unrelated regression, production access, merge or deployment. Backend types run once at review-fix freeze.

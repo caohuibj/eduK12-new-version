@@ -40,7 +40,7 @@ export interface FrozenScaleRuntimeSnapshotV2 {
   compiledPolicy: CompiledScalePolicyV1
   runtimePolicyHash: string
   measurementPresentation?: FrozenScalePresentation
-  instruction?: FrozenScaleInstruction
+  instruction?: FrozenScaleInstruction | null
   snapshotHash: string
 }
 
@@ -56,7 +56,7 @@ export interface FrozenScaleRuntimeSnapshotV1Like {
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
   measurementPresentation?: FrozenScalePresentation
-  instruction?: FrozenScaleInstruction
+  instruction?: FrozenScaleInstruction | null
   snapshotHash: string
 }
 
@@ -83,7 +83,7 @@ const frozenScaleRuntimeSnapshotV2Schema = z.object({
   definition: scaleDefinitionSchema,
   compiledPolicy: compiledScalePolicyV1Schema,
   runtimePolicyHash: z.string().regex(/^[0-9a-f]{64}$/),
-  instruction: frozenScaleInstructionSchema.optional(),
+  instruction: frozenScaleInstructionSchema.nullable().optional(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
@@ -125,7 +125,7 @@ const unsignedV2 = (input: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'>) =
   referenceBindings: input.referenceBindings,
   definition: input.definition,
   ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
-  ...(input.instruction ? { instruction: input.instruction } : {}),
+  ...(input.instruction !== undefined ? { instruction: input.instruction } : {}),
   compiledPolicy: input.compiledPolicy,
   runtimePolicyHash: input.runtimePolicyHash,
 })
@@ -242,7 +242,7 @@ export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
     referenceBindings: v1.referenceBindings,
     definition: v1.definition,
     ...(v1.measurementPresentation ? { measurementPresentation: v1.measurementPresentation } : {}),
-    ...(v1.instruction ? { instruction: v1.instruction } : {}),
+    ...(v1.instruction !== undefined ? { instruction: v1.instruction } : {}),
     compiledPolicy,
     runtimePolicyHash: compiledPolicy.runtimePolicyHash,
   }

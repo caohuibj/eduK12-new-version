@@ -1,3 +1,4 @@
+import {resolveFrozenScaleInstructionForScale} from '../scale/onboarding/instrument-registry'
 import {catalogDiscoveryRecords,cognitiveDiscoveryWhere,discoveryFacets,discoveryJoin,discoverySqlFilter,governedDiscoveryIdentity,scaleDiscoveryWhere} from './catalog-discovery'
 import {matchesCatalogDiscovery,type CatalogClassificationTag,type CatalogDiscoveryFilters} from '../scale/library/catalog-discovery'
 import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
@@ -292,7 +293,7 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     let admitted:Awaited<ReturnType<typeof readPublishedScaleMeasurementSource>>
     try{admitted=await readPublishedScaleMeasurementSource(scaleAuthorityDb as Prisma.TransactionClient,row!,scaleReleases)}
     catch(error){if(error instanceof ContentReleaseError)fail(error.code.replace('CONTENT_SCALE_SOURCE_','SOURCE_SCALE_'));throw error}
-    const result=adaptCatalogScale(ref,row!.name,definition)
+    const result=adaptCatalogScale(ref,row!.name,definition,{instruction:resolveFrozenScaleInstructionForScale(row!)?.text})
     return {...result,provenance:{...result.provenance,code:row!.code,instrumentClass:row!.instrumentClass,
       sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceDeploymentIdentity:admitted.deploymentIdentity}}
   }

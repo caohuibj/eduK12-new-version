@@ -67,16 +67,15 @@ export const getScaleInstrumentRuntimePolicy = SCALE_INSTRUMENT_REGISTRY.getRunt
 /** Resolve the instruction to freeze for a scale about to start an attempt:
  * a STANDARD instrument freezes its source-declared, versioned instruction;
  * everything else (teacher-authored rows, sources without a declared
- * instruction) freezes the current Scale field text. Empty rows freeze
- * nothing and legacy attempts without a frozen instruction keep falling
+ * instruction) freezes the current Scale field text. Empty rows freeze an explicit null; legacy attempts without the field keep falling
  * back to the live field at projection time. */
 export const resolveFrozenScaleInstructionForScale = (
   scale: { code: string; instrumentVersion: string; instrumentClass?: string; instruction?: string | null },
   registry: ScaleInstrumentRegistry = SCALE_INSTRUMENT_REGISTRY,
-): { text: string; language?: string; version?: string; origin: 'INSTRUMENT_SOURCE' | 'SCALE_FIELD' } | undefined => {
+): { text: string; language?: string; version?: string; origin: 'INSTRUMENT_SOURCE' | 'SCALE_FIELD' } | null => {
   if (scale.instrumentClass === 'STANDARD') {
     const instruction = registry.getSource(scale.code, scale.instrumentVersion)?.instruction
     if (instruction) return { text: instruction.text, language: instruction.language, version: instruction.version, origin: 'INSTRUMENT_SOURCE' }
   }
-  return scale.instruction ? { text: scale.instruction, origin: 'SCALE_FIELD' } : undefined
+  return scale.instruction ? { text: scale.instruction, origin: 'SCALE_FIELD' } : null
 }
