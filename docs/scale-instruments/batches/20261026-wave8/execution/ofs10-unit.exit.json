@@ -1,0 +1,14 @@
+{
+  "command": [
+    "node",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/unit.reporter.json"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "finishedAt": "2026-10-26T09:04:36.476183+00:00",
+  "exitCode": 0
+}

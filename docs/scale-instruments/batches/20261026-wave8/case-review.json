@@ -1,0 +1,277 @@
+{
+  "unitsUnique": 38,
+  "postgresUnique": 12,
+  "caseSets": [
+    {
+      "file": "execution/ofs10-unit.reporter.json",
+      "passed": 20,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation validates a standalone complete DRAFT source and records separate version identities",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation keeps all ten source items, five labelled anchors and independent prepared instructions",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation freezes English item eight and uses Spanish only to disambiguate illusions in item five",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation defines only the author total sum with precisely reverse item six and a disclosed platform complete-answer policy",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: minimum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: maximum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: midpoint",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: raw_all_one",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: raw_all_five",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: mixed_independent",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: mixed_reverse_high",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: one_missing",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation matches pinned independent arithmetic: empty",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation checks every legal item response direction without changing any other item score",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation does not interpret or fill zero for any single omission or an empty form",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation rejects invalid response values, duplicate answers and unknown item codes",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation uses the provisional adult self-report boundary and refuses to infer a missing age",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation builds actual uniform score-only feedback without Spanish diagnostic cutoffs or personalised bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation keeps version axes independent and catalogue discovery outside the measurement definition",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+          "OFS10 exact 2018 form independent Chinese research working translation preserves exact reuse permissions, Spanish-only evidence and pending Chinese localisation",
+          "passed"
+        ]
+      ]
+    },
+    {
+      "file": "execution/socs-s20-unit.reporter.json",
+      "passed": 18,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft validates a distinct complete DRAFT/CANDIDATE with exact 20-item carrier and agreement labels",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft uses five exact four-item facets and an allowed 20-item total, all identity mean with conservative complete_required",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: minimum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: maximum",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: middle",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: mixed",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: facet_distinct",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: missing_first",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft matches independent arithmetic: empty",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft changes exactly the owning facet and total without reverse transforms or other facet contamination",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft preserves sum/mean linear conversions for complete data without importing any thresholds",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft requires complete output groups without zero filling, changing denominator or generating invalid prose",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft rejects illegal response types, out-of-range values, duplicate answers and unknown items",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft enforces the project adult lower bound and refuses missing age or proxy respondents",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft refuses DRAFT activation despite open source-rights labels",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft builds actual six-part plain-language Chinese score-only reports without cutoffs or ranks",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft keeps content/scoring, parameters and report axes independent without catalog pollution",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+          "SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft records existing Chinese working-sample evidence, exact license attribution, pending platform review and all eight tag axes",
+          "passed"
+        ]
+      ]
+    },
+    {
+      "file": "execution/postgres.reporter.json",
+      "passed": 12,
+      "failed": 0,
+      "names": [
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL starts with twelve prior synthetic definitions and fourteen frozen snapshots under a non-owner role",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL ofs10_zh_cn_research rolls back new draft and frozen snapshot together",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL ofs10_zh_cn_research materializes pinned content once with exact axes and rich catalog snapshot",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL ofs10_zh_cn_research generates exact real result samples from persisted definition without reference or invented bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL ofs10_zh_cn_research freezes its complete source against mutation or deletion",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL ofs10_zh_cn_research refuses activation of its unpublished DRAFT despite open source rights",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL socs_s20_2023_zh_cn rolls back new draft and frozen snapshot together",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL socs_s20_2023_zh_cn materializes pinned content once with exact axes and rich catalog snapshot",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL socs_s20_2023_zh_cn generates exact real result samples from persisted definition without reference or invented bands",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL socs_s20_2023_zh_cn freezes its complete source against mutation or deletion",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL socs_s20_2023_zh_cn refuses activation of its unpublished DRAFT despite open source rights",
+          "passed"
+        ],
+        [
+          "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/wave8-reviewed-content.postgres.integration.test.ts",
+          "Wave8 independently reviewed OFS10 and SOCS-S2023 Chinese drafts in task-owned PostgreSQL preserves all previous definitions and snapshots and adds only two DRAFT/HIDDEN rows without references or deployment",
+          "passed"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "scope": "Only task-owned loopback synthetic PostgreSQL",
+  "container": "eduk12-scale-wave8-20261026",
+  "containerId": "dbef9f08a581f277e73a489d7a7766d6283544382d32fdde581b9a78bea0fab0",
+  "idAndTaskLabelChecked": true,
+  "dumpBytes": 1567982,
+  "dumpSha256": "832ff7cb19d4335cd03245cbe8b052ade4e95a3382c744e39542b9c0cf4aed92",
+  "purpose": "Retained task-private for future authorized incremental synthetic validation; restore of this new dump NOTRUN",
+  "containerAndOwnAnonymousVolumeRemoved": true,
+  "productionTouched": false,
+  "atUtc": "2026-10-26T09:11:48.811464+00:00"
+}

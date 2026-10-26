@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "status": "CONTENT_FACTS_AND_FROZEN_SNAPSHOT_VERIFIED; discovery/authorization/analysis index consumer NOTRUN",
+  "tools": {
+    "ofs10_zh_cn_research": {
+      "tagCount": 66,
+      "axes": {
+        "domain": [
+          "domain:wellbeing_strength",
+          "domain:stress_work"
+        ],
+        "construct": [
+          "construct:optimism",
+          "construct:wellbeing",
+          "construct:openness_to_future",
+          "construct:positive_future_expectations",
+          "construct:acceptance_of_uncertainty",
+          "construct:future_planning",
+          "construct:future_coping_confidence",
+          "construct:single_factor_total"
+        ],
+        "orientation": [
+          "orientation:CBT",
+          "orientation:cognitive_theory",
+          "orientation:transdiagnostic_research",
+          "orientation:not_therapy_specific"
+        ],
+        "population": [
+          "population:adult_research",
+          "population:ages_18_unspecified",
+          "population:source_spanish_community",
+          "population:source_spanish_clinical",
+          "population:platform_adult_boundary",
+          "population:not_k12_validated"
+        ],
+        "response": [
+          "response:self",
+          "response:digital_self",
+          "response:paper",
+          "response:10_items",
+          "response:five_point_agreement",
+          "response:all_five_anchors",
+          "response:reverse_item_6",
+          "response:fixed_order",
+          "response:no_fixed_recall_period",
+          "response:sum_10_50"
+        ],
+        "use": [
+          "use:research",
+          "use:reflection",
+          "use:not_diagnostic",
+          "use:score_only",
+          "use:no_chinese_cutoff",
+          "use:not_selection",
+          "use:not_individual_treatment_monitoring_validated"
+        ],
+        "license": [
+          "license:cc_by_4_0",
+          "license:attribution_required",
+          "license:changes_indicated",
+          "license:source_allows_redistribution",
+          "license:source_allows_adaptation",
+          "license:source_allows_commercial_use",
+          "license:retain_2017_credit_line"
+        ],
+        "language_validation": [
+          "language_validation:content_zh-CN",
+          "language_validation:working_translation",
+          "language_validation:translation_review_pending",
+          "language_validation:local_validation_pending",
+          "language_validation:maturity_pilot",
+          "language_validation:validated_source_es",
+          "language_validation:author_english_translation",
+          "language_validation:english_validation_not_established",
+          "language_validation:independent_platform_translation",
+          "language_validation:cognitive_debrief_not_established"
+        ]
+      },
+      "keywords": [
+        "面向未来",
+        "未来开放性",
+        "未来积极态度",
+        "未来期待",
+        "憧憬",
+        "计划与行动",
+        "面对不确定",
+        "应对信心",
+        "成人自评",
+        "西语原研究",
+        "中文研究工作稿",
+        "非诊断"
+      ]
+    },
+    "socs_s20_2023_zh_cn": {
+      "tagCount": 60,
+      "axes": {
+        "domain": [
+          "domain:self_compassion",
+          "domain:well_being",
+          "domain:social_emotional"
+        ],
+        "construct": [
+          "construct:recognizing_suffering",
+          "construct:universality_of_suffering",
+          "construct:feeling_for_self",
+          "construct:tolerating_uncomfortable_feelings",
+          "construct:acting_to_alleviate_suffering",
+          "construct:compassion_for_self",
+          "construct:five_facets",
+          "construct:distinct_from_scs_sf",
+          "construct:distinct_from_socs_o"
+        ],
+        "orientation": [
+          "orientation:compassion_research",
+          "orientation:five_element_compassion_model",
+          "orientation:not_therapy_specific",
+          "orientation:not_act_specific",
+          "orientation:not_dbt_specific"
+        ],
+        "population": [
+          "population:adult_project_18_plus",
+          "population:chinese_working_sample",
+          "population:convenience_sample",
+          "population:not_k12_validated",
+          "population:self_report"
+        ],
+        "response": [
+          "response:self",
+          "response:20_items",
+          "response:five_point_1_to_5",
+          "response:agreement_anchors_supplement",
+          "response:no_reverse_items",
+          "response:fixed_order",
+          "response:five_facet_means",
+          "response:total_mean",
+          "response:complete_required_project_policy"
+        ],
+        "use": [
+          "use:research",
+          "use:individual_reflection",
+          "use:not_diagnostic",
+          "use:not_high_stakes_selection",
+          "use:no_score_bands",
+          "use:no_population_ranking"
+        ],
+        "license": [
+          "license:cc_by_4_0",
+          "license:attribution_required",
+          "license:changes_indicated",
+          "license:redistribution_allowed",
+          "license:adaptation_allowed",
+          "license:commercial_reuse_allowed"
+        ],
+        "language_validation": [
+          "language_validation:published_chinese2023",
+          "language_validation:exact_supplement_table1",
+          "language_validation:working_sample_n1132",
+          "language_validation:not_platform_new_translation",
+          "language_validation:platform_expert_review_pending",
+          "language_validation:general_adult_validation_not_established"
+        ]
+      },
+      "keywords": [
+        "自我关怀",
+        "自我慈悲",
+        "自悯",
+        "痛苦识别",
+        "共同人性",
+        "容纳情绪",
+        "善待自己",
+        "照顾自己",
+        "职场成人",
+        "苏塞克斯牛津",
+        "非诊断"
+      ]
+    }
+  },
+  "note": "These tags describe scope and evidence. They do not replace copyright attribution or an actual deployment grant. Existing materializer row.tags contains only primaryDomain; rich catalog tags are preserved in source snapshot."
+}

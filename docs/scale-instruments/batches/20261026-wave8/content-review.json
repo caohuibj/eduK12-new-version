@@ -1,0 +1,43 @@
+{
+  "reviewedAt": "2026-10-26T09:12:51.990969+00:00",
+  "scope": "Coordinator review for research DRAFT only; management exact-commit final review pending",
+  "sources": [
+    {
+      "identity": {
+        "instrumentKey": "ofs10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourceSha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f",
+      "itemCount": 10,
+      "review": "PASS_COORDINATOR_CONTENT_AND_REPORT_REVIEW",
+      "originalCarrier": "English 2018 Additional file1, Spanish file2 cross-check",
+      "scoringDecision": "R6=6-x; only sum10–50",
+      "rights": "CC BY4.0 with author attribution and change notices; source/translation conditions recorded",
+      "report": "Plain Chinese, concrete reflection/actions; uniform score_only, no diagnostic or score-banded claims",
+      "parameter": "none, no reference; independent runtime parameter identity absent",
+      "age": "18+ project policy; missing age indeterminate; no K12 validation claim",
+      "tags": 66
+    },
+    {
+      "identity": {
+        "instrumentKey": "socs_s20_2023_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "sourceSha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe",
+      "itemCount": 20,
+      "review": "PASS_COORDINATOR_CONTENT_AND_REPORT_REVIEW",
+      "originalCarrier": "2023 Chinese Supplementary Table1 exact20 strings and punctuation verified against frozen DOCX",
+      "scoringDecision": "Five4-item means and20-item total mean1–5; explicit platform formula from Table5 scale, no reverse; no zero-fill or denominator change",
+      "rights": "CC BY4.0 with author attribution and change notices; source/translation conditions recorded",
+      "report": "Plain Chinese, concrete reflection/actions; uniform score_only, no diagnostic or score-banded claims",
+      "parameter": "none, no reference; independent runtime parameter identity absent",
+      "age": "18+ project policy; missing age indeterminate; no K12 validation claim",
+      "tags": 60
+    }
+  ],
+  "unmodifiedOldSourceFiles": 92,
+  "schemaEngineApprovalsChanged": false,
+  "originalReferenceRetrievalsReused": true,
+  "newSourceResearchFamilies": 2,
+  "secondThirdCategoryNewArchives": 0
+}

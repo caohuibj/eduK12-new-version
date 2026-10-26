@@ -1,0 +1,2050 @@
+{
+  "status": "POST_EXECUTION_UNSIGNED_NOT_PREBOUND",
+  "capturedAt": "2026-10-26T09:06:47.551Z",
+  "nodeVersion": "v24.21.0",
+  "typescriptVersion": "5.9.3",
+  "scope": "OFS10 isolated test compiler closure and direct read documentation/source files; captured after successful unit/type checks because original capture failed",
+  "otherInstrumentSourceFiles": [],
+  "files": [
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es5.d.ts",
+      "bytes": 218439,
+      "sha256": "c430d44666289dae81f30fa7b2edebf186ecc91a2d4c71266ea6ae76388792e1",
+      "mtimeIso": "2026-10-26T03:07:37.923Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.d.ts",
+      "bytes": 1241,
+      "sha256": "45b7ab580deca34ae9729e97c13cfd999df04416a79116c3bfb483804f85ded4",
+      "mtimeIso": "2026-10-26T03:07:37.852Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2016.d.ts",
+      "bytes": 965,
+      "sha256": "3facaf05f0c5fc569c5649dd359892c98a85557e3e0c847964caeb67076f4d75",
+      "mtimeIso": "2026-10-26T03:07:37.863Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.d.ts",
+      "bytes": 1162,
+      "sha256": "e44bb8bbac7f10ecc786703fe0a6a4b952189f908707980ba8f3c8975a760962",
+      "mtimeIso": "2026-10-26T03:07:37.867Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.d.ts",
+      "bytes": 1088,
+      "sha256": "5e1c4c362065a6b95ff952c0eab010f04dcd2c3494e813b493ecfd4fcb9fc0d8",
+      "mtimeIso": "2026-10-26T03:07:37.877Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.d.ts",
+      "bytes": 1071,
+      "sha256": "68d73b4a11549f9c0b7d352d10e91e5dca8faa3322bfb77b661839c42b1ddec7",
+      "mtimeIso": "2026-10-26T03:07:37.880Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.d.ts",
+      "bytes": 1201,
+      "sha256": "5efce4fc3c29ea84e8928f97adec086e3dc876365e0982cc8479a07954a3efd4",
+      "mtimeIso": "2026-10-26T03:07:37.887Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.core.d.ts",
+      "bytes": 22866,
+      "sha256": "c57796738e7f83dbc4b8e65132f11a377649c00dd3eee333f672b8f0a6bea671",
+      "mtimeIso": "2026-10-26T03:07:37.852Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.collection.d.ts",
+      "bytes": 5229,
+      "sha256": "dc2df20b1bcdc8c2d34af4926e2c3ab15ffe1160a63e58b7e09833f616efff44",
+      "mtimeIso": "2026-10-26T03:07:37.848Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.generator.d.ts",
+      "bytes": 2557,
+      "sha256": "515d0b7b9bea2e31ea4ec968e9edd2c39d3eebf4a2d5cbd04e88639819ae3b71",
+      "mtimeIso": "2026-10-26T03:07:37.854Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.iterable.d.ts",
+      "bytes": 18200,
+      "sha256": "0559b1f683ac7505ae451f9a96ce4c3c92bdc71411651ca6ddb0e88baaaad6a3",
+      "mtimeIso": "2026-10-26T03:07:37.856Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.promise.d.ts",
+      "bytes": 3200,
+      "sha256": "0dc1e7ceda9b8b9b455c3a2d67b0412feab00bd2f66656cd8850e8831b08b537",
+      "mtimeIso": "2026-10-26T03:07:37.857Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.proxy.d.ts",
+      "bytes": 5251,
+      "sha256": "ce691fb9e5c64efb9547083e4a34091bcbe5bdb41027e310ebba8f7d96a98671",
+      "mtimeIso": "2026-10-26T03:07:37.858Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.reflect.d.ts",
+      "bytes": 6493,
+      "sha256": "8d697a2a929a5fcb38b7a65594020fcef05ec1630804a33748829c5ff53640d0",
+      "mtimeIso": "2026-10-26T03:07:37.860Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.symbol.d.ts",
+      "bytes": 1649,
+      "sha256": "4ff2a353abf8a80ee399af572debb8faab2d33ad38c4b4474cff7f26e7653b8d",
+      "mtimeIso": "2026-10-26T03:07:37.861Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2015.symbol.wellknown.d.ts",
+      "bytes": 11010,
+      "sha256": "fb0f136d372979348d59b3f5020b4cdb81b5504192b1cacff5d1fbba29378aa1",
+      "mtimeIso": "2026-10-26T03:07:37.861Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2016.array.include.d.ts",
+      "bytes": 5204,
+      "sha256": "d15bea3d62cbbdb9797079416b8ac375ae99162a7fba5de2c6c505446486ac0a",
+      "mtimeIso": "2026-10-26T03:07:37.863Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2016.intl.d.ts",
+      "bytes": 1484,
+      "sha256": "68d18b664c9d32a7336a70235958b8997ebc1c3b8505f4f1ae2b7e7753b87618",
+      "mtimeIso": "2026-10-26T03:07:37.866Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.arraybuffer.d.ts",
+      "bytes": 915,
+      "sha256": "eb3d66c8327153d8fa7dd03f9c58d351107fe824c79e9b56b462935176cdf12a",
+      "mtimeIso": "2026-10-26T03:07:37.867Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.date.d.ts",
+      "bytes": 1916,
+      "sha256": "38f0219c9e23c915ef9790ab1d680440d95419ad264816fa15009a8851e79119",
+      "mtimeIso": "2026-10-26T03:07:37.868Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.object.d.ts",
+      "bytes": 2473,
+      "sha256": "69ab18c3b76cd9b1be3d188eaf8bba06112ebbe2f47f6c322b5105a6fbc45a2e",
+      "mtimeIso": "2026-10-26T03:07:37.871Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.sharedmemory.d.ts",
+      "bytes": 7209,
+      "sha256": "a680117f487a4d2f30ea46f1b4b7f58bef1480456e18ba53ee85c2746eeca012",
+      "mtimeIso": "2026-10-26T03:07:37.872Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.string.d.ts",
+      "bytes": 2378,
+      "sha256": "2f11ff796926e0832f9ae148008138ad583bd181899ab7dd768a2666700b1893",
+      "mtimeIso": "2026-10-26T03:07:37.873Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.intl.d.ts",
+      "bytes": 1449,
+      "sha256": "4de680d5bb41c17f7f68e0419412ca23c98d5749dcaaea1896172f06435891fc",
+      "mtimeIso": "2026-10-26T03:07:37.870Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2017.typedarrays.d.ts",
+      "bytes": 1542,
+      "sha256": "954296b30da6d508a104a3a0b5d96b76495c709785c1d11610908e63481ee667",
+      "mtimeIso": "2026-10-26T03:07:37.873Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.asyncgenerator.d.ts",
+      "bytes": 2692,
+      "sha256": "ac9538681b19688c8eae65811b329d3744af679e0bdfa5d842d0e32524c73e1c",
+      "mtimeIso": "2026-10-26T03:07:37.874Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.asynciterable.d.ts",
+      "bytes": 2257,
+      "sha256": "0a969edff4bd52585473d24995c5ef223f6652d6ef46193309b3921d65dd4376",
+      "mtimeIso": "2026-10-26T03:07:37.876Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.intl.d.ts",
+      "bytes": 3021,
+      "sha256": "9e9fbd7030c440b33d021da145d3232984c8bb7916f277e8ffd3dc2e3eae2bdb",
+      "mtimeIso": "2026-10-26T03:07:37.878Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.promise.d.ts",
+      "bytes": 1353,
+      "sha256": "811ec78f7fefcabbda4bfa93b3eb67d9ae166ef95f9bff989d964061cbf81a0c",
+      "mtimeIso": "2026-10-26T03:07:37.878Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2018.regexp.d.ts",
+      "bytes": 1232,
+      "sha256": "717937616a17072082152a2ef351cb51f98802fb4b2fdabd32399843875974ca",
+      "mtimeIso": "2026-10-26T03:07:37.879Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.array.d.ts",
+      "bytes": 3163,
+      "sha256": "d7e7d9b7b50e5f22c915b525acc5a49a7a6584cf8f62d0569e557c5cfc4b2ac2",
+      "mtimeIso": "2026-10-26T03:07:37.880Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.object.d.ts",
+      "bytes": 1473,
+      "sha256": "71c37f4c9543f31dfced6c7840e068c5a5aacb7b89111a4364b1d5276b852557",
+      "mtimeIso": "2026-10-26T03:07:37.882Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.string.d.ts",
+      "bytes": 1528,
+      "sha256": "576711e016cf4f1804676043e6a0a5414252560eb57de9faceee34d79798c850",
+      "mtimeIso": "2026-10-26T03:07:37.883Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.symbol.d.ts",
+      "bytes": 1006,
+      "sha256": "89c1b1281ba7b8a96efc676b11b264de7a8374c5ea1e6617f11880a13fc56dc6",
+      "mtimeIso": "2026-10-26T03:07:37.885Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2019.intl.d.ts",
+      "bytes": 958,
+      "sha256": "74f7fa2d027d5b33eb0471c8e82a6c87216223181ec31247c357a3e8e2fddc5b",
+      "mtimeIso": "2026-10-26T03:07:37.881Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.bigint.d.ts",
+      "bytes": 38185,
+      "sha256": "d6d7ae4d1f1f3772e2a3cde568ed08991a8ae34a080ff1151af28b7f798e22ca",
+      "mtimeIso": "2026-10-26T03:07:37.885Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.date.d.ts",
+      "bytes": 2956,
+      "sha256": "063600664504610fe3e99b717a1223f8b1900087fab0b4cad1496a114744f8df",
+      "mtimeIso": "2026-10-26T03:07:37.889Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.promise.d.ts",
+      "bytes": 1803,
+      "sha256": "934019d7e3c81950f9a8426d093458b65d5aff2c7c1511233c0fd5b941e608ab",
+      "mtimeIso": "2026-10-26T03:07:37.892Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.sharedmemory.d.ts",
+      "bytes": 5128,
+      "sha256": "52ada8e0b6e0482b728070b7639ee42e83a9b1c22d205992756fe020fd9f4a47",
+      "mtimeIso": "2026-10-26T03:07:37.894Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.string.d.ts",
+      "bytes": 2556,
+      "sha256": "3bdefe1bfd4d6dee0e26f928f93ccc128f1b64d5d501ff4a8cf3c6371200e5e6",
+      "mtimeIso": "2026-10-26T03:07:37.894Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.symbol.wellknown.d.ts",
+      "bytes": 1606,
+      "sha256": "59fb2c069260b4ba00b5643b907ef5d5341b167e7d1dbf58dfd895658bda2867",
+      "mtimeIso": "2026-10-26T03:07:37.895Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.intl.d.ts",
+      "bytes": 22438,
+      "sha256": "639e512c0dfc3fad96a84caad71b8834d66329a1f28dc95e3946c9b58176c73a",
+      "mtimeIso": "2026-10-26T03:07:37.890Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.es2020.number.d.ts",
+      "bytes": 1587,
+      "sha256": "368af93f74c9c932edd84c58883e736c9e3d53cec1fe24c0b0ff451f529ceab1",
+      "mtimeIso": "2026-10-26T03:07:37.892Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.decorators.d.ts",
+      "bytes": 13192,
+      "sha256": "8e7f8264d0fb4c5339605a15daadb037bf238c10b654bb3eee14208f860a32ea",
+      "mtimeIso": "2026-10-26T03:07:37.809Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/typescript/lib/lib.decorators.legacy.d.ts",
+      "bytes": 1326,
+      "sha256": "782dec38049b92d4e85c1585fbea5474a219c6984a35b004963b00beb1aab538",
+      "mtimeIso": "2026-10-26T03:07:37.809Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/pretty-format/dist/index.d.ts",
+      "bytes": 5148,
+      "sha256": "3a582c6e8906f5b094ccf0de6cc6f4f8a54b05a34f52517aba5c9c7f704f6b28",
+      "mtimeIso": "2026-10-26T03:07:36.785Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/display.d.ts",
+      "bytes": 1128,
+      "sha256": "0528f6d21f7a02d4092895090d2dd86104bd5a3e79eced96d5a1a7dd90943d17",
+      "mtimeIso": "2026-10-26T03:07:36.912Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/types.d.ts",
+      "bytes": 1044,
+      "sha256": "b5ce343886d23392be9c8280e9f24a87f1d7d3667f6672c2fe4aa61fa4ece7d4",
+      "mtimeIso": "2026-10-26T03:07:36.976Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/helpers.d.ts",
+      "bytes": 3309,
+      "sha256": "72ce5b734c05da85c85a6f6dc05823b051d6aa41acaedeeb1d17c72f3b4efa72",
+      "mtimeIso": "2026-10-26T03:07:36.924Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/timers.d.ts",
+      "bytes": 1063,
+      "sha256": "b0857bb28fd5236ace84280f79a25093f919fd0eff13e47cc26ea03de60a7294",
+      "mtimeIso": "2026-10-26T03:07:36.964Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/index.d.ts",
+      "bytes": 342,
+      "sha256": "5e43e0824f10cd8c48e7a8c5c673638488925a12c31f0f9e0957965c290eb14c",
+      "mtimeIso": "2026-10-26T03:07:36.928Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/types.d-BCElaP-c.d.ts",
+      "bytes": 1521,
+      "sha256": "ef13c73d6157a32933c612d476c1524dd674cf5b9a88571d7d6a0d147544d529",
+      "mtimeIso": "2026-10-26T03:07:36.972Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/dist/diff.d.ts",
+      "bytes": 4498,
+      "sha256": "49ab4f1d153a252779958fc87b700743d32b5ffa42addd70ae23ad3f429daa5c",
+      "mtimeIso": "2026-10-26T03:07:36.908Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/utils/diff.d.ts",
+      "bytes": 31,
+      "sha256": "05c7aef6a4e496b93c2e682cced8903c0dfe6340d04f3fe616176e2782193435",
+      "mtimeIso": "2026-10-26T03:07:36.904Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/runner/dist/tasks.d-DEYaIMIu.d.ts",
+      "bytes": 58324,
+      "sha256": "53cf4076f42b29b8d411259d168d51b3a0274c42c8814e5b44dfa8803a35d4fc",
+      "mtimeIso": "2026-10-26T03:07:36.828Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/runner/dist/index.d.ts",
+      "bytes": 7994,
+      "sha256": "a39461ee1f27cf3e6cfd63d21045713d26d521da55ea4d8efccb705f689e6dbb",
+      "mtimeIso": "2026-10-26T03:07:36.818Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/traces.d.D2T_R8rx.d.ts",
+      "bytes": 1353,
+      "sha256": "61bb64660ee150f3ab618340e15cca0a81664801bede7c966ca0eca3a952fe63",
+      "mtimeIso": "2026-10-26T03:07:37.384Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vite/dist/node/chunks/moduleRunnerTransport.d.ts",
+      "bytes": 3059,
+      "sha256": "10073cdcf56982064c5337787cc59b79586131e1b28c106ede5bff362f912b70",
+      "mtimeIso": "2026-10-26T03:07:37.108Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vite/dist/node/module-runner.d.ts",
+      "bytes": 11372,
+      "sha256": "ff0a83c9a0489a627e264ffcb63f2264b935b20a502afa3a018848139e3d8575",
+      "mtimeIso": "2026-10-26T03:07:37.096Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/snapshot/dist/environment.d-DOJxxZV9.d.ts",
+      "bytes": 659,
+      "sha256": "42a12f2faa483c9b48195ed794d22698162274e755f6e07219c2351c4f08d732",
+      "mtimeIso": "2026-10-26T03:07:36.774Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/snapshot/dist/rawSnapshot.d-D_X3-62x.d.ts",
+      "bytes": 6094,
+      "sha256": "ec0c42bb0f465e4993f2bc68a6ce9df9a2dcbc7b83e21748f82f1b69561938e3",
+      "mtimeIso": "2026-10-26T03:07:36.798Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/snapshot/dist/index.d.ts",
+      "bytes": 2819,
+      "sha256": "f50ff37a9cbbe74475f426474d9827083c7c2c138a954d28f1690df338f69291",
+      "mtimeIso": "2026-10-26T03:07:36.783Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/config.d.A1h_Y6Jt.d.ts",
+      "bytes": 6699,
+      "sha256": "61fd6c17235d530c40f543dd7c40afab091d91c1ef890baeed30db6d82b04b28",
+      "mtimeIso": "2026-10-26T03:07:37.240Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/environment.d.CrsxCzP1.d.ts",
+      "bytes": 848,
+      "sha256": "bcbd3becd08b4515225880abea0dbfbbf0d1181ce3af8f18f72f61edbe4febfb",
+      "mtimeIso": "2026-10-26T03:07:37.268Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/rpc.d.B_8sPU0w.d.ts",
+      "bytes": 1639,
+      "sha256": "091767bc841f937654ed597d49e023ed59850355e746ae1a6f20ab31076ee1fb",
+      "mtimeIso": "2026-10-26T03:07:37.344Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/worker.d.ZpHpO4yb.d.ts",
+      "bytes": 8770,
+      "sha256": "19c6d6135af59693698d384050b45a8a049493500add442f58e4bd7c8a255ab6",
+      "mtimeIso": "2026-10-26T03:07:37.394Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/browser.d.BcoexmFG.d.ts",
+      "bytes": 1837,
+      "sha256": "6a0dba12d55314638a8c51108b20fe2f68f1364a619d098918bda91c22dec154",
+      "mtimeIso": "2026-10-26T03:07:37.228Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/spy/optional-types.d.ts",
+      "bytes": 164,
+      "sha256": "c76c02846ba7d40b9b3488f0e8d75d02cbdee2f0bc5fcd55dd3bd2e1457646ea",
+      "mtimeIso": "2026-10-26T03:07:36.785Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/spy/dist/index.d.ts",
+      "bytes": 18205,
+      "sha256": "4ead13a482c539b77394b2a97e3b877b809eac596390371cea490286f53b996a",
+      "mtimeIso": "2026-10-26T03:07:36.783Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/tinyrainbow/dist/index.d.ts",
+      "bytes": 2224,
+      "sha256": "3e2d2171410b76a0587f2cf4278c299241f1bd33430adc4c6681ed80f507ab10",
+      "mtimeIso": "2026-10-26T03:07:36.340Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@standard-schema/spec/dist/index.d.ts",
+      "bytes": 6056,
+      "sha256": "bdd14f07b4eca0b4b5203b85b8dbc4d084c749fa590bee5ea613e1641dcd3b29",
+      "mtimeIso": "2026-10-26T03:07:36.844Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/deep-eql/index.d.ts",
+      "bytes": 1117,
+      "sha256": "427fe2004642504828c1476d0af4270e6ad4db6de78c0b5da3e4c5ca95052a99",
+      "mtimeIso": "2026-10-26T03:07:36.112Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/assertion-error/index.d.ts",
+      "bytes": 704,
+      "sha256": "2eeffcee5c1661ddca53353929558037b8cf305ffb86a803512982f99bcab50d",
+      "mtimeIso": "2026-10-26T03:07:36.152Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/chai/index.d.ts",
+      "bytes": 87485,
+      "sha256": "9afb4cb864d297e4092a79ee2871b5d3143ea14153f62ef0bb04ede25f432030",
+      "mtimeIso": "2026-10-26T03:07:36.200Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/expect/dist/index.d.ts",
+      "bytes": 31498,
+      "sha256": "5c935b7fc4ddc1410ea1cd7cd4e35ed106a6e4920dd27a9480a40fd224359dc3",
+      "mtimeIso": "2026-10-26T03:07:36.836Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/runner/dist/utils.d.ts",
+      "bytes": 3227,
+      "sha256": "2b39c6cf59088713babbfc3e20ee85f1375d40e66953156fa658346b8346f24f",
+      "mtimeIso": "2026-10-26T03:07:36.840Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/runner/utils.d.ts",
+      "bytes": 32,
+      "sha256": "e666e31d323fef5642f87db0da48a83e58f0aaf9e3823e87eabd8ec7e0441a36",
+      "mtimeIso": "2026-10-26T03:07:36.840Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/tinybench/dist/index.d.cts",
+      "bytes": 9058,
+      "sha256": "69bf2422313487956e4dacf049f30cb91b34968912058d244cb19e4baa24da97",
+      "mtimeIso": "2026-10-26T03:07:36.192Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/benchmark.d.DAaHLpsq.d.ts",
+      "bytes": 818,
+      "sha256": "6987dfb4b0c4e02112cc4e548e7a77b3d9ddfeffa8c8a2db13ceac361a4567d9",
+      "mtimeIso": "2026-10-26T03:07:37.220Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/global.d.DVsSRdQ5.d.ts",
+      "bytes": 3287,
+      "sha256": "4ffba3c5848b4fe62ee59b754fd5f256ad9656a0db6d37b9a2a8cb40dfc7ac21",
+      "mtimeIso": "2026-10-26T03:07:37.288Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/optional-runtime-types.d.ts",
+      "bytes": 164,
+      "sha256": "c76c02846ba7d40b9b3488f0e8d75d02cbdee2f0bc5fcd55dd3bd2e1457646ea",
+      "mtimeIso": "2026-10-26T03:07:37.314Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/mocker/dist/types.d-BjI5eAwu.d.ts",
+      "bytes": 4616,
+      "sha256": "5e2ba3d18d78aebbde1f34bde356e41e9c76eeaeaeee56a37036596a9eff4211",
+      "mtimeIso": "2026-10-26T03:07:36.948Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/mocker/dist/index.d-B41z0AuW.d.ts",
+      "bytes": 859,
+      "sha256": "8280ae8ccc0493b32d1742d585357ab9f0a508ea050af25a5a20d64010d0a5cf",
+      "mtimeIso": "2026-10-26T03:07:36.920Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@vitest/mocker/dist/index.d.ts",
+      "bytes": 645,
+      "sha256": "7adfd9f9056ecd4ae6c65fde2a98654960c662714c73f048478959d04c09e144",
+      "mtimeIso": "2026-10-26T03:07:36.924Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/suite.d.udJtyAgw.d.ts",
+      "bytes": 398,
+      "sha256": "32b35cf0dc3a1b1a7118b61c34ce2ad1a29695851679f9ec34e0776f2ece2a69",
+      "mtimeIso": "2026-10-26T03:07:37.372Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/chunks/evaluatedModules.d.BxJ5omdx.d.ts",
+      "bytes": 205,
+      "sha256": "b413fbc6658fe2774f8bf9a15cf4c53e586fc38a2d5256b3b9647da242c14389",
+      "mtimeIso": "2026-10-26T03:07:37.280Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/runners.d.ts",
+      "bytes": 2714,
+      "sha256": "59e5e964b84fdb2378e9455e4e59405030e4ed2b4c6f891ce395f17796af3cbb",
+      "mtimeIso": "2026-10-26T03:07:37.349Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/expect-type/dist/utils.d.ts",
+      "bytes": 8434,
+      "sha256": "dd51e53752b310bd20c9b1a87bbf12b1fe2be7fe40f505b43199496481096275",
+      "mtimeIso": "2026-10-26T03:07:36.452Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/expect-type/dist/overloads.d.ts",
+      "bytes": 23165,
+      "sha256": "a87be4662442b3feeffc331ecafe6b36cafd08727e2d7f2425a5099577e7fd18",
+      "mtimeIso": "2026-10-26T03:07:36.436Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/expect-type/dist/branding.d.ts",
+      "bytes": 6478,
+      "sha256": "cd4cd9220a1ba793bc935e76d8e5481c110a90d9868ae7866a182ee71cdb6abb",
+      "mtimeIso": "2026-10-26T03:07:36.376Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/expect-type/dist/messages.d.ts",
+      "bytes": 5570,
+      "sha256": "0a7fb8619b10bc05fd933ca9ac1c8b2ab2220be7a57b57565c3ac158595494ef",
+      "mtimeIso": "2026-10-26T03:07:36.420Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/expect-type/dist/index.d.ts",
+      "bytes": 37958,
+      "sha256": "c4a5f91feb9c5a6b2a91089d959c38391b79a961db3b9cc73b8877d57ad7dcdc",
+      "mtimeIso": "2026-10-26T03:07:36.404Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/vitest/dist/index.d.ts",
+      "bytes": 29194,
+      "sha256": "90ba95a763101bb61b8a799731a2ed60b5016b8135c1a2d5186862d4b534d4a1",
+      "mtimeIso": "2026-10-26T03:07:37.296Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-reference/governance.ts",
+      "bytes": 5631,
+      "sha256": "d27143b08c36220bcb618f8d3b35fee1a680e2aadd0e75163a669384f7ff59b7",
+      "mtimeIso": "2026-10-26T03:06:44.040Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/json-schema.d.cts",
+      "bytes": 2816,
+      "sha256": "d1fc2d317157b161af800631bb01668bf08307bf2a0ff053f743aeca3a368465",
+      "mtimeIso": "2026-10-26T03:07:37.717Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/standard-schema.d.cts",
+      "bytes": 6321,
+      "sha256": "835fb2909ce458740fb4a49fc61709896c6864f5ce3db7f0a88f06c720d74d02",
+      "mtimeIso": "2026-10-26T03:07:37.774Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/registries.d.cts",
+      "bytes": 1633,
+      "sha256": "6e5857f38aa297a859cab4ec891408659218a5a2610cd317b6dcbef9979459cc",
+      "mtimeIso": "2026-10-26T03:07:37.757Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/to-json-schema.d.cts",
+      "bytes": 8689,
+      "sha256": "2ef8ffe86811721c62038c3de3c2cb27e5555f252b9c71ae1a877f1335485aea",
+      "mtimeIso": "2026-10-26T03:07:37.782Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/util.d.cts",
+      "bytes": 17803,
+      "sha256": "404660f2aeed19fc2af51f287dad86556beeeff2075768b01832092de4397c38",
+      "mtimeIso": "2026-10-26T03:07:37.796Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/versions.d.cts",
+      "bytes": 109,
+      "sha256": "204b47598070c8d2b26921cdd7cb5b55804bd73ad1a60428750ef95b35c97ec4",
+      "mtimeIso": "2026-10-26T03:07:37.799Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/schemas.d.cts",
+      "bytes": 58771,
+      "sha256": "85605c7095abac45fb2be5b15d1a0a806586113321eb923c28ad7fd0764ed7db",
+      "mtimeIso": "2026-10-26T03:07:37.766Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/checks.d.cts",
+      "bytes": 14031,
+      "sha256": "c7d7e274be439bd604580d994bdfb305221e471e061d3178f430c09d417f9536",
+      "mtimeIso": "2026-10-26T03:07:37.549Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/errors.d.cts",
+      "bytes": 9126,
+      "sha256": "c140211fba71b3a847b15da4a70776ed904198e7e4dc8c32df22742235072c4c",
+      "mtimeIso": "2026-10-26T03:07:37.614Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/core.d.cts",
+      "bytes": 2977,
+      "sha256": "ce51a3572f75b0f8fc07a11828876ac28cf606a780a2d4c6b3bbcee79e48a90b",
+      "mtimeIso": "2026-10-26T03:07:37.576Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/parse.d.cts",
+      "bytes": 4343,
+      "sha256": "a8fed1298e1a1aeb2b689c56fe4200c6bf48491cabe47f54a1caa22fa9ebcc6e",
+      "mtimeIso": "2026-10-26T03:07:37.744Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/memoizer.d.cts",
+      "bytes": 844,
+      "sha256": "c7d1e897d7751e2f2f7e41ee6db87a567418a0e9d307c580029e8565a76cb1f8",
+      "mtimeIso": "2026-10-26T03:07:37.729Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/regexes.d.cts",
+      "bytes": 3919,
+      "sha256": "bae85faf965874160673777542d5def87f22c71125d3b71267b1384b0532a4c4",
+      "mtimeIso": "2026-10-26T03:07:37.755Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ar.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.520Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/az.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.526Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/be.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.532Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/bg.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.532Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/bn.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.536Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ca.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.542Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ckb.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.557Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/cs.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.580Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/da.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.580Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/de.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.586Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/el.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.599Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/en.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.603Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/eo.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.609Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/es.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.621Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/fa.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.629Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/fi.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.632Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/fr.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.637Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/fr-CA.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.632Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/gu.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.644Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/he.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.644Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/hi.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.649Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/hr.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.655Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/hu.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.657Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/hy.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.660Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/id.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.665Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/is.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.701Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/it.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.709Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ja.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.711Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ka.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.719Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/kh.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.720Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/km.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.722Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/kn.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.723Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ko.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.725Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/lt.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.726Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/mk.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.729Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ms.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.731Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ne.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.734Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/nl.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.736Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/nn.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.737Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/no.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.740Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ota.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.741Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ps.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.751Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/pl.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.751Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/pt.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.755Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/pt-BR.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.753Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ro.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.758Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ru.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.760Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/sk.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.771Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/sl.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.772Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/sv.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.774Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ta.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.776Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/tg.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.777Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/th.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.779Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/tk.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.780Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/tr.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.784Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ua.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.789Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/uk.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.790Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/ur.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.792Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/uz.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.797Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/vi.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.801Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/zh-CN.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.806Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/zh-TW.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.808Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/yo.d.cts",
+      "bytes": 142,
+      "sha256": "e0bfe601a9fdf6defe94ed62dc60ac71597566001a1f86e705c95e431a9c816d",
+      "mtimeIso": "2026-10-26T03:07:37.804Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/locales/index.d.cts",
+      "bytes": 2670,
+      "sha256": "8fdac54b93a59a6627b74c680e2df92f8f66b0b7d2699c9dd2a10484066a1c22",
+      "mtimeIso": "2026-10-26T03:07:37.693Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/doc.d.cts",
+      "bytes": 483,
+      "sha256": "55fadfc733db7198f557af11bf55ae955db6257e17262351a9cdb8a98af4a9f9",
+      "mtimeIso": "2026-10-26T03:07:37.594Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/compile.d.cts",
+      "bytes": 3667,
+      "sha256": "ff49687860a57d46828bccbedd739e192ead2421a59bb04024529e8e80c6264e",
+      "mtimeIso": "2026-10-26T03:07:37.568Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/api.d.cts",
+      "bytes": 33912,
+      "sha256": "d5063dd2ce061414ebb1ec3608295d6681d3153a427b715bd515813c621b3cf1",
+      "mtimeIso": "2026-10-26T03:07:37.516Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/json-schema-processors.d.cts",
+      "bytes": 3856,
+      "sha256": "b147d5d4e973ea9725631a6bd49d3dffd0c28c521b20b7bf44456daa86723395",
+      "mtimeIso": "2026-10-26T03:07:37.715Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/json-schema-generator.d.cts",
+      "bytes": 2636,
+      "sha256": "14e1da8984e72f3837de4aec8bc6d29e9ecce4dc260ac6ef4ca4e5e4f93add01",
+      "mtimeIso": "2026-10-26T03:07:37.712Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/core/index.d.cts",
+      "bytes": 709,
+      "sha256": "99003dbd8309d6cfda98e4bacb264ad40bfc197ede6af95370b0f3177076eb6a",
+      "mtimeIso": "2026-10-26T03:07:37.687Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/errors.d.cts",
+      "bytes": 1718,
+      "sha256": "be7e9393805753e479746c81dcfe4287063d83ffa30e0284f7a016775af2c1d2",
+      "mtimeIso": "2026-10-26T03:07:37.610Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/parse.d.cts",
+      "bytes": 2884,
+      "sha256": "f49bf9fcde399132c5760eefb0714cee3f8e96cd30fcec8c535e2cee57870d63",
+      "mtimeIso": "2026-10-26T03:07:37.743Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/schemas.d.cts",
+      "bytes": 51547,
+      "sha256": "9943ae429279a7a4bab6bacc828f9416ee0eed92a370d4c22d5b4235b0c9bd66",
+      "mtimeIso": "2026-10-26T03:07:37.763Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/checks.d.cts",
+      "bytes": 729,
+      "sha256": "5490cbcd192227f9a1f61bdf7000da8b47635fc0cdec9e1879b932586b6d2e8e",
+      "mtimeIso": "2026-10-26T03:07:37.545Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/compat.d.cts",
+      "bytes": 2830,
+      "sha256": "487178767be2789fa2f765d0e77fc5abad8212f7d5dfbe255011dd8e8bb5306c",
+      "mtimeIso": "2026-10-26T03:07:37.568Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/from-json-schema.d.cts",
+      "bytes": 627,
+      "sha256": "2316301dd223d31962d917999acf8e543e0119c5d24ec984c9f22cb23247160c",
+      "mtimeIso": "2026-10-26T03:07:37.641Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/deep-partial.d.cts",
+      "bytes": 2763,
+      "sha256": "a3eb5de45edf334745bb6347979b6f9eb44bab235910afb551d44eb05a84a233",
+      "mtimeIso": "2026-10-26T03:07:37.590Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/in-out.d.cts",
+      "bytes": 691,
+      "sha256": "bfa8e3563e561377191b49bcfb4cea149286a2b843058c1236dce8c3b541564d",
+      "mtimeIso": "2026-10-26T03:07:37.668Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/iso.d.cts",
+      "bytes": 579,
+      "sha256": "b8495ee8dbff077d31e9365c73f170709106d7bc6e17a163c7568bb485c8368c",
+      "mtimeIso": "2026-10-26T03:07:37.703Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/coerce.d.cts",
+      "bytes": 1149,
+      "sha256": "e818471014c77c103330aee11f00a7a00b37b35500b53ea6f337aefacd6174c9",
+      "mtimeIso": "2026-10-26T03:07:37.560Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/v4/classic/external.d.cts",
+      "bytes": 1235,
+      "sha256": "88c4f1da1a1a6f8ca005fa1a4241897da754b7120fdb731b51a4434232bbcb42",
+      "mtimeIso": "2026-10-26T03:07:37.624Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/zod/index.d.cts",
+      "bytes": 119,
+      "sha256": "31506fd6e72c0d09e082b2f0b3741e6bbe90670361c9560ef998bdb1e56edc3e",
+      "mtimeIso": "2026-10-26T03:07:37.673Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/material.ts",
+      "bytes": 1653,
+      "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "bytes": 632,
+      "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "bytes": 667,
+      "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "bytes": 1410,
+      "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "bytes": 4020,
+      "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "bytes": 1730,
+      "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6",
+      "mtimeIso": "2026-10-26T03:06:44.104Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "bytes": 2544,
+      "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-definition.ts",
+      "bytes": 29219,
+      "sha256": "8136925d8a6b99827da7abd68683d2f7de7cd06353105a246216eab920cfdaba",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-scoring.ts",
+      "bytes": 25883,
+      "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/context.ts",
+      "bytes": 10187,
+      "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d",
+      "mtimeIso": "2026-10-26T03:06:44.035Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "bytes": 8342,
+      "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38",
+      "mtimeIso": "2026-10-26T03:06:44.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "bytes": 3918,
+      "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7",
+      "mtimeIso": "2026-10-26T03:06:44.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/utils/logger.ts",
+      "bytes": 3090,
+      "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15",
+      "mtimeIso": "2026-10-26T03:06:44.136Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/utils/encryption.ts",
+      "bytes": 5773,
+      "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e",
+      "mtimeIso": "2026-10-26T03:06:44.136Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "bytes": 1815,
+      "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a",
+      "mtimeIso": "2026-10-26T03:06:44.036Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/security.ts",
+      "bytes": 908,
+      "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d",
+      "mtimeIso": "2026-10-26T03:06:44.036Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-context/index.ts",
+      "bytes": 83,
+      "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d",
+      "mtimeIso": "2026-10-26T03:06:44.036Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-reference/reference.ts",
+      "bytes": 34694,
+      "sha256": "c0ed72ec9f1a31fea8de882bede1201a9e76cb5c9c7ec9fb668227f5790efbc2",
+      "mtimeIso": "2026-10-26T03:06:44.040Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/content-locale.ts",
+      "bytes": 915,
+      "sha256": "4e163c26096d1b35815b5a5a9d468837095c98f4e706527ab8ffbde98edc1ec2",
+      "mtimeIso": "2026-10-26T03:06:44.088Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/assessment-governance/scientific-maturity.ts",
+      "bytes": 1669,
+      "sha256": "cadef7312021a52de9f1caadf5557b6bf51e6a9e361dcfbfac75659b19a0ef09",
+      "mtimeIso": "2026-10-26T03:06:44.038Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/catalog-manifest.ts",
+      "bytes": 16697,
+      "sha256": "b041a4196f3fdaef889d2e4d5be548639a7a89198be9ea55e6018127c151e154",
+      "mtimeIso": "2026-10-26T03:06:44.104Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/library/localization-manifest.ts",
+      "bytes": 4533,
+      "sha256": "2efa77c7f2c7962a3f23f7ff20fa43bca22379d176a4e1c3dfabf704553d5c17",
+      "mtimeIso": "2026-10-26T03:06:44.104Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/types.ts",
+      "bytes": 3167,
+      "sha256": "30a25b201b6ad1149425d1c7f162f0bf838e6ceffc9b9bb731048459d52d8d9f",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/types.ts",
+      "bytes": 3364,
+      "sha256": "382e4788967c8986848b829af63ca84590b53c476ae8edc4478b337286fa2f09",
+      "mtimeIso": "2026-10-26T03:06:44.105Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json",
+      "bytes": 34263,
+      "sha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f",
+      "mtimeIso": "2026-10-26T08:59:49.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/instrument.ts",
+      "bytes": 193,
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "mtimeIso": "2026-10-26T08:59:49.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/schema.ts",
+      "bytes": 3808,
+      "sha256": "f3039e91b4b44e9d8f84191f2d15e8605194d2845ca643d7d0623de515ab8286",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "bytes": 4798,
+      "sha256": "2f75dad2215f598b329a751f3d91f347caf4b5b39315b783a4a617256056f19a",
+      "mtimeIso": "2026-10-26T03:06:44.105Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+      "bytes": 8344,
+      "sha256": "23653dfe9da8518ede036d8afd2d7c57588b70c21f9c58004a0805cbed477a9a",
+      "mtimeIso": "2026-10-26T03:06:44.105Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/define-instrument.ts",
+      "bytes": 1146,
+      "sha256": "e6ade3db43e3945d7a33f7426cfe7056c6aae42e54cdc01d442450f628c52a93",
+      "mtimeIso": "2026-10-26T03:06:44.105Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/scale-result.ts",
+      "bytes": 14023,
+      "sha256": "eb88e9bd0f90e4a1fd93bf7f62b71238fa747bcc692a42e9e28a5cadf5bab1ac",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/policy/eligibility.ts",
+      "bytes": 3675,
+      "sha256": "a6266923493ab36ffa34da3b361cd92bf36a1ee2beda9f5e66ac75d42b92b515",
+      "mtimeIso": "2026-10-26T03:06:44.107Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+      "bytes": 13467,
+      "sha256": "f80a31934121b15a6967acc078e3df62f8089ad03af6d8ad278377b04d52eda8",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/compatibility/disposable.d.ts",
+      "bytes": 473,
+      "sha256": "70521b6ab0dcba37539e5303104f29b721bfb2940b2776da4cc818c07e1fefc1",
+      "mtimeIso": "2026-10-26T03:07:36.836Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/compatibility/indexable.d.ts",
+      "bytes": 990,
+      "sha256": "ab41ef1f2cdafb8df48be20cd969d875602483859dc194e9c97c8a576892c052",
+      "mtimeIso": "2026-10-26T03:07:36.844Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/compatibility/iterators.d.ts",
+      "bytes": 1303,
+      "sha256": "d153a11543fd884b596587ccd97aebbeed950b26933ee000f94009f1ab142848",
+      "mtimeIso": "2026-10-26T03:07:36.852Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/compatibility/index.d.ts",
+      "bytes": 533,
+      "sha256": "21d819c173c0cf7cc3ce57c3276e77fd9a8a01d35a06ad87158781515c9a438a",
+      "mtimeIso": "2026-10-26T03:07:36.836Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/globals.typedarray.d.ts",
+      "bytes": 1825,
+      "sha256": "98cffbf06d6bab333473c70a893770dbe990783904002c4f1a960447b4b53dca",
+      "mtimeIso": "2026-10-26T03:07:36.548Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/buffer.buffer.d.ts",
+      "bytes": 22704,
+      "sha256": "ba481bca06f37d3f2c137ce343c7d5937029b2468f8e26111f3c9d9963d6568d",
+      "mtimeIso": "2026-10-26T03:07:36.272Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/globals.d.ts",
+      "bytes": 6114,
+      "sha256": "6d9ef24f9a22a88e3e9b3b3d8c40ab1ddb0853f1bfbd5c843c37800138437b61",
+      "mtimeIso": "2026-10-26T03:07:36.544Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/web-globals/abortcontroller.d.ts",
+      "bytes": 1145,
+      "sha256": "1db0b7dca579049ca4193d034d835f6bfe73096c73663e5ef9a0b5779939f3d0",
+      "mtimeIso": "2026-10-26T03:07:36.924Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/web-globals/domexception.d.ts",
+      "bytes": 2565,
+      "sha256": "9798340ffb0d067d69b1ae5b32faa17ab31b82466a3fc00d8f2f2df0c8554aaa",
+      "mtimeIso": "2026-10-26T03:07:36.928Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/web-globals/events.d.ts",
+      "bytes": 2871,
+      "sha256": "f26b11d8d8e4b8028f1c7d618b22274c892e4b0ef5b3678a8ccbad85419aef43",
+      "mtimeIso": "2026-10-26T03:07:36.932Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/buffer/index.d.ts",
+      "bytes": 8755,
+      "sha256": "8e9c23ba78aabc2e0a27033f18737a6df754067731e69dc5f52823957d60a4b6",
+      "mtimeIso": "2026-10-26T03:07:36.272Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/header.d.ts",
+      "bytes": 133,
+      "sha256": "5929864ce17fba74232584d90cb721a89b7ad277220627cc97054ba15a98ea8f",
+      "mtimeIso": "2026-10-26T03:07:36.404Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/readable.d.ts",
+      "bytes": 1738,
+      "sha256": "763fe0f42b3d79b440a9b6e51e9ba3f3f91352469c1e4b3b67bfa4ff6352f3f4",
+      "mtimeIso": "2026-10-26T03:07:36.444Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/file.d.ts",
+      "bytes": 1707,
+      "sha256": "25c8056edf4314820382a5fdb4bb7816999acdcb929c8f75e3f39473b87e85bc",
+      "mtimeIso": "2026-10-26T03:07:36.360Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/fetch.d.ts",
+      "bytes": 5575,
+      "sha256": "c464d66b20788266e5353b48dc4aa6bc0dc4a707276df1e7152ab0c9ae21fad8",
+      "mtimeIso": "2026-10-26T03:07:36.356Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/formdata.d.ts",
+      "bytes": 4998,
+      "sha256": "78d0d27c130d35c60b5e5566c9f1e5be77caf39804636bc1a40133919a949f21",
+      "mtimeIso": "2026-10-26T03:07:36.380Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/connector.d.ts",
+      "bytes": 1029,
+      "sha256": "c6fd2c5a395f2432786c9cb8deb870b9b0e8ff7e22c029954fabdd692bff6195",
+      "mtimeIso": "2026-10-26T03:07:36.240Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/client.d.ts",
+      "bytes": 4964,
+      "sha256": "1d6e127068ea8e104a912e42fc0a110e2aa5a66a356a917a163e8cf9a65e4a75",
+      "mtimeIso": "2026-10-26T03:07:36.204Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/errors.d.ts",
+      "bytes": 4280,
+      "sha256": "5ded6427296cdf3b9542de4471d2aa8d3983671d4cac0f4bf9c637208d1ced43",
+      "mtimeIso": "2026-10-26T03:07:36.328Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/dispatcher.d.ts",
+      "bytes": 14222,
+      "sha256": "7f182617db458e98fc18dfb272d40aa2fff3a353c44a89b2c0ccb3937709bfb5",
+      "mtimeIso": "2026-10-26T03:07:36.300Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/global-dispatcher.d.ts",
+      "bytes": 276,
+      "sha256": "cadc8aced301244057c4e7e73fbcae534b0f5b12a37b150d80e5a45aa4bebcbd",
+      "mtimeIso": "2026-10-26T03:07:36.388Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/global-origin.d.ts",
+      "bytes": 175,
+      "sha256": "385aab901643aa54e1c36f5ef3107913b10d1b5bb8cbcd933d4263b80a0d7f20",
+      "mtimeIso": "2026-10-26T03:07:36.392Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/pool-stats.d.ts",
+      "bytes": 669,
+      "sha256": "9670d44354bab9d9982eca21945686b5c24a3f893db73c0dae0fd74217a4c219",
+      "mtimeIso": "2026-10-26T03:07:36.436Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/pool.d.ts",
+      "bytes": 1336,
+      "sha256": "0b8a9268adaf4da35e7fa830c8981cfa22adbbe5b3f6f5ab91f6658899e657a7",
+      "mtimeIso": "2026-10-26T03:07:36.440Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/handlers.d.ts",
+      "bytes": 447,
+      "sha256": "11396ed8a44c02ab9798b7dca436009f866e8dae3c9c25e8c1fbc396880bf1bb",
+      "mtimeIso": "2026-10-26T03:07:36.400Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/balanced-pool.d.ts",
+      "bytes": 961,
+      "sha256": "ba7bc87d01492633cb5a0e5da8a4a42a1c86270e7b3d2dea5d156828a84e4882",
+      "mtimeIso": "2026-10-26T03:07:36.156Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/agent.d.ts",
+      "bytes": 1065,
+      "sha256": "4893a895ea92c85345017a04ed427cbd6a1710453338df26881a6019432febdd",
+      "mtimeIso": "2026-10-26T03:07:36.116Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/mock-interceptor.d.ts",
+      "bytes": 3902,
+      "sha256": "c21dc52e277bcfc75fac0436ccb75c204f9e1b3fa5e12729670910639f27343e",
+      "mtimeIso": "2026-10-26T03:07:36.428Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/mock-agent.d.ts",
+      "bytes": 2535,
+      "sha256": "13f6f39e12b1518c6650bbb220c8985999020fe0f21d818e28f512b7771d00f9",
+      "mtimeIso": "2026-10-26T03:07:36.419Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/mock-client.d.ts",
+      "bytes": 1002,
+      "sha256": "9b5369969f6e7175740bf51223112ff209f94ba43ecd3bb09eefff9fd675624a",
+      "mtimeIso": "2026-10-26T03:07:36.420Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/mock-pool.d.ts",
+      "bytes": 974,
+      "sha256": "4fe9e626e7164748e8769bbf74b538e09607f07ed17c2f20af8d680ee49fc1da",
+      "mtimeIso": "2026-10-26T03:07:36.428Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/mock-errors.d.ts",
+      "bytes": 338,
+      "sha256": "24515859bc0b836719105bb6cc3d68255042a9f02a6022b3187948b204946bd2",
+      "mtimeIso": "2026-10-26T03:07:36.424Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/proxy-agent.d.ts",
+      "bytes": 780,
+      "sha256": "ea0148f897b45a76544ae179784c95af1bd6721b8610af9ffa467a518a086a43",
+      "mtimeIso": "2026-10-26T03:07:36.440Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/env-http-proxy-agent.d.ts",
+      "bytes": 675,
+      "sha256": "24c6a117721e606c9984335f71711877293a9651e44f59f3d21c1ea0856f9cc9",
+      "mtimeIso": "2026-10-26T03:07:36.320Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/retry-handler.d.ts",
+      "bytes": 2983,
+      "sha256": "dd3273ead9fbde62a72949c97dbec2247ea08e0c6952e701a483d74ef92d6a17",
+      "mtimeIso": "2026-10-26T03:07:36.452Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/retry-agent.d.ts",
+      "bytes": 232,
+      "sha256": "405822be75ad3e4d162e07439bac80c6bcc6dbae1929e179cf467ec0b9ee4e2e",
+      "mtimeIso": "2026-10-26T03:07:36.448Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/api.d.ts",
+      "bytes": 1455,
+      "sha256": "0db18c6e78ea846316c012478888f33c11ffadab9efd1cc8bcc12daded7a60b6",
+      "mtimeIso": "2026-10-26T03:07:36.140Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/interceptors.d.ts",
+      "bytes": 922,
+      "sha256": "e61be3f894b41b7baa1fbd6a66893f2579bfad01d208b4ff61daef21493ef0a8",
+      "mtimeIso": "2026-10-26T03:07:36.412Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/util.d.ts",
+      "bytes": 623,
+      "sha256": "bd0532fd6556073727d28da0edfd1736417a3f9f394877b6d5ef6ad88fba1d1a",
+      "mtimeIso": "2026-10-26T03:07:36.456Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/cookies.d.ts",
+      "bytes": 635,
+      "sha256": "89167d696a849fce5ca508032aabfe901c0868f833a8625d5a9c6e861ef935d2",
+      "mtimeIso": "2026-10-26T03:07:36.264Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/patch.d.ts",
+      "bytes": 691,
+      "sha256": "615ba88d0128ed16bf83ef8ccbb6aff05c3ee2db1cc0f89ab50a4939bfc1943f",
+      "mtimeIso": "2026-10-26T03:07:36.432Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/websocket.d.ts",
+      "bytes": 3840,
+      "sha256": "a4d551dbf8746780194d550c88f26cf937caf8d56f102969a110cfaed4b06656",
+      "mtimeIso": "2026-10-26T03:07:36.460Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/eventsource.d.ts",
+      "bytes": 1648,
+      "sha256": "8bd86b8e8f6a6aa6c49b71e14c4ffe1211a0e97c80f08d2c8cc98838006e4b88",
+      "mtimeIso": "2026-10-26T03:07:36.344Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/filereader.d.ts",
+      "bytes": 1433,
+      "sha256": "317e63deeb21ac07f3992f5b50cdca8338f10acd4fbb7257ebf56735bf52ab00",
+      "mtimeIso": "2026-10-26T03:07:36.368Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/diagnostics-channel.d.ts",
+      "bytes": 1579,
+      "sha256": "4732aec92b20fb28c5fe9ad99521fb59974289ed1e45aecb282616202184064f",
+      "mtimeIso": "2026-10-26T03:07:36.276Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/content-type.d.ts",
+      "bytes": 561,
+      "sha256": "2e85db9e6fd73cfa3d7f28e0ab6b55417ea18931423bd47b409a96e4a169e8e6",
+      "mtimeIso": "2026-10-26T03:07:36.252Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/cache.d.ts",
+      "bytes": 1251,
+      "sha256": "c46e079fe54c76f95c67fb89081b3e399da2c7d109e7dca8e4b58d83e332e605",
+      "mtimeIso": "2026-10-26T03:07:36.176Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/undici-types/index.d.ts",
+      "bytes": 3387,
+      "sha256": "bf67d53d168abc1298888693338cb82854bdb2e69ef83f8a0092093c2d562107",
+      "mtimeIso": "2026-10-26T03:07:36.408Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/web-globals/fetch.d.ts",
+      "bytes": 2700,
+      "sha256": "b52476feb4a0cbcb25e5931b930fc73cb6643fb1a5060bf8a3dda0eeae5b4b68",
+      "mtimeIso": "2026-10-26T03:07:36.936Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/assert.d.ts",
+      "bytes": 44590,
+      "sha256": "e2677634fe27e87348825bb041651e22d50a613e2fdf6a4a3ade971d71bac37e",
+      "mtimeIso": "2026-10-26T03:07:36.172Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/assert/strict.d.ts",
+      "bytes": 201,
+      "sha256": "7394959e5a741b185456e1ef5d64599c36c60a323207450991e7a42e08911419",
+      "mtimeIso": "2026-10-26T03:07:36.835Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/async_hooks.d.ts",
+      "bytes": 25601,
+      "sha256": "8c0bcd6c6b67b4b503c11e91a1fb91522ed585900eab2ab1f61bba7d7caa9d6f",
+      "mtimeIso": "2026-10-26T03:07:36.212Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/buffer.d.ts",
+      "bytes": 88372,
+      "sha256": "8cd19276b6590b3ebbeeb030ac271871b9ed0afc3074ac88a94ed2449174b776",
+      "mtimeIso": "2026-10-26T03:07:36.332Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/child_process.d.ts",
+      "bytes": 66686,
+      "sha256": "696eb8d28f5949b87d894b26dc97318ef944c794a9a4e4f62360cd1d1958014b",
+      "mtimeIso": "2026-10-26T03:07:36.368Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/cluster.d.ts",
+      "bytes": 27918,
+      "sha256": "3f8fa3061bd7402970b399300880d55257953ee6d3cd408722cb9ac20126460c",
+      "mtimeIso": "2026-10-26T03:07:36.388Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/console.d.ts",
+      "bytes": 21255,
+      "sha256": "35ec8b6760fd7138bbf5809b84551e31028fb2ba7b6dc91d95d098bf212ca8b4",
+      "mtimeIso": "2026-10-26T03:07:36.396Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/constants.d.ts",
+      "bytes": 816,
+      "sha256": "5524481e56c48ff486f42926778c0a3cce1cc85dc46683b92b1271865bcf015a",
+      "mtimeIso": "2026-10-26T03:07:36.404Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/crypto.d.ts",
+      "bytes": 196548,
+      "sha256": "68bd56c92c2bd7d2339457eb84d63e7de3bd56a69b25f3576e1568d21a162398",
+      "mtimeIso": "2026-10-26T03:07:36.448Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/dgram.d.ts",
+      "bytes": 27968,
+      "sha256": "3e93b123f7c2944969d291b35fed2af79a6e9e27fdd5faa99748a51c07c02d28",
+      "mtimeIso": "2026-10-26T03:07:36.456Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/diagnostics_channel.d.ts",
+      "bytes": 25227,
+      "sha256": "9d19808c8c291a9010a6c788e8532a2da70f811adb431c97520803e0ec649991",
+      "mtimeIso": "2026-10-26T03:07:36.468Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/dns.d.ts",
+      "bytes": 35556,
+      "sha256": "87aad3dd9752067dc875cfaa466fc44246451c0c560b820796bdd528e29bef40",
+      "mtimeIso": "2026-10-26T03:07:36.484Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/dns/promises.d.ts",
+      "bytes": 20383,
+      "sha256": "4aacb0dd020eeaef65426153686cc639a78ec2885dc72ad220be1d25f1a439df",
+      "mtimeIso": "2026-10-26T03:07:36.856Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/domain.d.ts",
+      "bytes": 7815,
+      "sha256": "f0bd7e6d931657b59605c44112eaf8b980ba7f957a5051ed21cb93d978cf2f45",
+      "mtimeIso": "2026-10-26T03:07:36.492Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/events.d.ts",
+      "bytes": 44280,
+      "sha256": "8db0ae9cb14d9955b14c214f34dae1b9ef2baee2fe4ce794a4cd3ac2531e3255",
+      "mtimeIso": "2026-10-26T03:07:36.508Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/fs.d.ts",
+      "bytes": 188318,
+      "sha256": "15fc6f7512c86810273af28f224251a5a879e4261b4d4c7e532abfbfc3983134",
+      "mtimeIso": "2026-10-26T03:07:36.544Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/fs/promises.d.ts",
+      "bytes": 55422,
+      "sha256": "58adba1a8ab2d10b54dc1dced4e41f4e7c9772cbbac40939c0dc8ce2cdb1d442",
+      "mtimeIso": "2026-10-26T03:07:36.864Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/http.d.ts",
+      "bytes": 91413,
+      "sha256": "4b34bdb6f29a4347b7db9c0f8622686035fe25adb1c9e927acd8d22a2cbb6ccb",
+      "mtimeIso": "2026-10-26T03:07:36.572Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/http2.d.ts",
+      "bytes": 129289,
+      "sha256": "714435130b9015fae551788df2a88038471a5a11eb471f27c4ede86552842bc9",
+      "mtimeIso": "2026-10-26T03:07:36.600Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/https.d.ts",
+      "bytes": 25837,
+      "sha256": "855cd5f7eb396f5f1ab1bc0f8580339bff77b68a770f84c6b254e319bbfd1ac7",
+      "mtimeIso": "2026-10-26T03:07:36.608Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/inspector.generated.d.ts",
+      "bytes": 197533,
+      "sha256": "5650cf3dace09e7c25d384e3e6b818b938f68f4e8de96f52d9c5a1b3db068e86",
+      "mtimeIso": "2026-10-26T03:07:36.644Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/module.d.ts",
+      "bytes": 23396,
+      "sha256": "1354ca5c38bd3fd3836a68e0f7c9f91f172582ba30ab15bb8c075891b91502b7",
+      "mtimeIso": "2026-10-26T03:07:36.648Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/net.d.ts",
+      "bytes": 46870,
+      "sha256": "27fdb0da0daf3b337c5530c5f266efe046a6ceb606e395b346974e4360c36419",
+      "mtimeIso": "2026-10-26T03:07:36.656Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/os.d.ts",
+      "bytes": 19443,
+      "sha256": "2d2fcaab481b31a5882065c7951255703ddbe1c0e507af56ea42d79ac3911201",
+      "mtimeIso": "2026-10-26T03:07:36.664Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/path.d.ts",
+      "bytes": 8337,
+      "sha256": "a192fe8ec33f75edbc8d8f3ed79f768dfae11ff5735e7fe52bfa69956e46d78d",
+      "mtimeIso": "2026-10-26T03:07:36.668Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/perf_hooks.d.ts",
+      "bytes": 38089,
+      "sha256": "ca867399f7db82df981d6915bcbb2d81131d7d1ef683bc782b59f71dda59bc85",
+      "mtimeIso": "2026-10-26T03:07:36.676Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/process.d.ts",
+      "bytes": 98931,
+      "sha256": "372413016d17d804e1d139418aca0c68e47a83fb6669490857f4b318de8cccb3",
+      "mtimeIso": "2026-10-26T03:07:36.688Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/punycode.d.ts",
+      "bytes": 5482,
+      "sha256": "9e043a1bc8fbf2a255bccf9bf27e0f1caf916c3b0518ea34aa72357c0afd42ec",
+      "mtimeIso": "2026-10-26T03:07:36.692Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/querystring.d.ts",
+      "bytes": 7128,
+      "sha256": "b4f70ec656a11d570e1a9edce07d118cd58d9760239e2ece99306ee9dfe61d02",
+      "mtimeIso": "2026-10-26T03:07:36.696Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/readline.d.ts",
+      "bytes": 25921,
+      "sha256": "3bc2f1e2c95c04048212c569ed38e338873f6a8593930cf5a7ef24ffb38fc3b6",
+      "mtimeIso": "2026-10-26T03:07:36.700Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/readline/promises.d.ts",
+      "bytes": 6456,
+      "sha256": "6e70e9570e98aae2b825b533aa6292b6abd542e8d9f6e9475e88e1d7ba17c866",
+      "mtimeIso": "2026-10-26T03:07:36.872Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/repl.d.ts",
+      "bytes": 19510,
+      "sha256": "f9d9d753d430ed050dc1bf2667a1bab711ccbb1c1507183d794cc195a5b085cc",
+      "mtimeIso": "2026-10-26T03:07:36.708Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/sea.d.ts",
+      "bytes": 6207,
+      "sha256": "9eece5e586312581ccd106d4853e861aaaa1a39f8e3ea672b8c3847eedd12f6e",
+      "mtimeIso": "2026-10-26T03:07:36.708Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/stream.d.ts",
+      "bytes": 85558,
+      "sha256": "47ab634529c5955b6ad793474ae188fce3e6163e3a3fb5edd7e0e48f14435333",
+      "mtimeIso": "2026-10-26T03:07:36.720Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/stream/promises.d.ts",
+      "bytes": 2971,
+      "sha256": "37ba7b45141a45ce6e80e66f2a96c8a5ab1bcef0fc2d0f56bb58df96ec67e972",
+      "mtimeIso": "2026-10-26T03:07:36.888Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/stream/consumers.d.ts",
+      "bytes": 1619,
+      "sha256": "45650f47bfb376c8a8ed39d4bcda5902ab899a3150029684ee4c10676d9fbaee",
+      "mtimeIso": "2026-10-26T03:07:36.880Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/stream/web.d.ts",
+      "bytes": 25437,
+      "sha256": "fad4e3c207fe23922d0b2d06b01acbfb9714c4f2685cf80fd384c8a100c82fd0",
+      "mtimeIso": "2026-10-26T03:07:36.896Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/string_decoder.d.ts",
+      "bytes": 2812,
+      "sha256": "74cf591a0f63db318651e0e04cb55f8791385f86e987a67fd4d2eaab8191f730",
+      "mtimeIso": "2026-10-26T03:07:36.728Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/test.d.ts",
+      "bytes": 82395,
+      "sha256": "5eab9b3dc9b34f185417342436ec3f106898da5f4801992d8ff38ab3aff346b5",
+      "mtimeIso": "2026-10-26T03:07:36.740Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/timers.d.ts",
+      "bytes": 14568,
+      "sha256": "12ed4559eba17cd977aa0db658d25c4047067444b51acfdcbf38470630642b23",
+      "mtimeIso": "2026-10-26T03:07:36.744Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/timers/promises.d.ts",
+      "bytes": 3780,
+      "sha256": "f3ffabc95802521e1e4bcba4c88d8615176dc6e09111d920c7a213bdda6e1d65",
+      "mtimeIso": "2026-10-26T03:07:36.900Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/tls.d.ts",
+      "bytes": 59378,
+      "sha256": "809821b8a065e3234a55b3a9d7846231ed18d66dd749f2494c66288d890daf7f",
+      "mtimeIso": "2026-10-26T03:07:36.760Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/trace_events.d.ts",
+      "bytes": 8929,
+      "sha256": "ae56f65caf3be91108707bd8dfbccc2a57a91feb5daabf7165a06a945545ed26",
+      "mtimeIso": "2026-10-26T03:07:36.768Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/tty.d.ts",
+      "bytes": 10056,
+      "sha256": "a136d5de521da20f31631a0a96bf712370779d1c05b7015d7019a9b2a0446ca9",
+      "mtimeIso": "2026-10-26T03:07:36.776Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/url.d.ts",
+      "bytes": 42470,
+      "sha256": "c3b41e74b9a84b88b1dca61ec39eee25c0dbc8e7d519ba11bb070918cfacf656",
+      "mtimeIso": "2026-10-26T03:07:36.780Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/util.d.ts",
+      "bytes": 89927,
+      "sha256": "4737a9dc24d0e68b734e6cfbcea0c15a2cfafeb493485e27905f7856988c6b29",
+      "mtimeIso": "2026-10-26T03:07:36.794Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/v8.d.ts",
+      "bytes": 34873,
+      "sha256": "36d8d3e7506b631c9582c251a2c0b8a28855af3f76719b12b534c6edf952748d",
+      "mtimeIso": "2026-10-26T03:07:36.800Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/vm.d.ts",
+      "bytes": 46095,
+      "sha256": "1ca69210cc42729e7ca97d3a9ad48f2e9cb0042bada4075b588ae5387debd318",
+      "mtimeIso": "2026-10-26T03:07:36.812Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/wasi.d.ts",
+      "bytes": 7942,
+      "sha256": "f5ebe66baaf7c552cfa59d75f2bfba679f329204847db3cec385acda245e574e",
+      "mtimeIso": "2026-10-26T03:07:36.818Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/worker_threads.d.ts",
+      "bytes": 35148,
+      "sha256": "ed59add13139f84da271cafd32e2171876b0a0af2f798d0c663e8eeb867732cf",
+      "mtimeIso": "2026-10-26T03:07:36.824Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/zlib.d.ts",
+      "bytes": 20857,
+      "sha256": "05db535df8bdc30d9116fe754a3473d1b6479afbc14ae8eb18b605c62677d518",
+      "mtimeIso": "2026-10-26T03:07:36.828Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/node_modules/@types/node/index.d.ts",
+      "bytes": 3967,
+      "sha256": "b1810689b76fd473bd12cc9ee219f8e62f54a7d08019a235d07424afbf074d25",
+      "mtimeIso": "2026-10-26T03:07:36.612Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/tsconfig.ofs10.json",
+      "bytes": 511,
+      "sha256": "84b7a2f520d43e4ea1cd364db6ad6e0f695a6358b8b506d769be65d0c2255fa0",
+      "mtimeIso": "2026-10-26T09:04:34.943Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/tsconfig.json",
+      "bytes": 809,
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+      "mtimeIso": "2026-10-26T03:06:44.137Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/vitest.config.ts",
+      "bytes": 521,
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "mtimeIso": "2026-10-26T03:06:44.138Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/package.json",
+      "bytes": 7246,
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+      "mtimeIso": "2026-10-26T03:06:43.925Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/package-lock.json",
+      "bytes": 245999,
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "mtimeIso": "2026-10-26T03:06:43.925Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/README.md",
+      "bytes": 1230,
+      "sha256": "d8d408c095ec08d78e2047798c908f205cfaa5928006f5d9b53cde02ecd2fc69",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/administration-sidecar.prepared.json",
+      "bytes": 938,
+      "sha256": "2a33f3102338fe8fa3be05a99f85d41069f1ae6e1a64eb2776f28f219ab6044b",
+      "mtimeIso": "2026-10-26T08:59:49.046Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/administration.md",
+      "bytes": 1280,
+      "sha256": "cc79974acf61cab63588b87fd0caa1e8d0865ff40851b6b0a9298199bef33443",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/bilingual-content.json",
+      "bytes": 7860,
+      "sha256": "25d8a5d9463241b3e76e166a59a2b61201f64c99f271c1454e50caf572242fc6",
+      "mtimeIso": "2026-10-26T08:59:49.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/parameter-plan.json",
+      "bytes": 449,
+      "sha256": "2eb0596a81d95fab3cb8958bdd94380b286c325bcaba94e02861dd5d8603c814",
+      "mtimeIso": "2026-10-26T08:59:49.046Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/references.md",
+      "bytes": 3204,
+      "sha256": "e8b98a16e436639ecc1f10e81d58c0bb8ab78c63d10303f73543e3c2ff58b90e",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/scoring-and-parameters.md",
+      "bytes": 2410,
+      "sha256": "69c0f5ba461421333d7180393cba839c0e5774b09b0cf1ad1543644cee4679c9",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/tags.md",
+      "bytes": 3508,
+      "sha256": "05d7affd36429c5edd71ce81015e1a3cee80c0943fa1111b6c714729991d0aaa",
+      "mtimeIso": "2026-10-26T09:02:58.083Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/docs/scale-instruments/research-drafts/ofs10/1.0.0/take-home-message.md",
+      "bytes": 79,
+      "sha256": "80a12b91431c9cb94f2453b6a50d1bd3106bef414213f04b990b9495a5510467",
+      "mtimeIso": "2026-10-26T09:02:58.078Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "bytes": 2478,
+      "sha256": "91cfc76c9b03d5305e47607ac3478561c1ad344c6cd6d61025db888aa65c9372",
+      "mtimeIso": "2026-10-26T08:59:49.045Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-evidence/20261026-candidate-review/ofs10/official-12955_2018_889_MOESM1_ESM.docx",
+      "bytes": 22731,
+      "sha256": "305d93d48fbf5c40d59dff2e8a977ca46b10be5e435dde73f47cc2d0c0aad500",
+      "mtimeIso": "2026-10-26T08:22:33.373Z"
+    },
+    {
+      "path": "/workspace/eduk12-scale-evidence/20261026-candidate-review/ofs10/official-12955_2018_889_MOESM2_ESM.docx",
+      "bytes": 17019,
+      "sha256": "13e525cc17b8336d53001605f14472a007915d8ac5328ad3321569098ca90f52",
+      "mtimeIso": "2026-10-26T08:22:33.591Z"
+    }
+  ]
+}

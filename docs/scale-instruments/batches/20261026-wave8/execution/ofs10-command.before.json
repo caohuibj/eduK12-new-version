@@ -1,0 +1,28 @@
+{
+  "startedAt": "2026-10-26T09:04:35.079064+00:00",
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "commands": {
+    "unit": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/unit.reporter.json"
+    ],
+    "types": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/tsconfig.ofs10.json",
+      "--pretty",
+      "false"
+    ]
+  },
+  "unitAdditionalEnv": {
+    "OFS10_REPORT_EVIDENCE_PATH": "/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/reports.synthetic.json"
+  },
+  "noDatabase": true,
+  "noCI": true
+}

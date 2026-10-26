@@ -1,0 +1,24 @@
+{
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "commands": {
+    "unit": [
+      "node",
+      "--import",
+      "tsx",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/scale/instruments/socs_s20_2023_zh_cn.test.ts",
+      "--reporter=json",
+      "--outputFile=/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.vitest.json",
+      "--maxWorkers=1"
+    ],
+    "types": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--project",
+      "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/tsconfig.socs_s20.json"
+    ]
+  },
+  "listingExitCode": 0,
+  "node": "v24.21.0"
+}

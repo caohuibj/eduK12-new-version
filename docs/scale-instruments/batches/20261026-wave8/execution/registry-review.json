@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "registryIdentities": 115,
+  "unique": true,
+  "oldSourceFilesUnchanged": 92,
+  "selected": [
+    {
+      "identity": {
+        "instrumentKey": "ofs10_zh_cn_research",
+        "instrumentVersion": "1.0.0"
+      },
+      "status": "PASS",
+      "tagCount": 66,
+      "axisTagCounts": {
+        "domain": 2,
+        "construct": 8,
+        "orientation": 4,
+        "population": 6,
+        "response": 10,
+        "use": 7,
+        "license": 7,
+        "language_validation": 10
+      },
+      "reportVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "independentParameterVersion": null,
+      "activation": "NOTRUN"
+    },
+    {
+      "identity": {
+        "instrumentKey": "socs_s20_2023_zh_cn",
+        "instrumentVersion": "1.0.0"
+      },
+      "status": "PASS",
+      "tagCount": 60,
+      "axisTagCounts": {
+        "domain": 3,
+        "construct": 9,
+        "orientation": 5,
+        "population": 5,
+        "response": 9,
+        "use": 6,
+        "license": 6,
+        "language_validation": 6
+      },
+      "reportVersion": "1.0.0",
+      "parameterPolicy": {
+        "type": "none"
+      },
+      "independentParameterVersion": null,
+      "activation": "NOTRUN"
+    }
+  ],
+  "ciExecuted": false
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/tsconfig.ofs10.json",
+    "--pretty",
+    "false"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "finishedAt": "2026-10-26T09:04:37.120211+00:00",
+  "exitCode": 0
+}

@@ -1,0 +1,16 @@
+[stdin]:11
+const paths=[...new Set([...all,cfg,backend+'/tsconfig.json',backend+'/vitest.config.ts',backend+'/package.json',backend+'/package-lock.json',...fs.readdirSync(docs).map(f=>docs+'/'+f),...fs.readdirSync(sourceDir).map(f=>sourceDir+'/'+f),'/workspace/eduk12-scale-evidence/20261026-candidate-review/ofs10/official-12955_2018_889_MOESM1_ESM.docx','/workspace/eduk12-scale-evidence/20261026-candidate-review/ofs10/official-12955_2018_889_MOESM2_ESM.docx'])]];
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+Expected a semicolon
+
+SyntaxError: Unexpected token ']'
+    at makeContextifyScript (node:internal/vm:194:14)
+    at compileScript (node:internal/process/execution:388:10)
+    at evalTypeScript (node:internal/process/execution:260:22)
+    at node:internal/main/eval_stdin:51:5
+    at Socket.<anonymous> (node:internal/process/execution:205:5)
+    at Socket.emit (node:events:526:24)
+    at endReadableNT (node:internal/streams/readable:1764:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+Node.js v24.21.0

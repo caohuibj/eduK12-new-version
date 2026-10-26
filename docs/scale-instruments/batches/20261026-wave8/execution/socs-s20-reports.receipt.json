@@ -1,0 +1,13 @@
+{
+  "startedAt": "2026-10-26T09:06:13.635298+00:00",
+  "endedAt": "2026-10-26T09:06:13.969516+00:00",
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/build-reports.ts"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "exitCode": 0,
+  "inputChangedDuringExecution": []
+}

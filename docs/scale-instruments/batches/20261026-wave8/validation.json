@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DRAFT_DEVELOPMENT_NOT_CI_OR_PUBLICATION",
+  "baseline": "24b826421e0546b8eb3f37fb02e2844218ade023",
+  "newFirstCategoryTools": 2,
+  "newFirstCategorySourceVersions": 2,
+  "newSecondCategoryArchives": 0,
+  "newThirdCategoryArchives": 0,
+  "completeInstrumentPackages": 2,
+  "actualSourceRegistryPackages": 2,
+  "unitStatus": "PASS",
+  "uniqueUnitCases": 38,
+  "unitByTool": {
+    "OFS10": 20,
+    "SOCS-S20": 18
+  },
+  "typesStatus": "PASS_AFFECTED_CLOSURES",
+  "inputBindingLimitation": "OFS initial capture failed; source/test reviewed after execution, not prebound. SOCS captured before execution. No retroactive signature or test rerun.",
+  "database": {
+    "status": "PASS",
+    "uniqueCases": 12,
+    "role": "scale_app",
+    "nonOwner": true,
+    "restoredOldDefinitions": 12,
+    "restoredOldSnapshots": 14,
+    "finalDefinitions": 14,
+    "finalSnapshots": 16,
+    "newRows": 2,
+    "allDraftHidden": true,
+    "references": 0,
+    "deployments": 0,
+    "productionTouched": false
+  },
+  "reports": {
+    "configs": 2,
+    "distinctGoldenResultSamples": 16,
+    "complete": 12,
+    "missingOrEmptyInvalid": 4,
+    "interpretationSections": 37,
+    "scoreDependentBands": false,
+    "duplicateAgentSamplesNotAddedToCount": true
+  },
+  "registry": {
+    "identities": 115,
+    "oldSourceFilesUnchanged": 92,
+    "OFS10tags": 66,
+    "SOCSS20tags": 60,
+    "eightAxesBoth": true
+  },
+  "formalActivation": 0,
+  "doubleEntryUse": "NOTRUN",
+  "browser": "NOTRUN",
+  "CI": "NOTRUN",
+  "deployment": "NOTRUN",
+  "independentNoneParameterVersion": "NOT_SUPPORTED_IN_RUNTIME; document plan only",
+  "instructions": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "review": "Coordinator content/report/input review; management independent final review pending exact commit",
+  "sourceCommit": "a79d749d618045bb32bb73371b5313c9c9f6a6ca",
+  "commits": {
+    "OFS10": "70e221d7f606e653abd209d38832884befb54c08",
+    "SOCSS20": "a79d749d618045bb32bb73371b5313c9c9f6a6ca"
+  },
+  "sourceInventory": {
+    "addedExecutableSourceVersions": 58,
+    "distinctToolIdentities": 54,
+    "notIndependentConstructsOrActivatedTools": true
+  },
+  "historicalFailures": [
+    {
+      "stage": "OFS pre-execution capture",
+      "status": "FAIL_RETAINED; actual unit/types pass; post-execution input review disclosed"
+    },
+    {
+      "stage": "First OFS local readback helper",
+      "status": "FAIL_REPAIRED_NARROWLY; explicit branch fetch updated FETCH_HEAD, not configured tracking ref; same downloaded immutable objects reused"
+    }
+  ]
+}

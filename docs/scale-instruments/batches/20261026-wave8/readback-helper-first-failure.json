@@ -1,0 +1,10 @@
+{
+  "status": "FAIL",
+  "stage": "local remote-tracking assumption after successful fetch",
+  "cause": "Explicit branch fetch wrote FETCH_HEAD but did not update configured origin tracking ref; assert expected new tracking ref failed before any HEAD update",
+  "remoteCommit": "70e221d7f606e653abd209d38832884befb54c08",
+  "remoteHeadAndCommitTreeAlreadyReadBack": true,
+  "fix": "Validate exact FETCH_HEAD from actual remote transfer and guard local tracking-ref update against old expected commit; reuse already fetched immutable objects",
+  "sourceTestsRepeated": false,
+  "atUtc": "2026-10-26T09:16:15.239769+00:00"
+}

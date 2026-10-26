@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave8-reviewed-content-20261026",
+  "sources": [
+    {
+      "instrumentKey": "ofs10_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f"
+    },
+    {
+      "instrumentKey": "socs_s20_2023_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "b45dbbc08b95535517cb0c724a802c8a48e7af04f6c96aaab9847538cddbdebe"
+    }
+  ]
+}

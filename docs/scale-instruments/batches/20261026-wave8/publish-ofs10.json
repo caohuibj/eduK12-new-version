@@ -1,0 +1,121 @@
+{
+  "parent": "24b826421e0546b8eb3f37fb02e2844218ade023",
+  "commit": "70e221d7f606e653abd209d38832884befb54c08",
+  "tree": "2c5cd97595ebf5d3c0b5f1afa9e532148254d9a7",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T09:16:15.437634+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/README.md",
+      "remoteBlob": "ad5bc7c44487640ac4bfc5b44946bcaf1bbcc9c9",
+      "sha256": "d8d408c095ec08d78e2047798c908f205cfaa5928006f5d9b53cde02ecd2fc69",
+      "bytes": 1230
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration-sidecar.prepared.json",
+      "remoteBlob": "a907aad07df8aa3313a68c1aafe6601fbb8fb984",
+      "sha256": "2a33f3102338fe8fa3be05a99f85d41069f1ae6e1a64eb2776f28f219ab6044b",
+      "bytes": 938
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/administration.md",
+      "remoteBlob": "078ec5839932b99414c3d584dea54e73c7558df2",
+      "sha256": "cc79974acf61cab63588b87fd0caa1e8d0865ff40851b6b0a9298199bef33443",
+      "bytes": 1280
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/bilingual-content.json",
+      "remoteBlob": "2bbff80f224bec2e52e5bad3cb0540b21bfe0083",
+      "sha256": "25d8a5d9463241b3e76e166a59a2b61201f64c99f271c1454e50caf572242fc6",
+      "bytes": 7860
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/parameter-plan.json",
+      "remoteBlob": "bab138741b9ea39c60a795aadcdac5d2bbd3b551",
+      "sha256": "2eb0596a81d95fab3cb8958bdd94380b286c325bcaba94e02861dd5d8603c814",
+      "bytes": 449
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/references.md",
+      "remoteBlob": "aca786026a83422f15e8cc9c4da89902fdab5f3d",
+      "sha256": "e8b98a16e436639ecc1f10e81d58c0bb8ab78c63d10303f73543e3c2ff58b90e",
+      "bytes": 3204
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/report-example.md",
+      "remoteBlob": "c3a3caf3dd4cc5688bd0d1a0b293a77574d25a3b",
+      "sha256": "d43cbbace4790db93c195af049cdd0ef827ace7a1d56ba7adcd72fe500e03a31",
+      "bytes": 2461
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/report-results.synthetic.json",
+      "remoteBlob": "476163ab33d99b15594a264e7b16f30251e44b08",
+      "sha256": "ff0bb0085a39dd48665d64f9ab63ea28097d06ee6861a28db0874b4f48ce13fb",
+      "bytes": 49825
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "3c961e831d6ee9bba236adf3b5849fffc5ba7b85",
+      "sha256": "69c0f5ba461421333d7180393cba839c0e5774b09b0cf1ad1543644cee4679c9",
+      "bytes": 2410
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/tags.md",
+      "remoteBlob": "c3ce6242e1d529114e8de98cc241613cc9230536",
+      "sha256": "05d7affd36429c5edd71ce81015e1a3cee80c0943fa1111b6c714729991d0aaa",
+      "bytes": 3508
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/take-home-message.md",
+      "remoteBlob": "715e3d34728abf495a42be8cd197bc1f7c13b61a",
+      "sha256": "80a12b91431c9cb94f2453b6a50d1bd3106bef414213f04b990b9495a5510467",
+      "bytes": 79
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/validation.json",
+      "remoteBlob": "12588d6cb295a635201e5e97fba63252624a215f",
+      "sha256": "2d0f38bbec0dda2f4dca3cdf56816b06d486d0d5c9d4fcc77c6f92c5af3f37f9",
+      "bytes": 1249
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ofs10/1.0.0/validation.md",
+      "remoteBlob": "4c5231b1a013c8f946b03089e9dfb60a57bf6ba7",
+      "sha256": "c66954e81d6138967c754c6f3dbee326a866ccbf8ed5ebd5e32614514f67f321",
+      "bytes": 3237
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/ofs10_zh_cn_research.test.ts",
+      "remoteBlob": "fd3621f60758c3f0b2ffc04beface92b050e42e2",
+      "sha256": "f80a31934121b15a6967acc078e3df62f8089ad03af6d8ad278377b04d52eda8",
+      "bytes": 13467
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "155b88b9ceed50e19cee1f64645721e33feacd39",
+      "sha256": "91cfc76c9b03d5305e47607ac3478561c1ad344c6cd6d61025db888aa65c9372",
+      "bytes": 2478
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/instrument.ts",
+      "remoteBlob": "0eed070bb879576339c5a71afdf34c0026591fd3",
+      "sha256": "9d0a31071b0e2df3edc98c8c2945dc6e926a4be28e6158e042014b3895473498",
+      "bytes": 193
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ofs10_zh_cn_research/1.0.0/source.json",
+      "remoteBlob": "1879b6e7b7e413cc2b03f41ebf2c1c3a3ce83691",
+      "sha256": "18e787244051ad737921fe3b9aba6df3bdd251d7cd3b8e8e88cd1e1f5bd97a4f",
+      "bytes": 34263
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "c5c01d7c32c0c822f4407e0ae5e5fdf3cc032983",
+      "sha256": "17531e71df768dacccbd8b590ff731a753055a75fd9c010517520c51d890a2ca",
+      "bytes": 14722
+    }
+  ]
+}

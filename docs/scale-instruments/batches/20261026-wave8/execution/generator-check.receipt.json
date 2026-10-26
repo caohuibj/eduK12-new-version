@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "--import",
+    "tsx",
+    "scripts/generate-scale-instruments.ts",
+    "--check"
+  ],
+  "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+  "startedAt": "2026-10-26T09:16:38.057720+00:00",
+  "finishedAt": "2026-10-26T09:16:38.161379+00:00",
+  "exitCode": 0,
+  "inputsManifestSha256": "dbab8b7ed3946cae0d6fb43e033ad380102809916bbf7a3ee305bd05f304e06f",
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

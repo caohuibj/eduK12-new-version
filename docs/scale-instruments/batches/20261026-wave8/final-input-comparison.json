@@ -1,0 +1,40 @@
+{
+  "kind": "POST_EXECUTION_FINAL_BYTE_COMPARISON_NOT_HISTORICAL_SIGNATURE",
+  "note": "OFS capture is explicitly post execution. Original registry has since added these two sources; both unit suites mock registry, final115-entry actual registry/type/PG evidence retained separately. Changed reviewer helpers are not execution inputs for the observed successful run.",
+  "comparisons": [
+    {
+      "label": "OFS-post",
+      "manifest": "/workspace/eduk12-scale-evidence/20261026-wave8/ofs10/inputs.post-execution.unsigned.json",
+      "fileCount": 340,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "label": "SOCS-pre",
+      "manifest": "/workspace/eduk12-scale-evidence/20261026-wave8/socs_s20/20261026T090530Z.inputs-before.json",
+      "fileCount": 566,
+      "changed": [
+        {
+          "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+          "executedOrReviewedSha256": "492a450666dbf3000a832ce95264e34f5e576dea9db46d8e3f3e2eef6ecd7b39",
+          "finalSha256": "42145e2c855f7cc693d3ba8c8e0fab153171f14f8a653358e3d8f3304be88204"
+        }
+      ],
+      "missing": []
+    },
+    {
+      "label": "final-PG-pre",
+      "manifest": "/workspace/eduk12-scale-evidence/20261026-wave8/coordinator/database-first/inputs.json",
+      "fileCount": 275,
+      "changed": [],
+      "missing": []
+    },
+    {
+      "label": "final-types-pre",
+      "manifest": "/workspace/eduk12-scale-evidence/20261026-wave8/coordinator/types-final/inputs.json",
+      "fileCount": 275,
+      "changed": [],
+      "missing": []
+    }
+  ]
+}
