@@ -99,7 +99,10 @@ describe('BPSES original final-five independent Chinese adult self-report DRAFT'
     expect(preview.sourceValidation.ok).toBe(true)
     expect(preview.allowActivation).toBe(false)
     expect(preview.blockers).toContain('EXECUTABLE_NOT_PUBLISHED')
-    expect(preview.blockers).toContain('AUTHORIZATION_MISSING')
+    // Authorization records are deliberately not a deployment gate (see
+    // policy/deployment.ts): an absent record must not block usage, so activation
+    // stays refused by release status and unfinished localization review instead.
+    expect(preview.blockers).toContain('LOCALIZATION_REVIEW_PENDING')
   })
   it('builds actual plain-language score-only Chinese reflection without diagnosis, rank, child-change promises or parent blame', () => {
     for (const fixture of pkg.goldenCases.filter(f => f.expected.quality === 'interpretable')) {

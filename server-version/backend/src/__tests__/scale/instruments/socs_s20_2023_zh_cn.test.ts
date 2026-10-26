@@ -100,7 +100,10 @@ describe('SOCS-S20 fixed Meng/Wang/Liu 2023 published Chinese research draft', (
     expect(preview.sourceValidation.ok).toBe(true)
     expect(preview.allowActivation).toBe(false)
     expect(preview.blockers).toContain('EXECUTABLE_NOT_PUBLISHED')
-    expect(preview.blockers).toContain('AUTHORIZATION_MISSING')
+    // Authorization records are deliberately not a deployment gate (see
+    // policy/deployment.ts): an absent record must not block usage, so activation
+    // stays refused by release status and unfinished localization review instead.
+    expect(preview.blockers).toContain('LOCALIZATION_REVIEW_PENDING')
   })
   it('builds actual six-part plain-language Chinese score-only reports without cutoffs or ranks', () => {
     for (const fixture of pkg.goldenCases.filter(f => f.expected.quality === 'interpretable')) {

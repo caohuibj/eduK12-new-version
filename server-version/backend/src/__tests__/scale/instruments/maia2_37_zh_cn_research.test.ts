@@ -88,7 +88,10 @@ describe('MAIA-2 adult 37-item fixed 2018 Table2 independent Chinese derivative'
     expect(preview.sourceValidation.ok).toBe(true)
     expect(preview.allowActivation).toBe(false)
     expect(preview.blockers).toContain('EXECUTABLE_NOT_PUBLISHED')
-    expect(preview.blockers).toContain('AUTHORIZATION_MISSING')
+    // Authorization records are deliberately not a deployment gate (see
+    // policy/deployment.ts): an absent record must not block usage, so activation
+    // stays refused by release status and unfinished localization review instead.
+    expect(preview.blockers).toContain('LOCALIZATION_REVIEW_PENDING')
   })
   it('builds eight actual plain-language score-only interpretations without rankings or foreign norms', () => {
     for (const fixture of pkg.goldenCases.filter(f => f.expected.quality === 'interpretable')) {
