@@ -14,4 +14,4 @@
 
 四个4题分维、两个8题综合维度、一个16题总和互相重叠，不能把七个分数再当独立量表相加。只有分数本身与生活化解释，`referencePolicy=none`，没有中文常模、临床阈值、百分位、分档。缺失则相应分数不可计，整体报告不解释；`complete_required`只是平台保守规则。
 
-固定版本：instrument 1.0.0 / scoring 1.0.0 / report 1.0.0 / localization 1.0.0 / catalog 1。
+固定版本：instrument 1.0.0 / scoring 1.0.0 / report 1.0.1 / localization 1.0.0 / catalog 1。

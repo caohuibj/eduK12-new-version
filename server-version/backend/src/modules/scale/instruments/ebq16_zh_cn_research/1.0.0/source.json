@@ -848,7 +848,7 @@
         ]
       },
       "report": {
-        "reportVersion": "1.0.0",
+        "reportVersion": "1.0.1",
         "primaryScoreKeys": [
           "general_controllability",
           "neg_usefulness",
@@ -1016,7 +1016,7 @@
           "locale": "zh-CN",
           "qcReview": {
             "reviewer": "AI-assisted item and report drafting (not human expert approval)",
-            "reviewedAt": "2026-10-26T01:50:00Z",
+            "reviewedAt": "2026-10-26T01:27:58.221Z",
             "basis": "Original author-published 16 English items, Stanford scoring PDF and GitHub mismatch checked, golden expectations independent arithmetic only. Not Vitest/DB/API or scientific approval. Student is technical report slot only."
           }
         }
