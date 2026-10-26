@@ -197,7 +197,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
           {formal&&<section className="ht-task ht-practice-form" aria-label="活动预制表单">
             {!currentInvite?<p className="ht-empty">无法读取此活动的预制表单，请联系组织者核实活动授权。</p>:formError?<div role="alert" className="ht-notice"><p>实践表单暂时无法读取：{formError}</p><button disabled={busy} onClick={()=>setFormReload(value=>value+1)}>重试实践表单</button></div>:!formLoaded?<p role="status">正在读取本活动的预制表单…</p>:!bound?<p className="ht-empty">本活动尚未配置预制表单，请联系组织者绑定已发布的实践表单。</p>:<>
               <p className="ht-muted">按表单逐页填写，最后一页由你确认正式提交。本表单不计分。</p>
-              <TaskForm purpose="HUITEACHER" advanceSingleChoiceFocus readOnly={busy||!editable}
+              <TaskForm purpose="HUITEACHER" readOnly={busy||!editable}
                 unit={{kind:'FORM',instrumentKey:bound.formId,title:bound.title,pages:bound.pages}}
                 answer={answers} onChange={(key,value)=>setFormAnswers(old=>({...old,[recordKey]:{...(old[recordKey]??{}),[key]:value}}))}
                 pageIndex={formPages[recordKey]??0} onPageChange={next=>setFormPages(old=>({...old,[recordKey]:next}))}/>

@@ -173,7 +173,7 @@ export function HuiteacherMyFormTasks({api,student=false,unified=false,onListSta
       {active.status==='COMPLETED'?<p role="status">本次评价已正式提交。</p>:
       <>
         <p>答案仅在本标签页短时暂存；按整份表单一次性提交。</p>
-        <TaskForm purpose="HUITEACHER" advanceSingleChoiceFocus
+        <TaskForm purpose="HUITEACHER"
           unit={{kind:'FORM',instrumentKey:active.formId,title:active.title,pages:active.pages}}
           answer={answers} onChange={updateAnswer} pageIndex={page}
           onPageChange={setPage}/>
