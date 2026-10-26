@@ -389,3 +389,25 @@ CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏�
 没有已批准的浏览器seed，不虚构科学批准。NFC10/HOLD、原Training范围和
 356-01仍按原表开放；普通ACK已走安全事务callback，旧atomic性能/SQL基线不再
 代表当前候选，只保留计划内单次cold/hot与SQL归因，不追加并发压测或新MOT。
+
+
+### 当前接线冻结（不是激活放行）
+
+| 项目 | 值 |
+| --- | --- |
+| 已提交接线锚点 | `dc915aa5822dcbf395c755a8ca37b6c3589e47a5` |
+| 锚点 tree | `bf005e5782c3d71cb224fc79ffa2c148ea8dab7b` |
+| base/main | `ff8471e529e7b3c56e1e20f17d1e2581040fc896` |
+| 完整差异 | 383路径＝342 source＋41逐名control，未使用目录白名单 |
+| 应用 tree | backend `ff7edd58e3824178075aaaf74730e2fa2367a5fe`；frontend `87590586f2902baf14f0a94e8d444ac9e4b2e7e8` |
+| bindings SHA-256 | `3dd02e6caaf9bc894d9f0e0944d42b26151317894a675e9b6bfc33672066e408` |
+| workflow SHA-256 | `cd7aefb80f7d9bda9b4f24addb22f84f8aef9336f7dc48740081aed5c4c3f723` |
+| 原件 | 当前376份可移植记录；原244行/25 reporter及来源关联保留 |
+| 实际执行 | 新控制直接契约、静态工作流/脚本、字节与严格版本核对；没有应用/PG/构建/扫描/浏览器/CI |
+| 放行 | B仍仅待审patch；所有phase/历史/SARIF策略pending；不得激活CI/Ready/合并/部署 |
+
+固定source映射、mode、两个组件及保护输入与58c43阶段相同。新增30个control
+只扩充精确文件名单；没有放宽SHA/tree检查。两项候选/拒绝定向契约已通过。
+锚点raw diff摘要来自锚点本身，不能冒充下一控制提交的raw diff摘要。
+提交后的完整HEAD/tree/父提交、远端PR/base/merge preview、工作树和全部376条
+bytes/SHA由后续只读实读在对话与PR描述交付，不在本文件伪造自引用SHA。

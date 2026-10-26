@@ -2253,6 +2253,26 @@
       "path": "/workspace/scratch/pr356-review-followup/workflow-static-contract.py",
       "sha256": "d5caf266f1d656deb345f148f39b4050b3007669ccb127578d4b458610575cc0",
       "rawBase64": "ZnJvbSBwYXRobGliIGltcG9ydCBQYXRoCmltcG9ydCBhc3QseWFtbCxyZSxqc29uLHN1YnByb2Nlc3MsaGFzaGxpYixkYXRldGltZSxzaGxleCxvcwpyb290PVBhdGgoJy93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uJyk7b3V0PVBhdGgoJy93b3Jrc3BhY2Uvc2NyYXRjaC9wcjM1Ni1yZXZpZXctZm9sbG93dXAnKTtyYXc9KHJvb3QvJy5naXRodWIvd29ya2Zsb3dzL2NpLnltbCcpLnJlYWRfYnl0ZXMoKTtkPXlhbWwuc2FmZV9sb2FkKHJhdyk7am9icz1kWydqb2JzJ107c2VsZWN0ZWQ9e2s6diBmb3Igayx2IGluIGpvYnMuaXRlbXMoKWlmIGsuc3RhcnRzd2l0aCgncHIzNTYtJykgb3IgayBpbiBbJ21lcmdlLWdhdGUnLCdzY29wZSddfTtzcGVjcz1bXTtzeW50YXg9W10KZm9yIG5hbWUsam9iIGluIHNlbGVjdGVkLml0ZW1zKCk6CiBmb3IgaSxzdGVwIGluIGVudW1lcmF0ZShqb2IuZ2V0KCdzdGVwcycsW10pKToKICBpZiAncnVuJ25vdCBpbiBzdGVwOmNvbnRpbnVlCiAgc2NyaXB0PXJlLnN1YihyJ1wkXHtcey4qP1x9XH0nLCcie30iJyxzdHIoc3RlcFsncnVuJ10pLGZsYWdzPXJlLlMpO3NoZWxsPXN0ZXAuZ2V0KCdzaGVsbCcsJ2Jhc2gnKQogIGlmIHNoZWxsLnN0YXJ0c3dpdGgoJ25vZGUnKTphcmd2PVsnbm9kZScsJy0tY2hlY2snLCctLWlucHV0LXR5cGU9Y29tbW9uanMnXQogIGVsaWYgc2hlbGwgaW4gKCdiYXNoJywnc2gnKTphcmd2PVsnYmFzaCcsJy1uJ10KICBlbHNlOmNvbnRpbnVlCiAgcD1zdWJwcm9jZXNzLnJ1bihhcmd2LGlucHV0PXNjcmlwdC5lbmNvZGUoKSxjd2Q9cm9vdCxzdGRvdXQ9c3VicHJvY2Vzcy5QSVBFLHN0ZGVycj1zdWJwcm9jZXNzLlNURE9VVCk7c3ludGF4LmFwcGVuZCh7J2pvYic6bmFtZSwnc3RlcCc6c3RlcC5nZXQoJ25hbWUnLGkpLCdjb21tYW5kJzphcmd2LCdleGl0Q29kZSc6cC5yZXR1cm5jb2RlLCdkaWFnbm9zdGljJzpwLnN0ZG91dC5kZWNvZGUoKX0pO2Fzc2VydCBwLnJldHVybmNvZGU9PTAsKG5hbWUsc3RlcC5nZXQoJ25hbWUnKSxwLnN0ZG91dC5kZWNvZGUoKSkKICBpZiBzaGVsbCBpbiAoJ2Jhc2gnLCdzaCcpOgogICBmb3IgbWF0Y2ggaW4gcmUuZmluZGl0ZXIociJweXRob24zXHMrLVxzKzw8XHMqWydcIl0/KFtBLVphLXpfXVtBLVphLXowLTlfXSopWydcIl0/XHMqXG4oLio/KVxuXDEoPzpcbnwkKSIsc2NyaXB0LHJlLlMpOmFzdC5wYXJzZShtYXRjaFsyXSk7c3ludGF4LmFwcGVuZCh7J2pvYic6bmFtZSwnc3RlcCc6c3RlcC5nZXQoJ25hbWUnLGkpLCdjb21tYW5kJzpbJ3B5dGhvbjMnLCdhc3QucGFyc2UnLCdoZXJlZG9jJ10sJ2V4aXRDb2RlJzowfSkKICAgZm9yIGxpbmUgaW4gc2NyaXB0LnNwbGl0bGluZXMoKToKICAgIGlmIGxpbmUubHN0cmlwKCkuc3RhcnRzd2l0aCgoJ25vZGUgLWUgJywnbm9kZSAtLWlucHV0LXR5cGU9JykpOgogICAgIHBhcnRzPXNobGV4LnNwbGl0KGxpbmUpO2l4PXBhcnRzLmluZGV4KCctZScpaWYnLWUnaW4gcGFydHMgZWxzZSAtMQogICAgIGlmIGl4Pj0wOgogICAgICBwPXN1YnByb2Nlc3MucnVuKFsnbm9kZScsJy0tY2hlY2snLCctLWlucHV0LXR5cGU9Y29tbW9uanMnXSxpbnB1dD1wYXJ0c1tpeCsxXS5lbmNvZGUoKSxzdGRvdXQ9c3VicHJvY2Vzcy5QSVBFLHN0ZGVycj1zdWJwcm9jZXNzLlNURE9VVCk7YXNzZXJ0IHAucmV0dXJuY29kZT09MCxwLnN0ZG91dC5kZWNvZGUoKTtzeW50YXguYXBwZW5kKHsnam9iJzpuYW1lLCdzdGVwJzpzdGVwLmdldCgnbmFtZScsaSksJ2NvbW1hbmQnOlsnbm9kZScsJy0tY2hlY2snLCdlbWJlZGRlZC1lJ10sJ2V4aXRDb2RlJzowfSkKICBpZiBzdGVwLmdldCgnbmFtZScpPT0nQmluZCBjb250cm9sbGVkIHJ1bm5lciBwYXRocyBhZnRlciBydW5uZXIgYWxsb2NhdGlvbic6c3BlY3MuYXBwZW5kKHsnam9iJzpuYW1lLCdjb2RlJzpzdGVwWydydW4nXX0pCmNvbmZpZz17J3dvcmtmbG93U0hBMjU2JzpoYXNobGliLnNoYTI1NihyYXcpLmhleGRpZ2VzdCgpLCdkaXNwYXRjaElucHV0cyc6ZC5nZXQoJ29uJyxkLmdldChUcnVlKSlbJ3dvcmtmbG93X2Rpc3BhdGNoJ11bJ2lucHV0cyddLCdqb2JzJzpqb2JzLCdwYXRocyc6c3BlY3N9O2ZpbGU9b3V0Lyd3b3JrZmxvdy1zdGF0aWMtY29udHJhY3QtaW5wdXQuanNvbic7YXNzZXJ0IG5vdCBmaWxlLmV4aXN0cygpO2ZpbGUud3JpdGVfdGV4dChqc29uLmR1bXBzKGNvbmZpZyxpbmRlbnQ9MikrJ1xuJyk7KG91dC8nd29ya2Zsb3ctaW5saW5lLXN5bnRheC5qc29uJykud3JpdGVfdGV4dChqc29uLmR1bXBzKHsnc2NvcGUnOidTdGF0aWMgc2hlbGwvTm9kZS9QeXRob24gcGFyc2luZyBvbmx5OyBubyBqb2Igc3RhdGVtZW50cyBleGVjdXRlZCcsJ3dvcmtmbG93U0hBMjU2Jzpjb25maWdbJ3dvcmtmbG93U0hBMjU2J10sJ2NoZWNrcyc6c3ludGF4fSxpbmRlbnQ9MikrJ1xuJyk7cHJpbnQoanNvbi5kdW1wcyh7J3BhcnNlZFN0YXRlbWVudHMnOmxlbihzeW50YXgpLCdjb250cm9sbGVkUGF0aEluaXRpYWxpemVycyc6bGVuKHNwZWNzKSwnZGlzcGF0Y2hJbnB1dHMnOmxlbihjb25maWdbJ2Rpc3BhdGNoSW5wdXRzJ10pfSkpCg=="
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.log",
+      "sha256": "a917534f5eb95539cafdcf39146f8bd8c91ebbb07726eff628c86148c4d2b55c",
+      "rawBase64": "VEFQIHZlcnNpb24gMTMKIyBTdWJ0ZXN0OiBjb21wbGV0ZSBpbW11dGFibGUgYXBwbGljYXRpb24gY2FuZGlkYXRlIGlzIHF1YWxpZmljYXRpb24gb25seQpvayAxIC0gY29tcGxldGUgaW1tdXRhYmxlIGFwcGxpY2F0aW9uIGNhbmRpZGF0ZSBpcyBxdWFsaWZpY2F0aW9uIG9ubHkKICAtLS0KICBkdXJhdGlvbl9tczogNC4zNzM2OTcKICB0eXBlOiAndGVzdCcKICAuLi4KIyBTdWJ0ZXN0OiBtaXNzaW5nLCBkdXBsaWNhdGUsIHVua25vd24sIHJlbmFtZWQsIGV4ZWN1dGFibGUsIGJhc2UgYW5kIHByb2R1Y3QgZHJpZnQgZmFpbCBjbG9zZWQKb2sgMiAtIG1pc3NpbmcsIGR1cGxpY2F0ZSwgdW5rbm93biwgcmVuYW1lZCwgZXhlY3V0YWJsZSwgYmFzZSBhbmQgcHJvZHVjdCBkcmlmdCBmYWlsIGNsb3NlZAogIC0tLQogIGR1cmF0aW9uX21zOiAxMC45MzUzMTkKICB0eXBlOiAndGVzdCcKICAuLi4KMS4uMgojIHRlc3RzIDIKIyBzdWl0ZXMgMAojIHBhc3MgMgojIGZhaWwgMAojIGNhbmNlbGxlZCAwCiMgc2tpcHBlZCAwCiMgdG9kbyAwCiMgZHVyYXRpb25fbXMgMjE1LjU2NDg1OAo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.receipt.json",
+      "sha256": "1212f61f90aa79cb064d995f319ed524d0984995e0d361b73155233e051989ad",
+      "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLS10ZXN0LW5hbWUtcGF0dGVybj1eY29tcGxldGUgaW1tdXRhYmxlfF5taXNzaW5nLCBkdXBsaWNhdGUsIHVua25vd24iLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1zY29wZS50ZXN0Lm1qcyIKICBdLAogICJjd2QiOiAiL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24iLAogICJzdGFydGVkQXQiOiAiMjAyNi0xMC0yNlQxMTo1MTowOC4wMjI3OTErMDA6MDAiLAogICJjb21wbGV0ZWRBdCI6ICIyMDI2LTEwLTI2VDExOjUxOjA4LjQyNjUwOCswMDowMCIsCiAgImV4aXRDb2RlIjogMCwKICAibG9nU0hBMjU2IjogImE5MTc1MzRmNWViOTU1MzljYWZkY2YzOTE0NmY4YmQ4YzkxZWJiYjA3NzI2ZWZmNjI4Yzg2MTQ4YzRkMmI1NWMiLAogICJzb3VyY2VTSEEyNTYiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXNjb3BlLnRlc3QubWpzIjogIjlmMmRkNjZiYmVmMjNhOTlhZWRhM2U5ZTA0YWE1MzhhZmIwYzNiMGVjNTkzNTE0OGNhODhmMzdmMjVkNTAzM2QiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1zY29wZS5tanMiOiAiMzI4YTJiM2ZhYjIyNTQyOTY2ZDRjOTdhOGMyODNiNjA2Yzg2NzgxNjc0MDA0ZmFkMTIwMjg0MWQ3ZTc5YjFjNCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWJpbmRpbmdzLmpzb24iOiAiM2RkMDJlNmNhYWY5YmM4OTRkOWYwZTA5NDRkNDJiMjYxNTEzMTc4OTRhNjc1ZTliNmJmYzMzNjcyMDY2ZTQwOCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXBsYW4ubWpzIjogIjVjZWNiYWI4OTlmZTQyNzRlMDZiNTRiMWU4MTk1ZjYxODNjMjUzN2ZlMjQ2N2EyNDgxZGM1OTg0Y2EyNTJhNzkiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1lbnRyeS5tanMiOiAiYjRlNTJjNDE4ZTZlNjMzYWE3YmNlYzFmOWQxNzc5YWEwOWRlNGFiNzk3Mzg5YWVkODYyNjk2NDBiYTgyMWJhOSIKICB9LAogICJzb3VyY2VTdGFibGUiOiB0cnVlLAogICJzY29wZSI6ICJPbmx5IHNvdXJjZSBjYW5kaWRhdGUvcmVmdXNhbCBjb250cmFjdHMgYWZmZWN0ZWQgYnkgbmV3IGV4cGxpY2l0IDQxLWNvbnRyb2wvMzQyLXNvdXJjZSBiaW5kaW5nLiBObyBBUEksIGFwcGxpY2F0aW9uIG9yIENJOyB1bmNoYW5nZWQgb2xkIHRlc3RzIGV4Y2x1ZGVkLiIsCiAgInF1YWxpZmljYXRpb25DbGFpbSI6IGZhbHNlCn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/source-freeze-383-raw-check.json",
+      "sha256": "dd2001c0077a647fc66c587f030f6fb36b482ce2b0bd57c894b6511c18d84985",
+      "rawBase64": "ewogICJraW5kIjogInJlYWRvbmx5LWJ5dGUtYW5kLW9yaWdpbmFsLWFzc29jaWF0aW9uLWNoZWNrIiwKICAic291cmNlUGF0aHMiOiAzNDIsCiAgImV4cGxpY2l0Q29udHJvbFBhdGhzIjogNDEsCiAgImNvbXBsZXRlRGlmZlBhdGhzIjogMzgzLAogICJwb3J0YWJsZVJhd1JlY29yZHMiOiAzNzIsCiAgIm9yaWdpbmFsMjQ0Um93c1VuY2hhbmdlZCI6IHRydWUsCiAgIm9yaWdpbmFsMjVSZXBvcnRzVW5jaGFuZ2VkIjogdHJ1ZSwKICAib3JpZ2luYWxPYnNlcnZhdGlvbkFzc29jaWF0aW9uVW5jaGFuZ2VkIjogdHJ1ZSwKICAiYXBwbGljYXRpb25Db21wb25lbnRzQW5kUHJvdGVjdGVkSW5wdXRzVW5jaGFuZ2VkIjogdHJ1ZSwKICAiZXZpZGVuY2VGaWxlU0hBMjU2IjogIjUxY2M5ZGNjZmVkODJkOTFkOGUzZTdkNTZkYmViMGYyMDliMjU2M2M2NWRhYTZiNjUxZTRhZWFkZmMwNmI5NDYiLAogICJiaW5kaW5nU0hBMjU2IjogIjNkZDAyZTZjYWFmOWJjODk0ZDlmMGUwOTQ0ZDQyYjI2MTUxMzE3ODk0YTY3NWU5YjZiZmMzMzY3MjA2NmU0MDgiLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZQp9Cg=="
+    },
+    {
+      "path": "/workspace/scratch/pr356-ci-closure-20261026/freeze-plan-dc915aa5822dcbf395c755a8ca37b6c3589e47a5.json",
+      "sha256": "643ca62c220617ed5a4fd68aacb6a8ba6f9afec1357a7bf40d3da1800e8ccda7",
+      "rawBase64": "ewogICJiYXNlIjogImZmODQ3MWU1MjllN2IzYzU2ZTFlMjBmMTdkMWUyNTgxMDQwZmM4OTYiLAogICJwcm9kdWN0IjogImRjOTE1YWE1ODIyZGNiZjM5NWM3NTVhOGNhMzdiNmMzNTg5ZTQ3YTUiLAogICJwcm9kdWN0VHJlZSI6ICJiZjAwNWU1NzgyYzNkNzFjYjIyNGZjNzlmZmEyYzE0OGVhOGRhYjdiIiwKICAic291cmNlUGF0aHMiOiAzNDIsCiAgImNvbnRyb2xQYXRocyI6IDQxLAogICJjb21wbGV0ZURpZmZQYXRocyI6IDM4MywKICAiY29tcG9uZW50cyI6IHsKICAgICJiYWNrZW5kIjogImZmN2VkZDU4ZTM4MjQxNzgwNzVhYWFmNzQ3MzBlMmZhMjM2N2E1ZmUiLAogICAgImZyb250ZW5kIjogIjg3NTkwNTg2ZjI5MDJiYWYxNGYwYTk0ZThkNDQ0YWM5ZTRiMmU3ZTgiCiAgfSwKICAicmF3RGlmZlNIQTI1NiI6ICJiMTRmOGE1M2IwN2I1ZTNiM2U3ZjcwZjYxYTE2MGUyZTBhNTZkZDc4NTEwNjNkMTdhYzQxNzRhYTU5Y2ZjZDRiIiwKICAiYmluZGluZ1BsYW5TSEEyNTYiOiAiM2RkMDJlNmNhYWY5YmM4OTRkOWYwZTA5NDRkNDJiMjYxNTEzMTc4OTRhNjc1ZTliNmJmYzMzNjcyMDY2ZTQwOCIsCiAgImFwcGxpZWQiOiB0cnVlLAogICJub1F1YWxpZmljYXRpb25DbGFpbSI6IHRydWUKfQo="
     }
   ],
   "portableRawIndexVersion": 1,
@@ -5232,6 +5252,38 @@
       "originalPath": "/workspace/scratch/pr356-review-followup/workflow-static-contract.py",
       "sha256": "d5caf266f1d656deb345f148f39b4050b3007669ccb127578d4b458610575cc0",
       "bytes": 2548
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/285",
+      "rawBase64Pointer": "/followupAttachments/285/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.log",
+      "sha256": "a917534f5eb95539cafdcf39146f8bd8c91ebbb07726eff628c86148c4d2b55c",
+      "bytes": 554
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/286",
+      "rawBase64Pointer": "/followupAttachments/286/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.receipt.json",
+      "sha256": "1212f61f90aa79cb064d995f319ed524d0984995e0d361b73155233e051989ad",
+      "bytes": 1230
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/287",
+      "rawBase64Pointer": "/followupAttachments/287/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-raw-check.json",
+      "sha256": "dd2001c0077a647fc66c587f030f6fb36b482ce2b0bd57c894b6511c18d84985",
+      "bytes": 565
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/288",
+      "rawBase64Pointer": "/followupAttachments/288/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-ci-closure-20261026/freeze-plan-dc915aa5822dcbf395c755a8ca37b6c3589e47a5.json",
+      "sha256": "643ca62c220617ed5a4fd68aacb6a8ba6f9afec1357a7bf40d3da1800e8ccda7",
+      "bytes": 617
     }
   ],
   "additionalRawRecovery": {
@@ -6652,6 +6704,56 @@
       "actualWorstCaseQualificationChainMinutes": 78,
       "qualificationClaim": false,
       "candidateState": "implementation checkpoint; final complete diff/control freeze and independent review still required"
+    },
+    {
+      "id": "strict-383-path-control-freeze",
+      "productAnchor": "dc915aa5822dcbf395c755a8ca37b6c3589e47a5",
+      "productTree": "bf005e5782c3d71cb224fc79ffa2c148ea8dab7b",
+      "sourcePaths": 342,
+      "explicitNamedControlPaths": 41,
+      "completeDiffPaths": 383,
+      "bindingSHA256": "3dd02e6caaf9bc894d9f0e0944d42b26151317894a675e9b6bfc33672066e408",
+      "sourceVerifierSHA256": "328a2b3fab22542966d4c97a8c283b606c86781674004fad1202841d7e79b1c4",
+      "records": [
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/285",
+          "rawBase64Pointer": "/followupAttachments/285/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.log",
+          "sha256": "a917534f5eb95539cafdcf39146f8bd8c91ebbb07726eff628c86148c4d2b55c",
+          "bytes": 554
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/286",
+          "rawBase64Pointer": "/followupAttachments/286/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-refusal.receipt.json",
+          "sha256": "1212f61f90aa79cb064d995f319ed524d0984995e0d361b73155233e051989ad",
+          "bytes": 1230
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/287",
+          "rawBase64Pointer": "/followupAttachments/287/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/source-freeze-383-raw-check.json",
+          "sha256": "dd2001c0077a647fc66c587f030f6fb36b482ce2b0bd57c894b6511c18d84985",
+          "bytes": 565
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/288",
+          "rawBase64Pointer": "/followupAttachments/288/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-ci-closure-20261026/freeze-plan-dc915aa5822dcbf395c755a8ca37b6c3589e47a5.json",
+          "sha256": "643ca62c220617ed5a4fd68aacb6a8ba6f9afec1357a7bf40d3da1800e8ccda7",
+          "bytes": 617
+        }
+      ],
+      "actualChecks": "Only two directly changed immutable candidate/refusal contracts passed; original342 source blobs/components/protected inputs match58c43; original244 raw rows and25 reporters unchanged; prior372 byte records checked before appending these four. Final all-record readback will be reported separately after commit.",
+      "initialFreezeInvocation": "Manually mistyped product SHA refused before freeze; original command output is in conversation, no fabricated execution receipt. Corrected invocation reads actual git HEAD.",
+      "finalControlHead": "Read after commit, never self-referentially embedded",
+      "applicationOrCIExecuted": false,
+      "qualificationClaim": false,
+      "activationStatus": "pending external exact-head independent review and unresolved B/evidence/policy/budget work"
     }
   ]
 }
