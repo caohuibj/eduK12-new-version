@@ -87,12 +87,14 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
   const answers=formAnswers[recordKey]??{}
   const formError=formErrors[eventId]
   const formLoaded=Object.prototype.hasOwnProperty.call(fieldForms,eventId)
-  const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'
+  const submittedFeedback=(event:string)=>notes.find(note=>note.eventId===event&&note.kind==='FORMAL_FEEDBACK'&&note.status==='SUBMITTED')
   const formal=currentKind==='FORMAL_FEEDBACK'
+  const alreadySubmitted=formal&&!!submittedFeedback(eventId)
+  const editable=currentNote?.status!=='SUBMITTED'&&currentInvite?.status==='ACCEPTED'&&!alreadySubmitted
   const ready=editable&&(!formal||!!bound)
   const openActivity=(invite:Invite)=>{
-    const draft=notes.find(note=>note.eventId===invite.eventId&&note.kind==='FORMAL_FEEDBACK'&&note.status==='DRAFT')
-    setNewEvent(invite.invitationId);setKind('FORMAL_FEEDBACK');setActiveNoteId(draft?.id??'');setOpened(true);setNotice('')
+    const existing=submittedFeedback(invite.eventId)??notes.find(note=>note.eventId===invite.eventId&&note.kind==='FORMAL_FEEDBACK'&&note.status==='DRAFT')
+    setNewEvent(invite.invitationId);setKind('FORMAL_FEEDBACK');setActiveNoteId(existing?.id??'');setOpened(true);setNotice('')
   }
   const openNote=(note:Note)=>{setActiveNoteId(note.id);setOpened(true);setNotice('')}
   const action=(fn:()=>Promise<void>)=>{
@@ -115,6 +117,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     const inv=invitations.find(x=>x.invitationId===newEvent)
     if(!inv||inv.status!=='ACCEPTED'||!content.trim())
       throw new Error('请选择已领取的实践活动，并填写专业意见或记录内容')
+    if(kind==='FORMAL_FEEDBACK'&&submittedFeedback(inv.eventId))throw new Error('本活动的正式反馈已提交，不能再次填写或提交。')
     if(kind==='FORMAL_FEEDBACK'&&!fieldForms[inv.eventId])throw new Error('本活动尚无可填写的预制表单，请联系组织者配置。')
     const created=await api<Pick<Note,'id'>>('/organizations/'+inv.organizationId+'/evaluation-events/'+inv.eventId+
       '/field-notes','POST',{kind,content:content.trim()})
@@ -136,6 +139,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     await refresh();setNotice('意见正文已加密保存。表单答案在正式提交时一并保存。')
   })
   const submit=(note:Note)=>action(async()=>{
+    if(note.kind==='FORMAL_FEEDBACK'&&submittedFeedback(note.eventId))throw new Error('本活动的正式反馈已提交，不能再次提交。')
     if(!window.confirm(note.kind==='PRIVATE_REFLECTION'
       ?'确认归档此私人反思吗？归档后不可修改，仍仅你本人可见。'
       :'确认将本记录作为正式观察材料提交吗？提交后不可修改。'))return
@@ -165,8 +169,8 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
     <h3 className="ht-practice-section-title">实践活动</h3>
     {!invitations.length?<p className="ht-empty">尚未收到实践活动邀请。</p>:<div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId} className="ht-event ht-practice-card">
       <span className="ht-practice-card-icon" aria-hidden="true"><Compass size={20}/></span>
-      <div className="ht-practice-card-copy"><h4>{inv.title}</h4><div className="ht-practice-card-meta"><span>{inv.role==='EXPERT'?'外部专家':'同行观察者'}</span><span className="ht-tag">{inv.status==='ACCEPTED'?'已领取':'待接受'}</span><span>到期：{new Date(inv.expiresAt).toLocaleString('zh-CN')}</span></div></div>
-      {inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy} onClick={()=>openActivity(inv)}>填写实践表单</button>}
+      <div className="ht-practice-card-copy"><h4>{inv.title}</h4><div className="ht-practice-card-meta"><span>{inv.role==='EXPERT'?'外部专家':'同行观察者'}</span><span className="ht-tag">{submittedFeedback(inv.eventId)?'已提交':inv.status==='ACCEPTED'?'已领取':'待接受'}</span><span>到期：{new Date(inv.expiresAt).toLocaleString('zh-CN')}</span></div></div>
+      {submittedFeedback(inv.eventId)?<button disabled={busy} onClick={()=>openActivity(inv)}>查看已提交记录</button>:inv.status==='INVITED'?<button disabled={busy} onClick={()=>accept(inv)}>接受本次邀请</button>:<button disabled={busy} onClick={()=>openActivity(inv)}>填写实践表单</button>}
     </article>)}</div>}
     <h3 className="ht-practice-section-title">我的记录</h3>
     {!notes.length?<p className="ht-empty">尚未创建实践记录。</p>:<div className="ht-event-list">{notes.map(note=><article key={note.id} className="ht-event ht-practice-card">
@@ -196,7 +200,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
           <p className="ht-muted">{currentKind==='PRIVATE_REFLECTION'?'私人反思仅本人可见，未向学校披露。':'原稿已冻结。本页展示获准读取的专业意见正文。'}</p>
           <p className="ht-field-content">{currentNote.content}</p>
         </>:<>
-          {!editable&&<p role="alert" className="ht-notice">当前活动授权不可用，不能保存或提交新内容。</p>}
+          {!editable&&<p role="alert" className="ht-notice">{alreadySubmitted?'本活动的正式反馈已提交，不能再次填写或提交。请返回查看已提交记录。':'当前活动授权不可用，不能保存或提交新内容。'}</p>}
           {formal&&<section className="ht-task ht-practice-form ht-form-surface" aria-label="活动预制表单">
             {!currentInvite?<p className="ht-empty">无法读取此活动的预制表单，请联系组织者核实活动授权。</p>:formError?<div role="alert" className="ht-notice"><p>实践表单暂时无法读取：{formError}</p><button disabled={busy} onClick={()=>setFormReload(value=>value+1)}>重试实践表单</button></div>:!formLoaded?<p role="status">正在读取本活动的预制表单…</p>:!bound?<p className="ht-empty">本活动尚未配置预制表单，请联系组织者绑定已发布的实践表单。</p>:<>
               <p className="ht-muted">按表单逐页填写，最后一页由你确认正式提交。本表单不计分。</p>
