@@ -135,12 +135,21 @@ suite('real PostgreSQL/HTTP source costs and existing 21B issuance, without manu
   await issueAdminContentRoot(fixture.system.id,{...proof,tokenVersion:fixture.system.tokenVersion},{requestId:id,expectedVersion:0,reason:'Isolated current-authority probe',grant:{subjectId:fixture.issuer.id,
    scope:{product:'TRAINING',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'material',resourceKeys:[fixture.measurement.releaseId]},
    capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:'2020-01-01T00:00:00Z',expiresAt:'2099-01-01T00:00:00Z'}})
+  // Raw use storage exercises the frozen delegation and immutable source reuse;
+  // it does not admit this untried APPROVED source as an ONLINE tool.
+  const teacher=await db.user.create({data:{username:'standard-sql-frozen-delegation-'+randomUUID(),passwordHash:'SYNTHETIC FIXTURE ONLY',
+   role:'TEACHER',platformRole:'STANDARD',accountDomain:'TRAINING',teacherApproved:true}})
+  const use=await db.materialGrant.create({data:{id:randomUUID(),teacherId:teacher.id,resourceType:'STANDARD_COMBINATION',resourceId:fixture.pointer.releaseId,
+   grantedBy:fixture.issuer.id,authorityGrantId:id,standardCombinationHash:fixture.pointer.combinationHash}})
+  const original={userId:teacher.id,combination:fixture.pointer,measurementReleaseId:fixture.measurement.releaseId,useGrantId:use.id,useGrantVersion:1}
   await db.$transaction(async tx=>{
    await readCurrentStandardCombination(tx,fixture.pointer,'HISTORY')
-   await assertLibraryAuthority(tx,fixture.issuer.id,fixture.measurement.releaseId,'material.distribute','TRAINING',id)
+   expect(await assertTrainingStandardUse(tx,original)).toMatchObject({authorityGrantId:id,useGrantId:use.id,useGrantVersion:1})
    await revokeContentAuthority(tx,{actorId:fixture.system.id,grantId:id,expectedVersion:1,reason:'Synthetic live revocation'})
    await readCurrentStandardCombination(tx,fixture.pointer,'HISTORY')
-   await expect(assertLibraryAuthority(tx,fixture.issuer.id,fixture.measurement.releaseId,'material.distribute','TRAINING',id)).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+   await expect(assertTrainingStandardUse(tx,original)).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+   expect(await assertLibraryAuthority(tx,fixture.issuer.id,fixture.measurement.releaseId,'material.distribute','TRAINING',id))
+    .toMatchObject({grantId:null,entryAuthority:{entry:'TRAINING'}})
   })
  })
  it('retains exact use history and rejects old versions after a synthetic row is revoked and explicitly reissued',async()=>{

@@ -4,7 +4,7 @@
   "pr": 356,
   "branch": "fix/runtime-time-and-validation-20261025",
   "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
-  "product": "9c43502680fe28c57c1edd64cc22a364beccb8e6",
+  "product": "feb5f12d678af008dcc2397ba752889c0f4350cd",
   "source": {
     "AGENTS.md": {
       "status": "M",
@@ -452,7 +452,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "acf322c63f9ca73fec7a0a8f8836e12bb4b670fe"
+      "after": "a227807eda34ab1f10dad07e69e7869e85d297d6"
     },
     "docs/evidence/pr356-standard-dual-entry-20261026.json": {
       "status": "A",
@@ -578,7 +578,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "2357e3e2dd27c555488c9b23fe94ab1ca065987b"
+      "after": "aa7cd20667c93c45a176fb494a2d57df1fff8125"
     },
     "docs/pr356-review-instructions-20261026.md": {
       "status": "A",
@@ -804,12 +804,26 @@
       "before": null,
       "after": "814e9db14008c6db9b39fbf3eff7be5f57334b79"
     },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bd2e57655805cb2e2561c603c35ee4fea702d0ab"
+    },
+    "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d95dad51c6054323fc0daf74b55adb3a43552522"
+    },
     "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "1bd956c3e0c62b517877b9a3feb7ab46260b1bfa"
+      "after": "2641fd107147602ef1b2430e88dcf5abe9807c39"
     },
     "server-version/backend/src/__tests__/composite/training-content-service.test.ts": {
       "status": "M",
@@ -942,7 +956,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "323a0f7e2f1ac23d2594f88f948356ecd8dbe747"
+      "after": "5659e26f945e0c26ed902e0320310481d790e57a"
     },
     "server-version/backend/src/__tests__/measurement-content/training-standard-issuance-boundary.test.ts": {
       "status": "A",
@@ -2390,22 +2404,54 @@
   "controls": [
     ".github/workflows/ci.yml",
     ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/scripts/pr356-acceptance.json",
+    ".github/scripts/pr356-admission.mjs",
+    ".github/scripts/pr356-admission.test.mjs",
+    ".github/scripts/pr356-artifacts.mjs",
+    ".github/scripts/pr356-artifacts.test.mjs",
+    ".github/scripts/pr356-bindings.json",
+    ".github/scripts/pr356-browser-fixture.cjs",
+    ".github/scripts/pr356-browser.mjs",
+    ".github/scripts/pr356-codeql.mjs",
+    ".github/scripts/pr356-codeql.test.mjs",
+    ".github/scripts/pr356-database.py",
+    ".github/scripts/pr356-database.test.py",
+    ".github/scripts/pr356-entry.mjs",
+    ".github/scripts/pr356-entry.test.mjs",
+    ".github/scripts/pr356-evidence.mjs",
+    ".github/scripts/pr356-exact-lazy-fixture.cjs",
+    ".github/scripts/pr356-exact-lazy-fixture.test.cjs",
+    ".github/scripts/pr356-gate-contract.mjs",
+    ".github/scripts/pr356-gate-contract.test.mjs",
+    ".github/scripts/pr356-local-evidence.json",
+    ".github/scripts/pr356-metadata-reuse.mjs",
+    ".github/scripts/pr356-metadata-reuse.test.mjs",
+    ".github/scripts/pr356-plan.mjs",
+    ".github/scripts/pr356-product-browser.mjs",
+    ".github/scripts/pr356-product-browser.test.mjs",
+    ".github/scripts/pr356-qualification.py",
+    ".github/scripts/pr356-qualification.test.py",
+    ".github/scripts/pr356-restore-fixture.cjs",
+    ".github/scripts/pr356-runtime-scan.mjs",
+    ".github/scripts/pr356-runtime-scan.test.mjs",
+    ".github/scripts/pr356-sarif.mjs",
+    ".github/scripts/pr356-sarif.test.mjs",
     ".github/scripts/pr356-scope.mjs",
     ".github/scripts/pr356-scope.test.mjs",
-    ".github/scripts/pr356-bindings.json",
-    ".github/scripts/pr356-evidence.mjs",
-    ".github/scripts/pr356-local-evidence.json",
-    ".github/scripts/pr356-qualification.py",
-    ".github/scripts/pr356-browser.mjs",
+    ".github/scripts/pr356-stable-gate.mjs",
+    ".github/scripts/pr356-stable-gate.test.mjs",
     "docs/pr356-ci-activation-20261026.md",
-    ".github/scripts/pr356-restore-fixture.cjs"
+    "docs/release/README.md"
   ],
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "5ca40b23e43117aa45eef80b2bf54b6f8641bfbb",
-    ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522"
+    ".github/scripts/merge-gate.mjs": "7cab6ae17bee90dfafc25a21e97f93ed79a40f1a",
+    ".github/workflows/ci.yml": "d95d71ae4cb5b23141135af0616155c318ebe522",
+    "docs/release/README.md": "70bd4031b5ac1ec23bff6650ba825d9b9d9e5a37"
   },
   "components": {
-    "backend": "ec0e23bec3398992883f30125e380a845c0a9337",
+    "backend": "8b2b7892401efac7cbdcddad8c73acacf5eb424d",
     "frontend": "87590586f2902baf14f0a94e8d444ac9e4b2e7e8"
   },
   "protectedInputs": {

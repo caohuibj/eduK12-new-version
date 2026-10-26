@@ -1,12 +1,17 @@
 const binding={browserOrigin:'https://training.eduk12.top'};
-import assert from 'node:assert/strict';import {createServer} from 'node:http';import {readFileSync,existsSync,mkdirSync,writeFileSync} from 'node:fs';import {resolve,extname} from 'node:path';import {chromium} from '../release-tools/node_modules/playwright-core/index.mjs';import {createHash} from 'node:crypto';const sha=b=>createHash('sha256').update(b).digest('hex'),out=process.env.PR356_EVIDENCE_DIR||'pr356-evidence';
+import {verifyDist,runBrowserPhase,statusBrowserResources} from './pr356-product-browser.mjs';
+import assert from 'node:assert/strict';import {createServer} from 'node:http';import {readFileSync,existsSync,mkdirSync,writeFileSync} from 'node:fs';import {resolve,extname} from 'node:path';import {createHash} from 'node:crypto';const sha=b=>createHash('sha256').update(b).digest('hex'),out=process.env.PR356_EVIDENCE_DIR||'pr356-evidence';
 
-const root=resolve(out+'/dist'),manifest=JSON.parse(readFileSync(out+'/frontend-dist.json'));assert.equal(manifest.head,process.env.GITHUB_SHA);assert.equal(manifest.sourceHead,process.env.GITHUB_SHA);assert.equal(manifest.run,process.env.GITHUB_RUN_ID);assert.equal(manifest.attempt,process.env.PR356_PRODUCER_ATTEMPT);
+const statusScenarioIds=['onboarding-1440-light','onboarding-1440-dark','onboarding-390-light','onboarding-390-dark'];
+await runBrowserPhase('status-browser',statusScenarioIds,async receipt=>{
+const {chromium}=await import('../release-tools/node_modules/playwright-core/index.mjs');
+const verifiedDist=verifyDist(process.env.PR356_FRONTEND_ARTIFACT_DIR),root=verifiedDist.root,manifest=verifiedDist.manifest;receipt.upstream(verifiedDist.upstream);
 for(const[p,h]of Object.entries(manifest.files)){const bytes=readFileSync(root+'/'+p);assert.equal(sha(bytes),h.sha256);assert.equal(bytes.length,h.bytes);}
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.json':'application/json'};
 const server=createServer((req,res)=>{const p=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!p.startsWith(root+'/')&&p!==root){res.writeHead(403).end();return}const file=existsSync(p)&&extname(p)?p:root+'/index.html';try{res.setHeader('content-type',mime[extname(file)]||'application/octet-stream');res.end(readFileSync(file))}catch{res.writeHead(404).end()}});
-await new Promise(r=>server.listen(4179,'127.0.0.1',r));const browser=await chromium.launch({headless:true,args:['--no-proxy-server']});const results=[];let currentPage;let currentDebug={};
+const resources=statusBrowserResources(server,()=>chromium.launch({headless:true,args:['--no-proxy-server']}));const results=[];let browser,currentPage;let currentDebug={};
 try{
+ browser=await resources.start();
  for(const width of [1440,390])for(const theme of ['light','dark']){
   const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme}),page=await context.newPage(),errors=[],unexpected=[],writes=[];
   currentPage=page;currentDebug={width,theme,errors,unexpected,writes};
@@ -42,7 +47,9 @@ try{
   await page.getByRole('button',{name:theme==='dark'?'切换为浅色外观':'切换为深色外观',exact:true}).click();
   assert.equal(await page.locator('.system-admin-shell').getAttribute('data-system-theme'),theme==='dark'?'light':'dark');
   const size=await page.evaluate(()=>({client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));assert(size.scroll<=size.client,'Management horizontal overflow');assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);assert.deepEqual(writes,[]);
-  const id=width+'-'+theme;await page.screenshot({path:out+'/'+id+'.png',fullPage:true});results.push({id,size,noMutation:true,errors,unexpected});await context.close();
+  const imageId=width+'-'+theme,id='onboarding-'+imageId;await page.screenshot({path:out+'/'+imageId+'.png',fullPage:true});results.push({id,size,noMutation:true,errors,unexpected});await context.close();receipt.pass(id);
  }
- writeFileSync(out+'/compiled-browser.json',JSON.stringify({sourceHead:process.env.CI_SOURCE_HEAD,run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,transport:'synthetic-https-fulfillment-no-live-production-requests',artifact:{kind:'same-run-exact-image-dist',sourceHead:manifest.sourceHead,run:manifest.run,attempt:manifest.attempt},syntheticOnly:true,results},null,2));
-}catch(error){writeFileSync(out+'/browser-failure.json',JSON.stringify({...currentDebug,error:error.message,url:currentPage?.url(),body:await currentPage?.locator('body').innerText().catch(()=>'' )},null,2));if(currentPage)await currentPage.screenshot({path:out+'/browser-failure.png',fullPage:true}).catch(()=>{});console.error(JSON.stringify({browserFailure:currentDebug,error:error.message,url:currentPage?.url()}));throw error;}finally{await browser.close();await new Promise(r=>server.close(r));}
+ writeFileSync(out+'/compiled-browser.json',JSON.stringify({sourceHead:process.env.PR356_SOURCE_HEAD,run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,transport:'synthetic-https-fulfillment-no-live-production-requests',artifact:{kind:'verified-independent-producer-frontend-dist',...verifiedDist.artifact,sourceHead:manifest.sourceHead??manifest.head,run:manifest.run,attempt:manifest.attempt},syntheticOnly:true,results},null,2));
+}catch(error){writeFileSync(out+'/browser-failure.json',JSON.stringify({...currentDebug,error:error.message,url:currentPage?.url(),body:await currentPage?.locator('body').innerText().catch(()=>'' )},null,2));if(currentPage)await currentPage.screenshot({path:out+'/browser-failure.png',fullPage:true}).catch(()=>{});console.error(JSON.stringify({browserFailure:currentDebug,error:error.message,url:currentPage?.url()}));throw error;}finally{await resources.close();}
+
+});

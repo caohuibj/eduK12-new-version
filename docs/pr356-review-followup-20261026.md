@@ -70,3 +70,16 @@
 另只补一个尚缺的真实锁等待用例：lease 有效时 receipt fence 已在 job 行锁等待，等真实时钟越过到期再释放，结果为 LEASE_LOST；1 PASS/3 filtered，未复跑已经 READY 的两个 worker。7 个变化生产文件的有限 TypeScript diagnostics 为 0，原退出/source SHA 原件保留；这仍不是整个 backend 生产编译。
 
 接收事务使用现有 callback 安全路径，ordinary ACK 不再走原无 callback 的单语句入口；detached 与 legacy 存储合同保持，但没有把其额外读写成本称为已测资源优化。原 356-01 资源/SQL/cold-hot 基线继续待审，不为本轮修复追加无关压测。旧正式 CI 与生产操作仍为 NOTRUN，全部新原件将随最终控制证据移交。b5 本地控制冻结随新业务明确作废，须以本产品修复提交重新生成完整候选。
+
+
+## c064 独审后的 ordinary 测试编排修复
+
+独审指出同一文件 single/batch 共用 database-name ledger：single READY 后 batch 会读入同一个记录并触发原 READY 禁止断言。此前分库、过滤执行的恢复结果有效，但不能证明整个文件一次执行成功。固定 `/workspace/scratch` 输出也不能直接用于 hosted runner。
+
+现在仅改测试接入：fresh 显式配置 single/batch/prestop/lockwait 四个不同物理数据库，每旅程独立 ledger；逐 case 重置模块，并分别核实际 production Prisma 的 `current_database()`、`prisma` 与 `prismaObservabilityClient` 两个 global 的所有权，关闭自己创建的队列/客户端，未知现存客户端直接阻断。全库 claim 前要求队列只含本旅程唯一 parent/epoch，不能消费别的待处理作业；原 READY、停用、RAW、lease/hash/epoch/item、canonical/回放断言全部保留。
+
+CI 的证据目录必须在真实 RUNNER_TEMP 内；本地显式配置受控根目录。拒绝越界/符号链接/覆盖旧 ledger。只有显式本地 replay 可读取指定 single/batch 未settled旧 ledger，先核 parent/subject/epoch/job/hash/cipher/source/停用，再允许 worker；原 ledger 只读，READY 仍拒绝，不会重新创建旧 fixture。测试不创建/迁移/清空数据库。
+
+实际仅运行新 harness 的临时文件系统与 fake-loader/client 合约：最终 30 PASS、0 FAIL、0 skip。新 helper/unit 的 standalone strict TypeScript 退出 0（首轮 never-helper 控制流窄化错误退出2保留，改函数声明后仅复验该小范围）；三个测试文件语法转译 0 诊断。原命令、退出、三源码前后 SHA 与原 reporter/log 均保留。它们不调用 PostgreSQL 或真实产品模块，不是四旅程 PG 通过或全项目类型检查。
+
+四库完整文件的新编排尚未执行，唯一未来位置是经独审放行后的隔离 PG job，一次无过滤4case，不能把旧分库结果换名成新文件成功。本轮未重跑历史 single/batch/prestop/lockwait，未构建、压测或激活 CI；只收口测试可移植性。新产品提交之后重新生成严格 source/blob/tree 清单，c064 旧冻结明确失效。普通新 ACK 的安全 callback 路径没有改回旧 atomic 路径，356-01 旧SQL/性能数字不代表当前候选。

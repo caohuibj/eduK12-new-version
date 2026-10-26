@@ -900,5 +900,100 @@
       "356-01 resource/SQL baseline"
     ],
     "costBoundary": "Ordinary ACK now uses existing guarded callback transaction; detached does not touch old budget, legacy permits retained. No performance improvement claim."
+  },
+  "ordinaryReceiptHarnessFollowup": {
+    "reviewedAnchor": "c064b38eb6ef68517e5a3861072cf3dc055da978",
+    "kind": "recorded-local-test-harness-execution",
+    "scope": "Four journey contexts, controlled evidence paths, explicit read-only local replay, queue/client ownership; no business change",
+    "sourceSHA256AtCollection": {
+      "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.ts": "af51dea142ecf9bb80be151bf3251563b35a89b184fe3411e997840c09123459",
+      "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt-harness.test.ts": "ae7aeb36610cd8ec03fa25fa1a5e498ce1609a41d65fd2e0ec1500eb12a5ebc9",
+      "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts": "dccb48099b56134dd08719a5f8f89bc41016b6d97e06949adfad6aa34f8551c0"
+    },
+    "checks": {
+      "harnessContracts": {
+        "passed": 30,
+        "failed": 0,
+        "pending": 0,
+        "realPostgres": false,
+        "realProductionModules": false
+      },
+      "strictHelperAndUnitOnly": {
+        "exitCode": 0,
+        "initialExitCodeRetained": 2
+      },
+      "threeTestFilesSyntaxOnly": {
+        "diagnostics": 0
+      }
+    },
+    "rawFiles": [
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts.json",
+        "bytes": 12568,
+        "sha256": "2c5a70de68d41755c233fc876ca35106e125c0220fdfc2372cded8c98c911d9d"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts.log",
+        "bytes": 712,
+        "sha256": "86d310f4bd1f877dd64da55b6443defb02e82a348b670e4ef9c4369231bb144a"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts-execution.json",
+        "bytes": 1003,
+        "sha256": "ef2ccdfb5697318347cacf60f2106a4471daacc0fbb5ca0a0e35df0e3cb19c66"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts-green.json",
+        "bytes": 12572,
+        "sha256": "d9e5ce8ef7f374c53722d02658ac4095f72aa793ab5db0934de6964584a12d1b"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts-green.log",
+        "bytes": 719,
+        "sha256": "075424c7ea7d8153bf86a11868f091bf3097936acc4de27aed88237387015052"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-contracts-green-execution.json",
+        "bytes": 1009,
+        "sha256": "5412f29df430c438b4e4cf51272ae4001c78675f856c91b82db719a7bddd5f5d"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-types.log",
+        "bytes": 1491,
+        "sha256": "53ce9be8c7ef4cdcbe13134e955b89ce4bdf93f3dbbca57eea7de4a2a926aa85"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-types-execution.json",
+        "bytes": 1095,
+        "sha256": "1e6e932404c78e54c5a3e24ae41b1edf37464101b479385965059e4d3e880867"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-types-green.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-types-green-execution.json",
+        "bytes": 1095,
+        "sha256": "9eee881d9696957392d46a5bc8a9f6c58cd6ac13899ecea0df0ab42750ca5556"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-syntax.json",
+        "bytes": 842,
+        "sha256": "13b5e099acdc26b94bdfa9e7f1a3f491f50c245169997c1d380e57ffd0d97208"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-harness-handoff.md",
+        "bytes": 5659,
+        "sha256": "aa5c6bbff416df8e692c4e2a32881c95f6adcb1b7bc9c26c372c72fd65cdc2e7"
+      }
+    ],
+    "historicalBusinessJourneysRerun": false,
+    "newUnfilteredFourDatabaseInvocation": "NOTRUN; sole planned isolated CI job after exact-candidate independent release",
+    "ciExecuted": false,
+    "originalExecutionSigned": false,
+    "qualificationClaim": false,
+    "sourceAssociation": "Per-execution three-file hashes and actual exit retained; not a full historical environment manifest",
+    "ordinaryAckRuntimePath": "Existing collection callback transaction; unchanged by this test-only patch; old atomic performance baseline not transferable"
   }
 }
