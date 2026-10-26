@@ -73,6 +73,8 @@ export class FinalDraftExpiredError extends Error {
 export interface FinalDraftMeta {
   /** Optional native raw lifecycle; core completion must not delete an unconfirmed archive. */
   cognitiveRawArchive?: CognitiveRawArchiveState
+  /** Local original artifacts. Mutable metadata must never replace or erase them. */
+  frozenInstrumentArtifacts?: Record<string, unknown>
   draftKey: string
   instrument: FinalDraftInstrument
   attemptId: string
@@ -270,6 +272,35 @@ export function assertFinalDraftWriteIdentity(current:FinalDraftMeta,expected?:F
   throw new FinalDraftIdentityConflictError(current)
 }
 
+const hasUnarchivedFrozenArtifacts=(meta:FinalDraftMeta)=>Boolean(meta.frozenInstrumentArtifacts&&Object.keys(meta.frozenInstrumentArtifacts).length
+ &&meta.cognitiveRawArchive?.archiveConfirmed!==true)
+const immutableArtifactCopy=<T,>(value:T):T=>{
+ const visit=(v:unknown):void=>{
+  if(v===null||typeof v==='string'||typeof v==='boolean'||(typeof v==='number'&&Number.isFinite(v)))return
+  if(Array.isArray(v)){for(let i=0;i<v.length;i++){if(!(i in v))throw new FinalDraftStorageError('原件必须是完整JSON');visit(v[i])}return}
+  if(v&&typeof v==='object'&&Object.getPrototypeOf(v)===Object.prototype){for(const key of Object.keys(v))visit((v as Record<string,unknown>)[key]);return}
+  throw new FinalDraftStorageError('原件必须是有限JSON')
+ }
+ visit(value);return cloneValue(value)
+}
+const preserveFrozenArtifacts=(next:FinalDraftMeta,existing?:FinalDraftMeta):FinalDraftMeta=>{
+ if(next.frozenInstrumentArtifacts!==undefined&&serialize(next.frozenInstrumentArtifacts)!==serialize(existing?.frozenInstrumentArtifacts))
+  throw new FinalDraftStorageError('冻结原件不可通过普通update替换')
+ return existing?.frozenInstrumentArtifacts?{...next,frozenInstrumentArtifacts:existing.frozenInstrumentArtifacts}:next
+}
+const freezeArtifactMeta=<T,>(current:FinalDraftMeta,expected:FinalDraftWriteIdentity,key:string,value:T):{meta:FinalDraftMeta;value:T}=>{
+ assertFinalDraftWriteIdentity(current,expected);assertNotExpired(current)
+ if(!key||key.length>128||['__proto__','constructor','prototype'].includes(key))throw new FinalDraftStorageError('无效原件键')
+ const slots=current.frozenInstrumentArtifacts??{}
+ if(Object.prototype.hasOwnProperty.call(slots,key)){
+  if(serialize(slots[key])!==serialize(value))throw new FinalDraftStorageError('本次冻结原件不允许替换')
+  return {meta:cloneValue(current),value:cloneValue(slots[key] as T)}
+ }
+ assertWritable(current)
+ const meta=stampChangedRetentionWrite(current,{...current,frozenInstrumentArtifacts:{...slots,[key]:value},updatedAt:Date.now()})
+ return {meta,value:cloneValue(value)}
+}
+
 const assertNotExpired = (meta: FinalDraftMeta) => {
   if (meta.trainingRetention?.expiredAt !== undefined) throw new FinalDraftExpiredError()
 }
@@ -312,7 +343,7 @@ const hasTrainingRetention = (meta: FinalDraftMeta) => {
     && meta.draftKey === trainingCognitiveDraftKey(b)
 }
 const trainingExpired = (meta: FinalDraftMeta, now: number) => {
-  if (!hasTrainingRetention(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission || (meta.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return false
+  if (!hasTrainingRetention(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission || hasUnarchivedFrozenArtifacts(meta) || (meta.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return false
   const b = meta.trainingRetention!
   return b.expiredAt === undefined && Number.isFinite(now) && now > 0
     && Number.isFinite(b.lastWriteAt) && b.lastWriteAt > 0 && b.lastWriteAt <= now
@@ -357,6 +388,7 @@ const stampChangedRetentionWrite = (current: FinalDraftMeta | undefined, next: F
 // Only explicit Survey ownership may migrate a legacy record. Its old meta/trial
 // timestamps predate this write-clock contract, so never infer its age from them.
 const surveyExpiry = (meta: FinalDraftMeta, legacySurvey: boolean, now: number): 'keep' | 'migrate' | 'delete' => {
+  if(hasUnarchivedFrozenArtifacts(meta))return 'keep'
   if (!isCognitiveDraft(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission
     || (!hasSurveyRetention(meta) && (!legacySurvey || meta.surveyRetention !== undefined))
     || !Number.isFinite(now) || now <= 0) return 'keep'
@@ -396,6 +428,7 @@ export interface FinalDraftStore {
   get(draftKey: string): Promise<FinalDraftMeta | null>
   ensure(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
+  freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T):Promise<{meta:FinalDraftMeta;value:T}>
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   /** Answer and optional timing metadata commit together under the seal lock. */
   putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>): Promise<void>
@@ -422,7 +455,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
 
   async get(draftKey: string) {
     const meta = this.metas.get(draftKey)
-    return meta?.trainingRetention ? cloneValue(meta) : meta ?? null
+    return meta?.trainingRetention||meta?.frozenInstrumentArtifacts ? cloneValue(meta) : meta ?? null
   }
 
   async listTrainingCognitiveDrafts(after?: string | null) {
@@ -479,11 +512,11 @@ class MemoryFinalDraftStore implements FinalDraftStore {
         this.metas.set(meta.draftKey, migrated)
         return migrated
       }
-      return existing.trainingRetention ? cloneValue(existing) : existing
+      return existing.trainingRetention||existing.frozenInstrumentArtifacts ? cloneValue(existing) : existing
     }
     const next = stampRetentionWrite(cloneValue(meta))
     this.metas.set(meta.draftKey, next)
-    return next.trainingRetention ? cloneValue(next) : next
+    return next.trainingRetention||next.frozenInstrumentArtifacts ? cloneValue(next) : next
   }
 
   async update(meta: FinalDraftMeta) {
@@ -491,10 +524,17 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if (existing) assertNotExpired(existing)
     if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
     if (existing) assertWritable(existing)
-    const candidate = withExistingRetention(cloneValue(meta), existing)
+    const candidate = preserveFrozenArtifacts(withExistingRetention(cloneValue(meta), existing),existing)
     const next = stampChangedRetentionWrite(existing, candidate)
     this.metas.set(meta.draftKey, next)
-    return next.trainingRetention ? cloneValue(next) : next
+    return next.trainingRetention||next.frozenInstrumentArtifacts ? cloneValue(next) : next
+  }
+
+  async freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T){
+    const copy=immutableArtifactCopy(value),current=this.metas.get(expected.draftKey)
+    if(!current)throw new FinalDraftStorageError('本地测评草稿不存在')
+    const result=freezeArtifactMeta(current,expected,key,copy)
+    this.metas.set(expected.draftKey,cloneValue(result.meta));return cloneValue(result)
   }
 
   async setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>) {
@@ -508,7 +548,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     }
     const written = stampChangedRetentionWrite(current, next)
     this.metas.set(draftKey, written)
-    return written.trainingRetention ? cloneValue(written) : written
+    return written.trainingRetention||written.frozenInstrumentArtifacts ? cloneValue(written) : written
   }
 
   async putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>) {
@@ -583,7 +623,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
     const written = stampChangedRetentionWrite(current, next)
     this.metas.set(draftKey, written)
-    return written.trainingRetention ? cloneValue(written) : written
+    return written.trainingRetention||written.frozenInstrumentArtifacts ? cloneValue(written) : written
   }
 
   async snapshot(draftKey: string) {
@@ -635,7 +675,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   async delete(draftKey: string, expected?: FinalDraftWriteIdentity) {
     const existing=this.metas.get(draftKey)
     if(existing)assertFinalDraftWriteIdentity(existing,expected)
-    if (existing?.trainingRetention?.expiredAt !== undefined || (existing?.cognitiveRawArchive && !existing.cognitiveRawArchive.archiveConfirmed)) return
+    if ((existing&&hasUnarchivedFrozenArtifacts(existing)) || existing?.trainingRetention?.expiredAt !== undefined || (existing?.cognitiveRawArchive && !existing.cognitiveRawArchive.archiveConfirmed)) return
     this.metas.delete(draftKey)
     for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
     for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
@@ -810,10 +850,20 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       if (existing) assertNotExpired(existing)
       if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
       if (existing) assertWritable(existing)
-      const candidate = withExistingRetention(cloneValue(meta), existing)
+      const candidate = preserveFrozenArtifacts(withExistingRetention(cloneValue(meta), existing),existing)
       const next = stampChangedRetentionWrite(existing, candidate)
       store.put(next)
       return next
+    })
+  }
+
+  async freezeInstrumentArtifact<T>(expected:FinalDraftWriteIdentity,key:string,value:T){
+    const copy=immutableArtifactCopy(value)
+    return this.run<{meta:FinalDraftMeta;value:T}>([META_STORE],'readwrite',async transaction=>{
+      const store=transaction.objectStore(META_STORE),current=await requestResult<FinalDraftMeta|undefined>(store.get(expected.draftKey))
+      if(!current)throw new FinalDraftStorageError('本地测评草稿不存在')
+      const result=freezeArtifactMeta(current,expected,key,copy)
+      store.put(result.meta);return result
     })
   }
 
@@ -985,7 +1035,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     await this.run<void>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
       if(meta)assertFinalDraftWriteIdentity(meta,expected)
-      if (meta?.trainingRetention?.expiredAt !== undefined || (meta?.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return
+      if ((meta&&hasUnarchivedFrozenArtifacts(meta)) || meta?.trainingRetention?.expiredAt !== undefined || (meta?.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return
       transaction.objectStore(META_STORE).delete(draftKey)
       // The index returns primary keys, not draftKey index values. Avoid cloning
       // potentially large answer/trial payloads solely to discard accepted drafts.

@@ -1,0 +1,80 @@
+{
+  "status": "LOCAL_IMMUTABLE_ARTIFACT_PRIMITIVE_ONLY",
+  "sealedAt": "2026-10-26T13:25:06.258023+00:00",
+  "tests": [
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/local-artifact.test.ts --maxWorkers=1 --reporter=json --outputFile=/tmp/enumeration-local-artifact-tests.json",
+      "exitCode": 0,
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/enumeration/local-artifact.test.ts -t 'survey TTL|complete confirmed archive' --maxWorkers=1 --reporter=json --outputFile=/tmp/enumeration-local-artifact-followup-tests.json",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 11
+    }
+  ],
+  "types": {
+    "command": "node /tmp/enumeration-local-artifact-types.cjs",
+    "actualConfig": "server-version/frontend/tsconfig.app.json",
+    "exitCode": 0,
+    "diagnostics": 0,
+    "scope": "new helper/test + FinalDraftStore roots and imported closure, not whole project build"
+  },
+  "contract": {
+    "storeAction": "freezeInstrumentArtifact(expectedIdentity,key,value) -> {meta,value}",
+    "atomicity": "Same existing META readwrite transaction; assertFinalDraftWriteIdentity before first write or idempotent return. No new IDB version/store.",
+    "slot": "frozenInstrumentArtifacts[cognitive.enumeration.artifact.v1]",
+    "value": "{sessionId,attemptEpoch,definitionHash,artifact} local host association only",
+    "immutability": "finite JSON; original JSON.stringify property-order equality, no canonicalization or extra digest; returns full stored original. Ordinary mutable metadata cannot reach slot; update preserves/rejects slot replacement; defensive Memory copies.",
+    "cleanup": "Unarchived frozen slots block generic delete and Training/Survey TTL; freeze/core seal/completed alone do not count as archival. Existing complete confirmed cognitiveRawArchive receipt is required to unlock cleanup.",
+    "taskHelper": "Requires actual IndexedDbFinalDraftStore and indexedDB; Memory cannot be labelled durable. Uses original EnumerationArtifact v1/candidate-json-stringify-sha256-v1. No change to Record/core/FINAL."
+  },
+  "notImplemented": [
+    "NativeEnumerationRunner/native registration/delivery/profile UI",
+    "Reservation/exposure marker lifecycle port",
+    "Backend enum archive service or real confirmed archive authority",
+    "DB/COS/API/CI/seed migrations",
+    "Real browser IndexedDB transaction contract for this new primitive",
+    "Physical calibration/timing or scientific validation"
+  ],
+  "notRepeated": [
+    "Old MOT tests",
+    "Old 18/27 suites",
+    "Prior HTTP/browser capture journey"
+  ],
+  "sourceFiles": [
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "eeb0cc3a752de92e44ad1ba9d1989b58a6214bf0a72902c0935b4178f52cbdc1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/local-artifact.ts",
+      "sha256": "0a724c5699c487545c12769e6da4890cfd4e7aed9efd99eef5390ce242843569"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/enumeration/local-artifact.test.ts",
+      "sha256": "d4d49db6a369005b9fa76aae5653196505a7e281f50783753ed04fb3768be2f3"
+    }
+  ],
+  "artifactHashes": [
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/input-contract-20261026/local-artifact-freeze/tests-first.json",
+      "sha256": "46009d5ae885e0c6abc980c4e599f68231b3445f84988a27c66ea20b72d55ce4"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/input-contract-20261026/local-artifact-freeze/types-runner.cjs.txt",
+      "sha256": "0f2b8b327d97446f1b5bcdf296ab163949332ce834fb487d1ce2e9c1d84b4deb"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/input-contract-20261026/local-artifact-freeze/tests-cleanup-followup.json",
+      "sha256": "aa843c81e0f3b3f4b2b85d7cc66fb8d895eb80c95d2e8bf516dd4bd4c223c619"
+    },
+    {
+      "path": "docs/cognitive-library/next-candidates-20261026/enumeration/input-contract-20261026/local-artifact-freeze/types.json",
+      "sha256": "5a6565088275092977a3573284de0bcc76540588f191a3e30349ac2e1090a667"
+    }
+  ]
+}
