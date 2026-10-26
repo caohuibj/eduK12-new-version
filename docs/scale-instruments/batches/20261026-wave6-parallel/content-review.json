@@ -1,0 +1,74 @@
+{
+  "status": "PASS_STATIC_REVIEW",
+  "eightAxisCatalogAndFactualSearchTags": true,
+  "scope": "Source/registry tags verified; no browser or PR356 runtime search/authorization claim",
+  "sources": [
+    {
+      "instrumentKey": "ffmq15_zh_cn_research",
+      "sourceSha256": "14cb5952f23bfce7fa4a56595444fe892908164b3c19af13ea24da9225d7c7ff",
+      "catalogTagCount": 53,
+      "unitUniquePassedCases": 24,
+      "license": "CC BY 3.0",
+      "reportVersion": "1.0.0",
+      "primaryReportSections": 5,
+      "reportMode": "score_only",
+      "reportSamples": "docs/scale-instruments/research-drafts/ffmq15/1.0.0/",
+      "browser": "NOTRUN",
+      "activation": "NOTRUN"
+    },
+    {
+      "instrumentKey": "erss19_zh_cn_research",
+      "sourceSha256": "13ada797d32319eb4a39892ed85ebbb83d78501d1fbffdbeb15f75848e2d2e3e",
+      "catalogTagCount": 55,
+      "unitUniquePassedCases": 24,
+      "license": "CC BY 4.0",
+      "reportVersion": "1.0.0",
+      "primaryReportSections": 4,
+      "reportMode": "score_only",
+      "reportSamples": "docs/scale-instruments/research-drafts/erss19/1.0.0/",
+      "browser": "NOTRUN",
+      "activation": "NOTRUN"
+    },
+    {
+      "instrumentKey": "brcs4_zh_cn_research",
+      "sourceSha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66",
+      "catalogTagCount": 55,
+      "unitUniquePassedCases": 18,
+      "license": "CC BY 4.0",
+      "reportVersion": "1.0.0",
+      "primaryReportSections": 1,
+      "reportMode": "score_only",
+      "reportSamples": "docs/scale-instruments/research-drafts/brcs4/1.0.0/",
+      "browser": "NOTRUN",
+      "activation": "NOTRUN"
+    },
+    {
+      "instrumentKey": "chime_s24_zh_cn_research",
+      "sourceSha256": "6917748d9ac9a5c32f0deebd4c8793f2eda5b976269ac14cecaae1afadc0eb64",
+      "catalogTagCount": 61,
+      "unitUniquePassedCases": 18,
+      "license": "CC BY 4.0",
+      "reportVersion": "1.0.0",
+      "primaryReportSections": 9,
+      "reportMode": "score_only",
+      "reportSamples": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/",
+      "browser": "NOTRUN",
+      "activation": "NOTRUN"
+    },
+    {
+      "instrumentKey": "ips9_2021_zh_cn",
+      "sourceSha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c",
+      "catalogTagCount": 54,
+      "unitUniquePassedCases": 20,
+      "license": "CC BY 4.0",
+      "reportVersion": "1.0.0",
+      "primaryReportSections": 1,
+      "reportMode": "score_only",
+      "reportSamples": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/",
+      "browser": "NOTRUN",
+      "activation": "NOTRUN"
+    }
+  ],
+  "imagesAdded": 0,
+  "existingContentTouched": false
+}

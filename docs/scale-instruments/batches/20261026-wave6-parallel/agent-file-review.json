@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "agents": [
+    {
+      "agent": "brcs4",
+      "ownedFileCount": 16,
+      "manifestSha256": "aa7ffc2db2d4a0db01e8eca19fe69613e88d95af936f93f281faf8e969aab85d",
+      "allSourceTestLicenseAndReportBytesMatch": true,
+      "coordinatorOnlyChange": "append database results to validation.md, separately recorded"
+    },
+    {
+      "agent": "chime_short",
+      "ownedFileCount": 15,
+      "manifestSha256": "8d90ee5301b60211cc4f13ce78756ac49c3587a3c49a791669837b40fc312346",
+      "allSourceTestLicenseAndReportBytesMatch": true,
+      "coordinatorOnlyChange": "append database results to validation.md, separately recorded"
+    },
+    {
+      "agent": "ips9",
+      "ownedFileCount": 12,
+      "manifestSha256": "96b1a1848d3d26bf95fffc7072b8cc6f441901f4cb9e09b6b5a98cd76f181f03",
+      "allSourceTestLicenseAndReportBytesMatch": true,
+      "coordinatorOnlyChange": "append database results to validation.md, separately recorded"
+    }
+  ]
+}

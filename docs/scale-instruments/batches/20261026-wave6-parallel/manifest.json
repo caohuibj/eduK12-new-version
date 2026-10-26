@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "batchId": "wave6-parallel-20261026",
+  "sources": [
+    {
+      "instrumentKey": "brcs4_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "68ae0f92da27333ee9b6b9f62bab7e4a98b6e2853910f8ad9fb9fafe2c972a66"
+    },
+    {
+      "instrumentKey": "chime_s24_zh_cn_research",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "6917748d9ac9a5c32f0deebd4c8793f2eda5b976269ac14cecaae1afadc0eb64"
+    },
+    {
+      "instrumentKey": "ips9_2021_zh_cn",
+      "instrumentVersion": "1.0.0",
+      "sourceSha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "priorSourceVersionsByteUnchanged": 49,
+  "snapshot": "6ee3edb1139865d0231db40e8d50f565a776dcc8",
+  "includesResCatalogV2": true,
+  "coordinatorInitialMetadataCommand": "Wrong cwd created own README under backend/docs; moved only that file and removed empty own directories. Manifest creation had failed before checks; no product/source change."
+}

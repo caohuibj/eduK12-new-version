@@ -1,0 +1,65 @@
+{
+  "status": "PASS",
+  "brcs4": {
+    "name": "types",
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--project",
+      "/workspace/eduk12-scale-evidence/20261026-parallel/brcs4/tsconfig.brcs4.json",
+      "--pretty",
+      "false"
+    ],
+    "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+    "startedAt": "2026-10-26T05:59:29.764997+00:00",
+    "completedAt": "2026-10-26T05:59:31.193798+00:00",
+    "exitCode": 0,
+    "inputManifestSha256": "f70b544feacfacc56a320b0a9aacaace001a366d2c0d97a2cc397730a6a1dd19"
+  },
+  "brcs4Reuse": "Only JSON QC reviewedAt string format changed; no TypeScript structural or code changes. Original closure retained in private evidence.",
+  "chime_s24": {
+    "check": "types",
+    "startedAt": "2026-10-26T06:01:09.986111+00:00",
+    "endedAt": "2026-10-26T06:01:11.568836+00:00",
+    "exitCode": 0,
+    "log": "/workspace/eduk12-scale-evidence/20261026-parallel/chime_short/20261026T060109Z.types.log"
+  },
+  "ips9_2021": {
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "--target",
+      "ES2020",
+      "--module",
+      "commonjs",
+      "--lib",
+      "ES2020",
+      "--moduleResolution",
+      "node",
+      "--esModuleInterop",
+      "--resolveJsonModule",
+      "--skipLibCheck",
+      "--strict",
+      "src/__tests__/scale/instruments/ips9_2021_zh_cn.test.ts"
+    ],
+    "cwd": "/workspace/eduk12-scale-content/server-version/backend",
+    "startedAt": "2026-10-26T06:02:08.786860+00:00",
+    "finishedAt": "2026-10-26T06:02:10.190628+00:00",
+    "exitCode": 0,
+    "inputsManifestSha256": "2d6dcb09d8820d70849d3b2bad6b36229ceb6f4e490ff82141d1524e051b761d",
+    "ciExecuted": false,
+    "originalExecutionSigned": false
+  },
+  "coordinatorDatabaseTest": {
+    "status": "PASS",
+    "exitCode": 0,
+    "observedToolCompletion": "exec session 68399 actual completion before closeout",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "emptyLogAloneIsNotProof": true,
+    "tsconfigSha256": "cf9c129d441ecdad4662627a6f491a744208c3239dfee6298e8d1949ed5cd858",
+    "scope": "strict inherited tsconfig; new DB test plus actual transitive imports; no full backend build"
+  },
+  "ciExecuted": false,
+  "originalExecutionSigned": false
+}

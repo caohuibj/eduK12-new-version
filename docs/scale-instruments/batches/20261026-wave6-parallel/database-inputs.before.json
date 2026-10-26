@@ -1,0 +1,8 @@
+{
+  "directInputs": {
+    "src/__tests__/scale/instruments/wave6-parallel.postgres.integration.test.ts": "42928da554a1da74ed3876cebd04799570066a912525e403fb9571407caab831",
+    "src/modules/scale/onboarding/instruments.generated.ts": "9b02c3e03ca78e29ce65c94e5670306e9f5f17865305a7eaccac9345776fbf78",
+    "package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+  },
+  "manifestSha256": "cd4c2a06339a817329a54be49fdcc4f73f8206113c070b79002c7ee547627ed7"
+}

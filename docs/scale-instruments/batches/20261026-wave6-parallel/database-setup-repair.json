@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "originalRestore": "FAIL before connecting; zero application test assertions",
+  "cause": "Unix-socket pg_isready saw temporary initialization server before it shut down",
+  "repair": "TCP loopback readiness distinguishes final service; actual public-table count0 verified before retry",
+  "retryExitCode": 0,
+  "originalLogSha256": "47edbc5ab8b24a9826af7dc285e257ff4be3fcb6c22a259e8e9356f8e3185260",
+  "repairLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "productionTouched": false
+}

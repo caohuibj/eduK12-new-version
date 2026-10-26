@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "kind": "LOCAL_DEVELOPMENT_EVIDENCE_NOT_CI_OR_RELEASE_ACCEPTANCE",
+  "batch": "20261026-wave6-parallel",
+  "sourceCommit": "84a5d4aa2401f3dcadc620c0406f1ee782ca2dbd",
+  "delegation": {
+    "agents": 4,
+    "firstCategoryExecutable": 3,
+    "secondCategoryNotionOnly": 1,
+    "thirdCategoryAdded": 0
+  },
+  "units": {
+    "status": "PASS_REVIEWED_UNIQUE_CASES",
+    "actualUniquePassedCases": 56,
+    "freshVersusReused": "BRCS 7 prior+11 repaired; CHIME 9 prior+9 repaired; IPS 20 fresh",
+    "initialFailuresPreserved": true,
+    "caseReview": "unit-case-review.json",
+    "exhaustive625VectorsAreOneCase": true
+  },
+  "database": {
+    "status": "PASS",
+    "actualAssertions": 17,
+    "reporterSha256": "0db3a270155778171fc52ac7eea6abd240774df13f2034dd04c0bf13fd5639cb",
+    "appRole": "scale_app",
+    "nonOwner": true,
+    "restoredOldRows": 7,
+    "restoredOldSnapshots": 9,
+    "finalRows": 10,
+    "finalSnapshots": 12,
+    "allDraftHidden": true,
+    "oldDefinitionsAndSnapshotsByteUnchanged": true,
+    "referenceSets": 0,
+    "deploymentPolicies": 0,
+    "setupInitialFailure": "Initialization temporary-server readiness race, then TCP readiness repair and actual restore exit0; original failure retained",
+    "productionTouched": false
+  },
+  "reports": {
+    "status": "PASS_ACTUAL_BUILD_SCALE_RESULT",
+    "newConfigurations": 3,
+    "retainedRawResultSamples": 12,
+    "byTool": {
+      "brcs4": 1,
+      "chime_s24": 8,
+      "ips9_2021": 3
+    },
+    "separatePersistedDefinitionPathsChecked": 3,
+    "imagesAdded": 0,
+    "referencesCreated": 0,
+    "scoreBandsCreated": 0
+  },
+  "combinedWave5And6ThisRound": {
+    "newFirstCategorySources": 5,
+    "newSecondCategoryNotionArchives": 1,
+    "newThirdCategoryArchives": 0,
+    "completeFormalItemSetsIncludingInternalScsSf": 6,
+    "unitUniquePassedCases": 104,
+    "actualDatabaseAssertions": 29,
+    "actualSavedResultSamples": 36,
+    "actualReportConfigurations": 5
+  },
+  "sourceInventory": {
+    "addedSourceVersions": 52,
+    "distinctToolIdentities": 50,
+    "notIndependentConstructCount": true,
+    "notActivatedToolCount": true,
+    "developmentInventory": "candidate-52.json",
+    "formal20261026PublicationAcceptance": "NOTRUN"
+  },
+  "notRun": [
+    "browser",
+    "dual product entry use",
+    "formal activation",
+    "GitHub CI",
+    "production deployment",
+    "restoration qualification of newly stored wave6 dump"
+  ],
+  "blocked": [
+    {
+      "item": "SCS-SF public redistribution",
+      "reason": "Official use/translation permission exists; general website redistribution terms unresolved; second-category archive only"
+    },
+    {
+      "item": "scientific and localization expert review",
+      "reason": "Working translations remain pending; no Chinese norms or diagnostic inference created"
+    }
+  ],
+  "failureResolution": "Original scientific/source discrepancy notes, unit failures, restore failure and cleanup identity assertion retained; no final unresolved implementation FAIL in this bounded batch",
+  "reusableEvidenceLimits": "Local execution and reviewed passed cases only. No claim of official CI, signed evidence, deployment or full-environment cryptographic binding."
+}

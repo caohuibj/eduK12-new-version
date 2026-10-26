@@ -1,0 +1,20 @@
+[
+  {
+    "path": "docs/scale-instruments/research-drafts/brcs4/1.0.0/validation.md",
+    "agentDocumentSha256": "2c69ce2cecc07df6a94324f6252ee0129ce8cc91b38b2a9806ea8f28dc01001f",
+    "coordinatorDocumentSha256": "44ceceb566070d6ae30f31ec1de5c79b6b1f030a8e370a9184247bd148abb3ab",
+    "change": "append actual coordinator DB scope only; executable and tests unchanged"
+  },
+  {
+    "path": "docs/scale-instruments/research-drafts/chime_s24/1.0.0/validation.md",
+    "agentDocumentSha256": "9d40e3c0b83105fea7e5fd7df17a116e7c8f59c23cb8c7b6ce127cb6f4e205e3",
+    "coordinatorDocumentSha256": "58bdaa4d1c7e98df7a1d8ea4077c0b688350bf92555922c960aae7b8227f4c79",
+    "change": "append actual coordinator DB scope only; executable and tests unchanged"
+  },
+  {
+    "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/validation.md",
+    "agentDocumentSha256": "54e2ed97d24be25d925a436cdf733a3ae8c0b489050ee76ab50cfe7666388e3d",
+    "coordinatorDocumentSha256": "81a0f308ead00aef8f39f2c4221008a4fd3aadf59fa7ecccdb26574f41ce1cf6",
+    "change": "append actual coordinator DB scope only; executable and tests unchanged"
+  }
+]

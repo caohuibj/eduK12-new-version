@@ -1,0 +1,91 @@
+{
+  "parent": "b59c182359760cfad4d4d792bddfac0b545df165",
+  "commit": "84a5d4aa2401f3dcadc620c0406f1ee782ca2dbd",
+  "tree": "6a53f01067ef0f369a676a7324c74e86f5843389",
+  "branch": "content/dot-local-scales-20261025",
+  "status": "PASS",
+  "verifiedAtUtc": "2026-10-26T06:33:35.951397+00:00",
+  "remoteCommitTreeEqualsStagedTree": true,
+  "remoteFilesByteEqual": true,
+  "forcePush": false,
+  "files": [
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/README.md",
+      "remoteBlob": "88f987fb423aa06be451235c69fa025f3533844d",
+      "sha256": "5cfef58289d96e6bde32dcdbf22f9f7065ecfc0862ad28194a0b733984d077a6",
+      "bytes": 920
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/administration.md",
+      "remoteBlob": "2cba9bd48dda2ffde0af901b27946052aba4a9fa",
+      "sha256": "cebd1ad57ff608dd4989a9e9ef4f3050e754974d52b9966eb898d5df45781d34",
+      "bytes": 1143
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/bilingual-content.json",
+      "remoteBlob": "439af4277c3b849baf931d7a5d6c8e1dfe714bba",
+      "sha256": "c80d2d695d90dd1d002650bd82632e795bedf056d8261762a6fbb9895d6aef6b",
+      "bytes": 3241
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/references.md",
+      "remoteBlob": "0217476b7f66e86a1844a98376af0a49e43d34d1",
+      "sha256": "736533fc3b20da981ae2f9d3cefc3e1e2713e2e820b34472fbc62ede60894d23",
+      "bytes": 2947
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/report-example.md",
+      "remoteBlob": "5725ce4d4dae7464c4d876b958604be6e8a94e23",
+      "sha256": "154caa0b0e578f280593ffd06d6aefd4f66223c0ec8a856f00a4cf0e3a0f428b",
+      "bytes": 2270
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/report-results.synthetic.json",
+      "remoteBlob": "587de501df141924ee94601ba52641f77aeadf72",
+      "sha256": "4def715af9ecd60a3fad543489099cd678a42be5fc919804e4adc7e6358403d3",
+      "bytes": 18086
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/scoring-and-parameters.md",
+      "remoteBlob": "8c43d0f9416023ff0709a40e03adbb14884f1858",
+      "sha256": "179d232bee3e9485339fe6f4febce6336309a0b8884234bb55fc232580a7b1b1",
+      "bytes": 1820
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ips9_2021/1.0.0/validation.md",
+      "remoteBlob": "21d360e2b3c77c8bb4fd33a77531263031e00cc5",
+      "sha256": "81a0f308ead00aef8f39f2c4221008a4fd3aadf59fa7ecccdb26574f41ce1cf6",
+      "bytes": 4163
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/instruments/ips9_2021_zh_cn.test.ts",
+      "remoteBlob": "15d3a06ae52854d0a962a6cdb6791d01ec056f10",
+      "sha256": "cd0f22c591a192f1743b93aab96fd43e74a9b62efbc43b8d56be8bc8e4e87aee",
+      "bytes": 8203
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/THIRD_PARTY_LICENSE.md",
+      "remoteBlob": "727c9b44a3a1ba872cbb35c833592405f36b13f8",
+      "sha256": "3917263d35e9e823ba8d4f7312adead14274c3954da41ada6aa2a90355103585",
+      "bytes": 1763
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/instrument.ts",
+      "remoteBlob": "353ef328bcde676cf7e00cb31e2a90814ce67b13",
+      "sha256": "aaa30b052fb5917e6b49b49468cfa3b6f2f52ba438ae38d84362dc427e913fd2",
+      "bytes": 182
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ips9_2021_zh_cn/1.0.0/source.json",
+      "remoteBlob": "064471f0cc5d7c62d5b07a12385b2034bc29f945",
+      "sha256": "f1f15cd10886356261fab9fb64b715a8ff7e6c34879bd82d60368a702941227c",
+      "bytes": 32061
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts",
+      "remoteBlob": "e0fc904326cbd1e8d3d7e4fdd37f14060460b296",
+      "sha256": "9b02c3e03ca78e29ce65c94e5670306e9f5f17865305a7eaccac9345776fbf78",
+      "bytes": 14116
+    }
+  ]
+}

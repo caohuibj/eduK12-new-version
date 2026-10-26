@@ -1,0 +1,13 @@
+{
+  "scope": "only task-owned loopback synthetic PostgreSQL",
+  "container": "eduk12-scale-wave6-20261026",
+  "containerId": "3c430608404ac042c316e410939a8ad6ca9069387d9d61e12495b0ab9c516a27",
+  "idAndTaskLabelChecked": true,
+  "initialAttempt": "FAIL before Docker action: stale narrative container-id assertion; recovered exact ID from contemporaneous private/container-id and matching live task label",
+  "dumpBytes": 1449803,
+  "dumpSha256": "6783185ab3d96465da81fd5b1d1cbbc0d40edca6e1849ba614e9f521045c0e55",
+  "purpose": "later incremental tests; restoring this newly stored dump NOTRUN",
+  "containerAndOwnAnonymousVolumeRemoved": true,
+  "productionTouched": false,
+  "atUtc": "2026-10-26T06:39:00.399539+00:00"
+}

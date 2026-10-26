@@ -1,0 +1,38 @@
+{
+  "kind": "READ_ONLY_GITHUB_API_OBSERVATION",
+  "observedAt": "2026-10-26T06:41:27.437094+00:00",
+  "checks": [
+    {
+      "commit": "208896bcb1f2cafece02dc613b5f19b072462fb9",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=208896bcb1f2cafece02dc613b5f19b072462fb9&per_page=100",
+      "totalCount": 0
+    },
+    {
+      "commit": "6ee3edb1139865d0231db40e8d50f565a776dcc8",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=6ee3edb1139865d0231db40e8d50f565a776dcc8&per_page=100",
+      "totalCount": 0
+    },
+    {
+      "commit": "34b458fa4de60621893207a39401f0fc0e41fb30",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=34b458fa4de60621893207a39401f0fc0e41fb30&per_page=100",
+      "totalCount": 0
+    },
+    {
+      "commit": "078d4c347583d6d579df6799bea7d81eae8477a4",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=078d4c347583d6d579df6799bea7d81eae8477a4&per_page=100",
+      "totalCount": 0
+    },
+    {
+      "commit": "b59c182359760cfad4d4d792bddfac0b545df165",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=b59c182359760cfad4d4d792bddfac0b545df165&per_page=100",
+      "totalCount": 0
+    },
+    {
+      "commit": "84a5d4aa2401f3dcadc620c0406f1ee782ca2dbd",
+      "url": "https://api.github.com/repos/caohuibj/eduK12-new-version/actions/runs?head_sha=84a5d4aa2401f3dcadc620c0406f1ee782ca2dbd&per_page=100",
+      "totalCount": 0
+    }
+  ],
+  "workflowDispatched": false,
+  "meaning": "No workflow runs observed at read time; not CI qualification."
+}

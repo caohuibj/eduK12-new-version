@@ -1,0 +1,135 @@
+{
+  "status": "PASS",
+  "uniquePassedCases": 56,
+  "invocationFailuresPreserved": true,
+  "casesAreNotInvocations": true,
+  "BRCS625CombinationsCountAsOneCase": true,
+  "tools": [
+    {
+      "agent": "brcs4",
+      "status": "PASS_REVIEWED_CASE_UNION",
+      "uniquePassedCases": 18,
+      "runs": [
+        {
+          "reporter": "vitest.report.json",
+          "sha256": "3c30875601b437c723ca884f43d52b9dcc4f2925ec7b63a91e8ba44daf5788c8",
+          "success": false,
+          "passed": 7,
+          "failed": 11,
+          "skipped": 0
+        },
+        {
+          "reporter": "vitest.attempt2.report.json",
+          "sha256": "b81dc09d8a7b94f0e94dda32256f17933a995f5b21ed088c741d06e75c25b4f1",
+          "success": true,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 7
+        }
+      ],
+      "passedCaseNames": [
+        "brcs4 independent Chinese research adaptation applies a provisional adult-self boundary and never guesses missing age",
+        "brcs4 independent Chinese research adaptation binds reuse rights to open coauthor wording while excluding original-manual and norms claims",
+        "brcs4 independent Chinese research adaptation builds actual plain-language reflection without norm labels or boundaries",
+        "brcs4 independent Chinese research adaptation checks every legal answer combination against independent addition",
+        "brcs4 independent Chinese research adaptation defines one equal-weight total and no reverse or imported Rasch conversion",
+        "brcs4 independent Chinese research adaptation keeps content, localization, scoring and report versions independently traceable",
+        "brcs4 independent Chinese research adaptation preserves the complete four open-author items, ordered separately from instructions",
+        "brcs4 independent Chinese research adaptation records rich factual eight-axis tags and pending local scientific work",
+        "brcs4 independent Chinese research adaptation refuses interpretation for every single missing item without imputation",
+        "brcs4 independent Chinese research adaptation rejects illegal, duplicate and unknown values",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic all_missing",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic maximum",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic midpoint_arithmetic_only",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic minimum",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic missing_last",
+        "brcs4 independent Chinese research adaptation scores pinned arithmetic mixed_independent",
+        "brcs4 independent Chinese research adaptation uses the independently arranged five-point format, with numeric middle options",
+        "brcs4 independent Chinese research adaptation validates a complete independent DRAFT source without claiming activation"
+      ],
+      "reuseBasis": "qcReview timestamp +00:00→Z only; response/scoring/report/test code unchanged"
+    },
+    {
+      "agent": "chime_short",
+      "status": "PASS_REVIEWED_CASE_UNION",
+      "uniquePassedCases": 18,
+      "runs": [
+        {
+          "reporter": "20261026T055937Z.vitest.json",
+          "sha256": "ed6f0a99b68819d4870e3852074e09ffc9d0e85e7394a7fb11d9ac340faebf8a",
+          "success": false,
+          "passed": 17,
+          "failed": 1,
+          "skipped": 0
+        },
+        {
+          "reporter": "20261026T060109Z.vitest.json",
+          "sha256": "442886c4f3d54bf1d589673599c20b64b36e3fdab8af2fe66fdec7f1c65b6217",
+          "success": true,
+          "passed": 9,
+          "failed": 0,
+          "skipped": 9
+        }
+      ],
+      "passedCaseNames": [
+        "CHIME-S24 exact 2024 S1 independent Chinese working version builds nine readable real interpretations without thresholds or foreign norms",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version changes only the owning facet and total, with the exact reverse direction",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version distinguishes raw response extremes from transformed minimum and maximum",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version does not insert a zero or prorate omitted items; missing facet and total become null",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version enforces the conservative adult boundary and does not allow missing age",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version keeps permission, source-language evidence and pending Chinese validation explicit",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: empty",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: maximum",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: midpoint_3_5",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: minimum",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: mixed_independent",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: one_missing",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: raw_all_one",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: raw_all_six",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version preserves independent version axes without letting catalog facts alter executable content",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version rejects illegal options, duplicates and unknown item codes",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version retains all eight three-item facets, five reverse keys and the permitted whole-scale mean",
+        "CHIME-S24 exact 2024 S1 independent Chinese working version validates the complete short form and remains a distinct draft candidate"
+      ],
+      "reuseBasis": "9 fresh affected cases plus 9 reviewed unchanged cases; see case-reuse-review.json"
+    },
+    {
+      "agent": "ips9",
+      "status": "PASS",
+      "uniquePassedCases": 20,
+      "runs": [
+        {
+          "reporter": "own-unit.reporter.json",
+          "sha256": "deacfa2bd717ca0100f6e9d299b2372b5b6b3bfcae0f15d54fd472ae4a22ffef",
+          "success": true,
+          "passed": 20,
+          "failed": 0,
+          "skipped": 0
+        }
+      ],
+      "passedCaseNames": [
+        "ips9_2021_zh_cn exact source contract builds readable platform feedback without norms, labels or diagnostic claims",
+        "ips9_2021_zh_cn exact source contract does not fill missing responses or generate a report on incomplete answers",
+        "ips9_2021_zh_cn exact source contract has rich factual tags on all eight axes and precise licensing/translation provenance",
+        "ips9_2021_zh_cn exact source contract keeps three axes independently changeable without contaminating measurement",
+        "ips9_2021_zh_cn exact source contract records published Chinese study evidence without inventing platform approval",
+        "ips9_2021_zh_cn exact source contract refuses out-of-scope and missing ages instead of guessing",
+        "ips9_2021_zh_cn exact source contract rejects illegal, duplicate and unknown answers",
+        "ips9_2021_zh_cn exact source contract respects single-item direction and weight independently of stored fixtures",
+        "ips9_2021_zh_cn exact source contract retains complete ordered Chinese items and exact scale options",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic all_missing",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic all_raw_five",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic all_raw_one",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic maximum",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic midpoint",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic minimum",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic missing_first",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic missing_last",
+        "ips9_2021_zh_cn exact source contract scores pinned arithmetic mixed_independent",
+        "ips9_2021_zh_cn exact source contract uses one original-scale sum score and precisely the source reverse keys",
+        "ips9_2021_zh_cn exact source contract validates an independent exact-source DRAFT identity"
+      ],
+      "reuseBasis": "single 20-pass invocation"
+    }
+  ]
+}

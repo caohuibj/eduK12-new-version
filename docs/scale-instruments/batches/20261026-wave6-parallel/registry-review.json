@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "generatorUnchanged": true,
+  "generatorSha256": "7f779e56f6ab244117e1812baeb7bdb77b02b036b804c6925fe81ee2208be1b5",
+  "generatedFileSha256": "9b02c3e03ca78e29ce65c94e5670306e9f5f17865305a7eaccac9345776fbf78",
+  "registeredVersionPaths": 109,
+  "originalGeneratorCheckExit": 0,
+  "scope": "Each tool used unchanged generator with isolated exact tracked path snapshot; final bytes equal final generated output. Documentation-only closeout does not invalidate evidence."
+}
