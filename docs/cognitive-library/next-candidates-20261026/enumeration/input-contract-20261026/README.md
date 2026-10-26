@@ -1,5 +1,7 @@
 # 点数判断：真实输入合同提案（仅文档，等待根 dot 独审）
 
+> 后续只读复核：当前推荐比较见 [thin-comparison.md](thin-comparison.md)。原B/F、首正式header、FINAL前helper及额外版本建议已撤下，保留为未实施历史；不据此继续编码。
+
 基线：cognitive-next-three-core-20261026 @ 162db124919801532c2b08e9b55d911f8e1e8652，tree 106af824852fa788a65514f89f35af27eac985bd。本轮只读源码、整理合同及计算静态配方 hash；没有改产品源码、seed、delivery、registry、数据库、凭据、CI 或部署。这里的版本与新字段均是明确提案，尚未成为真实 schema。MOT 保持上一审查结论，既有浏览器/宿主原件不补签、不复跑。
 
 ## 1. 本案选择与已批准边界

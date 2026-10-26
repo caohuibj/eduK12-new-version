@@ -1,5 +1,5 @@
 {
-  "status": "PROPOSED_NOT_IMPLEMENTED_PENDING_INDEPENDENT_REVIEW",
+  "status": "SUPERSEDED_BY_THIN_COMPARISON_NOT_IMPLEMENTED",
   "baseHead": "162db124919801532c2b08e9b55d911f8e1e8652",
   "candidateId": "attention-enumeration-flower",
   "testType": "enumeration",
@@ -52,5 +52,6 @@
     "FINAL binding helper",
     "COS enumeration schema",
     "CI/merge/deploy"
-  ]
+  ],
+  "supersededBy": "thin-comparison.md"
 }
