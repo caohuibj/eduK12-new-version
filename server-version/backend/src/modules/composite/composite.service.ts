@@ -3995,7 +3995,7 @@ const getUnifiedCompositeAttemptState = async (
         scale: {
           id: item.scale.id,
           name: packageSlotLabels.get(item.position) ?? item.scale.name,
-          instruction: item.scale.instruction ?? null,
+          instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : item.scale.instruction ?? null,
           description: item.scale.description ?? null,
           instrumentVersion: item.scale.instrumentVersion,
           definition: runnerDefinition(runtime.definition),

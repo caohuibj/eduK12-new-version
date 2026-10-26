@@ -199,7 +199,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
       presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
       ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
-      scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
+      scale: { id: child.scale.id, name: child.scale.name, instruction: runtime.instruction !== undefined ? runtime.instruction?.text ?? null : child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })
   }
   const positions = new Map(parent.compositeAssessment.items.map(item => [item.id, item.position]))

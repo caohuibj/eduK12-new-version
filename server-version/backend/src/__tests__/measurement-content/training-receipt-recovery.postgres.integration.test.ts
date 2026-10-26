@@ -88,6 +88,14 @@ suite('accepted STANDARD whole receipt actual report-worker recovery',()=>{
   await call(student,`${path}/form-sections/${section.id}/submit`,{submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:section.definitionHash,contextSnapshotHash:state.contextSnapshotHash,answers:section.answers.map((a:any)=>({formItemId:a.formItemId??a.id,value:'7'}))})
   state=await call(student,path);expect(state.currentItem.type).toBe('SCALE')
   const whole=await import('../../modules/composite/whole-questionnaire.service'),definition=await whole.getWholeQuestionnaireDefinition(id,{userId:student.id})
+  // New snapshots freeze an absent instruction as null. Metadata edits must
+  // not become instructions after whole-form or current-unit delivery reloads.
+  expect(definition.units[0].scale.instruction).toBeNull()
+  await db.scale.update({where:{id:installed.scaleId!},data:{instruction:'Later mutable instruction must not enter this attempt'}})
+  const refreshed=await whole.getWholeQuestionnaireDefinition(id,{userId:student.id})
+  expect(refreshed.units[0].scale.instruction).toBeNull()
+  const currentUnit=await (await import('../../modules/composite/composite.service')).getAttemptState(id,{userId:student.id},undefined,'current-unit')
+  expect(currentUnit.currentItem.scale.instruction).toBeNull()
   const answers=source.executable!.definition.items.map(i=>({itemCode:i.itemCode,responseValue:'3'})),input={submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,slotSetHash:definition.slotSetHash!,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map(unit=>({itemId:unit.itemId,definitionHash:unit.definitionHash,answers}))}
   const ack=await whole.submitWholeQuestionnaire(id,input,{userId:student.id});expect(ack.status).toBe('ACCEPTED')
   const prior=await db.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:id,attemptEpoch:state.attemptEpoch}}})
