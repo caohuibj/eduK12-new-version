@@ -77,6 +77,23 @@ export async function standardTripletDetail(actor:string,key:string,version:stri
  return {available,selection:{toolKey:key,...selection},history:history.map(r=>({...stateView(r),reference:r.reference})),versionMappings,trials,reference:defaults.length===3?(await previewStandardTriplet(prisma,actor,{toolKey:key,...selection})).reference:defaults[0]?.reference??null}
 }
 async function audit(db:Prisma.TransactionClient,actor:string,action:string,metadata:object){await db.surveyEvent.create({data:{id:randomUUID(),actorUserId:actor,action,metadata:metadata as Prisma.InputJsonValue}})}
+/** Immutable request intent, not the current mutable entry policy. Old audit
+ * rows are read as evidence and never rewritten; unverifiable scope is a conflict. */
+export async function readStandardApprovalIntent(tx:Db,row:StandardRelease){
+ const frozen=row.snapshot.reference.approvals as Array<{requestId?:string;versions?:string;actorId?:string;allowedProducts?:unknown;reason?:unknown}>
+ let evidence=frozen.find(a=>a.requestId===row.id&&a.versions===row.combination_hash&&a.actorId===row.approved_by&&a.allowedProducts!==undefined)
+ if(!evidence){
+  const events=await tx.$queryRaw<Array<{metadata:typeof evidence;actor_user_id:string}>>`SELECT metadata,actor_user_id FROM survey_events
+   WHERE action='STANDARD_TRIPLET_APPROVED' AND metadata->>'releaseId'=${row.id} ORDER BY created_at,id LIMIT 2`
+  if(events.length===1&&events[0].actor_user_id===row.approved_by){
+   const metadata=events[0].metadata as {allowedProducts?:unknown;reason?:unknown;combinationHash?:string}|undefined
+   if(metadata?.combinationHash===row.combination_hash)evidence=metadata
+  }
+ }
+ if(!evidence||typeof evidence.reason!=='string')fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程')
+ try{return {products:exactToolEntryProducts(evidence!.allowedProducts),reason:evidence!.reason}}
+ catch{ return fail(409,'原批准入口范围缺少可核验证据；请核对历史审批并使用正式入口范围调整流程') }
+}
 export async function approveStandardTriplet(actor:string,input:Selection&{requestId:string;expectedCombinationHash:string;reason:string;allowedProducts?:unknown},proof?:AdminSessionProof){
  const products=exactToolEntryProducts(input.allowedProducts)
  const triplet=await previewStandardTriplet(prisma,actor,input)
@@ -86,17 +103,23 @@ export async function approveStandardTriplet(actor:string,input:Selection&{reque
   await assertStandardSystem(tx,actor,proof)
   await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-standard:'+triplet.combinationHash}))`
   const prior=await tx.$queryRaw<StandardRelease[]>`SELECT * FROM survey_standard_releases WHERE id=${input.requestId} OR combination_hash=${triplet.combinationHash} FOR UPDATE`
-  if(prior.length){if(prior.some(r=>r.id===input.requestId&&r.combination_hash!==triplet.combinationHash))fail(409,'请求编号已用于另一份版本组合');return prior[0].id}
+  if(prior.length){
+   if(prior.some(r=>r.id===input.requestId&&r.combination_hash!==triplet.combinationHash))fail(409,'请求编号已用于另一份版本组合')
+   const existing=prior.find(r=>r.combination_hash===triplet.combinationHash)!,intent=await readStandardApprovalIntent(tx,existing)
+   if(canonicalHash(intent.products)!==canonicalHash(products))fail(409,'该组合已按其他入口范围批准；请使用正式入口范围调整流程，不可通过审批重试扩展范围')
+   if(existing.id===input.requestId&&(existing.approved_by!==actor||intent.reason!==input.reason))fail(409,'请求编号已用于另一项审批意图')
+   return existing.id
+  }
   for(const p of Object.values(triplet.parts).sort((a,b)=>a.axis.localeCompare(b.axis))){
    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'survey-axis:'+triplet.toolKey+':'+p.axis+':'+p.version}))`
    const rows=await tx.$queryRaw<Array<{content_hash:string}>>`SELECT content_hash FROM survey_standard_versions WHERE tool_key=${triplet.toolKey} AND axis=${p.axis} AND version=${p.version} FOR SHARE`
    if(rows[0]&&rows[0].content_hash!==p.hash)fail(409,p.axis+' 同一版本号已有不同内容，请使用新版本')
    await tx.$executeRaw`INSERT INTO survey_standard_versions(id,tool_key,axis,version,content_hash,payload,source_version,reference,created_by) VALUES(${randomUUID()},${triplet.toolKey},${p.axis},${p.version},${p.hash},${JSON.stringify(p.payload)}::jsonb,${p.sourceVersion},${JSON.stringify(p.reference)}::jsonb,${actor}) ON CONFLICT DO NOTHING`
   }
-  triplet.reference.approvals.push({actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash})
+  triplet.reference.approvals.push({actorId:actor,decision:'APPROVED',reason:input.reason,requestId:input.requestId,at:new Date().toISOString(),versions:input.expectedCombinationHash,allowedProducts:products})
   await tx.$executeRaw`INSERT INTO survey_standard_releases(id,tool_key,combination_hash,snapshot,reference,state,approved_by) VALUES(${input.requestId},${triplet.toolKey},${triplet.combinationHash},${JSON.stringify(triplet)}::jsonb,${JSON.stringify(triplet.reference)}::jsonb,'APPROVED',${actor})`
   await approveToolEntryPolicies(tx,{resourceKey:'standard-release:'+input.requestId,fingerprint:triplet.combinationHash},products,actor,input.reason)
-  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'SURVEY_ONLY',researcherGrantsCreated:0})
+  await audit(tx,actor,'STANDARD_TRIPLET_APPROVED',{releaseId:input.requestId,combinationHash:triplet.combinationHash,reason:input.reason,allowedProducts:products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
   return input.requestId
  },{timeout:15000})
  const row=await standardReleaseRow(prisma,id)
@@ -147,7 +170,8 @@ export async function runStandardTrial(actor:string,id:string,expectedVersion:nu
    const measurement=await publishContentRelease(tx,standardCombinationMeasurementInput(row),actor)
    if(measurement.layer!=='MEASUREMENT'||measurement.status!=='PUBLISHED')throw new Error('内容发布版本当前不能用于新增使用')
    await tx.$executeRaw`UPDATE survey_standard_releases SET state='ONLINE',version=version+1,lease_until=NULL,measurement_release=${JSON.stringify({releaseId:measurement.releaseId,contentHash:measurement.contentHash})}::jsonb,blockers='[]',updated_at=clock_timestamp() WHERE id=${id}`
-   await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,scope:'SURVEY_ONLY',researcherGrantsCreated:0})
+   const intent=await readStandardApprovalIntent(tx,current)
+   await audit(tx,actor,'STANDARD_TRIAL_PASSED_ONLINE',{releaseId:id,runId,caseCount:results.length,databaseReadback:true,allowedProducts:intent.products,scope:'PRODUCT_ENTRIES',researcherGrantsCreated:0})
   },{timeout:15000})
  }catch(e){
   const message=e instanceof Error?e.message:'试运行失败'
