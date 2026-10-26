@@ -1,4 +1,5 @@
-import {isPr356Entry} from './pr356-entry.mjs';
+import {refuseUnplannedPR356} from './pr356-entry.mjs';
+export {refuseUnplannedPR356} from './pr356-entry.mjs';
 import {surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
 import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
@@ -49,12 +50,6 @@ import { plan as applicationPlan, toolingOnly } from '../../server-version/scrip
 // Keep route refusal independent of the candidate verifier. The official
 // source CLI consumes this module while awaiting metadata; importing it back
 // from here would leave its top-level await unresolved.
-export function refuseUnplannedPR356(env=process.env) {
-  const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
-  const event=env.CI_EVENT||env.GITHUB_EVENT_NAME,fullRef=env.GITHUB_REF||(ref==='main'?'refs/heads/main':undefined);
-  const entries=event==='push'&&fullRef==='refs/heads/main'?changedEntries(env.CI_BASE_SHA,env.GITHUB_SHA||'HEAD'):[];
-  if(isPr356Entry({event,headRef:ref,refName:env.GITHUB_REF_NAME,ref:fullRef,entries}))throw new Error('PR356 uses its explicitly authorized bounded qualification dispatch; no legacy/full/probe fallback or merge eligibility');
-}
 
 const modules = 'server-version/backend/src/modules/';
 const frontendSrc = 'server-version/frontend/src/';

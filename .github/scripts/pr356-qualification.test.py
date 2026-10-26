@@ -40,6 +40,11 @@ class IndependentProducers(unittest.TestCase):
  def stubs(self):
   return patch.multiple(self.p,phase_context=self.context,run=self.run_stub,tool_identity=lambda name:{'version':'stub-'+name,'executableSHA256':'d'*64})
  def new_out(self,name):self.p.OUT=self.root/name;self.p.OUT.mkdir()
+ def test_phase_proof_declares_explicit_empty_upstream_for_independent_producers(self):
+  command={'command':['synthetic-control-only'],'cwd':str(self.root),'exitCode':0,'logSHA256':'f'*64,'startedAt':'2026-10-26T00:00:00Z','completedAt':'2026-10-26T00:00:01Z'}
+  for phase in ['backend-image','frontend-image','backend-audit','frontend-audit']:
+   self.new_out(phase+'-protocol');proof=self.p.phase_proof(phase,self.context(phase),command,{'files':{}})
+   self.assertEqual(proof['outputs']['upstream'],[]);self.assertEqual(json.loads((self.p.OUT/'phase-receipt.json').read_text())['outputs']['upstream'],[])
  def test_complete_inputs_and_actual_worktree_bytes_are_required(self):
   c=self.context('backend-image');self.p.validate_phase_inputs('backend-image',c['spec'],self.inputs)
   (self.root/'server-version/backend/package.json').write_text('changed')

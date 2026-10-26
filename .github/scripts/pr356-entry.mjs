@@ -27,16 +27,23 @@ export function detectPr356Entry(env=process.env,eventPayload={},readDiff){
  }
  return {candidate:false,event,reason:'unrelated-event'};
 }
-function readDiff(before,after){
- const raw=execFileSync('git',['diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40','-z',before,after,'--'],{encoding:'utf8'});
+export function readPr356Diff(before,after,execute=execFileSync){
+ assert.match(before||'',/^[a-f0-9]{40}$/);assert(after==='HEAD'||/^[a-f0-9]{40}$/.test(after||''));
+ const raw=execute('git',['diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40','-z',before,after,'--'],{encoding:'utf8'});
  assert(raw.endsWith('\0')||raw==='','Incomplete raw diff');
  const fields=raw?raw.slice(0,-1).split('\0'):[];assert.equal(fields.length%2,0);
- return Array.from({length:fields.length/2},(_,i)=>{assert.match(fields[i*2],/^:[0-7]{6} [0-7]{6} [a-f0-9]{40} [a-f0-9]{40} [A-Z][0-9]*$/);return {file:fields[i*2+1]};});
+ return Array.from({length:fields.length/2},(_,i)=>{const m=/^:([0-7]{6}) ([0-7]{6}) ([a-f0-9]{40}) ([a-f0-9]{40}) ([A-Z][0-9]*)$/.exec(fields[i*2]);assert(m,'Unsupported raw diff entry');return {file:fields[i*2+1],oldMode:m[1],newMode:m[2],status:m[5]};});
+}
+export function refuseUnplannedPR356(env=process.env){
+ const ref=env.CI_HEAD_REF||env.GITHUB_HEAD_REF||env.GITHUB_REF_NAME;
+ const event=env.CI_EVENT||env.GITHUB_EVENT_NAME,fullRef=env.GITHUB_REF||(ref==='main'?'refs/heads/main':undefined);
+ const entries=event==='push'&&fullRef==='refs/heads/main'?readPr356Diff(env.CI_BASE_SHA,env.GITHUB_SHA||'HEAD'):[];
+ if(isPr356Entry({event,headRef:ref,refName:env.GITHUB_REF_NAME,ref:fullRef,entries}))throw new Error('PR356 uses its explicitly authorized bounded qualification dispatch; no legacy/full/probe fallback or merge eligibility');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.argv[2],'--detect','Only explicit routing detection is supported');
  const payload=process.env.GITHUB_EVENT_PATH?JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')):{};
- const result=detectPr356Entry(process.env,payload,readDiff);
+ const result=detectPr356Entry(process.env,payload,readPr356Diff);
  console.log(JSON.stringify(result));
  if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,'candidate='+String(result.candidate)+'\n');
 }

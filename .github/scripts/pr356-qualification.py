@@ -119,6 +119,7 @@ def output_files(root):
  return files
 
 def phase_proof(phase,context,command,outputs,status='success'):
+ outputs.setdefault('upstream',[])
  validate_phase_inputs(phase,context['spec'],context['inputs'])
  proof={'schemaVersion':1,'kind':'pr356-phase-proof','phaseId':phase,'status':status,'source':context['source'],
   'inputs':context['inputs'],'inputsSHA256':hashlib.sha256(canonical(context['inputs']).encode()).hexdigest(),
