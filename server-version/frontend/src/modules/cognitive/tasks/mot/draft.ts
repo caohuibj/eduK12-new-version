@@ -2,12 +2,13 @@ import type { MotCalibration, MotTrial } from './generated/protocol'
 import type { MotRawFrames } from './capture'
 
 export interface MotDraftBinding {
-  sessionId: string; attemptNo: number; protocolKey: 'mot/1.1.0/1.1.0'
+  sessionId: string; attemptNo: number; protocolKey: 'mot/1.1.0/1.1.0' | 'mot/1.1.1/1.1.0'
   resolvedConfigHash: string; randomSeed: string
 }
 export interface MotPending { trialIndex: number; calibration: MotCalibration }
 export interface MotDraftRecord { core: MotTrial; raw: MotRawFrames }
 export interface MotDraftPort {
+  readonly binding: Readonly<MotDraftBinding>
   pending(): Promise<MotPending | null>
   begin(pending: MotPending): Promise<void>
   append(record: MotDraftRecord): Promise<void>
@@ -25,9 +26,9 @@ function normalizeBinding(value:unknown):MotDraftBinding {
   if(typeof b.sessionId!=='string'||!b.sessionId||b.sessionId.length>512
     ||typeof b.randomSeed!=='string'||!b.randomSeed||b.randomSeed.length>256
     ||typeof b.resolvedConfigHash!=='string'||!b.resolvedConfigHash||b.resolvedConfigHash.length>256
-    ||b.protocolKey!=='mot/1.1.0/1.1.0'||!Number.isSafeInteger(b.attemptNo)||Number(b.attemptNo)<1)
+    ||typeof b.protocolKey!=='string'||!['mot/1.1.0/1.1.0','mot/1.1.1/1.1.0'].includes(b.protocolKey)||!Number.isSafeInteger(b.attemptNo)||Number(b.attemptNo)<1)
     throw new Error('A complete frozen MOT draft binding is required')
-  return {sessionId:b.sessionId,attemptNo:Number(b.attemptNo),protocolKey:b.protocolKey,
+  return {sessionId:b.sessionId,attemptNo:Number(b.attemptNo),protocolKey:b.protocolKey as MotDraftBinding['protocolKey'],
     resolvedConfigHash:b.resolvedConfigHash,randomSeed:b.randomSeed}
 }
 /** Explicit field order: reordering an equivalent caller object cannot create a fresh exposure. */
@@ -118,6 +119,7 @@ export function createMotDraft(binding:MotDraftBinding):MotDraftPort {
     })
   }
   return {
+    binding:Object.freeze(normalizeBinding(binding)),
     pending:()=>transact(false,s=>s.pending),
     begin:pending=>{
       const snapshot=structuredClone(pending)

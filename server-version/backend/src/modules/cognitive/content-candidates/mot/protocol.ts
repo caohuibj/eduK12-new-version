@@ -116,7 +116,7 @@ export const MOT_COLORS = Object.freeze({
   object: '#222222', target: '#E53935', selected: '#1D4ED8', selectedMark: '#FFFFFF',
 })
 export const MOT_IDENTITY = Object.freeze({
-  testType: 'mot', engineVersion: '1.1.0', scoringVersion: '1.1.0',
+  testType: 'mot', engineVersion: '1.1.1', scoringVersion: '1.1.0',
   configVersion: '1.0.0', randomizationAlgorithmVersion: 'mot-fnv1a-mulberry32-v1',
 })
 export function motConfig(profile: MotProfile): MotConfig {

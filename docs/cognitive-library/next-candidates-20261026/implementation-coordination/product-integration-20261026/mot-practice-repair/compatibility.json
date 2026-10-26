@@ -1,0 +1,50 @@
+{
+  "kind": "CANDIDATE_ENGINE_PATCH_COMPATIBILITY_NOT_PRODUCT_ADMISSION",
+  "baseline": "eb5d90274c2f4301c1be93b107eb8c7bb10360ee",
+  "identity": {
+    "testType": "mot",
+    "engineVersion": "1.1.1",
+    "scoringVersion": "1.1.0",
+    "configVersion": "1.0.0",
+    "protocolKey": "mot/1.1.1/1.1.0",
+    "reportDefinitionVersion": "1.1.0",
+    "presentationVersion": "1.1.1"
+  },
+  "protocolVersion": "1.1.1",
+  "profiles": {
+    "research": {
+      "configHash": "a7a2660c4defe8d336926e63ae821d6e750130226bbfba85e8b054d891e4fbba",
+      "protocolSignature": "ec21f1319091f8f3fe46a3861e7a385ea9a82211607e1da7bbe1df8b036a34c2",
+      "planSha256": "db2b9527309b8748b4030fc656f5444386cd942657e20733ce633aa4e0f20325"
+    },
+    "experience": {
+      "configHash": "ac18eb0d0ee10f354a6ae9dd9d8bdec4587f991c6e19676eb0f45041154eaf13",
+      "protocolSignature": "ec21f1319091f8f3fe46a3861e7a385ea9a82211607e1da7bbe1df8b036a34c2",
+      "planSha256": "b232ca378ac62107aa2332edf0144d157fb1ebed53005be3631ccdb32318fade"
+    }
+  },
+  "changes": "Only practice interruption feedback and progression; two completed practices required before formal. Interrupted raw retained. No timing/scorer math/config/count/input/stimuli change.",
+  "oldFrozenBehavior": "Old engine1.1.0 is rejected by new scorer identity, old draft binding remains separately readable; do not relabel/re-score old results.",
+  "allowed": [
+    "exact new engine/scorer/protocol/config tuple and matching seed-bound draft port"
+  ],
+  "rejected": [
+    "old engine/protocol given to new execution",
+    "old draft port or wrong seed used in new task",
+    "cross-profile hash/config",
+    "silently reading latest report/reference"
+  ],
+  "pending": [
+    "platform native registry/two-profile admission",
+    "real epoch/session binding mapper",
+    "API/DB/COS archive & frozen report consumers",
+    "MOT async callback/context isolation C-02",
+    "MOT permanent practice budget recovery C-05"
+  ],
+  "notExecuted": [
+    "old seed/trajectory/scorer arithmetic tests",
+    "full task browser or timing measurements",
+    "DB/COS integration",
+    "CI/merge/deploy"
+  ]
+}

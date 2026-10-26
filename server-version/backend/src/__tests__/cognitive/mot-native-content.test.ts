@@ -47,7 +47,7 @@ describe('MOT native content candidate',()=>{
   expect(()=>score(forged)).toThrow('actual task clock')
  })
  it('pins each exact profile hash, protocol signature and seeded stimulus plan to a checked-in golden',()=>{
-  const golden=JSON.parse(readFileSync(join(__dirname,'fixtures/mot-native-v1.1.0.json'),'utf8'))
+  const golden=JSON.parse(readFileSync(join(__dirname,'fixtures/mot-native-v1.1.1.json'),'utf8'))
   for(const profile of ['research','experience'] as const){
     const snapshot=createMotSnapshot(profile)
     const plans=Array.from({length:snapshot.config.totalTrials},(_,i)=>motTrialPlan(snapshot.config,seed,i))

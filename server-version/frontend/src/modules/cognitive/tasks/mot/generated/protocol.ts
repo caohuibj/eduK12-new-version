@@ -1,4 +1,4 @@
-// Generated from the pure MOT candidate protocol. Source SHA256: bd79691a33a6680c220e170ef9e5fc210fca518ad7823f2c2c7fdca418c37da9
+// Generated from the pure MOT candidate protocol. Source SHA256: 59813dd8b4cbde0571ecdad9e87113cb52ab1b9885d506f0273cb8cca34a5612
 /** Pure task-owned MOT protocol. No runtime registration or product score. */
 export type MotProfile = 'research' | 'experience'
 export type MotSpeed = 1 | 4 | 8
@@ -117,7 +117,7 @@ export const MOT_COLORS = Object.freeze({
   object: '#222222', target: '#E53935', selected: '#1D4ED8', selectedMark: '#FFFFFF',
 })
 export const MOT_IDENTITY = Object.freeze({
-  testType: 'mot', engineVersion: '1.1.0', scoringVersion: '1.1.0',
+  testType: 'mot', engineVersion: '1.1.1', scoringVersion: '1.1.0',
   configVersion: '1.0.0', randomizationAlgorithmVersion: 'mot-fnv1a-mulberry32-v1',
 })
 export function motConfig(profile: MotProfile): MotConfig {

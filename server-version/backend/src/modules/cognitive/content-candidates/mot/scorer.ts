@@ -5,7 +5,7 @@ import { parseMotConfig, parseMotTrial } from './schema'
 export function scoreMot(input: AuthoritativeScorerInput<MotConfig,MotTrial>): CognitiveScoreResult {
   if (input.session.testType !== MOT_IDENTITY.testType || input.session.engineVersion !== MOT_IDENTITY.engineVersion
     || input.session.scoringVersion !== MOT_IDENTITY.scoringVersion || input.session.configVersion !== MOT_IDENTITY.configVersion
-    || input.session.protocol.key !== 'mot/1.1.0/1.1.0')
+    || input.session.protocol.key !== 'mot/1.1.1/1.1.0')
     throw new Error('Unsupported frozen MOT identity')
   const config = parseMotConfig(input.config)
   if (input.trials.length > config.totalTrials) throw new Error('MOT trial budget exceeded')

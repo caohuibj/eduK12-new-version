@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { MOT_COLORS, motCalibrationMatches, motConfig, motGeometry, motTrialPlan,
+import { MOT_COLORS, MOT_IDENTITY, motCalibrationMatches, motConfig, motGeometry, motTrialPlan,
   type MotCalibration as Calibration, type MotConfig, type MotTrial } from './generated/protocol'
 import { MotCalibration } from './MotCalibration'
 import { readMotDisplay } from './display'
@@ -21,12 +21,14 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
   const expected=motConfig(config.profile)
   if(Object.keys(config).length!==Object.keys(expected).length||Object.entries(expected).some(([key,v])=>config[key as keyof MotConfig]!==v))
     throw new Error('Unsupported frozen MOT config')
+  if(draft.binding.protocolKey!==`mot/${MOT_IDENTITY.engineVersion}/${MOT_IDENTITY.scoringVersion}`||draft.binding.randomSeed!==randomSeed)
+    throw new Error('MOT draft does not match the frozen execution identity')
   const en=language==='en'
   const [view,setView]=useState<'intro'|'calibration'|'ready'|'running'|'practice-feedback'|'break'|'saving'|'error'>('intro')
   const [calibration,setCalibration]=useState<Calibration|null>(null)
   const [practice,setPractice]=useState(0),[formal,setFormal]=useState(false)
   const [stage,setStage]=useState<MotStage>('fixation'),[selected,setSelected]=useState<number[]>([])
-  const [practiceHits,setPracticeHits]=useState(0),[error,setError]=useState('')
+  const [practiceHits,setPracticeHits]=useState<number|null>(null),[error,setError]=useState('')
   const capture=useRef<MotCapture|null>(null),board=useRef<HTMLDivElement>(null)
   const dots=useRef<Array<HTMLButtonElement|null>>([]),working=useRef(false)
   const saveGate=useRef(createMotSaveGate())
@@ -61,7 +63,9 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
       try{
         await draft.appendPractice(snapshot)
         retry.current=null
-        setPracticeHits(snapshot.core.responses.filter(r=>snapshot.core.targetIds.includes(r.objectId)).length)
+        const complete=snapshot.core.recordOrigin==='live'&&!snapshot.core.timedOut&&!snapshot.core.interruptions.length
+          &&snapshot.core.responseStartedAtPerfMs!==null&&snapshot.core.responses.length===config.targetCount
+        setPracticeHits(complete?snapshot.core.responses.filter(r=>snapshot.core.targetIds.includes(r.objectId)).length:null)
         setView('practice-feedback')
       }catch{
         retry.current=()=>persistPractice(snapshot)
@@ -192,11 +196,12 @@ export function MotTask({config,randomSeed,trialIndex,language='zh',draft,onTria
       <div className="mot-stage-footer"><h1>{stage==='response'?(en?'Select the five targets':'选出最初的5个目标'):stage==='cue'?(en?'Remember the red targets':'记住红色目标'):(en?'Keep watching':'请持续注视')}</h1>
         {stage==='response'&&<p role="status">{en?'Selected':'已选择'} {selected.length} / 5</p>}</div>
     </section>}
-    {view==='practice-feedback'&&<section className="mot-intro"><h1>{en?'Practice record':'练习记录'}</h1>
-      <p>{en?'Targets found':'找回目标'} {practiceHits} / 5</p>
+    {view==='practice-feedback'&&<section className="mot-intro"><h1>{practiceHits===null?(en?'Practice interrupted':'练习已中断'):(en?'Practice record':'练习记录')}</h1>
+      {practiceHits===null?<><p>{en?'This practice was interrupted. Its record is saved. Try this practice again before continuing.':'本次练习中断，记录已保存。请重新完成本次练习后再继续。'}</p>
+        <button className="mot-button" onClick={ready}>{en?'Retry this practice':'重试本次练习'}</button></>:<><p>{en?'Targets found':'找回目标'} {practiceHits} / 5</p>
       <button className="mot-button" onClick={()=>{if(practice===0){setPractice(1);ready()}else{setFormal(true);ready()}}}>
         {practice===0?(en?'Next practice':'再练习一次'):(en?'Start formal trials':'进入正式作答')}</button>
-      {practice===1&&<button className="mot-button mot-button-secondary" onClick={()=>{setPractice(0);ready()}}>{en?'Repeat practice':'重新练习'}</button>}</section>}
+      {practice===1&&<button className="mot-button mot-button-secondary" onClick={()=>{setPractice(0);ready()}}>{en?'Repeat practice':'重新练习'}</button>}</>}</section>}
     {view==='saving'&&<section className="mot-intro" role="status"><p>{en?'Saving your record…':'正在保存记录…'}</p></section>}
     {view==='error'&&<section className="mot-intro"><p role="alert">{error}</p><button className="mot-button" onClick={()=>{if(retry.current)void retry.current();else ready()}}>{en?'Retry':'重试'}</button></section>}
   </div>

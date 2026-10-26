@@ -41,7 +41,7 @@ export const motDefinition:TaskDefinition<MotConfig,MotTrial> = {
   engineVersion:MOT_IDENTITY.engineVersion,scoringVersion:MOT_IDENTITY.scoringVersion,
   configSchema:motConfigSchema as TaskDefinition<MotConfig,MotTrial>['configSchema'],
   trialSchema:motTrialSchema as TaskDefinition<MotConfig,MotTrial>['trialSchema'],
-  protocol:{schemaVersion:1,key:'mot/1.1.0/1.1.0',version:'1.1.0',clock:'performance',
+  protocol:{schemaVersion:1,key:'mot/1.1.1/1.1.0',version:'1.1.1',clock:'performance',
     randomizationAlgorithmVersion:MOT_IDENTITY.randomizationAlgorithmVersion,trialEnvelopeVersion:1,
     phases:[{key:'test',persists:true,required:true}],measurementCriticalConfigPaths:['*']},
   scorer:scoreMot,finalSubmission:{maxTrials:config=>config.totalTrials},

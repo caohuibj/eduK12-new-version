@@ -14,7 +14,7 @@ let clock=0,paint:FrameRequestCallback
 const delayed=()=>{let resolve!:()=>void;const promise=new Promise<void>(ok=>{resolve=ok});return{promise,resolve}}
 function draftFor(records:MotDraftRecord[]=[]){
  let pending:MotPending|null=null;const practices:MotDraftRecord[]=[]
- const port:MotDraftPort={pending:vi.fn(async()=>pending),begin:vi.fn(async p=>{pending=p}),
+ const port:MotDraftPort={binding:{sessionId:'synthetic-practice',attemptNo:1,protocolKey:'mot/1.1.1/1.1.0',resolvedConfigHash:'synthetic-only',randomSeed:seed},pending:vi.fn(async()=>pending),begin:vi.fn(async p=>{pending=p}),
   append:vi.fn(async record=>{if(!records.some(r=>r.core.trialIndex===record.core.trialIndex))records.push(structuredClone(record));pending=null}),
   records:vi.fn(async()=>structuredClone(records)),practices:vi.fn(async()=>structuredClone(practices)),
   appendPractice:vi.fn(async record=>{practices.push(structuredClone(record))})}
