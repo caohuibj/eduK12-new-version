@@ -284,6 +284,7 @@ const prepareUnifiedScaleWrite = async (
         result,
         runtime: snapshot.compiledRuntime,
         contextHash: admission.contextSnapshotHash,
+        participantContext:admission.contextValues??undefined,
         referenceBindings: snapshot.referenceBindings,
       })
     : null

@@ -1,3 +1,4 @@
+import {gradeLevelSchema,sexAtBirthSchema} from '../assessment-context/context'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { referenceSetHash } from '../assessment-runtime/reference-binding'
@@ -7,6 +8,7 @@ export interface ScaleReferenceIdentityV1 {
  instrumentKey:string; instrumentVersion:string; scoringVersion:string; measurementHash:string
  subjectKey:string; locale:string; schoolStage:'junior_secondary'|'upper_secondary'|'adult'; scoreKey:string
  direction:string; range:{min:number;max:number}; reportVersion:string
+ frozenContext?:FrozenLongitudinalContext
  originalReferenceVersion:string; originalReferenceHash:string
 }
 export interface LongitudinalReferencePoint { resultVersion:string; at:string; ordinal?:number; value:number|null; identity:ScaleReferenceIdentityV1 }
@@ -16,10 +18,10 @@ export interface LongitudinalReferenceSnapshotV1 {
  points:Array<{resultVersion:string;ordinal?:number;rawValue:number|null;reference:ResolvedScaleReference|null}>
  snapshotHash:string
 }
-const entryFor=(set:AssessmentReferenceSetDefinition,id:ScaleReferenceIdentityV1)=>set.instrumentType==='scale' && set.instrumentKey===id.instrumentKey ? set.entries.find(e=>e.scoreKey===id.scoreKey && e.instrumentVersion===id.instrumentVersion && e.scoringVersion===id.scoringVersion && e.governance?.measurementHash===id.measurementHash && e.governance.subjectKey===id.subjectKey && e.governance.locale===id.locale && (e.governance.schoolStage===id.schoolStage || e.governance.crossStageReReferenceAllowed) && e.governance.scoreRange.min===id.range.min && e.governance.scoreRange.max===id.range.max) : undefined
+const entryFor=(set:AssessmentReferenceSetDefinition,id:ScaleReferenceIdentityV1)=>set.instrumentType==='scale' && set.instrumentKey===id.instrumentKey ? set.entries.find(e=>e.scoreKey===id.scoreKey && e.instrumentVersion===id.instrumentVersion && e.scoringVersion===id.scoringVersion && e.governance?.measurementHash===id.measurementHash && e.governance.subjectKey===id.subjectKey && e.governance.locale===id.locale && (e.governance.schoolStage===id.schoolStage || e.governance.schoolStage!=='adult'&&id.schoolStage!=='adult'&&e.governance.crossStageReReferenceAllowed) && e.governance.scoreRange.min===id.range.min && e.governance.scoreRange.max===id.range.max) : undefined
 const compatible=(a:ScaleReferenceIdentityV1,b:ScaleReferenceIdentityV1)=>a.instrumentKey===b.instrumentKey && a.instrumentVersion===b.instrumentVersion && a.scoringVersion===b.scoringVersion && a.measurementHash===b.measurementHash && a.subjectKey===b.subjectKey && a.locale===b.locale && a.scoreKey===b.scoreKey && a.direction===b.direction && a.range.min===b.range.min && a.range.max===b.range.max
 export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalReferencePoint[];references:AssessmentReferenceSetDefinition[];mode?:ReferenceResolutionMode;explicitLatest?:boolean;generatedAt:string}):LongitudinalReferenceSnapshotV1 {
- if(input.points.length<2 || input.points.some(p=>!Number.isFinite(Date.parse(p.at)) || (p.value!==null && !Number.isFinite(p.value))) || new Set(input.points.map(p=>p.resultVersion)).size!==input.points.length || !Number.isFinite(Date.parse(input.generatedAt))) throw new Error('LONGITUDINAL_SOURCE_INVALID')
+ if(input.points.length<2 || input.points.some(p=>!scaleReferenceIdentitySchema.safeParse(p.identity).success || !Number.isFinite(Date.parse(p.at)) || (p.value!==null && !Number.isFinite(p.value))) || new Set(input.points.map(p=>p.resultVersion)).size!==input.points.length || !Number.isFinite(Date.parse(input.generatedAt))) throw new Error('LONGITUDINAL_SOURCE_INVALID')
  const points=[...input.points].sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)),mode=input.mode??'LATER_REFERENCE'
  if(!['ORIGINAL','TIME_MATCHED','LATER_REFERENCE'].includes(mode)) throw new Error('LONGITUDINAL_MODE_INVALID')
  const original=(p:LongitudinalReferencePoint)=>{
@@ -39,12 +41,10 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
  const project=(p:LongitudinalReferencePoint,r:AssessmentReferenceSetDefinition):ResolvedScaleReference|null=>{
   const e=entryFor(r,p.identity)
   if(!e) return null
-  const g=e.governance!
-  // School stages project through their canonical grade; adult references
-  // project through the midpoint of their declared age window instead.
-  const context:ReferenceContext=g.schoolStage==='junior_secondary'?{gradeLevel:'8',language:p.identity.locale}
-   :g.schoolStage==='upper_secondary'?{gradeLevel:'11',language:p.identity.locale}
-   :{ageMonthsAtFreeze:Math.floor(((e.population?.match?.minAgeMonthsInclusive??0)+(e.population?.match?.maxAgeMonthsExclusive??0))/2),language:p.identity.locale}
+  // Reinterpret the participant at measurement time; never manufacture a
+  // matching age/grade from the candidate reference population. Old identities
+  // without demographics remain readable but may be uninterpretable.
+  const context:ReferenceContext={...p.identity.frozenContext,language:p.identity.locale}
   return resolveAssessmentReference({instrumentType:'scale',instrumentKey:r.instrumentKey,instrumentVersion:p.identity.instrumentVersion,scoringVersion:p.identity.scoringVersion,selections:[{scoreKey:p.identity.scoreKey,referenceVersion:r.referenceVersion,referenceKind:e.referenceKind}],references:[{...r,status:'ACTIVE'}],score:{key:p.identity.scoreKey,value:p.value},context})[0]
  }
  const projected=points.map(p=>{
@@ -58,8 +58,20 @@ export function buildLongitudinalReferenceSnapshot(input:{points:LongitudinalRef
  return {...frozen,snapshotHash:canonicalHash(frozen)}
 }
 
+export const frozenLongitudinalContextSchema=z.object({
+ ageMonthsAtFreeze:z.number().int().min(0).max(1440).optional(),
+ sexAtBirth:sexAtBirthSchema.optional(),gradeLevel:gradeLevelSchema.optional(),
+ primaryLanguage:z.string().min(1).optional(),countryOrRegion:z.string().min(1).optional(),
+}).strict()
+export type FrozenLongitudinalContext=z.infer<typeof frozenLongitudinalContextSchema>
+export function freezeLongitudinalContext(context:ReferenceContext):FrozenLongitudinalContext{
+ return frozenLongitudinalContextSchema.parse(Object.fromEntries(
+  ['ageMonthsAtFreeze','sexAtBirth','gradeLevel','primaryLanguage','countryOrRegion']
+   .flatMap(key=>context[key as keyof ReferenceContext]===undefined?[]:[[key,context[key as keyof ReferenceContext]]])))
+}
 export const scaleReferenceIdentitySchema = z.object({
  instrumentKey:z.string().min(1),instrumentVersion:z.string().min(1),scoringVersion:z.string().min(1),measurementHash:z.string().regex(/^[a-f0-9]{64}$/),
  subjectKey:z.string().min(1),locale:z.string().min(1),schoolStage:z.enum(['junior_secondary','upper_secondary','adult']),scoreKey:z.string().min(1),direction:z.string().min(1),
+ frozenContext:frozenLongitudinalContextSchema.optional(),
  range:z.object({min:z.number().finite(),max:z.number().finite()}).strict().refine(r=>r.min<r.max),reportVersion:z.string().min(1),originalReferenceVersion:z.string().min(1),originalReferenceHash:z.string().regex(/^[a-f0-9]{64}$/)
 }).strict()

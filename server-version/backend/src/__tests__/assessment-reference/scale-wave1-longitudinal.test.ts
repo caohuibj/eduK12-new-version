@@ -3,7 +3,7 @@ import { testReference } from './wave1-reference.fixture'
 import { referenceSetHash } from '../../modules/assessment-runtime/reference-binding'
 import { buildLongitudinalReferenceSnapshot, type ScaleReferenceIdentityV1 } from '../../modules/assessment-reference/longitudinal'
 const refs=[1,2,3,4].map(n=>{const r=testReference();r.referenceVersion=`v${n}`;r.entries[0].governance!.effectiveFrom=`2026-0${n}-01T00:00:00Z`;return r})
-const identity=(n:number):ScaleReferenceIdentityV1=>({instrumentKey:'test_physics',instrumentVersion:'1.0.0',scoringVersion:'1.0.0',measurementHash:'a'.repeat(64),subjectKey:'physics',locale:'zh-CN',schoolStage:'junior_secondary',scoreKey:'wellbeing',direction:'higher_is_more',range:{min:1,max:5},reportVersion:'1.0.0',originalReferenceVersion:`v${n}`,originalReferenceHash:referenceSetHash(refs[n-1])})
+const identity=(n:number):ScaleReferenceIdentityV1=>({instrumentKey:'test_physics',instrumentVersion:'1.0.0',scoringVersion:'1.0.0',measurementHash:'a'.repeat(64),subjectKey:'physics',locale:'zh-CN',schoolStage:'junior_secondary',frozenContext:{gradeLevel:'8'},scoreKey:'wellbeing',direction:'higher_is_more',range:{min:1,max:5},reportVersion:'1.0.0',originalReferenceVersion:`v${n}`,originalReferenceHash:referenceSetHash(refs[n-1])})
 const points=[1,2,3].map(n=>({resultVersion:`T${n}`,at:`2026-0${n}-10T00:00:00Z`,value:n,identity:identity(n)}))
 describe('longitudinal later-reference priority',()=>{
  it('defaults to later attached v3 and only explicit regeneration selects v4',()=>{
@@ -46,5 +46,39 @@ describe('longitudinal provenance regression',()=>{
  })
  it('rejects non-finite raw observations rather than freezing JSON null',()=>{
   expect(()=>buildLongitudinalReferenceSnapshot({points:[{...points[0],value:NaN},points[1]],references:refs,generatedAt:'2026-10-01T00:00:00Z'})).toThrow('LONGITUDINAL_SOURCE_INVALID')
+ })
+})
+
+
+describe('actual frozen adult demographics, never candidate population midpoints',()=>{
+ const adult=(version:string,min=216,max=480)=>{const r=testReference();r.referenceVersion=version
+  r.entries[0].governance!.schoolStage='adult';r.entries[0].governance!.crossStageReReferenceAllowed=false
+  r.entries[0].governance!.effectiveFrom='2026-01-01T00:00:00Z'
+  r.entries[0].population={language:'zh-CN',match:{minAgeMonthsInclusive:min,maxAgeMonthsExclusive:max}}
+  return r}
+ const build=(ages:Array<number|undefined>,sets=[adult('adult-v1')])=>{
+  const ps=ages.map((age,i)=>({resultVersion:'A'+i,at:'2026-05-01T00:00:00Z',value:3,identity:{...identity(1),schoolStage:'adult' as const,originalReferenceVersion:sets[0].referenceVersion,originalReferenceHash:referenceSetHash(sets[0]),frozenContext:age===undefined?undefined:{ageMonthsAtFreeze:age}}}))
+  return {ps,input:{points:ps,references:sets,generatedAt:'2026-10-01T00:00:00Z',explicitLatest:true}}
+ }
+ it('uses each real age including exact lower and upper-exclusive boundaries',()=>{
+  const {input}=build([216,479,480,180])
+  const result=buildLongitudinalReferenceSnapshot(input)
+  expect(result.points.map(p=>p.reference?.status)).toEqual(['available','available','unavailable','unavailable'])
+  expect(result.points.slice(2).every(p=>p.reference?.unavailableReason==='no_population_match')).toBe(true)
+ })
+ it('returns missing-context for historical adult identities without a frozen age',()=>{
+  const {input}=build([undefined,300])
+  const result=buildLongitudinalReferenceSnapshot(input)
+  expect(result.points[0].reference).toMatchObject({status:'unavailable',unavailableReason:'missing_context'})
+  expect(result.points[1].reference?.status).toBe('available')
+ })
+ it.each(['adult-to-school','school-to-adult'])('refuses %s despite a candidate cross-stage flag',direction=>{
+  const a=adult('adult-v1'),school=testReference();school.referenceVersion='school-v2'
+  school.entries[0].governance!.crossStageReReferenceAllowed=true;school.entries[0].governance!.effectiveFrom='2026-02-01T00:00:00Z'
+  const {input}=build([300,320],[a,school])
+  if(direction==='school-to-adult'){a.entries[0].governance!.crossStageReReferenceAllowed=true;a.entries[0].governance!.effectiveFrom='2026-03-01T00:00:00Z'}
+  if(direction==='school-to-adult')for(const point of input.points){point.identity.schoolStage='junior_secondary' as never;point.identity.originalReferenceVersion=school.referenceVersion;point.identity.originalReferenceHash=referenceSetHash(school);point.identity.frozenContext={gradeLevel:'8'} as never}
+  const result=buildLongitudinalReferenceSnapshot(input)
+  expect(result.points.every(p=>p.reference?.referenceVersion===(direction==='adult-to-school'?'adult-v1':'school-v2'))).toBe(true)
  })
 })

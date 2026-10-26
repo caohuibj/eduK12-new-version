@@ -1,5 +1,6 @@
+import type {ReferenceContext} from '../assessment-reference/reference'
 import { rawScoreFeedbackMatchSchema, type RawScoreFeedbackMatch } from '../scale/raw-score-feedback'
-import { scaleReferenceIdentitySchema, type ScaleReferenceIdentityV1 } from '../assessment-reference/longitudinal'
+import { freezeLongitudinalContext, scaleReferenceIdentitySchema, type ScaleReferenceIdentityV1 } from '../assessment-reference/longitudinal'
 import type { ScaleResultV2 } from '../scale/scale-result'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
 import type { SituationalResultV1 } from '../situational/situation-scoring'
@@ -250,6 +251,7 @@ export const projectScaleCanonicalUnitResult = (input: {
   runtime: CompiledInstrumentRuntimeV1
   contextHash: string | null
   referenceBindings?: ReferenceBindingSnapshot[]
+  participantContext?:ReferenceContext
 }): CanonicalUnitResultCoreV1 => {
   const allowed = new Set(input.runtime.aggregateProjection.allowedMetricKeys)
   for (const score of input.result.scores) {
@@ -264,7 +266,8 @@ export const projectScaleCanonicalUnitResult = (input: {
       const scaleReference: ScaleReferenceIdentityV1 | undefined = g && ref && binding ? {
         instrumentKey:input.runtime.instrumentKey,instrumentVersion:input.runtime.instrumentVersion,scoringVersion:input.result.method.scoringVersion,measurementHash:input.runtime.sourceDefinitionHash,
         subjectKey:g.subjectKey,locale:g.locale,schoolStage:g.schoolStage,scoreKey:score.key,direction:score.direction,range:g.scoreRange,reportVersion:input.result.method.reportVersion,
-        originalReferenceVersion:ref.referenceVersion,originalReferenceHash:binding.referenceHash
+        originalReferenceVersion:ref.referenceVersion,originalReferenceHash:binding.referenceHash,
+        ...(input.contextHash&&input.participantContext?{frozenContext:freezeLongitudinalContext(input.participantContext)}:{})
       } : undefined
       return {
       key: score.key,
