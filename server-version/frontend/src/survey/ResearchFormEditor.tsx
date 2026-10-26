@@ -1,3 +1,4 @@
+import {ArrowUp,ArrowDown,Copy,Trash2} from 'lucide-react'
 import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import {SurveyFormChoiceList} from './SurveyFormChoiceList'
 import {referencedFormChoiceKeys} from '../modules/assessment-core/form/choiceSafety'
@@ -24,6 +25,7 @@ export function ResearchFormEditor(props:Props){
   return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl,onPendingChange,bulkPending)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} renderMaterials={props.renderMaterials} questionMeta={pageControl} bulkPending={bulkPending} onPendingChange={onPendingChange} focusedItem={props.focusedItem} variant={props.variant} compactSettings={props.compactSettings} renderImageField={props.renderImageField}/>}/>:<FormFields {...props}/>
 }
 function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedItem,variant,renderImageField,renderMaterials,bulkPending,onPendingChange,compactSettings=false}:FieldsProps){
+  const groupTerm=compactSettings?'分组':'区段'
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -37,26 +39,27 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
       return {...page,questions}
     })
   }
-  return <div className="space-y-5">
-    <div className="flex flex-wrap gap-2 items-center" hidden={!!questionKey}>
-      <h3 className="font-semibold">{variant==='education'?'表单区段':'Form 问卷页面'} · V{value.schemaVersion}</h3>
-      <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
-        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span>
+  return <div className={compactSettings?"education-form-editor space-y-5":"space-y-5"}>
+    <div className={compactSettings?"education-form-structure":"flex flex-wrap gap-2 items-center"} hidden={!!questionKey}>
+      <h3 className="font-semibold">{compactSettings?'题目管理':<>{variant==='education'?'表单区段':'Form 问卷页面'} · V{value.schemaVersion}</>}</h3>
+      {compactSettings&&fieldCount<=500?<details className="education-form-structure-help"><summary>结构说明</summary><span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
+        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span></details>:<span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
+        role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span>}
       {value.schemaVersion===1&&<button type="button" disabled={bulkPending} className="btn-secondary"
         onClick={()=>onChange({...value,schemaVersion:2})}>
         升级为 Form V2（生成新冻结版本）</button>}
       <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
-        {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+(variant==='education'?' 区段':' 页'),questions:[]}]})}>{variant==='education'?'新增区段':'新增分页'}</button>
+        {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+(variant==='education'?' '+groupTerm:' 页'),questions:[]}]})}>{variant==='education'?'新增'+groupTerm:'新增分页'}</button>
     </div>
-    {value.pages.map((page,pi)=>focusedItem&&focusedItem.pageKey!==page.pageKey?null:<section className={questionKey?'survey-form-question-fields':'rounded-xl border p-4 bg-white space-y-4'} key={page.pageKey} hidden={!!questionKey&&!page.questions.some(q=>q.itemKey===questionKey)}>
-      <header className="flex items-center gap-2" hidden={!!questionKey}>
-        <input className="input flex-1" aria-label={'第 '+(pi+1)+(variant==='education'?' 区段标题':' 页标题')} value={page.title}
+    {value.pages.map((page,pi)=>focusedItem&&focusedItem.pageKey!==page.pageKey?null:<section className={questionKey?'survey-form-question-fields':compactSettings?'education-form-group':'rounded-xl border p-4 bg-white space-y-4'} key={page.pageKey} hidden={!!questionKey&&!page.questions.some(q=>q.itemKey===questionKey)}>
+      <header className={compactSettings?"education-form-group-heading":"flex items-center gap-2"} hidden={!!questionKey}>
+        <input className="input flex-1" aria-label={'第 '+(pi+1)+(variant==='education'?' '+groupTerm+'标题':' 页标题')} value={page.title}
           onChange={e=>setPage(pi,p=>({...p,title:e.target.value}))}/>
-        <button className="btn-secondary" type="button" disabled={bulkPending||pi===0} aria-label={variant==='education'?'上移区段':'上移分页'}
+        <button className="btn-secondary" type="button" disabled={bulkPending||pi===0} aria-label={variant==='education'?'上移'+groupTerm:'上移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi-1]]=[copy[pi-1],copy[pi]];onChange({...value,pages:copy})}}>↑</button>
-        <button className="btn-secondary" type="button" disabled={bulkPending||pi===value.pages.length-1} aria-label={variant==='education'?'下移区段':'下移分页'}
+        <button className="btn-secondary" type="button" disabled={bulkPending||pi===value.pages.length-1} aria-label={variant==='education'?'下移'+groupTerm:'下移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi+1]]=[copy[pi+1],copy[pi]];onChange({...value,pages:copy})}}>↓</button>
-        <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>{variant==='education'?'删除区段':'删除页'}</button>
+        <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>{variant==='education'?'删除'+groupTerm:'删除页'}</button>
       </header>
       {page.questions.map((q,qi)=>{
         if(focusedItem&&focusedItem.itemKey!==q.itemKey)return null
@@ -81,14 +84,14 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               </button></p> : null}
           </FormSettings>
         return <article key={q.itemKey} id={'survey-form-'+q.itemKey} tabIndex={-1}
-          className={questionKey?'survey-form-question space-y-4':'border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4'}>
-          <div className={questionKey?'survey-form-question-meta':'flex flex-wrap gap-2 items-center'}>
+          className={questionKey?'survey-form-question space-y-4':compactSettings?'education-form-question':'border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4'}>
+          <div className={questionKey?'survey-form-question-meta':compactSettings?'education-form-question-meta':'flex flex-wrap gap-2 items-center'}>
             {questionKey?questionMeta:<strong className="text-sm">题目 {qi+1}</strong>}
-            {questionKey?<label className="survey-form-type-control">题型{typeControl}</label>:typeControl}
+            {questionKey||compactSettings?<label className={compactSettings?'education-form-type-control':'survey-form-type-control'}>题型{typeControl}</label>:typeControl}
 
-            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={bulkPending||qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
-            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={bulkPending||qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
-            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>{
+            <button hidden={!!questionKey} type="button" className="btn-secondary" aria-label={compactSettings?'上移题目':undefined} title={compactSettings?'上移题目':undefined} disabled={bulkPending||qi===0} onClick={()=>move(pi,qi,-1)}>{compactSettings?<ArrowUp size={16} aria-hidden="true"/>:'上移'}</button>
+            <button hidden={!!questionKey} type="button" className="btn-secondary" aria-label={compactSettings?'下移题目':undefined} title={compactSettings?'下移题目':undefined} disabled={bulkPending||qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>{compactSettings?<ArrowDown size={16} aria-hidden="true"/>:'下移'}</button>
+            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" aria-label={compactSettings?'复制题目':undefined} title={compactSettings?'复制题目':undefined} onClick={()=>{
               const copiedOptions=q.options.map(o=>({...o,optionKey:researchKey('o')}))
               const remap=new Map(q.options.map((o,i)=>[o.optionKey,copiedOptions[i].optionKey]))
               const clone:FormQuestion={...structuredClone(q),itemKey:researchKey('q'),
@@ -97,26 +100,27 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
                 exclusiveOptionKeys:q.exclusiveOptionKeys?.map(key=>remap.get(key)!).filter(Boolean)}
               setPage(pi,p=>({...p,questions:[
                 ...p.questions.slice(0,qi+1),clone,...p.questions.slice(qi+1)]}))
-            }}>复制</button>
-            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>删除</button>
+            }}>{compactSettings?<Copy size={16} aria-hidden="true"/>:'复制'}</button>
+            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" aria-label={compactSettings?'删除题目':undefined} title={compactSettings?'删除题目':undefined} onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>{compactSettings?<Trash2 size={16} aria-hidden="true"/>:'删除'}</button>
           </div>
-          <label className={questionKey?'survey-form-prompt':'block text-sm'}>题干
-            <textarea className="input w-full block" rows={questionKey?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
+          <label className={questionKey?'survey-form-prompt':compactSettings?'education-form-prompt':'block text-sm'}>题干
+            <textarea className="input w-full block" rows={questionKey||compactSettings?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
               onChange={e=>setQuestion(pi,qi,x=>({...x,prompt:e.target.value}))}/>
           </label>
-          <div className={questionKey?'survey-form-question-switches':'flex gap-4 flex-wrap'}>
+          <div className={questionKey?'survey-form-question-switches':compactSettings?'education-form-question-switches':'flex gap-4 flex-wrap'}>
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
               onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" checked={q.allowRefusal===true}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,allowRefusal:e.target.checked}))}/>
-              {questionKey?'允许选择“不愿回答”':'允许明确选择「不愿回答」（单独记为 REFUSED）'}
+              {questionKey||compactSettings?'允许选择“不愿回答”':'允许明确选择「不愿回答」（单独记为 REFUSED）'}
             </label>
           </div>
-          {renderMaterials ? <FormSettings compact={compactSettings} title="题目展示素材">{renderMaterials(q,next=>setQuestion(pi,qi,()=>next))}</FormSettings> : projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
-          {!questionKey&&mediaFields}
+          {!compactSettings&&(renderMaterials ? <FormSettings compact={compactSettings} title="题目展示素材">{renderMaterials(q,next=>setQuestion(pi,qi,()=>next))}</FormSettings> : projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>)}
+          {!questionKey&&!compactSettings&&mediaFields}
           {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} protectedKeys={referencedOptions} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
-          {questionKey&&mediaFields}
+          {questionKey&&!compactSettings&&mediaFields}
+          {compactSettings&&<details className="survey-form-question-settings"><summary>展示素材与配图</summary>{renderMaterials&&renderMaterials(q,next=>setQuestion(pi,qi,()=>next))}{mediaFields}</details>}
           {(!questionKey&&!compactSettings||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey||compactSettings} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
             <div className="border rounded-lg p-3 space-y-3">
@@ -188,12 +192,12 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
           </FormSettings>}
         </article>
       })}
-      <div className="flex flex-wrap gap-2" hidden={!!questionKey}>{Object.entries(types).filter(([type])=>value.schemaVersion===2||
+      <FormSettings compact={compactSettings} title="添加题目"><div className={compactSettings?"education-form-add-types":"flex flex-wrap gap-2"} hidden={!!questionKey}>{Object.entries(types).filter(([type])=>value.schemaVersion===2||
         !professionalTypes.has(type as FormQuestion['type'])).map(([type,title])=>
         <button type="button" disabled={bulkPending} className="btn-secondary" key={type}
           onClick={()=>setPage(pi,p=>({...p,questions:[...p.questions,newQuestion(type as FormQuestion['type'])]}))}>
-          + {title}</button>)}</div>
+          + {title}</button>)}</div></FormSettings>
     </section>)}
-    {!questionKey&&!value.pages.length&&<p className="text-sm text-slate-500">{variant==='education'?'先新增一个区段，再添加题目。':'先新增一个分页，再添加题目；也可使用批量导入自动创建第一页。'}</p>}
+    {!questionKey&&!value.pages.length&&<p className="text-sm text-slate-500">{variant==='education'?'先新增一个'+groupTerm+'，再添加题目。':'先新增一个分页，再添加题目；也可使用批量导入自动创建第一页。'}</p>}
   </div>
 }

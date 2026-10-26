@@ -7,7 +7,7 @@ import {ResearchFormEditor} from '../../survey/ResearchFormEditor'
 import type {FormDraft,FormQuestion} from '../../survey/builder.types'
 const question=(itemKey:string,prompt:string):FormQuestion=>({itemKey,type:'SHORT_TEXT',prompt,required:false,allowRefusal:false,options:[],rows:[]})
 const initial=():FormDraft=>({schemaVersion:2,pages:[{pageKey:'p1',title:'第一段',questions:[question('q1','第一题'),question('q2','第二题')]},{pageKey:'p2',title:'第二段',questions:[question('q3','第三题')]}]})
-function Harness({changed}:{changed:(value:FormDraft)=>void}){const [value,setValue]=useState(initial);return <EducationPrivateFormEditor value={value} onChange={next=>{changed(next);setValue(next)}}/>}
+function Harness({changed,compactSettings=false}:{changed:(value:FormDraft)=>void;compactSettings?:boolean}){const [value,setValue]=useState(initial);return <EducationPrivateFormEditor compactSettings={compactSettings} value={value} onChange={next=>{changed(next);setValue(next)}}/>}
 afterEach(cleanup)
 describe('education section and question authoring navigator',()=>{
  it('changes only view selection and keeps unsaved field edits when navigating away and back',()=>{
@@ -77,10 +77,32 @@ it('keeps optional School settings mounted but collapsed without changing the fo
  const changed=vi.fn()
  render(<EducationPrivateFormEditor compactSettings value={initial()} onChange={changed} renderMaterials={()=><button>读取已有素材</button>}/> )
  expect(screen.getByText('编制说明').closest('details')).not.toHaveAttribute('open')
- expect(screen.getByText('题目展示素材').closest('details')).not.toHaveAttribute('open')
+ expect(screen.getByText('展示素材与配图').closest('details')).not.toHaveAttribute('open')
  expect(screen.getByRole('button',{name:'读取已有素材'})).not.toBeVisible()
- fireEvent.click(screen.getByText('题目展示素材'))
+ fireEvent.click(screen.getByText('展示素材与配图'))
  expect(screen.getByRole('button',{name:'读取已有素材'})).toBeInTheDocument()
  expect(screen.getByLabelText('题干')).toHaveValue('第一题')
  expect(changed).not.toHaveBeenCalled()
+})
+
+
+it('keeps question identity and authoring actions in the compact School presentation',()=>{
+ const changed=vi.fn<(value:FormDraft)=>void>()
+ render(<Harness compactSettings changed={changed}/> )
+ expect(screen.getByRole('navigation',{name:'表单分组与题目'})).toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'新增分组'})).toBeInTheDocument()
+ expect(screen.getByText('添加题目').closest('details')).not.toHaveAttribute('open')
+ expect(screen.getByRole('button',{name:'+ 单选'})).not.toBeVisible()
+ fireEvent.click(screen.getByLabelText('允许选择“不愿回答”'))
+ expect(changed.mock.calls[changed.mock.calls.length-1]?.[0].pages[0].questions[0]).toMatchObject({itemKey:'q1',allowRefusal:true})
+ fireEvent.click(screen.getByRole('button',{name:'复制题目'}))
+ const copied=changed.mock.calls[changed.mock.calls.length-1]![0].pages[0].questions[1]
+ expect(copied.itemKey).not.toBe('q1')
+ expect(copied.allowRefusal).toBe(true)
+ expect(screen.getByLabelText('题干').closest('article')).toHaveAttribute('id','survey-form-'+copied.itemKey)
+ fireEvent.click(screen.getByRole('button',{name:'下移题目'}))
+ expect(changed.mock.calls[changed.mock.calls.length-1]![0].pages[0].questions.map(q=>q.itemKey)).toEqual(['q1','q2',copied.itemKey])
+ fireEvent.click(screen.getByRole('button',{name:'删除题目'}))
+ expect(changed.mock.calls[changed.mock.calls.length-1]![0].pages[0].questions.map(q=>q.itemKey)).toEqual(['q1','q2'])
+ expect(screen.getByLabelText('题干')).toHaveValue('第二题')
 })

@@ -41,20 +41,21 @@ export function EducationPrivateFormEditor({value,onChange,renderImageField,bulk
   }
   onChange(next)
  }
- const directory=<nav className="education-private-form-directory" aria-label="表单区段与题目">
+ const term=compactSettings?'分组':'区段'
+ const directory=<nav className="education-private-form-directory" aria-label={'表单'+term+'与题目'}>
     <h3>内容目录</h3>
-    {!value.pages.length&&<p>还没有区段，请先新增区段。</p>}
+    {!value.pages.length&&<p>还没有{term}，请先新增{term}。</p>}
     <ol>{value.pages.map((page,index)=><li key={page.pageKey}>
-     <button type="button" disabled={bulkPending} aria-label={`选择区段：${page.title}`} aria-pressed={active?.pageKey===page.pageKey}
-      onClick={()=>choose({pageKey:page.pageKey,itemKey:page.questions[0]?.itemKey??null})}>{index+1}. {page.title||'未命名区段'} <small>（{page.questions.length} 题）</small></button>
+     <button type="button" disabled={bulkPending} aria-label={`选择${term}：${page.title}`} aria-pressed={active?.pageKey===page.pageKey}
+      onClick={()=>choose({pageKey:page.pageKey,itemKey:page.questions[0]?.itemKey??null})}>{index+1}. {page.title||'未命名'+term} <small>（{page.questions.length} 题）</small></button>
      <ol>{page.questions.map((question,questionIndex)=><li key={question.itemKey}><button type="button" disabled={bulkPending}
       aria-label={`编辑题目：${question.prompt||'未命名题目'}`} aria-pressed={active?.pageKey===page.pageKey&&active.itemKey===question.itemKey}
       onClick={()=>choose({pageKey:page.pageKey,itemKey:question.itemKey})}><span>{questionIndex+1}. {question.prompt||'未命名题目'}</span><small>{question.required?'必答':'选答'}</small></button></li>)}</ol>
-     {!page.questions.length&&<p>此区段还没有题目。</p>}
+     {!page.questions.length&&<p>此{term}还没有题目。</p>}
     </li>)}</ol>
    </nav>
  return <div ref={root} className="education-private-form-workspace">
-  {compactSettings&&<details className="education-private-form-help"><summary>编制说明</summary><p className="education-private-step-help">按区段组织题目，正式作答时逐节呈现。切换题目会保留未保存修改，点击“保存草稿”才写入；离开工具前请先保存。</p></details>}
+  {compactSettings&&<details className="education-private-form-help"><summary>编制说明</summary><p className="education-private-step-help">按分组组织题目，正式作答时分组呈现。切换题目会保留未保存修改，点击“保存草稿”才写入；离开工具前请先保存。</p></details>}
   {!compactSettings&&<p className="education-private-step-help">按区段组织题目，正式作答时逐节呈现。切换题目会保留未保存修改，点击“保存草稿”才写入；离开工具前请先保存。</p>}
   {bulkPending&&<p role="status">请先应用或清空批量内容，再切换题目、保存或固定版本。</p>}
   <div className="education-private-form-layout">

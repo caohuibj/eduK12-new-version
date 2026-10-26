@@ -111,3 +111,51 @@
  .hs-app .education-private-tools--school .education-private-directory-disclosure>summary{display:list-item;margin-left:16px;padding:10px 14px 10px 0;font-weight:500}
  .hs-app .education-private-tools--school .education-private-directory-disclosure .education-private-form-directory{padding:12px;border:0;max-height:300px}
 }
+
+/* Keep the question itself prominent, matching the School respondent surfaces. */
+.hs-app .education-private-tools--school .education-form-structure{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px}
+.hs-app .education-private-tools--school .education-form-structure>h3{margin:0;font-size:16px}
+.hs-app .education-private-tools--school .education-form-structure>button{margin-left:auto}
+.hs-app .education-private-tools--school .education-form-structure-help{border:0;padding:0;margin:0;background:transparent}
+.hs-app .education-private-tools--school .education-form-structure-help[open]{flex-basis:100%;order:1}
+.hs-app .education-private-tools--school .education-form-structure-help>span{display:block;font-size:12px;color:var(--hs-muted)}
+.hs-app .education-private-tools--school .education-form-group{padding:0;border:0;background:transparent;min-width:0}
+.hs-app .education-private-tools--school .education-form-group-heading{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.hs-app .education-private-tools--school .education-form-group-heading>input{flex:1 1 180px;width:auto}
+.hs-app .education-private-tools--school .education-form-question{padding:20px;margin:0 0 16px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.hs-app .education-private-tools--school .education-form-question-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.hs-app .education-private-tools--school .education-form-question-meta>strong{flex:1 1 auto;font-size:17px;line-height:1.65;color:var(--hs-ink)}
+.hs-app .education-private-tools--school .education-form-type-control{display:flex;align-items:center;gap:8px;flex:0 1 150px;color:var(--hs-muted);white-space:nowrap}
+.hs-app .education-private-tools--school .education-form-type-control>select{flex:1;width:auto;min-width:90px}
+.hs-app .education-private-tools--school .education-form-question-meta>button{width:44px;flex:none;padding:0}
+.hs-app .education-private-tools--school .education-form-prompt{gap:8px;font-size:13px;color:var(--hs-muted)}
+.hs-app .education-private-tools--school .education-form-prompt>textarea{font-size:16px;line-height:1.85;min-height:100px;color:var(--hs-ink)}
+.hs-app .education-private-tools--school .education-form-question-switches{display:flex;align-items:center;flex-wrap:wrap;gap:10px 24px}
+.hs-app .education-private-tools--school .education-form-question-switches>label{display:inline-flex;align-items:center;gap:8px;min-height:36px;color:var(--hs-ink)}
+.hs-app .education-private-tools--school .education-form-question-switches input{margin:0}
+.hs-app .education-private-tools--school .education-form-question>.survey-form-question-settings{margin:0;padding:0 14px;border:1px solid var(--hs-border);border-radius:9px;background:var(--hs-surface-soft)}
+.hs-app .education-private-tools--school .education-form-question>.survey-form-question-settings[open]{padding-bottom:14px}
+.hs-app .education-private-tools--school .education-form-add-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-top:12px}
+.hs-app .education-private-tools--school .education-form-group>details{margin:0;padding:0 14px;border:1px dashed var(--hs-border);border-radius:9px;background:transparent}
+.hs-app .education-private-tools--school .education-form-group>details[open]{padding-bottom:14px}
+@media(max-width:600px){
+ .hs-app .education-private-tools--school .education-form-question{padding:16px 12px;gap:14px}
+ .hs-app .education-private-tools--school .education-form-question-meta>strong{flex-basis:calc(100% - 166px);font-size:16px}
+ .hs-app .education-private-tools--school .education-form-question-meta>button{margin-top:2px}
+ .hs-app .education-private-tools--school .education-form-group-heading>input{flex-basis:100%}
+ .hs-app .education-private-tools--school .education-form-question-switches{gap:8px 16px}
+ .hs-app .education-private-tools--school .education-form-add-types{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+.hs-app .education-private-tools--school .education-form-question .survey-form-choice-list{margin:0;padding:0;display:grid;gap:10px}
+.hs-app .education-private-tools--school .education-form-question .survey-form-option-row{padding:10px;border-radius:9px;background:var(--hs-surface-soft);border-color:var(--hs-border)}
+.hs-app .education-private-tools--school .education-form-question .survey-form-choice-actions{display:flex;align-items:center;gap:4px}
+.hs-app .education-private-tools--school .education-form-question .survey-form-choice-actions>button{width:44px;min-width:44px;min-height:44px;padding:0}
+@container education-editor (max-width:600px){
+ .hs-app .education-private-tools--school .education-form-question .survey-form-option-row{grid-template-columns:18px minmax(0,1fr);gap:8px}
+ .hs-app .education-private-tools--school .education-form-question .survey-form-option-number{align-self:center}
+ .hs-app .education-private-tools--school .education-form-question .survey-form-choice-actions{grid-column:2;justify-self:end}
+}
+@media(max-width:600px){.hs-app.hs-professional .education-private-tools--school .education-form-group{padding:0}}
+.hs-app .education-private-tools--school .education-form-question label:has(>input:is([type=checkbox],[type=radio])){display:inline-flex;align-items:center;gap:8px;min-height:36px}
+.hs-app .education-private-tools--school .education-form-question label>input:is([type=checkbox],[type=radio]){margin:0}
