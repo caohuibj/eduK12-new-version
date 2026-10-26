@@ -1,6 +1,6 @@
 import {sha256} from '@noble/hashes/sha256'
 import {bytesToHex} from '@noble/hashes/utils'
-import {finalDraftStore,IndexedDbFinalDraftStore,type FinalDraftStore,type FinalDraftMeta} from '../../../services/persistence/finalDraftStore'
+import {finalDraftStore,IndexedDbFinalDraftStore,assertFinalDraftWriteIdentity,type FinalDraftStore,type FinalDraftMeta,type FinalDraftWriteIdentity} from '../../../services/persistence/finalDraftStore'
 import type {CognitiveArchiveIdentity,CognitiveArchiveReceipt,CognitiveRawArchiveState} from '../../../services/persistence/cognitiveRawArchiveState'
 export type {CognitiveArchiveIdentity,CognitiveArchiveReceipt,CognitiveRawArchiveState}
 const canonical=(v:unknown):unknown=>{
@@ -16,21 +16,23 @@ export function requireCognitiveDurability(store:FinalDraftStore=finalDraftStore
  return store
 }
 export const cognitiveArchiveIdentity=(meta:FinalDraftMeta):CognitiveArchiveIdentity=>({sessionId:meta.attemptId,attemptEpoch:meta.attemptEpoch,submissionId:meta.submissionId,definitionHash:meta.definitionHash})
-export async function sealCognitiveArchive(draftKey:string,rawPayload:unknown,store:FinalDraftStore=finalDraftStore){
+export async function sealCognitiveArchive(draftKey:string,rawPayload:unknown,store:FinalDraftStore=finalDraftStore,expected?:FinalDraftWriteIdentity){
  requireCognitiveDurability(store)
  const meta=await store.get(draftKey);if(!meta)throw Error('本地认知草稿不存在')
+ assertFinalDraftWriteIdentity(meta,expected)
  return store.mutateCognitiveArchive(draftKey,cognitiveArchiveIdentity(meta),{kind:'seal',rawPayload:structuredClone(rawPayload),rawSha256:cognitiveRawDigest(rawPayload)})
 }
 /** Legacy drafts without sidecars retain their existing cleanup; native raw survives until COS confirmation. */
-export async function finishCognitiveCoreDraft(draftKey:string,store:FinalDraftStore=finalDraftStore){
+export async function finishCognitiveCoreDraft(draftKey:string,store:FinalDraftStore=finalDraftStore,expected?:FinalDraftWriteIdentity){
  const meta=await store.get(draftKey);if(!meta)return null
+ assertFinalDraftWriteIdentity(meta,expected)
  if(meta.cognitiveRawArchive){
   const next=await store.mutateCognitiveArchive(draftKey,cognitiveArchiveIdentity(meta),{kind:'core-saved'})
-  await store.setStatus(draftKey,'COMPLETED')
-  if(next.cognitiveRawArchive?.archiveConfirmed)await store.delete(draftKey)
+  await store.setStatus(draftKey,'COMPLETED',undefined,expected??meta)
+  if(next.cognitiveRawArchive?.archiveConfirmed)await store.delete(draftKey,expected??meta)
   return next.cognitiveRawArchive??null
  }
- await store.delete(draftKey);return null
+ await store.delete(draftKey,expected);return null
 }
 type ArchiveSender=(identity:CognitiveArchiveIdentity,raw:{rawPayload:unknown;rawSha256:string})=>Promise<CognitiveArchiveReceipt>
 /** One in-page upload per durable store/key, including receipt persistence and cleanup. */
@@ -56,7 +58,7 @@ async function uploadCognitiveRawArchive(draftKey:string,send:ArchiveSender,stor
   if(cognitiveRawDigest(raw.rawPayload)!==raw.rawSha256)throw Error('Local raw archive changed after sealing')
   const receipt=await send(identity,{rawPayload:structuredClone(raw.rawPayload),rawSha256:raw.rawSha256})
   const next=await store.mutateCognitiveArchive(draftKey,identity,{kind:'receipt',receipt})
-  if(next.cognitiveRawArchive?.archiveConfirmed)await store.delete(draftKey)
+  if(next.cognitiveRawArchive?.archiveConfirmed)await store.delete(draftKey,meta)
   return next.cognitiveRawArchive!
  }catch(error){await store.mutateCognitiveArchive(draftKey,identity,{kind:'retry',message:error instanceof Error?error.message:'原件上传尚未确认'}).catch(()=>{});throw error}
 }

@@ -110,6 +110,8 @@ export interface FinalDraftAnswer {
   updatedAt: number
 }
 
+export type FinalDraftWriteIdentity = Pick<FinalDraftMeta, 'draftKey'|'instrument'|'attemptId'|'attemptEpoch'|'definitionHash'|'submissionId'>
+
 export interface FinalDraftTrial {
   draftKey: string
   trialIndex: number
@@ -260,6 +262,14 @@ const sameIdentity = (left: FinalDraftMeta, right: FinalDraftMeta) => (
   && serialize(trainingIdentity(left.trainingRetention)) === serialize(trainingIdentity(right.trainingRetention))
 )
 
+/** Optional CAS ownership, checked in the same transaction as the write. */
+export function assertFinalDraftWriteIdentity(current:FinalDraftMeta,expected?:FinalDraftWriteIdentity){
+ if(expected&&(current.draftKey!==expected.draftKey||current.instrument!==expected.instrument
+  ||current.attemptId!==expected.attemptId||current.attemptEpoch!==expected.attemptEpoch
+  ||current.definitionHash!==expected.definitionHash||current.submissionId!==expected.submissionId))
+  throw new FinalDraftIdentityConflictError(current)
+}
+
 const assertNotExpired = (meta: FinalDraftMeta) => {
   if (meta.trainingRetention?.expiredAt !== undefined) throw new FinalDraftExpiredError()
 }
@@ -395,14 +405,14 @@ export interface FinalDraftStore {
   replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]): Promise<void>
   listAnswers(draftKey: string): Promise<FinalDraftAnswer[]>
   deleteAnswers(draftKey: string, itemKeys: string[]): Promise<void>
-  putTrial(trial: FinalDraftTrial): Promise<void>
+  putTrial(trial: FinalDraftTrial, expected?: FinalDraftWriteIdentity): Promise<void>
   listTrials(draftKey: string): Promise<FinalDraftTrial[]>
-  setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }): Promise<FinalDraftMeta | null>
+  setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }, expected?: FinalDraftWriteIdentity): Promise<FinalDraftMeta | null>
   reopenRejectedForm(draftKey: string, rejection: RejectedFormSubmission): Promise<FinalDraftMeta | null>
   snapshot(draftKey: string): Promise<FinalDraftSnapshot | null>
-  sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T): Promise<FinalDraftSealResult<T> | null>
+  sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T, expected?: FinalDraftWriteIdentity): Promise<FinalDraftSealResult<T> | null>
   mutateCognitiveArchive(draftKey:string,identity:CognitiveArchiveIdentity,mutation:CognitiveArchiveMutation):Promise<FinalDraftMeta>
-  delete(draftKey: string): Promise<void>
+  delete(draftKey: string, expected?: FinalDraftWriteIdentity): Promise<void>
 }
 
 class MemoryFinalDraftStore implements FinalDraftStore {
@@ -547,9 +557,10 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if (changed) this.metas.set(draftKey, stampRetentionWrite(meta))
   }
 
-  async putTrial(trial: FinalDraftTrial) {
+  async putTrial(trial: FinalDraftTrial, expected?: FinalDraftWriteIdentity) {
     const meta = this.metas.get(trial.draftKey)
     if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
+    assertFinalDraftWriteIdentity(meta,expected)
     assertWritable(meta)
     const key = `${trial.draftKey}:${trial.trialIndex}`
     const existing = this.trials.get(key)
@@ -564,9 +575,10 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     return sortedTrials([...this.trials.values()].filter((trial) => trial.draftKey === draftKey).map(cloneValue))
   }
 
-  async setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }) {
+  async setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }, expected?: FinalDraftWriteIdentity) {
     const current = this.metas.get(draftKey)
     if (!current) return null
+    assertFinalDraftWriteIdentity(current,expected)
     assertStatusTransition(current, status)
     const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
     const written = stampChangedRetentionWrite(current, next)
@@ -584,9 +596,10 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     }
   }
 
-  async sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T) {
+  async sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T, expected?: FinalDraftWriteIdentity) {
     const current = this.metas.get(draftKey)
     if (!current) return null
+    assertFinalDraftWriteIdentity(current,expected)
     assertNotExpired(current)
     if (current.sealedSubmission) {
       return { meta: cloneValue(current), payload: cloneValue(current.sealedSubmission.payload as T) }
@@ -619,8 +632,9 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     this.metas.set(draftKey,cloneValue(next));return cloneValue(next)
   }
 
-  async delete(draftKey: string) {
+  async delete(draftKey: string, expected?: FinalDraftWriteIdentity) {
     const existing=this.metas.get(draftKey)
+    if(existing)assertFinalDraftWriteIdentity(existing,expected)
     if (existing?.trainingRetention?.expiredAt !== undefined || (existing?.cognitiveRawArchive && !existing.cognitiveRawArchive.archiveConfirmed)) return
     this.metas.delete(draftKey)
     for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
@@ -882,10 +896,11 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
-  async putTrial(trial: FinalDraftTrial) {
+  async putTrial(trial: FinalDraftTrial, expected?: FinalDraftWriteIdentity) {
     await this.run<void>([META_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(trial.draftKey))
       if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
+      assertFinalDraftWriteIdentity(meta,expected)
       assertWritable(meta)
       const store = transaction.objectStore(TRIAL_STORE)
       const key: [string, number] = [trial.draftKey, trial.trialIndex]
@@ -904,11 +919,12 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     ))
   }
 
-  async setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }) {
+  async setStatus(draftKey: string, status: FinalDraftStatus, error?: { code?: string | null; message?: string | null }, expected?: FinalDraftWriteIdentity) {
     return this.run<FinalDraftMeta | null>([META_STORE], 'readwrite', async (transaction) => {
       const store = transaction.objectStore(META_STORE)
       const current = await requestResult<FinalDraftMeta | undefined>(store.get(draftKey))
       if (!current) return null
+      assertFinalDraftWriteIdentity(current,expected)
       assertStatusTransition(current, status)
       const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
       const written = stampChangedRetentionWrite(current, next)
@@ -927,11 +943,12 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
-  async sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T) {
+  async sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T, expected?: FinalDraftWriteIdentity) {
     return this.run<FinalDraftSealResult<T> | null>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
       const metaStore = transaction.objectStore(META_STORE)
       const current = await requestResult<FinalDraftMeta | undefined>(metaStore.get(draftKey))
       if (!current) return null
+      assertFinalDraftWriteIdentity(current,expected)
       assertNotExpired(current)
       if (current.sealedSubmission) {
         return { meta: current, payload: cloneValue(current.sealedSubmission.payload as T) }
@@ -964,9 +981,10 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
-  async delete(draftKey: string) {
+  async delete(draftKey: string, expected?: FinalDraftWriteIdentity) {
     await this.run<void>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
+      if(meta)assertFinalDraftWriteIdentity(meta,expected)
       if (meta?.trainingRetention?.expiredAt !== undefined || (meta?.cognitiveRawArchive && !meta.cognitiveRawArchive.archiveConfirmed)) return
       transaction.objectStore(META_STORE).delete(draftKey)
       // The index returns primary keys, not draftKey index values. Avoid cloning

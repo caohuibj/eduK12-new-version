@@ -1,0 +1,487 @@
+{
+  "kind": "AFFECTED_ENTRY_CLOSURE",
+  "config": "tsconfig.app.json",
+  "roots": [
+    "src/modules/cognitive/core/__tests__/native-mot-session.test.tsx",
+    "src/modules/cognitive/core/useCognitiveSession.ts",
+    "src/modules/cognitive/core/raw-archive.ts",
+    "src/services/persistence/finalDraftStore.ts",
+    "src/vite-env.d.ts"
+  ],
+  "sourceClosure": [
+    {
+      "path": "src/services/persistence/cognitiveRawArchiveState.ts",
+      "sha256": "8403ffab818df9743e50a76ae3f32745b7120f5adf840d5472f8cf681514f908"
+    },
+    {
+      "path": "src/services/persistence/finalDraftStore.ts",
+      "sha256": "df1664b17c7e6ab9fe6e7d97a241a584190539bbe2ac2db2895a16cb226dec99"
+    },
+    {
+      "path": "src/modules/cognitive/core/raw-archive.ts",
+      "sha256": "9b3b4a11179c471ff4e91938ba9b9ae31cdc481c28190535d4cfddd42844c0fb"
+    },
+    {
+      "path": "src/types/index.ts",
+      "sha256": "c6dc4d52062759f6341836b24252e2f94a7c915989500bedcea1b60a875a4bff"
+    },
+    {
+      "path": "src/utils/normalizeApiError.ts",
+      "sha256": "ba40b504da2de9c0b4fbb4159171f4a8b76f7ba620e02fab0bb0c9971b98245b"
+    },
+    {
+      "path": "src/admin/accountView.ts",
+      "sha256": "5cddbb26c347f0d49e44214808fd551a870ded550ee5b7403adaf0fb252130ef"
+    },
+    {
+      "path": "src/api/client.ts",
+      "sha256": "5ac0e77902d8b51147b131bcb59f82114553658fd4fc25804b2c75e44636288c"
+    },
+    {
+      "path": "src/modules/assessment-media/types.ts",
+      "sha256": "518c50706279c5e1569a442cee8b5a747844ab1e134413c6ed8adf1e2adafb70"
+    },
+    {
+      "path": "src/training/training-cognitive-retention.ts",
+      "sha256": "b76e750e2d1c5526c1f8fce2e88762c3b14700597082b501c9718428700f679e"
+    },
+    {
+      "path": "src/modules/cognitive/types.ts",
+      "sha256": "07e70b71fc4f479e89056ea5004cfd20006dda7d5dc5445536b193ca17014df7"
+    },
+    {
+      "path": "src/modules/cognitive/core/administration-provenance.ts",
+      "sha256": "b85adf8d4a0702ebb85d861f33d88f3343bb99d7e4d712213d45aaf134a3aa84"
+    },
+    {
+      "path": "src/utils/exportJobs.ts",
+      "sha256": "bf847ee926a84a69da0fa153d914d086c26b870068809bf191d6df9818252bc0"
+    },
+    {
+      "path": "src/modules/cognitive/api.ts",
+      "sha256": "dd155a58cbe283bde0cc75ce339cc3404b9791b7c2048f89e061f99b7f411550"
+    },
+    {
+      "path": "src/modules/cognitive/core/runner.types.ts",
+      "sha256": "3078ccd02febd16203205266b719d0d03a86e763725bf3ca6384dcc815be0889"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/generated/protocol.ts",
+      "sha256": "7a8fa5c93d3032c86a9156cdc24bde0c019cc4eb4b990f56aaaa9be553c485fb"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/display.ts",
+      "sha256": "47942092c64eaa1c0527c5dce66cd6202cc39e2164bf58728f36b16a3811444c"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/MotCalibration.tsx",
+      "sha256": "b50b10b92a75ac23d24b4af39c6973eedb8efae5580588ff745669aec218be20"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/capture.ts",
+      "sha256": "7a7deeb1e657250f59f54916d5a99d7b768eb7c17d805194a8b897cae03034ea"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/draft.ts",
+      "sha256": "c1f48de1bcf08b37d04648e949a71ac1f682178a39fdcedf0b625eba16bff77c"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/context-retention.ts",
+      "sha256": "6cd4d85f791059f0472a53dd57f5da7597c5e46901697cd799057b4eb1e89ca2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/save-gate.ts",
+      "sha256": "40264a4d74d1df47f9587f94ec748106f2611342b6df4f290026c1332b3e35c1"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "sha256": "c662727a6aeab049f751d37ea0d728332ec053bc8d4f791795146b79ab0ba3aa"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mot/NativeMotRunner.tsx",
+      "sha256": "17ec9da1e5ada6821c094ce4b039c677a5a6d806a49c20d2fff7188951d95e36"
+    },
+    {
+      "path": "src/modules/cognitive/native-runners.tsx",
+      "sha256": "fbf54d9f80149bbe92dc4fbbeac41a29ea18120ce9ca5eff8b70097923b97acf"
+    },
+    {
+      "path": "src/modules/cognitive/core/deferred-runner.tsx",
+      "sha256": "1c075d15294ef6e851f6b3b15346ffbefe58815ab5c779f220cfa19aa492791d"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/fake/FakeTask.tsx",
+      "sha256": "b4fe7e2bbc05a0bef9c77c2fa0650cd3d8a3cb320a7fc4cfdb42509c616cc0b2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/fake/fake.registry.ts",
+      "sha256": "d339e6e53d953dbe922555ac61043ce3ec2077b3fe4db835216ae543fc1402de"
+    },
+    {
+      "path": "src/modules/cognitive/core/timing.ts",
+      "sha256": "81d398c1dfee3181af20ba41855de42e73a312c8f20e52b105f4c089b29ec635"
+    },
+    {
+      "path": "src/components/product-ui/ProductPage.tsx",
+      "sha256": "e2b82047ffb2d2e56847af45133bf687f34c0f53abfad7dca97505d055e55cf6"
+    },
+    {
+      "path": "src/components/product-ui/PageHeader.tsx",
+      "sha256": "142611dd0fc9af6e4de62f3de9451a1360dac91353b531e641d48b7e9890bf27"
+    },
+    {
+      "path": "src/components/product-ui/ActionBar.tsx",
+      "sha256": "70d5bdeb6d9b7944b57813d140c823ec3a358644281f86e4dc86d7e3898e1354"
+    },
+    {
+      "path": "src/components/product-ui/ProductButton.tsx",
+      "sha256": "add1fee5e8d7800bbcc7d80ed1679bf25e674d7d8598b69482b93d6e92d02249"
+    },
+    {
+      "path": "src/components/product-ui/ProductStatus.tsx",
+      "sha256": "c0965c08549145ea85f6f0ec6cb37b69343e0f67eb3f9794a6aaa48902d858f6"
+    },
+    {
+      "path": "src/components/product-ui/DiscoveryCard.tsx",
+      "sha256": "d9ff9f59c467cb0a8b58a5048f9f8c495aa1d6dbe2d9b17d765acdce1eee9295"
+    },
+    {
+      "path": "src/components/product-ui/index.ts",
+      "sha256": "a7bacdcab87a380dd78cdf0adc5ba1adac59b5d12e95a1f7b011facdebab0c69"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/CognitiveTaskPresentation.tsx",
+      "sha256": "5fe222b76f9fe03dc3bacf99c6a2a48a36e861da3bbfe7721b11319f24752276"
+    },
+    {
+      "path": "src/modules/cognitive/core/response-timing.ts",
+      "sha256": "bde6544ca80cfad2461ef405a643a48e4a2f097e8dd626d96425a18e6a321180"
+    },
+    {
+      "path": "src/modules/cognitive/core/task-timing-diagnostics.ts",
+      "sha256": "a60324979fd18735be5b6626f19ad3a4097cca93df4d597fdb11066b2597e1d3"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/CognitiveFocusStage.tsx",
+      "sha256": "f24c35aa5900d9304efcc06de8cc40d262ff5f5bd90699656c2f7674ffe42cb6"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reaction/prng.ts",
+      "sha256": "98992a8c2c7e142fb64e7d51b834b21baf3555dc5028d94a9c82f16d96b042d4"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reaction/ReactionFrameTask.tsx",
+      "sha256": "1a061366be59137582213f3ac5e8cb5fc55fb10eb99b904786edb7e06cefbebe"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reaction/ReactionTask.tsx",
+      "sha256": "b82246680aaf96342b7e863c676cc122fb65271374c3fffc381557b0610ee27e"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reaction/reaction.registry.ts",
+      "sha256": "de6204e893f0b0adee6a7382aea2033acf8d5e5ecaf487d1763f4ad676fa2dda"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/memory/prng.ts",
+      "sha256": "5aca4e6072a7e3284856a20767c9a62b3e80cb428cf307f36163e430d49bf8fc"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/memory/MemoryTask.tsx",
+      "sha256": "5cec4836b354cea284f9dcada648e2ac724b9772f11e58a6c41aaec67d6fbea8"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/memory/memory.registry.ts",
+      "sha256": "1a0b8cf234185b8616f1c5ec6534877fe4c0872f94b0b0b4284364ee6d181df6"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/stroop/prng.ts",
+      "sha256": "76ffbed556b4ee2783f118317d594e61ba3db37ef09e777893d6a991434d18f0"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/stroop/StroopTask.tsx",
+      "sha256": "a0b9dfc11001b011fb77263d57d97a5f58fe04aec2359c2dbfbe521a92bae91f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/stroop/stroop.registry.ts",
+      "sha256": "f559e08443768f7f9ac56d44be04131d5b31509278aea2c507d4c9541a2b5851"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/practice.ts",
+      "sha256": "1b4ae7e1a7923c858add862367085eccaac351911f2608b5a3722fc13c509d08"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/gonogo/GonogoInstructions.tsx",
+      "sha256": "46a77565dfcfba49b8071d4caf8b73e85df9b0cc450fa1351ee570a927077694"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/prng.ts",
+      "sha256": "657834cca5ab705609dce8505dbf8e76c86a5a3f8c3cfec8f252acd8a57a11e7"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/gonogo/GonogoFrameTask.tsx",
+      "sha256": "0a1457480df7a8e1ec7b03452cac5d6d59f6eacf701879242e52374fc96c0db7"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/gonogo/GonogoTask.tsx",
+      "sha256": "4b153779bd7cd0b16b691fe313fcbba606f588772806a987926a23d2de13a510"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/gonogo/gonogo.registry.ts",
+      "sha256": "9fd56e11e3942c6f9c7e26ecd7ce31e96df009dcf80b07b968ff07926fc7a7e0"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/cpt/CptFrameTask.tsx",
+      "sha256": "b3c77ca44d36c78f5796532fc209ea22b9515bb5fc69be3ed8d4861c40d94aff"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/cpt/CptTask.tsx",
+      "sha256": "4e1098c050f192331ec3e058828fa17c6fb8215675524d118d87aa6e804a477a"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/cpt/cpt.registry.ts",
+      "sha256": "202d48c1a4b04497c34b81507026e0e8d411b393e13a8cff34a7272b3bc16335"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/nback/NbackTask.tsx",
+      "sha256": "2b141041490dae9e8c7e84a7aadec2d51d200e4da4c8dcf970d02689e54aa958"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/nback/nback.registry.ts",
+      "sha256": "b23d1db5529a7fd87534198528823d98287977c412aa7712087dc4f0360953e2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/corsi/CorsiTask.tsx",
+      "sha256": "5a9480e8f8988f6099eff0ed239dd6980fe9a96a31bd3d4efe59a304fa81cd61"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/corsi/corsi.registry.ts",
+      "sha256": "8cff3478f9286128b3c31e549c25cab073d7f8294d397e79a877d605ced67993"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/sst/SstTask.tsx",
+      "sha256": "5a537837953d7bfc57643cfcd0ff70debf83e5b75a2e6294839203ad927b79c6"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/sst/sst.registry.ts",
+      "sha256": "acfea8df303a16dd58c20904b7e6c02d1859a62f18af58e0a34fbe2d08acbde0"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/taskswitch/TaskswitchTask.tsx",
+      "sha256": "b9ff63c72ddb504a47453a30afb8aae9eb8a1afdb94559a117a53a1958af4929"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts",
+      "sha256": "373700b050527ddffd8880300f8532f3133d0f79d2b0a440a5e9a43ad596d234"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/patterncompare/PatterncompareTask.tsx",
+      "sha256": "9e09f03afdd3102eebba61a8840c635526b14a9ae8a5e85f3f23fd70a71c5694"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/patterncompare/patterncompare.registry.ts",
+      "sha256": "6d3c9799812e65e2bdabdca4a361401a54bb0ba4e5e3218316285a35df2a0fe8"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/flanker/FlankerTask.tsx",
+      "sha256": "022e17196ed8feef857145a39d54dc8d399e13d581ce43d5bdccd2c2903d9671"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/flanker/flanker.registry.ts",
+      "sha256": "cf82192b0f30d3930c18a500ac0bba757ec9f76983896464a7cc4e85bf768075"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/cardsort/CardsortTask.tsx",
+      "sha256": "ae22ab7bd734d1b840fbf30f05602f65cc493c937799050f09b270afab4f7f83"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/cardsort/cardsort.registry.ts",
+      "sha256": "d1d3db487b30be99ca2993b1c017bbb1f1649edf83a5f9aa5a5c4fbce23b462d"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/digitbackward/DigitbackwardTask.tsx",
+      "sha256": "b2afc98264b99c1146fd8c69b353eeb9c80d9706c97e9a90693e9e57480accc5"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts",
+      "sha256": "7b9b8157320c4555622fb474afdfb30078649e8e39e68878e6e8e7034e70b577"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/picturesequence/PicturesequenceTask.tsx",
+      "sha256": "00b8809ef9d87c99e3b57a68cb0a3cbdfeaa93769fd51cf2dd61242c76b702ee"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/picturesequence/picturesequence.registry.ts",
+      "sha256": "8a5f5a5e0baae3057b05bbed214043e92c052ba6d25563fe6fea4cd8aa650c23"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/pairedassociate/PairedassociateTask.tsx",
+      "sha256": "f4652381c59f7b8fbc4509eb74dd5a7c0111b2620c0331bbf5f3d456a0a16d39"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/pairedassociate/pairedassociate.registry.ts",
+      "sha256": "69d3b30598c837f920765843fbde83bfb9fa2954de27b2545e6d2a4b46f582dc"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/matrix/MatrixTask.tsx",
+      "sha256": "284c74e84c75241a10c8eaf51037083d736ce58e8c097b33739c64b1006a3324"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/matrix/matrix.registry.ts",
+      "sha256": "6b8d66e30004241ac4f2a3a7a2addb7c10146e7d2e01d0e90c4298d8736b9948"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mentalrotation/MentalrotationTask.tsx",
+      "sha256": "19895f334b0654db234b703da85461f15a4b7de8b15065412e568fd872db9692"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/mentalrotation/mentalrotation.registry.ts",
+      "sha256": "c424f14c55c0d13886e21282893c41720273f0579ef5484d77481b42c7d962a9"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/tower/TowerTask.tsx",
+      "sha256": "de83b4bb32f1bbdf0e72d38c31a0a546498d03a1507c3bb281caa57a04a1f187"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/tower/tower.registry.ts",
+      "sha256": "f57818f69a81f84f3ed3317e66173e0bb5f6414a30c3d413c12672dce7ea1c26"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/trailmaking/TrailmakingTask.tsx",
+      "sha256": "3209e2fd2cd1bfef0e0677b5973477df7512dcbb4a61ea86faf75863dcf32772"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts",
+      "sha256": "02a603b2d568d88df98486aa4aa137ce75c04b60bd80ddcdf8c8a97132c0d4d0"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reversallearning/ReversallearningTask.tsx",
+      "sha256": "bc1f5240af6cd771ca8b6c1e47d5ce9b6c8539f19c2a16043127fb579fb78d1c"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
+      "sha256": "eaf385c3ccf964c55285bffb1426eae462b4eff9672b18bd363ff99bf9b78515"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/bart/BartTask.tsx",
+      "sha256": "6200e01557bc5b0d26175f14444485d4e0cadb29cbbbf811cf34df36409b904f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/bart/bart.registry.ts",
+      "sha256": "d0ef9821450271743e1352e18ee28dc5b9d858268868ef067f69afda87231c1f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/wordlist/wordlist.utils.ts",
+      "sha256": "d8cfac19c81a73afd0a7629bee6898b2e568f0c7eb5f2493e507570f7ada4b29"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/pr13LexicalBank.ts",
+      "sha256": "18b3004c9bfbb9fed9f5d73e738debbbb5aa54919b6c793a762bf4b62e87685f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/shared/pr13Stimuli.ts",
+      "sha256": "cac82824fa6c83f4c6bdca009ac18d99b51b5138418940886cde463eed76f23b"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/wordlist/WordlistTask.tsx",
+      "sha256": "6e49e8c6ccf024b13f08da425082513411b9910d9cc7cccdbc65fac7ac1e20b1"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/wordlist/wordlist.registry.ts",
+      "sha256": "fef67745f2ab3d262930c5b290368384a55c65bb3550ce343d83fc60781c39f7"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/lexicaldecision/LexicaldecisionTask.tsx",
+      "sha256": "5cd15141d96397d1d7da6dd0b65be9bd66c34bfdc2c12b4bb5e95346db1c8ab2"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/lexicaldecision/lexicaldecision.registry.ts",
+      "sha256": "05529e7441bd3b5423cdc5d5e01c5d6c3925b32e0dc388c8e1a436e0f2dc6415"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts",
+      "sha256": "d28f51a3fdcb63e43750276b008cf3894c94fc8556c5000593566e8887fa077f"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/emotionrecognition/EmotionrecognitionTask.tsx",
+      "sha256": "47a45d3296a7e7714d3fac461b8807c25ff1a76ad6a53999e18f2a893bf039ee"
+    },
+    {
+      "path": "src/modules/cognitive/tasks/emotionrecognition/emotionrecognition.registry.ts",
+      "sha256": "eb1ecfe7df2170bc897dda999c8508e804deeb9e87150b4115cade663b1c2222"
+    },
+    {
+      "path": "src/modules/cognitive/generated/runners.ts",
+      "sha256": "12cbc67755b414ff5def7d5596fd4910a5139000af07e80c20cf3123f22e3d5f"
+    },
+    {
+      "path": "src/modules/cognitive/registry.ts",
+      "sha256": "cbcd64d98168a4428fe11fd6609dba39f5f6257f9028854ddb8bbfc1d81e3617"
+    },
+    {
+      "path": "src/modules/cognitive/core/session-ledger.ts",
+      "sha256": "23b0f5774fbefd1622adafa4cab83f8e08bea909bb58a0a5afbd1429ea9a2fe2"
+    },
+    {
+      "path": "src/modules/cognitive/core/runner.state.ts",
+      "sha256": "a327def5d2845828defd37a7b5210f0d9b9f029107f443f2038c40d49afaa0ae"
+    },
+    {
+      "path": "src/modules/cognitive/core/native-session-contract.ts",
+      "sha256": "bf950818fa33da56b1c9c73c90660a94dab3047d344d0014b3f60b709b6dfae1"
+    },
+    {
+      "path": "src/modules/cognitive/core/trial-envelope.ts",
+      "sha256": "23a68f7bc76f01fac4cfc67df3498a9157f0f51efa5b1915cc7e8eed3968bd60"
+    },
+    {
+      "path": "src/modules/cognitive/core/readiness.ts",
+      "sha256": "23b0523c2eb41657df36a663da6a6df9d981d0c1c9c2c2c1296956a705878ef2"
+    },
+    {
+      "path": "src/modules/cognitive/core/useAdministrationProvenance.ts",
+      "sha256": "98cf4b30a2b4f8c41065b38eb6d6cb0e9ad5885f863045c59a77c19997e5cd29"
+    },
+    {
+      "path": "src/services/persistence/checkpointTypes.ts",
+      "sha256": "a10ee99f9e9e0acc4a3058017cccb8b9d90de1dd7705250cde99b28a33d31647"
+    },
+    {
+      "path": "src/services/persistence/indexedDbStore.ts",
+      "sha256": "73f0c156b030c82d476521a7b7193b7d2337b4d402f63d57190dcad3e3836fde"
+    },
+    {
+      "path": "src/services/persistence/checkpointStore.ts",
+      "sha256": "f2a5acff1c8cdf6958a047e8cf649e21d26d6ae99fa5d4b951f337a5c6689aa2"
+    },
+    {
+      "path": "src/services/persistence/checkpointScheduler.ts",
+      "sha256": "e4ec525d4d17bee28715a7cc3e006543c4f86977f3f368d3824d15fa4c68b638"
+    },
+    {
+      "path": "src/services/persistence/flushLifecycle.ts",
+      "sha256": "9adfbee92adf08f003e9ccc0d2976ec0f0bf296c11a1becbdf137dbd5319eeac"
+    },
+    {
+      "path": "src/services/persistence/finalDraftCapacityRetry.ts",
+      "sha256": "cadc57a7a2d1d713480b902a835c1f1bffb7d7ca3a058bf8fdbed5b3a7f311eb"
+    },
+    {
+      "path": "src/modules/cognitive/core/recovery-credential.ts",
+      "sha256": "d434b0a25e320db16745a4c629e769b693f790c5832effafe1738930660b1a68"
+    },
+    {
+      "path": "src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "f49af276492c3e0f59e26a48b5c1e88d3df744765465f0d790399b6ff5de74cf"
+    },
+    {
+      "path": "src/modules/cognitive/core/__tests__/native-mot-session.test.tsx",
+      "sha256": "355eb9846d87ff13252b078f45bbef601bbe16ebf0d737831183a8e537e14d2a"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ],
+  "diagnostics": [],
+  "exitCode": 0
+}

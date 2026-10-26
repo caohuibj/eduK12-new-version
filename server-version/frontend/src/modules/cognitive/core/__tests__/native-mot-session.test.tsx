@@ -1,6 +1,7 @@
 import {act,renderHook,waitFor} from '@testing-library/react'
 import {describe,it,expect,vi} from 'vitest'
-import {finalDraftStore} from '../../../../services/persistence/finalDraftStore'
+import React from 'react'
+import {finalDraftStore,createFinalDraftStore,createFinalDraftMeta} from '../../../../services/persistence/finalDraftStore'
 import {cognitiveRawDigest} from '../raw-archive'
 import {useCognitiveSession} from '../useCognitiveSession'
 import {motConfig} from '../../tasks/mot/generated/protocol'
@@ -82,4 +83,83 @@ describe('native MOT hook submission lifecycle',()=>{
   await waitFor(()=>expect(result.current.state.status).toBe('ERROR'))
   expect(result.current.state.error?.message).toContain('入口');expect(f.submitFinal).not.toHaveBeenCalled();unmount()
  })
+})
+
+
+const deferred=<T,>()=>{let resolve!:(value:T)=>void;const promise=new Promise<T>(r=>{resolve=r});return {promise,resolve}}
+describe('native host-generation followup',()=>{
+ it.each(['list','put'] as const)('isolates delayed %s across the same session new epoch',async(stage)=>{
+  const f=fixture('host-generation-'+stage),hook=renderHook(()=>useCognitiveSession(f.session.sessionId,f.api))
+  await waitFor(()=>expect(hook.result.current.state.status).toBe('READY'));act(()=>hook.result.current.start())
+  const old=hook.result.current.nativeHost,key='cognitive:'+f.session.sessionId,gate=deferred<void>(),entered=deferred<void>()
+  const list=finalDraftStore.listTrials.bind(finalDraftStore),put=finalDraftStore.putTrial.bind(finalDraftStore)
+  const spy=stage==='list'?vi.spyOn(finalDraftStore,'listTrials').mockImplementationOnce(async k=>{const rows=await list(k);entered.resolve();await gate.promise;return rows})
+   :vi.spyOn(finalDraftStore,'putTrial').mockImplementationOnce(async(r,expected)=>{entered.resolve();await gate.promise;return put(r,expected)})
+  const pending=old.appendEnvelope(envelope);const settled=Promise.allSettled([pending]);await entered.promise
+  await finalDraftStore.delete(key)
+  f.getSession.mockResolvedValue({code:0,data:{...f.session,attemptNo:2,attemptEpoch:2,randomSeed:'seed-epoch-2'}})
+  act(()=>hook.result.current.reload());await waitFor(()=>expect(hook.result.current.state.session?.attemptEpoch).toBe(2))
+  await act(async()=>{gate.resolve();expect((await settled)[0].status).toBe('rejected')})
+  expect(hook.result.current.state.trialIndex).toBe(0);expect(hook.result.current.state.status).toBe('READY');expect(await list(key)).toEqual([])
+  await expect(old.appendEnvelope(envelope)).rejects.toThrow('身份已变化');await expect(old.sealRaw({old:true})).rejects.toThrow('身份已变化')
+  expect(f.submitFinal).not.toHaveBeenCalled();spy.mockRestore();hook.unmount();await finalDraftStore.delete(key)
+ })
+ it('unmount lets an already-owned delayed save retain the old record without accepting new actions',async()=>{
+  const f=fixture('host-generation-unmount-save'),hook=renderHook(()=>useCognitiveSession(f.session.sessionId,f.api))
+  await waitFor(()=>expect(hook.result.current.state.status).toBe('READY'));act(()=>hook.result.current.start())
+  const old=hook.result.current.nativeHost,gate=deferred<void>(),entered=deferred<void>(),put=finalDraftStore.putTrial.bind(finalDraftStore)
+  const spy=vi.spyOn(finalDraftStore,'putTrial').mockImplementationOnce(async(record,expected)=>{entered.resolve();await gate.promise;return put(record,expected)})
+  const settled=Promise.allSettled([old.appendEnvelope(envelope)]);await entered.promise;hook.unmount();gate.resolve()
+  expect((await settled)[0].status).toBe('rejected');expect((await finalDraftStore.listTrials('cognitive:'+f.session.sessionId))[0].payload).toEqual(envelope)
+  await expect(old.appendEnvelope({...envelope,trialIndex:1})).rejects.toThrow('身份已变化');expect(f.submitFinal).not.toHaveBeenCalled();spy.mockRestore()
+ })
+ it.each(['reload-epoch','unmount'] as const)('late FINAL %s cannot complete a new host or clean its local metadata',async(mode)=>{
+  const f=fixture('host-generation-final-'+mode),hook=renderHook(()=>useCognitiveSession(f.session.sessionId,f.api))
+  await waitFor(()=>expect(hook.result.current.state.status).toBe('READY'));act(()=>hook.result.current.start())
+  await act(async()=>{await hook.result.current.nativeHost.appendEnvelope(envelope);await hook.result.current.nativeHost.sealRaw({schemaVersion:1,formal:[1],practice:[]})})
+  const old=hook.result.current.nativeHost,key='cognitive:'+f.session.sessionId,gate=deferred<any>(),entered=deferred<void>()
+  f.submitFinal.mockImplementationOnce(async()=>{entered.resolve();return gate.promise})
+  const pending=old.complete(),settled=Promise.allSettled([pending]);await entered.promise
+  const sealed=await finalDraftStore.get(key),submitted=f.submitFinal.mock.calls[0][1]
+  if(mode==='unmount')hook.unmount()
+  else{f.getSession.mockResolvedValue({code:0,data:{...f.session,attemptNo:2,attemptEpoch:2,randomSeed:'next-seed'}});act(()=>hook.result.current.reload());await waitFor(()=>expect(hook.result.current.state.status).toBe('ERROR'))}
+  await act(async()=>{gate.resolve({code:0,data:{coreSaved:true,sessionId:f.session.sessionId,attemptEpoch:1,submissionId:submitted.submissionId,definitionHash:f.session.definitionHash,payloadHash:'c'.repeat(64),response:{sessionId:f.session.sessionId,status:'COMPLETED',result:{metrics:{},qualityFlags:{}}}}});expect((await settled)[0].status).toBe('rejected')})
+  const retained=await finalDraftStore.get(key);expect(retained?.attemptEpoch).toBe(1);expect(retained?.status).toBe(sealed?.status);expect(retained?.cognitiveRawArchive?.coreSaved).toBe(false);expect(retained?.sealedSubmission).toEqual(sealed?.sealedSubmission)
+  if(mode!=='unmount'){expect(hook.result.current.state.status).toBe('ERROR');hook.unmount()}
+  expect(f.submitFinal).toHaveBeenCalledTimes(1)
+ })
+ it('StrictMode active generation completes once and retains real device/input provenance',async()=>{
+  const f=fixture('host-generation-active'),hook=renderHook(()=>useCognitiveSession(f.session.sessionId,f.api),{wrapper:({children})=><React.StrictMode>{children}</React.StrictMode>})
+  await waitFor(()=>expect(hook.result.current.state.status).toBe('READY'));act(()=>hook.result.current.start())
+  await act(async()=>{await hook.result.current.nativeHost.appendEnvelope(envelope);await hook.result.current.nativeHost.sealRaw({schemaVersion:1,formal:[1],practice:[]})})
+  const provenance={schemaVersion:1 as const,deviceClass:'PHONE' as const,administrationMode:'TOUCH' as const}
+  await act(async()=>expect((await hook.result.current.nativeHost.complete(provenance)).coreSaved).toBe(true))
+  expect(hook.result.current.state.status).toBe('COMPLETED');expect(f.submitFinal).toHaveBeenCalledTimes(1);expect(f.submitFinal.mock.calls[0][1].administrationProvenance).toEqual(provenance);hook.unmount()
+ })
+ it('all native write/seal/status/delete CAS operations reject an old owner after same-key epoch replacement',async()=>{
+  const store=createFinalDraftStore(),key='host-generation-CAS'
+  const old=createFinalDraftMeta({draftKey:key,instrument:'cognitive',attemptId:'same-session',attemptEpoch:1,definitionHash:'a',submissionId:'old',deliveryMode:'final_only',contextSnapshotHash:null})
+  await store.ensure(old);await store.delete(key)
+  const next={...old,attemptEpoch:2,definitionHash:'b',submissionId:'new'};await store.ensure(next)
+  await expect(store.putTrial({draftKey:key,trialIndex:0,payload:{old:true},createdAt:1},old)).rejects.toThrow()
+  await expect(store.sealForSubmission(key,()=>({old:true}),old)).rejects.toThrow()
+  await expect(store.setStatus(key,'CONFLICT',undefined,old)).rejects.toThrow()
+  await expect(store.delete(key,old)).rejects.toThrow()
+  expect((await store.get(key))?.attemptEpoch).toBe(2);expect((await store.get(key))?.status).toBe('DRAFT');expect(await store.listTrials(key)).toEqual([])
+ })
+ it('delayed sealed replay busy response cannot set status after same-session epoch reload',async()=>{
+  const f=fixture('host-generation-sealed-replay'),key='cognitive:'+f.session.sessionId
+  const meta=createFinalDraftMeta({draftKey:key,instrument:'cognitive',attemptId:f.session.sessionId,attemptEpoch:1,definitionHash:f.session.definitionHash!,submissionId:'original-replay',deliveryMode:'final_only',contextSnapshotHash:null})
+  await finalDraftStore.ensure(meta);await finalDraftStore.putTrial({draftKey:key,trialIndex:0,payload:envelope,createdAt:1},meta)
+  await finalDraftStore.sealForSubmission(key,s=>({submissionId:s.meta.submissionId,attemptEpoch:1,definitionHash:meta.definitionHash,trials:s.trials.map(t=>t.payload)}),meta)
+  const gate=deferred<any>(),entered=deferred<void>();f.submitFinal.mockImplementationOnce(async()=>{entered.resolve();return gate.promise})
+  const status=vi.spyOn(finalDraftStore,'setStatus'),hook=renderHook(()=>useCognitiveSession(f.session.sessionId,f.api))
+  await entered.promise
+  f.getSession.mockResolvedValue({code:0,data:{...f.session,attemptNo:2,attemptEpoch:2,randomSeed:'next-replay-seed'}})
+  act(()=>hook.result.current.reload());await waitFor(()=>expect(hook.result.current.state.status).toBe('ERROR'))
+  await act(async()=>{gate.resolve({code:'ASSESSMENT_SUBMIT_BUSY',message:'synthetic old response'});await gate.promise;await Promise.resolve();await Promise.resolve()})
+  expect(status).not.toHaveBeenCalled();expect((await finalDraftStore.get(key))?.status).toBe('SUBMITTING');expect(hook.result.current.state.status).toBe('ERROR');expect(f.submitFinal).toHaveBeenCalledTimes(1)
+  status.mockRestore();hook.unmount()
+ })
+
 })
