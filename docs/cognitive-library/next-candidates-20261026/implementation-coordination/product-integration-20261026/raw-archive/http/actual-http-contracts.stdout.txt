@@ -1,0 +1,22 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+stdout | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:49.049Z] [INFO] [CacheService] Redis缓存服务初始化完成
+
+ ✓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > runs real cookie auth/current principal, START and FINAL with authority receipt 183ms
+ ✓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > keeps archive pending on failure, rejects wrong identity/role/format then confirms same sealed retry 241ms
+stderr | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:51.222Z] [WARN] [CacheService] Redis客户端已断开
+
+stdout | src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS
+[2026-10-26T11:08:51.223Z] [INFO] [CacheService] Redis连接已关闭
+
+ ✓ src/__tests__/cognitive/native-mot-http-archive.integration.test.ts > MOT actual authenticated HTTP START FINAL archive slice with synthetic COS > only the authenticated binary archive route bypasses the unchanged global 2MiB JSON parser 35ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  11:08:48
+   Duration  2.80s (transform 32ms, setup 0ms, import 44ms, tests 2.60s, environment 0ms)
+
+JSON report written to /workspace/scratch/cognitive-native-http-attempt2.json
