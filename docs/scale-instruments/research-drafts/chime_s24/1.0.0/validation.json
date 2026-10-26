@@ -1,0 +1,73 @@
+{
+  "status": "REVIEWED_CASE_LEVEL_REUSE_NOT_ONE_FRESH_18_PASS_RUN",
+  "reviewedAt": "2026-10-26T06:03:38.055134+00:00",
+  "finalSource": {
+    "path": "/workspace/eduk12-scale-content/server-version/backend/src/modules/scale/instruments/chime_s24_zh_cn_research/1.0.0/source.json",
+    "bytes": 71720,
+    "sha256": "6917748d9ac9a5c32f0deebd4c8793f2eda5b976269ac14cecaae1afadc0eb64"
+  },
+  "priorReporter": "/workspace/eduk12-scale-evidence/20261026-parallel/chime_short/20261026T055937Z.vitest.json",
+  "freshReporter": "/workspace/eduk12-scale-evidence/20261026-parallel/chime_short/20261026T060109Z.vitest.json",
+  "changedSourcePaths": [
+    "/catalog/administration/layoutConstraints/1",
+    "/executable/definition/responseSets/0/options/1/label",
+    "/executable/definition/responseSets/0/options/2/label",
+    "/executable/definition/responseSets/0/options/3/label",
+    "/executable/goldenCases/0/expected/totalScoreKeys",
+    "/executable/goldenCases/1/expected/totalScoreKeys",
+    "/executable/goldenCases/2/expected/totalScoreKeys",
+    "/executable/goldenCases/3/expected/totalScoreKeys",
+    "/executable/goldenCases/4/expected/totalScoreKeys",
+    "/executable/goldenCases/5/expected/totalScoreKeys",
+    "/executable/goldenCases/6/expected/totalScoreKeys",
+    "/executable/goldenCases/7/expected/totalScoreKeys"
+  ],
+  "freshPassedCases": [
+    "CHIME-S24 exact 2024 S1 independent Chinese working version validates the complete short form and remains a distinct draft candidate",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: minimum",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: maximum",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: midpoint_3_5",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: raw_all_one",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: raw_all_six",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: mixed_independent",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: one_missing",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version matches independently calculated fixture: empty"
+  ],
+  "reusedPassedCases": [
+    "CHIME-S24 exact 2024 S1 independent Chinese working version retains all eight three-item facets, five reverse keys and the permitted whole-scale mean",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version distinguishes raw response extremes from transformed minimum and maximum",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version changes only the owning facet and total, with the exact reverse direction",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version does not insert a zero or prorate omitted items; missing facet and total become null",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version rejects illegal options, duplicates and unknown item codes",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version enforces the conservative adult boundary and does not allow missing age",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version builds nine readable real interpretations without thresholds or foreign norms",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version preserves independent version axes without letting catalog facts alter executable content",
+    "CHIME-S24 exact 2024 S1 independent Chinese working version keeps permission, source-language evidence and pending Chinese validation explicit"
+  ],
+  "basis": "仅黄金expected.totalScoreKeys改为完整9键、选项中文2/3/4清晰度修订与对应布局说明。响应数值、计分transform/维度/缺失/适用政策、报告正文/版本均不变；复用9例检查原始分反向、维度/总分独立、缺失、非法答案、年龄、真实报告、相对hash与版本轴、许可和标签，其断言与代码未变，选项中文变化不会改变这些断言的结果。9个受影响例（源校验与8黄金）已新执行通过。",
+  "types": {
+    "status": "PASS",
+    "exitCode": 0,
+    "result": "/workspace/eduk12-scale-evidence/20261026-parallel/chime_short/20261026T060109Z.types.result.json",
+    "inputCount": 330,
+    "inputDrift": []
+  },
+  "reports": {
+    "status": "PASS",
+    "exitCode": 0,
+    "count": 8,
+    "completeCount": 6,
+    "interpretationCount": 54,
+    "invalidCount": 2
+  },
+  "notRun": [
+    "global onboarding",
+    "DB",
+    "browser",
+    "CI",
+    "publish",
+    "deploy"
+  ],
+  "scientificReview": "PENDING",
+  "chinaValidation": "NOT_ESTABLISHED"
+}

@@ -1,0 +1,14 @@
+{
+  "status": "PREPARED_NOT_RUNTIME_CONNECTED",
+  "instrumentKey": "chime_s24_zh_cn_research",
+  "instrumentVersion": "1.0.0",
+  "contentVersion": "1.0.0",
+  "locale": "zh-CN",
+  "instructions": [
+    "请阅读下面的每一项陈述，从以下选项中选择最适合你的回答：1＝几乎从不，2＝很少，3＝较少，4＝较常，5＝经常，6＝几乎总是。"
+  ],
+  "recallPeriod": null,
+  "timeFrameNote": "原S1没有固定回顾天数",
+  "itemOrderLocked": true,
+  "consumerStatus": "旧source schema不支持独立指导语，本sidecar尚未接入运行时"
+}

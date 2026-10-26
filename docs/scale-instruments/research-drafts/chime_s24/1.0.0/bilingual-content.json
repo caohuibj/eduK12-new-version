@@ -1,0 +1,274 @@
+{
+  "identity": {
+    "instrumentKey": "chime_s24_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "originalIdentity": {
+    "family": "Comprehensive Inventory of Mindfulness Experiences",
+    "version": "CHIME-S24, Karl et al. 2024, Supplementary Table S1",
+    "locale": "en",
+    "relatedVersions": [
+      "CHIME original 37-item; not administered here",
+      "CHIME-XS16 Table S2; not administered here",
+      "Dutch CHIME-SF 2019; distinct version, not administered here"
+    ]
+  },
+  "administrationInstructionOriginal": "Please respond to each statement below by choosing the most suitable response option for you from the following: 1 = Almost Never, 2 = Infrequently, 3 = Somewhat Infrequently, 4 = Somewhat Frequently, 5 = Frequently, 6 = Almost Always.",
+  "administrationInstructionZh": "请阅读下面的每一项陈述，从以下选项中选择最适合你的回答：1＝几乎从不，2＝很少，3＝较少，4＝较常，5＝经常，6＝几乎总是。",
+  "timeFrame": "No fixed recall period specified in S1; do not add one.",
+  "options": [
+    {
+      "value": 1,
+      "original": "Almost Never",
+      "zh": "几乎从不"
+    },
+    {
+      "value": 2,
+      "original": "Infrequently",
+      "zh": "很少"
+    },
+    {
+      "value": 3,
+      "original": "Somewhat Infrequently",
+      "zh": "较少"
+    },
+    {
+      "value": 4,
+      "original": "Somewhat Frequently",
+      "zh": "较常"
+    },
+    {
+      "value": 5,
+      "original": "Frequently",
+      "zh": "经常"
+    },
+    {
+      "value": 6,
+      "original": "Almost Always",
+      "zh": "几乎总是"
+    }
+  ],
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "CHIMES_01",
+      "original": "I notice details in nature, such as colors, shapes, and textures.",
+      "zh": "我会注意到大自然中的细节，比如颜色、形状和质地。",
+      "dimensionKey": "external_awareness",
+      "dimensionOriginal": "Awareness of external experiences",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "CHIMES_02",
+      "original": "I pay attention to sensations, such as the wind in my hair or sunshine on my face.",
+      "zh": "我会留意身体感受到的事物，比如风吹过头发或阳光照在脸上。",
+      "dimensionKey": "external_awareness",
+      "dimensionOriginal": "Awareness of external experiences",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "CHIMES_03",
+      "original": "I notice sounds in my environment, such as birds chirping or cars passing.",
+      "zh": "我会注意到周围环境中的声音，比如鸟叫声或汽车驶过的声音。",
+      "dimensionKey": "external_awareness",
+      "dimensionOriginal": "Awareness of external experiences",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "CHIMES_04",
+      "original": "When my mood changes, I notice it right away.",
+      "zh": "当我的心情发生变化时，我会马上注意到。",
+      "dimensionKey": "internal_awareness",
+      "dimensionOriginal": "Awareness of internal experiences",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "itemCode": "CHIMES_05",
+      "original": "When I talk to other people, I notice what feelings I am experiencing.",
+      "zh": "当我和别人交谈时，我会注意到自己正在体验什么感受。",
+      "dimensionKey": "internal_awareness",
+      "dimensionOriginal": "Awareness of internal experiences",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "CHIMES_06",
+      "original": "I am usually aware of how I am feeling at any given time.",
+      "zh": "通常，无论什么时候，我都能觉察到自己当时的感受。",
+      "dimensionKey": "internal_awareness",
+      "dimensionOriginal": "Awareness of internal experiences",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "CHIMES_07",
+      "original": "It is easy for me to stay focused on what I am doing.",
+      "zh": "我很容易把注意力保持在自己正在做的事情上。",
+      "dimensionKey": "acting_awareness",
+      "dimensionOriginal": "Acting with awareness",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "itemCode": "CHIMES_08",
+      "original": "In everyday life, I get distracted by many memories, images, or daydreams. (R)",
+      "zh": "在日常生活中，许多回忆、画面或白日梦会让我分心。",
+      "dimensionKey": "acting_awareness",
+      "dimensionOriginal": "Acting with awareness",
+      "reverse": true
+    },
+    {
+      "number": 9,
+      "itemCode": "CHIMES_09",
+      "original": "When I read, I have to reread paragraphs because I was thinking of something else. (R)",
+      "zh": "阅读时，我会因为刚才想着别的事情，而不得不重新读一遍段落。",
+      "dimensionKey": "acting_awareness",
+      "dimensionOriginal": "Acting with awareness",
+      "reverse": true
+    },
+    {
+      "number": 10,
+      "itemCode": "CHIMES_10",
+      "original": "In everyday life, I realize my thoughts are not always facts.",
+      "zh": "在日常生活中，我会意识到自己的想法并不总是事实。",
+      "dimensionKey": "thoughts_relativity",
+      "dimensionOriginal": "Awareness of thoughts’ relativity",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "CHIMES_11",
+      "original": "In everyday life, I am aware that my view on things is not always based on facts.",
+      "zh": "在日常生活中，我能觉察到自己对事物的看法并不总是基于事实。",
+      "dimensionKey": "thoughts_relativity",
+      "dimensionOriginal": "Awareness of thoughts’ relativity",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "CHIMES_12",
+      "original": "I am aware that even my strongly held opinions may change over time.",
+      "zh": "我知道，即使是自己坚信的观点，也可能随时间改变。",
+      "dimensionKey": "thoughts_relativity",
+      "dimensionOriginal": "Awareness of thoughts’ relativity",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "CHIMES_13",
+      "original": "I am able to smile when I notice myself seeing things as more complicated than they actually are.",
+      "zh": "当我注意到自己把事情看得比实际更复杂时，我能会心一笑。",
+      "dimensionKey": "insightful_understanding",
+      "dimensionOriginal": "Insightful understanding",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "CHIMES_14",
+      "original": "When I have needlessly given myself a hard time, I can see it with humor.",
+      "zh": "当我无端为难自己时，我能以幽默的眼光看待这件事。",
+      "dimensionKey": "insightful_understanding",
+      "dimensionOriginal": "Insightful understanding",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "CHIMES_15",
+      "original": "I am able to smile to myself when I notice I have made a big deal out of a small problem.",
+      "zh": "当我注意到自己把小问题看得过于严重时，我能对自己笑一笑。",
+      "dimensionKey": "insightful_understanding",
+      "dimensionOriginal": "Insightful understanding",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "CHIMES_16",
+      "original": "In the ups and downs of life, I am kind to myself.",
+      "zh": "面对生活中的起起落落，我会善待自己。",
+      "dimensionKey": "nonjudgmental_acceptance",
+      "dimensionOriginal": "Accepting nonjudgmental attitude",
+      "reverse": false
+    },
+    {
+      "number": 17,
+      "itemCode": "CHIMES_17",
+      "original": "I see my mistakes and difficulties without judging myself.",
+      "zh": "我能看见自己的错误和困难，而不评判自己。",
+      "dimensionKey": "nonjudgmental_acceptance",
+      "dimensionOriginal": "Accepting nonjudgmental attitude",
+      "reverse": false
+    },
+    {
+      "number": 18,
+      "itemCode": "CHIMES_18",
+      "original": "Even when I make a big mistake, I treat myself with kindness and understanding.",
+      "zh": "即使犯了大错，我仍会以善意和理解对待自己。",
+      "dimensionKey": "nonjudgmental_acceptance",
+      "dimensionOriginal": "Accepting nonjudgmental attitude",
+      "reverse": false
+    },
+    {
+      "number": 19,
+      "itemCode": "CHIMES_19",
+      "original": "When caught in thoughts and emotions, I am able to “step back” and quickly notice the thought or image without getting taken over by it.",
+      "zh": "当我陷入想法和情绪时，我能“退后一步”，迅速觉察到那个想法或画面，而不被它支配。",
+      "dimensionKey": "nonreactive_decentering",
+      "dimensionOriginal": "Nonreactive decentering",
+      "reverse": false
+    },
+    {
+      "number": 20,
+      "itemCode": "CHIMES_20",
+      "original": "I am able to notice my thoughts and feelings without getting tangled up in them.",
+      "zh": "我能注意到自己的想法和感受，而不被它们缠住。",
+      "dimensionKey": "nonreactive_decentering",
+      "dimensionOriginal": "Nonreactive decentering",
+      "reverse": false
+    },
+    {
+      "number": 21,
+      "itemCode": "CHIMES_21",
+      "original": "I notice my thoughts and feelings and can also “step back” and observe them from a distance.",
+      "zh": "我注意到自己的想法和感受，也能“退后一步”，从一定距离观察它们。",
+      "dimensionKey": "nonreactive_decentering",
+      "dimensionOriginal": "Nonreactive decentering",
+      "reverse": false
+    },
+    {
+      "number": 22,
+      "itemCode": "CHIMES_22",
+      "original": "I try to distract myself when I feel unpleasant emotions. (R)",
+      "zh": "当我感到不愉快的情绪时，我会试着分散自己的注意力。",
+      "dimensionKey": "openness",
+      "dimensionOriginal": "Openness to experience",
+      "reverse": true
+    },
+    {
+      "number": 23,
+      "itemCode": "CHIMES_23",
+      "original": "I do not like it when I am angry or fearful and I try to get rid of these feelings. (R)",
+      "zh": "我不喜欢自己生气或害怕时的状态，并会努力摆脱这些感受。",
+      "dimensionKey": "openness",
+      "dimensionOriginal": "Openness to experience",
+      "reverse": true
+    },
+    {
+      "number": 24,
+      "itemCode": "CHIMES_24",
+      "original": "When I am in pain, I try to avoid this sensation as much as possible. (R)",
+      "zh": "当我感到疼痛时，我会尽可能避开这种感觉。",
+      "dimensionKey": "openness",
+      "dimensionOriginal": "Openness to experience",
+      "reverse": true
+    }
+  ],
+  "scoringOriginal": "Scoring Instructions: Reverse-score all items marked with an “R”. Then, calculate the mean of the items included in each subscale to obtain the subscales’ scores. Finally, calculate the mean of all items in the scale to determine the total scale score.",
+  "source": "https://media.springernature.com/original/springer-static/esm/art%3A10.1007%2Fs12671-024-02302-z/MediaObjects/12671_2024_2302_MOESM1_ESM.docx",
+  "sourceSha256": "cb5093b7aeab12a5262cc2e54dff27b8af53ccc1816458849ff91ee5582c231e",
+  "license": "CC BY 4.0",
+  "translationStatus": "Independent working translation; expert review PENDING; China validation NOT_ESTABLISHED"
+}

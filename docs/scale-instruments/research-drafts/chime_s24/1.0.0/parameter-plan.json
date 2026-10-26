@@ -1,0 +1,13 @@
+{
+  "parameterPlanVersion": "1.0.0",
+  "status": "NONE_SCORE_ONLY",
+  "runtimeReferencePolicy": {
+    "type": "none"
+  },
+  "runtimeIndependentParameterVersionSupported": false,
+  "reason": "未建立适用的中国人群常模或阈值；不绑定外国分布。",
+  "contentVersion": "1.0.0",
+  "scoringVersion": "1.0.0",
+  "localizationVersion": "1.0.0",
+  "reportVersion": "1.0.0"
+}
