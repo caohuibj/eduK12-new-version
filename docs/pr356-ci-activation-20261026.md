@@ -2,6 +2,9 @@
 
 > 实施阶段小步①：新增固定PR356入口检测及真实legacy CLI的Ready/main拒绝，7个直接控制契约通过，原件见E A157–158。仅此防护已实现；下方其余计划仍在接线。新控制路径使58c43e22阶段的旧冻结不再代表当前中间提交，最终完成后重新列全差异、逐名control及完整head/tree/base。未运行应用检查/CI，没有Ready/合并/部署；本小步不是可激活候选。
 
+> 实施阶段小步②：独立backend/frontend image与audit执行器、实际工作树输入核对、官方FROM digest固定、官方run/job/attempt/artifact ZIP验证及统一stage已实现。原35/6与新增定向控制结果分开保留，stage首轮失败与仅失败两例复验均有原件；未执行真实API、构建、审计或应用。YAML及最终资格链仍接线中，历史未接纳，冻结尚未重做，不能激活CI。
+
+
 
 本轮先修复普通整卷测试的隔离/输出接入缺陷，再提出可执行的合并资格收口设计。**下述新接纳、分阶段作业、真实产品浏览器、required gate 与 main 复用均为待审实现，不是当前工作流已具备的能力。** 当前 `qualificationOnly=true / mergeEligible=false` 保留，不能只翻转这两个布尔值取得合并资格。
 

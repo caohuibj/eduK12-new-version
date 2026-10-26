@@ -1623,6 +1623,66 @@
       "path": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.receipt.json",
       "sha256": "fe664b9524a16fb31e86c887caf0f7d3d9b334c4b76fc2634c53d17f3bd6ed5f",
       "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5LnRlc3QubWpzIgogIF0sCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjUwOjA5LjcxMjY2NSswMDowMCIsCiAgImlucHV0U0hBMjU2QmVmb3JlIjogewogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1lbnRyeS5tanMiOiAiMjVkMGFiZmFjNDdhMjY0MGUzODM2MzEwNTVkNTFkZmQzNTMyNGM1NzA4MDk0MzNiNDNlYWM2NWM1M2QxOTIwZCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5LnRlc3QubWpzIjogIjA5MGE3Mjc3ODE1NjEwZDI1MjlhZGZkZTkwM2ZmYmRmZjdhNTM2NGRmY2Y5NTliOTEyMTg1OThjZTBiZmM1N2QiLAogICAgIi5naXRodWIvc2NyaXB0cy9jb250ZW50LXNjb3BlLm1qcyI6ICJlZmM1ZTUwMmFjMzBjMTY0YTU1ODMxZDAxOTdlY2Q4YWExMDAwOTZmZWY0MmQ1YjdmYWZhMWEyNDU0ZjhkYmY0IgogIH0sCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJjaUV4ZWN1dGVkIjogZmFsc2UsCiAgImFwcGxpY2F0aW9uQ2hlY2tzRXhlY3V0ZWQiOiBmYWxzZSwKICAiZXhpdENvZGUiOiAwLAogICJjb21wbGV0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjUwOjEwLjk0MTQ5OCswMDowMCIsCiAgImlucHV0U0hBMjU2QWZ0ZXIiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWVudHJ5Lm1qcyI6ICIyNWQwYWJmYWM0N2EyNjQwZTM4MzYzMTA1NWQ1MWRmZDM1MzI0YzU3MDgwOTQzM2I0M2VhYzY1YzUzZDE5MjBkIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtZW50cnkudGVzdC5tanMiOiAiMDkwYTcyNzc4MTU2MTBkMjUyOWFkZmRlOTAzZmZiZGZmN2E1MzY0ZGZjZjk1OWI5MTIxODU5OGNlMGJmYzU3ZCIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL2NvbnRlbnQtc2NvcGUubWpzIjogImVmYzVlNTAyYWMzMGMxNjRhNTU4MzFkMDE5N2VjZDhhYTEwMDA5NmZlZjQyZDViN2ZhZmExYTI0NTRmOGRiZjQiCiAgfSwKICAibG9nU0hBMjU2IjogImZjNWY1NzUzOGZiZDYxNTg4MWI3ZGQ4NzQ0OGQzZjM4NzgyY2I2Yzk2MTUzNjQ4MWUzOTY3ZDE1MDM3MmMwZTEiLAogICJpbnB1dHNVbmNoYW5nZWQiOiB0cnVlCn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-first.log",
+      "sha256": "c5f101e289c1c0912915e073889e57dc54555eb954b2af9215c416e051ed0fca",
+      "rawBase64": "4pyUIGRvd25sb2FkcyB0aGUgc3VjY2Vzc2Z1bCBwcm9kdWNlciBhdHRlbXB0IG9uY2UgYW5kIHJlcGVhdGVkbHkgdmVyaWZpZXMgdGhlIHNhbWUgb2ZmaWNpYWwgWklQIGFuZCBsb2NhbCBieXRlcyAoMTM5NS4xMTY2NG1zKQrinJQgcmVqZWN0cyBtaXNzaW5nSUQgd2l0aG91dCBmYWxsYmFjayAoMjM4LjQ5NDAwNG1zKQrinJQgcmVqZWN0cyBtaXNzaW5nRGlnZXN0IHdpdGhvdXQgZmFsbGJhY2sgKDE4My4yNjI4Mm1zKQrinJQgcmVqZWN0cyBjcm9zc1J1biB3aXRob3V0IGZhbGxiYWNrICgxNzAuNjc1NDIybXMpCuKclCByZWplY3RzIGNyb3NzSGVhZCB3aXRob3V0IGZhbGxiYWNrICgxNDUuNDMyNzM5bXMpCuKclCByZWplY3RzIGZ1dHVyZUF0dGVtcHQgd2l0aG91dCBmYWxsYmFjayAoMTY1LjM2MDM3OG1zKQrinJQgcmVqZWN0cyBjb25zdW1lckF0dGVtcHROYW1lIHdpdGhvdXQgZmFsbGJhY2sgKDI0NC4zMzczOW1zKQrinJQgcmVqZWN0cyBvZmZpY2lhbCBhcnRpZmFjdCBleHBpcmVkICgyMDYuMDE2MTkzbXMpCuKclCByZWplY3RzIG9mZmljaWFsIGFydGlmYWN0IGV4cGlyZWREYXRlICgzNzAuODU1MzM5bXMpCuKclCByZWplY3RzIG9mZmljaWFsIGFydGlmYWN0IHdyb25nSUQgKDE5MC4xMzc5MzNtcykK4pyUIHJlamVjdHMgb2ZmaWNpYWwgYXJ0aWZhY3Qgd3JvbmdOYW1lICgxMjYuOTg2MTc5bXMpCuKclCByZWplY3RzIG9mZmljaWFsIGFydGlmYWN0IHdyb25nSGVhZCAoMTU4Ljg3MzUyM21zKQrinJQgcmVqZWN0cyBvZmZpY2lhbCBhcnRpZmFjdCB3cm9uZ1J1biAoMjM3LjY4MDE3NW1zKQrinJQgcmVqZWN0cyBvZmZpY2lhbCBhcnRpZmFjdCB3cm9uZ0RpZ2VzdCAoMTUwLjM2NDQ1OW1zKQrinJQgcmVqZWN0cyBvZmZpY2lhbCBhcnRpZmFjdCBtaXNzaW5nRGlnZXN0ICgxNjYuMzkzMTI0bXMpCuKclCByZWplY3RzIG9mZmljaWFsIGFydGlmYWN0IHdyb25nQXR0ZW1wdFRpbWUgKDIwOS4wODgxNTJtcykK4pyUIHN0b3BzIGF0IG9mZmljaWFsIG1ldGFkYXRhIEhUVFAgNDAzICgzMDkuMTMwODE2bXMpCuKclCBzdG9wcyBhdCBvZmZpY2lhbCBtZXRhZGF0YSBIVFRQIDQwNCAoMjQxLjQyMjk2NW1zKQrinJQgcmVqZWN0cyBtaXNzaW5nIG9yIGZhaWxlZCBwcm9kdWNlciBqb2JzIGFuZCB3cm9uZyBvcmlnaW5hbCBydW4gYXR0ZW1wdCAoMTc2LjgyMjE0MW1zKQrinJQgcmVqZWN0cyBwcm9vZiBpbnB1dERyaWZ0ICgxNzYuNDc2MDE4bXMpCuKclCByZWplY3RzIHByb29mIG1pc3NpbmdDaGVja3MgKDI3Ny41MTU1MzltcykK4pyUIHJlamVjdHMgcHJvb2YgZmFpbGVkQ29tbWFuZCAoMTc2LjM5NDcxNG1zKQrinJQgcmVqZWN0cyBwcm9vZiB3cm9uZ1Byb2R1Y2VyQXR0ZW1wdCAoMTYyLjE3ODE1NW1zKQrinJQgcmVqZWN0cyBwcm9vZiBtaXNzaW5nTG9nICgxMDIuMTYzNDUzbXMpCuKclCByZWplY3RzIHByb29mIGV4dHJhQ2hlY2tzICgxNzQuNzgyMzU5bXMpCuKclCBsb2NhbCB2ZXJpZmljYXRpb24gcmVqZWN0cyBjaGFuZ2VkIGJ5dGVzIHdpdGhvdXQgYW5vdGhlciBkb3dubG9hZCAoNzI0LjQxNDc5OG1zKQrinJQgbG9jYWwgdmVyaWZpY2F0aW9uIHJlamVjdHMgZXh0cmEgYnl0ZXMgd2l0aG91dCBhbm90aGVyIGRvd25sb2FkICg4MjMuNjU2OTgxbXMpCuKclCBsb2NhbCB2ZXJpZmljYXRpb24gcmVqZWN0cyBzeW1saW5rIGJ5dGVzIHdpdGhvdXQgYW5vdGhlciBkb3dubG9hZCAoNzA4Ljg2NjMyM21zKQrinJQgbG9jYWwgdmVyaWZpY2F0aW9uIHJlamVjdHMgemlwIGJ5dGVzIHdpdGhvdXQgYW5vdGhlciBkb3dubG9hZCAoNDIyLjA0NzA1N21zKQrinJQgbG9jYWwgdmVyaWZpY2F0aW9uIHJlamVjdHMgcHJvb2YtYW5kLXBheWxvYWQgYnl0ZXMgd2l0aG91dCBhbm90aGVyIGRvd25sb2FkICg1MzAuNDg5NzgxbXMpCuKclCBzYWZlIGV4dHJhY3Rpb24gcmVmdXNlcyAuLi9lc2NhcGUgKDI5MS40ODU5NTdtcykK4pyUIHNhZmUgZXh0cmFjdGlvbiByZWZ1c2VzIC9hYnNvbHV0ZSAoMzc2LjM0NDYxOG1zKQrinJQgc2FmZSBleHRyYWN0aW9uIHJlZnVzZXMgYS8uLi9lc2NhcGUgKDM4NC45NzQ5OTVtcykK4pyUIHNhZmUgZXh0cmFjdGlvbiByZWZ1c2VzIGFcZXNjYXBlICg1MTYuOTY1ODQ5bXMpCuKclCBtYW5pZmVzdCB0cmF2ZXJzYWwgYW5kIG1pc3NpbmcgY29tcGxldGUgY29uZmlnL3Rvb2xzL2RlcGVuZGVuY3kgaW5wdXRzIGFyZSByZWZ1c2VkICgyOTMuMTA4OTY1bXMpCuKEuSB0ZXN0cyAzNQrihLkgc3VpdGVzIDAK4oS5IHBhc3MgMzUK4oS5IGZhaWwgMArihLkgY2FuY2VsbGVkIDAK4oS5IHNraXBwZWQgMArihLkgdG9kbyAwCuKEuSBkdXJhdGlvbl9tcyAxMTY3Ny41MzI5Ngo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-precision-origin.log",
+      "sha256": "504c9b35dbfba26bc06e3f9f96bacbcaad28221d1cad910201bb9334aa2fc0fa",
+      "rawBase64": "4pyUIG51bWVyaWMtc3RyaW5nIHByb2R1Y2VyIElEcyBmcm9tIHRoZSBEQiBwaGFzZSBrZWVwIHRoZSBzYW1lIHN0cmljdCBvcmlnaW5hbCBpZGVudGl0eSAoMjAyNC41NDgzMzltcykK4pyUIG9mZmljaWFsIHRpbWVzdGFtcCBwcmVjaXNpb24gcGVybWl0cyBvbmx5IHRoZSByZW1haW5kZXIgb2YgdGhlIHJlY29yZGVkIGNvbXBsZXRpb24gc2Vjb25kICgxMzM5Ljc3MTg4NG1zKQrinJQgZXhwbGljaXQgYWdncmVnYXRlIGV2aWRlbmNlIG9yaWdpbnMgcGluIGV2ZXJ5IG9yaWdpbmFsIGlkZW50aXR5IHdpdGhvdXQgZW5hYmxpbmcgZGVmYXVsdCBjcm9zcy1ydW4gcmV1c2UgKDcxOS4yOTUwNDJtcykK4oS5IHRlc3RzIDMK4oS5IHN1aXRlcyAwCuKEuSBwYXNzIDMK4oS5IGZhaWwgMArihLkgY2FuY2VsbGVkIDAK4oS5IHNraXBwZWQgMArihLkgdG9kbyAwCuKEuSBkdXJhdGlvbl9tcyA1MzQ1LjUwMjM1NQo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-precision-origin.receipt.json",
+      "sha256": "0ef72e3fed98a430b87aec9e9d14c6e95b72f64df77b22f5da4381130de6ac01",
+      "rawBase64": "ewogICJraW5kIjogInJlY29yZGVkLWNvbnRyb2wtZXhlY3V0aW9uIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJvcmlnaW5hbEV4ZWN1dGlvblNpZ25lZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiY29tbWFuZCI6IFsKICAgICJub2RlIiwKICAgICItLXRlc3QiLAogICAgIi0tdGVzdC1uYW1lLXBhdHRlcm49bnVtZXJpYy1zdHJpbmcgcHJvZHVjZXJ8b2ZmaWNpYWwgdGltZXN0YW1wIHByZWNpc2lvbnxleHBsaWNpdCBhZ2dyZWdhdGUgZXZpZGVuY2Ugb3JpZ2lucyIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qcyIKICBdLAogICJjd2QiOiAiL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24iLAogICJzdGFydGVkQXQiOiAiMjAyNi0xMC0yNlQwOTo0ODo1My41NzgzMzMrMDA6MDAiLAogICJjb21wbGV0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjQ4OjU5LjI3NzY1MyswMDowMCIsCiAgImV4aXRDb2RlIjogMCwKICAiaW5wdXRzQmVmb3JlIjogewogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMubWpzIjogImIwYjllNTI2ZDIxNmRlM2NhMzFmMDM1MDY2MzNmODlhMzAwZmUwY2MyMmY5MjBkMzY4MWFhYWYxYTI0NjhjZWMiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMudGVzdC5tanMiOiAiYzViODgyNTdmN2JmMzE0MjhmYzExN2EyOTlhMWM3NmFiODE0NjkyNGRhYTJlZTMxMWI0ZGZmYTVkMWE3ZjRhMCIKICB9LAogICJpbnB1dHNBZnRlciI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLm1qcyI6ICJiMGI5ZTUyNmQyMTZkZTNjYTMxZjAzNTA2NjMzZjg5YTMwMGZlMGNjMjJmOTIwZDM2ODFhYWFmMWEyNDY4Y2VjIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLnRlc3QubWpzIjogImM1Yjg4MjU3ZjdiZjMxNDI4ZmMxMTdhMjk5YTFjNzZhYjgxNDY5MjRkYWEyZWUzMTFiNGRmZmE1ZDFhN2Y0YTAiCiAgfSwKICAic291cmNlU3RhYmxlIjogdHJ1ZSwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgIm5vZGVFeGVjdXRhYmxlU0hBMjU2IjogIjdmZGU3YjhhZmExOThkYTY2MjU3ZjQyZWUyMDAxZDg3NGM3MzU1NjMxZTZkMTU3OWE1ZmI1ZWYxZjI0NmRmNGMiLAogICJzY29wZSI6ICJPbmx5IHRocmVlIG5ld2x5IGFkZGVkIGZha2UgQVBJL3RlbXAtZmlsZSBjb250cmFjdHM7IG9yaWdpbmFsIDM1IHdlcmUgZmlsdGVyZWQsIG5vIGFwcGxpY2F0aW9uIGNoZWNrcy9BUEkgdHJhZmZpYy9kb2NrZXIvYXVkaXQvREIvYnJvd3Nlci9DSS4iLAogICJsb2dTSEEyNTYiOiAiNTA0YzliMzVkYmZiYTI2YmMwNmUzZjlmOTZiYWNiY2FhZDI4MjIxZDFjYWQ5MTAyMDFiYjkzMzRhYTJmYzBmYSIKfQo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.log",
+      "sha256": "02b7fdf66a59c7ed7ed1c512cbbb633e53f6fb1767af2b131d8f988e1f563c12",
+      "rawBase64": "4pyUIHByb2R1Y2VyIHN0YWdlIGNvcGllcyBleGFjdCBvcmlnaW5hbCBieXRlcyB3aXRob3V0IGFydGlmYWN0IElEcywgdG9rZW4sIEFQSSBvciBxdWFsaWZpY2F0aW9uICgyMTkuNDA2NDY2bXMpCuKclCBwcm9kdWNlciBzdGFnZSBzZXBhcmF0ZXMgZnJvbnRlbmQgZGlzdCBmcm9tIHRoZSBpbWFnZS1yb2xlIGJ5dGVzIHdpdGggdGhlIHNhbWUgb3JpZ2luYWwgcHJvb2YgKDE3NC44MjExNDZtcykK4oS5IHRlc3RzIDIK4oS5IHN1aXRlcyAwCuKEuSBwYXNzIDIK4oS5IGZhaWwgMArihLkgY2FuY2VsbGVkIDAK4oS5IHNraXBwZWQgMArihLkgdG9kbyAwCuKEuSBkdXJhdGlvbl9tcyA2NTYuMzk1OTc2Cg=="
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.receipt.json",
+      "sha256": "cf9472dbddcab3c99ca1b4842cbfce0894dac493c51b70c742af6ec824e355c4",
+      "rawBase64": "ewogICJraW5kIjogInJlY29yZGVkLWNvbnRyb2wtZXhlY3V0aW9uIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJvcmlnaW5hbEV4ZWN1dGlvblNpZ25lZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiY29tbWFuZCI6IFsKICAgICJub2RlIiwKICAgICItLXRlc3QiLAogICAgIi0tdGVzdC1uYW1lLXBhdHRlcm49cHJvZHVjZXIgc3RhZ2UgY29waWVzfHByb2R1Y2VyIHN0YWdlIHNlcGFyYXRlcyIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qcyIKICBdLAogICJjd2QiOiAiL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24iLAogICJzdGFydGVkQXQiOiAiMjAyNi0xMC0yNlQxMDowMzoyMy43NTY1MDgrMDA6MDAiLAogICJjb21wbGV0ZWRBdCI6ICIyMDI2LTEwLTI2VDEwOjAzOjI0LjU4NDI1MCswMDowMCIsCiAgImV4aXRDb2RlIjogMCwKICAiaW5wdXRzQmVmb3JlIjogewogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMubWpzIjogIjNkMTU2MWQ3MDljOWRlNWQ0MTIzZWFiOTY2YTA5ZGEwOTNiMmVkMzgyOTIwZmYxNmUwYTBjN2NiZTkwNDZlNWEiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMudGVzdC5tanMiOiAiM2QzMDM1MmExZmMwNjNiMGQ4OWZjMGM3OGFjNjQ4MTFhODI3NTZjNzRlOTg1MTBmZGM3MTZhYzFlZWRhOThhZCIKICB9LAogICJpbnB1dHNBZnRlciI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLm1qcyI6ICIzZDE1NjFkNzA5YzlkZTVkNDEyM2VhYjk2NmEwOWRhMDkzYjJlZDM4MjkyMGZmMTZlMGEwYzdjYmU5MDQ2ZTVhIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLnRlc3QubWpzIjogIjNkMzAzNTJhMWZjMDYzYjBkODlmYzBjNzhhYzY0ODExYTgyNzU2Yzc0ZTk4NTEwZmRjNzE2YWMxZWVkYTk4YWQiCiAgfSwKICAic291cmNlU3RhYmxlIjogdHJ1ZSwKICAibm9kZSI6ICJ2MjQuMjEuMCIsCiAgIm5vZGVFeGVjdXRhYmxlU0hBMjU2IjogIjdmZGU3YjhhZmExOThkYTY2MjU3ZjQyZWUyMDAxZDg3NGM3MzU1NjMxZTZkMTU3OWE1ZmI1ZWYxZjI0NmRmNGMiLAogICJzY29wZSI6ICJPbmx5IHRoZSB0d28gcHJvZHVjZXItc3RhZ2Ugc3VjY2VzcyBjb250cmFjdHMgYWZmZWN0ZWQgYnkgZGlyZWN0IFJVTk5FUl9URU1QIHBhcmVudCBjb3JyZWN0aW9uLiBQcmlvciBwYXNzaW5nIG5lZ2F0aXZlIHN0YWdlIGNhc2UgYW5kIGFsbCBwcmlvciBpZGVudGl0eS9hcnRpZmFjdCBjb250cm9scyBmaWx0ZXJlZDsgbm8gQVBJL2J1aWxkL2F1ZGl0L2FwcGxpY2F0aW9uL2Jyb3dzZXIvUEcvQ0kuIiwKICAibG9nU0hBMjU2IjogIjAyYjdmZGY2NmE1OWM3ZWQ3ZWQxYzUxMmNiYmI2MzNlNTNmNmZiMTc2N2FmMmIxMzFkOGY5ODhlMWY1NjNjMTIiCn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-stage.log",
+      "sha256": "29a324207e0de7de8d768dac8c57b8688bfd1ca4e4263f42664cfa588572cadb",
+      "rawBase64": "4pyWIHByb2R1Y2VyIHN0YWdlIGNvcGllcyBleGFjdCBvcmlnaW5hbCBieXRlcyB3aXRob3V0IGFydGlmYWN0IElEcywgdG9rZW4sIEFQSSBvciBxdWFsaWZpY2F0aW9uICg0MjIuOTg2NzA1bXMpCuKcliBwcm9kdWNlciBzdGFnZSBzZXBhcmF0ZXMgZnJvbnRlbmQgZGlzdCBmcm9tIHRoZSBpbWFnZS1yb2xlIGJ5dGVzIHdpdGggdGhlIHNhbWUgb3JpZ2luYWwgcHJvb2YgKDE1MC42MDUxNjdtcykK4pyUIHByb2R1Y2VyIHN0YWdlIHJlamVjdHMgd3JvbmcgY3VycmVudCBhdHRlbXB0LCBwYXlsb2FkIGRyaWZ0IGFuZCBkZXN0aW5hdGlvbnMgb3V0c2lkZSBSVU5ORVJfVEVNUCAoMTczLjAwOTM0NW1zKQrihLkgdGVzdHMgMwrihLkgc3VpdGVzIDAK4oS5IHBhc3MgMQrihLkgZmFpbCAyCuKEuSBjYW5jZWxsZWQgMArihLkgc2tpcHBlZCAwCuKEuSB0b2RvIDAK4oS5IGR1cmF0aW9uX21zIDIzMDkuMjY1NjM2CgrinJYgZmFpbGluZyB0ZXN0czoKCnRlc3QgYXQgLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qczo2MjoxCuKcliBwcm9kdWNlciBzdGFnZSBjb3BpZXMgZXhhY3Qgb3JpZ2luYWwgYnl0ZXMgd2l0aG91dCBhcnRpZmFjdCBJRHMsIHRva2VuLCBBUEkgb3IgcXVhbGlmaWNhdGlvbiAoNDIyLjk4NjcwNW1zKQogIEFzc2VydGlvbkVycm9yIFtFUlJfQVNTRVJUSU9OXTogU3RhZ2luZyBwYXJlbnQgZXNjYXBlZCBSVU5ORVJfVEVNUAogICAgICBhdCBzdGFnZUFydGlmYWN0IChmaWxlOi8vL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24vLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy5tanM6MTk1OjUxKQogICAgICBhdCBwcm9jZXNzLnByb2Nlc3NUaWNrc0FuZFJlamVjdGlvbnMgKG5vZGU6aW50ZXJuYWwvcHJvY2Vzcy90YXNrX3F1ZXVlczoxMDQ6NSkKICAgICAgYXQgYXN5bmMgVGVzdENvbnRleHQuPGFub255bW91cz4gKGZpbGU6Ly8vd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbi8uZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLnRlc3QubWpzOjYyOjM1OCkKICAgICAgYXQgYXN5bmMgVGVzdC5ydW4gKG5vZGU6aW50ZXJuYWwvdGVzdF9ydW5uZXIvdGVzdDoxNDA5OjcpCiAgICAgIGF0IGFzeW5jIHN0YXJ0U3VidGVzdEFmdGVyQm9vdHN0cmFwIChub2RlOmludGVybmFsL3Rlc3RfcnVubmVyL2hhcm5lc3M6Mzg3OjMpIHsKICAgIGdlbmVyYXRlZE1lc3NhZ2U6IGZhbHNlLAogICAgY29kZTogJ0VSUl9BU1NFUlRJT04nLAogICAgYWN0dWFsOiBmYWxzZSwKICAgIGV4cGVjdGVkOiB0cnVlLAogICAgb3BlcmF0b3I6ICc9PScsCiAgICBkaWZmOiAnc2ltcGxlJwogIH0KCnRlc3QgYXQgLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qczo2MzoxCuKcliBwcm9kdWNlciBzdGFnZSBzZXBhcmF0ZXMgZnJvbnRlbmQgZGlzdCBmcm9tIHRoZSBpbWFnZS1yb2xlIGJ5dGVzIHdpdGggdGhlIHNhbWUgb3JpZ2luYWwgcHJvb2YgKDE1MC42MDUxNjdtcykKICBBc3NlcnRpb25FcnJvciBbRVJSX0FTU0VSVElPTl06IFN0YWdpbmcgcGFyZW50IGVzY2FwZWQgUlVOTkVSX1RFTVAKICAgICAgYXQgc3RhZ2VBcnRpZmFjdCAoZmlsZTovLy93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uLy5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMubWpzOjE5NTo1MSkKICAgICAgYXQgcHJvY2Vzcy5wcm9jZXNzVGlja3NBbmRSZWplY3Rpb25zIChub2RlOmludGVybmFsL3Byb2Nlc3MvdGFza19xdWV1ZXM6MTA0OjUpCiAgICAgIGF0IGFzeW5jIFRlc3RDb250ZXh0Ljxhbm9ueW1vdXM+IChmaWxlOi8vL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24vLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qczo2Mzo4MDQpCiAgICAgIGF0IGFzeW5jIFRlc3QucnVuIChub2RlOmludGVybmFsL3Rlc3RfcnVubmVyL3Rlc3Q6MTQwOTo3KQogICAgICBhdCBhc3luYyBUZXN0LnByb2Nlc3NQZW5kaW5nU3VidGVzdHMgKG5vZGU6aW50ZXJuYWwvdGVzdF9ydW5uZXIvdGVzdDo5NzQ6NykgewogICAgZ2VuZXJhdGVkTWVzc2FnZTogZmFsc2UsCiAgICBjb2RlOiAnRVJSX0FTU0VSVElPTicsCiAgICBhY3R1YWw6IGZhbHNlLAogICAgZXhwZWN0ZWQ6IHRydWUsCiAgICBvcGVyYXRvcjogJz09JywKICAgIGRpZmY6ICdzaW1wbGUnCiAgfQo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-artifacts-control-stage.receipt.json",
+      "sha256": "64610770c9ebeb35112530f3671d0b43fabdea8d105e53b714b3f13ce1581695",
+      "rawBase64": "ewogICJraW5kIjogInJlY29yZGVkLWNvbnRyb2wtZXhlY3V0aW9uIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJvcmlnaW5hbEV4ZWN1dGlvblNpZ25lZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiY29tbWFuZCI6IFsKICAgICJub2RlIiwKICAgICItLXRlc3QiLAogICAgIi0tdGVzdC1uYW1lLXBhdHRlcm49cHJvZHVjZXIgc3RhZ2UiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMudGVzdC5tanMiCiAgXSwKICAiY3dkIjogIi93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uIiwKICAic3RhcnRlZEF0IjogIjIwMjYtMTAtMjZUMDk6NTg6NDMuMzk5Njc3KzAwOjAwIiwKICAiY29tcGxldGVkQXQiOiAiMjAyNi0xMC0yNlQwOTo1ODo0Ni40Mzk5NDMrMDA6MDAiLAogICJleGl0Q29kZSI6IDEsCiAgImlucHV0c0JlZm9yZSI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLm1qcyI6ICJkYjZjMzkxMTBlNGIyODlkMGI4NTBjZjM4OWU5NDJkNDVhZGI2Yzg0NDU4MDQyMjIxNDk5NjYwZmM0N2ViY2E2IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYXJ0aWZhY3RzLnRlc3QubWpzIjogIjNkMzAzNTJhMWZjMDYzYjBkODlmYzBjNzhhYzY0ODExYTgyNzU2Yzc0ZTk4NTEwZmRjNzE2YWMxZWVkYTk4YWQiCiAgfSwKICAiaW5wdXRzQWZ0ZXIiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy5tanMiOiAiZGI2YzM5MTEwZTRiMjg5ZDBiODUwY2YzODllOTQyZDQ1YWRiNmM4NDQ1ODA0MjIyMTQ5OTY2MGZjNDdlYmNhNiIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWFydGlmYWN0cy50ZXN0Lm1qcyI6ICIzZDMwMzUyYTFmYzA2M2IwZDg5ZmMwYzc4YWM2NDgxMWE4Mjc1NmM3NGU5ODUxMGZkYzcxNmFjMWVlZGE5OGFkIgogIH0sCiAgInNvdXJjZVN0YWJsZSI6IHRydWUsCiAgIm5vZGUiOiAidjI0LjIxLjAiLAogICJub2RlRXhlY3V0YWJsZVNIQTI1NiI6ICI3ZmRlN2I4YWZhMTk4ZGE2NjI1N2Y0MmVlMjAwMWQ4NzRjNzM1NTYzMWU2ZDE1NzlhNWZiNWVmMWYyNDZkZjRjIiwKICAic2NvcGUiOiAiT25seSB0aHJlZSBuZXcgcHJvZHVjZXItc3RhZ2UgdGVtcG9yYXJ5LWZpbGUgY29udHJhY3RzOyBwcmlvciAzNSBhbmQgbGF0ZXIgMyBpZGVudGl0eS90aW1lL29yaWdpbiBjYXNlcyBmaWx0ZXJlZCwgbm8gb2ZmaWNpYWwgQVBJLCBhcHBsaWNhdGlvbiwgYnVpbGQvYXVkaXQvREIvYnJvd3Nlci9DSS4iLAogICJsb2dTSEEyNTYiOiAiMjlhMzI0MjA3ZTBkZTdkZThkNzY4ZGFjOGM1N2I4Njg4YmZkMWNhNGU0MjYzZjQyNjY0Y2ZhNTg4NTcyY2FkYiIKfQo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-independent-producer-control-docker-target.log",
+      "sha256": "ecfae4c055fbe7795c0401c236d69c667f6ef424586d05ba2c5aaada6468bae5",
+      "rawBase64": "LgotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tClJhbiAxIHRlc3QgaW4gMC4xMzVzCgpPSwo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-independent-producer-control-docker-target.receipt.json",
+      "sha256": "17b7cf6ef781993b7f5af3060eb08404febc1edca65dc266f313410efbf12813",
+      "rawBase64": "ewogICJraW5kIjogInJlY29yZGVkLWNvbnRyb2wtZXhlY3V0aW9uIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJvcmlnaW5hbEV4ZWN1dGlvblNpZ25lZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiY29tbWFuZCI6IFsKICAgICIvb3B0L2NvZGV4L3J1bnRpbWVzL2NvZGV4LXByaW1hcnktcnVudGltZS9kZXBlbmRlbmNpZXMvcHl0aG9uL2Jpbi9weXRob24zIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtcXVhbGlmaWNhdGlvbi50ZXN0LnB5IiwKICAgICJJbmRlcGVuZGVudFByb2R1Y2Vycy50ZXN0X2FsbF9waW5uZWRfZG9ja2VyX29wZXJhdGlvbnNfaWdub3JlX2luaGVyaXRlZF9yZW1vdGVfY29udGV4dF9hbmRfdGxzIgogIF0sCiAgImN3ZCI6ICIvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbiIsCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDA5OjUxOjEzLjUwMjI5OSswMDowMCIsCiAgImNvbXBsZXRlZEF0IjogIjIwMjYtMTAtMjZUMDk6NTE6MTQuMTcyODA0KzAwOjAwIiwKICAiZXhpdENvZGUiOiAwLAogICJpbnB1dHNCZWZvcmUiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXF1YWxpZmljYXRpb24ucHkiOiAiZjE1MmRiYzdiYzU2MDkzOTgzOGUzM2MwNmZkNDUzZWRhYzgxYmU4NDg2ZjZkZmVmMmQ5YWY3YTBiYzE1NDllYiIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXF1YWxpZmljYXRpb24udGVzdC5weSI6ICI4MTk2MDgzYWMxZmRiZGVlMTM0YzBkZGZhMDk4ZDU5ZDMzNGIxZjVlNzBjZTM5MmNiNDE3Nzg1N2JlNjBkNGE3IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYmluZGluZ3MuanNvbiI6ICIyNzQ1ODc2NTllOGZmZGI1ODYzYzI1MmM5YzcyZmQ3ZGJkYjMxYzk4ZWI4NWM0ODI2ZDVkNDQwZWVmMmI5YjE5IgogIH0sCiAgImlucHV0c0FmdGVyIjogewogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1xdWFsaWZpY2F0aW9uLnB5IjogImYxNTJkYmM3YmM1NjA5Mzk4MzhlMzNjMDZmZDQ1M2VkYWM4MWJlODQ4NmY2ZGZlZjJkOWFmN2EwYmMxNTQ5ZWIiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1xdWFsaWZpY2F0aW9uLnRlc3QucHkiOiAiODE5NjA4M2FjMWZkYmRlZTEzNGMwZGRmYTA5OGQ1OWQzMzRiMWY1ZTcwY2UzOTJjYjQxNzc4NTdiZTYwZDRhNyIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWJpbmRpbmdzLmpzb24iOiAiMjc0NTg3NjU5ZThmZmRiNTg2M2MyNTJjOWM3MmZkN2RiZGIzMWM5OGViODVjNDgyNmQ1ZDQ0MGVlZjJiOWIxOSIKICB9LAogICJzb3VyY2VTdGFibGUiOiB0cnVlLAogICJweXRob25WZXJzaW9uIjogIjMuMTIuMTQgKG1haW4sIEF1ZyAyNSAyMDI2LCAxNDowMDo0OSkgW0NsYW5nIDIyLjEuMyBdIiwKICAicHl0aG9uRXhlY3V0YWJsZVNIQTI1NiI6ICJmYTY3NDQzNTI3ZWQ5NjQ3Zjc2MGQ4MDdlMmEzOGYyNjM0MDc1NzEyM2U2NDNjNDYzOWNmMjczZWQxNWQ1ZWE3IiwKICAic2NvcGUiOiAiT25lIG5ldyBEb2NrZXItdGFyZ2V0IGVudmlyb25tZW50IHN0dWIgY29udHJhY3Qgb25seTsgb3JpZ2luYWwgc2l4IGFuZCB0aGUgdGhyZWUgcGlubmVkLWJhc2UgY2FzZXMgd2VyZSBub3Qgc2VsZWN0ZWQuIE5vIERvY2tlci9wdWxsL2J1aWxkL25wbSBhdWRpdC9hcHBsaWNhdGlvbi9EQi9icm93c2VyL0NJLiIsCiAgImxvZ1NIQTI1NiI6ICJlY2ZhZTRjMDU1ZmJlNzc5NWMwNDAxYzIzNmQ2OWM2NjdmNmVmNDI0NTg2ZDA1YmEyYzVhYWFkYTY0NjhiYWU1Igp9Cg=="
+    },
+    {
+      "path": "/workspace/scratch/pr356-independent-producer-control-first.log",
+      "sha256": "1483c7ca96ef288297ff213e28dc517a8be5c27ff818a936fb3478bb60146663",
+      "rawBase64": "Li4uLi4uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KUmFuIDYgdGVzdHMgaW4gMC45MzFzCgpPSwo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.log",
+      "sha256": "ea561c591ffef408f57c581a7f13bf4167a497adc93d459cbea9a20120edebd1",
+      "rawBase64": "Li4uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KUmFuIDMgdGVzdHMgaW4gMC4xNjZzCgpPSwo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.receipt.json",
+      "sha256": "693de0a503aeed40e7fd435bc2dc8deda12b12952922190c037911c3f31837ec",
+      "rawBase64": "ewogICJraW5kIjogInJlY29yZGVkLWNvbnRyb2wtZXhlY3V0aW9uIiwKICAiY2lFeGVjdXRlZCI6IGZhbHNlLAogICJvcmlnaW5hbEV4ZWN1dGlvblNpZ25lZCI6IGZhbHNlLAogICJxdWFsaWZpY2F0aW9uQ2xhaW0iOiBmYWxzZSwKICAiY29tbWFuZCI6IFsKICAgICIvb3B0L2NvZGV4L3J1bnRpbWVzL2NvZGV4LXByaW1hcnktcnVudGltZS9kZXBlbmRlbmNpZXMvcHl0aG9uL2Jpbi9weXRob24zIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtcXVhbGlmaWNhdGlvbi50ZXN0LnB5IiwKICAgICJJbmRlcGVuZGVudFByb2R1Y2Vycy50ZXN0X3Bpbm5lZF9mcm9tX21hdGVyaWFsc19jb3Zlcl9ub2RlX2FuZF9uZ2lueF93aXRob3V0X2NoYW5naW5nX3N0YWdlX2JvZGllcyIsCiAgICAiSW5kZXBlbmRlbnRQcm9kdWNlcnMudGVzdF9waW5uZWRfZnJvbV9yZXVzZXNfcmVzb2x1dGlvbl9hbmRfcmVqZWN0c19ub25vZmZpY2lhbF9vcl91bnJlc29sdmVkX21hdGVyaWFscyIsCiAgICAiSW5kZXBlbmRlbnRQcm9kdWNlcnMudGVzdF9waW5uZWRfYnVpbGRfY29tbWFuZF9hbmRfcmVjZWlwdF9yZWNvcmRfZXhhY3RfZ2VuZXJhdGVkX2RvY2tlcmZpbGUiCiAgXSwKICAiY3dkIjogIi93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uIiwKICAic3RhcnRlZEF0IjogIjIwMjYtMTAtMjZUMDk6NDg6NTAuNTM4NTgyKzAwOjAwIiwKICAiY29tcGxldGVkQXQiOiAiMjAyNi0xMC0yNlQwOTo0ODo1MS4xNzQ5MTUrMDA6MDAiLAogICJleGl0Q29kZSI6IDAsCiAgImlucHV0c0JlZm9yZSI6IHsKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtcXVhbGlmaWNhdGlvbi5weSI6ICI4NmU4NDA4ZjkyZWI0YWJlODVlMTM2ZGExODY3MGZkYWVlYWFhMzAyZTg0OTQ5NTcxZDNkZjI5MjBkMGZhYzJmIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtcXVhbGlmaWNhdGlvbi50ZXN0LnB5IjogIjdhNmNiN2VjMDdjZjYxYmUyNTkyZDVmYmY0Njg3MjUwN2E3NWY2YzZjOGJmOGE4OGQ4MDAxNjRiNDk5OGY4ZmIiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1iaW5kaW5ncy5qc29uIjogIjI3NDU4NzY1OWU4ZmZkYjU4NjNjMjUyYzljNzJmZDdkYmRiMzFjOThlYjg1YzQ4MjZkNWQ0NDBlZWYyYjliMTkiCiAgfSwKICAiaW5wdXRzQWZ0ZXIiOiB7CiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXF1YWxpZmljYXRpb24ucHkiOiAiODZlODQwOGY5MmViNGFiZTg1ZTEzNmRhMTg2NzBmZGFlZWFhYTMwMmU4NDk0OTU3MWQzZGYyOTIwZDBmYWMyZiIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LXF1YWxpZmljYXRpb24udGVzdC5weSI6ICI3YTZjYjdlYzA3Y2Y2MWJlMjU5MmQ1ZmJmNDY4NzI1MDdhNzVmNmM2YzhiZjhhODhkODAwMTY0YjQ5OThmOGZiIiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtYmluZGluZ3MuanNvbiI6ICIyNzQ1ODc2NTllOGZmZGI1ODYzYzI1MmM5YzcyZmQ3ZGJkYjMxYzk4ZWI4NWM0ODI2ZDVkNDQwZWVmMmI5YjE5IgogIH0sCiAgInNvdXJjZVN0YWJsZSI6IHRydWUsCiAgInB5dGhvblZlcnNpb24iOiAiMy4xMi4xNCAobWFpbiwgQXVnIDI1IDIwMjYsIDE0OjAwOjQ5KSBbQ2xhbmcgMjIuMS4zIF0iLAogICJweXRob25FeGVjdXRhYmxlU0hBMjU2IjogImZhNjc0NDM1MjdlZDk2NDdmNzYwZDgwN2UyYTM4ZjI2MzQwNzU3MTIzZTY0M2M0NjM5Y2YyNzNlZDE1ZDVlYTciLAogICJzY29wZSI6ICJPbmx5IHRocmVlIG5ldyBjb250cm9sbGVkLURvY2tlcmZpbGUvRlJPTS1kaWdlc3Qgc3R1YiBjb250cmFjdHM7IG9yaWdpbmFsIHNpeCBub3Qgc2VsZWN0ZWQuIE5vIGFjdHVhbCBEb2NrZXIvcHVsbC9idWlsZC9ucG0gYXVkaXQvYXBwbGljYXRpb24vREIvYnJvd3Nlci9DSS4iLAogICJsb2dTSEEyNTYiOiAiZWE1NjFjNTkxZmZlZjQwOGY1N2M1ODFhN2YxM2JmNDE2N2E0OTdhZGM5M2Q0NTljYmVhOWEyMDEyMGVkZWJkMSIKfQo="
     }
   ],
   "portableRawIndexVersion": 1,
@@ -3594,6 +3654,102 @@
       "originalPath": "/workspace/scratch/pr356-review-followup/pr356-entry-controls.receipt.json",
       "sha256": "fe664b9524a16fb31e86c887caf0f7d3d9b334c4b76fc2634c53d17f3bd6ed5f",
       "bytes": 1146
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/159",
+      "rawBase64Pointer": "/followupAttachments/159/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-first.log",
+      "sha256": "c5f101e289c1c0912915e073889e57dc54555eb954b2af9215c416e051ed0fca",
+      "bytes": 2315
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/160",
+      "rawBase64Pointer": "/followupAttachments/160/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-precision-origin.log",
+      "sha256": "504c9b35dbfba26bc06e3f9f96bacbcaad28221d1cad910201bb9334aa2fc0fa",
+      "bytes": 455
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/161",
+      "rawBase64Pointer": "/followupAttachments/161/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-precision-origin.receipt.json",
+      "sha256": "0ef72e3fed98a430b87aec9e9d14c6e95b72f64df77b22f5da4381130de6ac01",
+      "bytes": 1385
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/162",
+      "rawBase64Pointer": "/followupAttachments/162/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.log",
+      "sha256": "02b7fdf66a59c7ed7ed1c512cbbb633e53f6fb1767af2b131d8f988e1f563c12",
+      "bytes": 340
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/163",
+      "rawBase64Pointer": "/followupAttachments/163/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.receipt.json",
+      "sha256": "cf9472dbddcab3c99ca1b4842cbfce0894dac493c51b70c742af6ec824e355c4",
+      "bytes": 1428
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/164",
+      "rawBase64Pointer": "/followupAttachments/164/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-stage.log",
+      "sha256": "29a324207e0de7de8d768dac8c57b8688bfd1ca4e4263f42664cfa588572cadb",
+      "bytes": 2156
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/165",
+      "rawBase64Pointer": "/followupAttachments/165/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-artifacts-control-stage.receipt.json",
+      "sha256": "64610770c9ebeb35112530f3671d0b43fabdea8d105e53b714b3f13ce1581695",
+      "bytes": 1340
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/166",
+      "rawBase64Pointer": "/followupAttachments/166/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-independent-producer-control-docker-target.log",
+      "sha256": "ecfae4c055fbe7795c0401c236d69c667f6ef424586d05ba2c5aaada6468bae5",
+      "bytes": 98
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/167",
+      "rawBase64Pointer": "/followupAttachments/167/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-independent-producer-control-docker-target.receipt.json",
+      "sha256": "17b7cf6ef781993b7f5af3060eb08404febc1edca65dc266f313410efbf12813",
+      "bytes": 1753
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/168",
+      "rawBase64Pointer": "/followupAttachments/168/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-independent-producer-control-first.log",
+      "sha256": "1483c7ca96ef288297ff213e28dc517a8be5c27ff818a936fb3478bb60146663",
+      "bytes": 104
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/169",
+      "rawBase64Pointer": "/followupAttachments/169/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.log",
+      "sha256": "ea561c591ffef408f57c581a7f13bf4167a497adc93d459cbea9a20120edebd1",
+      "bytes": 101
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/170",
+      "rawBase64Pointer": "/followupAttachments/170/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.receipt.json",
+      "sha256": "693de0a503aeed40e7fd435bc2dc8deda12b12952922190c037911c3f31837ec",
+      "bytes": 1949
     }
   ],
   "additionalRawRecovery": {
@@ -3863,6 +4019,118 @@
       "ciExecuted": false,
       "qualificationClaim": false,
       "candidateState": "intermediate; final new control allowlist and complete qualification/admission wiring pending"
+    },
+    {
+      "id": "independent-producers-and-official-artifact-protocol",
+      "sourceSHA256AtCollection": {
+        ".github/scripts/pr356-qualification.py": "f152dbc7bc560939838e33c06fd453edac81be8486f6dfef2d9af7a0bc1549eb",
+        ".github/scripts/pr356-qualification.test.py": "8196083ac1fdbdee134c0ddfa098d59d334b1f5e70ce392cb4177857be60d4a7",
+        ".github/scripts/pr356-artifacts.mjs": "3d1561d709c9de5d4123eab966a09da093b2ed382920ff16e0a0c7cbe9046e5a",
+        ".github/scripts/pr356-artifacts.test.mjs": "3d30352a1fc063b0d89fc0c78ac64811a82756c74e98510fdc716ac1eeda98ad"
+      },
+      "records": [
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/159",
+          "rawBase64Pointer": "/followupAttachments/159/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-first.log",
+          "sha256": "c5f101e289c1c0912915e073889e57dc54555eb954b2af9215c416e051ed0fca",
+          "bytes": 2315
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/160",
+          "rawBase64Pointer": "/followupAttachments/160/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-precision-origin.log",
+          "sha256": "504c9b35dbfba26bc06e3f9f96bacbcaad28221d1cad910201bb9334aa2fc0fa",
+          "bytes": 455
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/161",
+          "rawBase64Pointer": "/followupAttachments/161/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-precision-origin.receipt.json",
+          "sha256": "0ef72e3fed98a430b87aec9e9d14c6e95b72f64df77b22f5da4381130de6ac01",
+          "bytes": 1385
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/162",
+          "rawBase64Pointer": "/followupAttachments/162/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.log",
+          "sha256": "02b7fdf66a59c7ed7ed1c512cbbb633e53f6fb1767af2b131d8f988e1f563c12",
+          "bytes": 340
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/163",
+          "rawBase64Pointer": "/followupAttachments/163/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-stage-direct-temp-fixed.receipt.json",
+          "sha256": "cf9472dbddcab3c99ca1b4842cbfce0894dac493c51b70c742af6ec824e355c4",
+          "bytes": 1428
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/164",
+          "rawBase64Pointer": "/followupAttachments/164/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-stage.log",
+          "sha256": "29a324207e0de7de8d768dac8c57b8688bfd1ca4e4263f42664cfa588572cadb",
+          "bytes": 2156
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/165",
+          "rawBase64Pointer": "/followupAttachments/165/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-artifacts-control-stage.receipt.json",
+          "sha256": "64610770c9ebeb35112530f3671d0b43fabdea8d105e53b714b3f13ce1581695",
+          "bytes": 1340
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/166",
+          "rawBase64Pointer": "/followupAttachments/166/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-independent-producer-control-docker-target.log",
+          "sha256": "ecfae4c055fbe7795c0401c236d69c667f6ef424586d05ba2c5aaada6468bae5",
+          "bytes": 98
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/167",
+          "rawBase64Pointer": "/followupAttachments/167/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-independent-producer-control-docker-target.receipt.json",
+          "sha256": "17b7cf6ef781993b7f5af3060eb08404febc1edca65dc266f313410efbf12813",
+          "bytes": 1753
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/168",
+          "rawBase64Pointer": "/followupAttachments/168/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-independent-producer-control-first.log",
+          "sha256": "1483c7ca96ef288297ff213e28dc517a8be5c27ff818a936fb3478bb60146663",
+          "bytes": 104
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/169",
+          "rawBase64Pointer": "/followupAttachments/169/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.log",
+          "sha256": "ea561c591ffef408f57c581a7f13bf4167a497adc93d459cbea9a20120edebd1",
+          "bytes": 101
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/170",
+          "rawBase64Pointer": "/followupAttachments/170/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-independent-producer-control-pinned-bases.receipt.json",
+          "sha256": "693de0a503aeed40e7fd435bc2dc8deda12b12952922190c037911c3f31837ec",
+          "bytes": 1949
+        }
+      ],
+      "results": "Earlier Node35/Python6 successes retain earlier inputs; later selected precision/origin3, FROM pinning3, Docker-env1, stage red1pass2fail and only failed2 green preserved separately; no whole-final-suite claim",
+      "realAPI": false,
+      "realBuildAuditApplicationDatabaseOrCI": false,
+      "qualificationClaim": false,
+      "candidateState": "intermediate control implementation; final full route/freeze pending"
     }
   ]
 }
