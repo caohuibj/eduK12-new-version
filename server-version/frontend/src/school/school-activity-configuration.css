@@ -1,0 +1,56 @@
+/* School-only layout for content creation and batch configuration. */
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create{display:grid;grid-template-columns:minmax(180px,.45fr) minmax(0,1fr);gap:12px 20px;align-items:end}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create>.hs-field{min-width:0;margin:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create>.hs-field>span{font-size:13px;font-weight:500;line-height:1.7;margin-bottom:7px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create :is(input,select,textarea){width:100%;min-width:0;max-width:100%;min-height:44px;font-size:15px;line-height:1.7;border-radius:9px;background:var(--hs-surface);color:var(--hs-ink)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-body{grid-column:1/-1}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-body textarea{min-height:132px;resize:vertical}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create>button{grid-column:1/-1;justify-self:end;min-height:44px;margin:0;font-size:13px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar{position:relative;display:flex;align-items:end;justify-content:flex-end;gap:12px 20px;margin:0 0 16px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create{display:flex;align-items:end;flex:1;gap:12px;min-width:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create>.hs-field{flex:1;min-width:0;max-width:560px;margin:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create>.hs-field>span{font-size:13px;font-weight:500;margin-bottom:7px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create input{width:100%;min-width:0;min-height:44px;font-size:15px;border-radius:9px;background:var(--hs-surface);color:var(--hs-ink)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create>button{flex:none;min-height:44px;font-size:13px;margin:0;white-space:nowrap}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar>.hs-teacher-task-help{position:static;flex:none;margin:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar .hs-teacher-task-help>button{display:flex;align-items:center;gap:6px;min-height:44px;padding:8px 0;font-size:12px;border:0;background:transparent;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar .hs-teacher-task-help-content{position:absolute;z-index:30;top:100%;right:0;width:min(420px,100%);max-height:min(65vh,420px);overflow-y:auto;padding:16px;border:1px solid var(--hs-border);border-radius:9px;background:var(--hs-surface);box-shadow:0 10px 28px #10251b20}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar .hs-teacher-task-help-content p{margin:0;font-size:13px;line-height:1.8;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:12px 0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;min-width:0;padding:10px 12px;border:1px solid var(--hs-border);border-radius:9px;background:var(--hs-surface)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>button{flex:1;min-width:0;text-align:left;justify-content:flex-start;font-size:14px;line-height:1.7;min-height:44px;padding:8px 10px;border-color:transparent;white-space:normal;overflow-wrap:anywhere}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>button[aria-pressed=true]{border-color:var(--hs-primary);background:var(--hs-surface-soft);color:var(--hs-primary)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>.hs-actions{display:flex;flex:none;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;margin:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>.hs-actions>button{width:auto;min-height:44px;font-size:12px;margin:0;white-space:normal}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor{padding:16px 0 0;margin:16px 0 0;border:0;border-top:1px solid var(--hs-border);border-radius:0;background:transparent}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:12px;margin:12px 0}
+.hs-activity-private-pickers:empty{display:none}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers>.hs-task-detail{min-width:0;margin:0;padding:16px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers h4{font-family:inherit;font-size:16px;font-weight:600;line-height:1.7;margin:0;color:var(--hs-ink)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-private-picker-help{margin:4px 0 10px;padding:0;border:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-private-picker-help>summary{cursor:pointer;min-height:36px;font-size:12px;line-height:1.7;color:var(--hs-muted);padding:8px 0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-private-picker-help p{font-size:12px;line-height:1.8;margin:4px 0 8px;color:var(--hs-muted)}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers .hs-field{min-width:0;margin:12px 0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers :is(input:not([type=checkbox]),select){min-width:0;max-width:100%;width:100%;min-height:44px;font-size:14px}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers button{min-height:44px;font-size:13px;max-width:100%;white-space:normal}
+@media(max-width:700px){
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create{grid-template-columns:minmax(0,1fr);gap:12px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create :is(input,select,textarea),.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create input{font-size:16px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-content-create>button{justify-self:stretch;width:100%}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar{gap:12px;align-items:end}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create{flex-wrap:wrap;gap:10px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create>.hs-field{flex:1 0 100%}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-create>button{width:100%;white-space:normal}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar .hs-teacher-task-help>button{width:44px;justify-content:center;font-size:0;gap:0;padding:8px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row{flex-wrap:wrap;padding:8px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>button{flex-basis:100%}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-row>.hs-actions{margin-left:auto}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers{grid-template-columns:minmax(0,1fr)}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers>.hs-task-detail{padding:14px 12px}
+ .hs-app.hs-professional .hs-activity-manager--compact .hs-activity-private-pickers :is(input:not([type=checkbox]),select){font-size:16px}
+}
+
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-batch-toolbar:not(:has(.hs-activity-run-create)){margin-bottom:0}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>details{margin:0 0 12px;padding:0;border:0;background:transparent}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>details>summary{min-height:36px;padding:8px 0;font-size:12px;color:var(--hs-muted);cursor:pointer}
+.hs-app.hs-professional .hs-activity-manager--compact .hs-activity-run-editor>.hs-selected-tool-outline{margin:12px 0 0;padding:0;border:0;background:transparent}

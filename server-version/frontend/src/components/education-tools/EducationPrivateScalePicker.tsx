@@ -71,8 +71,7 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
  }
  const prefix=entry==='SCHOOL'?'hs':'ht'
  return <section className={entry==='SCHOOL'?'hs-task-detail':'ht-task'} aria-label={`我的${label}固定版本`}>
-  <h4>我的{label}</h4><p>仅本人在当前入口和学校固定的{label}版本。编制权限不增加发布或个体报告读取权限；分享不在此处开放。</p>
-  {kind==='FORM'&&<p>先加入活动草稿，再预览并发布。表单采用 Training 式分节、逐步呈现，不承诺保留 Survey 原分页视觉；不兼容的图片或跨页条件会明确列出，不会自动删减。</p>}
+  <h4>我的{label}</h4>{entry==='SCHOOL'?<details className="hs-private-picker-help"><summary>使用说明</summary><p>仅本人在当前入口和学校固定的{label}版本。编制权限不增加发布或个体报告读取权限；分享不在此处开放。</p>{kind==='FORM'&&<p>先加入活动草稿，再预览并发布。表单按分组逐步呈现；不兼容的图片或跨页条件会明确列出，不会自动删减。</p>}</details>:<><p>仅本人在当前入口和学校固定的{label}版本。编制权限不增加发布或个体报告读取权限；分享不在此处开放。</p>{kind==='FORM'&&<p>先加入活动草稿，再预览并发布。表单采用 Training 式分节、逐步呈现，不承诺保留 Survey 原分页视觉；不兼容的图片或跨页条件会明确列出，不会自动删减。</p>}</>}
   <button disabled={disabled||loading||writing} onClick={()=>void load()}>读取我的固定{label}</button>
   {loading&&<p role="status">正在读取我的{label}…</p>}
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}

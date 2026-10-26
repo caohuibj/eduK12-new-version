@@ -1,8 +1,9 @@
 import {SchoolActivityCollection} from './SchoolActivityCollection'
 import './school-activity-collection.css'
+import './school-activity-configuration.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
@@ -11,6 +12,7 @@ const resourceFamilyText:Record<string,string>={FORM:'表单',SCALE:'量表',BUN
 
 type ActivityInputs={taskTitle:string;taskContent:string;taskKind:'ASSIGNMENT'|'READING'|'CHECKIN';runTitle:string}
 const emptyActivityInputs:ActivityInputs={taskTitle:'',taskContent:'',taskKind:'READING',runTitle:''}
+function ActivityLayout({compact,className,children}:{compact:boolean;className:string;children:ReactNode}){return compact?<div className={className}>{children}</div>:<>{children}</>}
 type ActivityPanel='participants'|'content'|'assessments'|'results'
 const activityPanels:readonly {id:ActivityPanel;label:string}[]=[{id:'participants',label:'班级与参与者'},{id:'content',label:'阅读／练习／打卡'},{id:'assessments',label:'正式测评批次'},{id:'results',label:'进度与结果说明'}]
 type ActivityState='DRAFT'|'SUBMITTED'|'OPEN'|'PAUSED'|'CLOSED'
@@ -382,52 +384,55 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       </section>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-content" aria-label="阅读、练习与打卡" hidden={compact&&panel!=='content'}>
-        {selected.status==='DRAFT'&&<>        <h3>添加活动内容</h3>
-        <label className="hs-field"><span>任务类型</span>
+        {selected.status==='DRAFT'&&<ActivityLayout compact={compact} className="hs-activity-content-create">{!compact&&<h3>添加活动内容</h3>}
+        <label className="hs-field hs-activity-content-kind"><span>任务类型</span>
           <select value={taskKind} onChange={event=>setTaskKind(event.target.value as typeof taskKind)}>
             <option value="READING">阅读材料</option><option value="ASSIGNMENT">练习任务</option>
             <option value="CHECKIN">活动记录</option>
           </select></label>
-        <label className="hs-field"><span>任务名称</span>
+        <label className="hs-field hs-activity-content-title"><span>任务名称</span>
           <input value={taskTitle} onChange={event=>setTaskTitle(event.target.value)}/></label>
-        <label className="hs-field"><span>内容</span>
+        <label className="hs-field hs-activity-content-body"><span>内容</span>
           <textarea rows={4} value={taskContent} onChange={event=>setTaskContent(event.target.value)}/></label>
         <button disabled={busy||!taskTitle.trim()} onClick={addTask}>{compact?'加入当前活动草稿':'加入草稿'}</button>
-</>}
+</ActivityLayout>}
         {compact&&selected.status!=='DRAFT'&&<p>活动已离开准备阶段，当前不能在这里添加阅读、练习或记录。</p>}
       </section>
       <section className="hs-activity-config-panel" id="hs-activity-panel-assessments" aria-label="正式测评批次" hidden={compact&&panel!=='assessments'}>
-        {selected.status==='DRAFT'&&<>        <h3>准备测评批次</h3>
+        <ActivityLayout compact={compact} className="hs-activity-batch-toolbar">
+        {selected.status==='DRAFT'&&<ActivityLayout compact={compact} className="hs-activity-run-create">{!compact&&<h3>准备测评批次</h3>}
         <label className="hs-field"><span>{compact?'测评批次名称':'测评活动名称'}</span>
           <input value={runTitle} onChange={event=>setRunTitle(event.target.value)}/></label>
         <button disabled={busy||!runTitle.trim()} onClick={newRun}>{compact?'创建测评批次草稿':'创建测评草稿'}</button>
-      </>}
-      <h3>2. 发布 · 测评批次</h3>
-      <p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p>
+      </ActivityLayout>}
+      {compact&&<SchoolTaskHelp label="测评批次与发布说明" buttonText="发布说明"><p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p></SchoolTaskHelp>}
+      </ActivityLayout>
+      {!compact&&<><h3>2. 发布 · 测评批次</h3><p>活动开放与测评发布是两个步骤。只有获授权人员正式发布的测评批次才会产生可作答任务。</p></>}
       {!canInspectRuns&&<p>当前活动状态不支持读取测评批次详情；以下仅展示活动关联状态。</p>}
       {selected.runs.length===0?<p>暂无测评。可先使用阅读与练习内容。</p>:
-        <div className="hs-actions">{selected.runs.map(r=>
-          <button disabled={busy||!canInspectRuns} key={r.runId} onClick={()=>void execute(async()=>{
+        <div className={compact?'hs-activity-run-list':'hs-actions'}>{selected.runs.map(r=><ActivityLayout key={r.runId} compact={compact} className="hs-activity-run-row">
+          <button aria-pressed={compact?activeRun?.id===r.runId:undefined} disabled={busy||!canInspectRuns} key={r.runId} onClick={()=>void execute(async()=>{
             const request=++runRequest.current
             resourceRequest.current++;setActiveRun(null);setPreview(null)
             const d=await api<RunDetail>(path+'/runs/'+r.runId)
             if(request!==runRequest.current||activityPath.current!==path)return
             setActiveRun({...d.run,tracks:d.tracks})
-          })}>{r.name} · {schoolRunStatusText(r.status)}</button>)}</div>}
-      {selected.runs.map(r=>(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
-        {r.capabilities.canClose&&<button disabled={busy} onClick={()=>void execute(async()=>{
+          })}>{r.name} · {schoolRunStatusText(r.status)}</button>
+          {(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
+        {r.capabilities.canClose&&<button aria-label={compact?`收尾 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('停止该批次的新作答；已开始的作答按原有规则继续。确认收尾？'))return
           await api(path+'/runs/'+r.runId+'/close','POST',{})
           await fetchDetail(selected.courseId)
-        })}>收尾 {r.name}</button>}
-        {r.capabilities.canCancel&&<button disabled={busy} onClick={()=>void execute(async()=>{
+        })}>{compact?"收尾":`收尾 ${r.name}`}</button>}
+        {r.capabilities.canCancel&&<button aria-label={compact?`取消 ${r.name}`:undefined} disabled={busy} onClick={()=>void execute(async()=>{
           if(!window.confirm('取消该批次尚未开始的任务；存在进行中作答时系统会拒绝取消。确认？'))return
           await api(path+'/runs/'+r.runId+'/cancel','POST',{})
           await fetchDetail(selected.courseId)
-        })}>取消 {r.name}</button>}
-      </div>:null)}
-      {activeRun&&<div className="hs-task-detail">
-        <h3>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
+        })}>{compact?"取消":`取消 ${r.name}`}</button>}
+      </div>:null}
+        </ActivityLayout>)}</div>}
+      {activeRun&&<div className={compact?"hs-task-detail hs-activity-run-editor":"hs-task-detail"}>
+        <h3 className={compact?'hs-visually-hidden':undefined}>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
         <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p>{compact&&<ul className="hs-activity-track-identifiers">{activeRun.tracks?.map(track=><li key={track.id}>{track.resourceFamily} · {track.resourceKey} · 固定版本：{track.resourceVersion}</li>)}</ul>}</details>
         <SelectedToolOutline className="hs-selected-tool-outline" heading={compact?'已配置测评项目':'已选工具大纲'} items={activeRun.tracks?.map((track,index)=>({
           id:track.id,kind:compact?(resourceFamilyText[track.resourceFamily]??track.resourceFamily):track.resourceFamily,version:track.resourceVersion,
@@ -435,6 +440,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             &&resource.version===track.resourceVersion)?.title??(compact?`${resourceFamilyText[track.resourceFamily]??'测评项目'} ${index+1}`:track.resourceKey),
         }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
+          <ActivityLayout compact={compact} className="hs-activity-private-pickers">
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
             entry="SCHOOL" organizationId={organizationId} actorKey={actorKey} scopeKey={`${selected.courseId}:${activeRun.id}`}
@@ -455,6 +461,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
+          </ActivityLayout>
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>
