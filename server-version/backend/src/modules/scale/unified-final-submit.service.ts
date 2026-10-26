@@ -369,7 +369,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     // Current epoch and frozen runtime/admission are locked and checked above.
     // Existing standalone FINAL keeps emergency collection policy, not new-entry policy.
     if(child.compositeAttemptId){
-      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
+      await assertTrainingScaleCollectionAllowed(tx, [child.scaleId],{compositeAttemptId:child.compositeAttemptId,compositeAttemptEpoch:input.attemptEpoch,compositeItemIds:child.compositeItemId?[child.compositeItemId]:[],acceptedReceipt:wholeReceipt})
     }else await assertScaleLibraryCollectionAllowed(tx,[],[child.scaleId])
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
@@ -568,7 +568,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
-      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],{compositeAttemptId:unit.child.compositeAttemptId,compositeItemIds:unit.child.compositeItemId?[unit.child.compositeItemId]:[],acceptedReceipt:execution})
+      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId],{compositeAttemptId:unit.child.compositeAttemptId,compositeAttemptEpoch:unit.input.attemptEpoch,compositeItemIds:unit.child.compositeItemId?[unit.child.compositeItemId]:[],acceptedReceipt:execution})
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())

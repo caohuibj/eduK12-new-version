@@ -687,5 +687,218 @@
       "merge-ready",
       "CI executed"
     ]
+  },
+  "durableAndExactFollowup": {
+    "recordedAtUTC": "2026-10-26T07:56:09.115450+00:00",
+    "reviewedParent": "b5e9bb81741db686939f23547c2cbc569b58879c",
+    "reporters": [
+      {
+        "path": "/workspace/scratch/pr356-review-followup/exact-lazy-flow-guard-valid-blockkey.json",
+        "sha256": "80f522cbe5d2b7173f27fcb42073f1dc3ff49086e66f0525d9ee2a1d37be31d9",
+        "total": 13,
+        "passed": 13,
+        "failed": 0,
+        "pendingOrFiltered": 0,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/exact-lazy-flow-guard.json",
+        "sha256": "f6c5817529d8ec94fb3c89e37f27b70b66803e0aff7bb7c9a5e921b73871d039",
+        "total": 13,
+        "passed": 0,
+        "failed": 13,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-batch-green.json",
+        "sha256": "a424096ce46745676afc3ebd141f0529bf4324bcb7387b82190af5c442f66d33",
+        "total": 3,
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-batch-red.json",
+        "sha256": "04fb932ece7214931a8d805868a3b0f2e1df385bf90786e30163bcbbd83ee921",
+        "total": 3,
+        "passed": 0,
+        "failed": 1,
+        "pendingOrFiltered": 2,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-lock-wait.json",
+        "sha256": "4214adc44ab292f6aa4cd981d54a8b08225ad183f386ebdf11ff76a8803f9937",
+        "total": 4,
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 3,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-prestop-green.json",
+        "sha256": "baeb9be6629c75dea4c941aa8d8db0a5a0235b5171a185e4ca34397fddc7cd93",
+        "total": 3,
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-prestop-red.json",
+        "sha256": "7d7e7514148531eb7d5b1e705b8435099e1ddc9adbb4fa3684a41d755015a2d2",
+        "total": 3,
+        "passed": 0,
+        "failed": 1,
+        "pendingOrFiltered": 2,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-single-green.json",
+        "sha256": "a42775bba6e29e42c1dd7b922af30d2eb94374658667cd6dbdd378ac3b0b530d",
+        "total": 3,
+        "passed": 1,
+        "failed": 0,
+        "pendingOrFiltered": 2,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-single-red.json",
+        "sha256": "a97ad141a723a8c4be594e34c8c7ddd6af208351ecd9ae23487a9e7c5917375c",
+        "total": 3,
+        "passed": 0,
+        "failed": 1,
+        "pendingOrFiltered": 2,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-green.json",
+        "sha256": "6743a8e80eae86780d78f74fd66e6970b94f54f814f0bab022150d0f5f6b1681",
+        "total": 21,
+        "passed": 8,
+        "failed": 0,
+        "pendingOrFiltered": 13,
+        "success": true,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-red.json",
+        "sha256": "a3d798186787127166fe5acee9abb1b5c762017aecb890f0bf205cf6bec9c665",
+        "total": 9,
+        "passed": 0,
+        "failed": 9,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-red2.json",
+        "sha256": "3985c4264da03c76568364d8c74f3999af6008c5ad55860f0cc7cb00d114a20f",
+        "total": 9,
+        "passed": 4,
+        "failed": 5,
+        "pendingOrFiltered": 0,
+        "success": false,
+        "interpretation": "Actual invocation; pending includes filtered cases; original fixture/product failures remain."
+      }
+    ],
+    "receipts": [
+      {
+        "path": "/workspace/scratch/pr356-review-followup/durable-ack-and-exact-flow-diagnostics.receipt.json",
+        "sha256": "c1c3d04c546b38f024cb1fd42f7f958c0d3bc6ce4b2fa4cc0437d4549496fc89",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-batch-green.execution.json",
+        "sha256": "6b365f919465a9e6adf75af8e279f427f08139bb0b096210bbc093bb5f325815",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-batch-red.execution.json",
+        "sha256": "02289902109fc461a1bf6147d5fa20a02f4c3e68c38f37dea596fce50b3d6b3b",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-lock-wait.execution.json",
+        "sha256": "83b6cfd53c1a755b863fece1946b1ad24a11ad651f94c48ce9918c9bfe3c1ee3",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-prestop-green.execution.json",
+        "sha256": "ff43074ff4525fd32bfb8e9268b4e1e88fdcde3dcf1882b2fd8d9bd747512bbe",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-prestop-red.execution.json",
+        "sha256": "73fa4a9232167e6a25eaebc4bc4fd2b6ed975b93a7c657064f271c294421b1d9",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-single-green.execution.json",
+        "sha256": "bf2b70bcb7a25405a862d072305d02af15a884732f9b219bb37b7d57089c0e78",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/ordinary-receipt-single-red.execution.json",
+        "sha256": "9c76326dc1cc4705897bb33402c7fee0650793fcf497abe9ea082fbd95961b0f",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-green-execution.json",
+        "sha256": "cd1d582cea0758a3d32e0b43d4995132bc3e61616294aaf4e08be25b5cf13c67",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-red-execution.json",
+        "sha256": "78b6abc3b2abb97a0c6010eba611ebbb14270f643e9ce7beb419c5891d02276e",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      },
+      {
+        "path": "/workspace/scratch/pr356-review-followup/whole-receipt-boundary-red2-execution.json",
+        "sha256": "297e40472aff56852aa0449272be6dd6fc2e3f2d912c842422a56e258ddfffc0",
+        "kind": "Preserved actual execution/static receipt, not a retrospective signature"
+      }
+    ],
+    "sevenProductionSourceHashesAtCollection": {
+      "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts": "95a6102c0a3b9ff7c98749b1f96fd8d0e9ea019145e82f551582f4cdaf55b697",
+      "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": "7485784490a79ed7e52d9e20d931dd1d7d1e38653a390b8f1d0b8e941cccd7ba",
+      "server-version/backend/src/modules/scale/scale-collection-guard.ts": "90f6937ef549141bc24c2d5c9ebf956286fc8e2b958a792ac43ae8e29ccbec19",
+      "server-version/backend/src/modules/scale/unified-final-submit.service.ts": "f101517ca2dcf55f0cd0df75195be1bd616062cc00e2c7de7d87682106a20ed6",
+      "server-version/backend/src/modules/composite/composite.service.ts": "046daae0fd3f71abc0a667e9e94e061d1773c40047bd1b7edbb50445be96e192",
+      "server-version/backend/src/modules/composite/training-flow-scope.ts": "4f1d4e69265f0b5a7d820fe9d9f669f391f5ac8546b87c17c3459c9e8ecd46ac",
+      "server-version/backend/src/modules/composite/training-standard-collection.ts": "ef4465022d430095579137e702dd1b158f7e6395ba9eba349f832de50777c11b"
+    },
+    "sevenProductionDiagnosticsMatch": true,
+    "ordinaryPG": {
+      "single": "ordinary-receipt-single-green.json",
+      "batch": "ordinary-receipt-batch-green.json",
+      "preAckStop": "ordinary-receipt-prestop-green.json",
+      "realLeaseLockWait": "ordinary-receipt-lock-wait.json",
+      "fixture": "Existing synthetic legacy descriptive outbox fixture; per-case isolated DB, no unrelated suites or production",
+      "rawAndHashPreserved": true,
+      "readyWorkersNotRepeated": true
+    },
+    "exactFlow": "Real encrypted resolver, frozen parent content identity and HISTORY boundary, 13 selected passed; direct producer-consumer wiring reviewed, full exact-flow HTTP/PG acceptance not claimed",
+    "ciExecuted": false,
+    "formalCIFailureRounds": 0,
+    "qualificationClaim": false,
+    "notClaimed": [
+      "complete contemporaneous source manifests for old runs",
+      "full exact-flow HTTP/PG acceptance",
+      "formal production build or merge eligibility",
+      "356-01 resource/SQL baseline"
+    ],
+    "costBoundary": "Ordinary ACK now uses existing guarded callback transaction; detached does not touch old budget, legacy permits retained. No performance improvement claim."
   }
 }

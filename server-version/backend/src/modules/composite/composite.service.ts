@@ -2681,7 +2681,7 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
     if(!snapshot||snapshot.definitionHash!==release.snapshot.definitionHash||snapshot.compiledRuntimeHash!==release.snapshot.compiledRuntimeHash)throw compositeForbidden('情境工具冻结身份不匹配')
     releases.set(situationalReleaseKey(situationalItemIdentity(item)),{...release,snapshot})
   }
-  const runtime=await createChildRecords(tx,parent,composite,[item],parent.userId,composite.formSections,releases,prepared,item.type==='SCALE'&&item.standardCombinationSource==null?verified!:undefined)
+  const runtime=await createChildRecords(tx,parent,composite,[item],parent.userId,composite.formSections,releases,prepared,item.type==='SCALE'?verified!:undefined)
   const created=freezeCompositeActiveSlotSet({...runtime,attemptEpoch:parent.attemptEpoch,formSections:[]})
   const expected=flow.frozenSlots.slots.find(s=>s.sourceBinding.compositeItemId===item.id)
   if(created.slots.length!==1||canonicalHash(created.slots[0])!==canonicalHash(expected))throw compositeForbidden('实际准入与冻结候选不一致')

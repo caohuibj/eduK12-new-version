@@ -8,7 +8,7 @@ suite('accepted STANDARD whole receipt actual report-worker recovery',()=>{
  async function finish(prior:any,expired:any,input:any,studentId:string,scaleIds:string[],itemIds:string[]){
   const id=prior.attemptId,outbox=await import('../../modules/assessment-runtime/report-outbox.service'),whole=await import('../../modules/composite/whole-questionnaire.service')
   const guard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
-  await expect(db.$transaction((tx:any)=>guard(tx,scaleIds,{compositeAttemptId:id,compositeItemIds:itemIds,acceptedReceipt:{submissionId:input.submissionId,payloadHash:prior.wholePayloadHash,acceptedAtMs:prior.wholeAcceptedAt.getTime(),leaseToken:expired!.leaseToken!}}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+  await expect(db.$transaction((tx:any)=>guard(tx,scaleIds,{compositeAttemptId:id,compositeAttemptEpoch:prior.attemptEpoch,compositeItemIds:itemIds,acceptedReceipt:{submissionId:input.submissionId,payloadHash:prior.wholePayloadHash,acceptedAtMs:prior.wholeAcceptedAt.getTime(),leaseToken:expired!.leaseToken!}}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
   process.env.ASSESSMENT_REPORT_LEASE_MS='60000';const job=await outbox.claimCompositeReportJob();expect(job?.id).toBe(prior.id);expect(job!.leaseToken).not.toBe(expired!.leaseToken)
   await expect(whole.processWholeQuestionnaireAnswers({...job!,wholePayloadHash:'f'.repeat(64)})).rejects.toThrow('封存内容无法验证')
   await (await import('../../workers/compositeReportWorker')).processCompositeReportJob(job!)

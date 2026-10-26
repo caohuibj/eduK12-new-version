@@ -55,3 +55,18 @@
 该消费者文件首轮 5 PASS/5 FAIL：四个负例是 scalar 夹具过早复制未反映后续变更，一个新正例是手写槽位缺生产 `scaleCode`。仅修夹具并复验相关 6 例，6 PASS/4 filtered；其余原通过保留，不改原 invocation 为全绿。单独检查本轮三个生产文件 TypeScript diagnostics 为 0；前端、其它后端文件和旧 PostgreSQL 成功未重跑。
 
 原件仍在本目录索引，新增 reporter、实际命令/退出与有限输入 SHA receipt 将随控制证据中的 `followupReports` / `followupAttachments` 原始字节移交，不能要求独审节点访问这里的绝对路径。a65 曾已本地 apply 的 CI 清单随新业务修复明确失效，尚未提交为最终冻结、未触发 CI。最终新候选仍须独立放行。
+
+## b5 独审后的 exact flow 与普通 durable ACK
+
+独立接管方继续核对 `b5e9bb81741db686939f23547c2cbc569b58879c` 后，两处剩余 R1 边界成立；不把前一小步说成全部闭合，也不撤销其已经证实的修复。
+
+- 合法 Training COURSE flow 并未拒绝精确 STANDARD 组合，父 START 已冻结全部候选。现在专用 resolver 也为当前 exact SCALE 产生同事务原 proof，真实物化调用与 standard collection 均已接线。仅这个同父/epoch/item/Scale 当前候选按已入场处理，继续走原 HISTORY 全量 reference/measurement/C/P/R 身份验证；使用权/入口后来撤回不能替换或重开来源。新 START 继续核当前授权，whole ACK 仍必须有实际 current-epoch child，proof 不能替代它。新增真实加密 resolver＋冻结 parent binding＋HISTORY 守卫 13 PASS、零 skip；首轮新增 blockKey 夹具错误的 13 FAIL 保留，不当作产品复现或删除原校验。
+- 普通非 exact 整卷有一条真实合同冲突：receipt 注册先前未检查来源停用，而 singleton/batch worker 后来重查共享停用。三个独立 PostgreSQL 反例实际复现了停用后错误 ACK，以及已 ACK 后两个 worker 路径进入 FAILED。现在所有新 whole ACK 都在 receipt 的同一事务核对实际 selected child/id/item/epoch 并持有共享来源/停用锁；ordinary 使用共享停用合同，exact 保留其独立冻结合同。原 ACK replay 不重新准入。
+- worker 消费 ordinary RAW 的豁免只在实际 current-epoch child/item/Scale 集完全匹配，并通过数据库 receipt/submission/hash/acceptedAt/current lease/slot/context/mode/非空 RAW 验证后生效；没有客户端 skip 参数。single 与 batch 都显式传当前 epoch。原 receipt fence 先锁 job，再用新的 statement 与 UTC wall clock 校验，避免等待锁后借过期 lease；canonical 写后既有最终 fence 保留。
+- 开启所有 ordinary source callback 时不能退化 detached backlog。callback 事务保持 `budgetHeld=false`、不触碰或等待旧共享 budget、NULL queue depth 合法；legacy 仍使用原 permit。锁定后还核当前 manifest hash；没有关闭 detached、放宽扫描/授权或修改 schema。
+
+实际验证分开保留：新 outbox 产品红轮 5 FAIL/4 PASS（另有最早 tag 夹具错误）；修后选中 8 PASS/13 filtered，其中 7 个直接新/受影响用例和 1 个既有 whole consumer，未变的拒绝/replay 原通过继续复用。三个真实 PostgreSQL 旅程各自为修前 1 FAIL/2 filtered、修后 1 PASS/2 filtered；single/batch 直接恢复原 FAILED job，保持原 ACK/密文/hash，不重做先前已接受提交。停用前拒绝使用新的合法 fixture，原错误接收记录保留。两个真实 worker 均最终 parent COMPLETED、job READY，canonical 单元数及 ACK replay 无重复；旧租约、错误 payload hash/acceptedAt/epoch/item 均拒绝。detached ACK 同时跨过真实持有的旧 budget 行锁，没有等待它。
+
+另只补一个尚缺的真实锁等待用例：lease 有效时 receipt fence 已在 job 行锁等待，等真实时钟越过到期再释放，结果为 LEASE_LOST；1 PASS/3 filtered，未复跑已经 READY 的两个 worker。7 个变化生产文件的有限 TypeScript diagnostics 为 0，原退出/source SHA 原件保留；这仍不是整个 backend 生产编译。
+
+接收事务使用现有 callback 安全路径，ordinary ACK 不再走原无 callback 的单语句入口；detached 与 legacy 存储合同保持，但没有把其额外读写成本称为已测资源优化。原 356-01 资源/SQL/cold-hot 基线继续待审，不为本轮修复追加无关压测。旧正式 CI 与生产操作仍为 NOTRUN，全部新原件将随最终控制证据移交。b5 本地控制冻结随新业务明确作废，须以本产品修复提交重新生成完整候选。

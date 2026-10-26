@@ -141,9 +141,10 @@ export async function resolveTrainingFlowScopeForMaterialization(attempt:any,com
   const verified=await resolveTrainingFlowScopeAndCandidate(attempt,composite,options)
   if(verified&&attempt.status==='IN_PROGRESS'&&!verified.scope.terminal){
     const current=(composite.items??[]).find((item:any)=>trainingFlowItemKey(item.id)===verified.scope.path.currentInstrumentKey)
-    // Exact STANDARD combinations keep their separate frozen-content contract.
-    // This proof covers only the pending ordinary SCALE selected by this path.
-    if(current?.type==='SCALE'&&current.standardCombinationSource==null&&current.scaleId
+    // Parent START froze every candidate. This proof authenticates only the
+    // pending SCALE selected now; exact STANDARD content still validates its
+    // separate immutable binding in the collection guard.
+    if(current?.type==='SCALE'&&current.scaleId
       &&verified.scope.itemIds.has(current.id)&&typeof verified.candidate.references?.[current.id]==='string'){
       materializationBindings.set(verified,Object.freeze({db:options.db??prisma,parentId:attempt.id,attemptEpoch:attempt.attemptEpoch,itemId:current.id,scaleId:current.scaleId}))
     }
@@ -153,7 +154,8 @@ export async function resolveTrainingFlowScopeForMaterialization(attempt:any,com
 
 /** Authenticate the original producer object against this transaction and the
  * precise current unit. Copies, client claims and future candidates cannot
- * borrow parent admission. The result never exempts shared emergency stops. */
+ * borrow parent admission. This proof alone never exempts emergency stops;
+ * exact STANDARD consumers must also verify their frozen content identity. */
 export function assertVerifiedTrainingFlowScaleMaterialization(db:unknown,verified:VerifiedTrainingFlowMaterialization,expected:{
   compositeAttemptId?:string|null;compositeAttemptEpoch?:number;compositeItemIds?:readonly string[];scaleIds:readonly string[]
 }):string {

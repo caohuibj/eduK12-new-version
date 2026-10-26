@@ -284,7 +284,7 @@ suite('dot356 registered source to real ONLINE and Training FINAL',()=>{
    const execution={submissionId:input.submissionId,payloadHash:ack.payloadHash,acceptedAtMs:job!.wholeAcceptedAt!.getTime(),leaseToken:job!.leaseToken!}
    const guard=(await import('../../modules/scale/scale-collection-guard')).assertTrainingScaleCollectionAllowed
    for(const bad of [{...execution,payloadHash:'f'.repeat(64)},{...execution,leaseToken:randomUUID()}]){
-    await expect(db.$transaction((tx:any)=>guard(tx,[scale.id],{compositeAttemptId:received.attemptId,compositeItemIds:definition.units.map(u=>u.itemId),acceptedReceipt:bad}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+    await expect(db.$transaction((tx:any)=>guard(tx,[scale.id],{compositeAttemptId:received.attemptId,compositeAttemptEpoch:received.attemptEpoch,compositeItemIds:definition.units.map(u=>u.itemId),acceptedReceipt:bad}))).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
    }
    expect(await db.assessmentResultFact.count({where:{assessment:{compositeAttemptId:received.attemptId}}})).toBe(0)
    expect(await whole.processWholeQuestionnaireAnswers(job!)).toBe(true)
