@@ -4225,7 +4225,7 @@ jobs:
       shell: node {0}
       run: |
         const fs=require('node:fs');
-        const spec=JSON.parse(fs.readFileSync(process.env.PR356_codeql-javascript-typescript_SPEC,'utf8'));
+        const spec=JSON.parse(fs.readFileSync(process.env.PR356_PHASE_SPEC,'utf8'));
         fs.writeFileSync(process.env.PR356_CODEQL_CONFIG,JSON.stringify(spec.inputs.configuration.codeql,null,2)+'\n',{flag:'wx',mode:0o600});
         const p={artifact_name:'pr356-codeql-javascript-typescript-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT};
         fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(p).map(([k,v])=>k+'='+v+'\n').join(''));
@@ -4337,7 +4337,7 @@ jobs:
       shell: node {0}
       run: |
         const fs=require('node:fs');
-        const spec=JSON.parse(fs.readFileSync(process.env.PR356_codeql-python_SPEC,'utf8'));
+        const spec=JSON.parse(fs.readFileSync(process.env.PR356_PHASE_SPEC,'utf8'));
         fs.writeFileSync(process.env.PR356_CODEQL_CONFIG,JSON.stringify(spec.inputs.configuration.codeql,null,2)+'\n',{flag:'wx',mode:0o600});
         const p={artifact_name:'pr356-codeql-python-'+process.env.GITHUB_RUN_ID+'-'+process.env.GITHUB_RUN_ATTEMPT,producer_run:process.env.GITHUB_RUN_ID,producer_head:process.env.GITHUB_SHA,producer_attempt:process.env.GITHUB_RUN_ATTEMPT};
         fs.appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(p).map(([k,v])=>k+'='+v+'\n').join(''));

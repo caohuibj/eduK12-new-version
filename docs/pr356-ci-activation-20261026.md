@@ -391,7 +391,7 @@ CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏�
 代表当前候选，只保留计划内单次cold/hot与SQL归因，不追加并发压测或新MOT。
 
 
-### 当前接线冻结（不是激活放行）
+### 718f接线冻结检查点（不是激活放行）
 
 | 项目 | 值 |
 | --- | --- |
@@ -411,3 +411,19 @@ CodeQL 20、DB upgrade/restore/vertical各20（其他DB旅程15）、status浏�
 锚点raw diff摘要来自锚点本身，不能冒充下一控制提交的raw diff摘要。
 提交后的完整HEAD/tree/父提交、远端PR/base/merge preview、工作树和全部376条
 bytes/SHA由后续只读实读在对话与PR描述交付，不在本文件伪造自引用SHA。
+
+
+### 后续独审窄修：实际 CodeQL YAML 消费者
+
+以718f为审查基线，仅将两个CodeQL identity脚本误写的带连字符env成员改为
+既有`process.env.PR356_PHASE_SPEC`，没有新增变量或更改检查标准。新增两项
+控制直接提取实际YAML的路径绑定和identity脚本，以合成临时FS跑完整spec→
+config/producer输出及exclusive-write拒绝。修复前两项分别实际ReferenceError，
+原失败保留；修复后2PASS/0FAIL/0skip。旧CodeQL/A及其它绿项均未重跑，没有
+CodeQL/应用/CI执行。原376条原件未改，新总数380；source342与逐名control41
+均未变，binding仍严格锚定dc915的应用源。修改使718的旧完整HEAD放行失效，
+新完整HEAD/tree在commit/push后实读。
+
+B仅收到根dot对精确20887字节/SHA835fa5d7补丁的新增独审实施方向授权；原审批
+拒绝没有解除。须携该新证据和三组实际reader/CLI控制计划提交实际审批，允许后
+才能实施，仍拒则停止、不分拆规避。当前B未应用，全部ready/approved/policy待审。

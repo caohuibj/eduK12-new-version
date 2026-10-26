@@ -2273,6 +2273,26 @@
       "path": "/workspace/scratch/pr356-ci-closure-20261026/freeze-plan-dc915aa5822dcbf395c755a8ca37b6c3589e47a5.json",
       "sha256": "643ca62c220617ed5a4fd68aacb6a8ba6f9afec1357a7bf40d3da1800e8ccda7",
       "rawBase64": "ewogICJiYXNlIjogImZmODQ3MWU1MjllN2IzYzU2ZTFlMjBmMTdkMWUyNTgxMDQwZmM4OTYiLAogICJwcm9kdWN0IjogImRjOTE1YWE1ODIyZGNiZjM5NWM3NTVhOGNhMzdiNmMzNTg5ZTQ3YTUiLAogICJwcm9kdWN0VHJlZSI6ICJiZjAwNWU1NzgyYzNkNzFjYjIyNGZjNzlmZmEyYzE0OGVhOGRhYjdiIiwKICAic291cmNlUGF0aHMiOiAzNDIsCiAgImNvbnRyb2xQYXRocyI6IDQxLAogICJjb21wbGV0ZURpZmZQYXRocyI6IDM4MywKICAiY29tcG9uZW50cyI6IHsKICAgICJiYWNrZW5kIjogImZmN2VkZDU4ZTM4MjQxNzgwNzVhYWFmNzQ3MzBlMmZhMjM2N2E1ZmUiLAogICAgImZyb250ZW5kIjogIjg3NTkwNTg2ZjI5MDJiYWYxNGYwYTk0ZThkNDQ0YWM5ZTRiMmU3ZTgiCiAgfSwKICAicmF3RGlmZlNIQTI1NiI6ICJiMTRmOGE1M2IwN2I1ZTNiM2U3ZjcwZjYxYTE2MGUyZTBhNTZkZDc4NTEwNjNkMTdhYzQxNzRhYTU5Y2ZjZDRiIiwKICAiYmluZGluZ1BsYW5TSEEyNTYiOiAiM2RkMDJlNmNhYWY5YmM4OTRkOWYwZTA5NDRkNDJiMjYxNTEzMTc4OTRhNjc1ZTliNmJmYzMzNjcyMDY2ZTQwOCIsCiAgImFwcGxpZWQiOiB0cnVlLAogICJub1F1YWxpZmljYXRpb25DbGFpbSI6IHRydWUKfQo="
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.log",
+      "sha256": "56b85e760c2eef1c6525cf4b8ee66d5204d41cceecbd2c625bc183270c6bc77a",
+      "rawBase64": "VEFQIHZlcnNpb24gMTMKIyBTdWJ0ZXN0OiBhY3R1YWwgWUFNTCBDb2RlUUwgaWRlbnRpdHkgY29uc3VtZXMgYm91bmQgcGhhc2Ugc3BlYyBmb3IgamF2YXNjcmlwdC10eXBlc2NyaXB0Cm5vdCBvayAxIC0gYWN0dWFsIFlBTUwgQ29kZVFMIGlkZW50aXR5IGNvbnN1bWVzIGJvdW5kIHBoYXNlIHNwZWMgZm9yIGphdmFzY3JpcHQtdHlwZXNjcmlwdAogIC0tLQogIGR1cmF0aW9uX21zOiAzNi44NDg5NzUKICB0eXBlOiAndGVzdCcKICBsb2NhdGlvbjogJy93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uLy5naXRodWIvc2NyaXB0cy9wcjM1Ni1jb2RlcWwudGVzdC5tanM6MTgzOjU4JwogIGZhaWx1cmVUeXBlOiAndGVzdENvZGVGYWlsdXJlJwogIGVycm9yOiAnamF2YXNjcmlwdCBpcyBub3QgZGVmaW5lZCcKICBjb2RlOiAnRVJSX1RFU1RfRkFJTFVSRScKICBuYW1lOiAnUmVmZXJlbmNlRXJyb3InCiAgc3RhY2s6IHwtCiAgICBldmFsbWFjaGluZS48YW5vbnltb3VzPjoyOjY0CiAgICBTY3JpcHQucnVuSW5Db250ZXh0IChub2RlOnZtOjE0OToxMikKICAgIFNjcmlwdC5ydW5Jbk5ld0NvbnRleHQgKG5vZGU6dm06MTU0OjE3KQogICAgT2JqZWN0LnJ1bkluTmV3Q29udGV4dCAobm9kZTp2bTozMTA6MzgpCiAgICBydW4gKGZpbGU6Ly8vd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbi8uZ2l0aHViL3NjcmlwdHMvcHIzNTYtY29kZXFsLnRlc3QubWpzOjE5NToyMCkKICAgIFRlc3RDb250ZXh0Ljxhbm9ueW1vdXM+IChmaWxlOi8vL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24vLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWNvZGVxbC50ZXN0Lm1qczoxOTU6MTM1KQogICAgVGVzdC5ydW5JbkFzeW5jU2NvcGUgKG5vZGU6YXN5bmNfaG9va3M6MjI3OjE0KQogICAgVGVzdC5ydW4gKG5vZGU6aW50ZXJuYWwvdGVzdF9ydW5uZXIvdGVzdDoxNDAyOjI1KQogICAgVGVzdC5zdGFydCAobm9kZTppbnRlcm5hbC90ZXN0X3J1bm5lci90ZXN0OjEyNjI6MTcpCiAgICBzdGFydFN1YnRlc3RBZnRlckJvb3RzdHJhcCAobm9kZTppbnRlcm5hbC90ZXN0X3J1bm5lci9oYXJuZXNzOjM4NzoxNykKICAuLi4KIyBTdWJ0ZXN0OiBhY3R1YWwgWUFNTCBDb2RlUUwgaWRlbnRpdHkgY29uc3VtZXMgYm91bmQgcGhhc2Ugc3BlYyBmb3IgcHl0aG9uCm5vdCBvayAyIC0gYWN0dWFsIFlBTUwgQ29kZVFMIGlkZW50aXR5IGNvbnN1bWVzIGJvdW5kIHBoYXNlIHNwZWMgZm9yIHB5dGhvbgogIC0tLQogIGR1cmF0aW9uX21zOiAxNi42NzMyMDkKICB0eXBlOiAndGVzdCcKICBsb2NhdGlvbjogJy93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uLy5naXRodWIvc2NyaXB0cy9wcjM1Ni1jb2RlcWwudGVzdC5tanM6MTgzOjU4JwogIGZhaWx1cmVUeXBlOiAndGVzdENvZGVGYWlsdXJlJwogIGVycm9yOiAncHl0aG9uX1NQRUMgaXMgbm90IGRlZmluZWQnCiAgY29kZTogJ0VSUl9URVNUX0ZBSUxVUkUnCiAgbmFtZTogJ1JlZmVyZW5jZUVycm9yJwogIHN0YWNrOiB8LQogICAgZXZhbG1hY2hpbmUuPGFub255bW91cz46Mjo2NAogICAgU2NyaXB0LnJ1bkluQ29udGV4dCAobm9kZTp2bToxNDk6MTIpCiAgICBTY3JpcHQucnVuSW5OZXdDb250ZXh0IChub2RlOnZtOjE1NDoxNykKICAgIE9iamVjdC5ydW5Jbk5ld0NvbnRleHQgKG5vZGU6dm06MzEwOjM4KQogICAgcnVuIChmaWxlOi8vL3dvcmtzcGFjZS9lZHVLMTItbmV3LXZlcnNpb24vLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWNvZGVxbC50ZXN0Lm1qczoxOTU6MjApCiAgICBUZXN0Q29udGV4dC48YW5vbnltb3VzPiAoZmlsZTovLy93b3Jrc3BhY2UvZWR1SzEyLW5ldy12ZXJzaW9uLy5naXRodWIvc2NyaXB0cy9wcjM1Ni1jb2RlcWwudGVzdC5tanM6MTk1OjEzNSkKICAgIFRlc3QucnVuSW5Bc3luY1Njb3BlIChub2RlOmFzeW5jX2hvb2tzOjIyNzoxNCkKICAgIFRlc3QucnVuIChub2RlOmludGVybmFsL3Rlc3RfcnVubmVyL3Rlc3Q6MTQwMjoyNSkKICAgIFRlc3QucHJvY2Vzc1BlbmRpbmdTdWJ0ZXN0cyAobm9kZTppbnRlcm5hbC90ZXN0X3J1bm5lci90ZXN0Ojk3NDoxOCkKICAgIFRlc3QucG9zdFJ1biAobm9kZTppbnRlcm5hbC90ZXN0X3J1bm5lci90ZXN0OjE1NDI6MTkpCiAgLi4uCjEuLjIKIyB0ZXN0cyAyCiMgc3VpdGVzIDAKIyBwYXNzIDAKIyBmYWlsIDIKIyBjYW5jZWxsZWQgMAojIHNraXBwZWQgMAojIHRvZG8gMAojIGR1cmF0aW9uX21zIDM2MS40NjUzNTEK"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.receipt.json",
+      "sha256": "8be3bd94a220b7bdff1f4c3b59d72405e14f17cc062cfb3c11b17c37a3ddf010",
+      "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLS10ZXN0LW5hbWUtcGF0dGVybj1eYWN0dWFsIFlBTUwgQ29kZVFMIGlkZW50aXR5IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtY29kZXFsLnRlc3QubWpzIgogIF0sCiAgImN3ZCI6ICIvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbiIsCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDEyOjIxOjA0LjA4ODk0NSswMDowMCIsCiAgImNvbXBsZXRlZEF0IjogIjIwMjYtMTAtMjZUMTI6MjE6MDQuNjM0MDY0KzAwOjAwIiwKICAiZXhpdENvZGUiOiAxLAogICJsb2dTSEEyNTYiOiAiNTZiODVlNzYwYzJlZWYxYzY1MjVjZjRiOGVlNjZkNTIwNGQ0MWNjZWVjYmQyYzYyNWJjMTgzMjcwYzZiYzc3YSIsCiAgInNvdXJjZVNIQTI1NiI6IHsKICAgICIuZ2l0aHViL3dvcmtmbG93cy9jaS55bWwiOiAiY2Q3YWVmYjgwZjdkOWJkYTliNGYyNGFkZGIyMmY4NGY4YWVmOTMzNmY3ZGM0ODc0MDA4MWFlZDVjNGMzZjcyMyIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWNvZGVxbC50ZXN0Lm1qcyI6ICI1YjM1NmVhNDkwYjFkYjE1NWQwYjBmYjM3NzI0ZWMwOTE3M2YyZGRmOTJhZmM3MTdiMWRhNWNkYTBmNzI3ZmE4IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtY29kZXFsLm1qcyI6ICIwYTcyNzU1ODc1MjJmYmIxZWUxNTJkOTk1OTllMDZhNmU2ODVhZTZkYTE5MTY4ZjBhOWQxZGVkMzA4NmQ4OGY0IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtc2FyaWYubWpzIjogIjk3NmFiZGZmMjIxZjU3N2UyMDE4MDhjNTE2ODdjYzllOGI0MTdlMWM2NzhlMmY1ZDg1MGZhOWJiMjY0NzA3MDAiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMubWpzIjogIjNkMTU2MWQ3MDljOWRlNWQ0MTIzZWFiOTY2YTA5ZGEwOTNiMmVkMzgyOTIwZmYxNmUwYTBjN2NiZTkwNDZlNWEiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1wbGFuLm1qcyI6ICI1Y2VjYmFiODk5ZmU0Mjc0ZTA2YjU0YjFlODE5NWY2MTgzYzI1MzdmZTI0NjdhMjQ4MWRjNTk4NGNhMjUyYTc5IgogIH0sCiAgInNvdXJjZVN0YWJsZSI6IHRydWUsCiAgInNjb3BlIjogIk9ubHkgdHdvIG5ldyBhY3R1YWwtWUFNTCBpbmxpbmUgcHJvZHVjZXIgY29uc3VtZXJzOyBzeW50aGV0aWMgZGVjbGFyZWQgcnVubmVyIHBhdGhzL3NwZWMvY29uZmlnL291dHB1dCwgbm8gQ29kZVFML3Rvb2wvQVBJL2FwcGxpY2F0aW9uL0NJLiBQcmUtZml4IGZhaWx1cmUgZGVsaWJlcmF0ZWx5IHJldGFpbmVkLiIsCiAgInF1YWxpZmljYXRpb25DbGFpbSI6IGZhbHNlCn0K"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.log",
+      "sha256": "99b35ff11dcafecee87b10265eebce44b748f0e4e9ce84b6404e871d30c6fa53",
+      "rawBase64": "VEFQIHZlcnNpb24gMTMKIyBTdWJ0ZXN0OiBhY3R1YWwgWUFNTCBDb2RlUUwgaWRlbnRpdHkgY29uc3VtZXMgYm91bmQgcGhhc2Ugc3BlYyBmb3IgamF2YXNjcmlwdC10eXBlc2NyaXB0Cm9rIDEgLSBhY3R1YWwgWUFNTCBDb2RlUUwgaWRlbnRpdHkgY29uc3VtZXMgYm91bmQgcGhhc2Ugc3BlYyBmb3IgamF2YXNjcmlwdC10eXBlc2NyaXB0CiAgLS0tCiAgZHVyYXRpb25fbXM6IDMyLjcyMjkzMgogIHR5cGU6ICd0ZXN0JwogIC4uLgojIFN1YnRlc3Q6IGFjdHVhbCBZQU1MIENvZGVRTCBpZGVudGl0eSBjb25zdW1lcyBib3VuZCBwaGFzZSBzcGVjIGZvciBweXRob24Kb2sgMiAtIGFjdHVhbCBZQU1MIENvZGVRTCBpZGVudGl0eSBjb25zdW1lcyBib3VuZCBwaGFzZSBzcGVjIGZvciBweXRob24KICAtLS0KICBkdXJhdGlvbl9tczogMjIuNTg4NjQyCiAgdHlwZTogJ3Rlc3QnCiAgLi4uCjEuLjIKIyB0ZXN0cyAyCiMgc3VpdGVzIDAKIyBwYXNzIDIKIyBmYWlsIDAKIyBjYW5jZWxsZWQgMAojIHNraXBwZWQgMAojIHRvZG8gMAojIGR1cmF0aW9uX21zIDI2NS43MDA5OTQK"
+    },
+    {
+      "path": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.receipt.json",
+      "sha256": "163f1acc82379937f6fa16b5adb439943f579522f7437d8d17968ac225d864ad",
+      "rawBase64": "ewogICJjb21tYW5kIjogWwogICAgIm5vZGUiLAogICAgIi0tdGVzdCIsCiAgICAiLS10ZXN0LXJlcG9ydGVyPXRhcCIsCiAgICAiLS10ZXN0LW5hbWUtcGF0dGVybj1eYWN0dWFsIFlBTUwgQ29kZVFMIGlkZW50aXR5IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtY29kZXFsLnRlc3QubWpzIgogIF0sCiAgImN3ZCI6ICIvd29ya3NwYWNlL2VkdUsxMi1uZXctdmVyc2lvbiIsCiAgInN0YXJ0ZWRBdCI6ICIyMDI2LTEwLTI2VDEyOjIzOjI5LjkyMTgzMSswMDowMCIsCiAgImNvbXBsZXRlZEF0IjogIjIwMjYtMTAtMjZUMTI6MjM6MzAuNjUzNjc2KzAwOjAwIiwKICAiZXhpdENvZGUiOiAwLAogICJsb2dTSEEyNTYiOiAiOTliMzVmZjExZGNhZmVjZWU4N2IxMDI2NWVlYmNlNDRiNzQ4ZjBlNGU5Y2U4NGI2NDA0ZTg3MWQzMGM2ZmE1MyIsCiAgInNvdXJjZVNIQTI1NiI6IHsKICAgICIuZ2l0aHViL3dvcmtmbG93cy9jaS55bWwiOiAiOGJlNjdiMDYwNDgxYWZlZDNlODIyNWVlODM5MjQwZTEyMjI0NmVmNThlNmQ4MGYyZTg1OTAwY2FjNDBkNGZkNyIsCiAgICAiLmdpdGh1Yi9zY3JpcHRzL3ByMzU2LWNvZGVxbC50ZXN0Lm1qcyI6ICI1YjM1NmVhNDkwYjFkYjE1NWQwYjBmYjM3NzI0ZWMwOTE3M2YyZGRmOTJhZmM3MTdiMWRhNWNkYTBmNzI3ZmE4IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtY29kZXFsLm1qcyI6ICIwYTcyNzU1ODc1MjJmYmIxZWUxNTJkOTk1OTllMDZhNmU2ODVhZTZkYTE5MTY4ZjBhOWQxZGVkMzA4NmQ4OGY0IiwKICAgICIuZ2l0aHViL3NjcmlwdHMvcHIzNTYtc2FyaWYubWpzIjogIjk3NmFiZGZmMjIxZjU3N2UyMDE4MDhjNTE2ODdjYzllOGI0MTdlMWM2NzhlMmY1ZDg1MGZhOWJiMjY0NzA3MDAiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1hcnRpZmFjdHMubWpzIjogIjNkMTU2MWQ3MDljOWRlNWQ0MTIzZWFiOTY2YTA5ZGEwOTNiMmVkMzgyOTIwZmYxNmUwYTBjN2NiZTkwNDZlNWEiLAogICAgIi5naXRodWIvc2NyaXB0cy9wcjM1Ni1wbGFuLm1qcyI6ICI1Y2VjYmFiODk5ZmU0Mjc0ZTA2YjU0YjFlODE5NWY2MTgzYzI1MzdmZTI0NjdhMjQ4MWRjNTk4NGNhMjUyYTc5IgogIH0sCiAgInNvdXJjZVN0YWJsZSI6IHRydWUsCiAgInNjb3BlIjogIk9ubHkgdHdvIGFjdHVhbC1ZQU1MIGlubGluZSBwcm9kdWNlciBjb25zdW1lcnMgYWZ0ZXIgcmVwbGFjaW5nIHRoZSB0d28gbWFsZm9ybWVkIGVudiBtZW1iZXJzIHdpdGggUFIzNTZfUEhBU0VfU1BFQy4gQWN0dWFsIGRlY2xhcmVkIHBhdGggaW5pdGlhbGl6ZXIsIHNwZWNcdTIxOTJjb25maWcgY29weSwgcHJvZHVjZXIgb3V0cHV0cyBhbmQgZXhjbHVzaXZlLXdyaXRlIHJlZnVzYWwgcnVuIHdpdGggc3ludGhldGljIEZTLiBObyBDb2RlUUwsIGFwcCwgQVBJLCBDSSBvciB1bnJlbGF0ZWQgZXhpc3RpbmcgdGVzdHMuIiwKICAicXVhbGlmaWNhdGlvbkNsYWltIjogZmFsc2UKfQo="
     }
   ],
   "portableRawIndexVersion": 1,
@@ -5284,6 +5304,38 @@
       "originalPath": "/workspace/scratch/pr356-ci-closure-20261026/freeze-plan-dc915aa5822dcbf395c755a8ca37b6c3589e47a5.json",
       "sha256": "643ca62c220617ed5a4fd68aacb6a8ba6f9afec1357a7bf40d3da1800e8ccda7",
       "bytes": 617
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/289",
+      "rawBase64Pointer": "/followupAttachments/289/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.log",
+      "sha256": "56b85e760c2eef1c6525cf4b8ee66d5204d41cceecbd2c625bc183270c6bc77a",
+      "bytes": 2208
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/290",
+      "rawBase64Pointer": "/followupAttachments/290/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.receipt.json",
+      "sha256": "8be3bd94a220b7bdff1f4c3b59d72405e14f17cc062cfb3c11b17c37a3ddf010",
+      "bytes": 1338
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/291",
+      "rawBase64Pointer": "/followupAttachments/291/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.log",
+      "sha256": "99b35ff11dcafecee87b10265eebce44b748f0e4e9ce84b6404e871d30c6fa53",
+      "bytes": 549
+    },
+    {
+      "kind": "new-control-execution-not-CI",
+      "pointer": "/followupAttachments/292",
+      "rawBase64Pointer": "/followupAttachments/292/rawBase64",
+      "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.receipt.json",
+      "sha256": "163f1acc82379937f6fa16b5adb439943f579522f7437d8d17968ac225d864ad",
+      "bytes": 1454
     }
   ],
   "additionalRawRecovery": {
@@ -6754,6 +6806,55 @@
       "applicationOrCIExecuted": false,
       "qualificationClaim": false,
       "activationStatus": "pending external exact-head independent review and unresolved B/evidence/policy/budget work"
+    },
+    {
+      "id": "actual-codeql-inline-bound-phase-spec",
+      "reviewBaseline": "718f4101d56d6846909dbd6fb1e5d7ab89607036",
+      "sourceSHA256AtCollection": {
+        ".github/workflows/ci.yml": "8be67b060481afed3e8225ee839240e122246ef58e6d80f2e85900cac40d4fd7",
+        ".github/scripts/pr356-codeql.test.mjs": "5b356ea490b1db155d0b0fb37724ec09173f2ddf92afc717b1da5cda0f727fa8"
+      },
+      "records": [
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/289",
+          "rawBase64Pointer": "/followupAttachments/289/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.log",
+          "sha256": "56b85e760c2eef1c6525cf4b8ee66d5204d41cceecbd2c625bc183270c6bc77a",
+          "bytes": 2208
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/290",
+          "rawBase64Pointer": "/followupAttachments/290/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-before.receipt.json",
+          "sha256": "8be3bd94a220b7bdff1f4c3b59d72405e14f17cc062cfb3c11b17c37a3ddf010",
+          "bytes": 1338
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/291",
+          "rawBase64Pointer": "/followupAttachments/291/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.log",
+          "sha256": "99b35ff11dcafecee87b10265eebce44b748f0e4e9ce84b6404e871d30c6fa53",
+          "bytes": 549
+        },
+        {
+          "kind": "new-control-execution-not-CI",
+          "pointer": "/followupAttachments/292",
+          "rawBase64Pointer": "/followupAttachments/292/rawBase64",
+          "originalPath": "/workspace/scratch/pr356-review-followup/codeql-actual-inline-env-fixed.receipt.json",
+          "sha256": "163f1acc82379937f6fa16b5adb439943f579522f7437d8d17968ac225d864ad",
+          "bytes": 1454
+        }
+      ],
+      "fix": "Only two malformed CodeQL identity env member expressions changed to the already bound PR356_PHASE_SPEC; no new variable or check-policy change",
+      "actualChecks": "Only two new real-YAML path-bind→frozen-spec/config/producer-output/exclusive-write consumers: pre-fix0PASS2FAIL retained, fixed2PASS0FAIL0skip. Prior CodeQL/A/other green tests excluded.",
+      "applicationCodeqlOrCIExecuted": false,
+      "qualificationClaim": false,
+      "phaseReadyHistoricalApprovedAndSarifPolicy": "all pending",
+      "metadataCallPointB": "not applied; new independent authorization received, actual approval not yet attempted",
+      "strictSourceMapAndExplicitControlSet": "unchanged342source/41control"
     }
   ]
 }

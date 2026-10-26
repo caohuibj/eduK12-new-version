@@ -1,3 +1,4 @@
+import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {chmodSync,existsSync,mkdtempSync,mkdirSync,readFileSync,readdirSync,rmSync,writeFileSync,symlinkSync} from 'node:fs';
@@ -163,4 +164,38 @@ test('SARIF summary CLI loads complete real Action-profile artifact layouts for 
   const result=spawnSync(process.execPath,[new URL('./pr356-sarif.mjs',import.meta.url).pathname,'summary',filename],{encoding:'utf8'});assert.equal(result.status,0,result.stderr);
   const summary=JSON.parse(result.stdout);assert.equal(summary.analyses.length,2);assert.equal(summary.findings.length,0);assert.equal(summary.releaseAuthorized,false);
  }finally{fixtures.forEach(f=>f.clean());rmSync(directory,{recursive:true,force:true});}
+});
+
+
+// Exercise the actual YAML consumer with only its declared synthetic runner
+// inputs. A syntax check accepts subtraction in an env member expression and
+// therefore cannot prove that the script reads the bound phase-spec variable.
+function codeqlWorkflowInline(language,stepName){
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const job='pr356-codeql-'+language,start=workflow.indexOf('\n  '+job+':\n');assert(start>=0,'Actual CodeQL job missing');
+ const rest=workflow.slice(start+1),next=/\n  [a-z][a-z0-9-]*:\n/.exec(rest),block=next?rest.slice(0,next.index):rest;
+ const lines=block.split('\n'),step=lines.findIndex(line=>line==='    - name: '+stepName);assert(step>=0,'Actual inline step missing');
+ const nextStep=lines.findIndex((line,index)=>index>step&&/^    - /.test(line)),segment=lines.slice(step,nextStep<0?undefined:nextStep);
+ assert(segment.includes('      shell: node {0}'),'Expected actual Node inline script');const run=segment.findIndex(line=>/^      run: \|[-+]?$/.test(line));assert(run>=0,'Literal run body missing');
+ const body=[];for(const line of segment.slice(run+1)){if(!line.trim()){body.push('');continue;}if(!line.startsWith('        '))break;body.push(line.slice(8));}
+ assert(body.length,'Empty actual inline script');return body.join('\n')+'\n';
+}
+for(const language of ['javascript-typescript','python'])test('actual YAML CodeQL identity consumes bound phase spec for '+language,()=>{
+ const temp=mkdtempSync(path.join(os.tmpdir(),'pr356-codeql-yaml-control-'));
+ try{
+  const env={RUNNER_TEMP:temp,GITHUB_ENV:path.join(temp,'runner.env'),GITHUB_OUTPUT:path.join(temp,'step.output'),GITHUB_RUN_ID:'40100000001',GITHUB_RUN_ATTEMPT:'2',GITHUB_SHA:HEAD};
+  const builtins={'node:fs':{realpathSync:read=>{assert.equal(read,temp);return temp;},appendFileSync:(file,...args)=>{assert.equal(file,env.GITHUB_ENV);return(requireFs()).appendFileSync(file,...args);}},'node:path':path,'node:assert/strict':assert};
+  function requireFs(){return {appendFileSync:(file,data)=>writeFileSync(file,(existsSync(file)?readFileSync(file):Buffer.alloc(0))+data)};}
+  vm.runInNewContext(codeqlWorkflowInline(language,'Bind controlled runner paths after runner allocation'),{require:name=>{assert(Object.hasOwn(builtins,name),'Unexpected binding import');return builtins[name];},process:{env}},{timeout:1000});
+  for(const row of readFileSync(env.GITHUB_ENV,'utf8').trim().split('\n')){const split=row.indexOf('=');assert(split>0);env[row.slice(0,split)]=row.slice(split+1);}
+  assert.equal(env.PR356_PHASE_SPEC,path.join(temp,'pr356/specs/codeql-'+language+'/phase-spec.json'));assert.equal(env.PR356_CODEQL_CONFIG,path.join(temp,'pr356/specs/codeql-'+language+'/codeql-config.json'));
+  mkdirSync(path.dirname(env.PR356_PHASE_SPEC),{recursive:true});const config={name:'PR356 bounded security-extended',paths:['server-version/backend','server-version/frontend','.github/scripts']};writeFileSync(env.PR356_PHASE_SPEC,JSON.stringify({id:'codeql-'+language,inputs:{configuration:{codeql:config}}}));const specBefore=readFileSync(env.PR356_PHASE_SPEC);
+  const script=codeqlWorkflowInline(language,'Write the frozen CodeQL configuration and producer identity');
+  const fsOnly={readFileSync:(file,...args)=>{assert.equal(file,env.PR356_PHASE_SPEC,'Read only the bound phase spec');return readFileSync(file,...args);},writeFileSync:(file,...args)=>{assert.equal(file,env.PR356_CODEQL_CONFIG,'Write only the declared config');return writeFileSync(file,...args);},appendFileSync:(file,data)=>{assert.equal(file,env.GITHUB_OUTPUT,'Append only the declared output');return writeFileSync(file,(existsSync(file)?readFileSync(file):Buffer.alloc(0))+data);}};
+  const run=()=>vm.runInNewContext(script,{require:name=>{assert.equal(name,'node:fs');return fsOnly;},process:{env}},{timeout:1000});run();
+  assert.deepEqual(readFileSync(env.PR356_PHASE_SPEC),specBefore);assert.equal(readFileSync(env.PR356_CODEQL_CONFIG,'utf8'),JSON.stringify(config,null,2)+'\n');
+  const observed=Object.fromEntries(readFileSync(env.GITHUB_OUTPUT,'utf8').trim().split('\n').map(line=>{const i=line.indexOf('=');return[line.slice(0,i),line.slice(i+1)];}));
+  assert.deepEqual(observed,{artifact_name:'pr356-codeql-'+language+'-40100000001-2',producer_run:'40100000001',producer_head:HEAD,producer_attempt:'2'});
+  const outputBefore=readFileSync(env.GITHUB_OUTPUT),configBefore=readFileSync(env.PR356_CODEQL_CONFIG);assert.throws(run,error=>error.code==='EEXIST');assert.deepEqual(readFileSync(env.GITHUB_OUTPUT),outputBefore);assert.deepEqual(readFileSync(env.PR356_CODEQL_CONFIG),configBefore);
+ }finally{rmSync(temp,{recursive:true,force:true});}
 });
