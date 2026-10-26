@@ -9,6 +9,8 @@
 
 
 
+> 实施阶段小步④：同一已验证 dist 的教师 COURSE 精确组合选择/提交、GENERAL 边界、Survey 普通逐题及 exact 冻结空指导语消费者脚本已实现；原状态页四场景保留。fixture 仅载入编译 runtime，使用独立 schema 与受控短会话，真实 HTTP API 透传；私人材料不入产物。仅语法和直接 fake 控制分批通过，原调用/过滤/旧失败均保留；实际 PG、浏览器、应用、CI 全部 NOTRUN。精确组合的非空指导语 seed 尚无批准来源，不冒称覆盖。YAML/required gate 接线仍未完成，本提交不能激活。
+
 本轮先修复普通整卷测试的隔离/输出接入缺陷，再提出可执行的合并资格收口设计。**下述新接纳、分阶段作业、真实产品浏览器、required gate 与 main 复用均为待审实现，不是当前工作流已具备的能力。** 当前 `qualificationOnly=true / mergeEligible=false` 保留，不能只翻转这两个布尔值取得合并资格。
 
 用户要求每个完成小步一次 commit/push，使用 `[skip ci]`；最新 dot 接管边界要求每轮 CI 之前独立审查全部修复和计划，并对最终完整 HEAD/tree/base 明确放行。未放行前不 dispatch、Ready、rerun 或推送会触发 CI 的提交。继续现有 PR/任务，不新建替代 PR/对话；不改 main、保护规则、长期凭据、安全设置或生产配置，不部署。
