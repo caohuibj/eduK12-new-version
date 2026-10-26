@@ -79,4 +79,14 @@ describe('shared roster workbench interactions',()=>{
   expect(screen.queryByRole('textbox',{name:/粘贴名单/})).toBeNull();fireEvent.click(toggle);expect(screen.getByRole('textbox',{name:/粘贴名单/})).toHaveValue('still editing')
  })
 
+ it('keeps the selected file after MFA expiry and retries only on an explicit click',async()=>{
+  const onText=vi.fn(),arrayBuffer=vi.fn(async()=>new Uint8Array([1,2,3]).buffer)
+  const api=vi.fn().mockRejectedValueOnce(Error('敏感操作需要重新验证动态验证码')).mockResolvedValue({sheets:[{name:'名单',rows:[{line:1,cells:['工号','姓名']},{line:2,cells:['T0001','合成教师']}]}]})
+  render(<EducationRosterSource api={api as EducationRosterApi} organizationId="org" kind="STAFF" text="old draft" onText={onText} onBlocked={vi.fn()} onInvalidate={vi.fn()}/>)
+  fireEvent.change(screen.getByLabelText('CSV／Excel 文件'),{target:{files:[{size:20,name:'名单.xlsx',arrayBuffer}]}})
+  const retry=await screen.findByRole('button',{name:'重新读取文件'});expect(api).toHaveBeenCalledTimes(1);expect(onText).not.toHaveBeenCalled()
+  fireEvent.click(retry);await screen.findByRole('region',{name:'表头映射与样例'});expect(api).toHaveBeenCalledTimes(2);expect(arrayBuffer).toHaveBeenCalledTimes(2)
+  expect(onText).not.toHaveBeenCalled();click('使用这份名单');expect(onText).toHaveBeenCalledWith('"工号","姓名"\n"T0001","合成教师"')
+ })
+
 })
