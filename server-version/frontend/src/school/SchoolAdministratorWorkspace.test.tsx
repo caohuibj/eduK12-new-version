@@ -126,7 +126,9 @@ it('keeps administrator page navigation and explanation toggles GET-only',async(
   await screen.findByRole('button',{name:'年级与班级管理说明'})
   for(const [group,page,help] of [['学校管理','学校与班级','年级与班级管理说明'],['学校管理','班级注册与审批','班级注册与审批说明'],['学校管理','学生账号恢复','账号恢复操作说明'],['学校管理','校园关系','校园关系使用说明'],['学校管理','人员邀请','人员邀请使用说明'],['校园活动','活动管理','活动与发布说明'],['报告与支持','群体报告','群体报告使用说明'],['报告与支持','群体纵向分析','群体纵向分析使用说明']]){
    fireEvent.click(within(screen.getByRole('navigation',{name:'校园功能分组'})).getByRole('link',{name:group}))
-   fireEvent.click(within(screen.getByRole('navigation',{name:group+'功能入口'})).getByRole('link',{name:page}))
+   const pages=screen.queryByRole('navigation',{name:group+'功能入口'})
+   if(pages)fireEvent.click(within(pages).getByRole('link',{name:page}))
+   else expect(page).toBe('活动管理')
    const toggle=await screen.findByRole('button',{name:help})
    expect(toggle).toHaveAttribute('aria-expanded','false')
    fireEvent.click(toggle)

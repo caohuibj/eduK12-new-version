@@ -317,11 +317,11 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   return <section className={"hs-panel hs-activity-manager"+(compact?" hs-activity-manager--compact":"")}>
 
     <h2>校园心理健康活动</h2>
-    {compact?<SchoolTaskHelp label="活动与发布说明" buttonText="活动说明"><p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p></SchoolTaskHelp>:<p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>}
+    {!compact&&<p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>}
     {error&&error!==listError&&<p className="hs-alert" role="alert">{error}</p>}
     {!compact&&listError&&<p className="hs-alert" role="alert">{listError}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
-    {compact?<SchoolActivityCollection key={actorKey+':'+organizationId} items={list} selectedId={selected?.courseId} busy={busy} loading={listLoading} error={listError} hasMore={listHasMore} onRefresh={()=>void execute(fetchList)} onMore={()=>void loadMoreActivities()} onSelect={chooseActivity} createControl={<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>}/>:<div className="hs-grid hs-activity-entry-grid">
+    {compact?<SchoolActivityCollection key={actorKey+':'+organizationId} items={list} selectedId={selected?.courseId} busy={busy} loading={listLoading} error={listError} hasMore={listHasMore} onRefresh={()=>void execute(fetchList)} onMore={()=>void loadMoreActivities()} onSelect={chooseActivity} helpControl={<SchoolTaskHelp label="活动与发布说明" buttonText="活动说明"><p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p></SchoolTaskHelp>} createControl={<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>}/>:<div className="hs-grid hs-activity-entry-grid">
       {compact?<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>:<div className="hs-activity-create"><h3>准备新活动</h3>{createFields}</div>}
       <div className="hs-activity-select"><h3>{compact?'选择要配置的活动':'继续已有活动'}</h3><label className="hs-field"><span>选择已有活动</span>
         <select value={selected?.courseId??''} onChange={event=>chooseActivity(event.target.value)}>

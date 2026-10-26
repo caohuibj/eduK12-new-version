@@ -62,3 +62,13 @@ it('shows the governor home using only actual authorized entries and keeps schoo
  expect(screen.queryByRole('heading',{name:'群体报告'})).not.toBeInTheDocument()
  expect(screen.queryByRole('heading',{name:'专业报告'})).not.toBeInTheDocument()
 })
+
+
+it('omits a redundant secondary row for a single authorized destination',()=>{
+ const navigate=vi.fn()
+ const adminItems=schoolNavigation('ADMIN','',{orgRole:'ORG_ADMIN',canGovern:true,personas:[],capabilities:[],explicitDenies:[]},false)
+ render(<SchoolProfessionalNavigation items={adminItems} page="activities" onNavigate={navigate}/>)
+ expect(screen.queryByRole('navigation',{name:'校园活动功能入口'})).not.toBeInTheDocument()
+ fireEvent.click(within(screen.getByRole('navigation',{name:'校园功能分组'})).getByRole('link',{name:'校园活动'}))
+ expect(navigate).toHaveBeenCalledWith('activities')
+})

@@ -7,11 +7,11 @@ type Activity={courseId:string;title:string;purpose:string;status:string;partici
 const states:Record<string,string>={DRAFT:'准备中',SUBMITTED:'学校审核中',OPEN:'已开放',PAUSED:'已暂停',CLOSED:'已结束'}
 const purposes:Record<string,string>={STUDENT_WELLBEING:'学生心理健康',LEARNING_ADAPTATION:'学习适应',SCHOOL_CLIMATE:'学校氛围与关系',FAMILY_SUPPORT:'家庭与学校支持'}
 const rank=['DRAFT','SUBMITTED','OPEN','PAUSED','CLOSED']
-export function SchoolActivityCollection({items,selectedId,busy,loading,error,hasMore,onRefresh,onMore,onSelect,createControl}:{items:Activity[];selectedId?:string;busy:boolean;loading:boolean;error:string;hasMore:boolean;onRefresh:()=>void;onMore:()=>void;onSelect:(id:string)=>void;createControl:ReactNode}){
+export function SchoolActivityCollection({items,selectedId,busy,loading,error,hasMore,onRefresh,onMore,onSelect,createControl,helpControl}:{items:Activity[];selectedId?:string;busy:boolean;loading:boolean;error:string;hasMore:boolean;onRefresh:()=>void;onMore:()=>void;onSelect:(id:string)=>void;createControl:ReactNode;helpControl?:ReactNode}){
  const [query,setQuery]=useState(''),[sort,setSort]=useState('default'),[view,setView]=useState<SchoolCollectionView>('list')
  const shown=items.filter(item=>schoolSearchText([item.title,purposes[item.purpose]??item.purpose,states[item.status]??item.status].join(' ')).includes(schoolSearchText(query))).slice().sort((a,b)=>sort==='title'?a.title.localeCompare(b.title,'zh-CN',{numeric:true}):sort==='status'?rank.indexOf(a.status)-rank.indexOf(b.status):sort==='participants'?b.participantCount-a.participantCount:0)
  return <div className="hs-activity-catalog">
-  <header className="hs-activity-catalog-heading"><h3>活动列表</h3>{createControl}</header>
+  <header className="hs-activity-catalog-heading"><h3>活动列表</h3><div className="hs-activity-catalog-heading-actions">{helpControl}{createControl}</div></header>
   {selectedId&&<button type="button" className="hs-activity-back" disabled={busy} onClick={()=>onSelect('')}><ArrowLeft size={16} aria-hidden="true"/>返回活动列表</button>}
   {error&&<p role="alert" className="hs-alert">{error}</p>}
   <div className="hs-activity-catalog-index" hidden={Boolean(selectedId)}>

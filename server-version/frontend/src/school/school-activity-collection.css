@@ -2,9 +2,9 @@
 .hs-activity-catalog{min-width:0}
 .hs-activity-catalog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
 .hs-app .hs-activity-catalog-heading>h3{font-family:inherit;font-size:18px;line-height:1.6;font-weight:600;margin:8px 0 0;color:var(--hs-ink)}
-.hs-app .hs-activity-catalog-heading>.hs-activity-create{max-width:100%;margin:0;padding:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
-.hs-activity-catalog-heading>.hs-activity-create>summary{cursor:pointer;min-height:44px;padding:10px 16px;font-size:14px;line-height:1.6;white-space:nowrap}
-.hs-activity-catalog-heading>.hs-activity-create[open]{width:340px}
+.hs-app .hs-activity-catalog-heading-actions>.hs-activity-create{max-width:100%;margin:0;padding:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-activity-catalog-heading-actions>.hs-activity-create>summary{cursor:pointer;min-height:44px;padding:10px 16px;font-size:14px;line-height:1.6;white-space:nowrap}
+.hs-activity-catalog-heading-actions>.hs-activity-create[open]{width:340px}
 .hs-activity-catalog .hs-activity-create-fields .hs-field{margin:0 0 18px}
 .hs-activity-catalog .hs-activity-create-fields :is(input,select){width:100%;min-width:0;min-height:44px;font-size:15px}
 .hs-activity-catalog-index[hidden]{display:none}
@@ -41,7 +41,7 @@
 }
 @media(max-width:600px){
  .hs-activity-catalog-heading{gap:12px;flex-wrap:wrap}
- .hs-activity-catalog-heading>.hs-activity-create[open]{width:100%;flex-basis:100%}
+ .hs-activity-catalog-heading-actions>.hs-activity-create[open]{width:100%;flex-basis:100%}
  .hs-app .hs-activity-catalog-heading>h3{font-size:17px}
  .hs-activity-catalog-toolbar>.hs-collection-options{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;gap:8px}
  .hs-activity-catalog-toolbar .hs-collection-options>label{min-width:0}
@@ -61,3 +61,16 @@
 @media(max-width:600px){
  .hs-app .hs-activity-catalog-list:not(.hs-activity-catalog-list--cards) .hs-activity-catalog-item>button{width:44px;min-width:44px;height:44px;padding:0;gap:0;font-size:0}
 }
+
+/* Keep explanation and creation beside the index title instead of extra rows. */
+.hs-activity-catalog-heading{align-items:center;margin-bottom:12px;gap:12px}
+.hs-app .hs-activity-catalog-heading>h3{margin:0}
+.hs-activity-catalog-heading-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px 16px;min-width:0;max-width:100%}
+.hs-activity-catalog-heading-actions:has(.hs-activity-create[open]){flex:1 1 100%;align-items:start}
+.hs-activity-catalog-heading:has(.hs-activity-create[open]){flex-wrap:wrap}
+.hs-activity-catalog-heading-actions>.hs-teacher-task-help{position:static;margin:0}
+.hs-activity-catalog-heading{position:relative}
+.hs-app .hs-activity-catalog-heading-actions>.hs-teacher-task-help>button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 0;font-size:13px;border:0;background:transparent;color:var(--hs-muted)}
+.hs-activity-catalog-heading-actions .hs-teacher-task-help-content{position:absolute;z-index:30;top:100%;right:0;width:min(420px,100%);padding:16px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);box-shadow:0 10px 28px #10251b20}
+.hs-app .hs-activity-catalog-heading-actions .hs-teacher-task-help-content p{font-size:13px;line-height:1.85;margin:0;color:var(--hs-muted)}
+@media(max-width:600px){.hs-activity-catalog-heading-actions:has(.hs-activity-create[open])>.hs-activity-create{width:100%;flex-basis:100%}}

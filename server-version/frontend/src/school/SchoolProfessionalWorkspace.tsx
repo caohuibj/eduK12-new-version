@@ -20,7 +20,7 @@ export function SchoolProfessionalNavigation({items,page,onNavigate}:{items:Scho
    const destination=section.items.find(item=>item.id===page)||section.items.find(item=>item.id==='activities')||section.items[0]
    return <a key={section.group} href={workspaceHref(destination.id)} aria-current={active?.group===section.group?'true':undefined} onClick={event=>follow(event,destination.id,onNavigate)}>{section.group}</a>
   })}</nav>
-  {active&&<nav className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
+  {active&&active.items.length>1&&<nav className="hs-professional-pages" aria-label={active.group+'功能入口'}>{active.items.map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={event=>follow(event,item.id,onNavigate)}><item.icon size={17} aria-hidden="true"/>{item.label}</a>)}</nav>}
  </>
 }
 
