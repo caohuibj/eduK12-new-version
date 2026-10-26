@@ -14,3 +14,18 @@ it('new references require new version identities and never imply new raw scorin
  next.referencePolicy.selections[0].referenceVersion='wave1-v2';expect(allowsScaleAxisRevision(old,next)).toBe(true);expect(hashScaleDefinition(old)).toBe(hashScaleDefinition(next))
  next.referencePolicy.selections[0].referenceVersion=old.referencePolicy.type==='declared'?old.referencePolicy.selections[0].referenceVersion:'';next.referencePolicy.selections[0].referenceKind='descriptive_sample';expect(allowsScaleAxisRevision(old,next)).toBe(false)
 })
+it('changes only the revised reference version and retains an independent selected reference',()=>{
+ const before=structuredClone(old)
+ if(before.referencePolicy.type!=='declared')throw Error('fixture')
+ before.referencePolicy.selections.push({scoreKey:before.referencePolicy.selections[0].scoreKey,referenceVersion:'independent-v1',referenceKind:'descriptive_sample'})
+ const next=structuredClone(before)
+ if(next.referencePolicy.type!=='declared')throw Error('fixture')
+ next.referencePolicy.selections[0].referenceVersion='bibliography-v2'
+ expect(allowsScaleAxisRevision(before,next)).toBe(true)
+ expect(next.referencePolicy.selections[1]).toEqual(before.referencePolicy.selections[1])
+ expect(hashScaleDefinition(next)).toBe(hashScaleDefinition(before))
+ const removed=structuredClone(before)
+ if(removed.referencePolicy.type!=='declared')throw Error('fixture')
+ removed.referencePolicy.selections.pop()
+ expect(allowsScaleAxisRevision(before,removed)).toBe(false)
+})

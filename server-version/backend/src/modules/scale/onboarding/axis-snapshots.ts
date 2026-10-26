@@ -17,7 +17,18 @@ export function allowsScaleAxisRevision(previous:unknown,next:ScaleDefinitionV2)
  if(canonicalHash(old.referencePolicy)!==canonicalHash(next.referencePolicy)) {
   if(old.referencePolicy.type!=='declared' || next.referencePolicy.type!=='declared')return false
   const oldVersions=new Set(old.referencePolicy.selections.map(s=>s.referenceVersion))
-  if(next.referencePolicy.selections.some(s=>oldVersions.has(s.referenceVersion)))return false
+  const previous=new Map(old.referencePolicy.selections.map(s=>[s.scoreKey+':'+s.referenceKind,s]))
+  let revised=false
+  for(const selection of next.referencePolicy.selections){
+   const prior=previous.get(selection.scoreKey+':'+selection.referenceKind)
+   if(prior&&canonicalHash(prior)===canonicalHash(selection))continue
+   if(oldVersions.has(selection.referenceVersion))return false
+   revised=true
+  }
+  // A changed binding needs a new exact version; unchanged independent
+  // references keep their original identity. Removal/reordering alone is not
+  // a versioned parameter revision.
+  if(!revised)return false
  }
  return true
 }

@@ -1,0 +1,121 @@
+{
+  "kind": "recorded-local-development-results",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "base": "6fa3bc0d9240023097edc909337ba7f09088ca50",
+  "recordedAt": "2026-10-26T02:17:41.690751+00:00",
+  "reports": [
+    {
+      "file": "axis-contracts.json",
+      "sha256": "de8e04ba05ebcbb2eace323da4eb86279126d374563ee6580b440db34b5d17ce",
+      "success": true,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    {
+      "file": "postgres.json",
+      "sha256": "62840c0a9b1a4b8b284807b89ba41c40a4e64b7460541b250a234a1ff65774b3",
+      "success": true,
+      "numPassedTests": 4,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    }
+  ],
+  "sourceSnapshotRecordedAfterExecution": {
+    "server-version/backend/src/modules/scale/onboarding/axis-snapshots.ts": "8f287eda46b80b86a3c4550616e07e30803ffdf45ca2cbb38926fc740525ad5c",
+    "server-version/backend/src/__tests__/scale/instruments/learning-motivation-axis-revisions.test.ts": "eec4288660c867b87c860e9004adbe3d60df8a950a805470bc575548c0263e72",
+    "server-version/backend/src/__tests__/scale/bibliography-axis.postgres.integration.test.ts": "893737601b32f1e1c4b22d9d6097e5f604dc91cc3d5631ecdfc358d8bf5473cb"
+  },
+  "readback": {
+    "axes": [
+      {
+        "reportVersion": "1.1.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [
+          {
+            "hash": "49afe4b0483a30bdca85def6c1784d7ad1faa0d742906479edfd664827a2252e",
+            "version": "wave1-20261001-v2"
+          },
+          {
+            "hash": "f1da252a06284acb0215d86a790871036048607022470f8d47860acd43a08c1b",
+            "version": "independent-literature-v1"
+          }
+        ],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 2
+      },
+      {
+        "reportVersion": "1.1.0",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [
+          {
+            "hash": "49afe4b0483a30bdca85def6c1784d7ad1faa0d742906479edfd664827a2252e",
+            "version": "wave1-20261001-v2"
+          },
+          {
+            "hash": "f1da252a06284acb0215d86a790871036048607022470f8d47860acd43a08c1b",
+            "version": "independent-literature-v1"
+          }
+        ],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 3
+      },
+      {
+        "reportVersion": "1.1.1",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [
+          {
+            "hash": "49afe4b0483a30bdca85def6c1784d7ad1faa0d742906479edfd664827a2252e",
+            "version": "wave1-20261001-v2"
+          },
+          {
+            "hash": "f1da252a06284acb0215d86a790871036048607022470f8d47860acd43a08c1b",
+            "version": "independent-literature-v1"
+          }
+        ],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 3
+      },
+      {
+        "reportVersion": "1.1.1",
+        "scoringVersion": "1.0.0",
+        "measurementHash": "63518b61b12ba18eeb5a07766e30b3dfa90a87d586b1fc859b66ca1cdcfef723",
+        "instrumentVersion": "1.0.0",
+        "referenceVersions": [
+          {
+            "hash": "74e13e31ab219a5b17e9bc3689053552f37d95a5c437f88a4c45fab75db35e62",
+            "version": "wave1-20261001-v2-bibliography-v2"
+          },
+          {
+            "hash": "f1da252a06284acb0215d86a790871036048607022470f8d47860acd43a08c1b",
+            "version": "independent-literature-v1"
+          }
+        ],
+        "localizationVersion": "1.0.0",
+        "catalogManifestVersion": 3
+      }
+    ],
+    "grantCount": 0,
+    "scaleCount": 1,
+    "scaleState": {
+      "status": "DRAFT",
+      "visibility": "HIDDEN"
+    },
+    "snapshotCount": 4,
+    "referenceCount": 3,
+    "deploymentCount": 0,
+    "onlineCombinationCount": 0
+  },
+  "limits": [
+    "Synthetic source provider; no production registry, activation, ONLINE or user grants.",
+    "Does not qualify an original-host content-line database upgrade.",
+    "Source hashes were recorded after execution; no formal CI or release qualification is claimed."
+  ]
+}
