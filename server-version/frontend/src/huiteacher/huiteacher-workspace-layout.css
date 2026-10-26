@@ -246,19 +246,19 @@
 .ht-practice-workbench .ht-event-list .ht-tag{font-size:12px;margin-top:6px}
 .ht-practice-page .ht-field-content{white-space:pre-wrap;overflow-wrap:anywhere}
 
-.ht-workspace .ht-practice-form>section>h3{font-size:18px;margin:0 0 12px}
-.ht-practice-form>section{margin:12px 0 0;padding:20px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper)}
-.ht-practice-form fieldset{min-width:0;margin:18px 0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:10px}
-.ht-practice-form legend{max-width:100%;padding:0 4px;font-size:14px;font-weight:600;line-height:1.7;overflow-wrap:anywhere}
-.ht-practice-form fieldset>label{display:flex;align-items:center;gap:10px;min-height:44px;margin:2px 0;padding:8px 4px;font-size:14px;line-height:1.7;cursor:pointer}
-.ht-practice-form input:is([type=radio],[type=checkbox]){width:18px;height:18px;flex:none;accent-color:var(--ht-copper)}
-.ht-practice-form :is(textarea,input:not([type=radio]):not([type=checkbox]),select){max-width:100%;width:100%;min-height:44px;padding:10px;border:1px solid var(--ht-line);border-radius:7px;background:var(--ht-bg);color:var(--ht-ink);font-size:16px}
-.ht-practice-form textarea{min-height:110px;resize:vertical}
-.ht-practice-form progress{display:block;width:100%;height:6px;border:0;border-radius:8px;overflow:hidden;accent-color:var(--ht-copper);background:var(--ht-line)}
-.ht-practice-form progress::-webkit-progress-bar{background:var(--ht-line)}
-.ht-practice-form progress::-webkit-progress-value{background:var(--ht-copper)}
-.ht-practice-form progress::-moz-progress-bar{background:var(--ht-copper)}
-@media(max-width:640px){.ht-practice-form>section{padding:14px}.ht-practice-form fieldset{padding:12px}.ht-workspace .ht-practice-form>section>h3{font-size:16px}}
+.ht-workspace .ht-form-surface>section>h3{font-size:18px;margin:0 0 12px}
+.ht-form-surface>section{margin:12px 0 0;padding:20px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper)}
+.ht-form-surface fieldset{min-width:0;margin:18px 0;padding:14px 16px;border:1px solid var(--ht-line);border-radius:10px}
+.ht-form-surface legend{max-width:100%;padding:0 4px;font-size:14px;font-weight:600;line-height:1.7;overflow-wrap:anywhere}
+.ht-form-surface fieldset>label{display:flex;align-items:center;gap:10px;min-height:44px;margin:2px 0;padding:8px 4px;font-size:14px;line-height:1.7;cursor:pointer}
+.ht-form-surface input:is([type=radio],[type=checkbox]){width:18px;height:18px;flex:none;accent-color:var(--ht-copper)}
+.ht-form-surface :is(textarea,input:not([type=radio]):not([type=checkbox]),select){max-width:100%;width:100%;min-height:44px;padding:10px;border:1px solid var(--ht-line);border-radius:7px;background:var(--ht-bg);color:var(--ht-ink);font-size:16px}
+.ht-form-surface textarea{min-height:110px;resize:vertical}
+.ht-form-surface progress{display:block;width:100%;height:6px;border:0;border-radius:8px;overflow:hidden;accent-color:var(--ht-copper);background:var(--ht-line)}
+.ht-form-surface progress::-webkit-progress-bar{background:var(--ht-line)}
+.ht-form-surface progress::-webkit-progress-value{background:var(--ht-copper)}
+.ht-form-surface progress::-moz-progress-bar{background:var(--ht-copper)}
+@media(max-width:640px){.ht-form-surface>section{padding:14px}.ht-form-surface fieldset{padding:12px}.ht-workspace .ht-form-surface>section>h3{font-size:16px}}
 
 /* Students use the same compact banner and task hierarchy with Teacher colors. */
 .ht-student-workspace .ht-student-task-inbox>.ht-muted{margin:0 0 12px;font-size:13px}
@@ -277,3 +277,7 @@
 .ht-student-schools>span{flex:none}
 .ht-student-schools>div{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
 @media(max-width:640px){.ht-app[data-theme] .ht-student-task-card{grid-template-columns:32px minmax(0,1fr);gap:10px 12px;padding-block:16px}.ht-student-task-icon{width:32px;height:36px}.ht-student-task-card>button{grid-column:2;justify-self:start}.ht-student-schools{align-items:flex-start}}
+
+/* The dedicated page already supplies its accessible title. */
+.ht-task-answer-form>section>h3{display:none}
+.ht-task-answer-form>p{margin:0 0 16px;color:var(--ht-quiet);font-size:13px}

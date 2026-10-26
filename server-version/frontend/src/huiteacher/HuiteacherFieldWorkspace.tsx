@@ -194,7 +194,7 @@ export function HuiteacherFieldWorkspace({api,onDraftStateChange}:{api:Api;onDra
           <p className="ht-field-content">{currentNote.content}</p>
         </>:<>
           {!editable&&<p role="alert" className="ht-notice">当前活动授权不可用，不能保存或提交新内容。</p>}
-          {formal&&<section className="ht-task ht-practice-form" aria-label="活动预制表单">
+          {formal&&<section className="ht-task ht-practice-form ht-form-surface" aria-label="活动预制表单">
             {!currentInvite?<p className="ht-empty">无法读取此活动的预制表单，请联系组织者核实活动授权。</p>:formError?<div role="alert" className="ht-notice"><p>实践表单暂时无法读取：{formError}</p><button disabled={busy} onClick={()=>setFormReload(value=>value+1)}>重试实践表单</button></div>:!formLoaded?<p role="status">正在读取本活动的预制表单…</p>:!bound?<p className="ht-empty">本活动尚未配置预制表单，请联系组织者绑定已发布的实践表单。</p>:<>
               <p className="ht-muted">按表单逐页填写，最后一页由你确认正式提交。本表单不计分。</p>
               <TaskForm purpose="HUITEACHER" readOnly={busy||!editable}

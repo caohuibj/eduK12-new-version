@@ -54,6 +54,14 @@ describe('Teacher student task presentation',()=>{
   expect(screen.queryByRole('note')).not.toBeInTheDocument()
   expect(api).toHaveBeenCalledTimes(1)
  })
+ it('avoids repeating an activity name that is identical to the form title',async()=>{
+  const api=vi.fn(async()=>({list:[{executionId:'task',formTitle:'同名评教表单',eventTitle:'同名评教表单',teacherName:'示例评价对象',status:'ASSIGNED'}]}))
+  render(<HuiteacherMyFormTasks student api={api as Api}/>)
+  const heading=await screen.findByRole('heading',{name:'同名评教表单'})
+  const card=heading.closest('article')!
+  expect(within(card).getAllByText('同名评教表单',{exact:true})).toHaveLength(1)
+  expect(within(card).getByText('示例评价对象')).toBeInTheDocument()
+ })
  it('keeps read errors separate from a successful empty task list and retries only the student list',async()=>{
   let failed=true
   const api=vi.fn(async()=>{if(failed)throw Error('学生列表暂不可用');return {list:[]}})
