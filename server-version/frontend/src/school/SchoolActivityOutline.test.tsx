@@ -44,7 +44,7 @@ it('uses neutral names only when compact catalogue titles are unavailable, retai
   throw Error('Unexpected '+path)
  })
  render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
- fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
+ fireEvent.click(await screen.findByRole('button',{name:'配置活动：活动'}))
  await screen.findByRole('heading',{name:'活动'})
  fireEvent.click(screen.getByRole('button',{name:'正式测评批次'}))
  fireEvent.click(screen.getByRole('button',{name:'批次 · 已发布'}))

@@ -26,7 +26,7 @@ describe('Huischool Activity peer allocation after reopen',()=>{
     try{
       render(<SchoolActivityManager compact api={api as unknown as SchoolApi}
         organizationId={org} isAdmin classes={[{id:classUnit,name:'五年级一班',unitKind:'CLASS'}]}/>)
-      fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
+      fireEvent.click(await screen.findByRole('button',{name:'配置活动：同伴支持'}))
       expect(await screen.findByText(/状态：已开放/)).toBeInTheDocument()
       const select=screen.getByLabelText('本次互评分配班级')
       fireEvent.change(select,{target:{value:classUnit}})
@@ -223,9 +223,11 @@ it('separates compact configuration and preserves unsaved inputs per activity wi
  })
  render(<SchoolActivityManager compact api={api as unknown as SchoolApi} organizationId={org} isAdmin={false} classes={[]}/>)
  expect(screen.getByRole('button',{name:'创建活动草稿'})).not.toBeVisible()
- await screen.findByRole('option',{name:'同伴支持（准备中）'})
- const choose=async(id:string,title:string)=>{
-  fireEvent.change(screen.getByLabelText('选择已有活动'),{target:{value:id}})
+ await screen.findByRole('button',{name:'配置活动：同伴支持'})
+ const choose=async(_id:string,title:string)=>{
+  const back=screen.queryByRole('button',{name:'返回活动列表'})
+  if(back)fireEvent.click(back)
+  fireEvent.click(await screen.findByRole('button',{name:'配置活动：'+title}))
   await screen.findByRole('heading',{name:title})
  }
  await choose(course,'同伴支持')
@@ -265,7 +267,7 @@ it.each([true,false])('keeps compact psychologist lifecycle controls in the resu
  expect(screen.getByText(/只有已批准班级中的授权学生/)).toBeInTheDocument()
  fireEvent.keyDown(help,{key:'Escape'})
  expect(help).toHaveAttribute('aria-expanded','false')
- fireEvent.change(await screen.findByLabelText('选择已有活动'),{target:{value:course}})
+ fireEvent.click(await screen.findByRole('button',{name:'配置活动：同伴支持'}))
  await screen.findByRole('heading',{name:'同伴支持'})
  expect(screen.getByRole('button',{name:'班级与参与者'})).toHaveAttribute('aria-pressed','true')
  expect(screen.queryByRole('button',{name:'开放本人活动'})).not.toBeInTheDocument()

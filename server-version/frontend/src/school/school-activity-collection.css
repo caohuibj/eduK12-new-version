@@ -1,0 +1,63 @@
+/* Activity management index reuses the School collection interaction pattern. */
+.hs-activity-catalog{min-width:0}
+.hs-activity-catalog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.hs-app .hs-activity-catalog-heading>h3{font-family:inherit;font-size:18px;line-height:1.6;font-weight:600;margin:8px 0 0;color:var(--hs-ink)}
+.hs-app .hs-activity-catalog-heading>.hs-activity-create{max-width:100%;margin:0;padding:0;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface)}
+.hs-activity-catalog-heading>.hs-activity-create>summary{cursor:pointer;min-height:44px;padding:10px 16px;font-size:14px;line-height:1.6;white-space:nowrap}
+.hs-activity-catalog-heading>.hs-activity-create[open]{width:340px}
+.hs-activity-catalog .hs-activity-create-fields .hs-field{margin:0 0 18px}
+.hs-activity-catalog .hs-activity-create-fields :is(input,select){width:100%;min-width:0;min-height:44px;font-size:15px}
+.hs-activity-catalog-index[hidden]{display:none}
+.hs-activity-catalog-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.hs-app .hs-activity-catalog-toolbar>.hs-collection-summary{font-size:13px;line-height:1.8;margin:0;color:var(--hs-muted)}
+.hs-activity-catalog-toolbar>.hs-collection-options{margin-left:auto;gap:12px}
+.hs-app .hs-activity-catalog-toolbar .hs-collection-options>label{margin:0;font-size:13px;font-weight:400}
+.hs-app .hs-activity-catalog-toolbar .hs-collection-options select{width:auto;min-width:0;font-weight:400;font-size:13px;min-height:44px;max-width:190px}
+.hs-app .hs-activity-catalog-toolbar .hs-collection-views>button{width:38px;height:36px;min-width:38px;min-height:36px;padding:0}
+.hs-app .hs-activity-catalog-toolbar .hs-collection-actions>button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0}
+.hs-app .hs-activity-catalog form.hs-collection-search{display:flex;flex-direction:row;align-items:center;gap:10px;flex:1 0 100%;min-width:0;margin:0;padding:5px 6px 5px 14px;border:1px solid var(--hs-border);border-radius:10px;background:var(--hs-surface);color:var(--hs-muted)}
+.hs-app .hs-activity-catalog .hs-collection-search>input{width:100%;min-width:0;min-height:36px;font-size:14px;font-weight:400;border:0;background:transparent;padding:6px 0;color:var(--hs-ink)}
+.hs-app .hs-activity-catalog .hs-collection-search>button{width:auto;min-width:36px;min-height:36px;padding:7px 10px;font-size:13px}
+.hs-app .hs-activity-catalog-limit{font-size:12px;line-height:1.8;color:var(--hs-muted);margin:0 0 14px}
+.hs-activity-catalog-list{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.hs-activity-catalog-item{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(160px,.5fr) auto;align-items:center;gap:16px;padding:16px 18px;border:1px solid var(--hs-border);border-radius:12px;background:var(--hs-surface);min-width:0}
+.hs-activity-catalog-item>div{min-width:0}
+.hs-app .hs-activity-catalog-item h4{font-family:inherit;font-size:16px;font-weight:600;line-height:1.65;margin:3px 0 0;color:var(--hs-ink);overflow-wrap:anywhere}
+.hs-activity-catalog-purpose{font-size:12px;line-height:1.7;color:var(--hs-muted)}
+.hs-activity-catalog-state{font-size:12px;line-height:1.7;color:var(--hs-primary);background:var(--hs-surface-soft);border-radius:6px;padding:4px 8px;justify-self:start}
+.hs-app .hs-activity-catalog-counts{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;font-size:13px;line-height:1.8;color:var(--hs-muted);margin:0}
+.hs-app .hs-activity-catalog-item>button,.hs-app .hs-activity-back{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;line-height:1.7;font-size:13px;padding:9px 12px;border-radius:9px;white-space:nowrap}
+.hs-app .hs-activity-back{color:var(--hs-primary)}
+.hs-activity-catalog-list--cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.hs-activity-catalog-list--cards>.hs-activity-catalog-item{grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:start;padding:18px}
+.hs-activity-catalog-list--cards .hs-activity-catalog-counts{grid-column:1/-1}
+.hs-activity-catalog-list--cards .hs-activity-catalog-item>button{grid-column:1/-1;justify-self:end}
+.hs-app .hs-activity-load-more{display:block;margin:18px auto 0;font-size:14px;min-height:44px}
+@media(max-width:800px){
+ .hs-activity-catalog-item{grid-template-columns:minmax(0,1fr) auto;gap:12px}
+ .hs-activity-catalog-counts{grid-column:1}
+ .hs-activity-catalog-item>button{grid-column:2;grid-row:2}
+ .hs-activity-catalog-list--cards .hs-activity-catalog-item>button{grid-row:auto}
+}
+@media(max-width:600px){
+ .hs-activity-catalog-heading{gap:12px;flex-wrap:wrap}
+ .hs-activity-catalog-heading>.hs-activity-create[open]{width:100%;flex-basis:100%}
+ .hs-app .hs-activity-catalog-heading>h3{font-size:17px}
+ .hs-activity-catalog-toolbar>.hs-collection-options{display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%;gap:8px}
+ .hs-activity-catalog-toolbar .hs-collection-options>label{min-width:0}
+ .hs-app .hs-activity-catalog-toolbar .hs-collection-options select{width:100%;max-width:none;font-size:16px}
+ .hs-activity-catalog-toolbar .hs-collection-options>label>span{display:none}
+ .hs-activity-catalog-toolbar .hs-collection-actions{grid-column:1/-1;justify-self:end}
+ .hs-app .hs-activity-catalog-toolbar .hs-collection-views>button{width:44px;min-width:44px;height:44px;min-height:44px}
+ .hs-activity-catalog-item{padding:16px 14px}
+ .hs-app .hs-activity-catalog .hs-collection-search>input,.hs-activity-catalog .hs-activity-create-fields :is(input,select){font-size:16px}
+}
+
+.hs-activity-catalog-identity{display:block;font-size:12px;line-height:1.7;color:var(--hs-muted);margin-top:4px}
+
+.hs-professional .hs-workspace-content:has(.hs-activity-catalog)>.hs-workspace-page-heading>p{display:none}
+.hs-professional .hs-workspace-content:has(.hs-activity-catalog)>.hs-workspace-page-heading h1{margin-bottom:0}
+
+@media(max-width:600px){
+ .hs-app .hs-activity-catalog-list:not(.hs-activity-catalog-list--cards) .hs-activity-catalog-item>button{width:44px;min-width:44px;height:44px;padding:0;gap:0;font-size:0}
+}

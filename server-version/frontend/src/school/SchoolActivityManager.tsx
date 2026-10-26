@@ -1,6 +1,8 @@
+import {SchoolActivityCollection} from './SchoolActivityCollection'
+import './school-activity-collection.css'
 import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {SchoolTaskHelp} from './SchoolTaskHelp'
 import type { SchoolApi } from './SchoolRecovery'
 import { schoolActivityNextStep, schoolRunStatusText } from './school-activity-workflow'
@@ -16,6 +18,7 @@ type Activity={
   courseId:string;organizationId:string;title:string;purpose:string;status:ActivityState
   version:number;participantCount:number;runCount:number
 }
+type ActivityPage={list:Activity[];hasMore?:boolean;page?:number}
 type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
 type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
 type RunDetail={run:Run;tracks?:RunTrackSummary[]}
@@ -61,6 +64,9 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
   api:SchoolApi;organizationId:string;isAdmin:boolean;classes:Unit[];canAuthorPrivateTools?:boolean;actorKey?:string;compact?:boolean
 }){
   const [list,setList]=useState<Activity[]>([])
+  const [listLoading,setListLoading]=useState(true),[listError,setListError]=useState('')
+  const [listPage,setListPage]=useState(1),[listHasMore,setListHasMore]=useState(false)
+  const listRequest=useRef(0),listMore=useRef(false)
   const [selected,setSelected]=useState<Detail|null>(null)
   const [title,setTitle]=useState('')
   const [purpose,setPurpose]=useState<(typeof purposeOptions)[number][0]>('STUDENT_WELLBEING')
@@ -120,9 +126,27 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     &&(!libraryTeacherReport||['HOMEROOM_TEACHER','ALL_CLASS_TEACHERS'].includes(mode))
     &&(!homeroomOnly||mode==='HOMEROOM_TEACHER'))
   useEffect(()=>{setTargetMode('')},[resourceId,isAdmin,selected?.capabilities?.ownPsychologyPublisher])
-  const fetchList=async()=>{
-    const result=await api<{list:Activity[]}>(base+'?page=1&pageSize=50')
-    setList(result.list)
+  const fetchList=useCallback(async()=>{
+    const token=++listRequest.current
+    listMore.current=false;setListLoading(true);setListError('')
+    try{
+      const result=await api<ActivityPage>(base+'?page=1&pageSize=50')
+      if(token!==listRequest.current)return
+      setList(result.list);setListPage(1);setListHasMore(result.hasMore===true)
+    }catch(err){if(token!==listRequest.current)return;setListError(err instanceof Error?err.message:'校园活动加载失败');throw err}
+    finally{if(token===listRequest.current)setListLoading(false)}
+  },[api,base])
+  const loadMoreActivities=async()=>{
+    if(listLoading||listMore.current||!listHasMore)return
+    const token=++listRequest.current,next=listPage+1
+    listMore.current=true;setListLoading(true);setListError('')
+    try{
+      const result=await api<ActivityPage>(base+`?page=${next}&pageSize=50`)
+      if(token!==listRequest.current)return
+      setList(previous=>Array.from(new Map([...previous,...result.list].map(item=>[item.courseId,item])).values()))
+      setListPage(next);setListHasMore(result.hasMore===true)
+    }catch(err){if(token===listRequest.current)setListError(err instanceof Error?err.message:'更多活动读取失败，请重试')}
+    finally{if(token===listRequest.current){listMore.current=false;setListLoading(false)}}
   }
   const fetchDetail=async(courseId:string)=>{
     const request=++detailRequest.current
@@ -135,14 +159,12 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun(null);setResources([]);setPreview(null)
   }
   useEffect(()=>{
-    let live=true
     ++detailRequest.current
     setSelected(null);setClassId('');setEligibleClasses([]);setList([]);setPanel('participants')
-    void api<{list:Activity[]}>(base+'?page=1&pageSize=50')
-      .then(result=>{if(live)setList(result.list)})
-      .catch(err=>{if(live)setError(err instanceof Error?err.message:'校园活动加载失败')})
-    return()=>{live=false;resourceRequest.current++;runRequest.current++}
-  },[base,api])
+    setListPage(1);setListHasMore(false)
+    void fetchList().catch(()=>{})
+    return()=>{listRequest.current++;listMore.current=false;resourceRequest.current++;runRequest.current++}
+  },[base,api,actorKey,fetchList])
   useEffect(()=>{
     resourceRequest.current++
     setResources([]);setResourceId('');setResourceCursor(null)
@@ -275,6 +297,10 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     setActiveRun(null);setNotice('正式测评已发布。学生仍需以本人身份完成原有作答流程。')
   })
 
+  const chooseActivity=(id:string)=>void execute(async()=>{
+    setPanel('participants');if(compact)createPanel.current?.removeAttribute('open')
+    if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}
+  })
   const createFields=<><label className="hs-field"><span>新建活动名称</span>
         <input value={title} onChange={event=>setTitle(event.target.value)} maxLength={200}/></label>
         <label className="hs-field"><span>活动主题</span>
@@ -292,22 +318,19 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
 
     <h2>校园心理健康活动</h2>
     {compact?<SchoolTaskHelp label="活动与发布说明" buttonText="活动说明"><p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p></SchoolTaskHelp>:<p>教师准备活动；学校管理员或获授权的心理教师控制其权限内活动的开放与暂停。只有已批准班级中的授权学生能看到活动和任务。</p>}
-    {error&&<p className="hs-alert" role="alert">{error}</p>}
+    {error&&error!==listError&&<p className="hs-alert" role="alert">{error}</p>}
+    {!compact&&listError&&<p className="hs-alert" role="alert">{listError}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <div className={"hs-grid hs-activity-entry-grid"+(compact?" hs-activity-entry-grid--compact":"")}>
+    {compact?<SchoolActivityCollection key={actorKey+':'+organizationId} items={list} selectedId={selected?.courseId} busy={busy} loading={listLoading} error={listError} hasMore={listHasMore} onRefresh={()=>void execute(fetchList)} onMore={()=>void loadMoreActivities()} onSelect={chooseActivity} createControl={<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>}/>:<div className="hs-grid hs-activity-entry-grid">
       {compact?<details className="hs-activity-create" ref={createPanel}><summary>新建活动</summary><div className="hs-activity-create-fields">{createFields}</div></details>:<div className="hs-activity-create"><h3>准备新活动</h3>{createFields}</div>}
       <div className="hs-activity-select"><h3>{compact?'选择要配置的活动':'继续已有活动'}</h3><label className="hs-field"><span>选择已有活动</span>
-        <select value={selected?.courseId??''} onChange={event=>void execute(async()=>{
-          const id=event.target.value
-          setPanel('participants');if(compact)createPanel.current?.removeAttribute('open')
-          if(id)await fetchDetail(id);else {++detailRequest.current;setSelected(null)}
-        })}>
+        <select value={selected?.courseId??''} onChange={event=>chooseActivity(event.target.value)}>
           <option value="">请选择活动</option>
           {list.map(a=><option key={a.courseId} value={a.courseId}>
             {a.title}（{stateText[a.status]}）</option>)}
         </select></label>
         <button disabled={busy} onClick={()=>void execute(fetchList)}>刷新活动列表</button></div>
-    </div>
+    </div>}
     {selected&&<div className="hs-activity-detail">
       <h3>{selected.title}</h3>
       <p>状态：{selected.status==='SUBMITTED'&&selected.capabilities?.ownPsychologyPublisher?'待开放':stateText[selected.status]} · 当前授权学生 {selected.participantCount} 人
