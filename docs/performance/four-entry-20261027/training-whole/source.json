@@ -1,0 +1,16 @@
+{
+  "head": "a07363fa3a0a7ce4f3d654204804ea957bd48638",
+  "tree": "256e21a7e62f134e40661f444aa44d12f3116715",
+  "node": "24.22.1",
+  "postgres": "17.11",
+  "redis": "8.0.2",
+  "fixture": "server-version/backend/src/__tests__/integration/report-outbox-fixture.ts",
+  "fixtureSha256": "5f4c8c7a518038118cbe311cee811fcd75617a178c4ab8cf4285b971bd33e13c",
+  "probeSha256": "4ffb1d1ddfa9e6225d2af3954c47a617da34bb5432f57cf0c118b83a61c66909",
+  "limitations": [
+    "prepared parent/children fixture, not authentic product publication or START",
+    "no browser presentation timing",
+    "manual real worker claim, no queue scheduling latency estimate",
+    "test-mode partial router mount, not production middleware or capacity"
+  ]
+}

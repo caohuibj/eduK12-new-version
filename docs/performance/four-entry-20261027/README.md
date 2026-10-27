@@ -75,3 +75,21 @@ main认知FINAL仍有cognitiveRawSubmission写入，未合并PR360的native/COS�
 范围不是“只优化两入口就关闭四入口任务”：该具体权限SQL目前由School/Teacher共用，二者一起修；Survey/Training不是该SQL消费者，继续分别核实际热点和反馈链，不给其加无用设置、不宣称整体任务完成。
 
 脱敏记录和探针源码快照：`education-report/`。source manifest绑定本次产品文件字节；旧基线与候选、无效实验、环境诊断分开。测量日志与合成DB仅留dot本地，无生产数据。尚未合并/部署此优化。
+
+## Training 整卷代表链（06:23 UTC）
+
+原件在`training-whole/`。固定两个3题量表的既有合成outbox fixture，**预先准备的parent/children不是通过产品发布/START产生**，不能把本诊断当完整发布旅程。使用真实认证Composite路由进行whole definition、durable ACK、同摘要重放、report-status与授权report读取；手动claim真实lease并执行真实worker，不伪造READY或报告。
+
+| 阶段 | 首份prepared ms | 第二份prepared ms | SQL事件 |
+|---|---:|---:|---:|
+| 整卷定义 |158.65|21.85|27|
+| 耐久ACK |33.74|11.12|13 / 12|
+| 同回执重放 |7.37|5.31|3|
+| worker处理前状态 |9.76|6.04|6|
+| claim＋worker＋READY校验 |246.87|52.70|70|
+| READY状态读取 |7.65|6.33|6|
+| 授权完整报告读取 |10.18|6.37|6|
+
+两次都验证ACK接受、重放不变、处理前不是READY、真实worker后READY且两个不可变量表FINAL存在。worker耗时不是生产排队时间；整体用户等待还包括浏览器、调度和网络，不能将单个ACK作为报告可见时间。Node/PG/Redis同前述版本，另建独立合成DB，async/whole/durable-backlog/atomic-receipt开启，background worker自动循环关闭，compact/shared-control未开启。结束时自有进程均停止。
+
+现在四入口均有一条代表性观测，但口径不完全相同：Survey是独立研究协议；Training是prepared whole链；School/Teacher是service completion＋实际权限报告HTTP。完整工具矩阵、浏览器展示、同口径容量尚未完成，不把它们直接排名或计为M1全部关闭。
