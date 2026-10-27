@@ -42,11 +42,13 @@ test('inline PR357 adds no reusable-workflow references and retains the preexist
  const previous=binding.reusableWorkflows;const current=graph(path=>readFileSync(path,'utf8'));
  assert.deepEqual(current,previous,'Do not remove old gates or add the 51st reusable workflow');assert(current.length-1<=50,'At most 50 referenced workflows, excluding the top-level caller');assert(!current.includes('.github/workflows/ci-pr357.yml'));
 });
-test('browser environment repair is limited to the approved opt directory and read-only font diagnostics',()=>{
+test('browser environment repair only removes write bits on approved bounded trusted paths',()=>{
  const text=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  const block=text.split('  pr357-connected:')[1].split('  pr357:')[0];
- assert.match(block,/p='\/opt';st=os.lstat\(p\)/);assert.match(block,/os.chmod\(p,0o755\)/);
- assert.equal((block.match(/os.chmod\(/g)||[]).length,1);assert.doesNotMatch(block,/chmod -R|no-sandbox|disable-setuid-sandbox/);
+ assert.match(block,/chrome=\['\/opt\/google\/chrome\/chrome','\/opt\/google\/chrome\/chrome-sandbox'\]/);
+ assert.match(block,/os.chmod\(p,mode & ~0o022\)/);assert.equal((block.match(/os.chmod\(/g)||[]).length,1);
+ assert.match(block,/assert all\(f.startswith\('\/usr\/share\/fonts\/'\)/);
+ assert.doesNotMatch(block,/chmod -R|no-sandbox|disable-setuid-sandbox/);
  assert(block.indexOf('school-teacher-chrome.cjs preflight')<block.indexOf('school-teacher-fixture.cjs seed'));
  assert.match(block,/'readOnly':True/);
 });

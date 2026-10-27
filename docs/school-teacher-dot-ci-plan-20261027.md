@@ -151,3 +151,18 @@ change. Font path metadata is read-only and constrained to /usr/share/fonts;
 any additional permission action needs its own specific approval. Preflight is
 moved before fixture seed so unavailable browser safety does not create unused
 fixture data. Actual browser journey remains NOTRUN, never replaced by preflight.
+
+## Complete trusted-path hardening authorized (03:38 UTC)
+
+Run40444862647 retained all other qualifications, but browser preflight stopped
+at root-owned0777 /opt/google after /opt was repaired. Read-only font metadata
+also identified0777 /usr/share and its font ancestor directories. The user then
+specifically approved removing group/other write bits from required Chrome/CJK
+paths and parents on this disposable runner. The new preparation inventories
+both exact Chrome executable paths and installed Chinese fonts under the fixed
+/usr/share/fonts root, validates every root-owned non-symlink regular file or
+directory before any mutation, and only applies mode & ~0022. Existing special
+bits, owner, read and execute bits are preserved; no new privilege is added.
+No unrelated recursive chmod, production change or sandbox bypass is allowed.
+The actual Python syntax and bounded-path workflow controls pass locally; actual
+Chrome/font/runtime acceptance remains a required real check, not assumed.
