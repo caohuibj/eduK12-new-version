@@ -1,0 +1,20 @@
+{
+  "command": [
+    "./node_modules/.bin/vitest",
+    "run",
+    "src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts",
+    "-t",
+    "SCHOOL reads exact stored",
+    "--maxWorkers=1",
+    "--reporter=json",
+    "--outputFile=/tmp/pr363-feedback-distribution/report-pg-2.json"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/backend",
+  "startedAtUnix": 1793095395.6026154,
+  "endedAtUnix": 1793095404.0191414,
+  "exitCode": 0,
+  "explicitNewLoopbackDatabase": true,
+  "CI": null,
+  "GITHUB_ACTIONS": null,
+  "RELEASE_VERIFY_LOCAL": null
+}

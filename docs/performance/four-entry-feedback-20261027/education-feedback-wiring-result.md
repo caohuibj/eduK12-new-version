@@ -1,5 +1,7 @@
 # Education feedback production wiring continuation
 
+Later source-contract integration and its affected-only evidence are recorded in [education-feedback-distribution-result.md](education-feedback-distribution-result.md). The results below remain historical observations bound to root `282e9fb`; the later delta absorbs `0e3d210d` and resolves its App conflict without relabelling these earlier results.
+
 Code: `e44a2ce96c1e25f03685a979c36ee630e33c23fb`, tree `8517b2f07439ff2fa4cbd654a7d0115f1b0c78fb`, branch `feat/pr363-education-feedback`. The earlier `bc49043f` handoff/evidence remains historical. This continuation normally merged root `f46336cc` and `282e9fb`; it did not edit the root-owned source, migration, registry, resource-authority or shared FINAL files. Relative to root `282e9fb`, those protected task files remain identical.
 
 ## Reused implementation and necessary adapters
