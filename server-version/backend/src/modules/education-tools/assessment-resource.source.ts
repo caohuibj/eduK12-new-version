@@ -11,6 +11,7 @@ import {situationalReleaseKey,type ResolvedSituationalRelease} from '../situatio
 import {educationManagementFail as fail} from './assessment-resource.issuer'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {assertScalePublicationRights} from '../scale/scale-publication-guard'
+import {prelockEducationStandardSourceActors} from './assessment-resource.marker'
 
 export const educationCompositeInclude={questionnaireCourses:true,items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
 /** Lock these advisory source identities before Org/User/Composite row locks.
@@ -54,6 +55,8 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
  // This existing helper proves executable/measurement identity only. Its Training
  // scope checks do NOT grant the target entry permission; explicit distribution
  // is checked separately before any draft or frozen metadata is written.
+ if(source.items.some(item=>item.standardCombinationSource!==null))
+  await prelockEducationStandardSourceActors(tx,source.createdBy,source.items)
  const content=await prepareTrainingContentSnapshot(tx,source,resolved)
  if(snapshot.units.length!==content.snapshot.units.length||snapshot.units.some(unit=>{
   const actual=content.snapshot.units.find(value=>value.itemId===unit.itemId)

@@ -7,6 +7,26 @@ const id=z.string().guid()
 export const educationMarkerBindingSchema=z.object({schemaVersion:z.literal(1),product:z.enum(['SCHOOL','TEACHER']),organizationId:id,resourceId:id,
  sourceCompositeId:id,sourceItemId:id,runtimeCompositeId:id,runtimeItemId:id,ownerId:id}).strict()
 export type EducationMarkerBinding=z.infer<typeof educationMarkerBindingSchema>
+/** Discovery only, never authorization. Root's NOWAIT fence prevents an
+ * education transaction holding Org/source locks from waiting on account writes.
+ * Existing Training validators subsequently reread the exact original proofs. */
+export async function prelockEducationStandardSourceActors(tx:Prisma.TransactionClient,ownerId:string,items:Array<{standardCombinationSource?:unknown}>){
+ const actors=new Set<string>([ownerId]),grantIds=new Set<string>()
+ for(const item of items){
+  const marker=item.standardCombinationSource as {reference?:{ownerId?:string;authority?:{issuerId?:string;authorityGrantId?:string}}}|null
+  if(marker?.reference?.ownerId)actors.add(marker.reference.ownerId)
+  if(marker?.reference?.authority?.issuerId)actors.add(marker.reference.authority.issuerId)
+  if(marker?.reference?.authority?.authorityGrantId)grantIds.add(marker.reference.authority.authorityGrantId)
+ }
+ if(grantIds.size){
+  const subjects=await tx.$queryRaw<Array<{subject_id:string}>>(Prisma.sql`SELECT DISTINCT ancestor.subject_id
+   FROM content_capability_grants leaf JOIN content_capability_grants ancestor ON ancestor.id=ANY(leaf.ancestry)
+   WHERE leaf.id IN (${Prisma.join([...grantIds].sort())}) AND cardinality(leaf.ancestry) BETWEEN 1 AND 2`)
+  for(const subject of subjects)actors.add(subject.subject_id)
+ }
+ const {lockEducationAssessmentUsers}=await import('./assessment-resource.locks')
+ await lockEducationAssessmentUsers(tx,[...actors].sort())
+}
 /** A persisted education binding authenticates the target container; upstream
  * Training/private markers remain original provenance, never target permission. */
 export async function readEducationMarkerSource(tx:Prisma.TransactionClient,raw:unknown,context:{compositeId:string;itemId:string;ownerId:string},purpose:'NEW_USE'|'HISTORY'='HISTORY'){

@@ -1,4 +1,4 @@
-import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
+import {readEducationMarkerSource,prelockEducationStandardSourceActors} from '../education-tools/assessment-resource.marker'
 import {assertToolEntryPolicy} from '../assessment-governance/tool-entry-policy'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -110,6 +110,8 @@ export async function verifyStoredTrainingStandardItem(tx:Prisma.TransactionClie
   // The independently published education delivery and its pinned target
   // distribution grants authorize this entry; original Training source rights
   // are separately rechecked by the recursive original-container verifier.
+  if(!exact.source.createdBy)fail('BINDING_IDENTITY_MISMATCH')
+  await prelockEducationStandardSourceActors(tx,exact.source.createdBy,[exact.item])
   return verifyStoredTrainingStandardItem(tx,exact.source,exact.item,purpose)
  }
  const stored=decodeTrainingStandardItemSource(item.standardCombinationSource,{compositeId:composite.id,itemId:item.id,scaleId:item.scaleId,ownerId:composite.createdBy})
