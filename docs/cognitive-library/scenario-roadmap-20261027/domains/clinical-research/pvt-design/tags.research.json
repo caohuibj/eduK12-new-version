@@ -1,0 +1,59 @@
+{
+  "artifactKind": "DESIGN_ONLY_NOT_RUNTIME_REGISTRATION",
+  "stableKeyProposal": "pvt",
+  "taxonomyCommit": "22721e5c63dd78819e8c58921adf20157cdaa08c",
+  "tags": {
+    "cognitive_domain": [
+      "attention"
+    ],
+    "target_process": [
+      "sustained_monitoring"
+    ],
+    "paradigm": null,
+    "stimulus_form": null,
+    "input_upstream": null,
+    "input_proposed": [
+      "not_frozen"
+    ],
+    "key_metric": null,
+    "intended_use": [
+      "research_protocol_selection"
+    ],
+    "code_license": null,
+    "code_rights_disposition": [
+      "authorization_pending"
+    ],
+    "asset_rights_disposition": null,
+    "asset_license_review": null,
+    "implementation_strategy": [
+      "literature_reimplementation"
+    ],
+    "maturity": [
+      "source_research_only"
+    ],
+    "evidence_limitations": [
+      "timing_device_unverified",
+      "protocol_variant_unvalidated",
+      "protocol_version_decision",
+      "personal_scoring_redefinition",
+      "cultural_language_burden",
+      "motor_burden"
+    ],
+    "baseline_relation": [
+      "new_family_candidate"
+    ],
+    "research_priority": [
+      "conditional_priority_finalize"
+    ],
+    "rule_type": [
+      "project_provisional",
+      "theoretical_reference"
+    ]
+  },
+  "notes": {
+    "authorization_pending": "Only the upstream source redistribution is unconfirmed; no upstream source/assets included.",
+    "nulls": "No exact PVT paradigm/stimulus/input/metric/license labels; no fabricated controlled values.",
+    "ageLanguageDeviceDifficulty": "Unknown; no clinical/child/Chinese/device equivalence validation.",
+    "ownership": "DOT confirmed clinical-research; user design approval pending."
+  }
+}

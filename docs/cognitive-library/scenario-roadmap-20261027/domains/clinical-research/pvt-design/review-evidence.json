@@ -1,0 +1,66 @@
+{
+  "artifactKind": "PVT_DESIGN_SOURCE_AND_LAYOUT_REVIEW_NOT_RUNTIME_OR_VALIDITY",
+  "reviewedAtUtc": "2026-10-27T12:15:49.744053+00:00",
+  "referencesObserved": {
+    "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+    "core": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+    "child-learning": "5db79eb8cfbbe97d05f048d50fd8bed3a1794391",
+    "emotion-ei": "215e9bbd96769064723b38d8f594c6b07c03fa4f",
+    "occupational": "31ace660411d8fcaeab9917947a133973d744ce4",
+    "clinical-sart-base": "4b3351509088683cf91e82c7bc8eb87a5333d2d2"
+  },
+  "literature": {
+    "doi": "10.1016/j.actaastro.2011.07.015",
+    "publicAuthorUrl": "https://www.med.upenn.edu/uep/assets/user-content/documents/Basner2011-ValidityandsensitivityofabriefPVT.pdf",
+    "pdfSha256": "0ca4776d8de0f18527ea7225a6ed40c80f2255bec0933049eb9047847b00ea1c",
+    "methodsSectionsRead": [
+      "2.1",
+      "2.2",
+      "2.3",
+      "2.4"
+    ],
+    "printedMethodsPageVisuallyRead": 951,
+    "originalPdfAndRenderIncluded": false
+  },
+  "upstreamReferenceOnly": {
+    "repo": "marsja/psychomotor_vigilance_task",
+    "commit": "053e76820b404eeba3a6ac10f09679c1a56042c2",
+    "readmeBlob": "1eee318cb80e406e3c404e6d3df6e8f8972defef",
+    "treeLicenseFiles": [],
+    "genericRedistributionPermission": "unconfirmed",
+    "codeCopied": false
+  },
+  "controlledTags": {
+    "dimensions": 18,
+    "allUsedKeysExist": true,
+    "registered": false
+  },
+  "scope": "Only this PVT static design directory; existing SART and original six untracked WIP files preserved. No runner/sequence/scorer, dependencies, CI, product integration, merge or deploy.",
+  "sourceChecks": "Source/license review, local links, whitespace, narrow secret-pattern scan, existing controlled vocabulary keys, no original paper/assets included. Static layout evidence is separate; no participant/task run.",
+  "files": {
+    "APPENDIX.md": {
+      "bytes": 16558,
+      "sha256": "fa71b955a7cfb5f62aa9cf49e623e24559e8f8eae1a6e13b4f838013e7bbd5db"
+    },
+    "REVIEW.md": {
+      "bytes": 2504,
+      "sha256": "b43690b3b0b08fa244aa939ee1e6e09b59aee59802360ca322af44bbbbaa137a"
+    },
+    "pvt-review.html": {
+      "bytes": 9492,
+      "sha256": "e1576e95774f72c73b64c4e5d066f05541832ac7d4c0dfcafb7b9a05a63a7b25"
+    },
+    "pvt-review.png": {
+      "bytes": 388729,
+      "sha256": "fe00169ac34185b3ed8e5655ccab61b08f12094680d4c39d4593632195be514d"
+    },
+    "static-review.json": {
+      "bytes": 913,
+      "sha256": "a922705546e5a9ce077570c29dd649baede268e680003c59f6b923941a20a3a9"
+    },
+    "tags.research.json": {
+      "bytes": 1691,
+      "sha256": "24f62eed71135e61d3784d03c29ba64cb9f6461e0100070bb2714ca1eab73873"
+    }
+  }
+}
