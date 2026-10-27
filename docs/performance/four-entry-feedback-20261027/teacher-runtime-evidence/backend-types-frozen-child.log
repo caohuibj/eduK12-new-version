@@ -1,7 +1,0 @@
-src/modules/huiteacher/assessmentRuntime.access.ts(172,7): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(172,64): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(172,93): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(173,94): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(174,37): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(174,59): error TS18048: 'slot' is possibly 'undefined'.
-src/modules/huiteacher/assessmentRuntime.access.ts(175,7): error TS18048: 'slot' is possibly 'undefined'.

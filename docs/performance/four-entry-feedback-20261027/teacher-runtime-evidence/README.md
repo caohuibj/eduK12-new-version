@@ -16,6 +16,15 @@ checks and not recorded as contemporaneous complete byte manifests. Final
 hashes in the machine-readable index identify the delivered files; they are
 not backdated manifests or permission to reuse these checks in CI.
 
+Tables below use each logical original `.log` name. Nonempty logs are stored as
+`.log.gz` with deterministic gzip (mtime 0); decode with `gzip -dc FILE.log.gz`.
+`checks.json` records both original-byte and archive SHA-256. Decompression was
+checked byte-for-byte. Empty compiler/lint logs remain empty `.log` files with
+the actual exit recorded separately. The full Git whitespace check initially
+exited 2 on raw stdout's trailing spaces/blank lines; lossless packing preserves
+that original output without rewriting it. Raw copies also remain in this cloud
+node's `/tmp/pr363-teacher-runtime-original-evidence`.
+
 ## Backend
 
 |Log|Command after NODE|Exit / observed result|
