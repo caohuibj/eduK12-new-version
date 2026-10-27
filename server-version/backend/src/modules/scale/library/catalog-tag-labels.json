@@ -267,6 +267,18 @@
     "label": "Teacher–student relationships",
     "axis": "construct"
   },
+  "construct:sel_delaware_techniques_positive": {
+    "label": "正向行为做法",
+    "axis": "construct"
+  },
+  "construct:sel_delaware_techniques_punitive": {
+    "label": "惩罚性做法",
+    "axis": "construct"
+  },
+  "construct:sel_delaware_techniques_sel": {
+    "label": "社会情绪学习做法",
+    "axis": "construct"
+  },
   "construct:sel_dsecs_r2_relationship_skills": {
     "label": "人际关系技能",
     "axis": "construct"
