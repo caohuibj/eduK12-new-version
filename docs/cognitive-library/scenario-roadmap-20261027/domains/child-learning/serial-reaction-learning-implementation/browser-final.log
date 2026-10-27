@@ -1,0 +1,9 @@
+{"practiceRound":0,"index":0,"state":"practice-feedback","text":"首次没有点到 ★\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":0,"index":1,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":0,"index":2,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":0,"index":3,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n没关系，先一起重看完整说明和例子，再试一组。最多三轮，也可以结束。\n\n重看说明与例子\n结束练习"}
+{"practiceRound":1,"index":0,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":1,"index":1,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":1,"index":2,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":1,"index":3,"state":"practice-feedback","text":"首次就点准了\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n进入正式活动\n结束练习"}
+{"synthetic":true,"participantData":false,"browser":"151.0.7922.173","chromiumSandbox":false,"sandboxReason":"isolated original local bundle; all external requests blocked; existing Chromium SUID sandbox unusable; no system permissions changed","layouts":[{"name":"phone instructions","width":390,"scroll":390,"cells":[]},{"name":"phone formal","width":390,"scroll":390,"cells":[{"width":156,"height":156},{"width":156,"height":156},{"width":156,"height":156},{"width":156,"height":156}]},{"name":"tablet report","width":820,"scroll":820,"cells":[]},{"name":"tablet English instructions","width":820,"scroll":820,"cells":[]}],"states":[{"state":"limited","performanceImageButtons":0,"performanceCounts":0},{"state":"invalid","performanceImageButtons":0,"performanceCounts":0}],"downloadMatchesBackendProjection":true,"nativeFinalizeCalls":1,"serverCalls":0,"requests":[],"errors":[],"centralizedAcceptance":false,"bundleSha256":"c3b0eac384ebf8ea62a5f42226429cec129e4ace14488f0669b032c200680be9"}

@@ -1,0 +1,13 @@
+{"practiceRound":0,"index":0,"state":"practice-feedback","text":"首次没有点到 ★\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习"}
+{"practiceRound":0,"index":1,"state":"running","text":"练习 3/4\n点 ★ 所在的方格\n \n \n \n★\n\n看清再点，不要提前猜。\n\n结束本次活动"}
+locator.click: Timeout 3000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '继续练习', exact: true })[22m
+
+    at practice (/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/serial-reaction-learning-implementation/browser-check.cjs:9:601)
+    at async /workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/serial-reaction-learning-implementation/browser-check.cjs:10:2 {
+  log: [
+    "  - waiting for getByRole('button', { name: '继续练习', exact: true })"
+  ],
+  name: 'TimeoutError'
+}

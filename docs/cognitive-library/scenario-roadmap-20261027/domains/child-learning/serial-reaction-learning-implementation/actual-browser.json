@@ -1,0 +1,69 @@
+{
+  "synthetic": true,
+  "participantData": false,
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": false,
+  "sandboxReason": "isolated original local bundle; all external requests blocked; existing Chromium SUID sandbox unusable; no system permissions changed",
+  "layouts": [
+    {
+      "name": "phone instructions",
+      "width": 390,
+      "scroll": 390,
+      "cells": []
+    },
+    {
+      "name": "phone formal",
+      "width": 390,
+      "scroll": 390,
+      "cells": [
+        {
+          "width": 156,
+          "height": 156
+        },
+        {
+          "width": 156,
+          "height": 156
+        },
+        {
+          "width": 156,
+          "height": 156
+        },
+        {
+          "width": 156,
+          "height": 156
+        }
+      ]
+    },
+    {
+      "name": "tablet report",
+      "width": 820,
+      "scroll": 820,
+      "cells": []
+    },
+    {
+      "name": "tablet English instructions",
+      "width": 820,
+      "scroll": 820,
+      "cells": []
+    }
+  ],
+  "states": [
+    {
+      "state": "limited",
+      "performanceImageButtons": 0,
+      "performanceCounts": 0
+    },
+    {
+      "state": "invalid",
+      "performanceImageButtons": 0,
+      "performanceCounts": 0
+    }
+  ],
+  "downloadMatchesBackendProjection": true,
+  "nativeFinalizeCalls": 1,
+  "serverCalls": 0,
+  "requests": [],
+  "errors": [],
+  "centralizedAcceptance": false,
+  "bundleSha256": "f35731a249d3a95ed0c14b4e38769e8825975eb4b95302b8ebc7e9544097022e"
+}

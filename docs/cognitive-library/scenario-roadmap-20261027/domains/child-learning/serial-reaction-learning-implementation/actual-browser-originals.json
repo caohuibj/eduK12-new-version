@@ -1,0 +1,642 @@
+{
+  "synthetic": true,
+  "participantData": false,
+  "nativeCalls": [
+    {
+      "synthetic": true,
+      "input": {
+        "context": {
+          "contextKey": "synthetic-srl-browser:epoch-1",
+          "language": "zh",
+          "snapshot": {
+            "schemaVersion": 1,
+            "frozenAt": "2026-10-27T00:00:00.000Z",
+            "testType": "serial-reaction-learning",
+            "configVersion": "0.1.0",
+            "engineVersion": "0.1.0",
+            "scoringVersion": "0.1.0",
+            "config": {
+              "profile": "experience",
+              "runs": 2,
+              "trialsPerRun": 84,
+              "totalTrials": 168,
+              "rsiMs": 500,
+              "input": "touch",
+              "deadlineMs": null,
+              "sourceVersion": "hodel-2014-published-spatial-sequences-and-project-R30-v1",
+              "profileDefinitionVersion": "0.1.0",
+              "parameterInterpretationVersion": "0.1.0",
+              "reportDefinitionVersion": "0.1.0",
+              "presentationVersion": "0.1.0",
+              "randomizationAlgorithmVersion": "srl-fnv1a-xorshift32-weighted-backtrack-v1",
+              "practice": {
+                "items": 4,
+                "passCorrect": 4,
+                "maximumRounds": 3
+              },
+              "minimumConditionFirstAccuracy": 0.8,
+              "maxResponsesPerTrial": 2048
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocol": {
+              "schemaVersion": 1,
+              "key": "serial-reaction-learning/0.1.0/0.1.0",
+              "version": "0.1.0",
+              "clock": "performance",
+              "randomizationAlgorithmVersion": "srl-fnv1a-xorshift32-weighted-backtrack-v1",
+              "trialEnvelopeVersion": 1,
+              "phases": [
+                {
+                  "key": "test",
+                  "persists": true,
+                  "required": true
+                }
+              ],
+              "measurementCriticalConfigPaths": [
+                "*"
+              ]
+            },
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c"
+          },
+          "randomSeed": "synthetic-srl-browser",
+          "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764"
+        },
+        "records": [
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 0,
+            "index": 0,
+            "raw": {
+              "plan": {
+                "index": 0,
+                "phase": "practice",
+                "round": 0,
+                "run": 0,
+                "position": 0,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 1
+              },
+              "startedAtPerfMs": 1334.1000000014901,
+              "endedAtPerfMs": 1616.5,
+              "status": "completed",
+              "firstLocation": 2,
+              "firstRtMs": 161.39999999850988,
+              "firstCorrect": false,
+              "correctAtMs": 1616.5,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 1495.5,
+                  "location": 2,
+                  "input": "touch"
+                },
+                {
+                  "kind": "tap",
+                  "atMs": 1616.5,
+                  "location": 1,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:0:0",
+            "recordDigest": "2747e5449dc267cf67fbc57a57d36c9820df520ee40d92e9c17b3232ca25da29"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 0,
+            "index": 1,
+            "raw": {
+              "plan": {
+                "index": 1,
+                "phase": "practice",
+                "round": 0,
+                "run": 0,
+                "position": 1,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 0
+              },
+              "startedAtPerfMs": 1744.1000000014901,
+              "endedAtPerfMs": 1800.4000000003725,
+              "status": "completed",
+              "firstLocation": 0,
+              "firstRtMs": 56.29999999888241,
+              "firstCorrect": true,
+              "correctAtMs": 1800.4000000003725,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 1800.4000000003725,
+                  "location": 0,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:0:1",
+            "recordDigest": "ad9987343d829b0ba47ddc2f2a22ea954bfc57049454d75f39b31f6c9b350cd1"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 0,
+            "index": 2,
+            "raw": {
+              "plan": {
+                "index": 2,
+                "phase": "practice",
+                "round": 0,
+                "run": 0,
+                "position": 2,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 3
+              },
+              "startedAtPerfMs": 1914.9000000003725,
+              "endedAtPerfMs": 2022.300000000745,
+              "status": "completed",
+              "firstLocation": 3,
+              "firstRtMs": 107.40000000037253,
+              "firstCorrect": true,
+              "correctAtMs": 2022.300000000745,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 2022.300000000745,
+                  "location": 3,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:0:2",
+            "recordDigest": "56c86b62c11392dcdc450eb2f7cd0f89e900e5beb6c0f5c130c7539fb5a50012"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 0,
+            "index": 3,
+            "raw": {
+              "plan": {
+                "index": 3,
+                "phase": "practice",
+                "round": 0,
+                "run": 0,
+                "position": 3,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 2
+              },
+              "startedAtPerfMs": 2160.10000000149,
+              "endedAtPerfMs": 2270,
+              "status": "completed",
+              "firstLocation": 2,
+              "firstRtMs": 109.89999999850988,
+              "firstCorrect": true,
+              "correctAtMs": 2270,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 2270,
+                  "location": 2,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:0:3",
+            "recordDigest": "d8f0f4fe76e5072d3ea46b400d2ba2d0b3ed788f2faacb110645e12fb05c0340"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 1,
+            "index": 0,
+            "raw": {
+              "plan": {
+                "index": 0,
+                "phase": "practice",
+                "round": 1,
+                "run": 0,
+                "position": 0,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 2
+              },
+              "startedAtPerfMs": 2766.300000000745,
+              "endedAtPerfMs": 2840.2000000011176,
+              "status": "completed",
+              "firstLocation": 2,
+              "firstRtMs": 73.90000000037253,
+              "firstCorrect": true,
+              "correctAtMs": 2840.2000000011176,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 2840.2000000011176,
+                  "location": 2,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:1:0",
+            "recordDigest": "3721aa2cfe252ea49bfc5bc083e1988eb490cb712ca3ea1f12f753a8db004cfe"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 1,
+            "index": 1,
+            "raw": {
+              "plan": {
+                "index": 1,
+                "phase": "practice",
+                "round": 1,
+                "run": 0,
+                "position": 1,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 0
+              },
+              "startedAtPerfMs": 3059.2000000011176,
+              "endedAtPerfMs": 3188.4000000003725,
+              "status": "completed",
+              "firstLocation": 0,
+              "firstRtMs": 129.19999999925494,
+              "firstCorrect": true,
+              "correctAtMs": 3188.4000000003725,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 3188.4000000003725,
+                  "location": 0,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:1:1",
+            "recordDigest": "fc6ec39be87f2d4db29e1508de4bf19ca49946a510b46be6e0237aa7412d881c"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 1,
+            "index": 2,
+            "raw": {
+              "plan": {
+                "index": 2,
+                "phase": "practice",
+                "round": 1,
+                "run": 0,
+                "position": 2,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 1
+              },
+              "startedAtPerfMs": 3381.4000000003725,
+              "endedAtPerfMs": 3563,
+              "status": "completed",
+              "firstLocation": 1,
+              "firstRtMs": 181.59999999962747,
+              "firstCorrect": true,
+              "correctAtMs": 3563,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 3563,
+                  "location": 1,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:1:2",
+            "recordDigest": "a773677fd8155a2d603a1cb3d2a2ebb319b230ed1093362cf651d372a79b39ae"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "practice",
+            "round": 1,
+            "index": 3,
+            "raw": {
+              "plan": {
+                "index": 3,
+                "phase": "practice",
+                "round": 1,
+                "run": 0,
+                "position": 3,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 3
+              },
+              "startedAtPerfMs": 3752.60000000149,
+              "endedAtPerfMs": 3846.10000000149,
+              "status": "completed",
+              "firstLocation": 3,
+              "firstRtMs": 93.5,
+              "firstCorrect": true,
+              "correctAtMs": 3846.10000000149,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 3846.10000000149,
+                  "location": 3,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "practice:1:3",
+            "recordDigest": "c3bbbb838596c463e2d8969410b785faa574cf04ccbbd4401460491ba7659dcb"
+          },
+          {
+            "contextKey": "synthetic-srl-browser:epoch-1",
+            "phase": "test",
+            "round": 0,
+            "index": 0,
+            "raw": {
+              "plan": {
+                "index": 0,
+                "phase": "test",
+                "round": 0,
+                "run": 0,
+                "position": 0,
+                "sequenceVariant": 0,
+                "source": "R",
+                "condition": "R",
+                "target": 3
+              },
+              "startedAtPerfMs": 4111.10000000149,
+              "endedAtPerfMs": 4522.200000001118,
+              "status": "completed",
+              "firstLocation": 0,
+              "firstRtMs": 217.2999999988824,
+              "firstCorrect": false,
+              "correctAtMs": 4522.200000001118,
+              "events": [
+                {
+                  "kind": "tap",
+                  "atMs": 4328.4000000003725,
+                  "location": 0,
+                  "input": "touch"
+                },
+                {
+                  "kind": "tap",
+                  "atMs": 4522.200000001118,
+                  "location": 3,
+                  "input": "touch"
+                }
+              ],
+              "ignoredInputCount": 0
+            },
+            "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+            "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+            "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+            "realm": {
+              "timeOriginMs": 1793108758931.8,
+              "pageInstanceId": "7ce9236f-7cd3-4bdf-bc16-f1ebfb5410c4"
+            },
+            "recordKey": "test:0:0",
+            "recordDigest": "c5697723c071c4324770aced825c1e8aa0e77135082a050f29e9243e91d7257d"
+          }
+        ],
+        "claim": {
+          "contextKey": "synthetic-srl-browser:epoch-1",
+          "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+          "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+          "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+          "formalCount": 1,
+          "practiceCount": 8,
+          "termination": "aborted",
+          "terminationReason": "participant-ended",
+          "recordDigests": [
+            "2747e5449dc267cf67fbc57a57d36c9820df520ee40d92e9c17b3232ca25da29",
+            "ad9987343d829b0ba47ddc2f2a22ea954bfc57049454d75f39b31f6c9b350cd1",
+            "56c86b62c11392dcdc450eb2f7cd0f89e900e5beb6c0f5c130c7539fb5a50012",
+            "d8f0f4fe76e5072d3ea46b400d2ba2d0b3ed788f2faacb110645e12fb05c0340",
+            "3721aa2cfe252ea49bfc5bc083e1988eb490cb712ca3ea1f12f753a8db004cfe",
+            "fc6ec39be87f2d4db29e1508de4bf19ca49946a510b46be6e0237aa7412d881c",
+            "a773677fd8155a2d603a1cb3d2a2ebb319b230ed1093362cf651d372a79b39ae",
+            "c3bbbb838596c463e2d8969410b785faa574cf04ccbbd4401460491ba7659dcb",
+            "c5697723c071c4324770aced825c1e8aa0e77135082a050f29e9243e91d7257d"
+          ],
+          "finalPayloadDigest": "2f19ec5276c9694ed0c1ff2bdbb731b7ab89a656970cb1e7039a97c26dbf9861"
+        }
+      },
+      "result": {
+        "score": {
+          "metrics": {
+            "counts": {
+              "planned": 168,
+              "presented": 1,
+              "answered": 1,
+              "firstCorrect": 0,
+              "completed": 1,
+              "interrupted": 0,
+              "unanswered": 0,
+              "unpresented": 167,
+              "corrections": 1
+            },
+            "runs": [
+              {
+                "run": 0,
+                "R": {
+                  "planned": 40,
+                  "presented": 1,
+                  "answered": 1,
+                  "firstCorrect": 0,
+                  "completed": 1,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "S": {
+                  "planned": 40,
+                  "presented": 0,
+                  "answered": 0,
+                  "firstCorrect": 0,
+                  "completed": 0,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "tail": {
+                  "planned": 4,
+                  "presented": 0,
+                  "answered": 0,
+                  "firstCorrect": 0,
+                  "completed": 0,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "deltaMs": null
+              },
+              {
+                "run": 1,
+                "R": {
+                  "planned": 40,
+                  "presented": 0,
+                  "answered": 0,
+                  "firstCorrect": 0,
+                  "completed": 0,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "S": {
+                  "planned": 40,
+                  "presented": 0,
+                  "answered": 0,
+                  "firstCorrect": 0,
+                  "completed": 0,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "tail": {
+                  "planned": 4,
+                  "presented": 0,
+                  "answered": 0,
+                  "firstCorrect": 0,
+                  "completed": 0,
+                  "interrupted": 0,
+                  "unanswered": 0,
+                  "correctRtMs": null
+                },
+                "deltaMs": null
+              }
+            ],
+            "firstAccuracy": 0,
+            "deltaMs": null,
+            "reportBinding": {
+              "testType": "serial-reaction-learning",
+              "engineVersion": "0.1.0",
+              "scoringVersion": "0.1.0",
+              "configVersion": "0.1.0",
+              "profile": "experience",
+              "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+              "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+              "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+              "parameterInterpretationVersion": "0.1.0",
+              "reportDefinitionVersion": "0.1.0",
+              "presentationVersion": "0.1.0",
+              "sourceVersion": "hodel-2014-published-spatial-sequences-and-project-R30-v1"
+            }
+          },
+          "quality": {
+            "state": "limited",
+            "flags": {
+              "noFirstResponses": false,
+              "incompletePlan": true,
+              "technicalInterruption": false,
+              "lowConditionFirstAccuracy": true,
+              "missingContrast": true
+            },
+            "reasons": [
+              "incompletePlan",
+              "lowConditionFirstAccuracy",
+              "missingContrast"
+            ]
+          },
+          "audit": {
+            "trialCount": 1,
+            "scorerVersion": "0.1.0"
+          }
+        },
+        "report": {
+          "testType": "serial-reaction-learning",
+          "engineVersion": "0.1.0",
+          "scoringVersion": "0.1.0",
+          "configVersion": "0.1.0",
+          "profile": "experience",
+          "configHash": "be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d",
+          "protocolSignature": "addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c",
+          "manifestHash": "e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764",
+          "parameterInterpretationVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0",
+          "sourceVersion": "hodel-2014-published-spatial-sequences-and-project-R30-v1",
+          "state": "limited",
+          "progress": {
+            "planned": 168,
+            "presented": 1,
+            "completed": 1
+          },
+          "summary": null
+        }
+      }
+    }
+  ]
+}

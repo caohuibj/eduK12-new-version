@@ -1,0 +1,9 @@
+{
+  "synthetic": true,
+  "participantData": false,
+  "originalSha256": "be40a2a4adac2357d376deee51edc3e67fb6ddb1c62b516c83aa0ee885e952e2",
+  "replayedNativeCalls": 1,
+  "scoreAndReportIdentical": true,
+  "change": "Final guards reject a2049th tap and map only actual blur/visibility events; existing captures and results unchanged",
+  "browserFlowRepeated": false
+}

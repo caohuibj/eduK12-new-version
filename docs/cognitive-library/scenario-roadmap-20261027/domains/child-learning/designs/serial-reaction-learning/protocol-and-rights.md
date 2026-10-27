@@ -1,4 +1,6 @@
-# 来源与协议附录：serial-reaction-learning design R1
+# 来源与协议附录：serial-reaction-learning design R2
+
+用户已同意原设计，并确认体验版从三轮缩为两轮。本文件记录 R2 设计；科研版五轮不变。原 R1 历史保留在 Git 提交中，不覆盖成已批准的两轮。
 
 此文件用于审核设计，全部工程行为、参数和报告规则均为**提案**，没有可执行实现或实际冻结组合。主审入口是 [单张图片与中英简短介绍](README.md)。
 
@@ -31,11 +33,11 @@
 |profile 提案|完整轮数|实际呈现|呈现来源 S／R|分析 S／R|收尾排除|
 |---|---:|---:|---:|---:|---:|
 |research|5|420|250／170|200／200|20|
-|experience|3|252|150／102|120／120|12|
+|experience|2|168|100／68|80／80|8|
 
-每轮上述结构相同、每轮分析两类各 40 次。短版不删 R、不只保留最容易的 S、不缩短某条件，也不把前 252 次任意截断为短版。两版采用同一界面、说明、练习、输入和 500 ms 间隔；正式不显示条件切换或是否首答正确，不提示记忆重复顺序。拟用四格与 ★、同一手操作；布局由原按钮盒改成触屏，运动距离与输入等值未验证。两版没有正式反应倒计时；可结束，轮间可休息，额外休息／纠正会延长估时。
+每轮上述结构相同、每轮分析两类各 40 次。短版不删 R、不只保留最容易的 S、不缩短某条件，也不把前 168 次任意截断为短版。两版采用同一界面、说明、练习、输入和 500 ms 间隔；正式不显示条件切换或是否首答正确，不提示记忆重复顺序。拟用四格与 ★、同一手操作；布局由原按钮盒改成触屏，运动距离与输入等值未验证。两版没有正式反应倒计时；可结束，轮间可休息，额外休息／纠正会延长估时。
 
-时间预算是假设每次首答约 0.5–1.0 秒，加 0.5 秒间隔后，正式约 research 7–10.5 分钟、experience 4.2–6.3 分钟，再加初次说明／练习／短休息得到主简介范围；不是实测结果或完成期限。重复练习、更多错答、慢速回应均可能超过范围。
+时间预算是假设每次首答约 0.5–1.0 秒，加 0.5 秒间隔后，正式约 research 7–10.5 分钟、experience 2.8–4.2 分钟，再加初次说明／练习／短休息得到主简介范围；不是实测结果或完成期限。重复练习、更多错答、慢速回应均可能超过范围。
 
 ## 完整指导语、示例与练习提案
 
@@ -50,7 +52,7 @@
 1. 每次目标出现后，四个有效格的首次触点立即保留：位置、首答正确性、相对目标出现的首答时间。触屏格之外、预先触摸、多触点的取用规则需在获批实现前明确，不能把未识别输入算成正确。★ 仍在时后续纠正另记，完成所需用时单列；**首次错误不改写、首答时间不改成纠正时间**。
 2. 原论文记首按准确率／正确试次 RT；本项目核心 RT 只纳入**首次响应即正确**的试次，不用纠正成功的最终时间伪装首答正确 RT。后续纠正记录只解释任务过程，不加入主要 RT 比较。
 3. 条件准确率 = 该分析条件首答正确数 ÷ 该条件实际呈现且有首答的次数。同时保留该条件计划数、实际呈现数、无首答／中断数，不能只报一个掩盖缺失的比例。完整一轮该分母应为每类 40；被排除的收尾四次不混入条件分母，但保留其真实响应。报告总首答计数使用全部正式呈现（包括收尾），不含教学／练习；条件均值／差值使用上述 80 次分析分类，两种口径不可混淆。
-4. 对完整轮 j，`meanRT(R,j)`、`meanRT(S,j)` 分别为对应分析类别首答正确且有效 RT 的算术平均。`Δj = meanRT(R,j) − meanRT(S,j)`（ms）；总体 `Δ = (Σ Δj) / J`，完整轮等权，J 是该冻结 profile 的全部计划轮数（5 或 3），不悄悄只选表现较好的轮。每个均值必须同时保留真实有效次数。若任一必需条件没有 RT，差值为 null；不补零或填充样本。
+4. 对完整轮 j，`meanRT(R,j)`、`meanRT(S,j)` 分别为对应分析类别首答正确且有效 RT 的算术平均。`Δj = meanRT(R,j) − meanRT(S,j)`（ms）；总体 `Δ = (Σ Δj) / J`，完整轮等权，J 是该冻结 profile 的全部计划轮数（5 或 2），不悄悄只选表现较好的轮。每个均值必须同时保留真实有效次数。若任一必需条件没有 RT，差值为 null；不补零或填充样本。
 5. 正差仅表示这次记录中 S 比 R 快，负差表示 S 较慢，真实 0 表示两均值相同。速度必须结合首答准确率解释；负差／0 不改成失败，也不裁成正分。均值为真实 0 时保留 0；没有响应、未呈现、无法计算是 null，不是 0 ms、0% 或零能力。
 6. 自定步速没有固定反应截止，因此不发明“超时错答”。主动结束时区分当前已呈现但未答、已错答尚未纠正、已完成、后续未执行；这些不标为成功或都记为错误。原件保留全部状态和排除原因。
 
@@ -68,7 +70,7 @@
 - limited：“谢谢你已经付出的努力。这次{未完成／中断／有较多首答点错}，先不解释表现差别。可以休息后重新看说明，再决定是否完整体验；本次没有表现评分。” / “Thank you for the effort you have made. This session {was incomplete / was interrupted / contained many incorrect first taps}, so we will not interpret performance differences. Rest and review the instructions before deciding whether to try a complete session. No performance score is shown.”
 - invalid：“这次记录不足以可靠解释，所以没有生成表现结果。这不代表你的能力。准备好后可以重新开始。” / “The record cannot support a reliable description, so no performance result was generated. This does not reflect your ability. You may start again when ready.”
 
-协议 `serial-reaction-learning-protocol-proposal-r1`、解释 `serial-reaction-learning-interpretation-proposal-r1`、报告 `serial-reaction-learning-report-proposal-r1` 分开版本。批准后实际组合还须绑定 profile、十位置序列选择及匹配对照约束、实际参数、输入、指导语 language 与材料身份，不能重算旧报告。本包只列设计标识，没有实际运行 tuple。
+协议 `serial-reaction-learning-protocol-proposal-r2`、解释 `serial-reaction-learning-interpretation-proposal-r2`、报告 `serial-reaction-learning-report-proposal-r1` 分开版本。批准后实际组合还须绑定 profile、十位置序列选择及匹配对照约束、实际参数、输入、指导语 language 与材料身份，不能重算旧报告。本包只列设计标识，没有实际运行 tuple。
 
 ## 去重、归属、标签与交付范围
 

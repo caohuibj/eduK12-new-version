@@ -1,0 +1,35 @@
+{
+  view: 'running',
+  text: '练习 1/4\n点 ★ 所在的方格\n \n★\n \n \n\n看清再点，不要提前猜。\n\n结束本次活动',
+  events: [
+    { type: 'mouse', primary: true, label: null },
+    { type: 'mouse', primary: true, label: null },
+    { type: 'touch', primary: true, label: '左下' }
+  ],
+  records: []
+}
+{
+  view: 'practice-feedback',
+  text: '首次没有点到 ★\n\n要点 ★ 所在的方格；点错后纠正，不会改写首答。\n\n继续练习\n结束练习',
+  events: [
+    { type: 'mouse', primary: true, label: null },
+    { type: 'mouse', primary: true, label: null },
+    { type: 'touch', primary: true, label: '左下' },
+    { type: 'touch', primary: true, label: '右上' }
+  ],
+  records: [
+    {
+      contextKey: 'synthetic-srl-browser:epoch-1',
+      phase: 'practice',
+      round: 0,
+      index: 0,
+      raw: [Object],
+      configHash: 'be99ae76ed5b40482fc44ceba6110ee9a231cd1624ead1381a5bd5fb5ea2f47d',
+      protocolSignature: 'addc493011033eaca715ceda9ecb092fd2c7563615d19d22d3595e4bbe1f052c',
+      manifestHash: 'e417b022feb8980a89f16d4156af1dacd7879df231518244a52fd38bcc0e1764',
+      realm: [Object],
+      recordKey: 'practice:0:0',
+      recordDigest: '60ddbc5774f45589eb447f049d3412ce0f91c1e93d6ccf300a986171b959cefa'
+    }
+  ]
+}

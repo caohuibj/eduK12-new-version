@@ -1,0 +1,11 @@
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('button', { name: '继续练习', exact: true })[22m
+
+    at practice (/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/serial-reaction-learning-implementation/browser-check.cjs:9:424)
+    at async /workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/serial-reaction-learning-implementation/browser-check.cjs:10:2 {
+  log: [
+    "  - waiting for getByRole('button', { name: '继续练习', exact: true })"
+  ],
+  name: 'TimeoutError'
+}

@@ -1,0 +1,337 @@
+{
+  "candidate": "serial-reaction-learning",
+  "status": "CONTENT_CANDIDATE_PENDING_DOT_REVIEW_NOT_INTEGRATED",
+  "approval": "User approved original design and explicitly confirmed shortened experience: 2 runs, 168 trials, estimated 4–7 minutes",
+  "baseHead": "f3a5f270ba76b4b44a3b79299fdff4deb29c94bf",
+  "baseNumberSeriesSourceHead": "5db79eb8cfbbe97d05f048d50fd8bed3a1794391",
+  "capturedAt": "2026-10-27T13:55:23.343641+00:00",
+  "scope": [
+    "new SRL backend candidate only",
+    "new SRL React candidate only",
+    "new SRL test only",
+    "own child-learning design R2 and implementation evidence only"
+  ],
+  "profiles": {
+    "research": {
+      "runs": 5,
+      "trials": 420,
+      "analysis_R": 200,
+      "analysis_S": 200,
+      "tail": 20,
+      "estimatedMinutes": [
+        9,
+        14
+      ]
+    },
+    "experience": {
+      "runs": 2,
+      "trials": 168,
+      "analysis_R": 80,
+      "analysis_S": 80,
+      "tail": 8,
+      "estimatedMinutes": [
+        4,
+        7
+      ]
+    }
+  },
+  "tests": [
+    {
+      "reporter": "backend-attempt1.json",
+      "passed": 5,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "success": true
+    },
+    {
+      "reporter": "backend-final.json",
+      "passed": 4,
+      "failed": 0,
+      "filteredOrPending": 1,
+      "success": true
+    },
+    {
+      "reporter": "frontend-attempt1.json",
+      "passed": 5,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "success": true
+    },
+    {
+      "reporter": "frontend-final.json",
+      "passed": 6,
+      "failed": 0,
+      "filteredOrPending": 0,
+      "success": true
+    },
+    {
+      "reporter": "frontend-report-guard-final.json",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "success": true
+    },
+    {
+      "reporter": "backend-capacity-final.json",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "success": true
+    },
+    {
+      "reporter": "frontend-capacity-final.json",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "success": true
+    },
+    {
+      "reporter": "backend-interruption-final.json",
+      "passed": 1,
+      "failed": 0,
+      "filteredOrPending": 5,
+      "success": true
+    }
+  ],
+  "reuseBoundary": "Backend original unchanged condition-construction case retained from first5PASS; final run only four test-helper-affected cases, one filtered. Frontend final6PASS retained; only shared same-gesture guard case rerun after applying the identical guard to report root, five filtered. No filtered case called newly passed.",
+  "types": {
+    "backend": {
+      "reporter": "types-backend-final.json",
+      "component": "backend",
+      "roots": 10,
+      "sourceFiles": 50,
+      "diagnostics": 0
+    },
+    "frontendOriginalFailure": {
+      "reporter": "types-attempt1.json",
+      "component": "frontend",
+      "reason": "test ByRoleOptions did not accept exact; corrected test option only"
+    },
+    "frontendFinal": {
+      "reporter": "types-frontend-report-guard-final.json",
+      "component": "frontend",
+      "roots": 7,
+      "sourceFiles": 56,
+      "diagnostics": 0
+    }
+  },
+  "browser": {
+    "synthetic": true,
+    "participantData": false,
+    "browser": "151.0.7922.173",
+    "chromiumSandbox": false,
+    "sandboxReason": "isolated original local bundle; all external requests blocked; existing Chromium SUID sandbox unusable; no system permissions changed",
+    "layouts": [
+      {
+        "name": "phone instructions",
+        "width": 390,
+        "scroll": 390,
+        "cells": []
+      },
+      {
+        "name": "phone formal",
+        "width": 390,
+        "scroll": 390,
+        "cells": [
+          {
+            "width": 156,
+            "height": 156
+          },
+          {
+            "width": 156,
+            "height": 156
+          },
+          {
+            "width": 156,
+            "height": 156
+          },
+          {
+            "width": 156,
+            "height": 156
+          }
+        ]
+      },
+      {
+        "name": "tablet report",
+        "width": 820,
+        "scroll": 820,
+        "cells": []
+      },
+      {
+        "name": "tablet English instructions",
+        "width": 820,
+        "scroll": 820,
+        "cells": []
+      }
+    ],
+    "states": [
+      {
+        "state": "limited",
+        "performanceImageButtons": 0,
+        "performanceCounts": 0
+      },
+      {
+        "state": "invalid",
+        "performanceImageButtons": 0,
+        "performanceCounts": 0
+      }
+    ],
+    "downloadMatchesBackendProjection": true,
+    "nativeFinalizeCalls": 1,
+    "serverCalls": 0,
+    "requests": [],
+    "errors": [],
+    "centralizedAcceptance": false,
+    "bundleSha256": "f35731a249d3a95ed0c14b4e38769e8825975eb4b95302b8ebc7e9544097022e"
+  },
+  "preservedFailures": [
+    "types-attempt1.json frontend diagnostic",
+    "browser-attempt1.log: touch compatibility click auto-advanced practice",
+    "browser-attempt2.log: narrow trace identifies skipped practice index",
+    "browser-check-attempt1.cjs",
+    "browser-diagnostic.cjs",
+    "browser-diagnostic.log"
+  ],
+  "fixBoundary": "First pointerdown recording, stimulus positions, four practice items, formal counts and nominal500ms unchanged; suppress same-gesture compatibility click on future navigation/report controls; fresh gestures work.",
+  "originals": [
+    "synthetic-worked-originals.json",
+    "actual-browser-originals.json",
+    "browser-fixture.json"
+  ],
+  "participantData": false,
+  "newDependencies": false,
+  "externalTaskCodeCopied": false,
+  "externalRestrictedAssetsIncluded": false,
+  "coreAndArchive": "Ports remain candidate-local host requirements; synthetic memory fixture only. A native core/report receipt never claims raw archive success.",
+  "notExecuted": [
+    "old-task tests",
+    "full application build/types/test",
+    "CI",
+    "production/API/DB/COS",
+    "global registry or product entry integration",
+    "merge/deploy/activation",
+    "population or device validity study"
+  ],
+  "finalOriginalReplay": {
+    "synthetic": true,
+    "participantData": false,
+    "originalSha256": "be40a2a4adac2357d376deee51edc3e67fb6ddb1c62b516c83aa0ee885e952e2",
+    "replayedNativeCalls": 1,
+    "scoreAndReportIdentical": true,
+    "change": "Final guards reject a2049th tap and map only actual blur/visibility events; existing captures and results unchanged",
+    "browserFlowRepeated": false
+  },
+  "frontendTypeReuseAfterCapacity": "Pure mirrored module adds only local over-capacity rejection, no exports/imports/signatures changed; exact module compiled in backend final types and frontend capture target rerun. Other frontend types reused, not called fresh.",
+  "sourceManifestTiming": "Post-check readable source SHA256 manifest, not signed evidence or a contemporaneous complete environment archive. Source diff/reuse boundaries explicitly recorded above.",
+  "sourceManifest": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/serial-reaction-learning-content.test.ts",
+      "sha256": "1e33e76f7bb065a4d9b3ea2d1c3dd991de8eda038be01a22e4915280913811d2",
+      "bytes": 9130
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/analysis.ts",
+      "sha256": "baf673a9b928dfda20033bec44d08d6f640d0de5324d828dc67a5fecc7a82903",
+      "bytes": 1029
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/attempt.ts",
+      "sha256": "3b5f3352a35a5f718203a997c0752bec9446cec4f9e86d5974ea57094fcbb7c2",
+      "bytes": 4721
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/metadata.ts",
+      "sha256": "d59f8423532e9dc74ebf2083f93a4b1c90f254cc37aa36d478c6dbf1a77fc61a",
+      "bytes": 2190
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/package.ts",
+      "sha256": "3bb642a8347714eb7aa33fa8b6a5bd8fc27c087924e25d8f0793511a3cf699a2",
+      "bytes": 3142
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/participant-presentation.ts",
+      "sha256": "b1aeacd0383f87f04b4ebd358ede4dd1c9f8ff4f20979c0c19e5f05f92ea73f3",
+      "bytes": 953
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/protocol.ts",
+      "sha256": "5eed4acf63c3b1f65e4fc1041311315face8e4549ea4f2aaf210e3c5960404cf",
+      "bytes": 8110
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/report.ts",
+      "sha256": "5cb3cf3439654c0eb659c8c720cb103271ff1c07a11b8604fd78c833b64d2389",
+      "bytes": 11027
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/scorer.ts",
+      "sha256": "48340f1a167614128772907439caa97f554de075c1562480b1a8a4d1feb19a9e",
+      "bytes": 4757
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/validation.ts",
+      "sha256": "29f2ca39f4ce87206a2f07cf79f7803bb9fbe50707837ba1b853ee966b8589fe",
+      "bytes": 1256
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/Instructions.tsx",
+      "sha256": "bb18d68edff5ecb2ebd2f6074f8351abdaa035ecdf92094ccb9702c3804f84c9",
+      "bytes": 3297
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/Report.tsx",
+      "sha256": "f7c17540c1d17e1c3e1de8d1da5dcb678718f1efbbda391f103d644eeaa659ed",
+      "bytes": 1215
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/SerialReactionLearningTask.tsx",
+      "sha256": "608dba1117bca00915916550bc4f8d3e8df579eadcf2f3ae3842c27b22c00987",
+      "bytes": 8136
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/capture.ts",
+      "sha256": "c812b8f6a43173c2aeaf792282d8597c170fc5026be7095a317cea2bb2953ed8",
+      "bytes": 1861
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/content.test.tsx",
+      "sha256": "61c25fb465ab353bf979db3f2d91024dc966eceec00c8aa186432cf8c6a1a206",
+      "bytes": 10089
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/contracts.ts",
+      "sha256": "307bfa2ce0f7541705be91362081a78de7336061d1126aca4188cce033919463",
+      "bytes": 3235
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/generated/analysis.ts",
+      "sha256": "baf673a9b928dfda20033bec44d08d6f640d0de5324d828dc67a5fecc7a82903",
+      "bytes": 1029
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/generated/protocol.ts",
+      "sha256": "5eed4acf63c3b1f65e4fc1041311315face8e4549ea4f2aaf210e3c5960404cf",
+      "bytes": 8110
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/generated/report.ts",
+      "sha256": "5cb3cf3439654c0eb659c8c720cb103271ff1c07a11b8604fd78c833b64d2389",
+      "bytes": 11027
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/serial-reaction-learning.css",
+      "sha256": "b87f50b596a8c3fa74cc36d38bcf49cb9e81a8ad6a7a2a4148b384294ecdfcb8",
+      "bytes": 1185
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/serial-reaction-learning/session.ts",
+      "sha256": "5db99f65baa2db7e762c537196b55d1c846bfaf95aa648b06d298c2450a97175",
+      "bytes": 8913
+    }
+  ],
+  "designR2Image": {
+    "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/designs/serial-reaction-learning/serial-reaction-learning-review.png",
+    "sha256": "7bf3b924824b9365bf87ac61e07642b60cf7d8afd224480ccd865ffeff4ffc4b"
+  }
+}

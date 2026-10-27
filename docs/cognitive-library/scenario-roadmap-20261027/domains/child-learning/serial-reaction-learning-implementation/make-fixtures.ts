@@ -1,0 +1,15 @@
+import {writeFileSync} from 'node:fs'
+import {sha256} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/v2/canonical'
+import {createSnapshot} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/package'
+import {planFor,type Plan,type Raw,type Location} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/protocol'
+import {scoreSerialReactionLearning,envelopeFor} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/scorer'
+import {projectReport,reportText,takeHomeSvg} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/serial-reaction-learning/report'
+const root='/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/child-learning/serial-reaction-learning-implementation',randomSeed='synthetic-srl-browser',snapshot=createSnapshot('experience','2026-10-27T00:00:00.000Z'),formal=planFor(snapshot.config,randomSeed)
+const context={contextKey:'synthetic-srl-browser:epoch-1',language:'zh',snapshot,randomSeed,manifestHash:sha256(formal)}
+function raw(p:Plan,rt:number,wrong=false):Raw{const start=100+p.index*10000,first=(wrong?(p.target+1)%4:p.target) as Location,events:Raw['events']=[{kind:'tap',atMs:start+rt,location:first,input:'touch'}];if(wrong)events.push({kind:'tap',atMs:start+rt+100,location:p.target,input:'touch'});return {plan:p,startedAtPerfMs:start,endedAtPerfMs:events[events.length-1].atMs,status:'completed',firstLocation:first,firstCorrect:!wrong,firstRtMs:rt,correctAtMs:events[events.length-1].atMs,events,ignoredInputCount:0}}
+const variants={positive:formal.map(p=>raw(p,p.condition==='S'?500:1000,p.position===8)),negative:formal.map(p=>raw(p,p.condition==='S'?1000:500)),zero:formal.map(p=>raw(p,0)),limited:[raw(formal[0],100,true)],invalid:[] as Raw[]}
+const cases=Object.fromEntries(Object.entries(variants).map(([name,records])=>{const score=scoreSerialReactionLearning({session:snapshot,config:snapshot.config,randomSeed,trials:records.map(envelopeFor)}),report=projectReport(score);return [name,{synthetic:true,records,score,report,text:{zh:reportText(report,'zh'),en:reportText(report,'en')},svg:{zh:takeHomeSvg(report,'zh'),en:takeHomeSvg(report,'en')}}]}))
+writeFileSync(root+'/synthetic-worked-originals.json',JSON.stringify({synthetic:true,participantData:false,context,cases},null,2)+'\n')
+writeFileSync(root+'/browser-fixture.json',JSON.stringify({synthetic:true,context,practice:[0,1,2].map(round=>planFor(snapshot.config,randomSeed,'practice',round)),formal,reports:Object.fromEntries(Object.entries(cases).map(([name,c])=>[name,c.report]))},null,2)+'\n')
+writeFileSync(root+'/synthetic-summary.svg',cases.positive.svg.zh!)
+console.log(JSON.stringify(Object.fromEntries(Object.entries(cases).map(([name,c])=>[name,{state:c.report.state,summary:c.report.summary}]))))
