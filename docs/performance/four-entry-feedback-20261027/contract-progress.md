@@ -26,3 +26,25 @@
 新增无副作用的精确来源草稿合同：独立教育runtime、product/organization身份、每单元C/P/R固定ID和hash、显式空参数/报告、重复/跨层冲突拒绝。复用既有关系条目和披露合同校验，只能产生DRAFT，不能通过HTTP布尔值成为PUBLISHED。7项初轮PASS；增加同ID跨层冲突断言后只补该项1PASS/6filtered。后端最终本地tsc exit0。该模块尚未接入持久化/发布消费者，不把它称为已可用资源登记。
 
 下一步必须由真实发布/授权服务读取并校验各层来源、许可、scope、受众、当前审批身份，再绑定到运行和报告；不能将本合同的结构校验当内容授权。正式CI/PG/浏览器仍未运行。
+
+## 第四切片（实施中）：投放元数据与真实来源读取
+
+增加单张education_assessment_deliveries元数据表及精确runtime-table-policy项，不复制答卷/原始事件，不替代C/P/R表。状态只能从未批准DRAFT进入独立REVIEWED、PUBLISHED、RETIRED；来源/组织/产品/运行目标/原审核身份不可改写，禁止删历史或复活。
+
+新内部identity reader核持久化entry hash、产品/组织命名空间、独立审核记录、真实ORGANIZATION_RESOURCE目标、完整runtime快照hash、单元来源绑定、参数选择与报告pointer，批量读取既有C/P/R发布对象；Teacher/School私有报告须匹配原产品、runtime owner和受众。返回identityOnly，不授予调用者使用、发布或报告权。尚未接入用户API，不计为功能完成。
+
+开发证据：reader初轮7PASS，后补报告跨产品/owner/audience及参数未绑定反例首轮2FAIL（7 filtered）：修改fixture的origin后漏更新educationOriginHash，真实identity校验正确提前拒绝；只修合成fixture，不弱化校验，定向复验2PASS/7filtered，原失败保留。该未推送阶段的初始说明曾提前填PASS，已在推送前纠正为实际失败→修正结果。真实PG17.11独立临时cluster使用最小父表执行原迁移SQL、7项拒绝断言和合法完整状态路径PASS；原件在schema-guard-evidence。**这只是数据库约束验证，不是全量旧schema升级、真实业务发布或PG16正式CI资格。**自有PG已停止。
+
+后端types-r3首轮52行诊断由never helper的控制流收窄未识别引起，改为显式function声明（无断言降级）后types-r4 exit0；其后新增两个测试仍需最终类型闭包。原失败保留。未启动正式CI、未部署。
+
+独立复核又补到一个身份边界：仅C/P/R snapshot不足以绑定组合中的Form字段和单元顺序。现新增runtimeDefinitionHash，直接复用buildTrainingFlowUnits及既有表单definition hash，读取时核对required/顺序/Form定义；不新造引擎。受影响两文件在新定义身份下完整17PASS。该合同变化需要最终类型检查，尚未把旧类型结果重标为新结果。
+
+## 原始授权证明与现有注册消费者接线
+
+进一步复核不能只记录“原审核者是谁”：原委托撤销后，同一人后来得到其他管理员资格也不应替代原证明。现持久化创建/审核/发布各自的SYSTEM_ADMIN身份或精确PRODUCT_ADMIN membership/grant，或PSYCHOLOGY_STAFF membership/persona/capability IDs；当前复核只检查原证明分支，不回退其他角色。迁移禁止替换这些原证明。
+
+新namespace已接入既有resolveReleasedRelationalEntry、resolveHistoricalRelationalEntry和assertRegisteredResourceUse。新增使用核实际Run所属School活动/Teacher事件、当前组织管理边界、精确组织/产品/家族及原授权证明，组织锁先于source锁；读取identity仍不等于报告授权。不创建新的内容能力根授权、不自动开放实际工具。
+
+新增授权与来源两文件在新证明合同下18PASS。修改后的实际PG17迁移重新在独立新cluster执行，8项拒绝与合法生命周期PASS，原7项仅保留为前一迁移输入历史；新原件delivery-assertions-r2.sql、delivery-guards-pg17-r2.log，旧迁移原文migration-r1.sql。最终后端types-r6 exit0。都不是正式PG16/全schema升级/端到端资格。
+
+未闭环项：实际来源登记/审核/发布API、原内容素材/跨产品分发检查、跨批次issuer锁次序与并发撤回真实PG、START时当前来源检查、Teacher运行前后端、获准反馈及最终CI。没有这些证据前不激活或合并。平台原审核者当前role检查与组织grant检查的并发撤回串行边界需要在完整发布/START事务中继续验证，不能把单元mock算作竞态证明。

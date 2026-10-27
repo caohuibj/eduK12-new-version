@@ -166,6 +166,7 @@
     "questionnaire_scales": "RUNTIME_RW",
     "questionnaires": "RUNTIME_RW",
     "registered_assessment_resources": "RUNTIME_RW",
+    "education_assessment_deliveries": "RUNTIME_RW",
     "relational_analysis_snapshots": "RUNTIME_RW",
     "relational_assessment_assignments": "RUNTIME_RW",
     "reporting_analysis_artifact_waves": "RUNTIME_RW",

@@ -4,6 +4,14 @@ import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../
 import {validateResultDisclosureContract} from '../assessment-policy/result-disclosure'
 
 const id=z.string().guid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
+// Captured from server-side authority reads at each lifecycle transition.
+// An actor acquiring a different later role/grant cannot repair a revoked proof.
+export const educationDeliveryAuthoritySchema=z.discriminatedUnion('kind',[
+ z.object({kind:z.literal('SYSTEM_ADMIN'),actorId:id}).strict(),
+ z.object({kind:z.literal('PRODUCT_ADMIN'),actorId:id,membershipId:id,grantId:id}).strict(),
+ z.object({kind:z.literal('PSYCHOLOGY_STAFF'),actorId:id,membershipId:id,personaGrantId:id,capabilityGrantId:id}).strict(),
+])
+export type EducationDeliveryAuthority=z.infer<typeof educationDeliveryAuthoritySchema>
 const pointer=z.object({releaseId:id,contentHash:digest}).strict()
 const unit=z.object({
   itemId:id,family:z.enum(['SCALE','COGNITIVE','SJT']),
@@ -18,7 +26,7 @@ export const educationAssessmentOriginSchema=z.object({
   schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),resourceId:id,
   product:z.enum(['SCHOOL','TEACHER']),organizationId:id,
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
-  sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,
+  sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
   units:z.array(unit).min(1).max(1000),
 }).strict().superRefine((origin,ctx)=>{
   const add=(message:string)=>ctx.addIssue({code:'custom',message})
@@ -35,6 +43,7 @@ export const educationAssessmentOriginSchema=z.object({
       identities.set(ref.releaseId,{hash:ref.contentHash,layer})
     }
   }
+  if(identities.size>1000)add('Release lookup bound exceeded')
 })
 export type EducationAssessmentOrigin=z.infer<typeof educationAssessmentOriginSchema>
 export const educationAssessmentResourceKey=(origin:EducationAssessmentOrigin)=>
