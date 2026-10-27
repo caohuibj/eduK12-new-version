@@ -1,0 +1,10 @@
+import { z } from 'zod'
+import { assertIstConfig, type IstConfig, type IstRaw } from './protocol'
+export const istConfigSchema = z.custom<IstConfig>(v => { try { assertIstConfig(v); return true } catch { return false } })
+const time = z.number().finite().nonnegative(), count = z.number().int().nonnegative(), category = z.enum(['blue-circle', 'orange-triangle']), rule = z.enum(['fixed', 'decreasing']), input = z.enum(['touch', 'mouse', 'pen', 'keyboard', 'assistive']), token = z.string().min(1).max(80)
+const action = z.object({ kind: z.enum(['down', 'up', 'cancel', 'activate']), atMs: time, target: token, input, token, key: z.enum(['Enter', 'Space']).nullable(), repeat: z.boolean() }).strict()
+export const istRawSchema = z.object({
+  plan: z.object({ index: count.max(19), phase: z.enum(['practice', 'test']), round: count.max(2), block: count.max(1), rule, majorityCount: z.number().int().min(13).max(21), majority: category, board: z.array(category).length(25), optionOrder: z.array(category).length(2) }).strict(),
+  startedAtPerfMs: time, endedAtPerfMs: time, status: z.enum(['complete', 'interrupted']), stopReason: z.string().min(1).max(100).nullable(), events: z.array(z.union([action, z.object({ kind: z.literal('feedback-ended'), atMs: time }).strict()])).max(256),
+  state: z.object({ stage: z.enum(['sampling', 'feedback', 'complete']), reveals: z.array(z.object({ cell: count.max(24), category, atMs: time, input }).strict()).max(25), decision: z.object({ category, atMs: time, rtMs: time, input, revealedCount: count.max(25), correct: z.boolean(), points: z.number().int().min(-100).max(250) }).strict().nullable(), held: z.array(z.object({ token, target: token, input, key: z.enum(['Enter', 'Space']).nullable(), startedAtMs: time, eligible: z.boolean() }).strict()).max(256), feedbackUntilMs: time.nullable(), completeAtMs: time.nullable(), ignored: z.object({ duplicate: count, inactive: count, unmatched: count, multiContact: count }).strict() }).strict(), ignoredRepeatCount: count, overflow: z.boolean(),
+}).strict() satisfies z.ZodType<IstRaw>

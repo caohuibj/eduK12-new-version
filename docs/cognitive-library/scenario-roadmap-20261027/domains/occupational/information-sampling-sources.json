@@ -1,0 +1,54 @@
+{
+  "status": "USER_APPROVED_IMPLEMENTATION_CANDIDATE_NOT_DOT_REVIEWED_NOT_INTEGRATED",
+  "sourceFiles": [
+    {
+      "repository": "expfactory/expfactory-experiments",
+      "commit": "49b8123f18b26d94dfc010bb8a6ec7458b265e2e",
+      "path": "information_sampling_task/experiment.js",
+      "blob": "435a8e1fefc13e3a60e214dc76f08f121728d306",
+      "sha256": "9aecae736211a5036fbe570a52ec70a1c544626b76014066b07fd5e0a522983d",
+      "byteLength": 19558,
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/information_sampling_task/experiment.js",
+      "observed": "2026-10-27",
+      "executed": false
+    },
+    {
+      "repository": "expfactory/expfactory-experiments",
+      "commit": "49b8123f18b26d94dfc010bb8a6ec7458b265e2e",
+      "path": "LICENSE",
+      "blob": "7ef17fe706ce88195e18473069d561dd4910a5ee",
+      "sha256": "aa4ae580fda10274025d5b8de586822deb3c6c60d459c3b3ae646c87557993aa",
+      "byteLength": 1102,
+      "url": "https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/LICENSE",
+      "observed": "2026-10-27",
+      "executed": false
+    }
+  ],
+  "rights": {
+    "item": "information-sampling",
+    "code": "MIT; retain copyright and permission notice for copies or substantial portions",
+    "sourceImages": "not independently cleared; not imported",
+    "sourceItemBank": "no restricted/private bank obtained; source assets/items not imported",
+    "sourceTranslation": "no independently cleared Chinese version obtained; no source translation copied",
+    "projectImages": "original HTML/CSS geometry and numeric illustrative panels",
+    "projectInstructions": "original Chinese and English draft, translation equivalence unvalidated",
+    "publicDistribution": "only original design artifacts and references in this package; no third-party images/fonts/banks/code copied",
+    "runtimeDependencies": "not imported or approved by source root license"
+  },
+  "literature": [
+    {
+      "doi": "10.1016/j.biopsych.2005.11.007",
+      "depth": "official linked PubMed metadata; original direct page returned no useful body; full methods not re-read"
+    },
+    {
+      "doi": "10.1016/j.biopsych.2016.05.027",
+      "depth": "official PubMed linked metadata only"
+    },
+    {
+      "doi": "10.1016/j.biopsych.2016.06.018",
+      "depth": "PubMed metadata, no abstract available"
+    }
+  ],
+  "approvedImageSHA256": "d0a2805ad553b259c8ed89915ad174a003302c4ccd9662c3389ed1cd31a38a61",
+  "rightsNote": "Original shapes, bilingual copy and own TS; no upstream PNG/runtime/private banks/brand copied. MIT reference notice retained in task NOTICE."
+}

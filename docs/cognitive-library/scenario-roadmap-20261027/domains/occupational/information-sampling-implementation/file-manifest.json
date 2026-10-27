@@ -1,0 +1,216 @@
+{
+  "status": "CONTENT_CANDIDATE_NOT_DOT_REVIEWED_NOT_INTEGRATED",
+  "base": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/dedup-index.md",
+      "bytes": 8335,
+      "sha256": "3bdaf2365d9294621b85c296f3b0f74bd0243db593734062f7315f9b4adaef6f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-REVIEW.md",
+      "bytes": 3423,
+      "sha256": "6624b9f1689714bb5a7f704475f81772cdd1d99bf936b2044d57bd236539711b"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-appendix.md",
+      "bytes": 10687,
+      "sha256": "8f696d0bce2bd43fde1590b906c4af0144a1a4229894a9ee5eaed6f01b0f478d"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-brief.md",
+      "bytes": 2196,
+      "sha256": "46c6d978bc5f98ae93546f3a795ca9c8c61102ecd625b16df13819dc5de76f5a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/README.md",
+      "bytes": 6944,
+      "sha256": "e265895348a25d6f36a61f227ebd9e72a25edc3068246b841fb36528e61a6d8f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/affected-types.cjs",
+      "bytes": 2173,
+      "sha256": "e0805b029a5af6b1124713574ad30d3de1f53e9dda2c5772e9f87c5ad7690015"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/backend-first.json",
+      "bytes": 2783,
+      "sha256": "a27e9f7dd74512a2aa09a0288a3d3383b1b832c9a0ee7c2a289e78920f59e7c2"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-final.json",
+      "bytes": 2910,
+      "sha256": "1850f97b6ba878e2ea555ebdb832833ef921f009be158341ddba39c8a1347ce3"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-first.json",
+      "bytes": 2968,
+      "sha256": "3666163868428c82bc60a8b83abb14c486ce385b19a892430fbb2c1dc9976242"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-lint-clean-import.json",
+      "bytes": 300,
+      "sha256": "d5f77bd7cdfb91fab8180702c21aa1388b1619d148a163b9b049315cc461fbe1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-lint.json",
+      "bytes": 13791,
+      "sha256": "f3ba97afc64645e955c56e9c14b70d7acec2b8a261c992d97c2171190f11bc21"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-example.json",
+      "bytes": 157354,
+      "sha256": "826ab36879585e0a80bceed9cb590eb2e96c7a18086278771292644538a92d96"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-example.ts",
+      "bytes": 3662,
+      "sha256": "5bce27d0ab3fdbd13729911bdf7b9e6162d0e2d9957c64d701790de63400cf7a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-public-report.json",
+      "bytes": 4703,
+      "sha256": "1dca97729bea41a0385173b6699136b650de403dc7c2159511b08fe2b3fbbd78"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-clean-imports.json",
+      "bytes": 20530,
+      "sha256": "24cf6734a5bc94d5c0c516ad8c7fe9b151e228ffe833b06d3c891b0a8b8d66d9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-first.json",
+      "bytes": 20530,
+      "sha256": "639387d8bb84508b3480f2d29910fdc228c61644e56d1034370bb7c188d17d0e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-frontend-final.json",
+      "bytes": 10731,
+      "sha256": "56a9fa60d8cd5e1a0abdcf0e64ac43c6900a1a9c98d986b1c71e3579fc1d7b0a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/validation.json",
+      "bytes": 11596,
+      "sha256": "cf90bc82f7d7d0306984ae502793f259cb1fc551cccd319a5bdd0d564b6b3467"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-phone.png",
+      "bytes": 393713,
+      "sha256": "743f53c74cbab8d736aa17932910e0648a9423b740a16b4d7537209e55deb29e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-review.html",
+      "bytes": 9459,
+      "sha256": "6a873f4862fc51f0379ad821a642c1aa0bf5d5e6d3181d5f76fa1758db3e20ba"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-review.png",
+      "bytes": 401956,
+      "sha256": "d0a2805ad553b259c8ed89915ad174a003302c4ccd9662c3389ed1cd31a38a61"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-sources.json",
+      "bytes": 2683,
+      "sha256": "b7fa3308034acf9dd0ff24c41349251abb535cb9397af2f152374e6562e5a54f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-tablet.png",
+      "bytes": 402647,
+      "sha256": "ebded1b4a11568cf26d4b0e61830c9f4b443cc5a743214fce21bea1128c4905b"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/information-sampling-content.test.ts",
+      "bytes": 8887,
+      "sha256": "2212f965de34c2db0621c3f6cdc3933f375e296ab53ef21a2d463320d5986889"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/NOTICE",
+      "bytes": 1744,
+      "sha256": "4f8479cc05daccb60776871d9a2d19b1f278b22c9b539a799427588dd1e98f2d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/metadata.ts",
+      "bytes": 2020,
+      "sha256": "5819e95b88d3e254d7b5e9c5564411a39745c0e36dd769f389ecc824783018a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+      "bytes": 3456,
+      "sha256": "581e5d23d6c6a07455d33f26a6dac30eb472dad23a6b028c900c512ba70775c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/participant-presentation.ts",
+      "bytes": 1209,
+      "sha256": "7422be57a5915eb2f5a1cc262213512669fc5804f13ce7967270580aff0eed28"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+      "bytes": 10599,
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+      "bytes": 10629,
+      "sha256": "7aa0285555216899b8658d2a552ee5d11cf284b5eeedac11d27ef716962c202d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/schema.ts",
+      "bytes": 2073,
+      "sha256": "f52d2144043ef824edbe06f9b5081445b9989e22f52b01b125646c8797103540"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+      "bytes": 5512,
+      "sha256": "25d17904f9b41338400aa13ed4edb1d83677612e92ba3afa42d54cb736ed67af"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstInstructions.tsx",
+      "bytes": 7396,
+      "sha256": "af7c88a9c3c357feee7bd7bcf578804a60cf47988b54e2f6b459f451ce08b9e3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstReport.tsx",
+      "bytes": 6002,
+      "sha256": "a180c59c180f253cfe4b0f865c9dc6de0849012e96febe8ba72c0405fde8eeaf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstTask.tsx",
+      "bytes": 16326,
+      "sha256": "15f30977d1145f0f2f187ed11e528be3e42d98fe14bb0181f9f2c2e70d754517"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/capture.ts",
+      "bytes": 1895,
+      "sha256": "0376bd4a705a701ab6960fc26af971c0604d55c163218cc79d20bcac4a954224"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+      "bytes": 15255,
+      "sha256": "dbdc071223995f107ba9ec2c40925b456840ac287bb5eff0995d293aae44aff6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/contracts.ts",
+      "bytes": 3379,
+      "sha256": "e5e314b59004ab552dc0befc38b787ccaebf727a51b29a41c3d2a60f52fa9134"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/protocol.ts",
+      "bytes": 10599,
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/report.ts",
+      "bytes": 10629,
+      "sha256": "7aa0285555216899b8658d2a552ee5d11cf284b5eeedac11d27ef716962c202d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/ist.css",
+      "bytes": 2670,
+      "sha256": "000ac9fa9312fd476b4ab4f2760b67ae6db7e96fd27791adf81e15d86a1d23d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/session.ts",
+      "bytes": 10871,
+      "sha256": "6aaeef280eba465e22c35cd31e1fdc4fa088d31ca4f0b103a0274e3111f2d06d"
+    }
+  ]
+}

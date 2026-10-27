@@ -1,0 +1,274 @@
+{
+  "status": "LOCAL_CONTENT_CHECKS_NOT_CI_NOT_FINAL_INTEGRATION",
+  "base": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+  "node": "24.21.0",
+  "tests": [
+    {
+      "artifact": "backend-first.json",
+      "passed": 5,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "allResults": [
+        {
+          "name": "information sampling content authority freezes 20/10 complete conditions, original geometry and reproducible independent practice groups",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling content authority replays exact first judgments and reproduces the approved signed worked report without a fabricated ability score",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling content authority preserves zero, null, wrong answers and judgments before a later interruption with actual condition denominators",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling content authority does not accept invented feedback completion, altered raw state, envelopes or conditions",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling content authority scrubs internal metrics from every public channel and refuses unknown report combinations",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "frontend-first.json",
+      "passed": 5,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "allResults": [
+        {
+          "name": "information sampling candidate flows requires complete fresh activations and preserves first judgment, duplicate, cancel, multi-contact and repeat facts",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows re-presents complete teaching after interruption and failed quiz, then completes ten rounds and retries an identical final claim",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows requires fresh preparation and retries a failed local save without another exposure or an archive-success claim",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows runs actual React bilingual teaching, touch/cancel/keyboard controls, quiz and full reread without revealing hidden categories",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows uses the same public gate for report text, the optional image and download through partial, invalid and stale versions",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "artifact": "frontend-final.json",
+      "passed": 3,
+      "failed": 0,
+      "pendingOrFiltered": 2,
+      "allResults": [
+        {
+          "name": "information sampling candidate flows requires complete fresh activations and preserves first judgment, duplicate, cancel, multi-contact and repeat facts",
+          "status": "skipped"
+        },
+        {
+          "name": "information sampling candidate flows re-presents complete teaching after interruption and failed quiz, then completes ten rounds and retries an identical final claim",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows requires fresh preparation and retries a failed local save without another exposure or an archive-success claim",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows runs actual React bilingual teaching, touch/cancel/keyboard controls, quiz and full reread without revealing hidden categories",
+          "status": "passed"
+        },
+        {
+          "name": "information sampling candidate flows uses the same public gate for report text, the optional image and download through partial, invalid and stale versions",
+          "status": "skipped"
+        }
+      ]
+    }
+  ],
+  "distinctTestTargets": 10,
+  "firstBackendExit": 0,
+  "firstFrontendExit": 0,
+  "affectedFrontendContinuationExit": 0,
+  "continuationReason": "review-fixed early callback scheduling and unfinished quiz disposal; only three affected session/React tests reexecuted; capture/report tests filtered",
+  "types": {
+    "backend": {
+      "entries": 3,
+      "sourceFiles": 48,
+      "diagnostics": 0,
+      "currentSourceHashesMatch": true,
+      "artifact": "types-clean-imports.json"
+    },
+    "frontend": {
+      "entries": 2,
+      "sourceFiles": 53,
+      "diagnostics": 0,
+      "currentSourceHashesMatch": true,
+      "artifact": "types-clean-imports.json"
+    }
+  },
+  "lint": {
+    "files": 9,
+    "errors": 0,
+    "warnings": 1,
+    "finalChangedImportErrors": 0,
+    "finalChangedImportWarnings": 0,
+    "originalWarning": "unused same import in generated/report.ts; removed in both pure copies, unchanged other files retain their original lint results"
+  },
+  "pureCopies": {
+    "protocol.ts": true,
+    "report.ts": true
+  },
+  "researchExample": "new synthetic capture/scorer research20 example, generated separately; not earlier test replay or real participant/device data",
+  "sourceFiles": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/information-sampling-content.test.ts",
+      "sha256": "2212f965de34c2db0621c3f6cdc3933f375e296ab53ef21a2d463320d5986889"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/NOTICE",
+      "sha256": "4f8479cc05daccb60776871d9a2d19b1f278b22c9b539a799427588dd1e98f2d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/metadata.ts",
+      "sha256": "5819e95b88d3e254d7b5e9c5564411a39745c0e36dd769f389ecc824783018a3"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+      "sha256": "581e5d23d6c6a07455d33f26a6dac30eb472dad23a6b028c900c512ba70775c6"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/participant-presentation.ts",
+      "sha256": "7422be57a5915eb2f5a1cc262213512669fc5804f13ce7967270580aff0eed28"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+      "sha256": "7aa0285555216899b8658d2a552ee5d11cf284b5eeedac11d27ef716962c202d"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/schema.ts",
+      "sha256": "f52d2144043ef824edbe06f9b5081445b9989e22f52b01b125646c8797103540"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+      "sha256": "25d17904f9b41338400aa13ed4edb1d83677612e92ba3afa42d54cb736ed67af"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstInstructions.tsx",
+      "sha256": "af7c88a9c3c357feee7bd7bcf578804a60cf47988b54e2f6b459f451ce08b9e3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstReport.tsx",
+      "sha256": "a180c59c180f253cfe4b0f865c9dc6de0849012e96febe8ba72c0405fde8eeaf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstTask.tsx",
+      "sha256": "15f30977d1145f0f2f187ed11e528be3e42d98fe14bb0181f9f2c2e70d754517"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/capture.ts",
+      "sha256": "0376bd4a705a701ab6960fc26af971c0604d55c163218cc79d20bcac4a954224"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+      "sha256": "dbdc071223995f107ba9ec2c40925b456840ac287bb5eff0995d293aae44aff6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/contracts.ts",
+      "sha256": "e5e314b59004ab552dc0befc38b787ccaebf727a51b29a41c3d2a60f52fa9134"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/protocol.ts",
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/report.ts",
+      "sha256": "7aa0285555216899b8658d2a552ee5d11cf284b5eeedac11d27ef716962c202d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/ist.css",
+      "sha256": "000ac9fa9312fd476b4ab4f2760b67ae6db7e96fd27791adf81e15d86a1d23d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/session.ts",
+      "sha256": "6aaeef280eba465e22c35cd31e1fdc4fa088d31ca4f0b103a0274e3111f2d06d"
+    }
+  ],
+  "evidenceLimits": [
+    "Local unsigned checks, no CI or formal admission",
+    "Test JSON is original; no retroactive signature or complete installed dependency byte manifest",
+    "First type read inventories original source hashes; final code inventories are recorded after tests, not mislabelled contemporaneous signed run manifests",
+    "Synthetic clocks, pointer labels and memory save ports are not real phone/IndexedDB/API/DB/COS verification",
+    "Approved static screenshots are design evidence, not runtime screenshots",
+    "No full application build, old-task suites, physical timing, platform integration, central testing, merge or deploy"
+  ],
+  "postTestChange": "Only removed unused same import in both report.ts copies after final affected tests. Runtime functions and imports of protocol module unchanged; no repeated unit tests. Final lint/types bind current bytes.",
+  "researchExampleImportOnlyDrift": [
+    "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts"
+  ],
+  "commands": [
+    {
+      "cwd": "server-version/backend",
+      "argv": [
+        "node(24.21.0)",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/cognitive/information-sampling-content.test.ts",
+        "--reporter=json",
+        "--outputFile=<backend-first.json>"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "server-version/frontend",
+      "argv": [
+        "node(24.21.0)",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+        "--maxWorkers=2",
+        "--reporter=json",
+        "--outputFile=<frontend-first.json>"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "server-version/frontend",
+      "argv": [
+        "node(24.21.0)",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+        "--maxWorkers=2",
+        "--testNamePattern=re-presents|requires fresh preparation|runs actual React",
+        "--reporter=json",
+        "--outputFile=<frontend-final.json>"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": ".",
+      "argv": [
+        "node(24.21.0)",
+        "<affected-types.cjs>",
+        "<types-clean-imports.json>"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": ".",
+      "argv": [
+        "node(24.21.0)",
+        "server-version/backend/node_modules/tsx/dist/cli.mjs",
+        "<research-example.ts>"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

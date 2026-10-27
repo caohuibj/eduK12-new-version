@@ -1,0 +1,6508 @@
+{
+  "kind": "new-synthetic-research-example-not-a-replay-of-earlier-tests",
+  "nodeVersion": "v24.21.0",
+  "generatedAtUTC": "2026-10-27T11:07:31.215Z",
+  "actualPointerHardware": false,
+  "actualBrowser": false,
+  "actualApiDbCos": false,
+  "sourceHashes": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/capture.ts",
+      "sha256": "0376bd4a705a701ab6960fc26af971c0604d55c163218cc79d20bcac4a954224"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/protocol.ts",
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+      "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/schema.ts",
+      "sha256": "f52d2144043ef824edbe06f9b5081445b9989e22f52b01b125646c8797103540"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+      "sha256": "25d17904f9b41338400aa13ed4edb1d83677612e92ba3afa42d54cb736ed67af"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+      "sha256": "8475cbfec0a056bfe7ba0f4bd4e16ba64d4b4c5384247e5932cecdd0994500d1"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+      "sha256": "581e5d23d6c6a07455d33f26a6dac30eb472dad23a6b028c900c512ba70775c6"
+    }
+  ],
+  "snapshot": {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-27T00:00:00.000Z",
+    "testType": "information-sampling",
+    "configVersion": "0.1.0",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "config": {
+      "profile": "research",
+      "totalTrials": 20,
+      "majorityCounts": [
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "repetitions": 2,
+      "grid": {
+        "rows": 5,
+        "columns": 5,
+        "tilePx": 48,
+        "gapPx": 6,
+        "blue": "#176B9A",
+        "orange": "#A84D12"
+      },
+      "feedbackMs": 2000,
+      "incentive": "hypothetical-task-points-no-cash",
+      "choiceDeadlineMs": null,
+      "reward": {
+        "fixedCorrect": 100,
+        "decreasingStart": 250,
+        "perReveal": 10,
+        "incorrect": -100
+      },
+      "practice": {
+        "trials": 2,
+        "majorityCount": 21,
+        "quizQuestions": 3,
+        "maximumGroups": 3,
+        "criterion": "complete-two-judgments-and-three-rule-questions-correct-not-preference-or-reward"
+      },
+      "profileDefinitionVersion": "0.1.0",
+      "parameterExplanationVersion": "0.1.0",
+      "metricDefinitionVersion": "0.1.0",
+      "qualityDefinitionVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0"
+    },
+    "configHash": "d48649b3d7c4a27218d7aa137edd877ca8157b818b50c02c501cd83f6ee310a8",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "information-sampling/0.1.0/0.1.0",
+      "version": "0.1.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "ist-fnv1a-utf16-xorshift32-balanced-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "61f12b6482dad33d0e229b1c81e67d7429a72751f3cf59994b54b41b8f897a8f"
+  },
+  "randomSeed": "ist-original-synthetic-research-example",
+  "raw": [
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 15,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 0,
+        "board": [
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 100,
+      "endedAtPerfMs": 2116,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 115,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 116,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 2116
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 114,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 7,
+          "points": 100,
+          "atMs": 116,
+          "rtMs": 16,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 2116,
+        "completeAtMs": 2116,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 16,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 1,
+        "board": [
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 10100,
+      "endedAtPerfMs": 12118,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 10101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 10117,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 10118,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 12118
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 10102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 10104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 10106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 10108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 10110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 10112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 10114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 10116,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 8,
+          "points": 100,
+          "atMs": 10118,
+          "rtMs": 18,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 12118,
+        "completeAtMs": 12118,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 16,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 2,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 20100,
+      "endedAtPerfMs": 22120,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 20101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 20119,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 20120,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 22120
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 20102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 20104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 20106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 20108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 20110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 20112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 20114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 20116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "orange-triangle",
+            "atMs": 20118,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 9,
+          "points": 100,
+          "atMs": 20120,
+          "rtMs": 20,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 22120,
+        "completeAtMs": 22120,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 17,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 3,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 30100,
+      "endedAtPerfMs": 32122,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 30101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30119,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30120,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 30121,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 30122,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 32122
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 30102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 30104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 30106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 30108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 30110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 30112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 30114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "orange-triangle",
+            "atMs": 30116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "orange-triangle",
+            "atMs": 30118,
+            "input": "touch"
+          },
+          {
+            "cell": 9,
+            "category": "orange-triangle",
+            "atMs": 30120,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 10,
+          "points": 100,
+          "atMs": 30122,
+          "rtMs": 22,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 32122,
+        "completeAtMs": 32122,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 17,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 4,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 40100,
+      "endedAtPerfMs": 42124,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 40101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40119,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40120,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40121,
+          "target": "cell:10",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40122,
+          "target": "cell:10",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 40123,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 40124,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 42124
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 40102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 40104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 40106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 40108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 40110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 40112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 40114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 40116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "blue-circle",
+            "atMs": 40118,
+            "input": "touch"
+          },
+          {
+            "cell": 9,
+            "category": "blue-circle",
+            "atMs": 40120,
+            "input": "touch"
+          },
+          {
+            "cell": 10,
+            "category": "orange-triangle",
+            "atMs": 40122,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": false,
+          "revealedCount": 11,
+          "points": -100,
+          "atMs": 40124,
+          "rtMs": 24,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 42124,
+        "completeAtMs": 42124,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 15,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 5,
+        "board": [
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 50100,
+      "endedAtPerfMs": 52116,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 50101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 50115,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 50116,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 52116
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 50102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 50104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 50106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 50108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 50110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 50112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 50114,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 7,
+          "points": 100,
+          "atMs": 50116,
+          "rtMs": 16,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 52116,
+        "completeAtMs": 52116,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 13,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 6,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 60100,
+      "endedAtPerfMs": 62118,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 60101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 60117,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 60118,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 62118
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 60102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 60104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 60106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 60108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 60110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 60112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 60114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 60116,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 8,
+          "points": 100,
+          "atMs": 60118,
+          "rtMs": 18,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 62118,
+        "completeAtMs": 62118,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 13,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 7,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 70100,
+      "endedAtPerfMs": 72120,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 70101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 70119,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 70120,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 72120
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 70102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 70104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 70106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 70108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 70110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 70112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 70114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 70116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "blue-circle",
+            "atMs": 70118,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 9,
+          "points": 100,
+          "atMs": 70120,
+          "rtMs": 20,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 72120,
+        "completeAtMs": 72120,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 14,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 8,
+        "board": [
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 80100,
+      "endedAtPerfMs": 82122,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 80101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80119,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80120,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 80121,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 80122,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 82122
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 80102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 80104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 80106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 80108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 80110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 80112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 80114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 80116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "orange-triangle",
+            "atMs": 80118,
+            "input": "touch"
+          },
+          {
+            "cell": 9,
+            "category": "orange-triangle",
+            "atMs": 80120,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 10,
+          "points": 100,
+          "atMs": 80122,
+          "rtMs": 22,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 82122,
+        "completeAtMs": 82122,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "rule": "fixed",
+        "majorityCount": 14,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 9,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 90100,
+      "endedAtPerfMs": 92124,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 90101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90119,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90120,
+          "target": "cell:9",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90121,
+          "target": "cell:10",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90122,
+          "target": "cell:10",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 90123,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 90124,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 92124
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 90102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 90104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 90106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 90108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 90110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "orange-triangle",
+            "atMs": 90112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 90114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "orange-triangle",
+            "atMs": 90116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "orange-triangle",
+            "atMs": 90118,
+            "input": "touch"
+          },
+          {
+            "cell": 9,
+            "category": "blue-circle",
+            "atMs": 90120,
+            "input": "touch"
+          },
+          {
+            "cell": 10,
+            "category": "orange-triangle",
+            "atMs": 90122,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": false,
+          "revealedCount": 11,
+          "points": -100,
+          "atMs": 90124,
+          "rtMs": 24,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 92124,
+        "completeAtMs": 92124,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 14,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 10,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 100100,
+      "endedAtPerfMs": 102112,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 100101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 100103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 100105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 100107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 100109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 100111,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 100112,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 102112
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 100102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 100104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 100106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 100108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 100110,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 5,
+          "points": 200,
+          "atMs": 100112,
+          "rtMs": 12,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 102112,
+        "completeAtMs": 102112,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 16,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 11,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 110100,
+      "endedAtPerfMs": 112114,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 110101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 110113,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 110114,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 112114
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 110102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 110104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 110106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 110108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 110110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 110112,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 6,
+          "points": 190,
+          "atMs": 110114,
+          "rtMs": 14,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 112114,
+        "completeAtMs": 112114,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 17,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 12,
+        "board": [
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 120100,
+      "endedAtPerfMs": 122116,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 120101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 120115,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 120116,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 122116
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 120102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 120104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 120106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 120108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 120110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 120112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 120114,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": false,
+          "revealedCount": 7,
+          "points": -100,
+          "atMs": 120116,
+          "rtMs": 16,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 122116,
+        "completeAtMs": 122116,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 15,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 13,
+        "board": [
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 130100,
+      "endedAtPerfMs": 132118,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 130101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 130117,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 130118,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 132118
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 130102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 130104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 130106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 130108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 130110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 130112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 130114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 130116,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 8,
+          "points": 170,
+          "atMs": 130118,
+          "rtMs": 18,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 132118,
+        "completeAtMs": 132118,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 16,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 14,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 140100,
+      "endedAtPerfMs": 142120,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 140101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 140119,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 140120,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 142120
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 140102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 140104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 140106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 140108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 140110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 140112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 140114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 140116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "orange-triangle",
+            "atMs": 140118,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 9,
+          "points": 160,
+          "atMs": 140120,
+          "rtMs": 20,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 142120,
+        "completeAtMs": 142120,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 13,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 15,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 150100,
+      "endedAtPerfMs": 152112,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 150101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 150103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 150105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 150107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 150109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 150111,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 150112,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 152112
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 150102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 150104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 150106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "blue-circle",
+            "atMs": 150108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 150110,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 5,
+          "points": 200,
+          "atMs": 150112,
+          "rtMs": 12,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 152112,
+        "completeAtMs": 152112,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 15,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 16,
+        "board": [
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle"
+        ]
+      },
+      "startedAtPerfMs": 160100,
+      "endedAtPerfMs": 162114,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 160101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 160113,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 160114,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 162114
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 160102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 160104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 160106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 160108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 160110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 160112,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 6,
+          "points": 190,
+          "atMs": 160114,
+          "rtMs": 14,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 162114,
+        "completeAtMs": 162114,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 14,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 17,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 170100,
+      "endedAtPerfMs": 172116,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 170101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 170115,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 170116,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 172116
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 170102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 170104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 170106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 170108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 170110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 170112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "blue-circle",
+            "atMs": 170114,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": false,
+          "revealedCount": 7,
+          "points": -100,
+          "atMs": 170116,
+          "rtMs": 16,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 172116,
+        "completeAtMs": 172116,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 17,
+        "majority": "orange-triangle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 18,
+        "board": [
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 180100,
+      "endedAtPerfMs": 182118,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 180101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 180117,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 180118,
+          "target": "choice:orange-triangle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 182118
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "blue-circle",
+            "atMs": 180102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "orange-triangle",
+            "atMs": 180104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "orange-triangle",
+            "atMs": 180106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 180108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "orange-triangle",
+            "atMs": 180110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 180112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 180114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "blue-circle",
+            "atMs": 180116,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "orange-triangle",
+          "correct": true,
+          "revealedCount": 8,
+          "points": 170,
+          "atMs": 180118,
+          "rtMs": 18,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 182118,
+        "completeAtMs": 182118,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "phase": "test",
+        "round": 0,
+        "block": 1,
+        "rule": "decreasing",
+        "majorityCount": 13,
+        "majority": "blue-circle",
+        "optionOrder": [
+          "blue-circle",
+          "orange-triangle"
+        ],
+        "index": 19,
+        "board": [
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "blue-circle",
+          "blue-circle",
+          "orange-triangle",
+          "orange-triangle"
+        ]
+      },
+      "startedAtPerfMs": 190100,
+      "endedAtPerfMs": 192120,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "down",
+          "atMs": 190101,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190102,
+          "target": "cell:0",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190103,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190104,
+          "target": "cell:1",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190105,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190106,
+          "target": "cell:2",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190107,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190108,
+          "target": "cell:3",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190109,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190110,
+          "target": "cell:4",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190111,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190112,
+          "target": "cell:5",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190113,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190114,
+          "target": "cell:6",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190115,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190116,
+          "target": "cell:7",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190117,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190118,
+          "target": "cell:8",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "down",
+          "atMs": 190119,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "up",
+          "atMs": 190120,
+          "target": "choice:blue-circle",
+          "input": "touch",
+          "token": "pointer:1",
+          "key": null,
+          "repeat": false
+        },
+        {
+          "kind": "feedback-ended",
+          "atMs": 192120
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "reveals": [
+          {
+            "cell": 0,
+            "category": "orange-triangle",
+            "atMs": 190102,
+            "input": "touch"
+          },
+          {
+            "cell": 1,
+            "category": "blue-circle",
+            "atMs": 190104,
+            "input": "touch"
+          },
+          {
+            "cell": 2,
+            "category": "blue-circle",
+            "atMs": 190106,
+            "input": "touch"
+          },
+          {
+            "cell": 3,
+            "category": "orange-triangle",
+            "atMs": 190108,
+            "input": "touch"
+          },
+          {
+            "cell": 4,
+            "category": "blue-circle",
+            "atMs": 190110,
+            "input": "touch"
+          },
+          {
+            "cell": 5,
+            "category": "blue-circle",
+            "atMs": 190112,
+            "input": "touch"
+          },
+          {
+            "cell": 6,
+            "category": "orange-triangle",
+            "atMs": 190114,
+            "input": "touch"
+          },
+          {
+            "cell": 7,
+            "category": "orange-triangle",
+            "atMs": 190116,
+            "input": "touch"
+          },
+          {
+            "cell": 8,
+            "category": "blue-circle",
+            "atMs": 190118,
+            "input": "touch"
+          }
+        ],
+        "decision": {
+          "category": "blue-circle",
+          "correct": true,
+          "revealedCount": 9,
+          "points": 160,
+          "atMs": 190120,
+          "rtMs": 20,
+          "input": "touch"
+        },
+        "held": [],
+        "feedbackUntilMs": 192120,
+        "completeAtMs": 192120,
+        "ignored": {
+          "duplicate": 0,
+          "inactive": 0,
+          "unmatched": 0,
+          "multiContact": 0
+        }
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    }
+  ],
+  "score": {
+    "metrics": {
+      "planned": 20,
+      "presented": 20,
+      "completed": 20,
+      "decided": 20,
+      "groups": {
+        "fixed": {
+          "planned": 10,
+          "presented": 10,
+          "decided": 10,
+          "correct": 8,
+          "completed": 10,
+          "omissions": 0,
+          "interruptions": 0,
+          "meanReveals": 9,
+          "medianReveals": 9,
+          "medianDecisionMs": 20,
+          "points": 600,
+          "conditions": [
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 8.5,
+              "medianReveals": 8.5,
+              "medianDecisionMs": 19,
+              "points": 200,
+              "majorityCount": 13
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 1,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 10.5,
+              "medianReveals": 10.5,
+              "medianDecisionMs": 23,
+              "points": 0,
+              "majorityCount": 14
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 7,
+              "medianReveals": 7,
+              "medianDecisionMs": 16,
+              "points": 200,
+              "majorityCount": 15
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 8.5,
+              "medianReveals": 8.5,
+              "medianDecisionMs": 19,
+              "points": 200,
+              "majorityCount": 16
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 1,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 10.5,
+              "medianReveals": 10.5,
+              "medianDecisionMs": 23,
+              "points": 0,
+              "majorityCount": 17
+            }
+          ]
+        },
+        "decreasing": {
+          "planned": 10,
+          "presented": 10,
+          "decided": 10,
+          "correct": 8,
+          "completed": 10,
+          "omissions": 0,
+          "interruptions": 0,
+          "meanReveals": 7,
+          "medianReveals": 7,
+          "medianDecisionMs": 16,
+          "points": 1240,
+          "conditions": [
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 7,
+              "medianReveals": 7,
+              "medianDecisionMs": 16,
+              "points": 360,
+              "majorityCount": 13
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 1,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 6,
+              "medianReveals": 6,
+              "medianDecisionMs": 14,
+              "points": 100,
+              "majorityCount": 14
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 7,
+              "medianReveals": 7,
+              "medianDecisionMs": 16,
+              "points": 360,
+              "majorityCount": 15
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 2,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 7.5,
+              "medianReveals": 7.5,
+              "medianDecisionMs": 17,
+              "points": 350,
+              "majorityCount": 16
+            },
+            {
+              "planned": 2,
+              "presented": 2,
+              "decided": 2,
+              "correct": 1,
+              "completed": 2,
+              "omissions": 0,
+              "interruptions": 0,
+              "meanReveals": 7.5,
+              "medianReveals": 7.5,
+              "medianDecisionMs": 17,
+              "points": 70,
+              "majorityCount": 17
+            }
+          ]
+        }
+      },
+      "decreasingMinusFixedReveals": -2,
+      "observations": [
+        {
+          "index": 0,
+          "rule": "fixed",
+          "majorityCount": 15,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 7,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 16,
+          "revealedBeforeStop": 7,
+          "input": "touch"
+        },
+        {
+          "index": 1,
+          "rule": "fixed",
+          "majorityCount": 16,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 8,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 18,
+          "revealedBeforeStop": 8,
+          "input": "touch"
+        },
+        {
+          "index": 2,
+          "rule": "fixed",
+          "majorityCount": 16,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 9,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 20,
+          "revealedBeforeStop": 9,
+          "input": "touch"
+        },
+        {
+          "index": 3,
+          "rule": "fixed",
+          "majorityCount": 17,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 10,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 22,
+          "revealedBeforeStop": 10,
+          "input": "touch"
+        },
+        {
+          "index": 4,
+          "rule": "fixed",
+          "majorityCount": 17,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 11,
+          "correct": false,
+          "points": -100,
+          "decisionMs": 24,
+          "revealedBeforeStop": 11,
+          "input": "touch"
+        },
+        {
+          "index": 5,
+          "rule": "fixed",
+          "majorityCount": 15,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 7,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 16,
+          "revealedBeforeStop": 7,
+          "input": "touch"
+        },
+        {
+          "index": 6,
+          "rule": "fixed",
+          "majorityCount": 13,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 8,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 18,
+          "revealedBeforeStop": 8,
+          "input": "touch"
+        },
+        {
+          "index": 7,
+          "rule": "fixed",
+          "majorityCount": 13,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 9,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 20,
+          "revealedBeforeStop": 9,
+          "input": "touch"
+        },
+        {
+          "index": 8,
+          "rule": "fixed",
+          "majorityCount": 14,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 10,
+          "correct": true,
+          "points": 100,
+          "decisionMs": 22,
+          "revealedBeforeStop": 10,
+          "input": "touch"
+        },
+        {
+          "index": 9,
+          "rule": "fixed",
+          "majorityCount": 14,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 11,
+          "correct": false,
+          "points": -100,
+          "decisionMs": 24,
+          "revealedBeforeStop": 11,
+          "input": "touch"
+        },
+        {
+          "index": 10,
+          "rule": "decreasing",
+          "majorityCount": 14,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 5,
+          "correct": true,
+          "points": 200,
+          "decisionMs": 12,
+          "revealedBeforeStop": 5,
+          "input": "touch"
+        },
+        {
+          "index": 11,
+          "rule": "decreasing",
+          "majorityCount": 16,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 6,
+          "correct": true,
+          "points": 190,
+          "decisionMs": 14,
+          "revealedBeforeStop": 6,
+          "input": "touch"
+        },
+        {
+          "index": 12,
+          "rule": "decreasing",
+          "majorityCount": 17,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 7,
+          "correct": false,
+          "points": -100,
+          "decisionMs": 16,
+          "revealedBeforeStop": 7,
+          "input": "touch"
+        },
+        {
+          "index": 13,
+          "rule": "decreasing",
+          "majorityCount": 15,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 8,
+          "correct": true,
+          "points": 170,
+          "decisionMs": 18,
+          "revealedBeforeStop": 8,
+          "input": "touch"
+        },
+        {
+          "index": 14,
+          "rule": "decreasing",
+          "majorityCount": 16,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 9,
+          "correct": true,
+          "points": 160,
+          "decisionMs": 20,
+          "revealedBeforeStop": 9,
+          "input": "touch"
+        },
+        {
+          "index": 15,
+          "rule": "decreasing",
+          "majorityCount": 13,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 5,
+          "correct": true,
+          "points": 200,
+          "decisionMs": 12,
+          "revealedBeforeStop": 5,
+          "input": "touch"
+        },
+        {
+          "index": 16,
+          "rule": "decreasing",
+          "majorityCount": 15,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 6,
+          "correct": true,
+          "points": 190,
+          "decisionMs": 14,
+          "revealedBeforeStop": 6,
+          "input": "touch"
+        },
+        {
+          "index": 17,
+          "rule": "decreasing",
+          "majorityCount": 14,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 7,
+          "correct": false,
+          "points": -100,
+          "decisionMs": 16,
+          "revealedBeforeStop": 7,
+          "input": "touch"
+        },
+        {
+          "index": 18,
+          "rule": "decreasing",
+          "majorityCount": 17,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 8,
+          "correct": true,
+          "points": 170,
+          "decisionMs": 18,
+          "revealedBeforeStop": 8,
+          "input": "touch"
+        },
+        {
+          "index": 19,
+          "rule": "decreasing",
+          "majorityCount": 13,
+          "completed": true,
+          "interrupted": false,
+          "reveals": 9,
+          "correct": true,
+          "points": 160,
+          "decisionMs": 20,
+          "revealedBeforeStop": 9,
+          "input": "touch"
+        }
+      ],
+      "reportBinding": {
+        "testType": "information-sampling",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "profile": "research",
+        "configHash": "d48649b3d7c4a27218d7aa137edd877ca8157b818b50c02c501cd83f6ee310a8",
+        "protocolSignature": "61f12b6482dad33d0e229b1c81e67d7429a72751f3cf59994b54b41b8f897a8f",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "parameterExplanationVersion": "0.1.0"
+      }
+    },
+    "quality": {
+      "state": "interpretable",
+      "flags": {
+        "noJudgments": false,
+        "incompleteRecords": false,
+        "interrupted": false
+      },
+      "reasons": []
+    },
+    "audit": {
+      "trialCount": 20,
+      "scorerVersion": "0.1.0"
+    }
+  },
+  "publicReport": {
+    "testType": "information-sampling",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "parameterExplanationVersion": "0.1.0",
+    "configHash": "d48649b3d7c4a27218d7aa137edd877ca8157b818b50c02c501cd83f6ee310a8",
+    "protocolSignature": "61f12b6482dad33d0e229b1c81e67d7429a72751f3cf59994b54b41b8f897a8f",
+    "profile": "research",
+    "state": "interpretable",
+    "planned": 20,
+    "presented": 20,
+    "completed": 20,
+    "groups": {
+      "fixed": {
+        "planned": 10,
+        "presented": 10,
+        "decided": 10,
+        "correct": 8,
+        "completed": 10,
+        "omissions": 0,
+        "interruptions": 0,
+        "meanReveals": 9,
+        "medianReveals": 9,
+        "medianDecisionMs": 20,
+        "points": 600,
+        "conditions": [
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 8.5,
+            "medianReveals": 8.5,
+            "medianDecisionMs": 19,
+            "points": 200,
+            "majorityCount": 13
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 1,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 10.5,
+            "medianReveals": 10.5,
+            "medianDecisionMs": 23,
+            "points": 0,
+            "majorityCount": 14
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 7,
+            "medianReveals": 7,
+            "medianDecisionMs": 16,
+            "points": 200,
+            "majorityCount": 15
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 8.5,
+            "medianReveals": 8.5,
+            "medianDecisionMs": 19,
+            "points": 200,
+            "majorityCount": 16
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 1,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 10.5,
+            "medianReveals": 10.5,
+            "medianDecisionMs": 23,
+            "points": 0,
+            "majorityCount": 17
+          }
+        ]
+      },
+      "decreasing": {
+        "planned": 10,
+        "presented": 10,
+        "decided": 10,
+        "correct": 8,
+        "completed": 10,
+        "omissions": 0,
+        "interruptions": 0,
+        "meanReveals": 7,
+        "medianReveals": 7,
+        "medianDecisionMs": 16,
+        "points": 1240,
+        "conditions": [
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 7,
+            "medianReveals": 7,
+            "medianDecisionMs": 16,
+            "points": 360,
+            "majorityCount": 13
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 1,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 6,
+            "medianReveals": 6,
+            "medianDecisionMs": 14,
+            "points": 100,
+            "majorityCount": 14
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 7,
+            "medianReveals": 7,
+            "medianDecisionMs": 16,
+            "points": 360,
+            "majorityCount": 15
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 2,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 7.5,
+            "medianReveals": 7.5,
+            "medianDecisionMs": 17,
+            "points": 350,
+            "majorityCount": 16
+          },
+          {
+            "planned": 2,
+            "presented": 2,
+            "decided": 2,
+            "correct": 1,
+            "completed": 2,
+            "omissions": 0,
+            "interruptions": 0,
+            "meanReveals": 7.5,
+            "medianReveals": 7.5,
+            "medianDecisionMs": 17,
+            "points": 70,
+            "majorityCount": 17
+          }
+        ]
+      }
+    },
+    "decreasingMinusFixedReveals": -2
+  }
+}

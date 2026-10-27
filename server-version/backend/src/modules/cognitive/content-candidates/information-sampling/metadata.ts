@@ -1,0 +1,11 @@
+export const istContent = {
+  candidateId: 'information-sampling', status: 'CONTENT_CANDIDATE_NOT_DOT_REVIEWED_NOT_INTEGRATED',
+  sourceRepository: 'expfactory/expfactory-experiments', sourceCommit: '49b8123f18b26d94dfc010bb8a6ec7458b265e2e', sourceBlob: '435a8e1fefc13e3a60e214dc76f08f121728d306', licenseBlob: '7ef17fe706ce88195e18473069d561dd4910a5ee',
+  implementationRoute: 'independent-typescript-original-colour-shape-ui-no-upstream-runtime-assets',
+  controlledVocabularyCommit: '22721e5c63dd78819e8c58921adf20157cdaa08c',
+  researchTags: { cognitive_domain: ['decision_learning'], target_process: ['information_seeking'], paradigm: [], stimulus_form: [], input_upstream: [], input_proposed: ['not_frozen'], key_metric: ['condition_accuracy', 'condition_rt', 'task_reward'], intended_use: ['research_protocol_selection'], code_license: [], code_rights_disposition: ['github_public_conditional'], asset_rights_disposition: [], asset_license_review: ['generated_shapes_other_assets_unverified'], implementation_strategy: ['literature_reimplementation'], maturity: ['source_research_only'], evidence_limitations: ['protocol_variant_unvalidated', 'protocol_version_decision'], baseline_relation: ['new_family_candidate'], research_priority: ['priority_finalize'], rule_type: ['project_provisional', 'literature_experience'] },
+  currentCodeLicense: 'original project code; MIT source acknowledgement retained in NOTICE; root notice does not clear unrelated assets',
+  actualInputs: ['touch', 'mouse', 'pen', 'keyboard', 'assistive'], profiles: { research: 20, experience: 10 },
+  applicationScenes: [{ label: '职业过程中的证据采样研究', status: 'research-question-not-job-prediction' }, { label: '成人信息核查策略交流', status: 'this-session-only' }, { label: '主动信息采样人机交互研究', status: 'unvalidated-application' }],
+  ageRange: null, difficulty: null, chineseValidation: null, deviceEquivalence: null, backendTagsPersisted: false, globalSearchConnected: false,
+} as const

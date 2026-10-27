@@ -1,0 +1,429 @@
+[
+  {
+    "label": "backend",
+    "configFile": "server-version/backend/tsconfig.json",
+    "entries": [
+      "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+      "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/participant-presentation.ts",
+      "server-version/backend/src/__tests__/cognitive/information-sampling-content.test.ts"
+    ],
+    "diagnostics": [],
+    "sourceFiles": [
+      {
+        "path": "server-version/backend/src/modules/assessment-reference/governance.ts",
+        "sha256": "6487175a5e4f4905264938e4e6ebe99db645e3c40e72a92d9796090fe9fa0930"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/material.ts",
+        "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+        "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+        "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+        "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/raw-score-feedback.ts",
+        "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+        "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+        "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+        "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+        "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/context.ts",
+        "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+        "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+        "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+      },
+      {
+        "path": "server-version/backend/src/utils/logger.ts",
+        "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15"
+      },
+      {
+        "path": "server-version/backend/src/utils/encryption.ts",
+        "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/form-answer.ts",
+        "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/security.ts",
+        "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/index.ts",
+        "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-reference/reference.ts",
+        "sha256": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+        "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/types.ts",
+        "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/task-package.types.ts",
+        "sha256": "ab1e4e3d040190162b46008a1f6d3e4d72a92d19034232a462d22631e41db25a"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/presentation.ts",
+        "sha256": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/cognitive.types.ts",
+        "sha256": "c1983d53cb88a1ed220fc8a3349b536cfd713a7187e292cc30c861bc14a71e46"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/types.ts",
+        "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+      },
+      {
+        "path": "server-version/backend/src/services/runtimeObservability.ts",
+        "sha256": "fad3be33a8f6851565143fb1b91081e237f7cc760ac5e7165d8459ee40392f5d"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+        "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+        "sha256": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-definition.ts",
+        "sha256": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+        "sha256": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-branching.ts",
+        "sha256": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+        "sha256": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/compiler.ts",
+        "sha256": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+        "sha256": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+        "sha256": "9bf9ba2bb7e4bafdc4c437c881bb979b3790c9775ee24eeda4ab27fe98e3e774"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+        "sha256": "ad18c4c83881e2c39c6e3cc176be6454626d093ddfb15ef47873dd77aa657a8a"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+        "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+        "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/schema.ts",
+        "sha256": "f52d2144043ef824edbe06f9b5081445b9989e22f52b01b125646c8797103540"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+        "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+        "sha256": "8475cbfec0a056bfe7ba0f4bd4e16ba64d4b4c5384247e5932cecdd0994500d1"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+        "sha256": "25d17904f9b41338400aa13ed4edb1d83677612e92ba3afa42d54cb736ed67af"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/metadata.ts",
+        "sha256": "5819e95b88d3e254d7b5e9c5564411a39745c0e36dd769f389ecc824783018a3"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+        "sha256": "581e5d23d6c6a07455d33f26a6dac30eb472dad23a6b028c900c512ba70775c6"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/protocol-presentation.types.ts",
+        "sha256": "1249da54565c3d2ae2e3b25c0eb214b850d8731eee973efbeae0c9cc73febd26"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/participant-presentation.types.ts",
+        "sha256": "358d035e8d5b839674cca9228ec84de5b1214192c03d630a3855c025301ece32"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/participant-presentation.ts",
+        "sha256": "7422be57a5915eb2f5a1cc262213512669fc5804f13ce7967270580aff0eed28"
+      },
+      {
+        "path": "server-version/backend/src/__tests__/cognitive/information-sampling-content.test.ts",
+        "sha256": "2212f965de34c2db0621c3f6cdc3933f375e296ab53ef21a2d463320d5986889"
+      }
+    ]
+  },
+  {
+    "label": "frontend",
+    "configFile": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/information-sampling/content.test.tsx"
+    ],
+    "diagnostics": [],
+    "sourceFiles": [
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/protocol.ts",
+        "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/capture.ts",
+        "sha256": "0376bd4a705a701ab6960fc26af971c0604d55c163218cc79d20bcac4a954224"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/report.ts",
+        "sha256": "8475cbfec0a056bfe7ba0f4bd4e16ba64d4b4c5384247e5932cecdd0994500d1"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/contracts.ts",
+        "sha256": "e5e314b59004ab552dc0befc38b787ccaebf727a51b29a41c3d2a60f52fa9134"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/session.ts",
+        "sha256": "36e0437a70838db3c4e00494ad7e6cc4dc88d679d46ed98b28162abe3d5c1451"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstInstructions.tsx",
+        "sha256": "af7c88a9c3c357feee7bd7bcf578804a60cf47988b54e2f6b459f451ce08b9e3"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstReport.tsx",
+        "sha256": "a180c59c180f253cfe4b0f865c9dc6de0849012e96febe8ba72c0405fde8eeaf"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstTask.tsx",
+        "sha256": "76345f5d0f94354db0f8f63be36e236592e5cfc1845fe04265d655abc30f5e88"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-reference/governance.ts",
+        "sha256": "6487175a5e4f4905264938e4e6ebe99db645e3c40e72a92d9796090fe9fa0930"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/material.ts",
+        "sha256": "2d12c58d222991ab4136a682c1281e6ac11e3e87911ca7e23d57aa9de0488a92"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+        "sha256": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+        "sha256": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+        "sha256": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/raw-score-feedback.ts",
+        "sha256": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+        "sha256": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+        "sha256": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+        "sha256": "35d9e51e53dc9fa5d1e2ff5539a82ec803a31b042a23e7cee952f8d24d3e0642"
+      },
+      {
+        "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+        "sha256": "74e3526c81b86a15e84d35b7dbbb0a112562a6e78254928640762615aecef2ba"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/context.ts",
+        "sha256": "2e2785f7e38edc4a3ffcf867f171243a9e36151a1cd8668da6604662cb349b6d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+        "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+        "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+      },
+      {
+        "path": "server-version/backend/src/utils/logger.ts",
+        "sha256": "a133aa7b8be98cb6a567bc8af648f7267817c92ff72cab821a582743db013e15"
+      },
+      {
+        "path": "server-version/backend/src/utils/encryption.ts",
+        "sha256": "2c1a615c82088fc48a3082c188dd58e7b9cdfa7935bc5e56d541e6a1fbc7470e"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/form-answer.ts",
+        "sha256": "ef06de2e9d183aacb1ef61ebbb0ad60df4cc57e716db9883e54c93d4388f032a"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/security.ts",
+        "sha256": "56524add610fe2f1d00b1e48e7205ec23b25cb945e6e8cd17b141dafefb7824d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-context/index.ts",
+        "sha256": "47da8cffe79e8dd9b1e64b722d62c8361472c56afdb8cd49abec5dede4ecf44d"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-reference/reference.ts",
+        "sha256": "179da23a71ca2f972a69b49f9c2a775d0fdd5aa6c93c65f520e82be01b4f2e02"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+        "sha256": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/types.ts",
+        "sha256": "d5e2393f0317013edf3cf6b349c2b3b625af393ea55045740f10718327423d55"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/task-package.types.ts",
+        "sha256": "ab1e4e3d040190162b46008a1f6d3e4d72a92d19034232a462d22631e41db25a"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/presentation.ts",
+        "sha256": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/cognitive.types.ts",
+        "sha256": "c1983d53cb88a1ed220fc8a3349b536cfd713a7187e292cc30c861bc14a71e46"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/types.ts",
+        "sha256": "ca6740c52cf7aafa8e09640abe608708af043c228ea82f9a290358bd0c8ba656"
+      },
+      {
+        "path": "server-version/backend/src/services/runtimeObservability.ts",
+        "sha256": "fad3be33a8f6851565143fb1b91081e237f7cc760ac5e7165d8459ee40392f5d"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/canonical.ts",
+        "sha256": "6688d12144fcd63f143429390cedb90332721cde57dbb0e9c14aab9b1e5caaaa"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+        "sha256": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-definition.ts",
+        "sha256": "7b6a0d7667ac7850d5b8a1b4c2dad7d6ad3f58e54398b3c2250c2856e44c0ba9"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+        "sha256": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-branching.ts",
+        "sha256": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2"
+      },
+      {
+        "path": "server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+        "sha256": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-runtime/compiler.ts",
+        "sha256": "37f7cc4cf3fa68dafcddab2a889a4b3dddf5b6c5c43f97915d89412d8fbf2877"
+      },
+      {
+        "path": "server-version/backend/src/modules/assessment-governance/operational-hold.ts",
+        "sha256": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/final-submission-budget.ts",
+        "sha256": "9bf9ba2bb7e4bafdc4c437c881bb979b3790c9775ee24eeda4ab27fe98e3e774"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/cognitive.errors.ts",
+        "sha256": "ad18c4c83881e2c39c6e3cc176be6454626d093ddfb15ef47873dd77aa657a8a"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts",
+        "sha256": "ef885828b8f0dc097ac38e17701f789e82e12036eb71bacdc8a859c43209ecb3"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+        "sha256": "4de123c2284d829eae0ff12aea4b415c56f80ca91a61c732d3bf8808d7e44e1c"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/schema.ts",
+        "sha256": "f52d2144043ef824edbe06f9b5081445b9989e22f52b01b125646c8797103540"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/v2/trial-envelope.ts",
+        "sha256": "9a6cd24c06876b82557ec6159c713519c13bb401693ae75ddb53218c24f3ba78"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+        "sha256": "8475cbfec0a056bfe7ba0f4bd4e16ba64d4b4c5384247e5932cecdd0994500d1"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+        "sha256": "25d17904f9b41338400aa13ed4edb1d83677612e92ba3afa42d54cb736ed67af"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/metadata.ts",
+        "sha256": "5819e95b88d3e254d7b5e9c5564411a39745c0e36dd769f389ecc824783018a3"
+      },
+      {
+        "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/package.ts",
+        "sha256": "581e5d23d6c6a07455d33f26a6dac30eb472dad23a6b028c900c512ba70775c6"
+      },
+      {
+        "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+        "sha256": "95a76b6e5758271d78457f1e9144fcee15111e972639f1f800aeade5578080ad"
+      }
+    ]
+  }
+]
