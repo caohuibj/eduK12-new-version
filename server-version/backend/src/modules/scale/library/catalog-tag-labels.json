@@ -283,6 +283,14 @@
     "label": "用语言分享感受",
     "axis": "construct"
   },
+  "construct:sel_erc24_emotion_regulation": {
+    "label": "情绪表达与调节",
+    "axis": "construct"
+  },
+  "construct:sel_erc24_lability_negativity": {
+    "label": "情绪变化与负面反应",
+    "axis": "construct"
+  },
   "construct:sel_fasttrack_scs_academic": {
     "label": "学习活动表现",
     "axis": "construct"
