@@ -1,0 +1,1818 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ders_sf18_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "请想一想以下描述在你平时生活中出现的频率。有些句子涉及心情不好的时候，也有些涉及平常是否留意自己的情绪。1表示几乎从不，5表示几乎总是；请选择最符合自己的数字。题目没有标准答案，也不需要给自己贴上好坏标签。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据Kaufman等作者2015年公布的DERS-SF 18题英文施测说明独立写作的中文工作稿；不设原文未声明的最近一周回顾时限。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "情绪调节困难量表短式（DERS-SF，18题）— 独立中文研究工作稿",
+      "abbreviation": "DERS-SF18-ZH-WORKING",
+      "instrumentFamily": "Difficulties in Emotion Regulation Scale – Short Form (Kaufman et al.)"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "SELF_REGULATION"
+      ],
+      "constructDefinition": "采用Kaufman等18题短式追问六类情绪调节困难：策略、情绪不接纳、冲动控制、目标导向、觉察及情绪清晰度；可另计算整体18题总和。不能将此版与Bjureberg DERS-16或Victor/Klonsky DERS-18混称。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:emotion_regulation",
+        "domain:social_emotional",
+        "domain:self_regulation",
+        "construct:emotion_regulation_difficulties",
+        "construct:six_three_item_facets",
+        "construct:nonacceptance",
+        "construct:goals",
+        "construct:impulse",
+        "construct:awareness",
+        "construct:strategies",
+        "construct:clarity",
+        "construct:total_18_item_sum",
+        "orientation:transdiagnostic_emotion_regulation",
+        "orientation:ders_family",
+        "orientation:dbt_relevant_not_exclusive",
+        "population:original_adolescent_and_adult_research",
+        "population:project_18_plus",
+        "population:chinese_working_translation_not_validated",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:18_items",
+        "response:five_point_frequency_1_to_5",
+        "response:official_five_percent_frequency_anchors",
+        "response:reverse_1_4_6",
+        "response:fixed_ders_sf_2015_order",
+        "response:no_fixed_recall_window",
+        "response:complete_required_project_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "use:no_chinese_norms",
+        "use:no_clinical_bands",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:source_full_text_acquired",
+        "license:copyright_retained",
+        "license:third_party_derived_items_review",
+        "language_validation:source_en",
+        "language_validation:independent_zh_cn_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:local_validation_pending",
+        "language_validation:not_ders16_or_victor_ders18",
+        "情绪调节困难",
+        "短式情绪调节困难问卷",
+        "认知觉察",
+        "情绪清晰度",
+        "情绪接纳",
+        "冲动控制",
+        "目标行为",
+        "策略可用性",
+        "18题",
+        "非诊断",
+        "待联系作者"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原论文基于三组青少年共257人与两组成人共797人研究；本独立中文工作稿没有中国青少年/成人测量验证。暂按保守18+成人自评配置，不将源研究的青少年证据归为本站译文的使用资格。"
+    },
+    "administration": {
+      "itemCount": 18,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "原作者仅请根据出现频率作答，无固定过去一周/两周回顾窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "严格保持Kaufman等2015作者英文DERS-SF表中18题的原顺序，不混另两个DERS短版。",
+        "使用作者提供的1–5频率锚点及百分比：1几乎从不(0–10%)、2有时(11–35%)、3约一半时候(36–65%)、4多数时候(66–90%)、5几乎总是(91–100%)。",
+        "只将觉察维第1/4/6题按6−原值反向；其他15题原始值，尤其要避免借用DERS-16的题号。",
+        "整体18题总和18–90；六个分维各三题取均分1–5（便于与原DERS分维量尺比较），不能将总和与均分错当同量纲。",
+        "本项目各维与总分采取complete_required：缺该维一题该维null，缺任何题总分null，其他齐备维度仍可计算；这是平台定义而非作者明确缺答规则。",
+        "本工作译文、中文目标人群验证、作者认可及电子分发使用条件未确认；DRAFT不自动施测。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "源2016英文研究包含青少年和成人，但本独立中文未验证，正式应用领域尚待管理员决定。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助理解情绪困难的类型及支持需求，不能凭分数作临床诊断或选拔。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "derssf18-kaufman2016-original",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "原英语研究：青少年三个样本n=257、成人两个样本n=797",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "作者按原DERS六维选择每维三题，CFA与原36题相关模式比较，证据仅属源研究，不说明新独立中文译稿有效。",
+        "rating": "MIXED",
+        "citation": "Kaufman, E. A., Xia, M., Fosco, G., Yaptangco, M., Skidmore, C. R., & Crowell, S. E. (2016). The Difficulties in Emotion Regulation Scale Short Form (DERS-SF): Validation and Replication in Adolescent and Adult Samples. Journal of Psychopathology and Behavioral Assessment, 38, 443–455. https://doi.org/10.1007/s10862-015-9529-3.",
+        "doi": "10.1007/s10862-015-9529-3",
+        "url": "https://psych.utah.edu/_resources/documents/people/crowell/Kaufman_Crowell_DERS-SF_2016.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Kaufman等作者ResearchGate 2015 DERS-SF scoring and measure 18-item uploaded full text: https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure。简体中文由平台独立逐项起草，未复制别人的验证译本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "DERS-SF Kaufman18与DERS16及Victor/Klonsky18分开；中文人工翻译审校、认知访谈与中国群体效度尚未完成。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "ders_sf18_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "ders_sf18_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "ders_sf18_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "© 2015/2016 Kaufman, Xia, Fosco, Yaptangco, Skidmore & Crowell；作者上传的18题施测表与计分说明见 https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure，开发/验证论文见 https://psych.utah.edu/_resources/documents/people/crowell/Kaufman_Crowell_DERS-SF_2016.pdf。原论文作者e-offprint标记©Springer且限个人用途；ResearchGate公开全文并非CC BY或公开GitHub再分发授权。简体中文题项、提示及报告由平台基于英文独立整理，未经作者批准、翻译审校和中国目标人群验证。实际线上施测、公开译稿再分发、商业用途及原DERS36衍生题文权利链应由管理员联系权利人确认；未联系不表示作者拒绝。该待办不阻断DRAFT内容加工。",
+      "作者联系和授权范围由管理员决策，不增加开发自动门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "DERS-SF Kaufman et al. 2015 author-uploaded English 18 items, independent Chinese draft",
+        "citation": "Kaufman, E. A., Xia, M., Fosco, G., Yaptangco, M., Skidmore, C. R., & Crowell, S. E. (2016). The Difficulties in Emotion Regulation Scale Short Form (DERS-SF): Validation and Replication in Adolescent and Adult Samples. Journal of Psychopathology and Behavioral Assessment, 38, 443–455. https://doi.org/10.1007/s10862-015-9529-3.",
+        "url": "https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "© 2015/2016 Kaufman, Xia, Fosco, Yaptangco, Skidmore & Crowell；作者上传的18题施测表与计分说明见 https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure，开发/验证论文见 https://psych.utah.edu/_resources/documents/people/crowell/Kaufman_Crowell_DERS-SF_2016.pdf。原论文作者e-offprint标记©Springer且限个人用途；ResearchGate公开全文并非CC BY或公开GitHub再分发授权。简体中文题项、提示及报告由平台基于英文独立整理，未经作者批准、翻译审校和中国目标人群验证。实际线上施测、公开译稿再分发、商业用途及原DERS36衍生题文权利链应由管理员联系权利人确认；未联系不表示作者拒绝。该待办不阻断DRAFT内容加工。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "ders_sf_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不（0–10%）",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "有时（11–35%）",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "大约一半时间（36–65%）",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "大多数时间（66–90%）",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "几乎总是（91–100%）",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DERS_SF18_01",
+          "content": "我会留意自己当下有什么感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_02",
+          "content": "我经常不知道自己究竟是什么感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_03",
+          "content": "我很难弄明白自己的感受是什么意思。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_04",
+          "content": "我会关心自己正在经历什么感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_05",
+          "content": "我对自己的感受常常感到困惑。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_06",
+          "content": "情绪难受的时候，我能够承认自己正在有这些感受。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_07",
+          "content": "情绪难受的时候，我会因为自己有这样的感受而觉得难为情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_08",
+          "content": "情绪难受的时候，我很难完成手头需要做的事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_09",
+          "content": "情绪难受的时候，我会觉得自己失去了控制。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_10",
+          "content": "情绪难受的时候，我认为自己最终会陷入非常低落的心情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_11",
+          "content": "情绪难受的时候，我很难把注意力转到其他事情上。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_12",
+          "content": "情绪难受的时候，我会因为自己有这种感受而感到内疚。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_13",
+          "content": "情绪难受的时候，我难以集中注意力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_14",
+          "content": "情绪难受的时候，我很难控制自己的行为。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_15",
+          "content": "情绪难受的时候，我觉得自己没有办法让自己好受一点。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_16",
+          "content": "情绪难受的时候，我会因为自己有这种感受而对自己生气。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_17",
+          "content": "情绪难受的时候，我会失去对自己行为的控制。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DERS_SF18_18",
+          "content": "情绪难受的时候，我要经过很长时间才能感觉好些。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "ders_sf_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "情绪调节困难总分",
+            "description": "反向觉察1、4、6后，18题原值相加，范围18–90；更高表示自述困难出现得更多，不代表诊断。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_16",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "strategies",
+            "type": "dimension",
+            "label": "觉得难以找到调节方法",
+            "description": "分数描述情绪难受时，是否容易认为缺少能让自己缓和的方法。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_18",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "nonacceptance",
+            "type": "dimension",
+            "label": "不容易接纳自己的情绪",
+            "description": "分数描述对自己的情绪感到羞愧、内疚或生气的频率。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "impulse",
+            "type": "dimension",
+            "label": "情绪强烈时控制行为有困难",
+            "description": "分数描述情绪不适时，是否较难控制自己的外在行为。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_17",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "goals",
+            "type": "dimension",
+            "label": "情绪难受时难以继续手头任务",
+            "description": "分数描述情绪不适时专注和完成日常事情的困难。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "awareness",
+            "type": "dimension",
+            "label": "对自己情绪的觉察较少",
+            "description": "原作者三个觉察题全部反向，分数越高表示较少留意或承认自己的情绪。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_06",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "clarity",
+            "type": "dimension",
+            "label": "不容易辨认和理解自己的情绪",
+            "description": "分数描述难以分清或理解自己感受的频率。 三题均值1–5，分数更高表示报告的相应困难更多。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DERS_SF18_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DERS_SF18_05",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total",
+          "strategies",
+          "nonacceptance",
+          "impulse",
+          "goals",
+          "awareness",
+          "clarity"
+        ],
+        "scoreOrder": [
+          "total",
+          "strategies",
+          "nonacceptance",
+          "impulse",
+          "goals",
+          "awareness",
+          "clarity"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "看看情绪难受时，哪些事情最费力",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷从不同角度了解，当情绪强烈时你是否容易遇到一些困难，例如难以集中注意、看不清感受，或者一下子找不到应对办法。总分只是十八道题的合计，并不表示你有什么疾病，也不代表一个人应该具备怎样的情绪管理能力。生活压力、环境和支持资源都可能影响回答。如果某个方面特别让你困扰，比起拿总分和别人比较，更重要的是找到实际让你感到困难的情境，考虑什么帮助适合你。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次情绪强烈时，哪些困难最需要你获得帮助？"
+              },
+              {
+                "category": "support",
+                "text": "若情绪持续影响日常生活，可以向信任的人或适当的专业资源寻求支持。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "strategies",
+            "headline": "觉得难以找到调节方法",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "心里很难受时，有时会觉得无论做什么都无法好起来，或者需要很长一段时间才恢复一点平静。这组回答关注这种无助的体验，而不是说你真的没有能力处理问题，更不能凭分数推断疾病。感受强烈的时候，解决方法也可能暂时看不清。可以先想想上次困难时，究竟是什么让情绪稍微缓和：是有人陪伴、睡了一觉、把事情分成小步，还是现实中某个问题得到了帮助？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "难受时什么样的小支持，曾让你感觉轻松一点？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以先写下两个安全、实际可做的小步骤，必要时向可信的人寻求帮助。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "nonacceptance",
+            "headline": "不容易接纳自己的情绪",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "当自己难过或生气时，有些人除了原本的难受，还会责备自己怎么会有这种情绪。这组题关注你是否经常因此感到羞愧、内疚或者对自己不耐烦。情绪出现本身并不等于做错了事，也不能以此判断一个人是否成熟。你可以回想最近一次强烈感受出现时，内心对自己说了什么。试着区分“我现在有这种感受”和“我必须马上把它消除”，给自己多一点理解的空间。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "哪一种感受出现时，你最容易责备自己？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以尝试用一句不带责备的话说出此刻的感受。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "impulse",
+            "headline": "情绪强烈时控制行为有困难",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "很生气、很难受的时候，脑中可能出现马上做点什么的冲动。有时人能够停下来，有时却发现行为不太受自己控制。这部分回答描述这种经验的频率，不是对道德品质的评价，也不能单独用来判定风险。你可以关注哪些场合最容易让自己想立刻行动，以及什么方法能争取一点安全的停顿。如果你担心自己的行为会伤害自己或他人，寻求现实中的即时支持，比独自研究分数更重要。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "情绪很强时，身体或行为会出现哪些提醒信号？"
+              },
+              {
+                "category": "strategy",
+                "text": "为自己预留一个安全的暂停方式，例如离开冲突现场、慢慢呼吸或向可信的人求助。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "goals",
+            "headline": "情绪难受时难以继续手头任务",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "情绪难受时，不容易集中注意力、完成事情，或者脑中反复想着刚发生的事，都可能出现。这个维度关注这些时候任务受到的影响，并不说明你不努力或学习能力不好。人有时需要休息、调整工作负担或得到支持，而不是立即要求自己恢复全部效率。可以试着辨认，什么样的任务最容易被情绪打断。下次可以先选择一个较小的步骤，看看怎样减轻压力并保留必要的休息。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近哪一种事情最容易在情绪难受时被打断？"
+              },
+              {
+                "category": "strategy",
+                "text": "把重要任务拆成一个短步骤，并允许自己在需要时暂停或求助。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "awareness",
+            "headline": "对自己情绪的觉察较少",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有时我们忙于处理事情，来不及发现自己正在难过、紧张或者愤怒。这里三道题已经按照原作者规则反向计算，得分更高表示较少注意或承认自己的情绪，并不是说你一定缺乏同理心。觉察不一定要立即改变情绪，也不需要时时刻刻关注自己。可以想想在一天里的哪个时候最容易注意到感受，什么时候因为环境紧张或太忙而忽略了它。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候你最容易发现情绪正在变化？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一个日常停顿时刻，简单问自己一句：现在我是什么感觉？"
+              }
+            ]
+          },
+          {
+            "scoreKey": "clarity",
+            "headline": "不容易辨认和理解自己的情绪",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "心里不舒服的时候，有时只知道自己不好受，却难以说清是失望、委屈、害怕还是愤怒。这是很常见的体验，这个分数仅记录你是否经常遇到类似困难，并不意味着你对自己了解得不够。不同感受也可能同时存在，未必能用一个词概括。你可以试着回想一次最近发生的事，把身体的反应、脑中的想法和情绪词分开看看；如果一时讲不清，也允许自己慢慢探索。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "有没有一个时刻，你说不清自己难受的感受究竟是什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "可以用几个不同的情绪词来描述同一次经历，不强迫自己立刻选出唯一答案。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Kaufman等18题原版不同于DERS-16或Victor/Klonsky的另一18题短式，题序和计分不可跨版本移用。",
+          "总分18–90与六个1–5的分维均分量纲不同，不能对分维求均值再声称得到18题总分。",
+          "只有第1/4/6题反向6−原值；分数更高仅表示自述相应困难较常见，不诊断疾病，不使用未经证实的常模、轻中重阈值或排序。",
+          "本简体中文为独立未验证工作稿；原研究英文青少年/成人的信效度不能自动迁移到中文成年人或中小学人群。",
+          "分维全答才计算该维、18题全答才计算总分为平台保守缺答规则，而非作者明确的缺答标准。",
+          "原版源材料可公开阅读，但未核明对本独立翻译源码公开再分发、电子施测或商业用途的许可，需管理员后续协调。"
+        ],
+        "disclaimer": "DERS-SF18原量表：Kaufman等（2016），基于DERS36缩短。本稿为EDUK12.TOP独立中文未验证研究准备版，仅提供非诊断性反馈，不能替代心理健康专业评估。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "ders_sf18_kaufman",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_1",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 30,
+            "strategies": 1,
+            "nonacceptance": 1,
+            "impulse": 1,
+            "goals": 1,
+            "awareness": 5,
+            "clarity": 1
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "all_5",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 78,
+            "strategies": 5,
+            "nonacceptance": 5,
+            "impulse": 5,
+            "goals": 5,
+            "awareness": 1,
+            "clarity": 5
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "all_3",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 54,
+            "strategies": 3,
+            "nonacceptance": 3,
+            "impulse": 3,
+            "goals": 3,
+            "awareness": 3,
+            "clarity": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "cyclic_1_to_5",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 57,
+            "strategies": 4.333333333333333,
+            "nonacceptance": 1.6666666666666667,
+            "impulse": 3.3333333333333335,
+            "goals": 2.3333333333333335,
+            "awareness": 4,
+            "clarity": 3.3333333333333335
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "reverse_5_other_1",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 18,
+            "strategies": 1,
+            "nonacceptance": 1,
+            "impulse": 1,
+            "goals": 1,
+            "awareness": 1,
+            "clarity": 1
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "reverse_1_other_5",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 90,
+            "strategies": 5,
+            "nonacceptance": 5,
+            "impulse": 5,
+            "goals": 5,
+            "awareness": 5,
+            "clarity": 5
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "missing_awareness_1",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "strategies": 3,
+            "nonacceptance": 3,
+            "impulse": 3,
+            "goals": 3,
+            "awareness": null,
+            "clarity": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "missing_strategies_10",
+        "answers": [
+          {
+            "itemCode": "DERS_SF18_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_12",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_13",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_14",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_15",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_16",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_17",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "DERS_SF18_18",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "strategies": null,
+            "nonacceptance": 3,
+            "impulse": 3,
+            "goals": 3,
+            "awareness": 3,
+            "clarity": 3
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null,
+            "strategies": null,
+            "nonacceptance": null,
+            "impulse": null,
+            "goals": null,
+            "awareness": null,
+            "clarity": null
+          },
+          "totalScoreKeys": [
+            "total",
+            "strategies",
+            "nonacceptance",
+            "impulse",
+            "goals",
+            "awareness",
+            "clarity"
+          ]
+        }
+      }
+    ]
+  }
+}

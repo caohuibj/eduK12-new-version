@@ -1,0 +1,268 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ders_sf18_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "kind": "AUTHOR_UPLOADED_FULL_TEXT",
+    "url": "https://www.researchgate.net/publication/286383944_DERS-SF_scoring_and_measure",
+    "paperDoi": "10.1007/s10862-015-9529-3",
+    "authors": [
+      "Kaufman",
+      "Xia",
+      "Fosco",
+      "Yaptangco",
+      "Skidmore",
+      "Crowell"
+    ],
+    "sourceYear": 2015,
+    "publicationYear": 2016,
+    "distinctFrom": [
+      "DERS16",
+      "Victor_Klonsky_DERS18"
+    ]
+  },
+  "items": [
+    {
+      "itemCode": "DERS_SF18_01",
+      "number": 1,
+      "reverse": true,
+      "facet": "awareness"
+    },
+    {
+      "itemCode": "DERS_SF18_02",
+      "number": 2,
+      "reverse": false,
+      "facet": "clarity"
+    },
+    {
+      "itemCode": "DERS_SF18_03",
+      "number": 3,
+      "reverse": false,
+      "facet": "clarity"
+    },
+    {
+      "itemCode": "DERS_SF18_04",
+      "number": 4,
+      "reverse": true,
+      "facet": "awareness"
+    },
+    {
+      "itemCode": "DERS_SF18_05",
+      "number": 5,
+      "reverse": false,
+      "facet": "clarity"
+    },
+    {
+      "itemCode": "DERS_SF18_06",
+      "number": 6,
+      "reverse": true,
+      "facet": "awareness"
+    },
+    {
+      "itemCode": "DERS_SF18_07",
+      "number": 7,
+      "reverse": false,
+      "facet": "nonacceptance"
+    },
+    {
+      "itemCode": "DERS_SF18_08",
+      "number": 8,
+      "reverse": false,
+      "facet": "goals"
+    },
+    {
+      "itemCode": "DERS_SF18_09",
+      "number": 9,
+      "reverse": false,
+      "facet": "impulse"
+    },
+    {
+      "itemCode": "DERS_SF18_10",
+      "number": 10,
+      "reverse": false,
+      "facet": "strategies"
+    },
+    {
+      "itemCode": "DERS_SF18_11",
+      "number": 11,
+      "reverse": false,
+      "facet": "goals"
+    },
+    {
+      "itemCode": "DERS_SF18_12",
+      "number": 12,
+      "reverse": false,
+      "facet": "nonacceptance"
+    },
+    {
+      "itemCode": "DERS_SF18_13",
+      "number": 13,
+      "reverse": false,
+      "facet": "goals"
+    },
+    {
+      "itemCode": "DERS_SF18_14",
+      "number": 14,
+      "reverse": false,
+      "facet": "impulse"
+    },
+    {
+      "itemCode": "DERS_SF18_15",
+      "number": 15,
+      "reverse": false,
+      "facet": "strategies"
+    },
+    {
+      "itemCode": "DERS_SF18_16",
+      "number": 16,
+      "reverse": false,
+      "facet": "nonacceptance"
+    },
+    {
+      "itemCode": "DERS_SF18_17",
+      "number": 17,
+      "reverse": false,
+      "facet": "impulse"
+    },
+    {
+      "itemCode": "DERS_SF18_18",
+      "number": 18,
+      "reverse": false,
+      "facet": "strategies"
+    }
+  ],
+  "response": {
+    "range": [
+      1,
+      5
+    ],
+    "labels": [
+      "Almost Never 0–10%",
+      "Sometimes 11–35%",
+      "About Half of the Time 36–65%",
+      "Most of the Time 66–90%",
+      "Almost Always 91–100%"
+    ],
+    "recallPeriod": "NO_FIXED_AUTHOR_WINDOW"
+  },
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "reversedItems": [
+      1,
+      4,
+      6
+    ],
+    "reverseFunction": "6-x",
+    "total": {
+      "aggregation": "sum",
+      "range": [
+        18,
+        90
+      ]
+    },
+    "facets": [
+      {
+        "name": "strategies",
+        "itemNumbers": [
+          10,
+          15,
+          18
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "name": "nonacceptance",
+        "itemNumbers": [
+          7,
+          12,
+          16
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "name": "impulse",
+        "itemNumbers": [
+          9,
+          14,
+          17
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "name": "goals",
+        "itemNumbers": [
+          8,
+          11,
+          13
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "name": "awareness",
+        "itemNumbers": [
+          1,
+          4,
+          6
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      },
+      {
+        "name": "clarity",
+        "itemNumbers": [
+          2,
+          3,
+          5
+        ],
+        "aggregation": "mean",
+        "range": [
+          1,
+          5
+        ]
+      }
+    ],
+    "missing": "complete_required_for_each_score_project_policy"
+  },
+  "versions": {
+    "instrument": "1.0.0",
+    "localization": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "reference": "none"
+  },
+  "copyright": {
+    "status": "unknown",
+    "publicRedistribution": "admin_review_pending",
+    "systemUse": "admin_review_pending",
+    "independentTranslation": "admin_review_pending"
+  },
+  "validation": {
+    "staticGoldenCases": 9,
+    "actualVitest": "NOTRUN",
+    "tsc": "NOTRUN",
+    "database": "NOTRUN",
+    "ci": "NOTRUN",
+    "activated": false
+  }
+}
