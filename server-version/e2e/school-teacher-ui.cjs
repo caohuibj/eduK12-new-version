@@ -328,30 +328,39 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     await theme(s, 'dark')
     for (const viewport of narrow) {
       await s.page.setViewportSize(viewport)
+      const mutations = s.audit.apiMutations.length
       if (s.product === 'TEACHER') {
-        const details = s.page.locator('details.ht-workspace-account'), summary = details.locator(':scope > summary')
-        assert.equal(await details.evaluate(el => el.open), false, 'Existing school member starts with account details collapsed')
-        await summary.focus(); await summary.press('Enter'); assert.equal(await details.evaluate(el => el.open), true)
-        await summary.press('Enter'); assert.equal(await details.evaluate(el => el.open), false)
-        await anchor(s, '个人任务分区', '私有表单任务', 'ht-personal-private-forms')
+        const trigger = s.page.getByRole('button', { name: '账号设置', exact: true })
+        const dialog = s.page.getByRole('dialog', { name: '账号设置', exact: true })
+        assert.equal(await dialog.isVisible(), false, 'Account dialog starts closed')
+        await trigger.focus(); await trigger.press('Enter'); await dialog.waitFor()
+        assert.equal(await dialog.getByRole('heading', { name: '账号设置', exact: true }).evaluate(el => document.activeElement === el), true)
+        await s.page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' })
+        assert.equal(await trigger.evaluate(el => document.activeElement === el), true)
+        await anchor(s, '个人任务分区', '个人测评', 'ht-personal-self')
+        await anchor(s, '个人任务分区', '参与测评', 'ht-personal-tasks')
       } else {
-        const toggle = s.page.getByRole('button', { name: '功能导航', exact: true })
-        await toggle.focus(); await toggle.press('Enter'); assert.equal(await toggle.getAttribute('aria-expanded'), 'true')
-        const nav = s.page.getByRole('navigation', { name: '工作台功能导航', exact: true })
-        await nav.getByRole('link').first().focus(); await s.page.keyboard.press('Escape')
-        assert.equal(await toggle.getAttribute('aria-expanded'), 'false')
-        assert.equal(await toggle.evaluate(el => document.activeElement === el), true)
+        const nav = s.page.getByRole('navigation', { name: '校园功能分组', exact: true })
+        const link = nav.getByRole('link', { name: '校园活动', exact: true })
+        await link.focus(); await link.press('Enter')
+        await s.page.getByRole('navigation', { name: '校园活动功能入口', exact: true }).waitFor()
+        assert.equal(new URL(s.page.url()).pathname, '/workspace/activities')
+        assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
+        const back = s.page.getByRole('link', { name: '返回概览', exact: true })
+        await back.focus(); await back.press('Enter')
+        await s.page.getByRole('heading', { name: '心理教师工作台', exact: true }).waitFor()
+        assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
       }
-      report.checks.push({ product: s.product, check: 'workspace-keyboard-' + viewport.width, collapsedAfter: true, focusVerified: true })
+      assert.equal(s.audit.apiMutations.length, mutations, 'Workspace navigation and account dialog must not mutate business data')
+      report.checks.push({ product: s.product, check: 'workspace-keyboard-' + viewport.width, restoredNavigation: true, focusVerified: true })
       await observe(s, 'compact-workspace', 'dark', viewport, viewport.width === 320)
     }
     await theme(s, 'light'); await s.page.setViewportSize({ width: 1440, height: 900 })
   }
   async function schoolManagementAnchor(s) {
-    if (done.has('teacher-school-anchor')) return
     await s.page.setViewportSize(narrow[1])
     await anchor(s, '学校管理分区', '评价活动', 'ht-school-evaluations')
-    report.checks.push({ product: 'TEACHER', check: 'school-management-anchor', focusVerified: true })
+    if (!done.has('teacher-school-anchor')) report.checks.push({ product: 'TEACHER', check: 'school-management-anchor', focusVerified: true })
     done.add('teacher-school-anchor')
     await s.page.setViewportSize({ width: 1440, height: 900 })
   }
@@ -568,7 +577,7 @@ function verifyReport(report, options, readScreenshot) {
       assert.deepEqual(c.isolatedValues, { guest: 'light', current: 'light', otherAccount: 'auto', otherProduct: 'dark' })
     } else {
       assert.equal(c.focusVerified, true)
-      if (c.check.startsWith('workspace-keyboard')) assert.equal(c.collapsedAfter, true)
+      if (c.check.startsWith('workspace-keyboard')) assert.equal(c.restoredNavigation, true)
     }
   }
   for (const product of products) {

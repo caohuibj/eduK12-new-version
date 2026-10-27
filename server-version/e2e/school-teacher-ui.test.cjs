@@ -95,7 +95,7 @@ function sample() {
     }
     for (const width of [320, 390]) {
       add('compact-workspace', 'dark', width, width === 320)
-      report.ui.checks.push({ product, check: 'workspace-keyboard-' + width, collapsedAfter: true, focusVerified: true })
+      report.ui.checks.push({ product, check: 'workspace-keyboard-' + width, restoredNavigation: true, focusVerified: true })
       for (const state of darkStates) add(state, 'dark', width, width === 390)
     }
   }
@@ -168,3 +168,17 @@ test('theme consumer uses the real cyclic button for every source and target mod
   }
   await assert.rejects(selectAppearanceButton({getAttribute:async()=> 'legacy select'},'Teacher','light'))
 })
+
+test('workspace and task consumers match the current compact product controls',()=>{
+ const fs=require('node:fs'),path=require('node:path'),root=path.resolve(__dirname,'..');
+ const ui=fs.readFileSync(path.join(__dirname,'school-teacher-ui.cjs'),'utf8'),browser=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const teacher=fs.readFileSync(path.join(root,'frontend/src/huiteacher/HuiteacherApp.tsx'),'utf8'),school=fs.readFileSync(path.join(root,'frontend/src/school/SchoolProfessionalWorkspace.tsx'),'utf8');
+ for(const label of ['账号设置','个人测评','参与测评']){assert(teacher.includes(label));assert(ui.includes(label))}
+ assert(school.includes('校园功能分组'));assert(ui.includes('校园功能分组'));
+ assert.doesNotMatch(ui,/details\.ht-workspace-account|name: '功能导航'|私有表单任务/);
+ assert.doesNotMatch(browser,/name: '选择已有活动'|kind === 'SCALE' \? '进入本人自评'|getByText\('状态：已完成'/);
+ assert.match(browser,/name: '配置活动：' \+ w.title/);assert.match(browser,/getByLabel\('状态：已完成'/);
+ assert.match(browser,/selected.press\('ArrowLeft'\)/);
+ const fn=ui.slice(ui.indexOf('async function schoolManagementAnchor'),ui.indexOf('async function schoolManagementAnchor')+700);
+ assert.doesNotMatch(fn,/if \(done.has\('teacher-school-anchor'\)\) return/);
+});

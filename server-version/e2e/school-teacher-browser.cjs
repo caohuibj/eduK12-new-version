@@ -537,6 +537,7 @@ async function run() {
       const title = `${s.product} 合成${kind} ${fixture.suffix}`
       await toolsPage(s, f)
       const studio = p.getByRole('region', { name: '我的私有工具', exact: true })
+      if (s.product === 'SCHOOL') await studio.locator('details.education-private-create > summary').click()
       await studio.getByLabel('工具名称', { exact: true }).fill(title)
       await studio.getByRole('combobox', { name: '类型', exact: true }).selectOption(kind)
       const draft = await s.click(studio.getByRole('button', { name: '创建私有工具' }), base)
@@ -590,7 +591,7 @@ async function run() {
     async function workflowPage(s, f, w) {
       if (s.product === 'SCHOOL') {
         await s.page.goto(s.origin + '/workspace/activities?organizationId=' + f.organizationId)
-        await s.page.getByRole('combobox', { name: '选择已有活动', exact: true }).selectOption(w.id)
+        await s.page.getByRole('button', { name: '配置活动：' + w.title, exact: true }).click()
         await s.page.getByRole('button', { name: w.runName + ' · 准备中', exact: true }).click()
         return s.page
       }
@@ -665,7 +666,7 @@ async function run() {
           : p.locator('article.ht-event').filter({ hasText: versions[kind].title })
         const open = async () => {
           const loaded = p.waitForResponse(r => r.request().method() === 'GET' && new RegExp('^' + s.prefix + '/(?:private-form-)?composite-attempts/[^/]+$').test(new URL(r.url()).pathname))
-          await card().getByRole('button', { name: s.product === 'SCHOOL' ? '开始／继续官方测评' : kind === 'SCALE' ? '进入本人自评' : '打开本人表单', exact: true }).click()
+          await card().getByRole('button', { name: s.product === 'SCHOOL' ? '开始／继续官方测评' : /^(开始测评|继续测评)$/, exact: true }).click()
           if (s.product === 'SCHOOL') {
             const consent = p.getByRole('checkbox', { name: '我已阅读本次测评的用途与可见性说明，自愿同意作答。', exact: true })
             if (await consent.count()) await consent.check()
@@ -696,10 +697,12 @@ async function run() {
           assert.ok(fields.every(field => field.type === field.formDefinition.type))
           const player = () => p.locator('.form-player')
           await keyboardCheck(s, player().getByRole('radio', { name: '合成选项乙', exact: true }))
-          await player().getByRole('button', { name: '下一题', exact: true }).click()
+          // Single-choice selection auto-advances; do not click the next question's Next.
           await player().getByRole('group', { name: /合成多选题/ }).waitFor()
           await player().getByRole('button', { name: '上一题', exact: true }).click()
-          await player().getByRole('radio', { name: '合成选项甲', exact: true }).check()
+          const selected = player().getByRole('radio', { name: '合成选项乙', exact: true })
+          await selected.focus(); await selected.press('ArrowLeft')
+          assert.equal(await player().getByRole('radio', { name: '合成选项甲', exact: true }).isChecked(), true)
           await p.getByRole('button', { name: '保存并退出', exact: true }).click(); await open()
           assert.equal(await player().getByRole('radio', { name: '合成选项甲', exact: true }).isChecked(), true)
           await shot(s, 'typed-single-restored')
@@ -735,7 +738,7 @@ async function run() {
         }
         if (s.product === 'SCHOOL') {
           await p.getByRole('button', { name: '返回我的校园活动', exact: true }).click()
-          await card().getByText('状态：已完成', { exact: true }).waitFor()
+          await card().getByLabel('状态：已完成', { exact: true }).waitFor()
         } else if (kind === 'FORM') {
           const completedForm = p.locator('.ht-task').filter({ has: p.getByText('本次表单已正式提交。', { exact: true }) })
           await completedForm.getByText('本次表单已正式提交。', { exact: true }).waitFor()
