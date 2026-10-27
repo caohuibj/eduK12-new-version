@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "base": "04a8d994207d7b831b874d4be4f5c31640466458",
-  "product": "493f089d06b9856dba73464c6d8f57b59ab0a8b6",
+  "product": "e593b7cc53713f90137958355783efdebbbb0a6c",
   "branch": "work/school-teacher-consolidated-20261027",
   "source": {
     "docs/evidence/school-teacher-review-20261027.json": {
@@ -449,21 +449,21 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "cf5cebf7c9ad119a20d80f314b989a632c7448bc",
-      "after": "5df3e3e5b073b9b4507f3b369ac6ca3d488cb7c0",
+      "after": "530a56f8e456a47718b2a4c00e2b2643b80cf50b",
       "status": "M"
     },
     "server-version/e2e/school-teacher-ui.cjs": {
       "oldMode": "100644",
       "newMode": "100644",
       "before": "a5113a9c4a58e7b598de78256a4497b4f0ca6664",
-      "after": "119c564482f39b859effdef0cddd966a0f7965af",
+      "after": "fce1961fbf7e1e7a04d2eb9fc4656f4919b7acbd",
       "status": "M"
     },
     "server-version/e2e/school-teacher-ui.test.cjs": {
       "oldMode": "100644",
       "newMode": "100644",
       "before": "0eb268531d0705bfdc7ec0a53100990a54e3f052",
-      "after": "e40587df81414b014ed7b3204931946a6193f1e8",
+      "after": "a1058429f221bba0fbb4876dc9f2ee43f60d1386",
       "status": "M"
     },
     "server-version/frontend/public/entry-brand.js": {

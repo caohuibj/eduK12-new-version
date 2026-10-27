@@ -313,3 +313,30 @@ The source-matched direct contract passes. No application/permission/timeout or
 workflow change; both app qualifications remain fixed-artifact reuse. Do not add
 a large per-realm admission framework solely to avoid replay of the changed,
 not-yet-qualified browser consumer. Its previous per-realm results remain explicit.
+
+## Painted-control layout check (05:24 UTC)
+
+R15 run40452289390/source4fa71a2e retained all nonbrowser qualifications and the
+whole Teacher journey. School SCALE author/publish/recovery/FINAL/report passed;
+FORM stopped at matrix refusal, dark320. Only one SELECT clipped was reported,
+while document width320 and axe/keyboard passed. The raw failed job and artifact
+12711066184 (ZIP3f1b277ee82c25dd91d0dded35f537f927ae8c3be8210b62b89fb10ff1e09434)
+remain failures. A390light screenshot does not prove the exact320dark element.
+
+The detector now evaluates native checkVisibility for geometrically overflowing
+controls and records only safe tag/rectangle/closed-details flags for unpainted
+ones. Visible SELECTs, document overflow and bounded scrolling rules remain
+unchanged. Missing native API throws, never silently accepts unknown state.
+Before any business journey, the same official sandboxed browser must prove a
+network-free synthetic contract: one visible overflowing SELECT is detected
+when details is closed; two are detected when opened. The final report verifier
+requires this contract result. Actual product DOM and API are never changed by
+this probe. This establishes the detector independently, not prior product PASS.
+The14pureUI contracts pass locally; native probe and complete journey remain
+NOTRUN for the new candidate. Local sandboxed launch was blocked by executor
+initialization, with no security flags disabled or permissions changed.
+
+Product e593b7cc is skip-ci. Both application trees, qualified artifacts, workflow
+and all unrelated controls are unchanged. Only source freeze, changed e2e SAST,
+native browser consumer and final required gate need current evidence. No app
+build/test/scan repeats, no merge before successful gates and no deployment.
