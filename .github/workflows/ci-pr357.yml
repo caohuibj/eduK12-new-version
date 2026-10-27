@@ -1,0 +1,251 @@
+name: PR357 exact affected qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  CI: 'true'
+  TZ: UTC
+  PLAN: ${{ inputs.plan }}
+  CI_EVENT: pull_request
+  CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.21.0'}
+      - run: node .github/scripts/pr357-checks.mjs source
+      - run: node --test .github/scripts/pr357-scope.test.mjs .github/scripts/pr357-checks.test.mjs
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/type_generation_only
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.21.0'}
+      - run: node .github/scripts/pr357-checks.mjs source
+      - name: prepare locked type dependencies without backend compilation
+        env: {PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'}
+        run: |
+          npm ci --ignore-scripts --prefix server-version/backend
+          node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+          npm ci --prefix server-version/frontend
+      - run: node .github/scripts/pr357-checks.mjs frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr357-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - uses: docker/setup-buildx-action@v3
+      - name: package the existing frontend dist without a second Vite build
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          source=Path('server-version/frontend/Dockerfile').read_text()
+          runtime=source[source.index('FROM nginx:'):]
+          assert runtime.count('COPY --from=build /app/dist')==1
+          Path('pr357-frontend.Dockerfile').write_text(runtime.replace('COPY --from=build /app/dist','COPY dist'))
+          PYCODE
+          mkdir -p "$RUNNER_TEMP/pr357-frontend-context"
+          cp -a server-version/frontend/dist "$RUNNER_TEMP/pr357-frontend-context/dist"
+          cp server-version/frontend/nginx.conf "$RUNNER_TEMP/pr357-frontend-context/nginx.conf"
+          docker buildx build --load -f pr357-frontend.Dockerfile -t pr357-frontend-runtime "$RUNNER_TEMP/pr357-frontend-context"
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with: {version: v0.70.0, cache: false}
+      - run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output pr357-evidence/frontend-scan.json pr357-frontend-runtime
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr357-frontend-checks-${{ github.sha }}
+          path: pr357-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env: {POSTGRES_DB: pr357_upgrade_ci_test, POSTGRES_USER: ptool, POSTGRES_PASSWORD: synthetic-actions-disposable}
+        ports: ['5432/tcp']
+        options: --health-cmd "pg_isready -U ptool -d pr357_upgrade_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379/tcp']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/pr357_upgrade_ci_test
+      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/14
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.21.0'}
+      - run: node .github/scripts/pr357-checks.mjs source
+      - uses: docker/setup-buildx-action@v3
+      - name: compile backend once using the unchanged production build dependencies
+        run: |
+          mkdir -p pr357-evidence
+          python3 - <<'PY'
+          from pathlib import Path
+          source=Path('server-version/backend/Dockerfile').read_text()
+          assert source.count('RUN npm run build')==1
+          Path('pr357.Dockerfile').write_text(source.replace('RUN npm run build','RUN npx tsc'))
+          PY
+          docker buildx build --load --build-arg DEBIAN_MIRROR=deb.debian.org --target build -f pr357.Dockerfile -t pr357-build server-version/backend
+          container=$(docker create pr357-build)
+          docker cp "$container:/app/dist" server-version/backend/dist
+          docker rm "$container"
+          node .github/scripts/ci-artifact.mjs write backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr357-backend-${{ github.sha }}
+          path: server-version/backend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - name: upgrade nonempty baseline then execute isolated affected consumers and restore
+        run: node .github/scripts/pr357-checks.mjs database
+      - name: package the already compiled backend without another compilation
+        run: docker buildx build --load --build-arg DEBIAN_MIRROR=deb.debian.org --target runtime -f pr357.Dockerfile -t pr357-runtime server-version/backend
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with: {version: v0.70.0, cache: false}
+      - run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output pr357-evidence/backend-scan.json pr357-runtime
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr357-backend-checks-${{ github.sha }}
+          path: pr357-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+  audit:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.21.0'}
+      - run: node .github/scripts/pr357-checks.mjs source
+      - name: retain HIGH CRITICAL production dependency threshold
+        run: |
+          mkdir -p pr357-evidence
+          npm audit --prefix server-version/backend --package-lock-only --omit=dev --audit-level=high --json > pr357-evidence/backend-audit.json
+          npm audit --prefix server-version/frontend --package-lock-only --omit=dev --audit-level=high --json > pr357-evidence/frontend-audit.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr357-audit-${{ github.sha }}
+          path: pr357-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+  connected:
+    needs: [frontend, backend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env: {POSTGRES_DB: school_teacher_browser_ci_test, POSTGRES_USER: ptool, POSTGRES_PASSWORD: synthetic-actions-disposable}
+        ports: ['5432/tcp']
+        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379/tcp']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+      SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+      SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.21.0'}
+      - run: node .github/scripts/pr357-checks.mjs source
+      - uses: actions/download-artifact@v4
+        with:
+          name: pr357-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: pr357-backend-${{ github.sha }}
+          path: server-version/backend/dist
+      - name: install locked runtime test dependencies, never rebuild either application
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          if [ -f /etc/apt/apt-mirrors.txt ]; then
+            sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+          fi
+          bash server-version/scripts/ci-install-canvas-deps.sh
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends fonts-wqy-zenhei
+          npm ci --prefix server-version/backend
+          node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+          node .github/scripts/ci-artifact.mjs verify frontend
+          node .github/scripts/ci-artifact.mjs verify backend
+      - name: prepare browser-only disposable schema and actual restricted principal
+        run: |
+          node server-version/backend/node_modules/prisma/build/index.js migrate deploy --schema server-version/backend/prisma/schema.prisma
+          node server-version/e2e/school-teacher-fixture.cjs seed
+      - name: require official sandboxed Chrome without changing security settings
+        run: node server-version/e2e/school-teacher-chrome.cjs preflight
+      - name: execute existing real product journey and its assertion matrix against the same artifacts
+        env: {SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'}
+        run: node server-version/e2e/school-teacher-browser.cjs
+      - name: remove only this job's private synthetic browser material
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import {resolve,sep} from 'node:path';import {rmSync} from 'node:fs';
+          const root=resolve(process.env.RUNNER_TEMP),dir=resolve(process.env.SCHOOL_TEACHER_PRIVATE_DIR);
+          if(dir!==root+sep+'school-teacher-private')throw Error('Refuse unexpected cleanup target');
+          rmSync(dir,{recursive:true,force:true});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr357-connected-${{ github.sha }}
+          path: |
+            school-teacher-evidence/*.json
+            school-teacher-evidence/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, frontend, backend, audit, connected]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: reject missing skipped cancelled and failed consumers
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          node -e "const n=JSON.parse(process.env.NEEDS);for(const k of ['admission','frontend','backend','audit','connected'])if(n[k]?.result!=='success')throw Error(k+' not qualified')"

@@ -1,0 +1,1765 @@
+{
+  "schemaVersion": 1,
+  "base": "04a8d994207d7b831b874d4be4f5c31640466458",
+  "product": "3fb06cd2bf35b863144e4554f30b4284311b7751",
+  "branch": "work/school-teacher-consolidated-20261027",
+  "source": {
+    "docs/evidence/school-teacher-review-20261027.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e0800d14d79112f0066e96a6f1da6455651a8d9c",
+      "status": "A"
+    },
+    "docs/school-management-execution-plan.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d8155ea3ff83109eefbaf8a7b3c986d725d1228e",
+      "status": "A"
+    },
+    "docs/school-personnel-import.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c63444a0a5b79855eb332ac9179ed94dd16f4f3b",
+      "status": "A"
+    },
+    "docs/school-private-form-import.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "11a83e44fc97a4a8b92168ab2d84323bdba3c1f5",
+      "status": "A"
+    },
+    "docs/school-teacher-dot-review-20261027.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "68fda5b5ddd2f71d014027d3586ee604995b479f",
+      "status": "A"
+    },
+    "docs/school-teacher-review-summary-20261027.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0ce6835594171c4cd8685799c2d239aea92f2474",
+      "status": "A"
+    },
+    "server-version/backend/prisma/migrations/20261026150000_campus_personnel_import/migration.sql": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "29a121677f21b053acac44ac45e22f70909eff9a",
+      "status": "A"
+    },
+    "server-version/backend/prisma/migrations/20261026210000_education_roster_jobs/migration.sql": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b8a635e19a2b50ee642e6b8a760bc5dfd9ffcef8",
+      "status": "A"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb",
+      "after": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+      "status": "M"
+    },
+    "server-version/backend/scripts/runtime-table-policy.json": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ca6913779ed4470737a510d68b5dde256f2e2521",
+      "after": "e837b8b868fdfff0ccbf0f14d00368c85c38e225",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/campus/personnel.routes.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ff2bcec824969183504f6a38e22a95e95ec22d4d",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/controllers/assignmentSubmit.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "392d12c6eaf180515a960dcbabb59de91be461ed",
+      "after": "49bee0c816e4f6eaec31af8244f6f51354616e00",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/controllers/checkinSubmit.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2b1a76196afc600c20b8456716d1284adbf4c9d2",
+      "after": "a6d839f4454f278377a51eb05926df72d9652188",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/education-roster/jobs-limits.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9791b34c8c0e2aa561c8983eb157cfd2dbbca22e",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/education-roster/routes.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ff7fa7358d70f313089d835518f05f10174fac08",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/education-roster/workbook.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2d329da1b6eaae0ea2ad187a4a5892c372906e3a",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/education-tools/private-tool.form-import.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f12143c02edcf5f8da242106c9c2c575f64ff939",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/huiteacher/consensus-approval-once.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8095b6c64bc17e127bfbf2e7eddbe77889c4deab",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/huiteacher/formal-feedback-once.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8bf7574a3ab29b2b8b3c6a34d4d59d041333cc9e",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/campusActivity.postgres.integration.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9fb15f2b23695d33ad3266e8f207ac8f12447405",
+      "after": "2228f9971fe67e147bf59f71803c78e2f8632a89",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/integration/campusPersonnel.postgres.integration.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8bfc7db3e7bfa719b29208476a9d033d890439bd",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/campusPersonnelDirectory.postgres.integration.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5730d3925bb757a447b6928a1b86acaddde27061",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateFormImport.postgres.integration.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0b7aef00fda723cbcb3d788ea4a117d6c4d3bdf2",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a60f3f2ef67ac0a3a16fac8d47c1a16dc36549c",
+      "after": "4c83c102d708c87a370179e1682fca0827d125b0",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/integration/educationRosterBridge.postgres.integration.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f906aa4ef39c14e07fb569c5c8b5bae5af5c2e6d",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ef81988d47385710f410f5569996936f4659a6fc",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherConsensus.postgres.integration.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c398c922060c3486362a748b3be795a68324234f",
+      "after": "27fe57c7b08c4a5cd4b4d37ee8ca13429c7e7793",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5dc4545817110e30b431fbe676bd5dd63412949b",
+      "after": "94b748bc57021da543ecbc0c144e85c9ce3e2c60",
+      "status": "M"
+    },
+    "server-version/backend/src/__tests__/reporting/education-scale-personal-report.service.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "82a5736d4c25dbe68ce369721038f0cf32f43cd8",
+      "after": "f4652cc3746ab1e2878e631e12982223e16505d4",
+      "status": "M"
+    },
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "49674087e8d6b608123a3e811009804a5bf99b9e",
+      "after": "b6d6bc950883408740ffb7dc214496b92820603a",
+      "status": "M"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9c71bf27106358d13e2e22bb2099b8eeef68bbea",
+      "after": "6a7e3158afa5f971b5635982df1b6c33956619e5",
+      "status": "M"
+    },
+    "server-version/backend/src/index.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9b8b0f9bc78282ce68b6df1d37ef9c76f2fca3d8",
+      "after": "9918e915973ef4b0675a3b4223139431dfe762ff",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/assessment-core/form/import-builder.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "88f04f8b43f3414f3ad626403c44c89029e02dc9",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "752e1704cbea5db97ad9b0d67c0a24f3721ae680",
+      "after": "abd6173475d963690910e95fc48cb8c15e52ca7c",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/assessment-run/educationLibraryExecution.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b98a1a98afb2cb091ce8f5f3c14661e690b5c5ce",
+      "after": "2621bb21268eec58aefe40ac7d959070e9186ff9",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/campus/admission.error.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f7b77908fe5392b3066bbde3a46dbf93b9253abe",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/admission.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6fbc5e477ac2d416cf8871145d62d117e448df4b",
+      "after": "962bb452c836fe61cce68b8f1fed87c95896deaf",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/campus/organization.routes.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7133afc1fb15ed403271e8452c004824fce3269c",
+      "after": "1d8a6b84798e2df22b55552c6920b22fbdf168f8",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/campus/personnel.access.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "02eb9e997deb134ac54e396cf4173ee7e01f555a",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/personnel.binding.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e39145921b2b94032dae0ee75248e776b460dc76",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/personnel.directory.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bf557a6c07a28b9f5c761b9799c203e1c851d1ab",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/personnel.routes.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "125cf120b3f36a42e73056447b3e1a313da10cdf",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/personnel.service.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "805d037ecdba7c80103e64bb3426b81693fe5136",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/campus/staff.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45994e5cae38d63f9c0f11fa3c29932f262ca470",
+      "after": "fc4fc3782a4a4b8147e805a7978c8a3a410f1ec7",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/education-roster/files.routes.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e32cd6ce19e92cef33cbfb243aab1a5ccc5d757a",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-roster/jobs.routes.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2df6859b6b82dd06078f5340aa11c58284fd9035",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-roster/jobs.schema.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "faefb56eecf1094a064d4061c0d50a9d080809e4",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-roster/jobs.service.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "62f55bb86fbde07cee5845e431169685371e0ceb",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-roster/school-personnel-authority.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ba184758790f01d2d28d95511df5638be45d8530",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-roster/workbook.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ae9e6e018956c1c83043e7843698d83c7b3caf78",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.form-import.service.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f6fa9b7f28be6a624fe043d85deb15fefe139618",
+      "status": "A"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.routes.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a33ae3bfac0272bfd349876b53263c607a977e5a",
+      "after": "fe63eac9c41ac91136379f947962a1cfc1ec22b9",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/huiteacher/consensus.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d9de3a5601b8ae301565a65b7c46546d8ade10bb",
+      "after": "bc4f89b3cfda8db8fed0bf1d5e1ef5d6ac4eacc8",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/huiteacher/libraryScaleExecution.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "df4eebdf222d7b440ad9d0bfe6ac903cc506b1b9",
+      "after": "81b67e56ad4fe96c3fff1df725c73010bb117132",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3357d90d638142e972b37080b07a5339f58f1b3d",
+      "after": "aba4b989b9992b66c14c96a56350f63450040354",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/huiteacher/organization.routes.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "22d259fe9f6939e916c4ddeb3fd1c79e146ca140",
+      "after": "b661e1f3ae5845a2c8a73d1595254b12f977e68a",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/huiteacher/studentInvitation.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e276a1fd8a700eaa2d3fbc19b7aff2b0c40505fb",
+      "after": "0a9d99336f95a7ea2c9e0b5728579221014e6ca4",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/organization/structure.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c2c0b3dedd0c1f6b5cf4711bedeaf9da3bdc3dd0",
+      "after": "c2a1a18b2adbdabb567aad6926b8b8a687652ceb",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8ba8be3e33f360fac9ed934f67a9a4ceab374547",
+      "after": "334ba8759f488c1476de3854142e164bdf0bf164",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/scale/scale-collection-guard.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "04c2e757a9edf2178bf12a3f49455fb38469d703",
+      "after": "00e432f43c19171ca65f1626efa6f83fbe429c9b",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/situational/authoring/workbook.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "87126575e617fae1ddded91d89bb32c7f8defe28",
+      "after": "ac7aeef1a924bf53dd832d6a3ae1eb098c65a8e9",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/survey/builder.import.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9ef131fb8d191aceb7027676ff4f452844e0317",
+      "after": "14d87f5b20c1347a235284eb6b352adf1cf03148",
+      "status": "M"
+    },
+    "server-version/backend/src/utils/bounded-xlsx.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "08e06c58b197f0aadf1c1e91f92a5908efa8d3e1",
+      "status": "A"
+    },
+    "server-version/e2e/school-teacher-browser.cjs": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cf5cebf7c9ad119a20d80f314b989a632c7448bc",
+      "after": "afbe40275e855e0d062df0c469247b8f8c22e671",
+      "status": "M"
+    },
+    "server-version/frontend/public/entry-brand.js": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9f19be9bdd1e8fe7754332c3a50d42bf39f2d170",
+      "after": "9056bc4e85ba3cc8a8f15f69aafabba025a4cd8c",
+      "status": "M"
+    },
+    "server-version/frontend/public/school/favicon.svg": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5bd673c12e780055b46ee2cff366469399e7ee51",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "268ba1fae95a2b94f102873f1613714c5a4d1a43",
+      "after": "6e5176e59df515962291f15a25a0b9a8270dc7b5",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cebb92747a751091358f4a269fa221266822b793",
+      "after": "d26248139817107f425e89c4288f5f24166f70e5",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositePresentationReuse.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ad9eae3346eb691606eff9356d4e21c954b6e457",
+      "after": "5d915c0a6ff2ad3ced737c44a024b910127204a4",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/education-roster/EducationPersonnelAccess.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4fa3a4849b35a3fce8b08711dabfc0305a402047",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationPersonnelAccess.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bf13e704d8292801940aad3fc9302e818e618f42",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationPersonnelDirectory.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5dfbfadf45a39c23b3642dde1849a72daf2b812c",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationPersonnelImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "602f7b2e53f793d57d0db28a0e61a01688709c76",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterJobImport.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7af0302c1dd7969b29ab04e294721a24fc84cb94",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterJobImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f7a3b42b9c2c56316584e748ac538bf1757b9079",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterManagement.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5cbe06d449eef2f1f81832a650a2511754c61878",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterSource.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ff706c621a49b87777892e5582119b04463a19d0",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterWorkbench.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "16cbcfcdc88490dcd2743ad28a2a6f85e4cf7368",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationRosterWorkbench.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "19b7a5a659ecd0f96509ac1da86e83787f1a91d1",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/EducationStructureImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "989a858493dc3debc18559c0134d45b9f0a56d3b",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/education-roster-jobs.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7a9a1c1c0ce3b272c3ed21b10c6118d97eca917d",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/education-roster.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8ca1bbdf7d0e04fd676274dbfb5769d55e6e2d22",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/job-client.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d4393fd11c7dbc673d1f9f458215965b59f09254",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/personnel-import.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7af73a19294a949ad201c96517fb8b6585a2af44",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/preparation.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fb6204149b218773a5f945a38c3c1a51da80c2a1",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/preparation.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9aa62b9ecc9af8b1f0f1814a92425d0ab3a4f1c7",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/structure-import.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8ece1a0479c525d4812be779d5650a02704f093e",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-roster/types.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "358249085f7b3fffdb892cc38e184cf2b6378236",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-tools/EducationFormBulkImport.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "84f05b05085ca776d67e336138db9fb48d517ae6",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-tools/EducationFormBulkImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "996d22616455f93ee79bc7b44ba6f7c22a8598b0",
+      "status": "A"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3c7c8a2f8f5d928666e6b6d24744c4156bf1e4dc",
+      "after": "7ef0dcaa207ca6a656672a3a1b6e964bdb65759c",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9946614495ac73266dab2b654571db47db12c06e",
+      "after": "3411d3e548dbc663320b866c09b84d80ff969ba7",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateScalePicker.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e6c86fc5ecc0eee4060a83d10de8c09972cdd7f2",
+      "after": "2f753cbae2b68207d824b7f6ad9d8f3add6cde8b",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "87b447a95da25fd9b097db30fba352cbbe5bc8de",
+      "after": "72c83e4d84b3bc831329d78d316df055c074c10b",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/education-tools/EducationPrivateToolStudio.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "79d9f1616ba2507518c03ab9cdae87d611deb83b",
+      "after": "b6db980baa29bd6ba5e36d34a9e63bb55f0e070e",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/product-theme/ProductTheme.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "38aa8fc2deed0c158c73d74a97ee033c465d5109",
+      "after": "3dc0c0522227683fea487c9e4cfbf177e8c90a63",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/product-theme/ProductThemeControl.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "57b75695a6037b7029d3fd0d374f7ca8cb033bef",
+      "after": "11a4b3bf0f310bce3ac0132b62799c7be374a978",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/product-theme/product-theme.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a655492f065a83e686d4af1f521ccea01cf3161",
+      "after": "73a1ae9b7fe4606c5f255d3d89a97243c079c988",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "23ce353fc75895818b2c08a23cd102233e069bea",
+      "after": "4e8c60f7b37f5a3df35a38ab9dd6e94ccf0091f4",
+      "status": "M"
+    },
+    "server-version/frontend/src/components/questionnaire/__tests__/FormPlayer.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4bfb49ab45fb4b9ce10a1cfd43f60fc1e9920f61",
+      "after": "0e16f35033a47bc5a4cd0ca6f655ae69627ebe4c",
+      "status": "M"
+    },
+    "server-version/frontend/src/hooks/useScaleAutoAdvance.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3025cee08c015abded67eaec4eb83313a8554269",
+      "after": "0c1977ecba918fb8e08e7f1e59d922c852b18cfd",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "195a25ec333a1ebc23ab64f23f33ffdf3a505117",
+      "after": "9b59466aa67cb80b37e7b4510e4e88380103f15c",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2246ed563d03d242b64acd50cd668490989c77fe",
+      "after": "30593e3cc91bf9fe2a970ffc95dd361fa7f6e8fe",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3a4828ea87a4b9681ae8038ae5f6fd8641cb6c96",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ca77d54ed174fe639e84f5664a2a3cd25f453b9f",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherClassRelationships.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "554c721cdd412d94325238f352a173315ad5a68d",
+      "after": "89ddb4d365f07e9a2542b575e3e1cba97dc1f14a",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherCompletedEntryGuards.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6c20d811f38dd435493ee65e1cdb197eefdd6626",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherConsensus.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "632591132dd69af78da04b3d403d0fbc3ef1c887",
+      "after": "29a9ed5dc7918eaeb8d0fd2c0d315c99b4b100f7",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherConsensusReviews.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d3b91484adc6a37a250bdbcc1b6af41adc3e4b40",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherEvaluationStudio.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "acd452b5d56c2e9b70dd123d4a902f05957837e5",
+      "after": "7198cf152cdaeecbc006460c0d8e787740628039",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFieldWorkspace.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d08f9be8e3d72cc98680ec5741905d5d25afb287",
+      "after": "e40ea048fe206c3750fb32d8c582d494e56c289e",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFormChoiceNavigation.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "95838aa3afc21fd1483e01fe648aad62a9f7a005",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFormStudio.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7ab0c5fd17c3aebbfbeca3fa2c5680e99b0055cd",
+      "after": "3a5b1a3d2f7c991170295b1a241edb07f540caf3",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyFormTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "859ff189d4b3ffee4c44959197b98774024c5dde",
+      "after": "975f08ad9d84f97de72232c42d60a734e498258d",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyPrivateFormTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "87e8c406a59e7f926d1d445dbd0469308a2c0858",
+      "after": "02aea9b8c6c5887884a3e0c2250364e227c6dfc0",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c3ad57a931ea48ecb847fbe6d1c5e127d78eb22d",
+      "after": "982fc0f5a1ee49b2a14c123c7e3cbb891d04efa9",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "46dffb1c5ad237617e0673d29fba79547a1a42ce",
+      "after": "23dbcbd780f31cb75ccb04b88d7dcc32b8519305",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPersonalSelf.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "333adec12c5e2e5c70eacc1454b93502d28a62b7",
+      "after": "bee1e4d14ee34c16d0323ebbf773d10de211fa50",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPracticePages.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4ff786df0033e179721d06a00db50036941bb0e1",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7f1f5c52145ac1abf4ed1a1cc73a8a4fa3daec12",
+      "after": "84992f093a1f4887282eaa5c1535b74cd4cdbd28",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherScaleSession.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0abc1299eb0f76bab00b4158254a73f5446873be",
+      "after": "cfbf0fd7ef8a44c4cfbe1209c39955849b3b85fa",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentWorkspace.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "aa775787ad7f5f23928b7865f756dec98f44f804",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherTaskListStates.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aa9365b06ce18a7b6eac80f848d281fba7da3d3e",
+      "after": "d17cb9df4b786893bc07a39505934a60d434aafc",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceFlow.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9b637fc69163e40c92cd69cf2bef4216877e091",
+      "after": "86904c6a21b523a59306a7d6ef864c20abfcc4fb",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceLayout.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5a956a06c38ce329e193c49f1fbe288caad55280",
+      "after": "076db77df6161b58bcb5acd22375d51ff81f30a1",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/TeacherAssessmentPage.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3a4581eb3c91c5ba6d157d1a18dc66027375fd16",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/TeacherAssessmentPages.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f3c8922ffb694966a0048e41d734bf67cb1f1709",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/TeacherBrand.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bb254c965b53bfb9155c051c7e26513f898362fa",
+      "after": "f413b2797121c655beec38e735ac00b7e1478b8c",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/TeacherBrand.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "272c4cb49552e52c4fa782b7c3b12a143892f7be",
+      "after": "345125525376fd076f7850306a0c736cd2bcfa8a",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/assessmentTaskPresentation.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "22758350aff9d308f94e02f22b041723da32fa8a",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/huiteacher-admin-layout.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dc3c807cb57ed142af2b38c5631f261d25f62a1f",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/huiteacher-theme.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "de4b411269a83397bb3f718f2603aafff81cf00f",
+      "after": "b1d05d107218391c7a0e67d96314503203884451",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cf12e586ca2bf8175505109ed86c230cde4edee8",
+      "after": "cca0638879744852907cd7b317bb3171de5aa47d",
+      "status": "M"
+    },
+    "server-version/frontend/src/huiteacher/teacher-home-refresh.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bf10c2f27d45777657f9782a8a0357f06572b756",
+      "status": "A"
+    },
+    "server-version/frontend/src/huiteacher/teacher-home-wordmark.svg": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2c272acd91980ee58c5e2434e342c264a5a29835",
+      "status": "A"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "44e59eae10193be27053932c39b68f6dcb773317",
+      "after": "9cfbdb31de02cac4666955dd2b90fa85d0598397",
+      "status": "M"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "af2b1a55774984c89c33c877ef6ac45354a93a4c",
+      "after": "9ca75dfe124c2afecb47a9b1abe00455e231da75",
+      "status": "M"
+    },
+    "server-version/frontend/src/modules/cognitive/cognitive-surface.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "51f4595ddaabd5078219e47998f3ef3111c3b2fc",
+      "after": "61de8e344763c3d6b3bf2c6a463b29db012309c4",
+      "status": "M"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aee6834ee0d68ddb7627ab2a7109baf2870582c7",
+      "after": "d3996784f6d4136ef06ae4122b5188a1d6e5cc57",
+      "status": "M"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fff8aa9395fb4bd5780893e07a3dfc3d07cf5baf",
+      "after": "68086135868a67632bcac3b1f7ceadbedd1f874f",
+      "status": "M"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eb126f258899d9e8623440c659f11094571e5df4",
+      "after": "537a3387a3fe56c9a0f9855eabbe7cb3675d6109",
+      "status": "M"
+    },
+    "server-version/frontend/src/product-entry.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "54b14af3ead41285754d1523c60bbce14ddcfc09",
+      "after": "8cc121849f96c081657e0449d756c5e230cb8aec",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolActivityClassSelection.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0d645f4ea8da2ece82c5ee6f8b674c05be32eefb",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolActivityCollection.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3a50489740a9c6bc2e63ab138f139a8071dfef3e",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolActivityCollection.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2588ff0c5d834a6bc5e9ca275d869a68815512f9",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolActivityManager.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0e739c0805f862d4659656a619baf67ddab00ef5",
+      "after": "88e830584511ee9259715f66ef5fa4f450291c29",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolActivityManager.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ccbaeec6dbd21ef82128a3e46aa2e15beb8308ab",
+      "after": "75398f092a381f0ed6ae42acad9f4ffa596f106e",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolActivityOutline.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3c7f0dd1cf28ed45cd59238d90af52321d5ccc75",
+      "after": "31cf4c2483f36d95cea69a6746a49731535b7269",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolAdministratorWorkspace.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4b5d3d6de2847b681c1e7db7fc95452ede3068ff",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolAdministratorWorkspace.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b1fa2dbe055604163116d83a2540a6c8ef1f91e6",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolAdmissionWorkspace.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3980f73f30655dcdf72c4a24555881251269539d",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolApp.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4856820a388996fb537a9479a1539a3b94d4d358",
+      "after": "53b4ef57edc8767cb9be2a018b6dc8026677129d",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolBoundContinuation.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "756b5f5335269d1ca7cc33f9537bc252f831716c",
+      "after": "b92eaf10e224b76ae880d85a7c9d8685e098d474",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolCollectionControls.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "11231a9d446f9dbcfde661b50288df111b02c14c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolCompositeRunner.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5724cd5d3a012c6590d06e162f8816bc50f6a60d",
+      "after": "d59db92dc343845e5664a307bd7f87e33aef75f0",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolCompositeRunner.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8b7d2b91508015daed93fda0b2e17347b24fe2eb",
+      "after": "72f811f9c5e94e4441dbdfb6795d2a8f34078184",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolGroupLongitudinal.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "be1318ac0d2c67cb264437cebeaa1e08e11f72d4",
+      "after": "cf1f7b752d65182b73b3315c20e7e8f303d3bad0",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolGroupLongitudinal.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "308e8530cf001e7b6ef6504ceed155e88b5395ed",
+      "after": "eb5c9674351936947e9a47634acc96c3dce94c08",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolGroupReports.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "03c8e525fd702e6fef4adf52d902a3b99d264bd0",
+      "after": "b55466f3c1e5591af566f99017e29d210f94a04b",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolGroupReports.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a3f24909bb1d504de992545ace1cc11870287009",
+      "after": "662aba141d6e30e2f513a9dd30065769d5687b41",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolIndividualLongitudinalStudio.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bc3b6fce5f0198579d7b16b7fa5b4ff05268beaa",
+      "after": "ad12f44e1e9d576fe90fe4c206bd3db6f80cad95",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolIndividualLongitudinalStudio.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d8bd5db2ab24ff9b19e5693f80009408acc2c51a",
+      "after": "405dbb6c9b0f88d872dcc39109a0ef6651647cba",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolLanding.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "11feb85cc6e53dacf2170bc95adb3da4d1e584a1",
+      "after": "856514531ecabdcaa7003d746f447c40256524ae",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolLearnerHome.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e2d072a2de6bf016c69d719ae917c05a129de332",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolLearnerHome.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "80f09cc1ef9006d8296dba4abb1d7f93477cc767",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolMark.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "89b031ae9b4393e89616b63b22b09a76989651f2",
+      "after": "7701a5ce2f7900911cfcbee5c804da75958e51e4",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolMark.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0ed6b7ebf8847e0067135e640a7a23f5f763b003",
+      "after": "feec2bceaf54dfb7043cd5368f7d1fb74f22be84",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolParentPortal.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f991fe368e21efd3c248782e3104eb978a211f0a",
+      "after": "bd6bd76dd6871896a08fe6284a5f9016d3e2bf0f",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolParentPortal.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0930d2c2e65668cd4d3501566d1dcd0927a4e7b",
+      "after": "a4c231a6a5916e0c78051869ccf19bd1f6350f57",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolParentTasks.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "83dc8eb77ff15b538cfef2ac32135d4ff12e91ab",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolParentTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c3b8fd24358853c9907825bea0e1d8a5307afa4c",
+      "after": "bce3b5c9519cd4c03f2283e5524dfa72feb5ca8d",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolPeerConsent.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cd36e1f30c2391442d6fb8342309e9ddbf2d0d53",
+      "after": "3fc98ff974dbe3a3eb09fc47b583d3922e85df09",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolPeerConsent.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1e700de5ef8c8273b613af56b12a6862114ed8c7",
+      "after": "71693ef5913408881b2efbab02d4ddcf2749fe06",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolPersonnelDirectory.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "453fa84ca49cae1e085e530fe13c54f3332ea8cf",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPersonnelDirectory.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4c2803f026ef2cc9ee7d54f158188bbe4634282f",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPersonnelImport.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "59a945df3778128aec5eea5f55e2ed193505d976",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPersonnelImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c22a89e0f07f6e4a1cfe5a60bee9880da2c0e0b4",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPrivateToolCollection.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c1379689d9824c59b7a20f09b2bba937e0e229b4",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPrivateToolCollection.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d1c742f67b75bd4ffab0f71d31dd185187557eda",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolPrivateToolNavigation.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a92623ac6de0302da3d612de418686c5e5f98231",
+      "after": "375ffed219a399545edcb9ba9c7c0d78b6430cf0",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolProfessionalAdmission.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3a8b2d4b312c1e3f77974fe6f888d873fa60ef1c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolProfessionalPresentation.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "696647d7b2e0b43ded43388b4ca342740506cfe3",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolProfessionalWorkspace.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4ba47664f707504ea5abb4a5afbc8d4adde903d6",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolProfessionalWorkspace.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3b2a095cbcc26a1ab73d241fe55b906cc2880ddb",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolProtectedReportStudio.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "220d58e3424740eadc2c37008c29839e82f96e50",
+      "after": "a4e202ad9f628f49a798fee2d9ef0665051ef15f",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolProtectedReportStudio.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d1684e0507d6865d54f52795279e8e79a4363100",
+      "after": "866a1bad827c57d017ff775eda2452401c0b17a9",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolRecovery.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee555ea0a8f1a8fafdd6fad920a97eb55ee80648",
+      "after": "bbbbc2dde5122cea1d8c78454869f5145fe300aa",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolRecovery.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "040123696bf997b7e255b5330a82a53bb159c1dd",
+      "after": "61de9d924bb8ba05fc7a0f3841e9a6929d18bde0",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolRelationships.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a724181b7a93babaf2f13bd8941199d5d2c75c61",
+      "after": "3955e3b0b228424938d486d02b6dfc826c1156cc",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolRelationships.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee86a43ce9cd198a7718294c0d436a6163960af0",
+      "after": "26bea9da6fdc49d23ebacf19460fd1bfb6b28181",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolReportPresentation.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eb2f9ada927c0f08e0b09b1f8c3d015460af843c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolReports.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2ead9b5a7a86577cb4b65483863e706a38fb89fb",
+      "after": "73ba055df8ad477f134f75d82327853f93e764bb",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolReports.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b4ccd53cd6e4b28ea90260fbabe059ab5c1ed4c4",
+      "after": "4c94614976782d39bbb0806bf0d65e448bdddb78",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolStructureImport.test.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "df9656780520859d0d9dc4b29ace021f6c52792e",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolStructureImport.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e535d2d2a8c8ef895bfb1e66b2c98c6298d25f7b",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "33923920748ae137ac6f58f3fdd0d261ad805e91",
+      "after": "5c5c2188406e28042a6fa8655775120adf032947",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "da60f52b913cbfadbf37db389089e3db4cafa774",
+      "after": "2f8828f667f9a22dcd7a5f7f1e8c5655481cc299",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolTaskHelp.tsx": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "038046fcb57b5b6fedaef6bd3a61b985abb103b4",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/SchoolTaskReadStates.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6b0f04fa224ecbee25dad477e8bddbc05cdba7af",
+      "after": "c6316538d14e311f7013dc2c82d0bd1573d74522",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolTeacherTasks.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "928afc6afa227c11c499bba217f2490c0d34d335",
+      "after": "9b2c2a361a4ee9efa88def3135349fef5a609e9b",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolTeacherTasks.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "11c0c14b733d0b4476d185b9d603f405c7f329be",
+      "after": "e2895d629645b93a5ce2363152cd058d76c89b7b",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolWorkspace.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bf8008e03ec911c1717c84fab2f4cc2074f19949",
+      "after": "b6d7666358cd1efe4ef8480e8f867d8dcc6e95fb",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolWorkspaceShell.test.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4769f8359d960dfd359792650d7a18657a0b6455",
+      "after": "28da51057339fef46c9f5df9ca06e1ed80056ab8",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/SchoolWorkspaceShell.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a852260cb546581d4cd60c34b9f4a22b72abf138",
+      "after": "958351624897f4805cf8e08dc728e3574da395a2",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/huischool-a1-emblem-dark.svg": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "96e79a06723ec5ddd8b3da457903c5528e5b2d0f",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-activity-collection.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ffdd5042138ac9bcf9623cb48973c744fe16793c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-activity-configuration.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ff649bcca0d79300aec9f1f4734c3894dd5e2043",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-administrator-polish.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c12a4730e11a5c642627db7c5ab95d3a5cb8136c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-administrator.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c477691ca564f74ba3996d8bc0102ee720c2ebf4",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-assessment.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1f2516d89a6570d612ccfcb2aae5e6c192b91cc8",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-brand.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "aacadbe01939ad26db7b50d31233f7e09df11f72",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-collection.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b2a1a0acbedd07d17268c9328138078064042002",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-compact-navigation.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3027cc66051d431ce3e189037c915e280b012611",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-educator.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f483879bf2ea45cc76c2bd0cd69736f3ece5f31e",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-header-actions.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e8f8f4875b0c0adbcf1a08a19bd719f058ea633c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-home-refresh.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "94b1a6eb410f2bb5e7a7786e1c897d366ccdf00b",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-home-wordmark.svg": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "26a9b5a0075c02ec2dcfcdb7ab0f152d97cef283",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-learner.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f138300e2f02f7992455d9b11c36c1b6b9d7ad1d",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-navigation.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "14f11b20e7b3f708237f0ac65e7aa8fc09b1c10a",
+      "after": "8728e3c1ac33ec87767f91f06dfb99d1a5f7c033",
+      "status": "M"
+    },
+    "server-version/frontend/src/school/school-overview-refresh.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "38436a7ac535e253e59010e320a7d33ead98935f",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-parent.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "01f78056ee6314a029c636811aa03ce99f7ec9f6",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-personnel-directory.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "17177125efca7b383c57977e8d352757d06a325e",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-personnel-import.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "10dac69d37335e84625765a15bf282717c610b07",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-personnel-import.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eaee8e1e0efa3307db1da6e876a9e80f6268b26c",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-personnel-import.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ac8bc92fec2e13439790ab51c4b5a34b5fe87d1f",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-private-tools.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1703410a721b7c977e8e6c7e696794ba5e0050cf",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-professional.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a8679ccb2ed08113e68f31715c80aeae159b3876",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-secondary-pages.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ed51795ff3270e85512ad352f5ffbe4e8fc90776",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-structure-import.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b197c0ea7a590010d81e36aa495b24ccd41e83c4",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-structure-import.test.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6e95484295eabf56ea4021f5a67ac135852bece1",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-structure-import.ts": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4249b72f43aab53d7388f7111e999ff5a602795d",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-task-detail.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5ed6570201f596595a21506890e561f84d3a9438",
+      "status": "A"
+    },
+    "server-version/frontend/src/school/school-task-refresh.css": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "07c96b73eafa05fc059090e1baddaada7f6af156",
+      "status": "A"
+    },
+    "server-version/frontend/src/survey/ResearchFormEditor.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f6b4a162e2f0cf39ae615a33e48fe86c17136f38",
+      "after": "bddbcd054fdbf0d13120160f6d9765f82c469352",
+      "status": "M"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6d04b2baa0c9bec2d1075728608655e81ef314d0",
+      "after": "2265c87e0034b03a16ccc0139dd1a8e282ef39b3",
+      "status": "M"
+    }
+  },
+  "controls": [
+    ".github/scripts/pr357-bindings.json",
+    ".github/scripts/pr357-scope.mjs",
+    ".github/scripts/pr357-scope.test.mjs",
+    ".github/scripts/pr357-checks.mjs",
+    ".github/workflows/ci-pr357.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    "docs/school-teacher-dot-ci-plan-20261027.md",
+    ".github/scripts/pr357-checks.test.mjs"
+  ],
+  "components": {
+    "backend": "100ae07d90a1bf9fc53b1df0a610008571f565dd",
+    "frontend": "80b6b3802410a48b5fbc4af90a11dd499f61d5f2"
+  },
+  "tests": {
+    "backend": [
+      "src/__tests__/campus/personnel.routes.test.ts",
+      "src/__tests__/controllers/assignmentSubmit.test.ts",
+      "src/__tests__/controllers/checkinSubmit.test.ts",
+      "src/__tests__/education-roster/jobs-limits.test.ts",
+      "src/__tests__/education-roster/routes.test.ts",
+      "src/__tests__/education-roster/workbook.test.ts",
+      "src/__tests__/education-tools/private-tool.form-import.test.ts",
+      "src/__tests__/huiteacher/consensus-approval-once.test.ts",
+      "src/__tests__/huiteacher/formal-feedback-once.test.ts",
+      "src/__tests__/integration/campusActivity.postgres.integration.test.ts",
+      "src/__tests__/integration/campusPersonnel.postgres.integration.test.ts",
+      "src/__tests__/integration/campusPersonnelDirectory.postgres.integration.test.ts",
+      "src/__tests__/integration/educationPrivateFormImport.postgres.integration.test.ts",
+      "src/__tests__/integration/educationRosterBridge.postgres.integration.test.ts",
+      "src/__tests__/integration/educationRosterJobs.postgres.integration.test.ts",
+      "src/__tests__/integration/huiteacherConsensus.postgres.integration.test.ts",
+      "src/__tests__/integration/huiteacherFieldObservation.postgres.integration.test.ts",
+      "src/__tests__/integration/organizationStructure.postgres.integration.test.ts",
+      "src/__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+      "src/__tests__/integration/educationLibraryCollectionStop.postgres.integration.test.ts",
+      "src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "src/__tests__/reporting/education-scale-personal-report.service.test.ts",
+      "src/__tests__/situational/sjt-authoring.test.ts",
+      "src/__tests__/scale/training-flow-materialization-guard.test.ts",
+      "src/__tests__/scale/scale-governance-boundaries.test.ts",
+      "src/__tests__/composite/student-archived-availability.postgres.integration.test.ts"
+    ],
+    "frontend": [
+      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "src/components/__tests__/FinalCompositePresentationReuse.test.tsx",
+      "src/components/education-roster/EducationPersonnelAccess.test.tsx",
+      "src/components/education-roster/EducationRosterJobImport.test.tsx",
+      "src/components/education-roster/EducationRosterWorkbench.test.tsx",
+      "src/components/education-roster/preparation.test.ts",
+      "src/components/education-tools/EducationFormBulkImport.test.tsx",
+      "src/components/education-tools/EducationPrivateFormEditor.test.tsx",
+      "src/components/education-tools/EducationPrivateToolStudio.test.tsx",
+      "src/components/product-theme/ProductTheme.test.tsx",
+      "src/components/questionnaire/__tests__/FormPlayer.test.tsx",
+      "src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx",
+      "src/huiteacher/HuiteacherAssessmentTasks.test.tsx",
+      "src/huiteacher/HuiteacherCompletedEntryGuards.test.tsx",
+      "src/huiteacher/HuiteacherConsensusReviews.test.tsx",
+      "src/huiteacher/HuiteacherFormChoiceNavigation.test.tsx",
+      "src/huiteacher/HuiteacherMyScaleTasks.test.tsx",
+      "src/huiteacher/HuiteacherPracticePages.test.tsx",
+      "src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx",
+      "src/huiteacher/HuiteacherStudentWorkspace.test.tsx",
+      "src/huiteacher/HuiteacherTaskListStates.test.tsx",
+      "src/huiteacher/HuiteacherWorkspaceFlow.test.tsx",
+      "src/huiteacher/HuiteacherWorkspaceLayout.test.tsx",
+      "src/huiteacher/TeacherAssessmentPages.test.tsx",
+      "src/huiteacher/TeacherBrand.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveRunner.test.tsx",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/product-entry.test.ts",
+      "src/school/SchoolActivityClassSelection.test.tsx",
+      "src/school/SchoolActivityCollection.test.tsx",
+      "src/school/SchoolActivityManager.test.tsx",
+      "src/school/SchoolActivityOutline.test.tsx",
+      "src/school/SchoolAdministratorWorkspace.test.tsx",
+      "src/school/SchoolAdmissionWorkspace.test.tsx",
+      "src/school/SchoolBoundContinuation.test.tsx",
+      "src/school/SchoolCompositeRunner.test.tsx",
+      "src/school/SchoolGroupLongitudinal.test.tsx",
+      "src/school/SchoolGroupReports.test.tsx",
+      "src/school/SchoolIndividualLongitudinalStudio.test.tsx",
+      "src/school/SchoolLearnerHome.test.tsx",
+      "src/school/SchoolMark.test.tsx",
+      "src/school/SchoolParentPortal.test.tsx",
+      "src/school/SchoolParentTasks.test.tsx",
+      "src/school/SchoolPeerConsent.test.tsx",
+      "src/school/SchoolPersonnelDirectory.test.tsx",
+      "src/school/SchoolPersonnelImport.test.tsx",
+      "src/school/SchoolPrivateToolCollection.test.tsx",
+      "src/school/SchoolPrivateToolNavigation.test.tsx",
+      "src/school/SchoolProfessionalPresentation.test.tsx",
+      "src/school/SchoolProfessionalWorkspace.test.tsx",
+      "src/school/SchoolProtectedReportStudio.test.tsx",
+      "src/school/SchoolRecovery.test.tsx",
+      "src/school/SchoolRelationships.test.tsx",
+      "src/school/SchoolReports.test.tsx",
+      "src/school/SchoolStructureImport.test.tsx",
+      "src/school/SchoolStudentTasks.test.tsx",
+      "src/school/SchoolTaskReadStates.test.tsx",
+      "src/school/SchoolTeacherTasks.test.tsx",
+      "src/school/SchoolWorkspace.test.tsx",
+      "src/school/SchoolWorkspaceShell.test.tsx",
+      "src/school/school-personnel-import.test.ts",
+      "src/school/school-structure-import.test.ts",
+      "src/huiteacher/HuiteacherScaleSession.test.tsx"
+    ]
+  }
+}
