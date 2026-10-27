@@ -201,3 +201,12 @@ test('browser assertions wait for committed replacement controls and async save 
  assert(keyboard.indexOf('!el.disabled')<keyboard.indexOf('Keyboard focus remains visible'));
  assert.match(keyboard,/assert.equal\(focus.same && focus.visible, true/);
 });
+
+test('School publish consumer opens the actual assessment panel before choosing its run',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ const fn=source.slice(source.indexOf('async function workflowPage'),source.indexOf('async function publish'));
+ assert(fn.indexOf("name: '配置活动：'")<fn.indexOf("name: '活动配置分区'"));
+ assert(fn.indexOf("name: '正式测评批次'")<fn.indexOf("w.runName + ' · 准备中'"));
+ const component=fs.readFileSync(path.join(__dirname,'../frontend/src/school/SchoolActivityManager.tsx'),'utf8');
+ assert.match(component,/aria-label="活动配置分区"/);assert.match(component,/hidden=\{compact&&panel!=='assessments'\}/);
+});

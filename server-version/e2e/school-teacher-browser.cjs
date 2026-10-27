@@ -607,6 +607,7 @@ async function run() {
       if (s.product === 'SCHOOL') {
         await s.page.goto(s.origin + '/workspace/activities?organizationId=' + f.organizationId)
         await s.page.getByRole('button', { name: '配置活动：' + w.title, exact: true }).click()
+        await s.page.getByRole('navigation', { name: '活动配置分区', exact: true }).getByRole('button', { name: '正式测评批次', exact: true }).click()
         await s.page.getByRole('button', { name: w.runName + ' · 准备中', exact: true }).click()
         return s.page
       }
