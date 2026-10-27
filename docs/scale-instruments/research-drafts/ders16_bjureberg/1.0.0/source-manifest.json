@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ders16_bjureberg_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "originalAuthors": "Bjureberg et al.",
+    "year": 2016,
+    "doi": "10.1007/s10862-015-9514-x",
+    "fullArticleWithAuthorAppendix": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4882111/",
+    "distinctFrom": [
+      "Kaufman DERS-SF18",
+      "Victor & Klonsky DERS18",
+      "Original DERS36"
+    ]
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "DERS16_01",
+      "originalFacet": "clarity",
+      "reverse": false
+    },
+    {
+      "number": 2,
+      "itemCode": "DERS16_02",
+      "originalFacet": "clarity",
+      "reverse": false
+    },
+    {
+      "number": 3,
+      "itemCode": "DERS16_03",
+      "originalFacet": "goals",
+      "reverse": false
+    },
+    {
+      "number": 4,
+      "itemCode": "DERS16_04",
+      "originalFacet": "impulse",
+      "reverse": false
+    },
+    {
+      "number": 5,
+      "itemCode": "DERS16_05",
+      "originalFacet": "strategies",
+      "reverse": false
+    },
+    {
+      "number": 6,
+      "itemCode": "DERS16_06",
+      "originalFacet": "strategies",
+      "reverse": false
+    },
+    {
+      "number": 7,
+      "itemCode": "DERS16_07",
+      "originalFacet": "goals",
+      "reverse": false
+    },
+    {
+      "number": 8,
+      "itemCode": "DERS16_08",
+      "originalFacet": "impulse",
+      "reverse": false
+    },
+    {
+      "number": 9,
+      "itemCode": "DERS16_09",
+      "originalFacet": "nonacceptance",
+      "reverse": false
+    },
+    {
+      "number": 10,
+      "itemCode": "DERS16_10",
+      "originalFacet": "nonacceptance",
+      "reverse": false
+    },
+    {
+      "number": 11,
+      "itemCode": "DERS16_11",
+      "originalFacet": "impulse",
+      "reverse": false
+    },
+    {
+      "number": 12,
+      "itemCode": "DERS16_12",
+      "originalFacet": "strategies",
+      "reverse": false
+    },
+    {
+      "number": 13,
+      "itemCode": "DERS16_13",
+      "originalFacet": "nonacceptance",
+      "reverse": false
+    },
+    {
+      "number": 14,
+      "itemCode": "DERS16_14",
+      "originalFacet": "strategies",
+      "reverse": false
+    },
+    {
+      "number": 15,
+      "itemCode": "DERS16_15",
+      "originalFacet": "goals",
+      "reverse": false
+    },
+    {
+      "number": 16,
+      "itemCode": "DERS16_16",
+      "originalFacet": "strategies",
+      "reverse": false
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 5,
+    "officialPercentageAnchors": [
+      "almost never 0–10%",
+      "sometimes 11–35%",
+      "about half the time 36–65%",
+      "most of the time 66–90%",
+      "almost always 91–100%"
+    ]
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reverseItems": [],
+    "total": {
+      "aggregation": "sum",
+      "range": [
+        16,
+        80
+      ]
+    },
+    "facets": [
+      {
+        "key": "clarity",
+        "itemNumbers": [
+          1,
+          2
+        ],
+        "aggregation": "sum",
+        "range": [
+          2,
+          10
+        ]
+      },
+      {
+        "key": "goals",
+        "itemNumbers": [
+          3,
+          7,
+          15
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      },
+      {
+        "key": "impulse",
+        "itemNumbers": [
+          4,
+          8,
+          11
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      },
+      {
+        "key": "strategies",
+        "itemNumbers": [
+          5,
+          6,
+          12,
+          14,
+          16
+        ],
+        "aggregation": "sum",
+        "range": [
+          5,
+          25
+        ]
+      },
+      {
+        "key": "nonacceptance",
+        "itemNumbers": [
+          9,
+          10,
+          13
+        ],
+        "aggregation": "sum",
+        "range": [
+          3,
+          15
+        ]
+      }
+    ],
+    "hasAwareness": false,
+    "missing": "per_score_complete_required_project_choice"
+  },
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "rights": {
+    "licenseStatus": "UNKNOWN",
+    "copyrightReview": "ADMIN_TODO",
+    "translation": "UNVERIFIED",
+    "publicRedistribution": "UNVERIFIED"
+  },
+  "checks": {
+    "staticGoldenCases": 12,
+    "vitest": "NOTRUN",
+    "CI": "NOTRUN",
+    "database": "NOTRUN",
+    "deployment": "NOTRUN"
+  }
+}
