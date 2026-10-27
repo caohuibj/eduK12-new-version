@@ -1,12 +1,7 @@
-import {z} from 'zod'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {EducationAssessmentSourceError,readEducationAssessmentDeliveryIdentity} from './assessment-resource.repository'
-import {assertEducationAssessmentDistributionCurrent} from './assessment-resource.distribution'
-const id=z.string().guid()
-export const educationMarkerBindingSchema=z.object({schemaVersion:z.literal(1),product:z.enum(['SCHOOL','TEACHER']),organizationId:id,resourceId:id,
- sourceCompositeId:id,sourceItemId:id,runtimeCompositeId:id,runtimeItemId:id,ownerId:id}).strict()
-export type EducationMarkerBinding=z.infer<typeof educationMarkerBindingSchema>
+import {educationMarkerBindingSchema} from './assessment-resource.marker-contract'
+export {educationMarkerBindingSchema,type EducationMarkerBinding} from './assessment-resource.marker-contract'
 /** Discovery only, never authorization. Root's NOWAIT fence prevents an
  * education transaction holding Org/source locks from waiting on account writes.
  * Existing Training validators subsequently reread the exact original proofs. */
@@ -31,6 +26,9 @@ export async function prelockEducationStandardSourceActors(tx:Prisma.Transaction
  * Training/private markers remain original provenance, never target permission. */
 export async function readEducationMarkerSource(tx:Prisma.TransactionClient,raw:unknown,context:{compositeId:string;itemId:string;ownerId:string},purpose:'NEW_USE'|'HISTORY'='HISTORY'){
  const b=educationMarkerBindingSchema.parse(raw)
+ // Keep the shared error contract, but defer the reader dependency until use:
+ // repository -> content schema -> marker must not evaluate a partial schema.
+ const {EducationAssessmentSourceError,readEducationAssessmentDeliveryIdentity}=await import('./assessment-resource.repository')
  function fail():never{throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_MARKER_IDENTITY')}
  if(b.runtimeCompositeId!==context.compositeId||b.runtimeItemId!==context.itemId||b.ownerId!==context.ownerId)fail()
  const identity=await readEducationAssessmentDeliveryIdentity(tx,{resourceKey:`education-assessment:${b.product}:${b.organizationId}:${b.resourceId}`,version:'1.0.0',purpose})
@@ -45,6 +43,9 @@ export async function readEducationMarkerSource(tx:Prisma.TransactionClient,raw:
  const unit=(source.trainingContentSnapshot as {units:Array<{itemId:string;source:unknown;measurement:unknown}>}|null)?.units.find(unit=>unit.itemId===b.sourceItemId)
  const {educationBinding:_,...originalSource}=targetUnit.source
  if(!item||!unit||item.scaleId!==target.scaleId||canonicalHash(unit.source)!==canonicalHash(originalSource)||canonicalHash(unit.measurement)!==canonicalHash(targetUnit.measurement))fail()
- if(purpose==='NEW_USE')await assertEducationAssessmentDistributionCurrent(tx,identity.origin)
+ if(purpose==='NEW_USE'){
+  const {assertEducationAssessmentDistributionCurrent}=await import('./assessment-resource.distribution')
+  await assertEducationAssessmentDistributionCurrent(tx,identity.origin)
+ }
  return {binding:b,source,item,unit,identity}
 }

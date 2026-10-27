@@ -1,4 +1,5 @@
-import {educationMarkerBindingSchema,readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
+import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
+import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'

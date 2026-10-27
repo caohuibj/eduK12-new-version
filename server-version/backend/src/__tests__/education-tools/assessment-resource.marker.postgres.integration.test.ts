@@ -13,6 +13,7 @@ import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
 import type {EducationAssessmentContext} from '../../modules/education-tools/assessment-resource.issuer'
 const url=integrationDatabaseUrl('EDUCATION_MARKER_TEST_DATABASE_URL'),suite=url?describe:describe.skip
 suite('Education privateVersion real persisted source and shared START binding',()=>{
+ let completedResourceId:string|undefined
  beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);process.env.DATA_ENCRYPTION_KEY||='ab'.repeat(32);await db.$connect()})
  afterAll(async()=>{await db.$disconnect()})
  it('retains an owned exact version in an independent education runtime and rejects a forged source-item mapping',async()=>{
@@ -48,5 +49,15 @@ suite('Education privateVersion real persisted source and shared START binding',
   const candidate=await db.$transaction(tx=>prepareTrainingContentAttemptBinding(tx,{compositeId:runtime.id,attemptId:randomUUID(),epoch:1,snapshot,snapshotHash:runtime.trainingContentSnapshotHash,composite:runtime,resolvedSituational:new Map()}))
   expect(candidate?.binding.units[0].source.privateVersionId).toBe(version.id)
   await expect(db.$transaction(tx=>readEducationMarkerSource(tx,{...binding,sourceItemId:randomUUID()},{compositeId:runtime.id,itemId:runtime.items[0].id,ownerId:author.user.id}))).rejects.toThrow('MARKER_IDENTITY')
+  completedResourceId=p.resourceId
+ })
+ it('refuses to prepare another author privateVersion even for an education product administrator',async()=>{
+  const resourceId=completedResourceId??process.env.EDUCATION_PRIVATE_MARKER_RESOURCE_ID
+  if(!resourceId)throw new Error('Run the preparation case or provide its isolated fixture resource ID')
+  const [row]=await db.$queryRaw<Array<{product:'SCHOOL'|'TEACHER';organization_id:string;source_composite_id:string;reviewed_by_user_id:string;entry:any}>>`SELECT product,organization_id,source_composite_id,reviewed_by_user_id,entry FROM education_assessment_deliveries WHERE id=${resourceId}`
+  const user=await db.user.findUniqueOrThrow({where:{id:row.reviewed_by_user_id}})
+  const other:EducationAssessmentContext={product:row.product,organizationId:row.organization_id,principal:{userId:user.id,username:user.username,role:user.role,platformRole:user.platformRole,accountDomain:user.accountDomain,tokenVersion:user.tokenVersion,mustChangePassword:user.mustChangePassword}}
+  const licenses=row.entry.educationOrigin.distribution.grants.map(({resourceId,grantId}:{resourceId:string;grantId:string})=>({resourceId,grantId}))
+  await expect(service.prepareEducationAssessment(other,{resourceId:randomUUID(),sourceCompositeId:row.source_composite_id,title:'Must not adopt another private version',family:'BUNDLE',licenses})).rejects.toThrow('EDUCATION_ASSESSMENT_PRIVATE_OWNER_REQUIRED')
  })
 })
