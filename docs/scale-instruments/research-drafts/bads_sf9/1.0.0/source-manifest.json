@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bads_sf9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "source": {
+    "authors": "Manos/Kanter/Luo",
+    "year": 2011,
+    "fullEnglishPdf": "https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf",
+    "scoringInstructions": "https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF-instructions.pdf",
+    "peerReviewedFullItemTable": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8106977/"
+  },
+  "response": {
+    "itemCount": 9,
+    "recall": "past_week_including_today",
+    "values": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "wordAnchors": {
+      "0": "Not at all",
+      "2": "A little",
+      "4": "A lot",
+      "6": "Completely"
+    }
+  },
+  "scoring": {
+    "version": "1.0.0",
+    "reversedItems": [
+      1,
+      6,
+      7,
+      8
+    ],
+    "reverse": "6-x",
+    "aggregation": "sum",
+    "min": 0,
+    "max": 54,
+    "subscalesEnabled": false,
+    "missing": "complete_required_platform_choice"
+  },
+  "axes": [
+    "domain",
+    "construct",
+    "orientation",
+    "population",
+    "response",
+    "use",
+    "license",
+    "language_validation"
+  ],
+  "rights": {
+    "authorContactRequired": true,
+    "commercial": "unverified",
+    "publicGitHubRedistribution": "unverified"
+  },
+  "versions": {
+    "measurement": "1.0.0",
+    "scoring": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "testing": {
+    "goldenVectors": 10,
+    "vitest": "NOTRUN",
+    "ci": "NOTRUN",
+    "db": "NOTRUN",
+    "deployment": "NOTRUN"
+  }
+}

@@ -1,0 +1,1003 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "bads_sf9_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "依据专业心理学会SCP提供的BADS-SF9原版英文指导语单独起草中文研究工作译文",
+    "text": "请回想**过去一周，包括今天**的实际生活。请逐句判断下面的描述在这段时间里有多符合自己：0表示完全不符合，6表示完全符合，中间数字表示介于两者之间的程度。没有标准答案；请按这段时间真正发生的事情作答。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "抑郁行为激活量表短式（BADS-SF，9题）— 独立中文研究工作稿",
+      "abbreviation": "BADS-SF9-ZH-WORKING",
+      "instrumentFamily": "Behavioral Activation for Depression Scale – Short Form (Manos, Kanter & Luo, 2011)"
+    },
+    "construct": {
+      "primaryDomain": "SELF_REGULATION",
+      "secondaryDomains": [
+        "WELL_BEING",
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "过去一周活动参与、成就与回避/反复思考的自我报告。短式九题转换为单一总分0–54，不把2个内部因子当作稳定的独立个人画像，不能解释为抑郁症状严重度或治疗效果。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:behavioral_activation",
+        "domain:self_regulation",
+        "domain:well_being",
+        "construct:behavioral_activation",
+        "construct:avoidance_and_rumination",
+        "construct:valued_activity",
+        "construct:single_shortform_total",
+        "construct:not_depression_severity",
+        "orientation:behavioral_activation_process",
+        "orientation:cbt_related",
+        "orientation:activity_and_avoidance",
+        "orientation:transdiagnostic",
+        "population:adult_18_plus",
+        "population:original_english_community_research",
+        "population:self_report",
+        "population:independent_zh_cn_unvalidated",
+        "population:not_k12_validated",
+        "response:self",
+        "response:digital_self",
+        "response:9_items",
+        "response:0_to_6_truth_scale",
+        "response:past_week_including_today",
+        "response:reverse_1_6_7_8",
+        "response:source_locked_order",
+        "response:total_only",
+        "response:complete_required_platform_rule",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:no_subscales_independent",
+        "use:no_norms",
+        "use:no_clinical_cutoffs",
+        "license:author_contact_required",
+        "license:publisher_permission_pending",
+        "license:full_english_source_acquired",
+        "license:redistribution_review_pending",
+        "license:independent_translation_pending",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_pending",
+        "language_validation:local_validation_pending",
+        "行为激活",
+        "行为回避",
+        "反刍",
+        "活动与价值",
+        "短式9题",
+        "过去一周",
+        "成人自评",
+        "非诊断",
+        "中文研究工作稿",
+        "版权待核"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "开发研究包含成人社区和本科生；当前独立简体中文未做译审或中国目标人群效度检验，保守只列18岁及以上成人自评，不使用英文版阈值评判中小学学生。"
+    },
+    "administration": {
+      "itemCount": 9,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去一周，包括今天（past week including today）。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "精准使用BADS-SF9（Manos et al. 2011），不得错用BADS25题号、反向或题序。",
+        "原版0–6符合程度；只有0=Not at all、2=A little、4=A lot、6=Completely为原表印刷词语锚点，其余1/3/5为数字。",
+        "仅第1、6、7、8按6-x反向；所有九题相加范围0–54，高分代表更高行为激活和较少回避，不是抑郁临床严重程度。",
+        "原作者2012书面说明不建议分别使用短式Activation与Avoidance分量表；保持一项总分，score_only，不提供没有来源的临床等级。",
+        "全部九题齐答才计算；缺答不插补是本站保守草稿规则，非原作者正式缺失数据标准。",
+        "当前独立简体中文工作稿及公开再分发使用范围待管理员核实；不把来源PDF免费可读当作CC或商业授权。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原英语版研究提供短式结构与计分，但本新译文未验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "只帮助回想活动和回避，不能诊断抑郁，也不能保证行为激活治疗有效。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "bads-sf-manos2011-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英语成人样本与大学生；独立中文新译未验证",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "原作者九题修订方案与2012年短式计分说明；0-6且反向1/6/7/8，总分0–54。",
+        "rating": "UNKNOWN",
+        "citation": "Manos, R. C., Kanter, J. W., & Luo, W. (2011). The Behavioral Activation for Depression Scale-Short Form: Development and validation. Behavior Therapy, 42, 726–739.",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8106977/"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "SCP发布BADS-SF9英文原题：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf；Kanter2012评分说明：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF-instructions.pdf；中文为EDUK12.TOP独立工作翻译，非作者审核正式中文版。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "尚未完成专家译审、认知访谈或中国成年人效度验证，且原BADS25中文研究不能自动证明BADS-SF9的适用效度。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "bads_sf9_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "bads_sf9_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "bads_sf9_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "BADS-SF由Manos、Kanter与Luo（2011）研究开发；SCP专业组织链接作者9题正式英文表与Kanter 2012评分说明。研究题本来源：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf，评分说明：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF-instructions.pdf；独立于原BADS25量表（不能混计分、题序）。论文题本可下载和作者鼓励使用，并不自动确认Eduk12自建电子施测、独立中文翻译、GitHub公开全文再分发或商业使用许可。原作者/译者或出版社须由管理员核实；本次未联系。本站简体中文为依据英语独立制作、未经译审及中国人群验证的内容工作稿。",
+      "管理员后续确认权限；不把是否已取得作者回信作为本轮内容准备的自动门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Behavioral Activation for Depression Scale – Short Form 9, independent Chinese working translation",
+        "citation": "Manos, R. C., Kanter, J. W., & Luo, W. (2011). The Behavioral Activation for Depression Scale-Short Form: Development and validation. Behavior Therapy, 42, 726–739.",
+        "url": "https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf",
+        "publicationYear": 2011
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "BADS-SF由Manos、Kanter与Luo（2011）研究开发；SCP专业组织链接作者9题正式英文表与Kanter 2012评分说明。研究题本来源：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF.pdf，评分说明：https://societyofclinicalpsychology.org/wp-content/uploads/2025/09/BADS-SF-instructions.pdf；独立于原BADS25量表（不能混计分、题序）。论文题本可下载和作者鼓励使用，并不自动确认Eduk12自建电子施测、独立中文翻译、GitHub公开全文再分发或商业使用许可。原作者/译者或出版社须由管理员核实；本次未联系。本站简体中文为依据英语独立制作、未经译审及中国人群验证的内容工作稿。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "bads_sf0_6",
+          "options": [
+            {
+              "value": "0",
+              "label": "完全不符合",
+              "score": 0
+            },
+            {
+              "value": "1",
+              "label": "1",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "稍微符合",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "相当符合",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "5",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "完全符合",
+              "score": 6
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "BADS_SF9_01",
+          "content": "过去一周，有一些我本来需要做的事情，我却没有去做。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_02",
+          "content": "过去一周，我对自己做过的事情的数量和类型感到满意。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_03",
+          "content": "过去一周，我参加了许多不同的活动。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_04",
+          "content": "过去一周，我能较好地决定参与哪些活动、置身于哪些情境。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_05",
+          "content": "过去一周，我积极参与活动，也完成了为自己设定的目标。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_06",
+          "content": "过去一周，我做的大部分事情都是为了逃离或回避某些不愉快的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_07",
+          "content": "过去一周，我花了很长时间反复想着自己的问题。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_08",
+          "content": "过去一周，我做了一些活动，目的是让自己不去感受难受的情绪。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "BADS_SF9_09",
+          "content": "过去一周，我做了一些令自己感到愉快的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "bads_sf0_6",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "行为激活短式总分",
+            "description": "原作者0–6九题，反向1/6/7/8后求和0–54；高分仅描述自报活动更多、回避更少的模式，不是疾病分级。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "BADS_SF9_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "BADS_SF9_09",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "过去一周，你做过哪些有意义的事",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这九道题回顾的是最近一周你做过的活动、为自己作过的选择，以及有没有因为困难的情绪而回避某些事情。这里的分数不是“你有多勤奋”，也不要求你总要把时间排得很满。一次看似很小的行动，可能已经需要许多力气；生活环境、健康状况和可获得的支持也会影响你能做什么。可以想想过去一周哪件事情让你感到一点意义或者满足，哪些事因为困难而难以开始。如果愿意，不妨把下一步安排得足够小、足够可行，给自己留出休息和调整的余地。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "过去一周，你完成过哪件虽小但对自己有价值的事情？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一件负担可控的具体活动，确定开始时间，完成后回顾实际感受。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本包BADS-SF9不是原BADS25，九题原始总分0–54，不与25题总分0–150直接比较。",
+          "作者不建议独立解释短式Activation与Avoidance两类分量表，报告只显示转换后9题的整体总分。",
+          "高分代表自报活动与回避模式，不用于诊断抑郁障碍、衡量人格/劳动表现或声称干预有效。",
+          "简体中文工作译稿未经作者认可、专家译审、中国成年人验证，不继承已有中文BADS25效度。",
+          "本版完整作答才计分、缺题不插补，为平台保守工作规则而非作者正式缺失处理。",
+          "电子施测、独立翻译与公开再分发权限由管理员确定；草稿DRAFT不等于正式授权发行。"
+        ],
+        "disclaimer": "BADS-SF由Manos、Kanter与Luo（2011）开发。EDUK12.TOP本独立中文DRAFT未经人群验证或公开使用权确认，不提供临床阈值、诊断或高风险判断。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "bads_sf9",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all0",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 24
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all6",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 30
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all3",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 27
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "min",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "0"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 0
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "max",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "6"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 54
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "0"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 24
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "reverse_high",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 15
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_reverse",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "missing_straight",
+        "answers": [
+          {
+            "itemCode": "BADS_SF9_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "BADS_SF9_09",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "none",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
