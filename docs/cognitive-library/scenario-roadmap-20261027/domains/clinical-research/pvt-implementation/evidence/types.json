@@ -1,0 +1,23 @@
+[
+  {
+    "name": "backend",
+    "config": "server-version/backend/tsconfig.json",
+    "entries": [
+      "server-version/backend/src/modules/cognitive/content-candidates/pvt/metadata.ts",
+      "server-version/backend/src/modules/cognitive/content-candidates/pvt/participant-presentation.ts",
+      "server-version/backend/src/__tests__/cognitive/pvt-content.test.ts"
+    ],
+    "sourceCount": 50,
+    "diagnostics": []
+  },
+  {
+    "name": "frontend",
+    "config": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx"
+    ],
+    "sourceCount": 55,
+    "diagnostics": []
+  }
+]

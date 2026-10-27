@@ -1,0 +1,5 @@
+import {z} from 'zod'
+import {assertPvtConfig,type PvtConfig,type PvtRaw} from './protocol'
+export const pvtConfigSchema=z.custom<PvtConfig>(v=>{try{assertPvtConfig(v);return true}catch{return false}})
+const time=z.number().finite().nonnegative(),token=z.string().min(1).max(80)
+export const pvtRawSchema=z.object({plan:z.object({phase:z.enum(['test','practice']),round:z.number().int().min(0).max(1),index:z.number().int().min(0).max(601),waitMs:z.number().int().min(2000).max(10000),feedbackMs:z.union([z.literal(0),z.literal(1000),z.literal(2000)])}).strict(),phaseStartedAtMs:time,waitStartedAtMs:time,endedAtMs:time,outcome:z.enum(['responded','early','timeout','budget-end','interrupted']),stopReason:z.string().min(1).max(100).nullable(),heldBefore:z.array(token).max(16),events:z.array(z.discriminatedUnion('kind',[z.object({kind:z.literal('target'),atMs:time}).strict(),z.object({kind:z.enum(['down','up']),atMs:time,token,input:z.enum(['touch','mouse','pen','keyboard']),repeat:z.boolean()}).strict()])).max(128),ignoredRepeats:z.number().int().nonnegative(),overflow:z.boolean()}).strict() satisfies z.ZodType<PvtRaw>

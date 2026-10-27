@@ -1,0 +1,103 @@
+{
+  "kind": "ACTUAL_REACT_SYNTHETIC_PORTS_LAYOUT_ONLY_NOT_HARDWARE_OR_VALIDITY",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": false,
+  "checks": [
+    {
+      "mode": "intro",
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "name": "actual-instructions-zh-phone",
+      "viewport": 390,
+      "documentWidth": 390,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "intro",
+      "language": "en",
+      "profile": "research",
+      "width": 820,
+      "height": 1180,
+      "name": "actual-instructions-en-tablet",
+      "viewport": 820,
+      "documentWidth": 820,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "report",
+      "state": "interpretable",
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "name": "actual-report-interpretable-phone",
+      "viewport": 390,
+      "documentWidth": 390,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "report",
+      "state": "limited",
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "name": "actual-report-limited-phone",
+      "viewport": 390,
+      "documentWidth": 390,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "report",
+      "state": "invalid",
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "name": "actual-report-invalid-phone",
+      "viewport": 390,
+      "documentWidth": 390,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "report",
+      "language": "en",
+      "state": "interpretable",
+      "width": 820,
+      "height": 1180,
+      "name": "actual-report-en-tablet",
+      "viewport": 820,
+      "documentWidth": 820,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "mode": "practice",
+      "language": "zh",
+      "width": 390,
+      "height": 844,
+      "name": "actual-waiting-phone",
+      "viewport": 390,
+      "documentWidth": 390,
+      "secureContext": true,
+      "errors": [],
+      "blockedExternalRequests": []
+    },
+    {
+      "name": "actual-target-tablet",
+      "viewport": 820,
+      "documentWidth": 820,
+      "errors": [],
+      "blockedExternalRequests": []
+    }
+  ]
+}

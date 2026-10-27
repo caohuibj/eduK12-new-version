@@ -1,0 +1,9 @@
+import fs from 'node:fs'
+import {scorePvt,pvtEnvelope} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/pvt/scorer'
+import {projectPvtReport,pvtPublic,pvtImageData,pvtDownload} from '/workspace/eduK12-new-version/server-version/backend/src/modules/cognitive/content-candidates/pvt/report'
+const out='/workspace/eduK12-new-version/docs/cognitive-library/scenario-roadmap-20261027/domains/clinical-research/pvt-implementation/evidence'
+const completed=JSON.parse(fs.readFileSync(out+'/completed-originals.json','utf8')),base=completed.find((x:any)=>x.profile==='experience'),context=base.prepared.context,formal=base.records.filter((r:any)=>r.raw.plan.phase==='test').map((r:any)=>structuredClone(r.raw))
+const limited=structuredClone(formal.slice(0,2)),last=limited[1];last.outcome='interrupted';last.stopReason='synthetic-preview-interruption';last.endedAtMs=last.waitStartedAtMs+10;last.events=last.events.filter((e:any)=>e.atMs<=last.endedAtMs)
+const input=(raws:any[])=>({session:context.snapshot,config:context.snapshot.config,randomSeed:context.randomSeed,trials:raws.map(pvtEnvelope)})
+const reports=Object.fromEntries((['interpretable','limited','invalid'] as const).map(state=>{const score=scorePvt(input(state==='interpretable'?formal:state==='limited'?limited:[])),report=projectPvtReport(score);return [state,{report,public:pvtPublic(report),image:pvtImageData(report),download:JSON.parse(pvtDownload(report))}]}))
+fs.writeFileSync(out+'/preview-reports.json',JSON.stringify({kind:'SYNTHETIC_RESEARCH_DEVELOPMENT_PREVIEW_NOT_PARTICIPANT_DATA',contexts:Object.fromEntries(completed.map((x:any)=>[x.profile,x.prepared.context])),reports,englishReport:projectPvtReport(scorePvt(input(formal)),'en')},null,2)+'\n')

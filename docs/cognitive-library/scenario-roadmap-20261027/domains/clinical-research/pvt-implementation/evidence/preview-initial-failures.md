@@ -1,0 +1,5 @@
+# 静态预览辅助脚本失败记录
+
+首轮夹具脚本报 `PVT envelope/continuous ownership mismatch`：limited夹具使用浅slice，连带改动完整流程第二条记录，权威scorer正确拒绝中断后续跑。后续渲染因夹具JSON尚未生成而构建失败。修复只将limited夹具独立structuredClone，没有放宽scorer或修改生产代码。
+
+修复时写本说明曾误用backend工作目录下的相对docs路径，报FileNotFoundError；实际夹具已修复且后续生成、8张React截图成功。本文件在仓库根目录补存。没有参与者数据、真实存储或后台接入。

@@ -1,0 +1,11 @@
+{
+  "kind": "PVT_SCOPED_DELIVERY_CONTENT_REVIEW_NOT_CI_OR_RELEASE_GATE",
+  "scopedFilesBeforeThisRecord": 73,
+  "totalBytes": 2709954,
+  "localMarkdownLinksChecked": 31,
+  "credentialPatterns": "none",
+  "copyrightSourceFiles": "no paper/audio/font files included",
+  "controlledDimensions": 18,
+  "runtimeMetadataMatchesTagDocument": true,
+  "staticDesignPngSha256": "b0fd6905348a9d10c0b1a99793b03f22fd8fb924cc54537ec0bb67628a6af40b"
+}

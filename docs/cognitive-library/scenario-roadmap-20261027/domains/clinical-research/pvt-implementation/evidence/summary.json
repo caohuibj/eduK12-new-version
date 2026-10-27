@@ -1,0 +1,328 @@
+{
+  "kind": "PVT_SCOPED_CONTENT_VERIFICATION_NOT_DOT_APPROVAL_OR_PRODUCT_INTEGRATION",
+  "baseCommit": "965375d2b0e6bd4719a766c08a7d2568f3686706",
+  "userApproved": {
+    "researchSeconds": 600,
+    "practicalSeconds": 180,
+    "practiceTargets": 3,
+    "supersedes120SecondDiscussion": true
+  },
+  "scope": "PVT source, direct tests and exclusive clinical-research PVT docs only",
+  "runs": [
+    {
+      "file": "backend-first.json",
+      "passed": 2,
+      "failed": 4,
+      "filtered": 0,
+      "success": false
+    },
+    {
+      "file": "frontend-first.json",
+      "passed": 5,
+      "failed": 1,
+      "filtered": 0,
+      "success": false
+    },
+    {
+      "file": "backend-fix1.json",
+      "passed": 2,
+      "failed": 2,
+      "filtered": 2,
+      "success": false
+    },
+    {
+      "file": "frontend-fix1.json",
+      "passed": 0,
+      "failed": 1,
+      "filtered": 5,
+      "success": false
+    },
+    {
+      "file": "backend-fix2.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 4,
+      "success": true
+    },
+    {
+      "file": "frontend-fix2.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 5,
+      "success": true
+    },
+    {
+      "file": "frontend-boundary.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 3,
+      "success": true
+    },
+    {
+      "file": "backend-projection.json",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 1,
+      "success": true
+    },
+    {
+      "file": "frontend-projection.json",
+      "passed": 4,
+      "failed": 0,
+      "filtered": 2,
+      "success": true
+    }
+  ],
+  "uniquePassingCases": [
+    {
+      "name": "PVT independent content authority freezes180/600 seconds, three practice targets and bounded deterministic waits without promising a target count",
+      "passingArtifact": "backend-first.json"
+    },
+    {
+      "name": "PVT independent content authority verifies stored practice, actual language, realm, all original digests and final completion independently",
+      "passingArtifact": "backend-projection.json"
+    },
+    {
+      "name": "PVT candidate flows captures first0, holds, feedback suppression and exact timeout/cutoff boundaries without speed thresholds",
+      "passingArtifact": "frontend-boundary.json"
+    },
+    {
+      "name": "PVT candidate flows re-presents teaching after failed practice, completes both approved durations and retains authoritative synthetic originals",
+      "passingArtifact": "frontend-projection.json"
+    },
+    {
+      "name": "PVT candidate flows keeps an already-complete last-save failure complete and a completed practice save retry does not replay practice",
+      "passingArtifact": "frontend-projection.json"
+    },
+    {
+      "name": "PVT candidate flows freezes teaching language and identity, rejects reused attempts and survives StrictMode replay before exposure",
+      "passingArtifact": "frontend-first.json"
+    },
+    {
+      "name": "PVT candidate flows renders actual circle/Space controls, re-presents full teaching on failure, and suppresses invalid body/image/download",
+      "passingArtifact": "frontend-projection.json"
+    },
+    {
+      "name": "PVT independent content authority separates full30-second nonresponses from scheduled censoring, waiting and unexecuted targets",
+      "passingArtifact": "backend-projection.json"
+    },
+    {
+      "name": "PVT independent content authority rejects changed waits, false timeouts, resumed or overlapping streams, wrong versions and altered envelopes",
+      "passingArtifact": "backend-projection.json"
+    },
+    {
+      "name": "PVT independent content authority accepts true0 and fast positive first responses without imported speed classes, and preserves signed internal differences",
+      "passingArtifact": "backend-projection.json"
+    },
+    {
+      "name": "PVT independent content authority uses a common three-state public projection with actual denominators, frozen bilingual copy and no internal metrics",
+      "passingArtifact": "backend-projection.json"
+    },
+    {
+      "name": "PVT candidate flows preserves failed save originals, stops subsequent exposure, and retries the exact final without replaying",
+      "passingArtifact": "frontend-projection.json"
+    }
+  ],
+  "caseCount": {
+    "backend": 6,
+    "frontend": 6
+  },
+  "reuseBoundary": "Only unaffected branches were reused: exact protocol/parameter and prepare/language/StrictMode cases. Changed fixture helpers, boundary capture, retry and public report projections were selectively rerun. Filtered cases are not new passes. No legacy/SART or whole-platform rerun.",
+  "types": [
+    {
+      "name": "backend",
+      "config": "server-version/backend/tsconfig.json",
+      "entries": [
+        "server-version/backend/src/modules/cognitive/content-candidates/pvt/metadata.ts",
+        "server-version/backend/src/modules/cognitive/content-candidates/pvt/participant-presentation.ts",
+        "server-version/backend/src/__tests__/cognitive/pvt-content.test.ts"
+      ],
+      "sourceCount": 50,
+      "diagnostics": []
+    },
+    {
+      "name": "frontend",
+      "config": "server-version/frontend/tsconfig.app.json",
+      "entries": [
+        "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtTask.tsx",
+        "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx"
+      ],
+      "sourceCount": 55,
+      "diagnostics": []
+    }
+  ],
+  "frontendLint": {
+    "artifacts": [
+      "frontend-lint-final.json",
+      "frontend-lint-session-fixed.json"
+    ],
+    "files": 11,
+    "errors": 0,
+    "warnings": 0
+  },
+  "pureProjectionCheck": "PVT protocol/analysis/report generated copies match backend; no hand-edited divergence",
+  "syntheticCompletedSessions": [
+    {
+      "profile": "experience",
+      "plannedMs": 180000,
+      "observedMs": 180000,
+      "records": 34,
+      "practiceRecords": 4,
+      "formalCycles": 30,
+      "actualTargetStats": {
+        "appeared": 29,
+        "responded": 29,
+        "timeouts": 0,
+        "completeTargets": 29,
+        "censored": 0,
+        "interruptedTargets": 0,
+        "earlyPresses": 0
+      },
+      "state": "interpretable",
+      "contextLanguage": "zh",
+      "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb",
+      "finalPayloadDigest": "a85acd5839a2e212793df66d354741d7ecd6ab2276bb54b0a753007be7a17865"
+    },
+    {
+      "profile": "research",
+      "plannedMs": 600000,
+      "observedMs": 600000,
+      "records": 100,
+      "practiceRecords": 4,
+      "formalCycles": 96,
+      "actualTargetStats": {
+        "appeared": 95,
+        "responded": 95,
+        "timeouts": 0,
+        "completeTargets": 95,
+        "censored": 0,
+        "interruptedTargets": 0,
+        "earlyPresses": 0
+      },
+      "state": "interpretable",
+      "contextLanguage": "zh",
+      "manifestHash": "c24de1b477bb09cbde43154ab84dc33094d066246c447e0fc88f154bfa2342ac",
+      "finalPayloadDigest": "30b021139bc5a1d73fde61d96c8cb7af36a64fca0a82062444fc55da60dfdf5a"
+    }
+  ],
+  "reactReview": "actual-react-review.json",
+  "failuresRetained": {
+    "strictScorerFixture": "First fixture passed helper-only raws/manifest keys into strict scorer; fixed the fixture, not scorer strictness.",
+    "testHelperShadow": "First helper name collided with local score variable; renamed helper.",
+    "retry": "Removed a duplicate finish entry after drain; fixed callback injection to occur before immutable ports were bound. Final one-click/one-claim retry and same-original tests passed.",
+    "boundary": "Expired input is handled before log capacity; exact cutoff cannot turn a valid terminal record into an overflow error.",
+    "typeDrafts": [
+      "types-initial.json",
+      "types-literal-initial.json"
+    ],
+    "preview": "preview-initial-failures.md",
+    "lintDraft": "Unused type-only PvtRaw import warned; removed without runtime changes and re-linted only session.ts. The first removal command used the wrong working-directory-relative path, so no source changed until the absolute-path correction. Prior warning artifacts retained.",
+    "scopeDraft": "First Markdown link audit ran before summary.json existed; final audit occurs after this file is written."
+  },
+  "preservedSartCommit": "4b3351509088683cf91e82c7bc8eb87a5333d2d2",
+  "sixOriginalUntrackedWipFiles": "Preserved outside staged PVT directories",
+  "excluded": [
+    "shared registration",
+    "product APIs/storage ports",
+    "platform schema",
+    "permissions",
+    "server",
+    "COS",
+    "dependency changes",
+    "CI activation",
+    "merge",
+    "deployment",
+    "clinical validation",
+    "hardware/physical timing validation"
+  ],
+  "sourceFiles": {
+    "server-version/backend/src/__tests__/cognitive/pvt-content.test.ts": {
+      "bytes": 10808,
+      "sha256": "9675cd129c5fa7147e45957add5d0fdfb11d69dbf5d3e853db301284f3595d43"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/analysis.ts": {
+      "bytes": 4969,
+      "sha256": "1e42581d08f6297faa7f371b8e7e76c10e21f0916232067cf2ae76ad3b3331bb"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/metadata.ts": {
+      "bytes": 2192,
+      "sha256": "01a91d1e48a0ff022f78bcfc824bb83e40dda40eee558f09c96ce2b321e75345"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/package.ts": {
+      "bytes": 3357,
+      "sha256": "79a1ec546984065bcb1f81a0d8ee3a962eb72d649faac765f0c9ff5dc4cacf9a"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/participant-presentation.ts": {
+      "bytes": 1045,
+      "sha256": "7d7d7758954fd2510acec840c524d7e095f54613574d0d44a1b77135daac2778"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/protocol.ts": {
+      "bytes": 5768,
+      "sha256": "26ae990d8676825f61b8a00c634dc618e9f4b112017dbfcb1172ad4150d81f44"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/report.ts": {
+      "bytes": 7584,
+      "sha256": "c1d4f6971187389114c67c1896106cb353fd85fd59b5b2adae2cb2290e76f79c"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/scorer.ts": {
+      "bytes": 4036,
+      "sha256": "f329a7abeea23f157ea44526c32032ac78324cb6f6fb52ba642a92cd340cf018"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/submission.ts": {
+      "bytes": 3923,
+      "sha256": "3d53eb299b8a596580e3ac223450eae11be4fa9f359395bbcb17783617ef7a4e"
+    },
+    "server-version/backend/src/modules/cognitive/content-candidates/pvt/validation.ts": {
+      "bytes": 1129,
+      "sha256": "d75e3c2a819c287081946bf975cae2f2c885b977460e0dc69d1c25e3e5c6f844"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtInstructions.tsx": {
+      "bytes": 5203,
+      "sha256": "53364ea434ca6d8bdf4a1c6ec2b3e3d683971cc946a5197a39c8faa0950655c5"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtReport.tsx": {
+      "bytes": 2338,
+      "sha256": "eb8b9fb151948423c90a0bd03968420859ba6b81e1518baa5302dd856a262eed"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtTask.tsx": {
+      "bytes": 9077,
+      "sha256": "574556b3f919599e1327fd1ae5c91cee537b45c2ae03c0af2dcccfa6b8a5b77d"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/capture.ts": {
+      "bytes": 2892,
+      "sha256": "906e250d97c7a0da8bcd68557feeed68ac10bb13d79b0d73505ca69320fea1fb"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx": {
+      "bytes": 13566,
+      "sha256": "111f5a0f77f88c6366b76af26f254c956861ce3f0dedbb2bb6af62869c7a1f64"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/contracts.ts": {
+      "bytes": 1238,
+      "sha256": "ef0b0c17f0e2bae871869a92a3689a83e51a7b6ea518cb144990ce466639a814"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/generated/analysis.ts": {
+      "bytes": 5084,
+      "sha256": "764086e5bd47f71e1cad67b58d562699bc1271ade9fc0e51ba52673a3e4b76f0"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/generated/protocol.ts": {
+      "bytes": 5883,
+      "sha256": "47d50a3bd97fe4e563ef6572e8eaa6188bc2f608dd68bd2560661a265110bb48"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/generated/report.ts": {
+      "bytes": 7699,
+      "sha256": "3a6682ce8159748602e6cba07b02d6203627fe14f6403895c2ce0402c7b69e7c"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/pvt.css": {
+      "bytes": 2309,
+      "sha256": "5bf02bc3ed385aeb78a223d3dd9630bb50f553c7b9ebf89316034727c583ed54"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/session.ts": {
+      "bytes": 8915,
+      "sha256": "03311c7fa74574b6a0bcccd9e564cbd0608162419dfe866d3697949887f671a3"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pvt/sync-content.cjs": {
+      "bytes": 926,
+      "sha256": "9d60c11e638e10c552e40d4c7fd74b54082dc62af25e841118b0f914581c98a5"
+    }
+  }
+}

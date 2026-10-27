@@ -1,0 +1,512 @@
+{
+  "kind": "SYNTHETIC_RESEARCH_DEVELOPMENT_PREVIEW_NOT_PARTICIPANT_DATA",
+  "contexts": {
+    "experience": {
+      "contextKey": "pvt-synthetic-experience",
+      "language": "zh",
+      "snapshot": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "pvt",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "experience",
+          "durationMs": 180000,
+          "waitMinimumMs": 2000,
+          "waitMaximumMs": 10000,
+          "feedbackMs": 1000,
+          "responseWindowMs": 30000,
+          "circleDiameterPx": 88,
+          "fieldHeightPx": 270,
+          "background": "#15232e",
+          "foreground": "#FFFFFF",
+          "fontFamily": "system-ui, sans-serif",
+          "inputPolicy": "first-fresh-down-half-open-no-rt-classification-v1",
+          "endPolicy": "fixed-duration-with-explicit-censor-v1",
+          "practice": {
+            "trials": 3,
+            "waitMs": [
+              3000,
+              5000,
+              3000
+            ],
+            "feedbackMs": 2000,
+            "maxRounds": 2,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "parameterDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "05a3fc4b3da916d2a17ae88bc64205eb3401130ecf17d686dc8ee1248304c236",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "pvt/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "pvt-fnv1a-xorshift32-rejection-integer-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc"
+      },
+      "randomSeed": "pvt-frontend-synthetic-experience",
+      "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb"
+    },
+    "research": {
+      "contextKey": "pvt-synthetic-research",
+      "language": "zh",
+      "snapshot": {
+        "schemaVersion": 1,
+        "frozenAt": "2026-10-27T00:00:00.000Z",
+        "testType": "pvt",
+        "configVersion": "0.1.0",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "config": {
+          "profile": "research",
+          "durationMs": 600000,
+          "waitMinimumMs": 2000,
+          "waitMaximumMs": 10000,
+          "feedbackMs": 1000,
+          "responseWindowMs": 30000,
+          "circleDiameterPx": 88,
+          "fieldHeightPx": 270,
+          "background": "#15232e",
+          "foreground": "#FFFFFF",
+          "fontFamily": "system-ui, sans-serif",
+          "inputPolicy": "first-fresh-down-half-open-no-rt-classification-v1",
+          "endPolicy": "fixed-duration-with-explicit-censor-v1",
+          "practice": {
+            "trials": 3,
+            "waitMs": [
+              3000,
+              5000,
+              3000
+            ],
+            "feedbackMs": 2000,
+            "maxRounds": 2,
+            "repeatInstructionsBeforeRetry": true
+          },
+          "profileDefinitionVersion": "0.1.0",
+          "parameterDefinitionVersion": "0.1.0",
+          "metricDefinitionVersion": "0.1.0",
+          "qualityDefinitionVersion": "0.1.0",
+          "reportDefinitionVersion": "0.1.0",
+          "presentationVersion": "0.1.0"
+        },
+        "configHash": "c3e02aabfcaef0264f764f9138797db05c5d2fef23ad522c31f5e1ff9cf01dd4",
+        "protocol": {
+          "schemaVersion": 1,
+          "key": "pvt/0.1.0/0.1.0",
+          "version": "0.1.0",
+          "clock": "performance",
+          "randomizationAlgorithmVersion": "pvt-fnv1a-xorshift32-rejection-integer-v1",
+          "trialEnvelopeVersion": 1,
+          "phases": [
+            {
+              "key": "test",
+              "persists": true,
+              "required": true
+            }
+          ],
+          "measurementCriticalConfigPaths": [
+            "*"
+          ]
+        },
+        "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc"
+      },
+      "randomSeed": "pvt-frontend-synthetic-research",
+      "manifestHash": "c24de1b477bb09cbde43154ab84dc33094d066246c447e0fc88f154bfa2342ac"
+    }
+  },
+  "reports": {
+    "interpretable": {
+      "report": {
+        "testType": "pvt",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "05a3fc4b3da916d2a17ae88bc64205eb3401130ecf17d686dc8ee1248304c236",
+        "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc",
+        "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "teachingLanguage": "zh",
+        "state": "interpretable",
+        "durationMs": 180000,
+        "observedMs": 180000,
+        "received": 30,
+        "finishedBudget": true,
+        "stats": {
+          "appeared": 29,
+          "responded": 29,
+          "timeouts": 0,
+          "completeTargets": 29,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "earlyPresses": 0
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段等待",
+            "invalid": "本次暂时无法形成表现结论",
+            "partial": "本次只描述已完整观察的部分，未完成原定持续时间。",
+            "targets": "完整观察了{complete}次目标，其中{responded}次记录到目标出现后的首答，{timeouts}次完整观察30秒仍未答。",
+            "waiting": "等待时提前按了{early}次；另有{censored}次目标因时间到未观察完，{interrupted}次目标因中断未观察完。",
+            "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+            "tip": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+            "limit": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+            "empty": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。"
+          },
+          "en": {
+            "title": "Thank you for completing this period of waiting",
+            "invalid": "No performance conclusion is available",
+            "partial": "Only fully observed targets are described; the scheduled duration was not completed.",
+            "targets": "Of {complete} fully observed targets, {responded} had a first response after onset and {timeouts} had no response during a full 30-second window.",
+            "waiting": "There were {early} presses while waiting. Another {censored} targets were cut short by the time limit and {interrupted} by an interruption.",
+            "explanation": "These counts describe responses and nonresponses in this period of random waiting; they do not identify causes of attention changes. Early presses mean presses before a target, not a speed-based judgement.",
+            "tip": "Before another task, review the outline and solid-circle examples, reduce nearby interruptions and take a break when needed. Respond after seeing the target rather than aiming for a score.",
+            "limit": "This is a custom project variant. The practical version lasts only 180 seconds and samples fewer targets. Devices, hand movements and sleep can affect the record. There are no clinical or age norms, diagnoses, IQ scores, rankings or job predictions.",
+            "empty": "No complete, interpretable formal target is available. This does not mean zero performance or poor ability. Rest or review the instructions, then decide whether to start a separate attempt."
+          }
+        }
+      },
+      "public": {
+        "state": "interpretable",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": null,
+        "summary": {
+          "completeTargets": 29,
+          "responded": 29,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 180000,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了29次目标，其中29次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      },
+      "image": {
+        "state": "interpretable",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": null,
+        "summary": {
+          "completeTargets": 29,
+          "responded": 29,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 180000,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了29次目标，其中29次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+        "brand": "EDUK12.TOP"
+      },
+      "download": {
+        "state": "interpretable",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": null,
+        "summary": {
+          "completeTargets": 29,
+          "responded": 29,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 180000,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了29次目标，其中29次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      }
+    },
+    "limited": {
+      "report": {
+        "testType": "pvt",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "05a3fc4b3da916d2a17ae88bc64205eb3401130ecf17d686dc8ee1248304c236",
+        "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc",
+        "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "teachingLanguage": "zh",
+        "state": "limited",
+        "durationMs": 180000,
+        "observedMs": 5684,
+        "received": 2,
+        "finishedBudget": false,
+        "stats": {
+          "appeared": 1,
+          "responded": 1,
+          "timeouts": 0,
+          "completeTargets": 1,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "earlyPresses": 0
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段等待",
+            "invalid": "本次暂时无法形成表现结论",
+            "partial": "本次只描述已完整观察的部分，未完成原定持续时间。",
+            "targets": "完整观察了{complete}次目标，其中{responded}次记录到目标出现后的首答，{timeouts}次完整观察30秒仍未答。",
+            "waiting": "等待时提前按了{early}次；另有{censored}次目标因时间到未观察完，{interrupted}次目标因中断未观察完。",
+            "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+            "tip": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+            "limit": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+            "empty": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。"
+          },
+          "en": {
+            "title": "Thank you for completing this period of waiting",
+            "invalid": "No performance conclusion is available",
+            "partial": "Only fully observed targets are described; the scheduled duration was not completed.",
+            "targets": "Of {complete} fully observed targets, {responded} had a first response after onset and {timeouts} had no response during a full 30-second window.",
+            "waiting": "There were {early} presses while waiting. Another {censored} targets were cut short by the time limit and {interrupted} by an interruption.",
+            "explanation": "These counts describe responses and nonresponses in this period of random waiting; they do not identify causes of attention changes. Early presses mean presses before a target, not a speed-based judgement.",
+            "tip": "Before another task, review the outline and solid-circle examples, reduce nearby interruptions and take a break when needed. Respond after seeing the target rather than aiming for a score.",
+            "limit": "This is a custom project variant. The practical version lasts only 180 seconds and samples fewer targets. Devices, hand movements and sleep can affect the record. There are no clinical or age norms, diagnoses, IQ scores, rankings or job predictions.",
+            "empty": "No complete, interpretable formal target is available. This does not mean zero performance or poor ability. Rest or review the instructions, then decide whether to start a separate attempt."
+          }
+        }
+      },
+      "public": {
+        "state": "limited",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": "本次只描述已完整观察的部分，未完成原定持续时间。",
+        "summary": {
+          "completeTargets": 1,
+          "responded": 1,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 5684,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了1次目标，其中1次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      },
+      "image": {
+        "state": "limited",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": "本次只描述已完整观察的部分，未完成原定持续时间。",
+        "summary": {
+          "completeTargets": 1,
+          "responded": 1,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 5684,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了1次目标，其中1次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+        "brand": "EDUK12.TOP"
+      },
+      "download": {
+        "state": "limited",
+        "profile": "experience",
+        "title": "谢谢你完成这段等待",
+        "notice": "本次只描述已完整观察的部分，未完成原定持续时间。",
+        "summary": {
+          "completeTargets": 1,
+          "responded": 1,
+          "timeouts": 0,
+          "earlyPresses": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "observedMs": 5684,
+          "scheduledMs": 180000
+        },
+        "observations": [
+          "完整观察了1次目标，其中1次记录到目标出现后的首答，0次完整观察30秒仍未答。",
+          "等待时提前按了0次；另有0次目标因时间到未观察完，0次目标因中断未观察完。"
+        ],
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      }
+    },
+    "invalid": {
+      "report": {
+        "testType": "pvt",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "05a3fc4b3da916d2a17ae88bc64205eb3401130ecf17d686dc8ee1248304c236",
+        "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc",
+        "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "teachingLanguage": "zh",
+        "state": "invalid",
+        "durationMs": 180000,
+        "observedMs": null,
+        "received": 0,
+        "finishedBudget": false,
+        "stats": {
+          "appeared": 0,
+          "responded": 0,
+          "timeouts": 0,
+          "completeTargets": 0,
+          "censored": 0,
+          "interruptedTargets": 0,
+          "earlyPresses": 0
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段等待",
+            "invalid": "本次暂时无法形成表现结论",
+            "partial": "本次只描述已完整观察的部分，未完成原定持续时间。",
+            "targets": "完整观察了{complete}次目标，其中{responded}次记录到目标出现后的首答，{timeouts}次完整观察30秒仍未答。",
+            "waiting": "等待时提前按了{early}次；另有{censored}次目标因时间到未观察完，{interrupted}次目标因中断未观察完。",
+            "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+            "tip": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+            "limit": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+            "empty": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。"
+          },
+          "en": {
+            "title": "Thank you for completing this period of waiting",
+            "invalid": "No performance conclusion is available",
+            "partial": "Only fully observed targets are described; the scheduled duration was not completed.",
+            "targets": "Of {complete} fully observed targets, {responded} had a first response after onset and {timeouts} had no response during a full 30-second window.",
+            "waiting": "There were {early} presses while waiting. Another {censored} targets were cut short by the time limit and {interrupted} by an interruption.",
+            "explanation": "These counts describe responses and nonresponses in this period of random waiting; they do not identify causes of attention changes. Early presses mean presses before a target, not a speed-based judgement.",
+            "tip": "Before another task, review the outline and solid-circle examples, reduce nearby interruptions and take a break when needed. Respond after seeing the target rather than aiming for a score.",
+            "limit": "This is a custom project variant. The practical version lasts only 180 seconds and samples fewer targets. Devices, hand movements and sleep can affect the record. There are no clinical or age norms, diagnoses, IQ scores, rankings or job predictions.",
+            "empty": "No complete, interpretable formal target is available. This does not mean zero performance or poor ability. Rest or review the instructions, then decide whether to start a separate attempt."
+          }
+        }
+      },
+      "public": {
+        "state": "invalid",
+        "profile": "experience",
+        "title": "本次暂时无法形成表现结论",
+        "notice": null,
+        "summary": null,
+        "observations": [],
+        "explanation": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      },
+      "image": null,
+      "download": {
+        "state": "invalid",
+        "profile": "experience",
+        "title": "本次暂时无法形成表现结论",
+        "notice": null,
+        "summary": null,
+        "observations": [],
+        "explanation": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。",
+        "suggestion": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limitation": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。"
+      }
+    }
+  },
+  "englishReport": {
+    "testType": "pvt",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "configHash": "05a3fc4b3da916d2a17ae88bc64205eb3401130ecf17d686dc8ee1248304c236",
+    "protocolSignature": "bfa6c97a75397e85ad95e86a52181e369fbcf2b8938118971d81c1161002a1bc",
+    "manifestHash": "9aad1fad27c3760e7518cf2298fd1069a1dd3579906b3ca9ebde05d8795da2cb",
+    "profile": "experience",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "teachingLanguage": "en",
+    "state": "interpretable",
+    "durationMs": 180000,
+    "observedMs": 180000,
+    "received": 30,
+    "finishedBudget": true,
+    "stats": {
+      "appeared": 29,
+      "responded": 29,
+      "timeouts": 0,
+      "completeTargets": 29,
+      "censored": 0,
+      "interruptedTargets": 0,
+      "earlyPresses": 0
+    },
+    "copy": {
+      "zh": {
+        "title": "谢谢你完成这段等待",
+        "invalid": "本次暂时无法形成表现结论",
+        "partial": "本次只描述已完整观察的部分，未完成原定持续时间。",
+        "targets": "完整观察了{complete}次目标，其中{responded}次记录到目标出现后的首答，{timeouts}次完整观察30秒仍未答。",
+        "waiting": "等待时提前按了{early}次；另有{censored}次目标因时间到未观察完，{interrupted}次目标因中断未观察完。",
+        "explanation": "这些次数描述这段随机等待中的回应和未答，不说明注意波动的原因。提前按仅指目标出现前按下，不按反应快慢划分对错。",
+        "tip": "下次可以先确认空心圆与实心圆的区别，减少旁边打断，需要时安排休息。看到目标后再回应，无需追求某种分数。",
+        "limit": "这是自定义项目变式；实用版仅180秒，目标较少。设备、手部操作与睡眠等也可能影响记录。没有临床或同龄参照，不用于诊断、IQ、排名或岗位适配。",
+        "empty": "尚无可解释的完整正式目标。这不代表表现为零或能力差。可以先休息或重看说明，再决定是否另开一次。"
+      },
+      "en": {
+        "title": "Thank you for completing this period of waiting",
+        "invalid": "No performance conclusion is available",
+        "partial": "Only fully observed targets are described; the scheduled duration was not completed.",
+        "targets": "Of {complete} fully observed targets, {responded} had a first response after onset and {timeouts} had no response during a full 30-second window.",
+        "waiting": "There were {early} presses while waiting. Another {censored} targets were cut short by the time limit and {interrupted} by an interruption.",
+        "explanation": "These counts describe responses and nonresponses in this period of random waiting; they do not identify causes of attention changes. Early presses mean presses before a target, not a speed-based judgement.",
+        "tip": "Before another task, review the outline and solid-circle examples, reduce nearby interruptions and take a break when needed. Respond after seeing the target rather than aiming for a score.",
+        "limit": "This is a custom project variant. The practical version lasts only 180 seconds and samples fewer targets. Devices, hand movements and sleep can affect the record. There are no clinical or age norms, diagnoses, IQ scores, rankings or job predictions.",
+        "empty": "No complete, interpretable formal target is available. This does not mean zero performance or poor ability. Rest or review the instructions, then decide whether to start a separate attempt."
+      }
+    }
+  }
+}

@@ -12,25 +12,19 @@
     "paradigm": null,
     "stimulus_form": null,
     "input_upstream": null,
-    "input_proposed": [
-      "not_frozen"
-    ],
+    "input_proposed": null,
     "key_metric": null,
     "intended_use": [
       "research_protocol_selection"
     ],
     "code_license": null,
-    "code_rights_disposition": [
-      "authorization_pending"
-    ],
+    "code_rights_disposition": null,
     "asset_rights_disposition": null,
     "asset_license_review": null,
     "implementation_strategy": [
       "literature_reimplementation"
     ],
-    "maturity": [
-      "source_research_only"
-    ],
+    "maturity": null,
     "evidence_limitations": [
       "timing_device_unverified",
       "protocol_variant_unvalidated",
@@ -52,8 +46,8 @@
   },
   "notes": {
     "authorization_pending": "Only the upstream source redistribution is unconfirmed; no upstream source/assets included.",
-    "nulls": "No exact PVT paradigm/stimulus/input/metric/license labels; no fabricated controlled values.",
+    "nulls": "No exact stable vocabulary value for PVT paradigm, original circles, frozen pointer/Space input, content-candidate maturity or independent source-code license; do not relabel these as not_frozen or source_research_only.",
     "ageLanguageDeviceDifficulty": "Unknown; no clinical/child/Chinese/device equivalence validation.",
-    "ownership": "DOT confirmed clinical-research; user accepted interface and requested three practice targets; 120-second practical version is a design revision; development explicitly paused."
+    "ownership": "User approved 180-second implementation with three practice targets; candidate is not DOT-reviewed or product-integrated."
   }
 }

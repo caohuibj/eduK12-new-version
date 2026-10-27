@@ -1,0 +1,42 @@
+[
+  {
+    "name": "backend",
+    "config": "server-version/backend/tsconfig.json",
+    "entries": [
+      "server-version/backend/src/modules/cognitive/content-candidates/pvt/participant-presentation.ts",
+      "server-version/backend/src/__tests__/cognitive/pvt-content.test.ts"
+    ],
+    "sourceCount": 47,
+    "diagnostics": [
+      {
+        "code": 6053,
+        "file": null,
+        "line": null,
+        "message": "File '/workspace/eduK12-new-version/server-version/backend/src/__tests__/cognitive/pvt-content.test.ts' not found.\n  The file is in the program because:\n    Root file specified for compilation"
+      },
+      {
+        "code": 2322,
+        "file": "server-version/backend/src/modules/cognitive/content-candidates/pvt/package.ts",
+        "line": 8,
+        "message": "Type '\"number\" | \"boolean\" | \"object\"' is not assignable to type 'MetricValueType'.\n  Type '\"boolean\"' is not assignable to type 'MetricValueType'."
+      }
+    ]
+  },
+  {
+    "name": "frontend",
+    "config": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx"
+    ],
+    "sourceCount": 9,
+    "diagnostics": [
+      {
+        "code": 6053,
+        "file": null,
+        "line": null,
+        "message": "File '/workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx' not found.\n  The file is in the program because:\n    Root file specified for compilation"
+      }
+    ]
+  }
+]

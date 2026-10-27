@@ -1,0 +1,47 @@
+[
+  {
+    "name": "backend",
+    "config": "server-version/backend/tsconfig.json",
+    "entries": [
+      "server-version/backend/src/modules/cognitive/content-candidates/pvt/participant-presentation.ts",
+      "server-version/backend/src/__tests__/cognitive/pvt-content.test.ts"
+    ],
+    "sourceCount": 49,
+    "diagnostics": []
+  },
+  {
+    "name": "frontend",
+    "config": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/PvtTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx"
+    ],
+    "sourceCount": 55,
+    "diagnostics": [
+      {
+        "code": 2322,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx",
+        "line": 18,
+        "message": "Type 'Mock<(c: any, m: any, realm: any) => Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>>' is not assignable to type '(context: PvtContext, manifest: { formal: PvtPlan[]; practice: PvtPlan[][]; }, realm: PvtRealm) => Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n  Type 'Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>' is not assignable to type 'Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n    Type '{ fresh: boolean; contextKey: any; bindingDigest: string; }' is not assignable to type '{ fresh: true; contextKey: string; bindingDigest: string; }'.\n      Types of property 'fresh' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+      },
+      {
+        "code": 2322,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx",
+        "line": 18,
+        "message": "Type 'Mock<(record: any) => Promise<{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }>>' is not assignable to type '(record: PvtDraft) => Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n  Type 'Promise<{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }>' is not assignable to type 'Promise<{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }>'.\n    Type '{ retained: boolean; contextKey: any; recordKey: any; recordDigest: any; }' is not assignable to type '{ retained: true; contextKey: string; recordKey: string; recordDigest: string; }'.\n      Types of property 'retained' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+      },
+      {
+        "code": 2322,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx",
+        "line": 18,
+        "message": "Type 'Mock<(claim: any) => Promise<{ contextKey: any; finalPayloadDigest: string; finalSaved: boolean; receiptId: string; report: PvtReport; }>>' is not assignable to type '(claim: PvtFinal) => Promise<PvtReceipt>'.\n  Type 'Promise<{ contextKey: any; finalPayloadDigest: string; finalSaved: boolean; receiptId: string; report: PvtReport; }>' is not assignable to type 'Promise<PvtReceipt>'.\n    Type '{ contextKey: any; finalPayloadDigest: string; finalSaved: boolean; receiptId: string; report: PvtReport; }' is not assignable to type 'PvtReceipt'.\n      Types of property 'finalSaved' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+      },
+      {
+        "code": 2322,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/pvt/content.test.tsx",
+        "line": 72,
+        "message": "Type 'Mock<(c: any, m: any, realm: any) => Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>>' is not assignable to type '(context: PvtContext, manifest: { formal: PvtPlan[]; practice: PvtPlan[][]; }, realm: PvtRealm) => Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n  Type 'Promise<{ fresh: boolean; contextKey: any; bindingDigest: string; }>' is not assignable to type 'Promise<{ fresh: true; contextKey: string; bindingDigest: string; }>'.\n    Type '{ fresh: boolean; contextKey: any; bindingDigest: string; }' is not assignable to type '{ fresh: true; contextKey: string; bindingDigest: string; }'.\n      Types of property 'fresh' are incompatible.\n        Type 'boolean' is not assignable to type 'true'."
+      }
+    ]
+  }
+]

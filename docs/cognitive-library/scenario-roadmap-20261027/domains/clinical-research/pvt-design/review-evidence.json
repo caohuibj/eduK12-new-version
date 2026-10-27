@@ -35,42 +35,42 @@
     "allUsedKeysExist": true,
     "registered": false
   },
-  "scope": "Only this PVT static design directory; existing SART and original six untracked WIP files preserved. No runner/sequence/scorer, dependencies, CI, product integration, merge or deploy.",
+  "scope": "This static design directory plus the independently implemented PVT candidate and scoped evidence; not DOT-reviewed or product-integrated.",
   "sourceChecks": "Source/license review, local links, whitespace, narrow secret-pattern scan, existing controlled vocabulary keys, no original paper/assets included. Static layout evidence is separate; no participant/task run.",
   "files": {
     "APPENDIX.md": {
-      "bytes": 17435,
-      "sha256": "fcd6e790da6591c07377e71a345a95e6cbc4810b06977be6660c784a5a3684de"
+      "bytes": 17605,
+      "sha256": "8a73de035d50a4fb0b643663bb2e44ddc5b51960fbd1fa3e7f9251c1983d140f"
     },
     "REVIEW.md": {
-      "bytes": 3017,
-      "sha256": "ca5e164095e7ac92256e148817cbce4026a816086ebdab8a6e7917afe01445c7"
+      "bytes": 3118,
+      "sha256": "b88aea15c94ec03a455c3c2aa10f240574b25d80948fb8bb7a1e45751cdc6ebc"
     },
     "pvt-review.html": {
       "bytes": 9532,
-      "sha256": "5f7e9d1b7e3a6d675124ab0d3aa27447146fa046d9631b177560c4174b2c2b6f"
+      "sha256": "4ab531bc5760aff56d1a61c8a43f289288f72d510919696c4b2d4df258bbc6ea"
     },
     "pvt-review.png": {
-      "bytes": 393225,
-      "sha256": "3807a68b0b19c44501354fc49e68933803e52d3797f51d5772e9dfa761192bce"
+      "bytes": 394945,
+      "sha256": "b0fd6905348a9d10c0b1a99793b03f22fd8fb924cc54537ec0bb67628a6af40b"
     },
     "static-review.json": {
       "bytes": 913,
-      "sha256": "ceb13d85759c0ec28166cc61d817fda0219e78950534fa58574f0447ad405f9d"
+      "sha256": "7952dcbe3fc8133364891aa95924e7e0d473c5f337397aaa4d5dc2c7dd028a59"
     },
     "tags.research.json": {
-      "bytes": 1805,
-      "sha256": "fc53e89a1063aabdaaae1abb6fa2a95cc705f0d187c74064bede88e34e0b1014"
+      "bytes": 1790,
+      "sha256": "8294d06d871c63bd926377c721b63a102ac1ee7b92492566465eeeb2ec0d8f81"
     }
   },
   "designRevisedAtUtc": "2026-10-27T13:12:07.507389+00:00",
   "designRevision": {
-    "version": "0.1.2",
-    "previousDesignCommit": "99b382b151bb1c6d8c080798cc37a767cc571c81",
+    "version": "0.1.3",
+    "previousDesignCommit": "965375d2b0e6bd4719a766c08a7d2568f3686706",
     "practiceTargets": 3,
     "researchDurationMs": 600000,
-    "practicalDurationMs": 120000,
-    "userDirection": "Interface accepted; practice reduced to 3; 120 seconds discussed and proposed for practical version; do not develop.",
+    "practicalDurationMs": 180000,
+    "userDirection": "User approved the design and explicitly instructed implementation of the 180-second version. Three practice targets retained; 120-second discussion superseded.",
     "checksThisRevision": "Only changed static labels/layout and file hashes; prior source review retained; no repeated runtime checks or new task implementation.",
     "thresholdDisposition": "100/500/355 ms literature classifications are historical source context only; neither project profile adopts them. Actual first-response RT including zero is retained. Final substantive design awaits user confirmation; no implementation."
   }
