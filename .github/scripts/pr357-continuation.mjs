@@ -16,6 +16,11 @@ export const artifacts={
  build:{id:12702422597,sha:'86fd8bab952095ca943c75ecf89111883b7c04a1de6b8bded18d3dd5f8a1c49c',prefix:'pr357-backend-',job:121952713588},
  audit:{id:12703000745,sha:'dcd01c97d3c09251f7f960c994d2948746e4ab9838e6673e0ea9824d49bc32ee',prefix:'pr357-audit-',job:121952713641},
 };
+export const deliveredFrontend={run:40436352177,head:'edb119f64768787bd4fd3028e59859bc55ef846d',checkout:'0019a9aea629687c693b9e4197f86388352bc980',tree:'c82f81537ef8ff164fcaf20f42c7e2119ecdbd49',frontendTree:'1bb800f156220de1e5a2f043a82208f713cfa273',scopeJobs:[121965824219,121965905570]};
+export const deliveredArtifacts={
+ build:{id:12704057621,sha:'decfa1befeace0a009d26018eae93461743017725d317dc8a3335dc6f3f5a92e',prefix:'pr357-frontend-',job:121965972676},
+ checks:{id:12703623377,sha:'b954b12f1ad078817f3b52b045ac185e7dbdebf2c8bd940c35c80e61b78fcb61',prefix:'pr357-frontend-checks-',job:121965972676},
+};
 export const changedFixtureFiles=['src/huiteacher/HuiteacherAssessmentMediaHost.test.tsx','src/school/SchoolBoundContinuation.test.tsx'];
 const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim(),sha=x=>createHash('sha256').update(x).digest('hex');
 export function verifyContinuationInputs(read=git){
@@ -28,27 +33,27 @@ export function verifyContinuationInputs(read=git){
  assert.deepEqual(binding.tests,old.tests,'Cannot drop/change requested consumers while admitting prior files');
  return {original,backendTree:original.backendTree,changedFrontendFixtures:changedFixtureFiles};
 }
-export function verifyOriginalArtifact(meta,kind,now=Date.now()){
- const a=artifacts[kind];assert(a);assert.equal(meta.id,a.id);assert.equal(meta.name,a.prefix+original.checkout);assert.equal(meta.expired,false);assert.equal(meta.digest,'sha256:'+a.sha);assert.equal(meta.workflow_run.id,original.run);assert.equal(meta.workflow_run.head_sha,original.head);assert.equal(meta.workflow_run.head_branch,binding.branch);assert(meta.size_in_bytes>0&&meta.size_in_bytes<32*1024*1024);
+export function verifyOriginalArtifact(meta,kind,now=Date.now(),delivered=false){
+ const pin=delivered?deliveredFrontend:original,a=(delivered?deliveredArtifacts:artifacts)[kind];assert(a);assert.equal(meta.id,a.id);assert.equal(meta.name,a.prefix+pin.checkout);assert.equal(meta.expired,false);assert.equal(meta.digest,'sha256:'+a.sha);assert.equal(meta.workflow_run.id,pin.run);assert.equal(meta.workflow_run.head_sha,pin.head);assert.equal(meta.workflow_run.head_branch,binding.branch);assert(meta.size_in_bytes>0&&meta.size_in_bytes<32*1024*1024);
  const age=now-Date.parse(meta.created_at);assert(age>=0&&age<86400000,'Original evidence outside bounded freshness window');return a;
 }
-async function trustedGet(url,options={}){let last;for(let attempt=0;attempt<3;attempt++){try{const response=await fetch(url,{...options,signal:AbortSignal.timeout(30000)});if(![502,503,504].includes(response.status)||attempt===2)return response;await response.body?.cancel();}catch(error){last=error;if(attempt===2)throw error;}await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));}throw last??new Error('Official GET unavailable');}
+async function trustedGet(url,options={}){let last;for(let attempt=0;attempt<3;attempt++){try{const response=await fetch(url,{...options,signal:AbortSignal.timeout(30000)});if(![502,503,504].includes(response.status)||attempt===2)return response;await response.body?.cancel();}catch(error){last=error;if(attempt===2)throw error;}await new Promise(done=>setTimeout(done,1000*(attempt+1)));}throw last??new Error('Official GET unavailable');}
 async function api(path){assert(process.env.GH_TOKEN,'Official Actions read token required');const r=await trustedGet('https://api.github.com/repos/'+repo+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official evidence read failed');return r.json();}
-export async function loadOriginal(kind){
- assert.equal(process.env.GITHUB_ACTIONS,'true');verifyContinuationInputs();const a=artifacts[kind];assert(a);
- const run=await api('/actions/runs/'+original.run);assert.equal(run.head_sha,original.head);assert.equal(run.event,'pull_request');assert.equal(run.head_branch,binding.branch);assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.run_attempt,1);
- for(const id of [121952530408,121952617241]){const source=await api('/actions/jobs/'+id);assert.equal(source.run_id,original.run);assert.equal(source.head_sha,original.head);assert.equal(source.conclusion,'success');}
- const meta=await api('/actions/artifacts/'+a.id);verifyOriginalArtifact(meta,kind);
- const job=await api('/actions/jobs/'+a.job);assert.equal(job.run_id,original.run);assert.equal(job.head_sha,original.head);assert.equal(job.status,'completed');assert.equal(job.conclusion,kind==='audit'?'success':'failure');
- if(kind==='build')for(const name of ['compile backend once using the unchanged production build dependencies','Run actions/upload-artifact@v4'])assert(job.steps.some(s=>s.name===name&&s.conclusion==='success'),'Original producer step did not succeed');
+export async function loadOriginal(kind,delivered=false){
+ assert.equal(process.env.GITHUB_ACTIONS,'true');verifyContinuationInputs();const pin=delivered?deliveredFrontend:original,a=(delivered?deliveredArtifacts:artifacts)[kind];assert(a);
+ const run=await api('/actions/runs/'+pin.run);assert.equal(run.head_sha,pin.head);assert.equal(run.event,'pull_request');assert.equal(run.head_branch,binding.branch);assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.run_attempt,1);
+ for(const id of (pin.scopeJobs??[121952530408,121952617241])){const source=await api('/actions/jobs/'+id);assert.equal(source.run_id,pin.run);assert.equal(source.head_sha,pin.head);assert.equal(source.conclusion,'success');}
+ const meta=await api('/actions/artifacts/'+a.id);verifyOriginalArtifact(meta,kind,Date.now(),delivered);
+ const job=await api('/actions/jobs/'+a.job);assert.equal(job.run_id,pin.run);assert.equal(job.head_sha,pin.head);assert.equal(job.status,'completed');assert.equal(job.conclusion,delivered||kind==='audit'?'success':'failure');
+ if(kind==='build'&&!delivered)for(const name of ['compile backend once using the unchanged production build dependencies','Run actions/upload-artifact@v4'])assert(job.steps.some(s=>s.name===name&&s.conclusion==='success'),'Original producer step did not succeed');
  const response=await trustedGet('https://api.github.com/repos/'+repo+'/actions/artifacts/'+a.id+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual'});let bytes;
  if(response.status===302){const location=new URL(response.headers.get('location'));assert.equal(location.protocol,'https:');assert(/(^|\.)(blob\.core\.windows\.net|githubusercontent\.com|s3\.amazonaws\.com)$/.test(location.hostname),'Unexpected artifact storage host');const r=await trustedGet(location);assert.equal(r.status,200);bytes=Buffer.from(await r.arrayBuffer());}
  else{assert.equal(response.status,200);bytes=Buffer.from(await response.arrayBuffer());}
  assert(bytes.length<32*1024*1024);assert.equal(sha(bytes),a.sha,'Original ZIP digest mismatch');
- const root=resolve(process.env.RUNNER_TEMP),dir=join(root,'pr357-original-'+kind),zip=dir+'.zip';mkdirSync(dir,{recursive:false});writeFileSync(zip,bytes,{mode:0o600});
+ const root=resolve(process.env.RUNNER_TEMP),dir=join(root,'pr357-original-'+(delivered?'delivered-':'')+kind),zip=dir+'.zip';mkdirSync(dir,{recursive:false});writeFileSync(zip,bytes,{mode:0o600});
  const names=execFileSync('unzip',['-Z1',zip],{encoding:'utf8'}).trim().split('\n');assert.equal(new Set(names).size,names.length);assert(names.every(n=>/^[A-Za-z0-9_./-]+$/.test(n)&&!n.startsWith('/')&&!n.split('/').includes('..')));
  execFileSync('unzip',['-q',zip,'-d',dir]);
- return {dir,proof:{run:original.run,head:original.head,checkout:original.checkout,artifactId:a.id,zipSHA256:a.sha,jobId:a.job,originalJobConclusion:job.conclusion},read:name=>JSON.parse(readFileSync(join(dir,name),'utf8'))};
+ return {dir,proof:{run:pin.run,head:pin.head,checkout:pin.checkout,artifactId:a.id,zipSHA256:a.sha,jobId:a.job,originalJobConclusion:job.conclusion},read:name=>JSON.parse(readFileSync(join(dir,name),'utf8'))};
 }
 export function selectUnfinished(report,expectedFiles){
  assert.equal(report.success,false,'Preserve original failure state');assert.equal(report.numPendingTests,0);assert.equal(report.testResults.length,expectedFiles.length);
@@ -74,4 +79,15 @@ export function verifyOriginalSastJob(job,now=Date.now()){
 export async function originalSast(){
  verifyContinuationInputs();const run=await api('/actions/runs/'+original.run);assert.equal(run.head_sha,original.head);assert.equal(run.run_attempt,1);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
  return verifyOriginalSastJob(await api('/actions/jobs/121952617174'));
+}
+
+export async function copyDeliveredFrontend(){
+ verifyContinuationInputs();assert.equal(git('rev-parse',deliveredFrontend.head+'^{tree}'),deliveredFrontend.tree);assert.equal(git('rev-parse','HEAD:server-version/frontend'),deliveredFrontend.frontendTree);assert.equal(git('rev-parse',deliveredFrontend.head+':server-version/frontend'),deliveredFrontend.frontendTree);
+ const prior=await testContinuation('frontend'),checks=await loadOriginal('checks',true),verified=checks.read('frontend-verified.json'),fresh=checks.read('frontend-tests.json');
+ assert.equal(verified.status,'PASS_WITH_PINNED_PRIOR');assert.equal(verified.candidate.head,deliveredFrontend.checkout);assert.equal(verified.candidate.run,String(deliveredFrontend.run));assert.equal(verified.candidate.tree,deliveredFrontend.tree);
+ assert.deepEqual(verified.prior.accepted,prior.accepted);assert.equal(verified.prior.proof.artifactId,artifacts.frontend.id);assert.equal(verified.prior.proof.zipSHA256,artifacts.frontend.sha);assert.equal(verified.prior.originalReportSuccess,false);assert.equal(verified.prior.priorPassedCases,560);
+ assert.equal(fresh.success,true);assert.equal(fresh.numPassedTests,10);assert.equal(fresh.numFailedTests,0);assert.equal(fresh.numPendingTests,0);assert.equal(fresh.testResults.length,2);assert(fresh.testResults.every(row=>row.status==='passed'&&row.assertionResults.length>0&&row.assertionResults.every(a=>a.status==='passed')));assert.deepEqual(fresh.testResults.map(row=>'src/'+row.name.split('/src/').at(-1)).sort(),[...prior.fresh].sort());assert.deepEqual(fresh.testResults.flatMap(row=>row.assertionResults.map(a=>a.fullName)).sort(),prior.expectedFreshNames);
+ const scan=checks.read('frontend-scan.json');assert.equal(scan.ArtifactID,'sha256:fcb1c6da11c7ffdebde7757625cb3b60f1ba19a8d690f50c787cf8cd1721105a');assert(Array.isArray(scan.Results));assert(!scan.Results.some(row=>(row.Vulnerabilities??[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity))));
+ const built=await loadOriginal('build',true),manifest=built.read('ci-build-manifest.json');verifyManifest(manifest,{schemaVersion:1,kind:'frontend',sha:deliveredFrontend.checkout,runId:String(deliveredFrontend.run),lockDigest:sha(readFileSync('server-version/frontend/package-lock.json'))},treeDigest(built.dir));cpSync(built.dir,resolve('server-version/frontend/dist'),{recursive:true,errorOnExist:true,force:false});
+ return {status:'REUSED_COMPLETE_FRONTEND_QUALIFICATION_NOT_REBUILT',componentTree:deliveredFrontend.frontendTree,originalManifest:manifest,buildProof:built.proof,checksProof:checks.proof,originalQualification:verified,originalScanArtifactId:scan.ArtifactID};
 }

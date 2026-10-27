@@ -29,3 +29,16 @@ test('application SAST continuation requires exact completed original analysis, 
  assert.match(verifyOriginalSastJob(job,now).config,/\.github\/scripts/);
  for(const delta of [{conclusion:'skipped'},{head_sha:'0'.repeat(40)},{run_id:1},{steps:[job.steps[0]]},{steps:job.steps.map(x=>({...x,conclusion:'skipped'}))}])assert.throws(()=>verifyOriginalSastJob({...job,...delta},now));
 });
+import {readFileSync} from 'node:fs';import {runInNewContext} from 'node:vm';
+test('actual database continuation validates original receipt before fixture work without lexical shadowing',async()=>{
+ const source=readFileSync(new URL('./pr357-checks.mjs',import.meta.url),'utf8'),start=source.indexOf('async function database()'),end=source.indexOf('\nasync function main()',start);assert(start>=0&&end>start);const fn=source.slice(start,end),stop=new Error('fixture preparation boundary');let calls=0;
+ const context={assert,URL,original,process:{env:{DATABASE_URL:'postgresql://ptool:synthetic@127.0.0.1:5432/pr357_upgrade_ci_test',CI_POSTGRES_SERVICE_ID:'a'.repeat(64)}},testContinuation:async()=>({upgrade:{head:original.checkout,run:String(original.run),status:'PASS',oldUserPreserved:true,migrations:239}}),execFileSync:()=>JSON.stringify([{Config:{Image:'postgres:16.15-bookworm'},State:{Running:true},Mounts:[],NetworkSettings:{Ports:{'5432/tcp':[{HostPort:'5432'}]}}}]),save:()=>{},run:()=>{calls++;throw stop}};
+ await assert.rejects(runInNewContext('('+fn+')',context)(),e=>e===stop);assert.equal(calls,1);
+ calls=0;await assert.rejects(runInNewContext('('+fn.replaceAll('beforeRestore','original')+')',context)(),/Cannot access 'original' before initialization/);assert.equal(calls,0);
+});
+import {deliveredFrontend,deliveredArtifacts} from './pr357-continuation.mjs';
+test('complete frontend reuse is pinned to its actually successful producer, not the earlier failed run',()=>{
+ const now=Date.now(),a=deliveredArtifacts.checks,m={id:a.id,name:a.prefix+deliveredFrontend.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:deliveredFrontend.run,head_sha:deliveredFrontend.head,head_branch:binding.branch},size_in_bytes:13651,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'checks',now,true).id,a.id);
+ assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:original.run}},'checks',now,true));assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+artifacts.frontend.sha},'checks',now,true));
+});

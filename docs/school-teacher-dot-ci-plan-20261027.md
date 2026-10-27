@@ -71,3 +71,13 @@ HEAD `41ad563d` 的主workflow run `40430737854` 与可复用workflow校验记�
 - 新复用消费者有固定ID/摘要/过期/输入漂移/原FAIL保留/缺失SAST阶段反例；实际原ZIP选择得到62/2与5/8，原backenddist按ci-artifact重新计算digest一致。Actions语义lint在本地真实执行；新增CodeQLstep缩进曾被本地lint拒绝并修正，没有推到CI试错。
 
 续跑冻结口径：产品检查点为 `b37c60aebaa05b15d28f8172fc3a4600f5c29b90`（只增加上述两份fixture修订），backend tree `100ae07d90a1bf9fc53b1df0a610008571f565dd` 不变，frontend tree `1bb800f156220de1e5a2f043a82208f713cfa273`；235个source＋新增固定续跑消费者后的10个control＝245路径。页首旧候选作为首次激活历史保留，不把旧候选身份改写成新执行身份。
+
+## 续跑中的局部变量遮蔽与已完成前端保全
+
+run40436352177 / sourceedb119f6 / checkout0019a9ae：scope、admission、audit、CodeQL及整个frontend producer均实际success。frontend原10项在正式环境通过，原62文件/560项按原件接纳；生产dist及运行镜像扫描完成。backend成功复用原编译产物并上传，但database控制器在调用新fixture前报 `Cannot access 'original' before initialization`：本地restore快照变量与导入的原run身份同名。数据库消费者仍NOTRUN，不是业务断言失败。
+
+修复只将restore快照命名为beforeRestore。针对实际脚本的no-shadow检查先1FAIL、修正后0；实际database函数前缀在隔离VM控制下验证原升级receipt后到达fixture边界，恢复旧命名则复现原TDZ，未执行伪造PG。另对此前未加载的7个unit文件在本地诊断112/112PASS，与先前9项同属于8个缺失文件；Node24.22本地诊断仍不冒充正式Node24.21资格。
+
+后续不重复前端：固定成功job121965972676、run40436352177与同一frontend tree1bb800f1，核 checks artifact12703623377 SHA256 `b954b12f1ad078817f3b52b045ac185e7dbdebf2c8bd940c35c80e61b78fcb61` 与 dist artifact12704057621 SHA256 `decfa1befeace0a009d26018eae93461743017725d317dc8a3335dc6f3f5a92e`。真实原ZIP均已核，747个dist文件无非法路径，manifest contentDigest `94257d9e7ea5572bbc675d466f76a5f2c44580829e3e07212e560a3ecd223b97` 重算一致。消费者同时验证原560＋新10的完整链、当前frontend tree未变、扫描原image ID `sha256:fcb1c6da11c7ffdebde7757625cb3b60f1ba19a8d690f50c787cf8cd1721105a` 无HIGH/CRITICAL，保留原manifest/检查身份，仅转交同字节dist，不再npm安装、类型/lint/测试、Vite构建或重扫前端镜像。浏览器是独立未执行消费者，仍必须真实通过。
+
+后端编译、原升级、audit与不变应用SAST继续沿原固定证据；实际新控制代码仍扫描。唯一未完成主链仍为后端8文件、13PG、compact、恢复、backend运行镜像扫描及connected浏览器。此阶段不增加新业务功能，不改检查阈值或分支保护。
