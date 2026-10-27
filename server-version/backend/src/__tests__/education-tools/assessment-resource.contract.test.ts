@@ -4,7 +4,7 @@ import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const pointer={releaseId:id(5),contentHash:'a'.repeat(64)}
 const origin={schemaVersion:1,adapterVersion:'1.0.0',resourceId:id(1),product:'TEACHER',organizationId:id(2),family:'COGNITIVE',
- sourceCompositeId:id(3),runtimeCompositeId:id(4),sourceSnapshotHash:'b'.repeat(64),runtimeSnapshotHash:'c'.repeat(64),
+ sourceCompositeId:id(3),runtimeCompositeId:id(4),sourceSnapshotHash:'b'.repeat(64),runtimeSnapshotHash:'c'.repeat(64),runtimeDefinitionHash:'f'.repeat(64),
  units:[{itemId:id(6),family:'COGNITIVE',measurement:{...pointer,measurementHash:'d'.repeat(64)},references:[],report:null}]}
 describe('education delivery identity is independent of tool publication',()=>{
  it.each(['SCHOOL','TEACHER'])('builds only a draft for exact %s product and organization',product=>{
