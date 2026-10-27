@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "base": "dff80f0604163a04e2f5a8119d7d4295116eeb41",
+  "product": "30e91afad2c4bc08878280b7f4877487ffe08e27",
+  "branch": "perf/four-entry-shared-path-20261027",
+  "source": {
+    "docs/performance/four-entry-20261027/README.md": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a2aaaf82d4281b00701025c557aa225746f06389",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/baseline.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8a2d694cd3bb2662bca3c790f6fc11b1c48a7d0a",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/candidate-local-setting.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5b0cf46c59bc65807996bdde996a631dfb443138",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/diagnostic-join-limit.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "daaabd4bf739f16f5b96dbbd0644cdfa747272bd",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/education-report-local-setting.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5daa97e4e3e65262572770b1345c2d1676b85e8f",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/education-report-plan.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ebb8a392b0628c1b0db80a5b915fde9dd09a9521",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/education-report-probe.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e2d29e7f3900c6b0d971c280269932c51773f4b8",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/manifest.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f8ee8c3f742da8c12d98a0b18a1f33fc5af45eb1",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/planning-baseline.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "34f8a01215942134182ab482c69df19a9dc72851",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/postgres-summary.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0bb560c56ce6b48957d8b55bc48d04eb11d4f815",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/education-report/rejected-scalar-fence.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b1b758a84fd165d9cb366fa01f2794eedbeb2d8d",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/education-report-bounded.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2ddf3563596e34fa631cd563cba45f15d6c7b6d9",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/education-report-bounded.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "58060071dc2fabd7954920380d4d73bcf6a42d04",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/education-storage-compact-shared.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "750e5616aeab34b0e09b54c4e8806196e7a57072",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/education-storage-legacy.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8a5b3e9f27fb56cf88297620182165c9c51453ab",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/education-storage-probe.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "611a06d3bfed43828aec826840d921633d34e36e",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/manifest.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f0c6f262ab8ac461254e5e8a32f91f111cb07145",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/survey-compact.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d9822dd38c2cce8c0f168141d673d37e80d95bd2",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/storage-and-bounded/training-whole-compact-probe.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d3c75ab8dde2845d425f329d4a9c5bc6d435daa7",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/survey-baseline/native-mixed.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5b5e6cdc8038ff980e2d11d4103b152960413259",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/survey-baseline/ordinary.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b0124dcbddc327d1f609e36fc01370c7f5c36bdf",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/survey-baseline/source.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "160a07e7ab650153eac19f8fa9b4e56fea6c5f92",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/survey-baseline/whole-package.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "409deb07bbea57758b0f92ca2be64c4dd34d1a05",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/training-whole/baseline.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "819a8d9bea3a248b82b0553227d9ef10678e1dbe",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/training-whole/probe.ts.txt": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd13e335fba6f89cfdee5433b8caa46b14c795b3",
+      "status": "A"
+    },
+    "docs/performance/four-entry-20261027/training-whole/source.json": {
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ca78cdd751bd0d6795a3957dc95bf808f656bed9",
+      "status": "A"
+    },
+    "server-version/backend/src/__tests__/reporting/education-scale-personal-report.service.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f4652cc3746ab1e2878e631e12982223e16505d4",
+      "after": "a10be6a6acd45610557fad25fd4146179e2d599f",
+      "status": "M"
+    },
+    "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "334ba8759f488c1476de3854142e164bdf0bf164",
+      "after": "0147e53823af93d88d703a9d7857854770a2e524",
+      "status": "M"
+    },
+    "server-version/scripts/performance/survey-governance-probe/fixture.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "685ea4fdbf25e2f0fb3ada4384217cb0a9aa101b",
+      "after": "3e453b0d8ea163bafdb132b6fbd0e99b8023fc1d",
+      "status": "M"
+    }
+  },
+  "controls": [
+    ".github/scripts/report-planning-scope.mjs",
+    ".github/scripts/report-planning-scope.test.mjs",
+    ".github/scripts/report-planning-checks.mjs",
+    ".github/scripts/report-planning-bindings.json",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml"
+  ],
+  "components": {
+    "backend": "33fcfc53e3fd30b9893715e6bac5ae2bd3977085",
+    "frontend": "eff42512c7a727c347fabea865dbad281d698bb1"
+  }
+}
