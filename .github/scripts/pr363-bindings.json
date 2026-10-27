@@ -4,9 +4,9 @@
   "readiness": "READY",
   "branch": "perf/four-entry-feedback-20261027",
   "base": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
-  "product": "7f472b204abc2fb6f715b6841b61fbf6c5dc2324",
+  "product": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
   "components": {
-    "backend": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
+    "backend": "857b09f27913b2d630a306d339a87ecec974e68e",
     "frontend": "361fcbf63584d4e07cef72192a47d27e9392e050"
   },
   "source": {
@@ -2230,6 +2230,74 @@
       "before": null,
       "after": "67da80ebb342fc89324ddb56e1c060be97748dbc"
     },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/CI-CONTINUATION.md": {
+      "before": null,
+      "after": "efcd67869bda7ae1e352010838d9c3ad465cdaaf"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/README.md": {
+      "before": null,
+      "after": "12794edb5594fb4bef1a3bb13d449345258bfd81"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/authority-nowait-contract-current-review.json": {
+      "before": null,
+      "after": "5bbacd8dd67f18c991b1d6dbca072605e6e25901"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/context-child-two.json": {
+      "before": null,
+      "after": "7f5f32b247c63dc075e244a54ef73649169aed3e"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/context-first-two.json": {
+      "before": null,
+      "after": "45a55ed293f53bc38e6852d69025a8afe261ebe4"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-execution.json": {
+      "before": null,
+      "after": "fabc6bdd8fab0baf6fe2211629459943ce3da2be"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-inputs.json": {
+      "before": null,
+      "after": "4d94fe70f307198debd892bcea548f09b21caac7"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-log.log": {
+      "before": null,
+      "after": "f79bee3feb1fd9d5d1e48a30524ad2be4f60c247"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-review.json": {
+      "before": null,
+      "after": "d29fcf0d308e148701b1e1e5808fc3dc29604ead"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-execution.json": {
+      "before": null,
+      "after": "eab710eada2ecbb86e62ade4be587b2fc99f092f"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-inputs.json": {
+      "before": null,
+      "after": "4d94fe70f307198debd892bcea548f09b21caac7"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-log.log": {
+      "before": null,
+      "after": "62bc70f0be19300aeecb21f803cc5e6b10742515"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-review.json": {
+      "before": null,
+      "after": "f2a1a4d7c155afafa85831b2629fbda5d46a5168"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/picker-actual-form-error-current-review.json": {
+      "before": null,
+      "after": "7b67df90f020886a6b114bd2c650e927531f148c"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/picker-original-typed-error-current-review.json": {
+      "before": null,
+      "after": "9a369f23274902a944d807825ec05bca44c7d476"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/safe-diagnostics.log": {
+      "before": null,
+      "after": "914ee55d57007ccc7211c9eb77de078fd57c3036"
+    },
+    "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/shared-final-report-dispatch-current-review.json": {
+      "before": null,
+      "after": "c72cac5e0be769e389e5a5610bbbfb9a3432fdcc"
+    },
     "server-version/backend/prisma/migrations/20261027100000_education_assessment_delivery/migration.sql": {
       "before": null,
       "after": "159d6c30b7ed58f1d9e0f0b9179f7a28c0be0a36"
@@ -2350,6 +2418,10 @@
       "before": null,
       "after": "f4ee759fde590cead60adfc687a193139491bace"
     },
+    "server-version/backend/src/__tests__/integration/education-start-context.test.ts": {
+      "before": null,
+      "after": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
+    },
     "server-version/backend/src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts": {
       "before": null,
       "after": "ac345d1319dca3c03547f760c84adc98465d5a7c"
@@ -2418,9 +2490,13 @@
       "before": "567955e7a3819e7768983fab6731f558fb3c7a37",
       "after": "3a22f174140ac4d3e29942ae8631208f673df165"
     },
+    "server-version/backend/src/modules/assessment-run/education-start-context.ts": {
+      "before": null,
+      "after": "eaaf9def6fba07c36979908548737b27116da99c"
+    },
     "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": {
       "before": null,
-      "after": "cf4f307d829be934f876a61d46c7c4c846b555db"
+      "after": "6f496c3f92905bbe1ca44817a7b65821036acae0"
     },
     "server-version/backend/src/modules/assessment-run/publish.ts": {
       "before": "26e8cc1b46e4d60089f0da1da1c04e2507c05b8b",
@@ -2452,7 +2528,7 @@
     },
     "server-version/backend/src/modules/assessment-run/startExecution.ts": {
       "before": "79ebef581523d6d6ef15f0a19b06488fa88a9ffa",
-      "after": "8710c63e389a15521ca4037b4b7e4e1739366c78"
+      "after": "2c57e5935e521bddd71833150335db2634f9bbe9"
     },
     "server-version/backend/src/modules/assessment-runtime/typed-form.ts": {
       "before": "dfeaeedfd406b82490a62dc759e2a7cc3b0b2b38",
@@ -2469,6 +2545,10 @@
     "server-version/backend/src/modules/campus/organization.routes.ts": {
       "before": "1d8a6b84798e2df22b55552c6920b22fbdf168f8",
       "after": "5ca2a75e263ac331d6c491fab3722c109c8fb224"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "dc8bde2502e05527293c39731b03757586c4aba4",
+      "after": "457d5a794df63a85e4b212f2f33b0ca0d97aa242"
     },
     "server-version/backend/src/modules/composite/education-content-scope.ts": {
       "before": null,
@@ -2552,7 +2632,7 @@
     },
     "server-version/backend/src/modules/education-tools/assessment-resource.source.ts": {
       "before": null,
-      "after": "0b5065dc61fcafc0d0a7dd14efefb808d9a076d3"
+      "after": "9c26307f0e29d19ecfd7b92504d1cd56146fbec0"
     },
     "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts": {
       "before": null,
@@ -2606,13 +2686,17 @@
       "before": "5a44cb74c7a5dfcdabe9588683cbf52ba07ced36",
       "after": "dbffca79bab712da49e2a6d2a95ffc310396f969"
     },
+    "server-version/backend/src/modules/situational/situational-runtime.service.ts": {
+      "before": "e5650bd94e40e01b8856f41b36e23389562405c1",
+      "after": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+    },
     "server-version/e2e/pr363-browser.cjs": {
       "before": null,
       "after": "af007142918d55bc8e6a4c1a45615ccb314bef6c"
     },
     "server-version/e2e/pr363-browser.test.cjs": {
       "before": null,
-      "after": "97e134a61c0a04fb24ec12f2a61f4a7bc60c4bb1"
+      "after": "8bb4c5f654214d7b557b1896ecb6e6ed778c6266"
     },
     "server-version/e2e/pr363-database.cjs": {
       "before": null,
@@ -2620,11 +2704,19 @@
     },
     "server-version/e2e/pr363-fixture.cjs": {
       "before": null,
-      "after": "77b2f39ac1f6d0de1aed35690d56dde977fb2083"
+      "after": "7c7b048a3e91355d98b0fad8c4a12803d30a8440"
     },
     "server-version/e2e/pr363-native-template.json": {
       "before": null,
       "after": "0feb30bcc03a4fa93f5acfc65d7f42d11ba6bce3"
+    },
+    "server-version/e2e/pr363-runtime-postgres.cjs": {
+      "before": null,
+      "after": "3c000ba3c87fa1a091edbeb78031fd508d54bcba"
+    },
+    "server-version/e2e/pr363-runtime-postgres.test.cjs": {
+      "before": null,
+      "after": "2086fc6a4c22582c82f786d597ee068c82535c92"
     },
     "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": {
       "before": "aaae35ff24b6ea07d4b245c81571302eed599d1e",
@@ -2804,15 +2896,15 @@
     ".github/scripts/merge-gate.mjs": "5069865eca709cc04a579083ae6354e4aefea89b",
     ".github/scripts/pr363-bindings.json": null,
     ".github/scripts/pr363-checks.mjs": null,
+    ".github/scripts/pr363-continuation-pins.json": null,
+    ".github/scripts/pr363-continuation.mjs": null,
+    ".github/scripts/pr363-continuation.test.mjs": null,
     ".github/scripts/pr363-control-evidence.json": null,
     ".github/scripts/pr363-controls.test.mjs": null,
     ".github/scripts/pr363-scope.mjs": null,
-    ".github/workflows/ci.yml": "31c345639cc790249d0c6a51a284971890613572",
-    ".github/scripts/pr363-continuation-pins.json": null,
-    ".github/scripts/pr363-continuation.mjs": null,
-    ".github/scripts/pr363-continuation.test.mjs": null
+    ".github/workflows/ci.yml": "31c345639cc790249d0c6a51a284971890613572"
   },
-  "controlCheckpoint": "7f472b204abc2fb6f715b6841b61fbf6c5dc2324",
+  "controlCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
   "protectedInputs": {
     "server-version/backend/Dockerfile": "8dfd85f6e843d964eb192cfdf52addffdc3c4132",
     "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
@@ -2887,18 +2979,32 @@
         "validates TEACHER frozen report scope before any rendering",
         "validates PLATFORM frozen report scope before any rendering",
         "source picker typed unavailable failures projects known invalid source definitions but not unknown HTTP-shaped or SQL errors",
-        "source picker typed unavailable failures recognizes the actual typed Form definition failure without swallowing other final-submit errors"
+        "source picker typed unavailable failures recognizes the actual typed Form definition failure without swallowing other final-submit errors",
+        "transaction-bound education START context retains exact server-verified product and refuses copied or cross-transaction/assignment/actor/runtime hints",
+        "transaction-bound education START context keeps SCHOOL distinct and snapshots issuer facts against later mutation",
+        "binds teacher permission to one actual same-transaction parent and rejects forged, observer and cross-parent use",
+        "actual embedded SJT boundary still rejects ordinary Training, School and copied teacher hints"
       ],
       "inputs": [
+        {
+          "path": "server-version/backend/package-lock.json",
+          "mode": "100644",
+          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        },
         {
           "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.authority.test.ts",
           "mode": "100644",
           "blob": "97406a73b828b460296a19b589b1d37ce012dbaa"
         },
         {
-          "path": "server-version/backend/package-lock.json",
+          "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts",
           "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+          "blob": "8b77d6ab7889d27247ae9e4c9f5649d75647f0d9"
+        },
+        {
+          "path": "server-version/backend/src/__tests__/integration/education-start-context.test.ts",
+          "mode": "100644",
+          "blob": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
         },
         {
           "path": "server-version/backend/src/__tests__/measurement-content/training-content-final.test.ts",
@@ -2911,9 +3017,14 @@
           "blob": "9a37a382f39653ba5cbadddd962a825dd3df66b9"
         },
         {
-          "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.picker-error.test.ts",
+          "path": "server-version/backend/src/modules/assessment-run/education-start-context.ts",
           "mode": "100644",
-          "blob": "8b77d6ab7889d27247ae9e4c9f5649d75647f0d9"
+          "blob": "eaaf9def6fba07c36979908548737b27116da99c"
+        },
+        {
+          "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+          "mode": "100644",
+          "blob": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
         }
       ]
     },
@@ -10275,13 +10386,17 @@
     "pg": {
       "environment": {
         "TZ": "UTC",
-        "NODE_ENV": "test"
+        "NODE_ENV": "test",
+        "COGNITIVE_MODULE_ENABLED": "true",
+        "HUITEACHER_WORKSPACE_ENABLED": "true",
+        "ASSESSMENT_REPORT_ASYNC_ENABLED": "false",
+        "BACKGROUND_WORKERS_ENABLED": "false"
       },
       "steps": [
         {
-          "id": "additive-schema-and-nonempty-restore",
+          "id": "affected-education-runtime",
           "kind": "receipt",
-          "outcomeId": "additive-schema-and-nonempty-restore",
+          "outcomeId": "affected-education-runtime",
           "runner": "host-node",
           "dependencies": [
             "backend"
@@ -10289,52 +10404,31 @@
           "expectedExitCode": 0,
           "argv": [
             "node",
-            "server-version/e2e/pr363-database.cjs"
+            "server-version/e2e/pr363-runtime-postgres.cjs"
           ],
-          "report": "pr363-evidence/database.json",
+          "report": "pr363-evidence/runtime-postgres.json",
           "assertions": [
             {
               "pointer": "/status",
               "equals": "PASS"
             },
             {
-              "pointer": "/stage",
-              "equals": "complete"
+              "pointer": "/casesComplete",
+              "equals": true
             },
             {
               "pointer": "/syntheticOnly",
               "equals": true
             },
             {
-              "pointer": "/checks",
-              "equals": [
-                "nonempty-base-schema-fixture",
-                "additive-upgrade-preserves-existing-rows-and-creates-no-deliveries",
-                "restricted-runtime-and-delivery-immutability",
-                "nonempty-restore-identical-data-schema-runtime-and-trigger"
-              ]
-            },
-            {
-              "pointer": "/productJourneysRepeated",
+              "pointer": "/originalSchemaRestoreRepeated",
               "equals": false
             }
           ]
         }
       ],
       "requiredOutcomes": [
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=true actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=true completionOnly=true actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'ADMIN_IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
-        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > SCHOOL exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
-        "additive-schema-and-nonempty-restore"
+        "affected-education-runtime"
       ],
       "inputs": [
         {
@@ -11623,9 +11717,44 @@
           "blob": "b69a6eb1941f0e8aa4cc77a01a0110c9ea0d1e96"
         },
         {
+          "path": "server-version/backend/src/__tests__/integration/education-start-context.test.ts",
+          "mode": "100644",
+          "blob": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
+        },
+        {
+          "path": "server-version/backend/src/__tests__/integration/educationLibraryReportFixture.ts",
+          "mode": "100644",
+          "blob": "8d0cda92cbc29cd41753edac27601b1db4e40efe"
+        },
+        {
           "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
           "mode": "100644",
           "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
+        },
+        {
+          "path": "server-version/backend/src/__tests__/integration/integration-env.ts",
+          "mode": "100644",
+          "blob": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60"
+        },
+        {
+          "path": "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+          "mode": "100644",
+          "blob": "eaaf9def6fba07c36979908548737b27116da99c"
+        },
+        {
+          "path": "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+          "mode": "100644",
+          "blob": "6f496c3f92905bbe1ca44817a7b65821036acae0"
+        },
+        {
+          "path": "server-version/backend/src/modules/assessment-run/startExecution.ts",
+          "mode": "100644",
+          "blob": "2c57e5935e521bddd71833150335db2634f9bbe9"
+        },
+        {
+          "path": "server-version/backend/src/modules/composite/composite.service.ts",
+          "mode": "100644",
+          "blob": "457d5a794df63a85e4b212f2f33b0ca0d97aa242"
         },
         {
           "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
@@ -11633,9 +11762,19 @@
           "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
         },
         {
+          "path": "server-version/backend/src/modules/education-tools/assessment-resource.source.ts",
+          "mode": "100644",
+          "blob": "9c26307f0e29d19ecfd7b92504d1cd56146fbec0"
+        },
+        {
           "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
           "mode": "100644",
           "blob": "368a93a592944897a21f5936073395069473519c"
+        },
+        {
+          "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+          "mode": "100644",
+          "blob": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
         },
         {
           "path": "server-version/backend/vitest.config.ts",
@@ -11646,8 +11785,42 @@
           "path": "server-version/e2e/pr363-database.cjs",
           "mode": "100644",
           "blob": "c86e2e4d9241fecf8407d8f4642979893a16d4ee"
+        },
+        {
+          "path": "server-version/e2e/pr363-runtime-postgres.cjs",
+          "mode": "100644",
+          "blob": "3c000ba3c87fa1a091edbeb78031fd508d54bcba"
+        },
+        {
+          "path": "server-version/e2e/pr363-runtime-postgres.test.cjs",
+          "mode": "100644",
+          "blob": "2086fc6a4c22582c82f786d597ee068c82535c92"
         }
-      ]
+      ],
+      "suites": {
+        "reports": {
+          "file": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
+          "expectedCases": [
+            "Actual education producer to canonical FINAL to own frozen report 'SCHOOL' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'FUTURE' Form=true completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'FUTURE' Form=true completionOnly=true actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'DUE' Form=true completionOnly=true actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
+            "Actual education producer to canonical FINAL to own frozen report 'TEACHER' 'ADMIN_IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening"
+          ]
+        },
+        "scales": {
+          "file": "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+          "expectedCases": [
+            "Actual education Scale marker START and FINAL TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
+            "Actual education Scale marker START and FINAL SCHOOL exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
+          ]
+        }
+      }
     },
     "browser": {
       "environment": {
@@ -11699,12 +11872,12 @@
         {
           "path": ".github/scripts/pr363-continuation-pins.json",
           "mode": "100644",
-          "blob": "b23a9974ebe85af2368c988e0fbf5ea84f0e08d1"
+          "blob": "3981d141225eb152cdba0f9c02a31f18cea2ab00"
         },
         {
           "path": ".github/scripts/pr363-continuation.mjs",
           "mode": "100644",
-          "blob": "22da28d6ece1f512db935876ff06981fd02f65cf"
+          "blob": "33e1cd23ae910958fed4e35260541866819ce01a"
         },
         {
           "path": "server-version/backend/package-lock.json",
@@ -11719,7 +11892,7 @@
         {
           "path": "server-version/e2e/pr363-browser.test.cjs",
           "mode": "100644",
-          "blob": "97e134a61c0a04fb24ec12f2a61f4a7bc60c4bb1"
+          "blob": "8bb4c5f654214d7b557b1896ecb6e6ed778c6266"
         },
         {
           "path": "server-version/e2e/pr363-database.cjs",
@@ -11729,7 +11902,7 @@
         {
           "path": "server-version/e2e/pr363-fixture.cjs",
           "mode": "100644",
-          "blob": "77b2f39ac1f6d0de1aed35690d56dde977fb2083"
+          "blob": "7c7b048a3e91355d98b0fad8c4a12803d30a8440"
         },
         {
           "path": "server-version/e2e/pr363-native-template.json",
@@ -11822,506 +11995,6 @@
   "historicalAdmissions": [
     {
       "schemaVersion": 1,
-      "id": "runtime-report-r4",
-      "kind": "vitest-verbose",
-      "phase": "pg",
-      "outcomes": [
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=true actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=true completionOnly=true actual producer FINAL report opening"
-      ],
-      "cases": [
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/1"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/2"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/3"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/4"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'FUTURE' Form=true completionOnly=true actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/5"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'DUE' Form=true completionOnly=true actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/6"
-        }
-      ],
-      "currentInputs": [
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
-          "mode": "100644",
-          "blob": "547246fee2a6fa6e00129379689e647c2e6623bd"
-        },
-        {
-          "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
-          "mode": "100644",
-          "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
-        },
-        {
-          "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
-          "mode": "100644",
-          "blob": "368a93a592944897a21f5936073395069473519c"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
-          "mode": "100644",
-          "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
-        },
-        {
-          "path": "server-version/backend/package-lock.json",
-          "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
-        },
-        {
-          "path": "server-version/backend/vitest.config.ts",
-          "mode": "100644",
-          "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
-          "mode": "100644",
-          "blob": "9126a9221dc3a66b7eccca60df9b797773b0b551"
-        }
-      ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
-      "selectors": {
-        "argv": "/argv",
-        "exitCode": "/exitCode",
-        "signal": "/signal",
-        "cwd": "/cwd",
-        "files": "/files",
-        "environment": "/environment",
-        "dependencies": "/dependencies",
-        "tools": "/tools",
-        "generated": "/generated"
-      },
-      "proofs": {
-        "execution": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r4/execution.json",
-          "sha256": "5dd5902900510e2b8d13ff7dace21dccc28887d9b216828f5fed88dfc342dc86",
-          "encoding": "json"
-        },
-        "inputs": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r4/inputs.json",
-          "sha256": "7978bebf9e62c89f2301145df22194399821e137fdaecea505efea654dd1f004",
-          "encoding": "json"
-        },
-        "log": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase4/pg-report-policy-r4.log.gz",
-          "sha256": "019645e903c25379890057e55a63fb1911ec9533b4ab874287bd434be705288e",
-          "decodedSHA256": "65540577ec23c48f90452f896cbf157d41e7ed5624a9fb7eba3d66b809f9612c",
-          "encoding": "gzip-utf8"
-        },
-        "report": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase4/pg-report-policy-r4.log.gz",
-          "sha256": "019645e903c25379890057e55a63fb1911ec9533b4ab874287bd434be705288e",
-          "decodedSHA256": "65540577ec23c48f90452f896cbf157d41e7ed5624a9fb7eba3d66b809f9612c",
-          "encoding": "gzip-utf8"
-        },
-        "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r4/review.json",
-          "sha256": "04fa395c8447290472712c193bf54631b31e11fad90e6a1f565997200e664752",
-          "encoding": "json"
-        }
-      }
-    },
-    {
-      "schemaVersion": 1,
-      "id": "runtime-report-r5",
-      "kind": "vitest-verbose",
-      "phase": "pg",
-      "outcomes": [
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening"
-      ],
-      "cases": [
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'FUTURE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/8"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'SCHOOL' 'DUE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/9"
-        }
-      ],
-      "currentInputs": [
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
-          "mode": "100644",
-          "blob": "547246fee2a6fa6e00129379689e647c2e6623bd"
-        },
-        {
-          "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
-          "mode": "100644",
-          "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
-        },
-        {
-          "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
-          "mode": "100644",
-          "blob": "368a93a592944897a21f5936073395069473519c"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
-          "mode": "100644",
-          "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
-        },
-        {
-          "path": "server-version/backend/package-lock.json",
-          "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
-        },
-        {
-          "path": "server-version/backend/vitest.config.ts",
-          "mode": "100644",
-          "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
-          "mode": "100644",
-          "blob": "9126a9221dc3a66b7eccca60df9b797773b0b551"
-        }
-      ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
-      "selectors": {
-        "argv": "/argv",
-        "exitCode": "/exitCode",
-        "signal": "/signal",
-        "cwd": "/cwd",
-        "files": "/files",
-        "environment": "/environment",
-        "dependencies": "/dependencies",
-        "tools": "/tools",
-        "generated": "/generated"
-      },
-      "proofs": {
-        "execution": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r5/execution.json",
-          "sha256": "b35d72af79759cca6accebf747243a8119ffe0564829a9cf9aaf44a33169ad1f",
-          "encoding": "json"
-        },
-        "inputs": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r5/inputs.json",
-          "sha256": "5313e108d59bbb64f21a2d936c9d1a4a3d6a9e95796e90666c120e1eabbe8956",
-          "encoding": "json"
-        },
-        "log": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase4/pg-report-school-policy-r5.log.gz",
-          "sha256": "889c10f933cc5da93d7016b50c375474c8765f983ef7ca16d8cad5fd6ac10eb7",
-          "decodedSHA256": "9844afe16c37e4d9a689189f9aaeb501e06d98422e97132a17be23db2826542f",
-          "encoding": "gzip-utf8"
-        },
-        "report": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase4/pg-report-school-policy-r5.log.gz",
-          "sha256": "889c10f933cc5da93d7016b50c375474c8765f983ef7ca16d8cad5fd6ac10eb7",
-          "decodedSHA256": "9844afe16c37e4d9a689189f9aaeb501e06d98422e97132a17be23db2826542f",
-          "encoding": "gzip-utf8"
-        },
-        "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-report-r5/review.json",
-          "sha256": "ce8fbdfb43c6b5667261a952eda59bfce7d892b5394d7e04c3ef221ce7064235",
-          "encoding": "json"
-        }
-      }
-    },
-    {
-      "schemaVersion": 1,
-      "id": "runtime-exact-key-r6",
-      "kind": "vitest-verbose",
-      "phase": "pg",
-      "outcomes": [
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-        "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'ADMIN_IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening"
-      ],
-      "cases": [
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/0"
-        },
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts > Actual education producer to canonical FINAL to own frozen report > 'TEACHER' 'ADMIN_IMMEDIATE' Form=false completionOnly=false actual producer FINAL report opening",
-          "pointer": "/testResults/0/assertionResults/7"
-        }
-      ],
-      "currentInputs": [
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts",
-          "mode": "100644",
-          "blob": "547246fee2a6fa6e00129379689e647c2e6623bd"
-        },
-        {
-          "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
-          "mode": "100644",
-          "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
-        },
-        {
-          "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
-          "mode": "100644",
-          "blob": "368a93a592944897a21f5936073395069473519c"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
-          "mode": "100644",
-          "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
-        },
-        {
-          "path": "server-version/backend/package-lock.json",
-          "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
-        },
-        {
-          "path": "server-version/backend/vitest.config.ts",
-          "mode": "100644",
-          "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-runtime.postgres.fixture.ts",
-          "mode": "100644",
-          "blob": "9126a9221dc3a66b7eccca60df9b797773b0b551"
-        }
-      ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
-      "selectors": {
-        "argv": "/argv",
-        "exitCode": "/exitCode",
-        "signal": "/signal",
-        "cwd": "/cwd",
-        "files": "/files",
-        "environment": "/environment",
-        "dependencies": "/dependencies",
-        "tools": "/tools",
-        "generated": "/generated"
-      },
-      "proofs": {
-        "execution": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-exact-key-r6/execution.json",
-          "sha256": "f3e1adc4b0086105b8d4e90a4c351daf4265d2df2c9d2b802493f7a0365f1e3f",
-          "encoding": "json"
-        },
-        "inputs": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-exact-key-r6/inputs.json",
-          "sha256": "5367ad3d8e23c68a96c2e4a362e8d9ebd11bd89a0523825729813a455a8f2e96",
-          "encoding": "json"
-        },
-        "log": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase5/pg-report-exact-key-r6.log.gz",
-          "sha256": "fd0d5680b99c0d885f0b87db8c8d5f46f770f8dc71ea57061492c54bf7398e19",
-          "decodedSHA256": "312e9489b56e40467a4b51000f12ea7f8b927894099d42935192390c6763c8b4",
-          "encoding": "gzip-utf8"
-        },
-        "report": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase5/pg-report-exact-key-r6.log.gz",
-          "sha256": "fd0d5680b99c0d885f0b87db8c8d5f46f770f8dc71ea57061492c54bf7398e19",
-          "decodedSHA256": "312e9489b56e40467a4b51000f12ea7f8b927894099d42935192390c6763c8b4",
-          "encoding": "gzip-utf8"
-        },
-        "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/runtime-exact-key-r6/review.json",
-          "sha256": "a29fc5beb8c235051b7eb0cff94498e5628ba32bd65b21fd9b5fb4960dae41fd",
-          "encoding": "json"
-        }
-      }
-    },
-    {
-      "schemaVersion": 1,
-      "id": "scale-marker-teacher-r2",
-      "kind": "vitest-verbose",
-      "phase": "pg",
-      "outcomes": [
-        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
-      ],
-      "cases": [
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
-          "pointer": "/testResults/0/assertionResults/1"
-        }
-      ],
-      "currentInputs": [
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
-          "mode": "100644",
-          "blob": "354cbb1115e11d59978bc8065141dde421fb879c"
-        },
-        {
-          "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
-          "mode": "100644",
-          "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
-        },
-        {
-          "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
-          "mode": "100644",
-          "blob": "368a93a592944897a21f5936073395069473519c"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
-          "mode": "100644",
-          "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
-        },
-        {
-          "path": "server-version/backend/package-lock.json",
-          "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
-        },
-        {
-          "path": "server-version/backend/vitest.config.ts",
-          "mode": "100644",
-          "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
-          "mode": "100644",
-          "blob": "b69a6eb1941f0e8aa4cc77a01a0110c9ea0d1e96"
-        }
-      ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
-      "selectors": {
-        "argv": "/argv",
-        "exitCode": "/exitCode",
-        "signal": "/signal",
-        "cwd": "/cwd",
-        "files": "/files",
-        "environment": "/environment",
-        "dependencies": "/dependencies",
-        "tools": "/tools",
-        "generated": "/generated"
-      },
-      "proofs": {
-        "execution": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-teacher-r2/execution.json",
-          "sha256": "449c5c9ec41cf4c233363958799659c21b973e21782a2da64cdd8ff2fc29e7f3",
-          "encoding": "json"
-        },
-        "inputs": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-teacher-r2/inputs.json",
-          "sha256": "c8e63dfbd27bc6fa5e1ebdd400782748f018352daeb8efb200d16e50cac65ff5",
-          "encoding": "json"
-        },
-        "log": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase6/pg-scale-markers-r2.log.gz",
-          "sha256": "1ab61b8e78fd4539eb62f7bc22d9afe7946a85b4451ee945afcc753a7d479c6e",
-          "decodedSHA256": "72aff73d3c011669eae398639d9c6e6d3ea9a878e2180e65ac7f0591265b6b0c",
-          "encoding": "gzip-utf8"
-        },
-        "report": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase6/pg-scale-markers-r2.log.gz",
-          "sha256": "1ab61b8e78fd4539eb62f7bc22d9afe7946a85b4451ee945afcc753a7d479c6e",
-          "decodedSHA256": "72aff73d3c011669eae398639d9c6e6d3ea9a878e2180e65ac7f0591265b6b0c",
-          "encoding": "gzip-utf8"
-        },
-        "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-teacher-r2/review.json",
-          "sha256": "86389ebd9417d1e86f6c4548f974d26f8f3121a42f8114aea7cb2a0542544041",
-          "encoding": "json"
-        }
-      }
-    },
-    {
-      "schemaVersion": 1,
-      "id": "scale-marker-school-r3",
-      "kind": "vitest-verbose",
-      "phase": "pg",
-      "outcomes": [
-        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > SCHOOL exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
-      ],
-      "cases": [
-        {
-          "fullName": "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > SCHOOL exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
-          "pointer": "/testResults/0/assertionResults/0"
-        }
-      ],
-      "currentInputs": [
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
-          "mode": "100644",
-          "blob": "354cbb1115e11d59978bc8065141dde421fb879c"
-        },
-        {
-          "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
-          "mode": "100644",
-          "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
-        },
-        {
-          "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
-          "mode": "100644",
-          "blob": "368a93a592944897a21f5936073395069473519c"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
-          "mode": "100644",
-          "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
-        },
-        {
-          "path": "server-version/backend/package-lock.json",
-          "mode": "100644",
-          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
-        },
-        {
-          "path": "server-version/backend/vitest.config.ts",
-          "mode": "100644",
-          "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
-        },
-        {
-          "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
-          "mode": "100644",
-          "blob": "b69a6eb1941f0e8aa4cc77a01a0110c9ea0d1e96"
-        }
-      ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
-      "selectors": {
-        "argv": "/argv",
-        "exitCode": "/exitCode",
-        "signal": "/signal",
-        "cwd": "/cwd",
-        "files": "/files",
-        "environment": "/environment",
-        "dependencies": "/dependencies",
-        "tools": "/tools",
-        "generated": "/generated"
-      },
-      "proofs": {
-        "execution": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-school-r3/execution.json",
-          "sha256": "8dc32052501d6e8e4d1fff53b017f940c4e2eaba582532c4be8f5730fe1d9a5c",
-          "encoding": "json"
-        },
-        "inputs": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-school-r3/inputs.json",
-          "sha256": "c8e63dfbd27bc6fa5e1ebdd400782748f018352daeb8efb200d16e50cac65ff5",
-          "encoding": "json"
-        },
-        "log": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase6/pg-scale-school-grade-r3.log.gz",
-          "sha256": "347546306a6db7f21e30321f57a3a3a5ec86727227d35f0fb3d85a412981734f",
-          "decodedSHA256": "32bb7b18ed746ea6012f5341922f4470d17f6ac3594884b373bdcc62c9fdd72b",
-          "encoding": "gzip-utf8"
-        },
-        "report": {
-          "path": "docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase6/pg-scale-school-grade-r3.log.gz",
-          "sha256": "347546306a6db7f21e30321f57a3a3a5ec86727227d35f0fb3d85a412981734f",
-          "decodedSHA256": "32bb7b18ed746ea6012f5341922f4470d17f6ac3594884b373bdcc62c9fdd72b",
-          "encoding": "gzip-utf8"
-        },
-        "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/scale-marker-school-r3/review.json",
-          "sha256": "f502f955c7d19bab55a53a5c347e5f91cf357ff0d84a6bd87360ff8566fad02e",
-          "encoding": "json"
-        }
-      }
-    },
-    {
-      "schemaVersion": 1,
       "id": "authority-nowait-contract",
       "kind": "vitest",
       "phase": "backend",
@@ -12386,7 +12059,7 @@
           "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
         }
       ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
       "selectors": {
         "argv": "/argv",
         "exitCode": "/exitCode",
@@ -12422,9 +12095,9 @@
           "encoding": "json"
         },
         "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/authority-nowait-contract/review.json",
-          "sha256": "81653b36b1cdc7413bcc9ea3cfe80a6a7d393dbe17a1d16fd83ea31655d47602",
-          "encoding": "json"
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/authority-nowait-contract-current-review.json",
+          "encoding": "json",
+          "sha256": "74618e914e43424e32b0ed366b80572f174b526ec30266e18ff521a528871938"
         }
       }
     },
@@ -12654,7 +12327,7 @@
           "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
         }
       ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
       "selectors": {
         "argv": "/argv",
         "exitCode": "/exitCode",
@@ -12690,9 +12363,9 @@
           "encoding": "json"
         },
         "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/shared-final-report-dispatch/review.json",
-          "sha256": "f0a54f01e45080be983e551ac1266fb2ce12ae2156df42f59c9e62cb768a54eb",
-          "encoding": "json"
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/shared-final-report-dispatch-current-review.json",
+          "encoding": "json",
+          "sha256": "75ce4072c69149167cf8e0d29ff8903851e61abb9d1890d77fb05db755680085"
         }
       }
     },
@@ -12722,7 +12395,7 @@
           "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
         }
       ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
       "selectors": {
         "argv": "/argv",
         "exitCode": "/exitCode",
@@ -12758,9 +12431,9 @@
           "encoding": "json"
         },
         "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/picker-original-typed-error/review.json",
-          "sha256": "08c81c00802a7c5b0773ad48ee78aac446382aed1b4775d89e9de4e0c3e606c9",
-          "encoding": "json"
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/picker-original-typed-error-current-review.json",
+          "encoding": "json",
+          "sha256": "0a63c56e84054557b0299bcb5354819ce0dd540a61552550219b84e26249aaac"
         }
       }
     },
@@ -12790,7 +12463,7 @@
           "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
         }
       ],
-      "reviewCheckpoint": "8b7d7a36887f64e9a3543b5561dbf197e290b40d",
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
       "selectors": {
         "argv": "/argv",
         "exitCode": "/exitCode",
@@ -12824,9 +12497,9 @@
           "encoding": "json"
         },
         "review": {
-          "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/picker-actual-form-error/review.json",
-          "sha256": "20bdf61f64a04ba8005eb5d2f551ad18b2352c45ea1188016c13ebfaabe841f6",
-          "encoding": "json"
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/picker-actual-form-error-current-review.json",
+          "encoding": "json",
+          "sha256": "e18649573cdfef9b2146825763dc28b070c5a8a4381bc22d502032e77cd60527"
         }
       }
     },
@@ -20243,6 +19916,170 @@
           "path": "docs/performance/four-entry-feedback-20261027/root-admission-review/frontend-app-types/review.json",
           "sha256": "424f84ac92cc562e075557b90138f1f73363bd15400d420f1eb3c7e3832ec21f",
           "encoding": "json"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "education-context-first-two",
+      "kind": "vitest",
+      "phase": "backend",
+      "outcomes": [
+        "transaction-bound education START context retains exact server-verified product and refuses copied or cross-transaction/assignment/actor/runtime hints",
+        "transaction-bound education START context keeps SCHOOL distinct and snapshots issuer facts against later mutation"
+      ],
+      "cases": [
+        {
+          "fullName": "transaction-bound education START context retains exact server-verified product and refuses copied or cross-transaction/assignment/actor/runtime hints",
+          "pointer": "/testResults/0/assertionResults/0"
+        },
+        {
+          "fullName": "transaction-bound education START context keeps SCHOOL distinct and snapshots issuer facts against later mutation",
+          "pointer": "/testResults/0/assertionResults/1"
+        }
+      ],
+      "currentInputs": [
+        {
+          "path": "server-version/backend/src/__tests__/integration/education-start-context.test.ts",
+          "mode": "100644",
+          "blob": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
+        },
+        {
+          "path": "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+          "mode": "100644",
+          "blob": "eaaf9def6fba07c36979908548737b27116da99c"
+        },
+        {
+          "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+          "mode": "100644",
+          "blob": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+        },
+        {
+          "path": "server-version/backend/package-lock.json",
+          "mode": "100644",
+          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        }
+      ],
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
+      "selectors": {
+        "argv": "/argv",
+        "exitCode": "/exitCode",
+        "signal": "/signal",
+        "signalFromNormalExit": true,
+        "cwd": "/cwd",
+        "files": "/files",
+        "environment": "/environment",
+        "dependencies": "/dependencies",
+        "tools": "/tools",
+        "generated": "/generated"
+      },
+      "proofs": {
+        "report": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/context-first-two.json",
+          "encoding": "json",
+          "sha256": "ee166eb193dddbaa26f2caff3d4b4e79b9aef694963404df1f907ec45e01fba9"
+        },
+        "execution": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-execution.json",
+          "encoding": "json",
+          "sha256": "79eb555cdf06993e20cf301b21ece38391eebeac7d52fcc1ee49652b67fa28c0"
+        },
+        "log": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-log.log",
+          "encoding": "utf8",
+          "sha256": "a0732c500ca0f5fc4045a39a482c7d4a328008a69760dcccba7bb72cd6ee2261"
+        },
+        "inputs": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-inputs.json",
+          "encoding": "json",
+          "sha256": "bda205f9a684ed6d72f67755748b45c299e9b4d286c5e44982d3a1ca3c6f47c8"
+        },
+        "review": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-first-two-review.json",
+          "encoding": "json",
+          "sha256": "c12992a1369e0c5eabc433cd5e962e1773c6ae70af1a2d2b9f325937abe2f336"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "education-context-child-two",
+      "kind": "vitest",
+      "phase": "backend",
+      "outcomes": [
+        "binds teacher permission to one actual same-transaction parent and rejects forged, observer and cross-parent use",
+        "actual embedded SJT boundary still rejects ordinary Training, School and copied teacher hints"
+      ],
+      "cases": [
+        {
+          "fullName": "binds teacher permission to one actual same-transaction parent and rejects forged, observer and cross-parent use",
+          "pointer": "/testResults/0/assertionResults/2"
+        },
+        {
+          "fullName": "actual embedded SJT boundary still rejects ordinary Training, School and copied teacher hints",
+          "pointer": "/testResults/0/assertionResults/3"
+        }
+      ],
+      "currentInputs": [
+        {
+          "path": "server-version/backend/src/__tests__/integration/education-start-context.test.ts",
+          "mode": "100644",
+          "blob": "9c68a23244ba35ffd12e3afa8929a26693ed3978"
+        },
+        {
+          "path": "server-version/backend/src/modules/assessment-run/education-start-context.ts",
+          "mode": "100644",
+          "blob": "eaaf9def6fba07c36979908548737b27116da99c"
+        },
+        {
+          "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+          "mode": "100644",
+          "blob": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
+        },
+        {
+          "path": "server-version/backend/package-lock.json",
+          "mode": "100644",
+          "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+        }
+      ],
+      "reviewCheckpoint": "ad0cea304a68323cd7914af964b6e14cce1d6bd2",
+      "selectors": {
+        "argv": "/argv",
+        "exitCode": "/exitCode",
+        "signal": "/signal",
+        "signalFromNormalExit": true,
+        "cwd": "/cwd",
+        "files": "/files",
+        "environment": "/environment",
+        "dependencies": "/dependencies",
+        "tools": "/tools",
+        "generated": "/generated"
+      },
+      "proofs": {
+        "report": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/context-child-two.json",
+          "encoding": "json",
+          "sha256": "4715792fbead147b099dcfc533579a5d7933a0e7db8f909a9dc7d2a6e8fcc994"
+        },
+        "execution": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-execution.json",
+          "encoding": "json",
+          "sha256": "0acddc7c56bccee29f5550143afda9d25b54d017c15202d7ab44a062e1a8c9ee"
+        },
+        "log": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-log.log",
+          "encoding": "utf8",
+          "sha256": "13012965a71ade272af8d97029506b7c13229ab985d786987d9ae7fd2e5b9a0d"
+        },
+        "inputs": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-inputs.json",
+          "encoding": "json",
+          "sha256": "bda205f9a684ed6d72f67755748b45c299e9b4d286c5e44982d3a1ca3c6f47c8"
+        },
+        "review": {
+          "path": "docs/performance/four-entry-feedback-20261027/teacher-sjt-start-correction/education-context-child-two-review.json",
+          "encoding": "json",
+          "sha256": "e62cd837cbc7359af7a6e5c08ef3dfe3f4ba61561849c6e0a4b1aed7125e8206"
         }
       }
     }
