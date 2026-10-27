@@ -1,0 +1,113 @@
+{
+  "kind": "LIMITED_LANGUAGE_AND_UNPUBLISHED_COPY_POLISH_NOT_INTEGRATION_QUALIFICATION",
+  "recordedAt": "2026-10-27T11:38:25.695034+00:00",
+  "baseCommit": "4556a76893b8d61d4bfb7a182086407d5324c560",
+  "scope": [
+    "freeze teaching language in existing context/prepare binding, once per attempt",
+    "match React teaching language before instruction/stimulus exposure",
+    "practical profile label and two factual report sentences, latency folded into details",
+    "retain frozen copy and one public projection for body/image/download"
+  ],
+  "executions": [
+    {
+      "cwd": "server-version/frontend",
+      "target": "src/modules/cognitive/tasks/sart/content.test.tsx",
+      "filter": "freezes teaching language once|uses the frozen teaching language|shows plain factual report",
+      "report": "frontend-targeted.json",
+      "exitCode": 0,
+      "passed": 3,
+      "filtered": 7
+    },
+    {
+      "cwd": "server-version/backend",
+      "target": "src/__tests__/cognitive/sart-content.test.ts",
+      "filter": "uses Go/No-Go actual denominators|whitelists all three public surfaces",
+      "report": "backend-public-targeted.json",
+      "exitCode": 0,
+      "passed": 2,
+      "filtered": 3
+    }
+  ],
+  "types": "types.json: backend48/frontend54 source closures, zero diagnostics",
+  "lint": "frontend-lint.json:5 changed frontend files, zero errors/warnings",
+  "reactPreview": "actual-react-polish-review.json:6 changed teaching/report layouts, synthetic data only; no formal/practice stream rerun",
+  "sourceFootprint": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/sart-content.test.ts",
+      "sha256": "b3fc7c002a7044f4a703a5b306aca193f33307716142c03c83c27bba8fc078df"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/participant-presentation.ts",
+      "sha256": "219145445a1553033b14612d2fbb0c1e2fd0042ca00ad3d5f72964a72c298cd0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/report.ts",
+      "sha256": "60902cd7b33584ce087dc6ae3aec731e657c770dd4e34058b86c53d25c23e7f6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartInstructions.tsx",
+      "sha256": "4a9bf394faa471919db5393f54b520059c23cd3034fd69028f1ebea4744f0a10"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartReport.tsx",
+      "sha256": "fe9d0728bc6c63c020528e0b0f2b933b01c7181ee9371e2350879419fca2e29e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartTask.tsx",
+      "sha256": "dbc0a1e020798959c076508bd68b6546bcfd9acf9901adc3a3614a77ac633cac"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx",
+      "sha256": "99e9d9ea7a9ca465f634ec6f7f5060f6b9cfe0e6c385027d097a331e02d3c733"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/contracts.ts",
+      "sha256": "2bc7c884779c794736e359e5b68cfff39a0902133425785a3559330100eb261b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/generated/report.ts",
+      "sha256": "fdc141fdb9c58b91d9ccd3a28f8e244c0f45402a0b05f9eb47cb708da3f3643f"
+    }
+  ],
+  "unchangedMeasurementInputs": [
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/protocol.ts",
+      "gitBlob": "746aee6f459bd71e4b5f0762644fd16d282b5ec5",
+      "sha256": "62097f12f207a19b522ecb26d729081f89e04a72a3059e925ce54ab2139674de"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/analysis.ts",
+      "gitBlob": "99d2fbba3fb20008665108fc58115a5aa6296c06",
+      "sha256": "48ecf2b1195d8bcfac9feaa66219db46ff91e8f5dff27caa460302ecc0818b39"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/scorer.ts",
+      "gitBlob": "e2ac26e1465cbbec9d572937edb87ce4163f23d1",
+      "sha256": "ed6d750b2fd5be9d54fbf1fe63edb440c3f6a5d53bc05e394d77886e1b0ab423"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/schema.ts",
+      "gitBlob": "15e4188d41782fe44aec5601de9a41c1e3def446",
+      "sha256": "c4f2016489ce29446f64e2ebc184a02f1bd0e65106bdc36662caadc0281427f9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/capture.ts",
+      "gitBlob": "2dc59277fcd27f9045ffc1078b507e10702e9f63",
+      "sha256": "78494661396b204bbcdd20fb799cd9d4e550a8710e0c5d1866b40a7375217449"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/session.ts",
+      "gitBlob": "b859c5a7745ce5032a75c5d545566fbd9bb74024",
+      "sha256": "c33bcfd9cd331f9e1fdf19177f53234351e12ce9a522c2ecd84e6c94c4ab77fd"
+    }
+  ],
+  "notRerun": [
+    "old full SART session flows",
+    "other cognitive tasks",
+    "all-App tests",
+    "CI",
+    "server/DB/COS",
+    "integration acceptance"
+  ],
+  "status": "UNPUBLISHED_CONTENT_CANDIDATE_PENDING_DOT_POLISH_REVIEW_NOT_CONNECTED"
+}

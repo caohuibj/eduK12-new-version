@@ -1,0 +1,10 @@
+const fs=require('fs'),path=require('path'),ts=require('/workspace/eduK12-new-version/server-version/backend/node_modules/typescript');
+const root='/workspace/eduK12-new-version',out=root+'/docs/cognitive-library/scenario-roadmap-20261027/domains/clinical-research/polish-evidence';
+const result=[];
+for(const [name,config,entry] of [['backend','server-version/backend/tsconfig.json',['server-version/backend/src/modules/cognitive/content-candidates/sart/participant-presentation.ts','server-version/backend/src/__tests__/cognitive/sart-content.test.ts']],['frontend','server-version/frontend/tsconfig.app.json',['server-version/frontend/src/modules/cognitive/tasks/sart/SartTask.tsx','server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx']]]){
+ const file=path.join(root,config),read=ts.readConfigFile(file,ts.sys.readFile),parsed=ts.parseJsonConfigFileContent(read.config,ts.sys,path.dirname(file));
+ const program=ts.createProgram(entry.map(p=>path.join(root,p)),{...parsed.options,noEmit:true,incremental:false,composite:false});
+ const diagnostics=ts.getPreEmitDiagnostics(program).map(d=>({code:d.code,file:d.file?path.relative(root,d.file.fileName):null,line:d.file&&d.start!==undefined?d.file.getLineAndCharacterOfPosition(d.start).line+1:null,message:ts.flattenDiagnosticMessageText(d.messageText,'\n')}));
+ result.push({name,config,entries:entry,sourceCount:program.getSourceFiles().filter(f=>!f.isDeclarationFile).length,diagnostics});
+}
+fs.writeFileSync(out+'/types.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));process.exitCode=result.some(r=>r.diagnostics.length)?1:0;

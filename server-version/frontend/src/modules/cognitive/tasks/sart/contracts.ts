@@ -3,12 +3,12 @@ import {bytesToHex} from '@noble/hashes/utils'
 import {SART_IDENTITY,SART_PROTOCOL,assertSartConfig,same,sartPlan,type SartConfig,type SartRaw} from './generated/protocol'
 import type {SartReport} from './generated/report'
 export interface SartSnapshot {schemaVersion:1;testType:string;engineVersion:string;scoringVersion:string;configVersion:string;config:SartConfig;protocol:typeof SART_PROTOCOL;configHash:string;protocolSignature:string;frozenAt:string}
-export interface SartContext {contextKey:string;snapshot:SartSnapshot;randomSeed:string;manifestHash:string}
+export interface SartContext {contextKey:string;snapshot:SartSnapshot;randomSeed:string;manifestHash:string;language:'zh'|'en'}
 export interface SartDraft {contextKey:string;phase:'practice'|'test';round:number;index:number;raw:SartRaw;configHash:string;protocolSignature:string;manifestHash:string;realm:{timeOriginMs:number;pageInstanceId:string};recordKey:string;recordDigest:string}
 export interface SartFinal {contextKey:string;configHash:string;protocolSignature:string;manifestHash:string;formalCount:number;practiceCount:number;termination:'completed'|'aborted';terminationReason:string|null;recordDigests:string[];finalPayloadDigest:string}
 export interface SartReceipt {contextKey:string;finalPayloadDigest:string;finalSaved:true;receiptId:string;report:SartReport}
 export interface SartPorts {
-  /** Freeze context, every plan and clock realm durably before exposure; reject reused attempts. */
+  /** Freeze the actual teaching language with context, every plan and clock realm once before exposure; drafts reference this durable contextKey. Reject reused attempts. */
   prepareLocalAttempt(context:SartContext,manifest:ReturnType<typeof sartManifest>,realm:SartDraft['realm']):Promise<{fresh:true;contextKey:string;bindingDigest:string}>
   /** Local durable port, called serially without delaying the continuous stimulus stream. Failure stops subsequent exposure. */
   persistLocalDraft(record:SartDraft):Promise<{retained:true;contextKey:string;recordKey:string;recordDigest:string}>
@@ -21,7 +21,7 @@ export const sartManifestPlans=(c:SartConfig,seed:string)=>({formal:sartPlan(c,s
 export const sartManifest=(c:SartContext)=>sartManifestPlans(c.snapshot.config,c.randomSeed)
 export function validateSartContext(value:SartContext){
   const c=structuredClone(value),s=c.snapshot
-  if(!c.contextKey||c.contextKey.length>512||!c.randomSeed||c.randomSeed.length>256||s.schemaVersion!==1||s.testType!==SART_IDENTITY.testType||s.engineVersion!==SART_IDENTITY.engineVersion||s.scoringVersion!==SART_IDENTITY.scoringVersion||s.configVersion!==SART_IDENTITY.configVersion||!same(s.protocol,SART_PROTOCOL)||!Number.isFinite(Date.parse(s.frozenAt)))throw Error('Unknown frozen SART identity')
+  if((c.language!=='zh'&&c.language!=='en')||!c.contextKey||c.contextKey.length>512||!c.randomSeed||c.randomSeed.length>256||s.schemaVersion!==1||s.testType!==SART_IDENTITY.testType||s.engineVersion!==SART_IDENTITY.engineVersion||s.scoringVersion!==SART_IDENTITY.scoringVersion||s.configVersion!==SART_IDENTITY.configVersion||!same(s.protocol,SART_PROTOCOL)||!Number.isFinite(Date.parse(s.frozenAt)))throw Error('Unknown frozen SART identity or teaching language')
   assertSartConfig(s.config)
   if(digest(s.config)!==s.configHash||digest(s.protocol)!==s.protocolSignature||digest(sartManifest(c))!==c.manifestHash)throw Error('Frozen SART hash mismatch')
   return c

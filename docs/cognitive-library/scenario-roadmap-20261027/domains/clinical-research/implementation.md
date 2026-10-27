@@ -4,6 +4,8 @@
 
 **已开发，不等于已接入或上线。** 实际 React、纯协议／随机化、冻结快照、原始记录、权威 scorer、后台描述报告和同三态公开投影已完成。本项未 DOT 代码复核；无共享注册、产品入口、真实耐久端口／HTTP／DB／COS、集中集成验收、CI、合并、激活或部署。
 
+DOT已实读首轮候选并要求两项限定收尾，本轮已完成：教学语言一次冻结及React一致性校验；中文名称统一“实用版”，首屏改为通俗真实次数描述，用时折入详情。复核原件见 [polish-evidence/summary.json](polish-evidence/summary.json)。这是未发布候选的文字／元数据修订，不改刺激、时序、输入、225/90或练习。仍待DOT复核修订稿。
+
 ## 沿已审定设计实现
 
 | 内容 | research | experience |
@@ -36,16 +38,22 @@
 
 新身份的prepare回执必须匹配完整context、manifest和realm，复用或不符时不曝光。每个窗口结束先同步保留不可变原件，再串行调用本机耐久端口，正式呈现不等待回执。失败停止后续曝光，中断当前窗口；同recordKey／digest重试，不重放数字。已经完整结束正式段、只有最后一笔保存失败时，重试后仍如实认定正式段已完成，不把存储故障冒充施测中断。
 
+`SartContext.language`必填为zh/en，与完整context在prepare中一次冻结，并自然进入已有bindingDigest；原始逐题记录通过contextKey追溯所读说明，不逐题重复保存语言。React默认取冻结语言，显式language不一致或缺失语言时不显示说明／数字；prepare回执绑定另一语言时不进入练习、不曝光数字。测量manifest、configHash和计分参数不因教学语言改变。
+
 FINAL等待所有原件回执，冻结同一claim重试，报告回执必须匹配context、摘要、配置／协议、profile和实际正式记录数。报告保存不等于完整原件归档，未取得独立归档确认不清草稿，也不保证关页后上传。**此处只有端口合同与合成内存替身；内存留存不等于实际耐久性。** 既有DB/core＋私有COS规则保留，真实接入由DOT后续统一协调。
 
 ## 实际 React 与报告图
 
 以下为实际组件的合成数据／端口检查图，不是参与者数据、产品接入或硬件计时证据：
 
-- [手机教学](implementation-evidence/actual-instructions-zh-phone.png) · [英文科研版平板教学](implementation-evidence/actual-instructions-en-research-tablet.png) · [实际练习数字](implementation-evidence/actual-practice-digit-phone.png)
-- [完整报告](implementation-evidence/actual-report-interpretable-phone.png) · [部分记录](implementation-evidence/actual-report-limited-phone.png) · [无可解释记录](implementation-evidence/actual-report-invalid-phone.png) · [英文报告](implementation-evidence/actual-report-en-tablet.png)
+- [手机教学](polish-evidence/actual-instructions-zh-phone.png) · [英文科研版平板教学](polish-evidence/actual-instructions-en-research-tablet.png) · [原轮实际练习数字（刺激未变）](implementation-evidence/actual-practice-digit-phone.png)
+- [完整报告](polish-evidence/actual-report-interpretable-phone.png) · [部分记录](polish-evidence/actual-report-limited-phone.png) · [无可解释记录](polish-evidence/actual-report-invalid-phone.png) · [英文报告](polish-evidence/actual-report-en-tablet.png)
+
+首屏以“看到3应不按的10次中，你有0次按下”“需要按的数字共完整记录80次，其中0次没有按下”等两句真实计数描述呈现。没有对应完整条件时直接说明尚无记录，不能写成0次误按。用时的中间值及排序说明放入默认关闭的详情。正文、可选图片数据和下载共用相同observations，叙述模板也随双语copy冻结，invalid不输出这些句子。此处截图为合成记录；旧截图和旧合成报告仍保留在implementation-evidence，不就地改写或回算。
 
 本机路由fulfill的独立HTTPS预览使用原生secure context／crypto，不访问生产；HTTP(S)外部请求阻止。Chromium自身sandbox=false，仍在平台进程沙箱内；不声称浏览器沙箱／真实手机Safari验收。390／820布局无横向溢出，记录在 `actual-react-review.json`；冻结copy后只续核受影响报告四图，见 `actual-react-report-final-review.json`，教学／练习不重跑。
+
+本次文字／语言收尾仅续核教学和报告六个实际React布局（没有重跑练习或正式整流），见 [actual-react-polish-review.json](polish-evidence/actual-react-polish-review.json)。新增前端3项通过／原7项filtered；后台公开投影受影响2项通过／其他3项filtered。相关类型零诊断，改动5个前端文件lint零错误零警告。此前失败及全部原件保留，不把历史结果改为本轮新执行。
 
 ## 最小验证及保留的失败
 
