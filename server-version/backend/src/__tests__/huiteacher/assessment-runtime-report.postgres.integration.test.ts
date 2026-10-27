@@ -14,6 +14,7 @@ import {generateToken} from '../../utils/jwt'
 import {UserRole} from '../../types'
 import {prisma} from '../../config/database'
 import {createTrialEnvelope} from '../../modules/cognitive/v2/trial-envelope'
+import {loadStoredCanonicalUnitResults} from '../../modules/assessment-runtime/compact-assessment-storage'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {verifyRuntimePrivileges} from '../../../scripts/runtime-role-contract.mjs'
 
@@ -29,7 +30,7 @@ let owner:PrismaClient,server:Server,origin:string,entryBase='/api/huiteacher'
 const teacherCookie=(actor:{id:string;username:string;role:string;accountDomain?:string},product:'HUITEACHER'|'SCHOOL'|'TRAINING'='HUITEACHER',copyIntoTeacherCookie=false)=>{
  const name=copyIntoTeacherCookie||product==='HUITEACHER'?'huiteacher_session':product==='SCHOOL'?'huischool_session':'ptool_session'
  return name+'='+generateToken({userId:actor.id,username:actor.username,role:actor.role as UserRole,tokenVersion:0,accountDomain:product==='TRAINING'?'TRAINING':'SCHOOL',
-  ...(product==='HUITEACHER'?{sessionProduct:'HUITEACHER' as const}:{})})+'; '+(product==='SCHOOL'?'huischool_csrf':'huiteacher_csrf')+'=pr363-csrf'
+  ...(product==='HUITEACHER'?{sessionProduct:'HUITEACHER' as const,mfaVerifiedAt:Math.floor(Date.now()/1000)}:{})})+'; '+(product==='SCHOOL'?'huischool_csrf':'huiteacher_csrf')+'=pr363-csrf'
 }
 async function request(path:string,cookie:string,method='GET',body?:unknown,headers:Record<string,string>={}){
  const response=await fetch(origin+entryBase+path,{method,headers:{cookie,Origin:entryBase==='/api/campus'?'http://school.localhost':'http://teacher.localhost','Content-Type':'application/json','X-CSRF-Token':'pr363-csrf',...headers},
@@ -79,15 +80,16 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
   server=await new Promise<Server>(resolve=>{const instance=app.listen(0,'127.0.0.1',()=>resolve(instance))});origin='http://127.0.0.1:'+(server.address() as AddressInfo).port
  },60_000)
  afterAll(async()=>{server?.closeAllConnections();if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await owner?.$disconnect();await prisma.$disconnect()})
- it.each(['TEACHER','SCHOOL'] as const)('%s mixed publishes actual C/R, accepts canonical FINAL and renders stored own report',async product=>{
+ it.each([{product:'TEACHER',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'SCHOOL',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'DUE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'DUE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'ADMIN_IMMEDIATE',formOnly:false,completionOnly:false}] as const)('$product $timing Form=$formOnly completionOnly=$completionOnly actual producer FINAL report opening',async({product,timing,formOnly,completionOnly})=>{
+  const feedbackPolicy=(timing==='IMMEDIATE'||timing==='ADMIN_IMMEDIATE')?{schemaVersion:1 as const,mode:'IMMEDIATE' as const}:{schemaVersion:1 as const,mode:'SCHEDULED' as const,releaseAt:new Date(Date.now()+(timing==='FUTURE'?86400000:-86400000)).toISOString()}
   entryBase=product==='TEACHER'?'/api/huiteacher':'/api/campus'
   let f:any
-  if(product==='TEACHER')f=await teacherRuntimePgFixture(owner,'BUNDLE',false,false,true)
+  if(product==='TEACHER')f=await teacherRuntimePgFixture(owner,'BUNDLE',false,false,!formOnly,feedbackPolicy,formOnly,completionOnly)
   else{
    const school=await setupEducationLibraryRuntimeFixture({db:owner,product:'SCHOOL',publish:false,trackCount:0})
    const issuer=await owner.user.findUniqueOrThrow({where:{id:school.libraryAdminUserId}})
    const reviewer=await owner.user.create({data:{username:'pr363-report-review-'+randomUUID(),passwordHash:'synthetic-only',accountDomain:'TRAINING',role:'ADMIN',platformRole:'SYSTEM_ADMIN'}})
-   const delivery=await runtimeDeliverySourceFixture(owner,'SCHOOL',{id:school.organizationId},issuer,reviewer,'BUNDLE',false,true)
+   const delivery=await runtimeDeliverySourceFixture(owner,'SCHOOL',{id:school.organizationId},issuer,reviewer,'BUNDLE',false,true,feedbackPolicy)
    const a=delivery.entry.applicability
    await addAssessmentRunTrackDraft({organizationId:school.organizationId,runId:school.runId,actorUserId:school.managerUserId,expectedVersion:school.expectedVersion,expectedRunId:school.runId,educationWorkflow:{product:'SCHOOL',id:school.workflow.id},
     resource:{family:'BUNDLE',key:delivery.resourceKey,version:'1.0.0'},subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:[school.participantMembershipId!]},
@@ -97,14 +99,19 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
    const executions=await school.executions()
    f={...delivery,organizationId:school.organizationId,executionId:executions[0].id,respondent:await owner.user.findUniqueOrThrow({where:{id:school.participantUserId}}),issuer}
   }
+  if(timing==='ADMIN_IMMEDIATE')f.respondent=await owner.user.update({where:{id:f.respondent.id},data:{role:'ADMIN'}})
+  expect(f.origin.feedbackPolicy).toEqual(feedbackPolicy)
   const cookie=teacherCookie(f.respondent,product==='TEACHER'?'HUITEACHER':'SCHOOL')
   const started=await startAssessmentRunExecution({executionId:f.executionId,actorUserId:f.respondent.id})
   expect(started.state).toBe('STARTED');if(started.state!=='STARTED')throw new Error('Actual durable START required')
   const parentPath=(product==='TEACHER'?'/assessment-composite-attempts/':'/composite-attempts/')+started.runtimeBindingRef
   let state=requireSuccess<any>(await request(parentPath,cookie))
-  const cg=await submitCognitive(parentPath,state.currentItem,cookie)
-  state=requireSuccess<any>(await request(parentPath,cookie));await submitSjt(parentPath,state.currentItem,cookie)
-  state=requireSuccess<any>(await request(parentPath,cookie))
+  let cg:{sessionId:string}|null=null
+  if(!formOnly){
+   cg=await submitCognitive(parentPath,state.currentItem,cookie)
+   state=requireSuccess<any>(await request(parentPath,cookie));await submitSjt(parentPath,state.currentItem,cookie)
+   state=requireSuccess<any>(await request(parentPath,cookie))
+  }
   requireSuccess(await request(parentPath+'/form-sections/'+state.currentItem.formSectionId+'/submit',cookie,'POST',{
    submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:state.currentItem.definitionHash,contextSnapshotHash:state.contextSnapshotHash??null,
    answers:state.currentItem.answers.map((field:any)=>({formItemId:field.id,value:'synthetic frozen report journey'}))}))
@@ -113,12 +120,26 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
   const fingerprint=canonicalHash(before.map(row=>({...row,completedAt:row.completedAt?.toISOString(),createdAt:row.createdAt.toISOString()})))
   const endpoint='/assessment-reports/executions/'+f.executionId
   const report=requireSuccess<any>(await request(endpoint,cookie))
-  expect(report,JSON.stringify(report)).toMatchObject({state:'READY',mode:'INDIVIDUAL_SUMMARY'})
-  expect(report.reports).toHaveLength(2)
-  for(const unit of report.reports){expect(unit.status,JSON.stringify(unit)).toBe('READY');expect(unit.rendered.blocks.some((block:any)=>block.type==='METRIC'&&typeof block.value==='number')).toBe(true)}
+  if(timing==='FUTURE'){
+   expect(report,JSON.stringify(report)).toMatchObject({state:'WITHHELD',mode:'NONE',...(!formOnly||completionOnly?{releaseAt:feedbackPolicy.mode==='SCHEDULED'?feedbackPolicy.releaseAt:null}:{})})
+   expect(report).not.toHaveProperty('reports')
+  }else if(formOnly){
+   expect(report,JSON.stringify(report)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'});expect(report).not.toHaveProperty('reports')
+  }else{
+   expect(report,JSON.stringify(report)).toMatchObject({state:'READY',mode:'INDIVIDUAL_SUMMARY'})
+   expect(report.reports).toHaveLength(2)
+   for(const unit of report.reports){
+    expect(unit.status,JSON.stringify(unit)).toBe('READY')
+    const stored=before.find(row=>row.slotKey.endsWith(unit.itemId))!
+    const [fact]=await loadStoredCanonicalUnitResults([stored.canonicalResultEncrypted!])
+    const metrics=unit.rendered.blocks.filter((block:any)=>block.type==='METRIC')
+    expect(metrics.length).toBeGreaterThan(0)
+    for(const metric of metrics)expect(fact.core.metrics.some(value=>value.value===metric.value&&typeof metric.value==='number')).toBe(true)
+   }
+  }
   expect((await request(endpoint,teacherCookie(f.issuer,'TRAINING'))).status).toBe(401)
   const repeated=requireSuccess<any>(await request(endpoint,cookie));expect(repeated).toEqual(report)
-  expect(await owner.cognitiveRawSubmission.count({where:{sessionId:cg.sessionId}})).toBe(1)
+  if(cg)expect(await owner.cognitiveRawSubmission.count({where:{sessionId:cg.sessionId}})).toBe(1)
   const after=await owner.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:started.runtimeBindingRef},orderBy:{slotKey:'asc'}})
   expect(canonicalHash(after.map(row=>({...row,completedAt:row.completedAt?.toISOString(),createdAt:row.createdAt.toISOString()})))).toBe(fingerprint)
  },120_000)

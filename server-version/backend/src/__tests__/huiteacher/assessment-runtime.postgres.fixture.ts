@@ -1,3 +1,4 @@
+import type {TrainingFeedbackPolicy} from '../../modules/assessment-policy/training-feedback-policy'
 import {randomUUID} from 'node:crypto'
 import {getContentRelease,publishContentRelease} from '../../modules/measurement-content/repository'
 import {DECLARATIVE_REPORT_GENERATOR} from '../../modules/measurement-content/report-renderer'
@@ -21,7 +22,7 @@ import {testDisclosure} from '../assessment-policy/result-disclosure.fixture'
 /** Disposable database only: synthetic users/content setup followed by actual
  * exact grant issuance and prepare/register/independent review/publication.
  * No real tool, third-party content or external participant data is approved. */
-export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL'='BUNDLE',consentRequired=false,includeOther=false,withReports=false){
+export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL'='BUNDLE',consentRequired=false,includeOther=false,withReports=false,feedbackPolicy?:TrainingFeedbackPolicy,formOnly=false,completionOnly=false){
  const user=async(label:string,accountDomain:'SCHOOL'|'TRAINING'='SCHOOL',system=false)=>owner.user.create({data:{
   username:'pr363_'+label+'_'+randomUUID(),passwordHash:'synthetic-not-login',accountDomain,role:system?'ADMIN':'TEACHER',teacherApproved:true,
   ...(system?{platformRole:'SYSTEM_ADMIN'}:{}),
@@ -38,7 +39,7 @@ export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'
   if(actor.id===respondent.id)respondentMemberId=member.id
   if(actor.id===other.id)otherMemberId=member.id
  }
- const delivery=await runtimeDeliverySourceFixture(owner,'TEACHER',org,issuer,reviewer,family,consentRequired,withReports)
+ const delivery=await runtimeDeliverySourceFixture(owner,'TEACHER',org,issuer,reviewer,family,consentRequired,withReports,feedbackPolicy,formOnly,completionOnly)
  const {entry}=delivery
  const target=await createHuiteacherTarget({organizationId:org.id,actorUserId:manager.id,kind:'ORGANIZATION',name:'Synthetic teachers'})
  const event=await createHuiteacherEvent({organizationId:org.id,actorUserId:manager.id,targetId:target.id,kind:'ASSESSMENT',title:'Synthetic PR363 event'})
@@ -58,12 +59,12 @@ export async function teacherRuntimePgFixture(owner:PrismaClient,family:'BUNDLE'
  return {otherExecutionId:otherExecution?.id,respondent,other,manager,issuer,reviewer,organizationId:org.id,eventId:event.id,runId:run.runId,executionId:execution.id,...delivery}
 }
 
-export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'TEACHER'|'SCHOOL',org:{id:string},issuer:User,reviewer:User,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL',consentRequired=false,withReports=false){
+export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'TEACHER'|'SCHOOL',org:{id:string},issuer:User,reviewer:User,family:'BUNDLE'|'COGNITIVE'|'SITUATIONAL',consentRequired=false,withReports=false,feedbackPolicy:TrainingFeedbackPolicy={schemaVersion:1,mode:'IMMEDIATE'},formOnly=false,completionOnly=false){
  const resourceId=randomUUID(),resourceKey=`education-assessment:${product}:${org.id}:${resourceId}`
  const source=await owner.compositeAssessment.create({data:{code:'pr363-source-'+randomUUID(),name:'Synthetic actual source',createdBy:issuer.id,
   status:'PUBLISHED',publishedAt:new Date(),publicEnabled:false,copyable:false}})
  const runtime=source
- if(family!=='SITUATIONAL'){
+ if(family!=='SITUATIONAL'&&!formOnly){
   const config=await owner.cognitiveTestConfig.create({data:{testType:'reaction',configVersion:'pr363-'+randomUUID(),name:'Synthetic reaction runtime parameters',status:'PUBLISHED',
    engineVersion:'1.0.0',scoringVersion:'1.1.0',accessPolicy:'OPEN',publishedAt:new Date(),config:{totalTrials:5,foreperiodMinMs:700,foreperiodMaxMs:1500,timeoutMs:2000,readyDurationMs:1000,
     report:{reportVersion:'1.1.0',referenceMode:'none'}}}})
@@ -73,7 +74,7 @@ export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'T
   await owner.$transaction(tx=>publishAssignmentMeasurementRelease(tx,issuer.id,assignment.id))
   await owner.compositeAssessmentItem.create({data:{compositeAssessmentId:runtime.id,type:'COGNITIVE',position:0,required:true,cognitiveAssignmentId:assignment.id}})
  }
- if(family!=='COGNITIVE'){
+ if(family!=='COGNITIVE'&&!formOnly){
   await owner.$transaction(async tx=>{
    const mapping=await ensureStaticSjtRegistryMapping(tx,{instrumentKey:sjt.key,instrumentVersion:sjt.instrumentVersion})
    await publishStaticSjtMeasurement(tx,{actorId:reviewer.id,mappingId:mapping.id,deployment:{locale:'zh-CN',territory:'synthetic-disposable-test'}})
@@ -116,9 +117,10 @@ export async function runtimeDeliverySourceFixture(owner:PrismaClient,product:'T
   licenses.push({resourceId:report.releaseId,grantId:grant.grantId});reports.push({itemId:unit.itemId,releaseId:report.releaseId})
  }
  const disclosure={...testDisclosure(),...(consentRequired?{policyKey:'observer_private_respondent_v1'}:{})}
+ if(completionOnly)disclosure.audiences.RESPONDENT={mode:'COMPLETION_ONLY',metricKeys:[],longitudinalMetricKeys:[]}
  if(withReports)disclosure.audiences.RESPONDENT={mode:'INDIVIDUAL_SUMMARY',metricKeys:[...new Set(metricKeys)],longitudinalMetricKeys:[]}
  const registered=await producer.registerEducationAssessment(context(issuer),resourceId,{expectedPreparationHash:preparation.preparationHash,
-  disclosure,references:{schemaVersion:1,units:[]},reports,licenses})
+  disclosure,references:{schemaVersion:1,units:[]},reports,licenses,...(feedbackPolicy?{feedbackPolicy}:{})})
  const reviewed=await producer.transitionEducationAssessment(context(reviewer),resourceId,'REVIEW',{expectedEntryHash:registered.entryHash,reason:'Independent synthetic runtime fixture review'})
  await producer.transitionEducationAssessment(context(reviewer),resourceId,'PUBLISH',{expectedEntryHash:reviewed.entryHash,reason:'Publish synthetic runtime fixture only'})
  const identity=await owner.$transaction(tx=>readEducationAssessmentDeliveryIdentity(tx,{resourceKey,version:'1.0.0',purpose:'NEW_USE'}))
