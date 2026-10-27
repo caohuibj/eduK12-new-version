@@ -1,0 +1,64 @@
+{
+  "cognitive_domain": [
+    "decision_learning"
+  ],
+  "target_process": [
+    "effort_reward_choice",
+    "effort_execution"
+  ],
+  "paradigm": [
+    "balloon_effort_choice"
+  ],
+  "stimulus_form": [
+    "balloons_cost_reward"
+  ],
+  "input_upstream": [
+    "qp_repeated_press"
+  ],
+  "input_proposed": [
+    "not_frozen"
+  ],
+  "key_metric": [
+    "high_effort_choice_rate",
+    "press_execution",
+    "task_reward"
+  ],
+  "intended_use": [
+    "research_protocol_selection"
+  ],
+  "code_license": [
+    "mit_recorded"
+  ],
+  "code_rights_disposition": [
+    "github_public_conditional"
+  ],
+  "asset_rights_disposition": [
+    "authorization_pending"
+  ],
+  "asset_license_review": [
+    "brand_third_party_unverified"
+  ],
+  "implementation_strategy": [
+    "code_adaptation"
+  ],
+  "maturity": [
+    "source_research_only"
+  ],
+  "evidence_limitations": [
+    "timing_device_unverified",
+    "protocol_version_decision",
+    "motor_burden"
+  ],
+  "baseline_relation": [
+    "new_family_candidate"
+  ],
+  "research_priority": [
+    "conditional_priority_finalize"
+  ],
+  "rule_type": [
+    "technical_quality",
+    "theoretical_reference",
+    "literature_experience",
+    "project_provisional"
+  ]
+}
