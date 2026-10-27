@@ -10,6 +10,8 @@
 
 已实现独立协议/冻结参数/seed计划、React候选、中英教学/原始事件、权威scorer、后台描述报告和白名单公开投影。公开正文、可选一张小图和JSON下载共用三态；没有内部指标直出、能力总分、常模、IQ、诊断、同龄排名或岗位预测。保存失败停止呈现，重试同一原件及最终声明，不重新曝光；完整原件归档与报告回执不混为成功。
 
+DOT定向收尾已补冻结教学语言与首屏普通中英叙述，并修复StrictMode replay永久dispose的问题；当前配置/呈现0.1.1、测量协议/计分0.1.0。旧0.1.0报告保留原呈现，不重算。[本轮修订与证据](information-sampling-implementation/review-followup.md)。
+
 审阅入口：
 
 - [实施说明及边界](information-sampling-implementation/README.md)

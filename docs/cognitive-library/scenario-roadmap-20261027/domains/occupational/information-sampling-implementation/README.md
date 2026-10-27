@@ -2,9 +2,13 @@
 
 状态：用户图审批准后已实现；**未DOT复核、未注册/导入产品、未接入真实存储、未上线**。只实现本项，未触碰共享注册表/接口/全局清单、MOT/ANT暂停WIP、其他领域、数据库/权限/COS/依赖/CI。
 
+## DOT定向收尾
+
+已按DOT实读意见补齐准备快照language=zh/en、原件/FINAL语言与contextDigest追溯、UI与冻结语言一致性，以及基于本次真实数据的一两句普通中英描述；专业差值解释移入详情；追加generation+microtask区分StrictMode replay与真实卸载，保留原context端口停止/保存。见[修订记录](review-followup.md)与[本轮原件](review-followup-validation.json)。本轮只有语言/报告3个及StrictMode1个新增目标和必要类型/lint，不重跑原旅程；下方“首轮/续验”是f094原开发历史，原JSON保留。
+
 ## 冻结协议与教学
 
-- testType `information-sampling`；engine/scorer/config/protocol均实际初版0.1.0，profile、参数解释、metric、quality、reportDefinition、presentation各自独立字段0.1.0。实际配置和protocol分别哈希并按精确组合解析，不找“最新”配置重算历史报告。
+- testType `information-sampling`；engine/scorer/protocol保持0.1.0，当前config/presentation递增0.1.1；profile、参数解释、metric、quality、reportDefinition独立字段保持0.1.0。旧config/presentation 0.1.0的冻结报告可只读保留原布局，新旧混搭拒绝，不重新计分旧记录。实际配置和protocol分别哈希并按精确组合解析，不找“最新”配置重算历史报告。
 - research20/experience10：两奖励块各10/5，真实多数13–17各2/1。seed选择块次序、块内条件顺序和25格身份位置；多数身份长版每条件蓝/橙各1，短版每条件仅1且两个规则互补，块内正确左/右3/2、另一块2/3。按钮固定蓝左橙右，沿已批准图；单场块顺序和细分条件不能提供独立因果识别或稳定参数。
 - 两版均25格、原创蓝圆#176B9A/橙三角#A84D12、48×48px格、6px间隙；操作/普通文字沿既有标准角色色。可以0–25格后判断，首次有效多数判断锁定；完整按下松开同一控件，或明确辅助激活。取消/跨控件松开/多指/重复/长按不制造额外采样，已揭格不重复扣点。
 - 固定：正确+100，错误−100；递减：正确250−10×不同揭格数，错误−100；假想点数，无现金承诺。0格直接答是合法行为，25格正确为真0；不以高收益或采样偏好作为练习或质量标准。

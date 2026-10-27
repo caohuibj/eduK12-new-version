@@ -1,0 +1,368 @@
+{
+  "kind": "LOCAL_UNSIGNED_TARGETED_DOT_FOLLOWUP_NOT_INTEGRATION",
+  "base": "f0944d630751f68186a0ea14d45fbf1f3135e349",
+  "status": "NOT_DOT_APPROVED_NOT_INTEGRATED",
+  "nodeVersion": "24.21.0",
+  "scope": [
+    "freeze teaching language and context digest on prepare/raw/FINAL with matching UI",
+    "ordinary bilingual narrative, professional detail folded, exact presentation identity with legacy read-only display",
+    "StrictMode lifecycle generation/microtask; true unmount and original-context ports"
+  ],
+  "notChanged": [
+    "stimulus colour/shape/geometry",
+    "trial timing/input mechanics",
+    "20/10 counts/practice rules",
+    "measurement protocol/scorer mathematics",
+    "shared registry/interfaces/platform schema/COS/CI/HF/SART"
+  ],
+  "versions": {
+    "engine": "0.1.0",
+    "scorer": "0.1.0",
+    "protocol": "0.1.0",
+    "config": "0.1.1",
+    "reportDefinition": "0.1.0",
+    "presentation": "0.1.1",
+    "parameterExplanation": "0.1.0",
+    "legacyReadOnly": "0.1.0 config + presentation; no new narration/re-scoring; mixed tuples and old presentation under a new receipt refused"
+  },
+  "distinctNewTargets": 4,
+  "runs": [
+    {
+      "artifact": "review-followup-first.json",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "targets": []
+    },
+    {
+      "artifact": "review-followup-executed.json",
+      "exitCode": 1,
+      "passed": 2,
+      "failed": 1,
+      "pendingOrFiltered": 0,
+      "targets": [
+        {
+          "name": "information sampling DOT review follow-up binds teaching language to preparation, retained raw and FINAL in one partial formal flow",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up uses the frozen teaching language by default and rejects initial or later UI mismatches before exposure",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up generates plain bilingual data descriptions and preserves detail placement, three public gates and legacy presentation",
+          "status": "failed",
+          "failureMessages": [
+            "TypeError: The URL must be of scheme file\n    at readFileSync (node:fs:481:14)\n    at /workspace/eduK12-new-version/server-version/frontend/src/modules/cognitive/tasks/information-sampling/review-followup.test.tsx:58:31\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///workspace/eduK12-new-version/server-version/frontend/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ]
+    },
+    {
+      "artifact": "review-followup-continuation.json",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 2,
+      "targets": [
+        {
+          "name": "information sampling DOT review follow-up binds teaching language to preparation, retained raw and FINAL in one partial formal flow",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up uses the frozen teaching language by default and rejects initial or later UI mismatches before exposure",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up generates plain bilingual data descriptions and preserves detail placement, three public gates and legacy presentation",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "artifact": "review-followup-version-final.json",
+      "exitCode": 0,
+      "passed": 2,
+      "failed": 0,
+      "pendingOrFiltered": 1,
+      "targets": [
+        {
+          "name": "information sampling DOT review follow-up binds teaching language to preparation, retained raw and FINAL in one partial formal flow",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up uses the frozen teaching language by default and rejects initial or later UI mismatches before exposure",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "name": "information sampling DOT review follow-up generates plain bilingual data descriptions and preserves detail placement, three public gates and legacy presentation",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "artifact": "strictmode-lifecycle-first.json",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "targets": [
+        {
+          "name": "information sampling StrictMode lifecycle follow-up survives effect replay through preparation/start and saves a real unmount or context replacement through the original ports",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "artifact": "strictmode-lifecycle-final.json",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "pendingOrFiltered": 0,
+      "targets": [
+        {
+          "name": "information sampling StrictMode lifecycle follow-up survives effect replay through preparation/start and saves a real unmount or context replacement through the original ports",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "initialCommandFailure": "Wrong cwd: new test file not created; 0 targets executed and exit1. Original reporter retained.",
+  "failedAssertionCause": "Legacy JSON fixture used jsdom-transformed non-file URL with fs; fixed explicit local path, reexecuted only that target.",
+  "warningHistory": "First StrictMode lint exited0 with one cleanup-ref warning; corrected the earlier progress wording, retained original lint. Callback defined in setup, same generation/microtask logic; only lifecycle case, Task lint and frontend types repeated.",
+  "versionContinuation": "Only language-FINAL and report targets reexecuted after stronger receipt tuple checks; 2PASS/1filtered. Old journeys not rerun.",
+  "latestTypes": {
+    "backend": {
+      "artifact": "review-followup-types-current.json",
+      "entries": 3,
+      "sourceFiles": 48,
+      "diagnostics": 0,
+      "currentHashesMatch": true
+    },
+    "frontend": {
+      "artifact": "review-followup-types-final.json",
+      "entries": 4,
+      "sourceFiles": 55,
+      "diagnostics": 0,
+      "currentHashesMatch": true
+    }
+  },
+  "lint": {
+    "review-followup-lint.json": {
+      "files": 8,
+      "errors": 0,
+      "warnings": 0
+    },
+    "strictmode-lifecycle-lint.json": {
+      "files": 2,
+      "errors": 0,
+      "warnings": 1
+    },
+    "strictmode-lifecycle-lint-final.json": {
+      "files": 1,
+      "errors": 0,
+      "warnings": 0
+    }
+  },
+  "pureCopiesIdentical": true,
+  "preservedOriginalArtifacts": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/affected-types.cjs",
+      "sha256": "e0805b029a5af6b1124713574ad30d3de1f53e9dda2c5772e9f87c5ad7690015"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/backend-first.json",
+      "sha256": "a27e9f7dd74512a2aa09a0288a3d3383b1b832c9a0ee7c2a289e78920f59e7c2"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/file-manifest.json",
+      "sha256": "d7fab9f284a469356b311770313bb2016a33c24efd4dc4687f93703e50db1d31"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-final.json",
+      "sha256": "1850f97b6ba878e2ea555ebdb832833ef921f009be158341ddba39c8a1347ce3"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-first.json",
+      "sha256": "3666163868428c82bc60a8b83abb14c486ce385b19a892430fbb2c1dc9976242"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-lint-clean-import.json",
+      "sha256": "d5f77bd7cdfb91fab8180702c21aa1388b1619d148a163b9b049315cc461fbe1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/frontend-lint.json",
+      "sha256": "f3ba97afc64645e955c56e9c14b70d7acec2b8a261c992d97c2171190f11bc21"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-example.json",
+      "sha256": "826ab36879585e0a80bceed9cb590eb2e96c7a18086278771292644538a92d96"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-example.ts",
+      "sha256": "5bce27d0ab3fdbd13729911bdf7b9e6162d0e2d9957c64d701790de63400cf7a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/research-public-report.json",
+      "sha256": "1dca97729bea41a0385173b6699136b650de403dc7c2159511b08fe2b3fbbd78"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-clean-imports.json",
+      "sha256": "24cf6734a5bc94d5c0c516ad8c7fe9b151e228ffe833b06d3c891b0a8b8d66d9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-first.json",
+      "sha256": "639387d8bb84508b3480f2d29910fdc228c61644e56d1034370bb7c188d17d0e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/types-frontend-final.json",
+      "sha256": "56a9fa60d8cd5e1a0abdcf0e64ac43c6900a1a9c98d986b1c71e3579fc1d7b0a"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/validation.json",
+      "sha256": "cf90bc82f7d7d0306984ae502793f259cb1fc551cccd319a5bdd0d564b6b3467"
+    }
+  ],
+  "evidenceLimits": [
+    "Synthetic clocks/jsdom/memory ports; not real participant/device/durable storage/API/DB/COS qualification",
+    "Original failed/filtered reporters retained; not signed execution or CI admission",
+    "No existing full journey, old task group, full build, CI, merge, deploy or activation ran"
+  ],
+  "changedAndNewFiles": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-REVIEW.md",
+      "sha256": "5a86ad62fb19635bc623e9e4792424fe9d83bd40503cb2bb86d0cbe7cd53790e"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/README.md",
+      "sha256": "e35ef044a68968f2719e4e656680215f0c6cb038c7fba40efca439be6375859c"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-continuation.json",
+      "sha256": "aa608515ff77bfb32c44332f6178a56e9db40a9dd46710eaa40fc2ddae92aeea"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-executed.json",
+      "sha256": "fc18ce92b8b1902f06d526651c8ecec9ac2ff3b8ec409c25da97eeded36092b2"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-first.json",
+      "sha256": "97a896353675966b640e0a7955edd124d7d5086013ec455dd500b22b7dd18396"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-lint.json",
+      "sha256": "e5f956eec9a02acc86ac704ae6d884e885ff1eb3edebd0fd6b7c915546501add"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types-current.json",
+      "sha256": "683469f6c10f6ca09cf73cea5fbdab89778a2dd43dce30958eca324012a15412"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types-final.json",
+      "sha256": "1fb42085629b1cf683ed6e1cefef6d79d316d8ddfb5224b464834c2eb1a09ee1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types-frontend-final.json",
+      "sha256": "e508d01b93cf1630e892beeb1365b062ce5d2d32b2bfff5e6392392be69be7e5"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types-lifecycle.json",
+      "sha256": "0b6008d69eb7585e17f782dd826bbfae9a274653a0158dbff3460cf2e8847d53"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types.cjs",
+      "sha256": "f159bbab5b02a5b2bccd7c856abbe20ae52a034372162682ecfc8a44204bd085"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-types.json",
+      "sha256": "6f82220c38c4c40d720d84d5599fb468db34b61320cfc8a3bb294516ce109826"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup-version-final.json",
+      "sha256": "d171d4cae304e3ab7a89e37618c17f10f9bf87ee9fed1f642c83660df51337e8"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/review-followup.md",
+      "sha256": "a6baa7c27ce3891f05b696eca2a29bc12d8598f79452bf67ba7fe37f9a63de87"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/strictmode-lifecycle-final.json",
+      "sha256": "92d0b235bce1dbccf4bc2ff39412fba052d1297e27adeea3e62802a697de63d3"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/strictmode-lifecycle-first.json",
+      "sha256": "ab9432eca02bd9a79e7d99818f1ec655705fb34b64081b580efb94ef1bf97827"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/strictmode-lifecycle-lint-final.json",
+      "sha256": "f9ede3a376b34daabadd45fa73ad39f86981f8e06151c2e4acbc91d159184fd5"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/information-sampling-implementation/strictmode-lifecycle-lint.json",
+      "sha256": "771564e0764579431985cda34a09de2cce0353476049b15257e24404abaa8503"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/participant-presentation.ts",
+      "sha256": "b516ebe17c0aac1efcffbb890f759257712256f87bd188e24065e152abb38d65"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/protocol.ts",
+      "sha256": "5b47f0fd8f5800ecca4eb8afed5e732560773c58767048a9b86c5abc3bb0b5cd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/report.ts",
+      "sha256": "5a8a7d44bafb8519e27a6ea1dd2d9a2ef4cdf98efc030e406e57960eda1a7403"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/information-sampling/scorer.ts",
+      "sha256": "9302d65ab1f00e00b3f521523ca2cdb8bc50316a5f0d62a8b200e4449ecb1793"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstReport.tsx",
+      "sha256": "526cc0591b06f13885818d9f592e9fa12b4a298714dd69a184dc824760a177da"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/IstTask.tsx",
+      "sha256": "5978c91c27aeb44ff69d732568f1e531ff8b09653c7ba44fb16b323c7583bcf6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/content.test.tsx",
+      "sha256": "7d68ae11bae590f16d1cf8b5dd7d90418f7cccd7e5896e453d4327c13cba591e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/contracts.ts",
+      "sha256": "b9fb313c85e5e8c5ad6a1ca9cbce8215d5b2e5fa0c48dfca16e12b2238be0462"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/protocol.ts",
+      "sha256": "5b47f0fd8f5800ecca4eb8afed5e732560773c58767048a9b86c5abc3bb0b5cd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/generated/report.ts",
+      "sha256": "5a8a7d44bafb8519e27a6ea1dd2d9a2ef4cdf98efc030e406e57960eda1a7403"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/review-followup.test.tsx",
+      "sha256": "8c70adcbacd6d9f15279f0286eb307a667314421286bcad76057845f7dd21558"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/session.ts",
+      "sha256": "9dbf536dc9a561404f83498c257e903d4a424cc15d0b785695732439420bece8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/information-sampling/strictmode-lifecycle.test.tsx",
+      "sha256": "0b62885175365175601a0c2291bfcd9c65455d46539116a2d79969d1724f695f"
+    }
+  ]
+}

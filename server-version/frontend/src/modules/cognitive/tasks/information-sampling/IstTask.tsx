@@ -8,12 +8,22 @@ import { IstReport } from './IstReport'
 import './ist.css'
 export interface IstTaskProps { context: IstContext; ports: IstPorts; language?: 'zh' | 'en' }
 /** Isolated content candidate. No registry, delivery, durable storage or COS implementation is installed here. */
-export function IstTask({ context, ports, language = 'zh' }: IstTaskProps) {
-  const [, render] = useReducer(n => n + 1, 0), alive = useRef(true), invalid = useRef(false), initial = useRef({ key: digest(context), ports, language }), gridRef = useRef<HTMLDivElement>(null), starting = useRef<number | null>(null)
+export function IstTask({ context, ports, language = context.language }: IstTaskProps) {
+  const [, render] = useReducer(n => n + 1, 0), alive = useRef(true), lifecycle = useRef(0), invalid = useRef(false), initial = useRef({ key: digest(context), ports, language }), gridRef = useRef<HTMLDivElement>(null), starting = useRef<number | null>(null)
   const [holder] = useState(() => { try { return { session: new IstSession(context, ports, () => { if (alive.current) render() }) } } catch { return { error: true as const } } })
   const s = holder.session, view = s?.view ?? 'blocked', cap = s?.capture, stage = cap?.raw.state.stage, en = language === 'en'
-  if (initial.current.key !== digest(context) || initial.current.ports !== ports || initial.current.language !== language) invalid.current = true
-  useEffect(() => { alive.current = true; return () => { alive.current = false; if (starting.current !== null) cancelAnimationFrame(starting.current); s?.dispose() } }, [s])
+  if (language !== context.language || initial.current.key !== digest(context) || initial.current.ports !== ports || initial.current.language !== language) invalid.current = true
+  useEffect(() => {
+    const generation = ++lifecycle.current
+    alive.current = true
+    const disposeIfUnmounted = () => { if (lifecycle.current === generation && !alive.current) s?.dispose() }
+    return () => {
+      alive.current = false
+      if (starting.current !== null) { cancelAnimationFrame(starting.current); starting.current = null }
+      // StrictMode replays setup before this microtask; a real unmount does not.
+      queueMicrotask(disposeIfUnmounted)
+    }
+  }, [s])
   useEffect(() => { if (invalid.current) s?.dispose() }, [s, context, ports, language])
   useEffect(() => {
     if (!s || !cap || view !== 'running' || invalid.current) return

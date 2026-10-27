@@ -3,7 +3,7 @@ export type Profile = 'research' | 'experience'
 export type Rule = 'fixed' | 'decreasing'
 export type Category = 'blue-circle' | 'orange-triangle'
 export type Input = 'touch' | 'mouse' | 'pen' | 'keyboard' | 'assistive'
-export const IST_IDENTITY = { testType: 'information-sampling', engineVersion: '0.1.0', scoringVersion: '0.1.0', configVersion: '0.1.0' } as const
+export const IST_IDENTITY = { testType: 'information-sampling', engineVersion: '0.1.0', scoringVersion: '0.1.0', configVersion: '0.1.1' } as const
 export const IST_PROTOCOL = { schemaVersion: 1 as const, key: 'information-sampling/0.1.0/0.1.0', version: '0.1.0', clock: 'performance' as const, randomizationAlgorithmVersion: 'ist-fnv1a-utf16-xorshift32-balanced-v1', trialEnvelopeVersion: 1 as const, phases: [{ key: 'test' as const, persists: true, required: true }], measurementCriticalConfigPaths: ['*'] }
 export function istConfig(profile: Profile) {
   if (profile !== 'research' && profile !== 'experience') throw Error('Unknown IST profile')
@@ -13,7 +13,7 @@ export function istConfig(profile: Profile) {
     feedbackMs: 2000, incentive: 'hypothetical-task-points-no-cash', choiceDeadlineMs: null,
     reward: { fixedCorrect: 100, decreasingStart: 250, perReveal: 10, incorrect: -100 },
     practice: { trials: 2, majorityCount: 21, quizQuestions: 3, maximumGroups: 3, criterion: 'complete-two-judgments-and-three-rule-questions-correct-not-preference-or-reward' },
-    profileDefinitionVersion: '0.1.0', parameterExplanationVersion: '0.1.0', metricDefinitionVersion: '0.1.0', qualityDefinitionVersion: '0.1.0', reportDefinitionVersion: '0.1.0', presentationVersion: '0.1.0',
+    profileDefinitionVersion: '0.1.0', parameterExplanationVersion: '0.1.0', metricDefinitionVersion: '0.1.0', qualityDefinitionVersion: '0.1.0', reportDefinitionVersion: '0.1.0', presentationVersion: '0.1.1',
   } as const
 }
 export type IstConfig = ReturnType<typeof istConfig>

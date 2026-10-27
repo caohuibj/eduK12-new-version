@@ -14,7 +14,7 @@ function summary(planned: number, rows: Observation[]): Omit<IstCondition, 'majo
 export const istEnvelope = (raw: IstRaw): TrialEnvelope<IstRaw> => ({ schemaVersion: 1, trialIndex: raw.plan.index, phase: 'test', condition: `${raw.plan.rule}:${raw.plan.majorityCount}`, startedAtPerfMs: raw.startedAtPerfMs, endedAtPerfMs: raw.endedAtPerfMs, durationMs: raw.endedAtPerfMs - raw.startedAtPerfMs, flags: { timeout: false, premature: false }, qualityEvents: raw.status === 'interrupted' ? ['resume'] : [], payload: raw })
 export function scoreIst(input: AuthoritativeScorerInput<IstConfig, IstRaw>): CognitiveScoreResult {
   const call = z.object({ session: z.unknown(), config: z.unknown(), randomSeed: z.string().min(1).max(256), trials: z.array(z.unknown()).max(20) }).strict().parse(input), s = parseSessionConfigSnapshot<IstConfig>(call.session)
-  if (s.testType !== IST_IDENTITY.testType || s.engineVersion !== '0.1.0' || s.scoringVersion !== '0.1.0' || s.configVersion !== '0.1.0' || !same(s.protocol, IST_PROTOCOL) || (s.referenceBindings?.length ?? 0) > 0) throw Error('Unsupported exact IST identity')
+  if (s.testType !== IST_IDENTITY.testType || s.engineVersion !== '0.1.0' || s.scoringVersion !== '0.1.0' || s.configVersion !== IST_IDENTITY.configVersion || !same(s.protocol, IST_PROTOCOL) || (s.referenceBindings?.length ?? 0) > 0) throw Error('Unsupported exact IST identity')
   const c = istConfigSchema.parse(s.config)
   if (!same(c, istConfigSchema.parse(call.config))) throw Error('IST config differs from frozen snapshot')
   const plan = istPlan(c, call.randomSeed), observations: Observation[] = []; let previousEnd: number | null = null, interrupted = false
