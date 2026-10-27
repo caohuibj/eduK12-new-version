@@ -1,0 +1,16 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a combination id as the existing V1 Scale/config/SJT source contract
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM theoretical_range parameter snapshot is not a formal normative publication just because its Survey combo is approved
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM descriptive_sample parameter snapshot is not a formal normative publication just because its Survey combo is approved
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM criterion_threshold parameter snapshot is not a formal normative publication just because its Survey combo is approved
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not admit a Survey private parameter copy to the Training owner/composite
+ ↓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a SURVEY report pointer as an existing Training private report binding
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a PLATFORM report pointer as an existing Training private report binding 12ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 6 skipped (7)
+   Start at  10:17:03
+   Duration  2.79s (transform 1.89s, setup 0ms, import 2.67s, tests 13ms, environment 0ms)
+

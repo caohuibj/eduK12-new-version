@@ -1,0 +1,91 @@
+{
+  "kind": "cloud-producer-feedback-policy-increment",
+  "base": "16845c9a2",
+  "upstreamContract": "385277be09228ace5d9ff8da1bbd8934d86cd471",
+  "markerCheckpoint": "9ce3f44d7c1b2fb5025a8c6442f61faaa3ec3e9b",
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "database": "eduk12_pr363_publication_test",
+    "production": false
+  },
+  "invocations": [
+    {
+      "name": "source-feedback-policy-r1",
+      "exitCode": 0,
+      "unitCases": 2,
+      "realPostgresCases": 2,
+      "filter": null,
+      "legacyResourceId": "dcb0c636-f468-426d-9e8b-b43e4db10cc3"
+    },
+    {
+      "name": "source-feedback-types-r1",
+      "exitCode": 2,
+      "firstError": "selectedContent incorrectly required the new full register DTO from read-only callers"
+    },
+    {
+      "name": "source-feedback-types-r2",
+      "exitCode": 0,
+      "delta": "narrow selectedContent input type to its references/reports properties; erased TypeScript-only change"
+    }
+  ],
+  "receipts": [
+    {
+      "path": "pr363-source-feedback-policy-r1.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-feedback-policy-r1.log",
+      "sha256": "980f8c40b887f09b7c7f6f87ddbacf1c4c4835a36022c3f29bf68d0d12a429f5"
+    },
+    {
+      "path": "pr363-source-feedback-types-r1.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "path": "pr363-source-feedback-types-r1.log",
+      "sha256": "8224c9967e0bd99e82a5becf790777672416ec3e6eec33a34a7ac4d644632938"
+    },
+    {
+      "path": "pr363-source-feedback-types-r2.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "pr363-source-feedback-types-r2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceInputsAtCollection": [
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.feedback-policy.postgres.integration.test.ts",
+      "sha256": "72959c65219bdea1eaec20fb9dcf00a539a5a90ee8209deed0ace7d263e6de03",
+      "gitBlob": "80008fc8e3f1011c14c0e1073430b1d38bdf3399"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.feedback-policy.test.ts",
+      "sha256": "d4450951a6b0dd055924b4b27f66fe547fb3a0661ad88c330b292baecebccfe7",
+      "gitBlob": "acb3ce901dca314f4c5f7e15160158d6ebcd5fd2"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/training-feedback-policy.ts",
+      "sha256": "e2eef914d088deee2d98bea840d3142de02e9e60f4a9e185d894e752f822bbb1",
+      "gitBlob": "f3294b402475ae7c9b5deed86785b7cd5f076551"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+      "sha256": "cd9ce862e282dc994d10214d77094175db3a94f3d67d8f47e28a7c9addcf0364",
+      "gitBlob": "391cf78a3dbe4869d5bfcc553173a0c65a917204"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "sha256": "d6a4c6d9146d3d5b4b00f23eb53a938092387eca469e3126907638261229f9fe",
+      "gitBlob": "422bf5559676321cf9523b79d73c3cfa1d1b311c"
+    }
+  ],
+  "limitations": [
+    "Collected after execution, not a CI signature or contemporaneous full environment attestation.",
+    "PG case source is a synthetic published Form fixture, not a claim to validate instrument development/publication.",
+    "Legacy SQL read requires explicitly retained legacy fixture ID; future no-fixture invocations skip that named legacy case.",
+    "No repeat of root contract cases, ordinary18 PG cases, marker5 PG cases, browser or actual feedback runtime delivery."
+  ]
+}

@@ -11,8 +11,9 @@ import {situationalReleaseKey,type ResolvedSituationalRelease} from '../situatio
 import {educationManagementFail as fail} from './assessment-resource.issuer'
 import {frozenDatabaseScaleDefinition} from '../scale/scale-workflow.service'
 import {assertScalePublicationRights} from '../scale/scale-publication-guard'
+import {prelockEducationStandardSourceActors} from './assessment-resource.marker'
 
-export const educationCompositeInclude={items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
+export const educationCompositeInclude={questionnaireCourses:true,items:{orderBy:{position:'asc' as const},include:{scale:true,cognitiveAssignment:{include:{config:true}}}},formSections:{orderBy:{position:'asc' as const},include:{items:{orderBy:{position:'asc' as const}}}}}
 /** Lock these advisory source identities before Org/User/Composite row locks.
  * The initial item read orders locks only; readEducationAssessmentSource then
  * verifies the same exact identities under the composite lock. */
@@ -54,6 +55,8 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
  // This existing helper proves executable/measurement identity only. Its Training
  // scope checks do NOT grant the target entry permission; explicit distribution
  // is checked separately before any draft or frozen metadata is written.
+ if(source.items.some(item=>item.standardCombinationSource!==null))
+  await prelockEducationStandardSourceActors(tx,source.createdBy,source.items)
  const content=await prepareTrainingContentSnapshot(tx,source,resolved)
  if(snapshot.units.length!==content.snapshot.units.length||snapshot.units.some(unit=>{
   const actual=content.snapshot.units.find(value=>value.itemId===unit.itemId)
@@ -70,7 +73,7 @@ export async function readEducationAssessmentSource(tx:Prisma.TransactionClient,
   if(!['participant_self_report',product==='TEACHER'?'teacher_self_report':'student_self_report'].includes(definition.respondentType))fail('EDUCATION_ASSESSMENT_SELF_SOURCE_REQUIRED',403)
   if(definition.license.status==='unknown'||definition.license.redistribution==='unknown')fail('EDUCATION_ASSESSMENT_SOURCE_RIGHTS_UNKNOWN',403)
  }
- await assertScalePublicationRights(tx,owner.id,owner.role,scales.map(item=>item.scaleId!))
+ await assertScalePublicationRights(tx,owner.id,owner.role,scales.filter(item=>item.standardCombinationSource===null).map(item=>item.scaleId!))
  for(const item of source.items)if(item.type==='COGNITIVE'&&item.cognitiveAssignment?.config.accessPolicy==='GRANT'){
   const author=await tx.user.findUnique({where:{id:item.cognitiveAssignment.createdBy!}})
   if(!author||!author.isActive||author.isFrozen||author.mustChangePassword||author.expiresAt&&author.expiresAt<=new Date())fail('EDUCATION_ASSESSMENT_SOURCE_OWNER_UNAVAILABLE',403)

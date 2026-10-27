@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ↓ src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts > Education privateVersion real persisted source and shared START binding > retains an owned exact version in an independent education runtime and rejects a forged source-item mapping
+ ✓ src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts > Education privateVersion real persisted source and shared START binding > refuses to prepare another author privateVersion even for an education product administrator 111ms
+ ↓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > performs actual approval/trials and preserves original Training rights in a separately authorized School runtime
+ ✓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > checks exact original use at collection, rejects revocation and keeps frozen identity independently readable 276ms
+
+ Test Files  2 passed (2)
+      Tests  2 passed | 2 skipped (4)
+   Start at  10:14:49
+   Duration  5.79s (transform 6.73s, setup 0ms, import 10.05s, tests 446ms, environment 0ms)
+
