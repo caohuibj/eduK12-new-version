@@ -239,6 +239,26 @@
     "label": "学校归属",
     "axis": "construct"
   },
+  "construct:sel_bessi45_dimension_1": {
+    "label": "自我管理",
+    "axis": "construct"
+  },
+  "construct:sel_bessi45_dimension_2": {
+    "label": "社交参与",
+    "axis": "construct"
+  },
+  "construct:sel_bessi45_dimension_3": {
+    "label": "合作",
+    "axis": "construct"
+  },
+  "construct:sel_bessi45_dimension_4": {
+    "label": "情绪复原",
+    "axis": "construct"
+  },
+  "construct:sel_bessi45_dimension_5": {
+    "label": "创新",
+    "axis": "construct"
+  },
   "construct:sel_delaware_climate_bullying": {
     "label": "Schoolwide bullying",
     "axis": "construct"
