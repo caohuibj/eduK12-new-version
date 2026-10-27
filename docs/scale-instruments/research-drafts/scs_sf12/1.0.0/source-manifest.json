@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "scs_sf12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "original": {
+    "authors": [
+      "Raes",
+      "Pommier",
+      "Neff",
+      "Van Gucht"
+    ],
+    "year": 2011,
+    "originalPaperDoi": "10.1002/cpp.702",
+    "officialForm": "https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf",
+    "sourcePaper": "https://self-compassion.org/wp-content/uploads/publications/scsshort.pdf",
+    "scoringPolicyYear": 2021
+  },
+  "items": [
+    {
+      "number": 1,
+      "itemCode": "SCS_SF12_01",
+      "sourceEnglishMeaning": "feeling inadequate after important failure",
+      "reverse": true,
+      "group": "over_identification"
+    },
+    {
+      "number": 2,
+      "itemCode": "SCS_SF12_02",
+      "sourceEnglishMeaning": "patient acceptance of disliked personality traits",
+      "reverse": false,
+      "group": "self_kindness"
+    },
+    {
+      "number": 3,
+      "itemCode": "SCS_SF12_03",
+      "sourceEnglishMeaning": "balanced perspective in painful circumstances",
+      "reverse": false,
+      "group": "mindfulness"
+    },
+    {
+      "number": 4,
+      "itemCode": "SCS_SF12_04",
+      "sourceEnglishMeaning": "assuming others happier when down",
+      "reverse": true,
+      "group": "isolation"
+    },
+    {
+      "number": 5,
+      "itemCode": "SCS_SF12_05",
+      "sourceEnglishMeaning": "failings as common human experience",
+      "reverse": false,
+      "group": "common_humanity"
+    },
+    {
+      "number": 6,
+      "itemCode": "SCS_SF12_06",
+      "sourceEnglishMeaning": "giving oneself care in very difficult times",
+      "reverse": false,
+      "group": "self_kindness"
+    },
+    {
+      "number": 7,
+      "itemCode": "SCS_SF12_07",
+      "sourceEnglishMeaning": "maintaining emotional balance when upset",
+      "reverse": false,
+      "group": "mindfulness"
+    },
+    {
+      "number": 8,
+      "itemCode": "SCS_SF12_08",
+      "sourceEnglishMeaning": "feeling alone in important failure",
+      "reverse": true,
+      "group": "isolation"
+    },
+    {
+      "number": 9,
+      "itemCode": "SCS_SF12_09",
+      "sourceEnglishMeaning": "fixation on wrong things when down",
+      "reverse": true,
+      "group": "over_identification"
+    },
+    {
+      "number": 10,
+      "itemCode": "SCS_SF12_10",
+      "sourceEnglishMeaning": "inadequacy shared with other people",
+      "reverse": false,
+      "group": "common_humanity"
+    },
+    {
+      "number": 11,
+      "itemCode": "SCS_SF12_11",
+      "sourceEnglishMeaning": "self-judgment of flaws",
+      "reverse": true,
+      "group": "self_judgment"
+    },
+    {
+      "number": 12,
+      "itemCode": "SCS_SF12_12",
+      "sourceEnglishMeaning": "impatience with disliked personality aspects",
+      "reverse": true,
+      "group": "self_judgment"
+    }
+  ],
+  "response": {
+    "min": 1,
+    "max": 5,
+    "sourceLabels": {
+      "1": "Almost never",
+      "5": "Almost always"
+    },
+    "otherSourceLabelsNotSpecified": true,
+    "noFixedRecallPeriod": true
+  },
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "reverseItemNumbers": [
+      1,
+      4,
+      8,
+      9,
+      11,
+      12
+    ],
+    "transform": "6 - responseScore",
+    "originalSixPairs": {
+      "self_kindness": [
+        2,
+        6
+      ],
+      "self_judgment": [
+        11,
+        12
+      ],
+      "common_humanity": [
+        5,
+        10
+      ],
+      "isolation": [
+        4,
+        8
+      ],
+      "mindfulness": [
+        3,
+        7
+      ],
+      "over_identification": [
+        1,
+        9
+      ]
+    },
+    "official2021": "mean_of_six_pair_means",
+    "completeCaseEquivalent": "mean_of_twelve_scored_items",
+    "range": [
+      1,
+      5
+    ],
+    "reportedScoreKeys": [
+      "total"
+    ],
+    "subscaleScoresPublished": false,
+    "previous2011SummationNotImported": true,
+    "missingPolicy": "complete_required_project_choice"
+  },
+  "independentAxes": [
+    "domain",
+    "construct",
+    "orientation",
+    "population",
+    "response",
+    "use",
+    "license",
+    "language_validation"
+  ],
+  "versions": {
+    "instrument": "1.0.0",
+    "localization": "1.0.0",
+    "instruction": "1.0.0",
+    "scoring": "1.0.0",
+    "report": "1.0.0",
+    "reference": "none"
+  },
+  "rights": {
+    "sourceUses": "any_purpose",
+    "translationGranted": true,
+    "fullPublicRedistribution": "ADMIN_REVIEW_PENDING",
+    "commercialResaleDownstream": "ADMIN_REVIEW_PENDING"
+  },
+  "validation": {
+    "syntheticCases": 9,
+    "vitest": "NOTRUN",
+    "tsc": "NOTRUN",
+    "database": "NOTRUN",
+    "browser": "NOTRUN",
+    "ci": "NOTRUN",
+    "deployment": "NOTRUN"
+  }
+}

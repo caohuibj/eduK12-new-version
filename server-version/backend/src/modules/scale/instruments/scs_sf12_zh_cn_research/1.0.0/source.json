@@ -1,0 +1,1108 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "scs_sf12_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "下面这些话描述人遇到困难、受挫或对自己不满意时，通常怎样对待自己。请逐句想一想，这种描述在你平时有多常见，并从1到5选择一个数字。1表示几乎从不，5表示几乎总是；中间数字表示出现得逐渐更多。答案没有对错，不需要为自己的感受或反应责备自己。",
+    "source": "依据Raes等2011 SCS-SF及Kristin Neff官网2021英文正式指导语独立起草中文工作稿；未添加过去两周等原作者没有规定的回忆窗。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "自我关怀量表短式（SCS-SF，12题）— 独立中文研究工作稿",
+      "abbreviation": "SCS-SF12-ZH-WORKING",
+      "instrumentFamily": "Self-Compassion Scale Short Form (Raes et al., 2011)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [
+        "SOCIAL_EMOTIONAL"
+      ],
+      "constructDefinition": "描述面对失败、痛苦或不足时的自我关怀倾向，涉及自我友善/自我评判、共同人性/孤立、正念/过度认同。12题短式目前仅生成整体自我关怀均分；每组仅两题，不把六组构成已验证的个人独立能力画像。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:wellbeing",
+        "domain:self_compassion",
+        "domain:social_emotional",
+        "construct:self_compassion",
+        "construct:self_kindness",
+        "construct:self_judgment",
+        "construct:common_humanity",
+        "construct:isolation",
+        "construct:mindfulness",
+        "construct:over_identification",
+        "construct:single_mean_total",
+        "construct:short_form_subscale_unreliable",
+        "orientation:compassion_focused",
+        "orientation:transdiagnostic",
+        "orientation:positive_psychology",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:project_18_plus",
+        "population:independent_translation_not_chinese_validated",
+        "population:not_child_adolescent_validated",
+        "response:self",
+        "response:digital_self",
+        "response:12_items",
+        "response:five_point_frequency_1_to_5",
+        "response:endpoints_only_author_labels",
+        "response:no_fixed_recall_period",
+        "response:fixed_official_order",
+        "response:reverse_1_4_8_9_11_12",
+        "response:all_twelve_mean",
+        "response:complete_required_platform_choice",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:no_shortform_facets_in_report",
+        "use:no_chinese_norms",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "license:official_any_purpose_use",
+        "license:official_translation_permission",
+        "license:attribution_required",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:public_github_rights_unknown",
+        "license:full_original_text_acquired",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:local_validation_pending",
+        "language_validation:not_official_chinese_version",
+        "自我关怀",
+        "自我慈悲",
+        "自我友善",
+        "共同人性",
+        "正念",
+        "自我批评",
+        "孤立感",
+        "过度认同",
+        "反向题",
+        "总均分",
+        "非诊断",
+        "翻译权限已列明",
+        "公开再分发待核"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "Raes等英文/荷兰语研究含成人，平台独立简体中文工作稿尚未经过译审、认知访谈或中国群体验证。保守仅作为18岁及以上成人研究内容；Neff官网对26题长版的14岁表述不能直接用于本新译12题版。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "面对困难时平时怎样对待自己；不规定过去两周、过去一个月或其他固定回忆时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "作者官网2021短式原题1–12顺序全部保留，不从26题长版按位置抽题或改用其他版式。",
+        "原本为1–5出现频率，仅两端正式锚点1=Almost never、5=Almost always，2/3/4保留数字而不冒称作者提供了正式锚词。",
+        "反向题1/4/8/9/11/12采用6−原始分，其他6题原值。不能借用长版、6题state版的计分题号。",
+        "官网当前2021计分方案：六个两题分组各求均分，再取六组均分的平均；完整作答时等于反向后12题直接求均分1–5。",
+        "短版每组仅两题，官方建议若要可靠解释分量表，宜使用26题长版。本工作稿仅输出一个整体总分，不启用六组维度评分或六维雷达。",
+        "当前项目complete_required要求12题全部有效才能给整体均分，不插补。这是平台保守缺答规则，不是原作者已验证的规则。",
+        "2011原论文曾用总和12–60，2021官方指导更推荐总体均分1–5；本包显式绑定2021评分版本，不把两种口径混用。",
+        "官网可用与可翻译许可已经明确，但公开Github完整题文再分发、下游复用以及正式使用仍须单独核实；不将使用误标为只限非商业。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "原2011英文/荷兰语短版有开发和信效度资料，但独立简体中文草稿尚未验证，不能直接用于中国人群定量解释。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助理解困难时如何对待自己，报告只提供普通读者可理解的整体解释，不作临床筛查、人格等级或高风险选择。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "scssf-raes2011-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原2011英语n=415以及荷兰语原研究人群；该证据不属于当前独立中文工作译稿",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "原2011短版验证及Kristin Neff官网2021版说明证实整体总分支持；仅两题分维的可靠性有限，不应用于稳定六维个人画像。",
+        "rating": "UNKNOWN",
+        "citation": "Raes, F., Pommier, E., Neff, K. D., & Van Gucht, D. (2011). Construction and factorial validation of a short form of the Self-Compassion Scale. Clinical Psychology & Psychotherapy, 18, 250–255. https://doi.org/10.1002/cpp.702.",
+        "doi": "10.1002/cpp.702",
+        "url": "https://self-compassion.org/wp-content/uploads/publications/scsshort.pdf"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Kristin Neff官网英文正式12题和2021计分 https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf；平台依据英文独立编制简体中文研究工作稿，不复制现成第三方中文译本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "官网允许使用与翻译，不自动证明当前工作译稿已通过专业译审或中国研究者的结构效度验证。原2011发表的总和口径和2021推荐的均值口径明确区分。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "scs_sf12_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "scs_sf12_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "scs_sf12_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "Kristin Neff官网正式SCS-SF信息PDF明确授予使用该短式（any purpose whatsoever）及翻译权限，并要求引用Raes等2011。官网文件：https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf，论文：https://self-compassion.org/wp-content/uploads/publications/scsshort.pdf。量表特定的广泛使用/翻译许可不是完整题本和独立简体中文工作译稿公开GitHub再分发、下游再许可、第三方商业复制或销售的明确证明；官网一般Terms的复制/分发限制仍需区分范围。当前将公开全文再分发等事项记录author_contact_required和redistribution_review_pending由管理员处理，不把官方许可误记成仅非商业，也不声称额外再分发已许可。该中文题本/报告系EDUK12.TOP依据英文原版独立制作，未继承他人译本信效度，未经专业译审或中国人群验证。",
+      "官方量表特定许可已授予使用及翻译，尚未独立确认公共GitHub完整题文再分发或下游再许可；由管理员决定是否公开发布。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Self-Compassion Scale Short Form official English, 2021 recommended scoring; Raes et al. 2011",
+        "citation": "Raes, F., Pommier, E., Neff, K. D., & Van Gucht, D. (2011). Construction and factorial validation of a short form of the Self-Compassion Scale. Clinical Psychology & Psychotherapy, 18, 250–255. https://doi.org/10.1002/cpp.702.",
+        "url": "https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf",
+        "publicationYear": 2011
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "Kristin Neff官网正式SCS-SF信息PDF明确授予使用该短式（any purpose whatsoever）及翻译权限，并要求引用Raes等2011。官网文件：https://self-compassion.org/wp-content/uploads/2021/03/SCS-SF-information.pdf，论文：https://self-compassion.org/wp-content/uploads/publications/scsshort.pdf。量表特定的广泛使用/翻译许可不是完整题本和独立简体中文工作译稿公开GitHub再分发、下游再许可、第三方商业复制或销售的明确证明；官网一般Terms的复制/分发限制仍需区分范围。当前将公开全文再分发等事项记录author_contact_required和redistribution_review_pending由管理员处理，不把官方许可误记成仅非商业，也不声称额外再分发已许可。该中文题本/报告系EDUK12.TOP依据英文原版独立制作，未继承他人译本信效度，未经专业译审或中国人群验证。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "scssf_frequency_1_5",
+          "options": [
+            {
+              "value": "1",
+              "label": "几乎从不",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "2",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "3",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "4",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "几乎总是",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "SCS_SF12_01",
+          "content": "当我在一件对自己很重要的事情上失败时，我会被“自己不够好”的感觉深深困住。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_02",
+          "content": "对于自己性格中不喜欢的部分，我会尽量抱着理解和耐心对待。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_03",
+          "content": "发生让自己痛苦的事时，我会努力用比较平衡的角度来看待。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_04",
+          "content": "心情低落时，我常觉得其他人大概都比我过得快乐。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_05",
+          "content": "我会试着把自己的不足看作每个人都可能有的经历。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_06",
+          "content": "经历很困难的时刻时，我会给自己需要的关心与温柔对待。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_07",
+          "content": "遇到令人难受的事时，我会努力让自己的情绪保持平衡。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_08",
+          "content": "在一件对自己重要的事情上失败时，我常觉得只有自己经历了这样的失败。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_09",
+          "content": "心情低落时，我容易不断纠结眼前所有不顺利的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_10",
+          "content": "觉得自己在某方面不够好时，我会提醒自己：很多人也有类似的不足感。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_11",
+          "content": "面对自己的缺点或不足，我经常会批评和否定自己。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "SCS_SF12_12",
+          "content": "对于自己性格中不喜欢的部分，我常常缺乏耐心，难以接纳。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "scssf_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "transform": {
+              "type": "reverse"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "自我关怀整体均分",
+            "description": "先将负向1、4、8、9、11、12按6−原分反向，再对完整12题求均分；等于官网六个二题分组均分再平均。范围1–5，更高表示自报在困难时更多以理解关怀方式对待自己。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "SCS_SF12_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "SCS_SF12_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "困难时，你怎样对待自己",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "人在做错事、遇到困难或觉得自己不够好的时候，对待自己的方式可能和平时很不一样。有时我们会给自己耐心和理解，有时却容易责备自己，觉得只有自己过得不好。这份问卷只是帮你看见过去常有的反应，而不是判断你是否足够善良、坚强或值得被爱。总分也不能告诉别人你应该承受什么。可以回想最近一次感到挫败的经历：你当时对自己说了什么？如果一位你在乎的人遇到同样的事情，你会怎样安慰他？你也可以尝试把那份理解带给自己，或者向信任的人说明你需要哪些支持。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "当你觉得自己做得不够好时，你通常会怎样对待自己？"
+              },
+              {
+                "category": "strategy",
+                "text": "试着用你愿意对待一位朋友的语气，重新对自己说一句理解的话。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "仅报告完整12题的整体自我关怀均分1–5；短版六组各仅两题，官方提示其分量表可靠性有限，本版不输出六个独立能力分数或雷达图。",
+          "此分数是自我报告，不能据此诊断任何心理障碍、衡量道德价值或确定个人能力。",
+          "官方2021指导采用六组均分再平均，完整作答等价于12题均分；原2011论文使用总和，两个口径不可混为相同数值。",
+          "本独立简体中文工作译稿尚未经翻译专家审核、认知访谈或中国目标样本信效度验证，不继承其他中文译本或者原英语样本证据。",
+          "平台对12题要求完整作答才能报告，不补零、不插补；此策略不是作者经验证的缺答填补规则。",
+          "Neff官网明确允许使用和翻译，但公开GitHub完整复制及下游再分发范围需管理员决定；该工作稿未激活且没有声明公共版权许可。"
+        ],
+        "disclaimer": "SCS-SF原工具由Raes、Pommier、Neff、Van Gucht（2011）开发；本独立中文版本处于未验证的DRAFT研究工作稿，不提供中国常模、临床等级或诊断结论。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "scs_sf12",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum_compassion",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 1
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum_compassion",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 5
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_never",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_always",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "5"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_middle",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed_3_25",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 3.25
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "one_reverse_missing",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_02",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "one_positive_missing",
+        "answers": [
+          {
+            "itemCode": "SCS_SF12_01",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_04",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_05",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_06",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_08",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_09",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_10",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "SCS_SF12_12",
+            "responseValue": "3"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
