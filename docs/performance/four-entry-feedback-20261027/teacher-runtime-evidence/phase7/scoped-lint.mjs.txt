@@ -1,0 +1,12 @@
+import {ESLint} from '/workspace/eduK12-new-version/server-version/frontend/node_modules/eslint/lib/api.js'
+import config from '/workspace/eduK12-new-version/server-version/frontend/eslint.config.js'
+import globals from '/workspace/eduK12-new-version/server-version/frontend/node_modules/globals/index.js'
+import fs from 'node:fs'
+const cwd='/workspace/eduK12-new-version/server-version/backend'
+const files=['src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts','src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts']
+const lint=new ESLint({cwd,overrideConfigFile:true,overrideConfig:[...config,{files:['**/*.ts'],languageOptions:{globals:globals.node}}]})
+const results=await lint.lintFiles(files),formatter=await lint.loadFormatter('stylish'),output=formatter.format(results)
+fs.writeFileSync('/workspace/eduK12-new-version/docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase7/scoped-lint.log',output)
+const code=results.some(r=>r.errorCount||r.warningCount)?1:0
+fs.writeFileSync('/workspace/eduK12-new-version/docs/performance/four-entry-feedback-20261027/teacher-runtime-evidence/phase7/scoped-lint.exit',code+'\n')
+process.stdout.write(output);process.exitCode=code

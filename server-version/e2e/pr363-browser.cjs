@@ -83,6 +83,46 @@ async function native(page){
  }
  await page.getByRole('button',{name:'提交测评',exact:true}).click()
 }
+function assertManagementReads(reads){
+ assert.ok(Array.isArray(reads));assert.deepEqual(reads.map(row=>row.product).sort(),['SCHOOL','TEACHER'])
+ assert.ok(reads.every(row=>row.summaryRead===true&&row.cprVerified===true&&row.technicalJsonCollapsed===true&&row.disclosure==='INDIVIDUAL_SUMMARY'&&row.openingMode==='IMMEDIATE'))
+}
+async function readManagementSummary(manager,c){
+ const {page,url,prefix}=manager
+ await page.goto(url+'/workspace')
+ await page.getByRole(c.product==='SCHOOL'?'link':'button',{name:'我的工具',exact:true}).click()
+ const panel=page.getByLabel('共享测评资源登记',{exact:true})
+ await panel.getByRole('button',{name:'读取登记权限与资源',exact:true}).click()
+ const resourceId=c.resourceKey.split(':').at(-1)
+ const endpoint=prefix+'/organizations/'+c.organizationId+'/assessment-resource-registrations/'+resourceId
+ const pending=page.waitForResponse(response=>new URL(response.url()).pathname===endpoint&&response.request().method()==='GET')
+ await panel.getByRole('button',{name:c.title+' · PUBLISHED',exact:true}).click()
+ const response=await pending;assert.equal(response.status(),200)
+ const body=await response.json();assert.equal(body.code,0);const dto=body.data,entry=dto.entry,origin=entry.educationOrigin
+ assert.equal(dto.resourceId,resourceId);assert.equal(dto.status,'PUBLISHED');assert.equal(entry.title,c.title)
+ assert.equal(origin.product,c.product);assert.equal(origin.organizationId,c.organizationId);assert.equal(origin.runtimeCompositeId,c.runtimeId)
+ assert.deepEqual(origin.feedbackPolicy,c.feedbackPolicy);assert.equal(origin.feedbackPolicy.mode,'IMMEDIATE')
+ assert.equal(entry.resultDisclosure.audiences.RESPONDENT.mode,'INDIVIDUAL_SUMMARY')
+ assert.deepEqual(origin.units.map(unit=>unit.family).sort(),['COGNITIVE','SJT'])
+ const summary=panel.getByLabel('冻结版本摘要',{exact:true});await summary.getByRole('heading',{name:c.title,exact:true}).waitFor()
+ const value=(root,label)=>root.locator('dt').filter({hasText:new RegExp('^'+label+'$')}).locator('xpath=following-sibling::dd[1]')
+ assert.equal((await value(summary,'本人披露').innerText()).trim(),'已批准报告的本人摘要')
+ assert.equal((await value(summary,'反馈开放方式').innerText()).trim(),'完成后按权限开放')
+ const rows=summary.locator('ol > li');assert.equal(await rows.count(),2)
+ for(const [index,unit] of origin.units.entries()){
+  const row=rows.nth(index),content=await value(row,'固定内容 C').innerText(),references=await value(row,'选择的参考 P').innerText(),report=await value(row,'选择的报告 R').innerText()
+  assert.ok(content.includes(unit.measurement.releaseId)&&content.includes(unit.measurement.contentHash))
+  assert.ok(Array.isArray(unit.references))
+  if(unit.references.length)for(const ref of unit.references)assert.ok(references.includes(ref.releaseId)&&references.includes(ref.contentHash))
+  else assert.equal(references.trim(),'明确未选参考')
+  assert.ok(unit.report?.releaseId&&unit.report?.contentHash)
+  assert.ok(report.includes(unit.report.releaseId)&&report.includes(unit.report.contentHash))
+ }
+ const technical=panel.locator('details').filter({has:page.getByText('查看冻结技术详情',{exact:true})})
+ assert.equal(await technical.count(),1);assert.equal(await technical.evaluate(node=>node.open),false)
+ assert.equal(await technical.locator('pre').isVisible(),false)
+ return {product:c.product,summaryRead:true,cprVerified:true,disclosure:'INDIVIDUAL_SUMMARY',openingMode:origin.feedbackPolicy.mode,technicalJsonCollapsed:true}
+}
 async function run(){
  const {root,value:fixture}=base.readFixture(),data=JSON.parse(fs.readFileSync(path.join(root,'pr363.json')))
  assert.deepEqual(data.identity,fixture.identity);fixtureTools.assertCases(data.cases)
@@ -90,7 +130,7 @@ async function run(){
  for(const product of ['SCHOOL','TEACHER']){const addresses=await dns.lookup(new URL(fixtureTools.origin(product)).hostname,{all:true});assert.ok(addresses.length&&addresses.every(x=>['127.0.0.1','::1'].includes(x.address)),'Never connect to public/production product hosts')}
  const out=path.resolve(process.env.PR363_EVIDENCE_DIR||path.join(base.repo,'pr363-evidence'))
  assert.ok(!out.startsWith(root+path.sep)&&!root.startsWith(out+path.sep)&&out!==root);fs.mkdirSync(out,{recursive:true})
- const report={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,status:'RUNNING',source:fixture.identity,cases:[],inputs:{backend:backendArtifact,frontend:frontendArtifact}}
+ const report={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,status:'RUNNING',source:fixture.identity,cases:[],managementReads:[],inputs:{backend:backendArtifact,frontend:frontendArtifact}}
  let browser
  try{
   report.stage='chrome-preflight';const preflight=preflightChrome();report.chromePreflight=preflight;assert.equal(preflight.ok,true)
@@ -99,7 +139,12 @@ async function run(){
   const observed=[]
   for(const product of ['SCHOOL','TEACHER']){
    // Real password + TOTP enrollment/confirmation. No generated session cookies.
-   report.stage=product+'-manager-mfa';const manager=await login(browser,product,fixture.products[product].author,true);await manager.verifyAssets();await manager.context.close()
+   report.stage=product+'-manager-mfa';const manager=await login(browser,product,fixture.products[product].author,true)
+   try{
+    report.stage=product+'-management-read'
+    const c=data.cases.find(row=>row.product===product&&row.mode==='IMMEDIATE');assert.ok(c)
+    report.managementReads.push(await readManagementSummary(manager,c));await manager.verifyAssets()
+   }finally{await manager.context.close()}
    for(const c of data.cases.filter(c=>c.product===product)){
     report.stage=product+'-'+c.mode+'-participant-login';const {page,context,prefix,verifyAssets}=await login(browser,product,fixture.products[product].participant,false),pageErrors=[]
     const mutations=[]
@@ -130,9 +175,9 @@ async function run(){
   }
   fixtureTools.privateFile(root,'pr363-observed.json',observed)
   const checked=spawnSync(process.execPath,[path.join(__dirname,'pr363-fixture.cjs'),'verify'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024});assert.equal(checked.status,0,'Persisted FINAL exact metric-key/value verification required')
-  report.status='PASS';report.stage='complete'
+  assertManagementReads(report.managementReads);report.status='PASS';report.stage='complete'
  }catch(error){report.status='FAILED';report.errorDigest=base.sha(String(error));throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }
-module.exports={api,login,openCase,reaction,native,artifactResponseFile,run}
+module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,readManagementSummary,run}
 if(require.main===module)run().catch(error=>{console.error('PR363_BROWSER_FAILED '+base.sha(String(error)));process.exitCode=1})

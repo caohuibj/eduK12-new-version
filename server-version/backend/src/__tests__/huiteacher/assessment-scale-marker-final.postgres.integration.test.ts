@@ -16,9 +16,6 @@ import {huiteacherOriginGuard} from '../../modules/huiteacher/originGuard'
 import {generateToken} from '../../utils/jwt'
 import {UserRole} from '../../types'
 import {prisma} from '../../config/database'
-import {createTrialEnvelope} from '../../modules/cognitive/v2/trial-envelope'
-import {loadStoredCanonicalUnitResults} from '../../modules/assessment-runtime/compact-assessment-storage'
-import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {verifyRuntimePrivileges} from '../../../scripts/runtime-role-contract.mjs'
 
 import campusCompositeRouter from '../../modules/campus/composite.routes'
@@ -46,29 +43,6 @@ function requireSuccess<T=any>(response:{status:number;body:any}):T{
  expect(response.body.code,JSON.stringify(response.body)).toBe(0)
  return response.body.data as T
 }
-async function submitCognitive(parentPath:string,item:any,cookie:string){
- const path=parentPath+'/items/'+item.id+'/cognitive/'+item.cognitiveSession.sessionId
- const child=requireSuccess<any>(await request(path,cookie))
- const trials=Array.from({length:child.config.totalTrials},(_,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*3000,
-  endedAtPerfMs:trialIndex*3000+400,payload:{foreperiodMs:700+trialIndex*100,rtMs:400,prematureCount:0,interrupted:false,inputMode:'pointer'}}))
- const payload={submissionId:randomUUID(),attemptEpoch:child.attemptEpoch??1,definitionHash:child.definitionHash,contextSnapshotHash:child.contextSnapshotHash??null,trials}
- const result=requireSuccess<any>(await request(path+'/submit',cookie,'POST',payload))
- expect(result).toBeTruthy()
- return {path,payload,sessionId:child.sessionId}
-}
-async function submitSjt(parentPath:string,item:any,cookie:string){
- const path=parentPath+'/items/'+item.id+'/situational/'+item.situationalAttemptId
- const child=requireSuccess<any>(await request(path,cookie))
- expect(child.result).toBeUndefined();expect(child.canonicalResult).toBeUndefined()
- const payload={submissionId:randomUUID(),attemptEpoch:child.attempt.attemptEpoch,definitionHash:child.attempt.definitionHash,
-  compiledRuntimeHash:child.attempt.compiledRuntimeHash,instrumentVersion:child.attempt.instrumentVersion,scoringVersion:child.attempt.scoringVersion,
-  responses:[{sceneKey:'AS-01',channelKey:'behavior',responseValue:'A'},{sceneKey:'AS-02',channelKey:'behavior',responseValue:'B'}]}
- requireSuccess(await request(path+'/submit',cookie,'POST',payload))
- return {path,payload,childId:child.attemptId}
-}
-
-
-
 suite('Actual education Scale marker START and FINAL',()=>{
  beforeAll(async()=>{
   process.env.CAMPUS_ELIGIBILITY_HMAC_KEY??='ef'.repeat(32)

@@ -25,10 +25,10 @@ and displays authorized READY or frozen-future WITHHELD feedback. Post-browser
 verification reads encrypted canonical FINAL and compares exact metricKey/value.
 No report scorer is invoked by verification.
 
-This is participant runtime/report acceptance, not a claim that the registration
-management panel has been browser-tested. Exact source licenses are selected by
-actual service-returned identities inside the synthetic producer fixture; no user
-is asked to enter bare UUIDs. Management panel/DTO checking stays its own consumer.
+The prepared browser scope includes participant runtime/report acceptance plus
+one read-only shared registration panel summary per product. Source selection,
+prepare/register/review authoring are not a browser claim: those actual services
+run in synthetic fixture setup. No user is asked to enter bare UUIDs.
 The two special Scale marker PG journeys requested by root remain separate work;
 this representative browser does not substitute for those.
 
@@ -109,9 +109,40 @@ statuses remain NOTRUN until the designated formal CI consumer executes.
 Final output contract: browser.json schemaVersion=1, runId, source={head,tree},
 inputs={backend,frontend} original build manifests, chromePreflight/chromeSandbox,
 status RUNNING/PASS/FAILED, stage and sanitized errorDigest, cases containing only
-product/mode/complete/resumedSameParent/reportState. PASS requires exactly School
+product/mode/complete/resumedSameParent/reportState, and independent managementReads
+rows for SCHOOL and TEACHER. PASS requires exactly School
 IMMEDIATE, Teacher IMMEDIATE, Teacher SCHEDULED; empty/duplicate/incomplete scope
 fails. Network mutation checks require each real Cognitive/native/Form FINAL200
 under its product prefix. No Training/global transport fallback is accepted.
 Read the same official component receipts/digests; do not promote NOTRUN metadata
 or the four direct control assertions into browser acceptance.
+
+
+## Increment: two actual shared management summary reads (NOTRUN locally)
+
+Reuse each existing privileged manager password/MFA context before closing it.
+Navigate the real workspace to “我的工具” (School link / Teacher tab button), open
+“共享测评资源登记”, click “读取登记权限与资源”, then select the seeded immediate
+case by its exact title/status button. No raw resource UUID is entered. Observe
+the actual GET /organizations/:org/assessment-resource-registrations/:resourceId
+response, require200/code0/PUBLISHED and exact product/org/runtime/title identity,
+then compare its frozen C/P/R pointers with the actual visible “冻结版本摘要”.
+Explicit empty P is checked, both selected R pointers are checked,本人披露 must be
+“已批准报告的本人摘要” and开放方式 “完成后按权限开放”. The technical JSON details
+must have open=false and its pre must be invisible without expanding it.
+
+browser.json adds managementReads: an array of exactly two rows with product
+SCHOOL/TEACHER, summaryRead=true, cprVerified=true, technicalJsonCollapsed=true,
+disclosure=INDIVIDUAL_SUMMARY, openingMode=IMMEDIATE. PASS requires both rows and
+all earlier participant/sandbox/artifact/fact checks. A missing/duplicate product
+or unchecked summary cannot PASS. Failure stage is PRODUCT-management-read.
+No new env, fixture transfer or CLI is needed. This verifies the new management
+mount/read DTO only; it is not browser coverage of source selection, preparation,
+registration, independent review or publication authoring. Those prior unit/
+producer PG observations retain their original qualification.
+
+Only new management control assertion and browser syntax were run locally.
+Two Scale test files also received imports-only/unused-helper cleanup; scoped
+ESLint used the existing recommended TS rules plus Node globals and returned0,
+zero warnings. Suite/fixture operation+assertion body hashes are unchanged in
+phase7/increment.json; PG was not repeated. Browser remains NOTRUN until formal CI.

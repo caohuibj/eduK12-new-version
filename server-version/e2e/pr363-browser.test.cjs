@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict')
 const {origin,exactMetric,assertCases}=require('./pr363-fixture.cjs')
 const fs=require('node:fs'),os=require('node:os'),path=require('node:path')
-const {artifactResponseFile}=require('./pr363-browser.cjs')
+const {artifactResponseFile,assertManagementReads}=require('./pr363-browser.cjs')
 test('entry origins cannot become HTTP, another host or credential URL',()=>{
  assert.equal(origin('SCHOOL',{}),'https://school.eduk12.top')
  for(const value of ['http://school.eduk12.top','https://school.eduk12.top:9443','https://training.eduk12.top','https://user:secret@school.eduk12.top','https://school.eduk12.top/path','https://school.eduk12.top?x=1'])assert.throws(()=>origin('SCHOOL',{PR363_SCHOOL_ORIGIN:value}))
@@ -28,4 +28,13 @@ test('fixture scope cannot pass empty, duplicate or product-incomplete browser c
  assert.throws(()=>assertCases([]))
  assert.throws(()=>assertCases([cases[0],cases[0],cases[2]]))
  assert.throws(()=>assertCases(cases.map(c=>({...c,executionId:'same'}))))
+})
+
+test('management acceptance requires successful summary reads from both real product contexts',()=>{
+ const valid=['SCHOOL','TEACHER'].map(product=>({product,summaryRead:true,cprVerified:true,technicalJsonCollapsed:true,disclosure:'INDIVIDUAL_SUMMARY',openingMode:'IMMEDIATE'}))
+ assertManagementReads(valid)
+ assert.throws(()=>assertManagementReads([]))
+ assert.throws(()=>assertManagementReads([valid[0],valid[0]]))
+ assert.throws(()=>assertManagementReads([valid[0],{...valid[1],technicalJsonCollapsed:false}]))
+ assert.throws(()=>assertManagementReads([valid[0],{...valid[1],cprVerified:false}]))
 })
