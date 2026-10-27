@@ -1,0 +1,31 @@
+import {performance} from 'node:perf_hooks'
+import {writeFileSync} from 'node:fs'
+const root=process.env.PROBE_BACKEND_ROOT!,imp=(p:string)=>import(root+'/'+p)
+async function main(){
+ const target=new URL(process.env.DATABASE_URL!);if(target.hostname!=='127.0.0.1'||target.port!=='55433'||target.pathname!=='/survey_governance_probe_test'||process.env.NODE_ENV!=='test')throw Error('Exact synthetic environment required')
+ const {prisma:db}=await imp('src/config/database.ts'),{default:express}=await imp('node_modules/express/index.js')
+ const {cacheService}=await imp('src/services/cacheService.ts');await cacheService.initialize();if(!cacheService.getStatus().connected)throw Error('Dedicated Redis required')
+ const {setupPrivateScaleExecutionFixture:setup}=await imp('src/__tests__/integration/educationPrivateScaleExecutionFixture.ts')
+ const {completeEducationLibraryScaleExecution:complete}=await imp('src/__tests__/integration/educationLibraryReportFixture.ts')
+ const {educationSchoolScaleReportRouter:school,educationTeacherScaleReportRouter:teacher}=await imp('src/modules/reporting/education-scale-report.routes.ts')
+ const {generateToken}=await imp('src/utils/jwt.ts')
+ const events:any[]=[];db.$on('query',(e:any)=>events.push({query:e.query,duration:e.duration}))
+ const app=express();app.use('/api/campus',school);app.use('/api/huiteacher',teacher);app.use((e:any,_q:any,r:any,_n:any)=>r.status(e.statusCode||500).json({code:e.code||'ERROR'}))
+ const server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const rows:any[]=[]
+ try{
+  for(const product of ['SCHOOL','TEACHER']){
+   const f=await setup(db,product);const before=events.length,cpu=process.cpuUsage(),t=performance.now()
+   await complete({db,actorUserId:f.participantUserId,executionId:f.executionId,answers:f.answers})
+   const d=process.cpuUsage(cpu);rows.push({product,phase:'service-start-final-parent-completion',elapsedMs:performance.now()-t,cpuMs:(d.user+d.system)/1000,sqlEvents:events.length-before})
+   const u=await db.user.findUniqueOrThrow({where:{id:f.participantUserId}});const token=generateToken({userId:u.id,role:u.role,accountDomain:u.accountDomain,tokenVersion:u.tokenVersion,...(product==='TEACHER'?{sessionProduct:'HUITEACHER'}:{})})
+   const prefix=product==='SCHOOL'?'/api/campus':'/api/huiteacher',cookie=product==='SCHOOL'?'huischool_session':'huiteacher_session'
+   for(const phase of ['first-report-read','repeat-report-read']){
+    const sessionBefore=await db.$queryRawUnsafe("SELECT pg_backend_pid() AS pid,current_setting('join_collapse_limit') AS setting");const n=events.length,c=process.cpuUsage(),t0=performance.now();const r=await fetch('http://127.0.0.1:'+server.address().port+prefix+'/library-scale/executions/'+f.executionId+'/report',{headers:{Cookie:cookie+'='+token}});const text=await r.text(),v=JSON.parse(text),d=process.cpuUsage(c)
+    if(r.status!==200||v.code!==0||v.data?.state!=='READY')throw Error(product+' '+phase+' failed '+r.status+' '+(v.code??'')+' '+(v.data?.state??''))
+    const elapsed=performance.now()-t0;const selected=events.slice(n);const sessionAfter=await db.$queryRawUnsafe("SELECT pg_backend_pid() AS pid,current_setting('join_collapse_limit') AS setting");if(sessionBefore[0].pid!==sessionAfter[0].pid||sessionBefore[0].setting!==sessionAfter[0].setting||sessionAfter[0].setting!=='8')throw Error('Same-session setting restoration unproven');rows.push({product,phase,elapsedMs:elapsed,cpuMs:(d.user+d.system)/1000,sqlEvents:selected.length,queryEventDurationMs:selected.reduce((s,e)=>s+e.duration,0),restoredPlannerSetting:sessionAfter[0].setting,sameBackendSession:true,responseBytes:Buffer.byteLength(text),rssBytes:process.memoryUsage().rss,verified:true})
+   }
+  }
+  writeFileSync(process.env.EDUCATION_PROBE_OUTPUT!,JSON.stringify({scope:'real service completion plus actual authenticated report HTTP; no browser, not full application middleware or capacity',flags:{compactFacts:process.env.ASSESSMENT_COMPACT_FACTS_ENABLED==='true',sharedControl:process.env.ASSESSMENT_SHARED_CONTROL_ENABLED==='true'},rows},null,2));console.log('education report probe completed')
+ }finally{await new Promise<void>(r=>server.close(()=>r()));await(await imp('src/config/queue.ts')).closeQueues(true);await cacheService.close();await db.$disconnect()}
+}
+main().catch(e=>{console.error(JSON.stringify({name:e?.name,code:e?.code,message:String(e?.message),stack:String(e?.stack).split('\n').slice(1,5)}));process.exit(1)})

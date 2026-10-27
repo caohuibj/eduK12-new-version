@@ -1,0 +1,61 @@
+{
+  "numTotalTests": 9,
+  "numPassedTests": 9,
+  "numFailedTests": 0,
+  "suites": [
+    {
+      "file": "server-version/backend/src/__tests__/integration/educationLibraryObserver.postgres.integration.test.ts",
+      "status": "passed",
+      "assertions": [
+        {
+          "name": "School approved library observer real completion and report privacy completes PARENT_REPORT with real relationship/consent and no individual report disclosure",
+          "status": "passed"
+        },
+        {
+          "name": "School approved library observer real completion and report privacy completes TEACHER_REPORT with real relationship/consent and no individual report disclosure",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/educationLibraryPersonalReport.postgres.integration.test.ts",
+      "status": "passed",
+      "assertions": [
+        {
+          "name": "Education library real START\u2192FINAL\u2192personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
+          "status": "passed"
+        },
+        {
+          "name": "Education library real START\u2192FINAL\u2192personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
+          "status": "passed"
+        },
+        {
+          "name": "Education library real START\u2192FINAL\u2192personal report and image authorization does not invent personal text or image rights for a version with no content audience",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "status": "passed",
+      "assertions": [
+        {
+          "name": "Private fixed-version education actual FINAL and report privacy SCHOOL preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+          "status": "passed"
+        },
+        {
+          "name": "Private fixed-version education actual FINAL and report privacy TEACHER preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+          "status": "passed"
+        },
+        {
+          "name": "Private fixed-version education actual FINAL and report privacy keeps private PARENT_REPORT actual completion NONE for observer, subject and publisher",
+          "status": "passed"
+        },
+        {
+          "name": "Private fixed-version education actual FINAL and report privacy keeps private TEACHER_REPORT actual completion NONE for observer, subject and publisher",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

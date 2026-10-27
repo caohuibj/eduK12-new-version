@@ -1,0 +1,75 @@
+{
+  "scope": "real service completion plus actual authenticated report HTTP; no browser, not full application middleware or capacity",
+  "flags": {
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 393.8769309999998,
+      "cpuMs": 287.807,
+      "sqlEvents": 195
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "first-report-read",
+      "elapsedMs": 90.01388700000007,
+      "cpuMs": 69.254,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 23,
+      "restoredPlannerSetting": "8",
+      "sameBackendSession": true,
+      "responseBytes": 1655,
+      "rssBytes": 344465408,
+      "verified": true
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "repeat-report-read",
+      "elapsedMs": 55.04892199999995,
+      "cpuMs": 33.584,
+      "sqlEvents": 21,
+      "queryEventDurationMs": 19,
+      "restoredPlannerSetting": "8",
+      "sameBackendSession": true,
+      "responseBytes": 1655,
+      "rssBytes": 344596480,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 284.634955,
+      "cpuMs": 168.404,
+      "sqlEvents": 195
+    },
+    {
+      "product": "TEACHER",
+      "phase": "first-report-read",
+      "elapsedMs": 48.995714999999564,
+      "cpuMs": 29.204,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 19,
+      "restoredPlannerSetting": "8",
+      "sameBackendSession": true,
+      "responseBytes": 1655,
+      "rssBytes": 346959872,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "repeat-report-read",
+      "elapsedMs": 47.64457299999958,
+      "cpuMs": 27.025,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 18,
+      "restoredPlannerSetting": "8",
+      "sameBackendSession": true,
+      "responseBytes": 1655,
+      "rssBytes": 346959872,
+      "verified": true
+    }
+  ]
+}

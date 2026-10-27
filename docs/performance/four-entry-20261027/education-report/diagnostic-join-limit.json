@@ -1,0 +1,81 @@
+{
+  "scope": "real service completion plus actual authenticated report HTTP; no browser, not full application middleware or capacity",
+  "flags": {
+    "compactFacts": false,
+    "sharedControl": false
+  },
+  "rows": [
+    {
+      "product": "SCHOOL",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 444.5299850000001,
+      "cpuMs": 263.028,
+      "sqlEvents": 195
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "first-report-read",
+      "elapsedMs": 77.21213199999966,
+      "cpuMs": 58.793,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 19,
+      "planSummary": {
+        "planningTimeMs": 6.205,
+        "executionTimeMs": 0.792,
+        "actualRows": 1,
+        "sharedHitBlocks": 70,
+        "sharedReadBlocks": 0
+      },
+      "responseBytes": 1656,
+      "rssBytes": 325279744,
+      "verified": true
+    },
+    {
+      "product": "SCHOOL",
+      "phase": "repeat-report-read",
+      "elapsedMs": 44.469236000000365,
+      "cpuMs": 27.334,
+      "sqlEvents": 20,
+      "queryEventDurationMs": 15,
+      "responseBytes": 1656,
+      "rssBytes": 325935104,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "service-start-final-parent-completion",
+      "elapsedMs": 210.24872500000038,
+      "cpuMs": 139.815,
+      "sqlEvents": 195
+    },
+    {
+      "product": "TEACHER",
+      "phase": "first-report-read",
+      "elapsedMs": 45.90126499999997,
+      "cpuMs": 26.755,
+      "sqlEvents": 19,
+      "queryEventDurationMs": 16,
+      "planSummary": {
+        "planningTimeMs": 5.271,
+        "executionTimeMs": 0.971,
+        "actualRows": 1,
+        "sharedHitBlocks": 226,
+        "sharedReadBlocks": 0
+      },
+      "responseBytes": 1655,
+      "rssBytes": 328200192,
+      "verified": true
+    },
+    {
+      "product": "TEACHER",
+      "phase": "repeat-report-read",
+      "elapsedMs": 45.62162800000033,
+      "cpuMs": 27.43,
+      "sqlEvents": 19,
+      "queryEventDurationMs": 19,
+      "responseBytes": 1655,
+      "rssBytes": 328200192,
+      "verified": true
+    }
+  ]
+}

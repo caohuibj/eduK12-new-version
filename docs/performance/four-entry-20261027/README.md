@@ -59,3 +59,19 @@ main认知FINAL仍有cognitiveRawSubmission写入，未合并PR360的native/COS�
 5. 完成正确性与代表基线后才进行有界并发，固定SLO、资源/开关与停止阈值，不关闭安全限流。
 
 本轮尚无Training/School/Teacher同口径新测量、用户可见反馈端到端计时、四入口容量或生产成本结论。未运行新CI、未部署。
+
+## 首个共享热点候选：School／Teacher 本人报告的 SQL 规划
+
+定位过程与失败保留：真实报告HTTP基线School首读323.79ms/再读240.63ms，Teacher264.15/225.58ms。一次额外查询诊断发现同一权限SQL每请求执行两次，各约100ms；EXPLAIN ANALYZE显示planning98.94/96.82ms，execution仅1.50/1.13ms。不能因此删除前后两次权限检查。
+
+先尝试把相关EXISTS包为标量子查询，planning仍103.51/92.88ms，没有可靠改善，已经撤回，未提交该实验。隔离PG进程的join规划限额诊断进一步证明联接枚举为热点；不将该全进程诊断参数用于生产或最终候选。
+
+最终小候选只在`readEducationRespondentScaleReport`的现有事务内使用固定`SET LOCAL join_collapse_limit = 1`，依已有单execution ID锚点的显式联接顺序限制规划搜索。没有改变SQL授权谓词、两次readOwn、报告投影或版本规则，没有权限/结果跨请求缓存。只影响这一事务，提交/回滚后由PG恢复池连接设置。没有更改全局/数据库/角色配置。
+
+默认PG配置下候选HTTP观察：School首读90.01ms/再读55.05ms；Teacher49.00/47.64ms。每次多1条事务内设置语句，SQL总数21/20；四次读取均验证报告READY，并在前后确认同一backend session、join_collapse_limit恢复为8。响应均1655bytes。不由少量样本推算生产改善百分比或吞吐倍数；高基数/并发与其他版本仍须评估。
+
+检查：5项服务编排单元断言保留两次当前权限读取及先执行SET LOCAL；3文件9项真实PG覆盖School/Teacher公共库与私有版本、图片与独立权限、作者变更/撤回、家长及教师他评不得获得个人报告。5根/1567源码的定向类型闭包0诊断。初轮类型诊断13项来自漏带Express全局声明，另1项为已有测试fromEntries直接断言；补正确ambient根及纯类型unknown转换后通过，原失败留存。没有全平台重测或新CI。
+
+范围不是“只优化两入口就关闭四入口任务”：该具体权限SQL目前由School/Teacher共用，二者一起修；Survey/Training不是该SQL消费者，继续分别核实际热点和反馈链，不给其加无用设置、不宣称整体任务完成。
+
+脱敏记录和探针源码快照：`education-report/`。source manifest绑定本次产品文件字节；旧基线与候选、无效实验、环境诊断分开。测量日志与合成DB仅留dot本地，无生产数据。尚未合并/部署此优化。
