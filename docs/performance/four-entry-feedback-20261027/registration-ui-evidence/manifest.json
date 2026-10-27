@@ -1,0 +1,117 @@
+{
+  "kind": "unsigned local UI/API evidence; no PG/browser/CI qualification",
+  "artifacts": {
+    "final-inputs.json": {
+      "sha256": "3d6e9b07054d3fa02c57b6be197dc3f69c29a2e045224ab313c78371bdcbf974",
+      "originalSha256": "3d6e9b07054d3fa02c57b6be197dc3f69c29a2e045224ab313c78371bdcbf974"
+    },
+    "final-source-observation.json": {
+      "sha256": "8e9bbc5a16d2e04914d964c7713c3a946e3cf389a4414feb7a39997e75b53f72",
+      "originalSha256": "8e9bbc5a16d2e04914d964c7713c3a946e3cf389a4414feb7a39997e75b53f72"
+    },
+    "lint-final.log.gz": {
+      "sha256": "9f386d711a45af2df4ae42449a16fcb129fdba9ef05ee823e41ed2ef70888e44",
+      "originalSha256": "409e98f568db6ac283186e174c95e6b24f01a4f53d12834a15724eb968419edf"
+    },
+    "lint-r1.log.gz": {
+      "sha256": "b886109bbf4652d3983481e9d296871bef1f298527977108d1472272626b168a",
+      "originalSha256": "83a449c4c98ee58dbf10ca426e6b92e21744bed0a3e581b96b3736c05ab6ad38"
+    },
+    "lint-r4.log.gz": {
+      "sha256": "b722d572941d76bd5608733220ec8b54c4707efba59c7048e5cc7eb85bce02b9",
+      "originalSha256": "9417c1ab6f843ced473e2572ccc2c478c500b6491e65151dbd47fcfa59d0fcb8"
+    },
+    "types-final.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "types-r1.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "types-r3.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ui-r1.json": {
+      "sha256": "668a747a92e14c61d93695e7840cdd9bf4ef8297f81087ef3d54e652a8297b86",
+      "originalSha256": "668a747a92e14c61d93695e7840cdd9bf4ef8297f81087ef3d54e652a8297b86"
+    },
+    "ui-r1.log.gz": {
+      "sha256": "1366e4011294c196c353bf0703054e437dc432d23b9b1ece4af830d6c84fe8d8",
+      "originalSha256": "02b925a96a87f0d3740704ba53bb87215e3819676735ddebc5f7aa3059c4b806"
+    },
+    "ui-r2.json": {
+      "sha256": "ec77fbdc73f490328075b2d0d013f0d38f5ab649e4f28c5f94a3fdae90989438",
+      "originalSha256": "ec77fbdc73f490328075b2d0d013f0d38f5ab649e4f28c5f94a3fdae90989438"
+    },
+    "ui-r2.log.gz": {
+      "sha256": "491f1fabecd27715e640efba3c0e75abbf95ad604ab516925603f146ea2dd763",
+      "originalSha256": "be2a88a2222ddd4f9cc28b127c27184a8037ce4f4f3a6db22a9ebc303a462323"
+    },
+    "ui-r3.json": {
+      "sha256": "8f7dfdbd4170221e9a2601c51821a65f482737244c1d3a0ff1b7a258b2b942de",
+      "originalSha256": "8f7dfdbd4170221e9a2601c51821a65f482737244c1d3a0ff1b7a258b2b942de"
+    },
+    "ui-r3.log.gz": {
+      "sha256": "8cfbf0889147deb845e742c1ed5b6f8988008bd5f1f0cb5f5a2a40b42fb00226",
+      "originalSha256": "c959ef044413f615ccf76ba8b1b8d6bff12f1c67900b34e1096b3832e70ba34b"
+    },
+    "ui-r4.json": {
+      "sha256": "17d11c528a63027ca14262d3847a9d935a4d19fe485f2753aeddfe535f5dca6c",
+      "originalSha256": "17d11c528a63027ca14262d3847a9d935a4d19fe485f2753aeddfe535f5dca6c"
+    },
+    "ui-r4.log.gz": {
+      "sha256": "8a4b72e57013e694089a92a44d3ce10aa9d47372894bc7484ca5ddbfa4d724c8",
+      "originalSha256": "c1198649d1a6c248cf7527fa23a15a669a46ca8dc03d55d18100d05dd7fd61e5"
+    },
+    "types-r4.log.gz": {
+      "sha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "originalSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "tests": [
+    {
+      "command": "vitest run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx --maxWorkers=2 --reporter=json",
+      "report": "ui-r1.json",
+      "exitCode": 0,
+      "passed": 6
+    },
+    {
+      "command": "vitest run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'freezes exact|requires an explicit|cancels a pending' --maxWorkers=2 --reporter=json",
+      "report": "ui-r2.json",
+      "exitCode": 0,
+      "passed": 3,
+      "filtered": 4
+    },
+    {
+      "command": "vitest run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'freezes exact' --reporter=json",
+      "report": "ui-r3.json",
+      "exitCode": 0,
+      "passed": 1,
+      "filtered": 6
+    },
+    {
+      "command": "vitest run src/components/education-tools/EducationAssessmentRegistrationPanel.test.tsx -t 'recovers an existing preparation' --reporter=json",
+      "report": "ui-r4.json",
+      "exitCode": 0,
+      "passed": 1,
+      "filtered": 7
+    }
+  ],
+  "commandsCwd": "server-version/frontend; source /workspace/eduk12-cloud/activate.sh; node node_modules/vitest/vitest.mjs",
+  "typesCommand": "node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+  "lintCommand": "node node_modules/eslint/bin/eslint.js; exact files recorded in registration-ui-progress.md",
+  "inputObservation": "Final-source observations are not retroactive signed or contemporaneous manifests for early executions; intermediate types retained but not relabelled final-source results",
+  "finalTypes": {
+    "exitCode": 0,
+    "toolCompletion": "5551b1",
+    "log": "types-r4.log.gz"
+  },
+  "finalLint": {
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 1,
+    "log": "lint-r4.log.gz"
+  }
+}
