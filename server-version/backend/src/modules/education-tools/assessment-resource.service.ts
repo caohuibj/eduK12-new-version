@@ -4,6 +4,7 @@ import {assertStandardCombinationDerivedRelease} from '../measurement-content/st
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
+import {parseTrainingFeedbackPolicy,trainingFeedbackPolicySchema} from '../assessment-policy/training-feedback-policy'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {buildTrainingFlowUnits} from '../composite/training-flow-definition'
@@ -23,7 +24,7 @@ import {educationCompositeInclude,lockEducationAssessmentSourceIdentities,readEd
 type Tx=Prisma.TransactionClient
 const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const prepareEducationAssessmentSchema=z.object({resourceId:uuid,sourceCompositeId:uuid,title:z.string().trim().min(1).max(200),family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),licenses:educationDistributionSelectionSchema}).strict()
-export const registerEducationAssessmentSchema=z.object({expectedPreparationHash:hash,disclosure:z.unknown(),references:trainingReferenceSelectionSchema,
+export const registerEducationAssessmentSchema=z.object({expectedPreparationHash:hash,disclosure:z.unknown(),feedbackPolicy:trainingFeedbackPolicySchema.transform(parseTrainingFeedbackPolicy),references:trainingReferenceSelectionSchema,
  reports:z.array(z.object({itemId:uuid,releaseId:uuid}).strict()).max(1000),licenses:educationDistributionSelectionSchema}).strict()
 export const transitionEducationAssessmentSchema=z.object({expectedEntryHash:hash,reason:z.string().trim().min(1).max(500)}).strict()
 const preparationSchema=z.object({schemaVersion:z.literal(1),resourceId:uuid,product:z.enum(['SCHOOL','TEACHER']),organizationId:uuid,
@@ -125,7 +126,7 @@ export async function readEducationAssessmentPreparation(c:EducationAssessmentCo
   return {...projection(p),units:p.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement})),canPublish:false}
  })
 }
-async function selectedContent(tx:Tx,c:EducationAssessmentContext,p:Preparation,snapshot:TrainingContentSnapshot,input:z.infer<typeof registerEducationAssessmentSchema>){
+async function selectedContent(tx:Tx,c:EducationAssessmentContext,p:Preparation,snapshot:TrainingContentSnapshot,input:Pick<z.infer<typeof registerEducationAssessmentSchema>,'references'|'reports'>){
  if(new Set(input.reports.map(item=>item.itemId)).size!==input.reports.length)fail('EDUCATION_ASSESSMENT_REPORT_DUPLICATE')
  const ids=[...new Set(snapshot.units.flatMap(unit=>[unit.measurement.releaseId,
   ...(input.references.units.find(selected=>selected.itemId===unit.itemId)?.choices.map(choice=>choice.releaseId)??[]),
@@ -201,7 +202,7 @@ export async function registerEducationAssessment(c:EducationAssessmentContext,i
   for(const original of p.distribution.grants)if(!distribution.grants.some(grant=>grant.resourceId===original.resourceId&&grant.grantId===original.grantId&&grant.version===original.version))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_CHANGED',403)
   const origin=educationAssessmentOriginSchema.parse({schemaVersion:1,adapterVersion:'1.0.0',resourceId:id,product:c.product,organizationId:c.organizationId,family:p.family,
    sourceCompositeId:source.id,runtimeCompositeId:runtime.id,sourceSnapshotHash:p.sourceSnapshotHash,runtimeSnapshotHash:canonicalHash(selected.snapshot),runtimeDefinitionHash:p.runtimeDefinitionHash,
-   distribution,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
+   distribution,feedbackPolicy:input.feedbackPolicy,units:selected.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,
     references:[...new Map((unit.referencePolicy?.choices??[]).map(choice=>[choice.releaseId,{releaseId:choice.releaseId,contentHash:choice.contentHash}])).values()],report:unit.report??null}))})
   const entry=(()=>{try{return draftEducationAssessmentEntry({origin,title:p.title,disclosure:input.disclosure})}
    catch(error){if(error instanceof z.ZodError)throw error;fail('EDUCATION_ASSESSMENT_DISCLOSURE_INVALID',400)}})()

@@ -106,7 +106,7 @@ async function fixture(product:Product='TEACHER',kind:Source='COGNITIVE'){
  const prepare=()=>service.prepareEducationAssessment(creator.context,prepareInput)
  return {product,kind,system,organizationId,creator,reviewer,compositeId,units,grant,distribution,licenses,prepareInput,prepare,actor}
 }
-function registration(preparation:{preparationHash:string},licenses:unknown[]){return {expectedPreparationHash:preparation.preparationHash,disclosure:testDisclosure(),references:{schemaVersion:1,units:[]},reports:[],licenses}}
+function registration(preparation:{preparationHash:string},licenses:unknown[]){return {expectedPreparationHash:preparation.preparationHash,disclosure:testDisclosure(),feedbackPolicy:{schemaVersion:1,mode:'IMMEDIATE'},references:{schemaVersion:1,units:[]},reports:[],licenses}}
 const transition=(entryHash:string)=>({expectedEntryHash:entryHash,reason:'Synthetic independent lifecycle verification'})
 suite('Education resource producer with real isolated PostgreSQL, source engines and product HTTP',()=>{
  beforeAll(async()=>{

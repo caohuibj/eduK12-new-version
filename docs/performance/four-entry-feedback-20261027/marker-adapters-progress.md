@@ -86,4 +86,4 @@ unit fixture，缺教育发布身份仍拒绝，且恰好一次查询、零写�
 原循环加载 PG 0断言失败、standard 首轮错误夹具的系统管理员403、旧边界 mock
 失败、原 types 失败/空日志均保留。救援 manifest 和 raw diff 原件不改写。
 本证据不是浏览器/真实受试者 START、子作答、耐久 FINAL、报告 outbox/replay 或
-PG17 新锁竞争证明；这些仍由 root 集成闭环。没有 CI、合并、部署或真实工具批准。
+PG17 新锁竞争证明；这些仍由 root 集成闭环。没有 CI、PR 合并、部署或真实工具批准。
