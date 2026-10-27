@@ -109,3 +109,24 @@ mapped-table hashes and immutable receipt trigger verification. No production
 code, limits, security thresholds or database cleanup policy changed. Current
 CI controls still require actual SAST and stable required gate success. No merge
 or deployment is performed by this correction.
+
+## Actual Vitest filtered-status correction (02:59 UTC)
+
+Run40440930935/source976e has the real quota PASS (21.1s),16 filtered; artifact
+12706064269 ZIP86578174eda2c428141a891dd2d5e5a9c8b36da1f65099236fe88132be5469f1.
+The evidence reader then failed: JSON assertion status is `skipped`, while its
+aggregate field is `numPendingTests`. The prior synthetic control used `pending`
+incorrectly. Fix only that representation, require exact16 names and1 passed
+quota name, retain original failed job and successful test raw bytes. The actual
+report now validates locally; a `pending` assertion fixture is explicitly refused.
+
+This completed HTTP quota test is not reexecuted. Because its ephemeral database
+was removed on runner teardown before a dump existed, the pending restore now
+uses a separate, explicitly synthetic small storage fixture: one user/school,
+one batch/person and completed job/immutable part. Assignment/credential tables
+are empty as in the prior staff-only quota fixture; all six table counts/hashes
+still must match after real restore, with committed-part tampering refused.
+This seed is storage-only, not a new permission, profile-decryption or business
+qualification. Its actual creation was diagnosed with local PG17, not claimed
+as formal PG16 restore success. Remaining PG6–12/compact/restore/runtime scan and
+browser stay required; no passing application checks or compilation are repeated.

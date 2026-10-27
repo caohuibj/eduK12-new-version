@@ -53,7 +53,7 @@ test('actual selected PostgreSQL files use unique Redis slots and retain roster 
 });
 test('quota continuation only accepts one passed original failure with exact 16 prior names filtered',()=>{
  const accepted=Array.from({length:16},(_,i)=>'prior'+String(i).padStart(2,'0'));
- const r={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:16,testResults:[{name:'/app/'+rosterFile,status:'passed',assertionResults:[{fullName:quotaName,status:'passed'},...accepted.map(fullName=>({fullName,status:'pending'}))]}]};
+ const r={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:16,testResults:[{name:'/app/'+rosterFile,status:'passed',assertionResults:[{fullName:quotaName,status:'passed'},...accepted.map(fullName=>({fullName,status:'skipped'}))]}]};
  assert.equal(verifyQuotaContinuation(r,accepted).freshPassed,1);
  for(const delta of [{success:false},{numPendingTests:0},{numPassedTests:17},{testResults:[{...r.testResults[0],assertionResults:r.testResults[0].assertionResults.slice(0,-1)}]}])assert.throws(()=>verifyQuotaContinuation({...r,...delta},accepted));
  assert.throws(()=>verifyQuotaContinuation(r,[...accepted.slice(1),'wrong']));assert.equal(r.numPendingTests,16);
@@ -63,4 +63,12 @@ test('partial database evidence admits only the fixed failed run and ZIP',()=>{
  assert.equal(verifyOriginalArtifact(m,'checks',now,'database').id,a.id);
  assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:deliveredFrontend.run}},'checks',now,'database'));
  assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+'0'.repeat(64)},'checks',now,'database'));
+});
+import {quotaProgress,quotaArtifacts} from './pr357-continuation.mjs';
+test('completed quota original report requires exact run artifact and actual Vitest skipped representation',()=>{
+ const now=Date.now(),a=quotaArtifacts.checks,m={id:a.id,name:a.prefix+quotaProgress.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:quotaProgress.run,head_sha:quotaProgress.head,head_branch:binding.branch},size_in_bytes:15685,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'checks',now,'quota').id,a.id);assert.throws(()=>verifyOriginalArtifact({...m,id:progressArtifacts.checks.id},'checks',now,'quota'));
+ const accepted=Array.from({length:16},(_,i)=>'case'+i).sort();
+ const wrong={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:16,testResults:[{name:'/app/'+rosterFile,status:'passed',assertionResults:[{fullName:quotaName,status:'passed'},...accepted.map(fullName=>({fullName,status:'pending'}))]}]};
+ assert.throws(()=>verifyQuotaContinuation(wrong,accepted));
 });

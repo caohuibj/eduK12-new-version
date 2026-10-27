@@ -6,7 +6,7 @@ import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {binding,pr357Plan} from './pr357-scope.mjs';
 import {changedEntries} from './content-scope.mjs';
-import {original,testContinuation,copyOriginalBackend,originalAudit,originalSast,copyDeliveredFrontend,databaseContinuation,verifyQuotaContinuation,rosterFile,quotaName} from './pr357-continuation.mjs';
+import {original,testContinuation,copyOriginalBackend,originalAudit,originalSast,copyDeliveredFrontend,databaseContinuation,verifyQuotaContinuation,rosterFile,quotaName,quotaContinuation} from './pr357-continuation.mjs';
 const root=process.cwd(),out=resolve('pr357-evidence');
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const digest=value=>createHash('sha256').update(value).digest('hex');
@@ -39,19 +39,35 @@ async function database(){const prior=await testContinuation('backend');const u=
  assert.equal(Number(sql('pr357_upgrade_ci_test','SELECT count(*) FROM _prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL')),239);
  const selected=binding.tests.backend,progress=await databaseContinuation(prior);
  save('database-progress-reused',{status:'REUSED_EXACT_PASSED_CASES',...progress});
- let roster;
+ save('quota-reused',await quotaContinuation(progress));
+ const roster='pr357_restore_source_ci_test';
  for(const [i,file]of selected.filter(p=>p.includes('.postgres.')).entries()){
-  if(i<5)continue;
+  if(i<=5)continue;
   const db='pr357_case_'+i+'_ci_test';sql('postgres',`CREATE DATABASE ${db} TEMPLATE pr357_upgrade_ci_test`);
   const redis=postgresRedis(process.env.REDIS_URL,file,i);
   dockerTest([file],'postgres-'+i,url(db),{REDIS_URL:redis,ROSTER_INTEGRATION_REDIS_URL:redis},file===rosterFile?progress.acceptedRosterNames:null);
-  if(file===rosterFile)roster=db;
+
  }
  const compactDb='pr357_compact_report_ci_test';sql('postgres',`CREATE DATABASE ${compactDb} TEMPLATE pr357_upgrade_ci_test`);
  const compactRedis=new URL(process.env.REDIS_URL);compactRedis.pathname='/13';
  dockerTest(['src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts'],'compact-report',url(compactDb),{ASSESSMENT_COMPACT_FACTS_ENABLED:'true',REDIS_URL:compactRedis.href,ROSTER_INTEGRATION_REDIS_URL:compactRedis.href});
  assert(Number(sql(compactDb,"SELECT count(*) FROM assessments WHERE status='COMPLETED' AND result->>'k'='SFF1'"))>0,'Compact consumer must use real compact facts');
- assert(roster);const tables=['campus_personnel_import_batches','campus_personnel','campus_personnel_assignments','campus_personnel_credentials','education_roster_import_jobs','education_roster_import_parts'];
+ // The previous successful HTTP quota fixture was destroyed with its runner.
+ // Recreate only a small, explicit storage fixture for the still-missing restore
+ // check; this is not a second quota/permission/HTTP test or a production seed.
+ sql('postgres',`CREATE DATABASE ${roster} TEMPLATE pr357_upgrade_ci_test`);
+ const seed=`const {PrismaClient}=require('@prisma/client');const db=new PrismaClient();
+ (async()=>{try{await db.user.create({data:{id:'pr357-restore-user',username:'pr357-restore-user',passwordHash:'synthetic-no-login',role:'TEACHER'}});
+ await db.organization.create({data:{id:'pr357-restore-org',name:'Synthetic restore only',productDomain:'SCHOOL',createdByUserId:'pr357-restore-user'}});
+ }finally{await db.$disconnect()}})().catch(e=>{console.error(e);process.exitCode=1});`;
+ run('docker',['run','--rm','--network','host','-e','DATABASE_URL='+url(roster),'pr357-build','node','-e',seed]);
+ sql(roster,`BEGIN;
+ INSERT INTO campus_personnel_import_batches(id,organization_id,actor_user_id,request_hash,receipt) VALUES('restore-batch','pr357-restore-org','pr357-restore-user','synthetic-hash','{"batchId":"restore-batch","added":1,"skipped":0}');
+ INSERT INTO campus_personnel(id,organization_id,kind,number_digest,profile_cipher,persona,batch_id) VALUES('restore-person','pr357-restore-org','STAFF','synthetic-digest','synthetic-storage-sentinel-not-a-user-profile','TEACHER','restore-batch');
+ INSERT INTO education_roster_import_jobs(id,organization_id,actor_user_id,entry,kind,input_digest,source_digest,row_count,part_count,status) VALUES('restore-job','pr357-restore-org','pr357-restore-user','SCHOOL','STAFF','synthetic-input','synthetic-source',1,1,'COMPLETED');
+ INSERT INTO education_roster_import_parts(organization_id,job_id,part_index,batch_id,input_digest,row_count,state,receipt,committed_at) VALUES('pr357-restore-org','restore-job',0,'restore-batch','synthetic-input',1,'COMMITTED','{"batchId":"restore-batch","added":1,"skipped":0}',CURRENT_TIMESTAMP);
+ COMMIT;`);
+ const tables=['campus_personnel_import_batches','campus_personnel','campus_personnel_assignments','campus_personnel_credentials','education_roster_import_jobs','education_roster_import_parts'];
  const snapshot=db=>tables.map(table=>({table,count:Number(sql(db,'SELECT count(*) FROM '+table)),hash:digest(sql(db,'SELECT row_to_json(t)::text FROM '+table+' t ORDER BY row_to_json(t)::text'))}));const beforeRestore=snapshot(roster);assert(beforeRestore.find(x=>x.table==='education_roster_import_parts').count>0);assert(beforeRestore.find(x=>x.table==='education_roster_import_jobs').count>0);
  const backup=join(process.env.RUNNER_TEMP,'pr357-roster.dump');execFileSync('docker',['exec',process.env.CI_POSTGRES_SERVICE_ID,'pg_dump','-U','ptool','-Fc','-f','/tmp/pr357-roster.dump',roster]);run('docker',['cp',process.env.CI_POSTGRES_SERVICE_ID+':/tmp/pr357-roster.dump',backup]);sql('postgres','CREATE DATABASE pr357_restore_ci_test');run('docker',['exec',process.env.CI_POSTGRES_SERVICE_ID,'pg_restore','-U','ptool','--exit-on-error','--no-owner','-d','pr357_restore_ci_test','/tmp/pr357-roster.dump']);assert.deepEqual(snapshot('pr357_restore_ci_test'),beforeRestore);
  assert(Number(sql('pr357_restore_ci_test',"SELECT count(*) FROM education_roster_import_parts WHERE state='COMMITTED'"))>0);
