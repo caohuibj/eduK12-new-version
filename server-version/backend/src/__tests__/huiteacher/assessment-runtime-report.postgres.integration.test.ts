@@ -80,8 +80,10 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
   server=await new Promise<Server>(resolve=>{const instance=app.listen(0,'127.0.0.1',()=>resolve(instance))});origin='http://127.0.0.1:'+(server.address() as AddressInfo).port
  },60_000)
  afterAll(async()=>{server?.closeAllConnections();if(server)await new Promise<void>(resolve=>server.close(()=>resolve()));await owner?.$disconnect();await prisma.$disconnect()})
- it.each([{product:'TEACHER',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'SCHOOL',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'DUE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'DUE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'ADMIN_IMMEDIATE',formOnly:false,completionOnly:false}] as const)('$product $timing Form=$formOnly completionOnly=$completionOnly actual producer FINAL report opening',async({product,timing,formOnly,completionOnly})=>{
+ it.each([{product:'TEACHER',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'SCHOOL',timing:'IMMEDIATE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'DUE',formOnly:false,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:false},{product:'TEACHER',timing:'FUTURE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'DUE',formOnly:true,completionOnly:true},{product:'TEACHER',timing:'ADMIN_IMMEDIATE',formOnly:false,completionOnly:false},{product:'SCHOOL',timing:'FUTURE',formOnly:false,completionOnly:false},{product:'SCHOOL',timing:'DUE',formOnly:false,completionOnly:false}] as const)('$product $timing Form=$formOnly completionOnly=$completionOnly actual producer FINAL report opening',async({product,timing,formOnly,completionOnly})=>{
   const feedbackPolicy=(timing==='IMMEDIATE'||timing==='ADMIN_IMMEDIATE')?{schemaVersion:1 as const,mode:'IMMEDIATE' as const}:{schemaVersion:1 as const,mode:'SCHEDULED' as const,releaseAt:new Date(Date.now()+(timing==='FUTURE'?86400000:-86400000)).toISOString()}
+  if(product==='SCHOOL'&&feedbackPolicy.mode==='SCHEDULED')feedbackPolicy.releaseAt=new Date(Date.parse(feedbackPolicy.releaseAt)+8*3600000).toISOString().replace('Z','+08:00')
+  const frozenPolicy=feedbackPolicy.mode==='SCHEDULED'?{...feedbackPolicy,releaseAt:new Date(feedbackPolicy.releaseAt).toISOString()}:feedbackPolicy
   entryBase=product==='TEACHER'?'/api/huiteacher':'/api/campus'
   let f:any
   if(product==='TEACHER')f=await teacherRuntimePgFixture(owner,'BUNDLE',false,false,!formOnly,feedbackPolicy,formOnly,completionOnly)
@@ -100,7 +102,7 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
    f={...delivery,organizationId:school.organizationId,executionId:executions[0].id,respondent:await owner.user.findUniqueOrThrow({where:{id:school.participantUserId}}),issuer}
   }
   if(timing==='ADMIN_IMMEDIATE')f.respondent=await owner.user.update({where:{id:f.respondent.id},data:{role:'ADMIN'}})
-  expect(f.origin.feedbackPolicy).toEqual(feedbackPolicy)
+  expect(f.origin.feedbackPolicy).toEqual(frozenPolicy)
   const cookie=teacherCookie(f.respondent,product==='TEACHER'?'HUITEACHER':'SCHOOL')
   const started=await startAssessmentRunExecution({executionId:f.executionId,actorUserId:f.respondent.id})
   expect(started.state).toBe('STARTED');if(started.state!=='STARTED')throw new Error('Actual durable START required')
@@ -121,7 +123,7 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
   const endpoint='/assessment-reports/executions/'+f.executionId
   const report=requireSuccess<any>(await request(endpoint,cookie))
   if(timing==='FUTURE'){
-   expect(report,JSON.stringify(report)).toMatchObject({state:'WITHHELD',mode:'NONE',...(!formOnly||completionOnly?{releaseAt:feedbackPolicy.mode==='SCHEDULED'?feedbackPolicy.releaseAt:null}:{})})
+   expect(report,JSON.stringify(report)).toMatchObject({state:'WITHHELD',mode:'NONE',...(!formOnly||completionOnly?{releaseAt:frozenPolicy.mode==='SCHEDULED'?frozenPolicy.releaseAt:null}:{})})
    expect(report).not.toHaveProperty('reports')
   }else if(formOnly){
    expect(report,JSON.stringify(report)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'});expect(report).not.toHaveProperty('reports')
