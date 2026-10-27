@@ -7,6 +7,9 @@ import type { ScaleInstrumentSourceV1 } from '../../modules/scale/onboarding/typ
 vi.mock('../../modules/scale/onboarding/instrument-registry', async original => ({
   ...(await original<object>()),
   getScaleInstrumentSource: vi.fn(),
+  // This suite isolates instruction projection/materialization. The real
+  // selected registry contract is exercised by admission-cache-and-instruction.
+  getScaleInstrumentValidation: vi.fn(() => ({ valid: true, issues: [] })),
 }))
 vi.mock('../../modules/scale/onboarding/axis-snapshots', async original => ({
   ...(await original<object>()),
@@ -89,7 +92,7 @@ describe('frozen scale instruction content contract', () => {
     }
   })
 
-  it('updates instruction alone and records its independent source version without rebuilding scoring',async()=>{
+  it('updates declared instruction alone and preserves exact legacy text when source instruction is absent',async()=>{
     getScaleInstrumentSource.mockReturnValue(source({instruction:{...instruction,version:'1.0.1',text:'Revised administration wording'}}))
     const {materializeScaleInstrumentContent}=await import('../../modules/scale/onboarding/materialize')
     const {hashScaleDefinition}=await import('../../modules/scale/scale-definition')
@@ -100,7 +103,8 @@ describe('frozen scale instruction content contract', () => {
     getScaleInstrumentSource.mockReturnValue(source({instruction:undefined}))
     db.scale.update.mockClear()
     await materializeScaleInstrumentContent(db as never,{instrumentKey:'nfc10_zh_cn',instrumentVersion:'1.0.0',actorUserId:'admin'})
-    expect(db.scale.update).toHaveBeenCalledExactlyOnceWith({where:{id:'s'},data:{instruction:null}})
+    expect(db.scale.update).not.toHaveBeenCalled()
+    expect(row.instruction).toBe(instruction.text)
   })
 
   it('materializes the source instruction onto the Scale row and keeps it through axis revision', async () => {

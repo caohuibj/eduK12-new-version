@@ -39,7 +39,7 @@ export const materializeLocalizationManifest = (source: ScaleInstrumentSourceV1)
     : undefined
 )
 
-export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1, options: { requireInstruction?: boolean } = {}): InstrumentSourceValidation => {
+export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1, options: { requireInstruction?: boolean; executeGoldenCases?: boolean } = {}): InstrumentSourceValidation => {
   const issues: InstrumentSourceIssue[] = []
   const catalogResult = parseScaleCatalogManifest(materializeCatalogManifest(source))
   if (!catalogResult.ok) {
@@ -136,7 +136,10 @@ export const validateScaleInstrumentSource = (source: ScaleInstrumentSourceV1, o
   if (source.executable.goldenCases.length === 0) {
     issues.push({ path: 'executable.goldenCases', message: 'executable source 必须包含 golden cases', severity: 'error' })
   }
-  source.executable.goldenCases.forEach((fixture, index) => {
+  // The selected registry identity delegates these same executable fixtures to
+  // validateScalePackage/product readiness once, then caches the combined result.
+  // Standalone source audits retain their original full execution by default.
+  if (options.executeGoldenCases !== false) source.executable.goldenCases.forEach((fixture, index) => {
     try {
       const output = scoreScale(source.executable!.definition, fixture.answers)
       if (output.quality.status !== fixture.expected.quality) issues.push({ path: `executable.goldenCases.${index}.quality`, message: `${fixture.name} quality 不匹配`, severity: 'error' })

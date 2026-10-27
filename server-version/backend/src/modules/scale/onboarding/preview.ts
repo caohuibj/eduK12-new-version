@@ -6,7 +6,7 @@ import {
   type ScaleDeploymentModeV1,
 } from '../policy/deployment'
 import { localizationNextActions, scaleLocalizationReasons, scaleLocalizationManualIssues } from '../policy/localization'
-import { getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 import { scaleInstrumentSourceV1Schema } from './schema'
 import { validateScaleInstrumentSource, materializeCatalogManifest, materializeLocalizationManifest } from './validate-instrument'
 import type { InstrumentAuthorizationRecordV1 } from '../../assessment-authorization/types'
@@ -28,7 +28,15 @@ export const previewScaleInstrument = (input: {
     ? scaleInstrumentSourceV1Schema.parse(input.source) as unknown as ScaleInstrumentSourceV1
     : (input.instrumentKey && input.instrumentVersion ? getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion) : undefined)
   if (!source) throw new Error('Scale instrument source not found')
-  const validation = validateScaleInstrumentSource(source, { requireInstruction: true })
+  // Submitted candidate previews are mutable, standalone audits. A selected
+  // registered identity reuses its frozen contract and only checks instruction
+  // presence here; any legacy row binding is checked by the install/publish plan.
+  const baseValidation = input.source
+    ? validateScaleInstrumentSource(source)
+    : getScaleInstrumentValidation(source.identity.instrumentKey, source.identity.instrumentVersion)!
+  const issues = [...baseValidation.issues]
+  if (source.executable && !source.instruction) issues.push({ path: 'instruction', message: 'INSTRUCTION_NOT_DECLARED', severity: 'error' as const })
+  const validation = { valid: issues.every(issue => issue.severity !== 'error'), issues }
   const catalog = materializeCatalogManifest(source)
   const localization = materializeLocalizationManifest(source)
   const blockers = validation.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}: ${issue.message}`)

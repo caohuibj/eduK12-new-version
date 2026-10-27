@@ -101,7 +101,7 @@ export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): 
     const source = getScaleInstrumentSource(row.code, row.instrument_version)
     const deployment = row.id ? deployments.get(row.id) ?? null : null
     const preview = source ? previewScaleInstrument({
-      source,
+      instrumentKey: source.identity.instrumentKey, instrumentVersion: source.identity.instrumentVersion,
       locale: deployment?.policy.locale ?? source.localization?.targetLocale ?? 'zh-CN',
       territory: deployment?.policy.territory ?? source.scientificReview?.territory ?? 'CN',
       deploymentModes: deployment?.policy.deploymentModes ?? ['STANDALONE'],

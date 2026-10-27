@@ -25,7 +25,7 @@ main 本来有 57 个 source 版本。主候选来源的新增 85 版本去重�
 
 ## 技术门槛与人工事项
 
-题本保留稳定身份、题项/选项结构、指导语语言与版本、适用人群/披露策略等。新的安装、物化和发布明确要求可冻结的独立指导语；已有运行/历史定义保持兼容，不因旧 source 缺字段改变已冻结尝试。指导语/报告文字不重写。
+题本保留稳定身份、题项/选项结构、指导语语言与版本、适用人群/披露策略等。全新安装要求明确可冻结的 source 指导语；既有精确定义的 STANDARD 行可保留并绑定原 Scale.instruction，详见下方补充。已有运行/历史定义不因旧 source 缺字段改变已冻结尝试。指导语/报告文字不重写。
 
 计分保留 item/score/reference 引用、参数 schema/边界、计分器注册与固定实现、golden 算例执行及版本关系。`referencePolicy=none` 继续表示明确无常模/阈值；没有新增全国常模、翻译专家签字或科研验证的要求。
 
@@ -68,3 +68,28 @@ registry 继续使用同一静态 generated source 和现有执行注册表。sc
 dot 需独立审阅本任务最终精确 base/head/tree、完整 raw diff、原始报告及复用边界，再决定需要的正式检查与任何后续候选接入操作。本任务保持 Draft、所有提交 `[skip ci]`，不自行启动 CI、不 Ready、不合并、不部署。若后续 main 或候选 SHA 再变化，只重核受影响的 source/schema/scorer/compiler/report/安装发布消费者；不新增另一套 CI。
 
 保留的特殊边界：`huiteacher/teacherPilotContent.ts` 仍对既有第一方 Teacher Pilot 本人报告协议要求完整 hash、self_authored/allowed、成人 teacher 受众及旧 QC/字数字段。它被 `scaleLicense.service.ts` 和 `scalePersonalReport.service.ts` 用于该狭窄试点的资源发放/本人报告，不是本次 STANDARD 公共库安装入口。本次没有用“删除 license/grant”扩大此试点来源或改动本人报告披露。它的旧编辑性约束尚未随公共库结构门槛统一，作为 dot 独审的剩余适配项明确保留；不能声称本 PR 已清除所有产品特殊路径中的编辑/版权规则。接入状态前端目前也未渲染新增 sourceDiagnostics 字段，原诊断已可由管理员 API/CLI 读取，未把隔离项称为通过或已安装。
+
+
+## 独立复核后的定向收口：验证复用与历史指导语
+
+本次仅修改量表 registry、install/materialize/publish/preview/status、source validator、一个量表内指导语绑定 helper 及直接测试；没有改共享 assessment-governance、公共导入 API、认知源码、数据表或 CI。
+
+原 head `ed7315aeafa9f1ab94b7aef1f4daaf0607325713` 确有重复工作：runtime policy getter 执行 source golden，install 每次计划、materialize、publish 又分别执行 source golden，publish readiness 还再次执行 package golden。现在由现有 registry 的选中身份统一产生并缓存真实结构/执行结果：先由原 product-readiness/package validator 执行一次完整 golden 和编译；source validator 保留来源/本地化/引用的附加检查，仅在此已真实执行 package 合同的内部调用中跳过第二轮 golden。独立 source audit 的默认语义不变，仍真实执行 golden。源对象、缓存诊断和编译 policy 深冻结；失败结果也缓存并继续拒绝，不能通过改返回对象清除错误。没有用自述 QC 或假通过取代执行。
+
+install、materialize、publish 和按注册身份读取的预览/接入状态消费同一结果。缓存只含进程内固定源码/包/计分器合同，**没有** actor、部署、数据库 Scale/reference、revision、visibility 或指导语字段状态；它们在每次 plan、apply 事务及重新读取时仍检查。临时提交的 source preview 仍是独立审计，不凭相同 key/version 套用注册源的缓存。
+
+指导语核查与边界：
+
+- [main 字段盘点原件](evidence/main-instruction-field-inventory.json)：当前 main 57 个来源中 53 个可执行包，**53 个均 PUBLISHED 且没有独立 source.instruction**。这是代码字段盘点；未读取现有数据库的 Scale.instruction，也没有重跑 53 套 golden。因此 56 个候选缺 source 字段绝不能写成“56 个工具不存在指导语”。候选 docs、layoutConstraints、现有行内容或语言来源尚未核实的部分仍未知。
+- `instruction-admission.ts` 仅允许版本完全相同、STANDARD、measurement hash 与完整 definition 都匹配且字段非空的已安装行，作为 `origin=SCALE_FIELD` 的兼容文本。保留原始字节和空白，不补语言、版本、审校来源，不提升成正式 source 声明。materialize 不再因 source 字段缺失把已有行清成 null。
+- publication proof 加入当次读取的完整 instruction binding；既有行文字在预览后变化会使 proof stale，空文本、错版本、错定义/哈希、CUSTOM 行不能借用为兼容来源。冻结 runtime 原有 SCALE_FIELD/INSTRUMENT_SOURCE 行为保持，历史快照未改写。
+- 真正迁入正式 source，需要内容维护者核实原文字节、真实语言、来源，并按现有独立 instruction.version 声明；本次不自动抽取文档或数据补写，不新增迁移器或平行协议。新 source 声明仍进入原 source/axis snapshot 冻结机制。
+- **剩余冷启动边界**：没有已安装行且 source 未声明指导语时，即使包 PUBLISHED，也拒绝新安装/物化；原 `prisma/seeds/scales.ts` 会遍历物化所有 executable，所以空库 seed 将遇到该缺项。这是本 PR 新结构要求的实际兼容风险，尚未以真实空库执行或完成资料迁移；不得声称现有 53 包已全新安装可用。已安装行字段为空或与定义不符时也不能自动放行。source-only preview 无数据库字段，只报告 source 缺项；兼容绑定是否成立由 install/publication plan 对当前行核定。
+
+新证据只覆盖直接行为，见 [补充索引](evidence/cache-instruction-evidence-index.json)：
+
+- 新增 6 个定向场景，实际经过真实 registry/package/source 校验、scorer、runtime compiler、install/materialize 和 publication plan/apply；数据库、媒体、measurement release、入口政策及 axis 写入端为合成 mock。断言每个 golden 在完整调用链中只执行一次，原样返回失败缓存，源/缓存不能篡改，actor 冻结在事务内仍拒绝，部署哈希/版本/reference 数据变化仍拒绝，历史文字原样保留与 proof stale，PUBLISHED 不补造新安装指导语。
+- 直接修改的一个旧 instruction-freeze 用例只重核 materialize 的“source 缺字段时不清空既有行”行为，其注册源验证接口在该 unit 中明确 mock；真实缓存/结构保护由上面的新场景执行。未跑整个旧冻结套件。
+- 初次新用例 reporter 为 5 PASS，但外层 shell 退出 1；另一次新增场景/旧用例 reporter 为 2 PASS / 11 filtered，外层 shell 同样退出 1。这两条原 invocation 保留为失败/未归因，不改标整命令成功。只保留 reporter 能证明的 passed case，不声称退出清理成功。为核对退出边界，选中单个完整链场景的独立诊断退出 0（其余 4 filtered），随后直接 subprocess 捕获单个状态场景退出 0（其余 5 filtered）；没有重跑整套 5/6 项或现有全量。
+- 变化源码的 backend tsc --noEmit 实际子进程退出 0，[前后输入哈希/时间/退出 receipt](evidence/cache-instruction-types-receipt.json) 保留；tests 不在该 tsc include 中，不声称测试或 scripts 已类型验收。
+- 旧 79 工具盘点、旧报告和原失败原件不覆盖、不重跑。候选审计调用 source validator 的默认参数，此次仅增加缓存专用的内部执行分工，默认校验和结构结果未改；56/19 是原快照字段结论，不能套成数据库结论。新证据不是 CI、已接纳证明或真实数据库生命周期资格。

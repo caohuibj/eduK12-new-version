@@ -1,4 +1,4 @@
-import { validateScaleInstrumentSource } from './validate-instrument'
+import { resolveScaleAdmissionInstruction } from './instruction-admission'
 import { allowsScaleAxisRevision } from './axis-snapshots'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
 import { scaleLocalizationReasons, scaleLocalizationManualIssues } from '../policy/localization'
@@ -7,7 +7,7 @@ import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { hashScaleDefinition } from '../scale-definition'
 import { materializeScaleInstrumentContent } from './materialize'
-import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource } from './instrument-registry'
+import { getScaleInstrumentRuntimePolicy, getScaleInstrumentSource, getScaleInstrumentValidation } from './instrument-registry'
 import {
   evaluateScaleDeployment,
   hashScaleDeploymentPolicy,
@@ -61,7 +61,7 @@ const resolvePlan = async (
   const deploymentPolicy = scaleDeploymentPolicySchema.parse(input.deploymentPolicy)
   const blockers: string[] = [
     ...scaleLocalizationReasons(source, deploymentPolicy),
-    ...validateScaleInstrumentSource(source, { requireInstruction: true }).issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}:${issue.message}`),
+    ...getScaleInstrumentValidation(input.instrumentKey, input.instrumentVersion)!.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}:${issue.message}`),
   ]
   // Caller authority and exact deployment identity remain mandatory.
   const actor = await db.user.findUnique({ where: { id: input.actorUserId } })
@@ -78,8 +78,10 @@ const resolvePlan = async (
 
   const scale = await db.scale.findUnique({
     where: { code: input.instrumentKey },
-    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true },
+    select: { id: true, instrumentClass: true, instrumentVersion: true, definitionHash: true, definition: true, status: true, instruction: true },
   })
+  const instruction = resolveScaleAdmissionInstruction(source, scale)
+  blockers.push(...instruction.blockers)
   if (scale) {
     if (scale.instrumentClass !== 'STANDARD') blockers.push('SCALE_CODE_OWNED_BY_CUSTOM_INSTRUMENT')
     if (scale.instrumentVersion !== input.instrumentVersion) blockers.push('DEPLOYMENT_VERSION_CONFLICT')

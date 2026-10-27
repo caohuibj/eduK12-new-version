@@ -1,0 +1,31 @@
+{
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit"
+  ],
+  "start": "2026-10-27T23:24:09.132494+00:00",
+  "before": {
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "72987afadf20781e2ff5318d42891ff158ea76ac33d3a3854a5db5868eef321d",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "6469dd05aeca1f786fc898509b921a3733be761a6391c7f4a7120e077167142e",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "4bd0109bdbb61a1a3a8e70b940c6abedfc560c76b1060ca1b3faf730a4825cd5",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "bb4402a821678cb31afd59cbb439e4001c4c39fa1d1f79f14205e5e48196dc80",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "5e292b2bff29d743da09076f7b15a2bf38ce3ba3afc827dc9e94f9c013c74b57",
+    "server-version/backend/src/modules/scale/onboarding/status.ts": "3a5f43ec93631b8a1049f49ace540f1e60d2c60b847f1f4ab6e91e59aea84f4c",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "667e27831adcb987f8dd116e9d8d2f391a7cd4d44371b788d26fc61193d00264",
+    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": "a3f9ed43f68fe43395c9cfd1ef1a51a5a177ad279759996d49ca9a2bba5bea26"
+  },
+  "ciExecuted": false,
+  "end": "2026-10-27T23:24:37.190612+00:00",
+  "exitCode": 0,
+  "after": {
+    "server-version/backend/src/modules/scale/onboarding/install.ts": "72987afadf20781e2ff5318d42891ff158ea76ac33d3a3854a5db5868eef321d",
+    "server-version/backend/src/modules/scale/onboarding/instrument-registry.ts": "6469dd05aeca1f786fc898509b921a3733be761a6391c7f4a7120e077167142e",
+    "server-version/backend/src/modules/scale/onboarding/materialize.ts": "4bd0109bdbb61a1a3a8e70b940c6abedfc560c76b1060ca1b3faf730a4825cd5",
+    "server-version/backend/src/modules/scale/onboarding/preview.ts": "bb4402a821678cb31afd59cbb439e4001c4c39fa1d1f79f14205e5e48196dc80",
+    "server-version/backend/src/modules/scale/onboarding/publish.ts": "5e292b2bff29d743da09076f7b15a2bf38ce3ba3afc827dc9e94f9c013c74b57",
+    "server-version/backend/src/modules/scale/onboarding/status.ts": "3a5f43ec93631b8a1049f49ace540f1e60d2c60b847f1f4ab6e91e59aea84f4c",
+    "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts": "667e27831adcb987f8dd116e9d8d2f391a7cd4d44371b788d26fc61193d00264",
+    "server-version/backend/src/modules/scale/onboarding/instruction-admission.ts": "a3f9ed43f68fe43395c9cfd1ef1a51a5a177ad279759996d49ca9a2bba5bea26"
+  }
+}

@@ -1,0 +1,12 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/scale/admission-cache-and-instruction.test.ts (6 tests | 5 skipped) 34ms
+ ✓ src/__tests__/scale/instruction-freeze.test.ts (7 tests | 6 skipped) 47ms
+
+ Test Files  2 passed (2)
+      Tests  2 passed | 11 skipped (13)
+   Start at  23:22:14
+   Duration  1.66s (transform 762ms, setup 0ms, import 1.37s, tests 81ms, environment 0ms)
+
+JSON report written to /workspace/eduK12-new-version/docs/scale-library-structure-20261027/evidence/cache-instruction-state-supplement.json
