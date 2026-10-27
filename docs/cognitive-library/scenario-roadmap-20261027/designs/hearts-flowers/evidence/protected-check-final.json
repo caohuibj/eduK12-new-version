@@ -1,0 +1,157 @@
+{
+  "checkedAt": "2026-10-27T10:17:30.908765+00:00",
+  "count": 25,
+  "allUnchanged": true,
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/information-sampling/README.md",
+      "expectedSHA256": "083bb24c4eeabf308e52922a04c76b8339dd33bd3c4e1e78ce632a46168b5464",
+      "actualSHA256": "083bb24c4eeabf308e52922a04c76b8339dd33bd3c4e1e78ce632a46168b5464",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/information-sampling/preview.html",
+      "expectedSHA256": "867a9be02545a1356b6cea5c30495e7bc560ec10d457773e939ca258adc584fc",
+      "actualSHA256": "867a9be02545a1356b6cea5c30495e7bc560ec10d457773e939ca258adc584fc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/information-sampling/sources.json",
+      "expectedSHA256": "5be031329a0775eb957206e3f352e8f8a65ccc25ab40cabc8e575904f56db777",
+      "actualSHA256": "5be031329a0775eb957206e3f352e8f8a65ccc25ab40cabc8e575904f56db777",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/sart/README.md",
+      "expectedSHA256": "8f1eddce9fc0e5d01fd7bd6baaaa1b5dd6de987d0e0ae07cc2c186a2307d275b",
+      "actualSHA256": "8f1eddce9fc0e5d01fd7bd6baaaa1b5dd6de987d0e0ae07cc2c186a2307d275b",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/sart/preview.html",
+      "expectedSHA256": "d123d0b66642882bd715d09d4efdbe40584266e43ec82619354e9417667c6b64",
+      "actualSHA256": "d123d0b66642882bd715d09d4efdbe40584266e43ec82619354e9417667c6b64",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/sart/review.png",
+      "expectedSHA256": "d39368fd3d09f4591133180db2a0c80bbf0956cb17870dca97a20e9a17a84528",
+      "actualSHA256": "d39368fd3d09f4591133180db2a0c80bbf0956cb17870dca97a20e9a17a84528",
+      "unchanged": true
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/sart/sources.json",
+      "expectedSHA256": "6fe6f30ad92ccc4768392127817b2f7d77046b56a35257df01db9333873679f9",
+      "actualSHA256": "6fe6f30ad92ccc4768392127817b2f7d77046b56a35257df01db9333873679f9",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/parallel-mot-content-20261027.test.ts",
+      "expectedSHA256": "89e7ccd24227ee320c11d3189147691050f32bdf21db9c1ca820cf8d5b495edb",
+      "actualSHA256": "89e7ccd24227ee320c11d3189147691050f32bdf21db9c1ca820cf8d5b495edb",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/package.ts",
+      "expectedSHA256": "bda87e4ff326a97f91116f9ab37760c275c43268e56774afa5246da22bcea753",
+      "actualSHA256": "bda87e4ff326a97f91116f9ab37760c275c43268e56774afa5246da22bcea753",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/protocol.ts",
+      "expectedSHA256": "5822ab23ad93a3c4cbb518fc3d9dfa03ce86d0155e8be8364e711fbd9e451cde",
+      "actualSHA256": "5822ab23ad93a3c4cbb518fc3d9dfa03ce86d0155e8be8364e711fbd9e451cde",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/schema.ts",
+      "expectedSHA256": "168d76c622384a49d6427048991d6b4b836788b86751e3d5cd5fc6a2012a71c5",
+      "actualSHA256": "168d76c622384a49d6427048991d6b4b836788b86751e3d5cd5fc6a2012a71c5",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/ant/scorer.ts",
+      "expectedSHA256": "ba1bae8ff73115d09e0d4f02c4581626fd2c6137eae322209a0e938977d72f11",
+      "actualSHA256": "ba1bae8ff73115d09e0d4f02c4581626fd2c6137eae322209a0e938977d72f11",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/descriptive-package.ts",
+      "expectedSHA256": "fb40373b85b2cd734174de55c857dc3a4b755f2f3eb533684a12f446f64916b9",
+      "actualSHA256": "fb40373b85b2cd734174de55c857dc3a4b755f2f3eb533684a12f446f64916b9",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/descriptive-protocol.ts",
+      "expectedSHA256": "762bf274b4652d559b11c9df5f2962517fd85b3b12215cd1fa28b66e17acd427",
+      "actualSHA256": "762bf274b4652d559b11c9df5f2962517fd85b3b12215cd1fa28b66e17acd427",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/mot/descriptive-scorer.ts",
+      "expectedSHA256": "0ad3bbed1c9fd17b024390ab52a142301db1f1370e9352529299cca6038ea796",
+      "actualSHA256": "0ad3bbed1c9fd17b024390ab52a142301db1f1370e9352529299cca6038ea796",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/AntReportCard.tsx",
+      "expectedSHA256": "d0f9096dccc146bbf29168e82982be2acbef98282ca121c12872d3237a22b20f",
+      "actualSHA256": "d0f9096dccc146bbf29168e82982be2acbef98282ca121c12872d3237a22b20f",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/protocol.ts",
+      "expectedSHA256": "782ed73c9ffe94e57a9c8188f4886aae62b41e03fa96f624871f1d2b39c1871e",
+      "actualSHA256": "782ed73c9ffe94e57a9c8188f4886aae62b41e03fa96f624871f1d2b39c1871e",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/generated/report.ts",
+      "expectedSHA256": "b0316e1df601f4454b44139416e195c27fd38d4e1175f233f978a15027539e4c",
+      "actualSHA256": "b0316e1df601f4454b44139416e195c27fd38d4e1175f233f978a15027539e4c",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/ant/session.ts",
+      "expectedSHA256": "00b4411312f4abe9978f3cd435789907c40b768ef760fbc2c36e1cf6607db060",
+      "actualSHA256": "00b4411312f4abe9978f3cd435789907c40b768ef760fbc2c36e1cf6607db060",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotDescriptive.test.tsx",
+      "expectedSHA256": "de54de686b5627d88b58050517b41b75e24c340be3bb0fba3f2f1d677fc8c816",
+      "actualSHA256": "de54de686b5627d88b58050517b41b75e24c340be3bb0fba3f2f1d677fc8c816",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotDescriptiveReport.test.tsx",
+      "expectedSHA256": "c25f0a3adb7ad829ea99790fc1c87f02e9f12af7cbeea91c0434ca739cdf5bc8",
+      "actualSHA256": "c25f0a3adb7ad829ea99790fc1c87f02e9f12af7cbeea91c0434ca739cdf5bc8",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotDescriptiveReport.tsx",
+      "expectedSHA256": "b9349e8a69834a15fddf4e58d49a0ed14aebe08f1a693b5d1c951cc1af9d9d9d",
+      "actualSHA256": "b9349e8a69834a15fddf4e58d49a0ed14aebe08f1a693b5d1c951cc1af9d9d9d",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/MotTask.tsx",
+      "expectedSHA256": "4bddedb0ba2ae005faf463f8b91ad9291307108792215f54e8cca0cd968fb525",
+      "actualSHA256": "4bddedb0ba2ae005faf463f8b91ad9291307108792215f54e8cca0cd968fb525",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/descriptive-protocol.ts",
+      "expectedSHA256": "0f2c888fe930c952e54b4a348faa5d5663a87ec61c3d9645e5aabc954af1dbfe",
+      "actualSHA256": "0f2c888fe930c952e54b4a348faa5d5663a87ec61c3d9645e5aabc954af1dbfe",
+      "unchanged": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mot/draft.ts",
+      "expectedSHA256": "094cad01da79e0b518d37cedb7276b9b7730a1e9273a669e5ebbd52c03ae849a",
+      "actualSHA256": "094cad01da79e0b518d37cedb7276b9b7730a1e9273a669e5ebbd52c03ae849a",
+      "unchanged": true
+    }
+  ]
+}

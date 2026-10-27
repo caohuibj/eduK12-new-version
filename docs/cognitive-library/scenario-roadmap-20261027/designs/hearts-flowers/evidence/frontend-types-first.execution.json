@@ -1,0 +1,136 @@
+{
+  "name": "frontend-types-first",
+  "start": "2026-10-27T10:07:04.695Z",
+  "end": "2026-10-27T10:07:07.889Z",
+  "command": [
+    "/tmp/cognitive-takeover-20261027/tools/node-v24.21.0-linux-x64/bin/node",
+    "/tmp/hearts-flowers-content-20261027/types.cjs",
+    "frontend",
+    "first"
+  ],
+  "cwd": "/workspace/eduK12-new-version/server-version/frontend",
+  "nodeVersion": "v24.21.0",
+  "toolSHA256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "inputSHA256": "e7f5f731472f9c7c656d7ee51f1d64c7e8e1ba42c84be9a2670b50261074f6de",
+  "inputs": [
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/hearts-flowers-content.test.ts",
+      "sha256": "4ae6cf69ef7c47fb716f9f3301cda3d60a04f9a87be3a22ef76a7128b1a61510"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/analysis.ts",
+      "sha256": "f5760e2743a992dbe6fd027a6ed7d796f0975bca7a7a157fa73ec661d9053732"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/metadata.ts",
+      "sha256": "d87fb8216982d9af8c561f35cca1cac7fca8a7b6bbe115d3a626e1cd7d11f00f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/package.ts",
+      "sha256": "d0f9ee9f355535549450ec8242191ae2e1e629c8fb2f60da66843605121dd91a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/participant-presentation.ts",
+      "sha256": "0f18f697c82f68b04674b109428b19b2d84e085cd17ebd7a9dd1ba54af85c278"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/protocol.ts",
+      "sha256": "872c811cd63d60e932710907ffee777e29e75b2ec35b9aced1d2d31915aa1d4a"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/report.ts",
+      "sha256": "81058a17652c157af55fe5bbcc3ee37295345e89bee1ffefc711b57b99a1e95e"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/schema.ts",
+      "sha256": "0ea40a91a9037dee197565fa6abc12c652ba2e59345ea78d473b9ff86735b3d8"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/hearts-flowers/scorer.ts",
+      "sha256": "fc2bc743ec198e0f5702f64fcc67e6cb4ac54e84255e57e3c52f8b2427691dbf"
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFInstructions.tsx",
+      "sha256": "706d692f214956a0650101ae9f891aa3d6ba9c61a459fbc6243e25fea0f4bea2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "sha256": "c8f9bd8ee520e3fed4d92a213aa770b307308b7af3a46ac6ccd4a8f2d8fa90f2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFShape.tsx",
+      "sha256": "694546f02d874515a4e30bcd44bd429ac14ad51a741f2e14c5bf6c5296c1e9c9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HeartsFlowersTask.tsx",
+      "sha256": "a3eb89b9554549678ec62ffc894802e41cf3fb18eda2e524f7c4e5971160a6da"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/capture.ts",
+      "sha256": "b66efd62621b2ccaa906203cfb015680e3b6857b5107aa3d64ff9c0619808eaf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "sha256": "803a43d101e0a90f022f7a6dc6e86b9456897cad46f1635ae341bfa37e8b1e9e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/contracts.ts",
+      "sha256": "732421b614eb698d1bdd20a71fe04db2f744d47223f93a9ba5616d2d0589207b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/analysis.ts",
+      "sha256": "d674840eb75627462c6fc7e8321ea3cb206302f45cc10ae9e3cff2be5d6add69"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/protocol.ts",
+      "sha256": "c08eef7f9fcd1cab02a2b97add5301f3ddf9e6d28e2c985102b250ca94476938"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/generated/report.ts",
+      "sha256": "76e3a55d34e0b754f0e3f0252351f79a50bc575dde24734aeb83508e2eb23974"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/hearts-flowers.css",
+      "sha256": "c28af6a9530992a2b119b9f8e888732145ba7d5875f8a7830fb10b9c560d6708"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/session.ts",
+      "sha256": "4ec838fa9e6a46181d88d1548048d99a897b9db931befe27a6d53bd68124e9f9"
+    },
+    {
+      "path": "server-version/frontend/src/test/setup.ts",
+      "sha256": "6e40f95ed1a8c33a9142d1d1ceb9400abc38b6a8de2d5798f7fa3fe9984482f8"
+    },
+    {
+      "path": "server-version/frontend/tsconfig.app.json",
+      "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+    },
+    {
+      "path": "server-version/frontend/vitest.config.ts",
+      "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+    },
+    {
+      "path": "server-version/scripts/cognitive/hearts-flowers-content.cjs",
+      "sha256": "7a489e378106f8f40a10e63e2656ba038274c422538d674d2a71fa9aaad9ddab"
+    }
+  ],
+  "exit": 1,
+  "signal": null,
+  "error": null
+}

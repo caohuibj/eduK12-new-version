@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "status": "REPORT_PRESENTATION_CANDIDATE_PENDING_DOT_FINAL_REVIEW",
+  "parentReviewCommit": "2d888e2afe20753e45f4e182da68519dc496ed79",
+  "branch": "cognitive/review-hearts-flowers-20261027",
+  "changeClass": "presentation/text only in unpublished candidate; protocol, input, timing, scorer and public report data contract unchanged",
+  "changedSources": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.tsx",
+      "sha256": "1105db291bd000b0296ce904522dc926058a11487b30ab44107f703a8c81f77e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/HFReport.test.tsx",
+      "sha256": "fe99c5205147e3aa61c7140784c9949d6de7171cc797f9bcd7372942b28e869e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/hearts-flowers/content.test.tsx",
+      "sha256": "8f9268230ae25ad0820957325a6e5e78abb5238b73d93125a60c85a7a03a308b"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/designs/hearts-flowers/IMPLEMENTATION.md",
+      "sha256": "ca5bab0871804915761ec281f39113317f1c3df0c7f6cd0264fdb66097ebfab6"
+    }
+  ],
+  "execution": {
+    "name": "frontend-report-reading-first",
+    "exit": 0,
+    "inputSHA256": "791e1dd4681306c5c4557a9439d04ad0112dd6b81b9da2ec37ae66dc8bbbc5a1",
+    "command": [
+      "/tmp/cognitive-takeover-20261027/tools/node-v24.21.0-linux-x64/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/modules/cognitive/tasks/hearts-flowers/HFReport.test.tsx",
+      "--maxWorkers=1",
+      "--reporter=json",
+      "--outputFile=/tmp/hearts-flowers-content-20261027/frontend-report-reading-first.vitest.json"
+    ],
+    "passed": 2,
+    "failed": 0,
+    "cases": [
+      [
+        "Hearts and flowers report reading describes actual counts in Chinese and English, keeping technical definitions collapsed",
+        "passed"
+      ],
+      [
+        "Hearts and flowers report reading distinguishes real zero and unanswered trials from absent conditions, and keeps invalid or malformed reports behind the gate",
+        "passed"
+      ]
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "frontend-report-reading-first.execution.json",
+      "sha256": "2336282c30254d7543cf8b7bea03c922f3d634e2d7978ec661be7d31985dbd5a",
+      "bytes": 13862
+    },
+    {
+      "path": "frontend-report-reading-first.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "frontend-report-reading-first.stdout.log",
+      "sha256": "fed8034e51dec02648bee22dd2583473aad0be137a760a6cad9b6dc79c304879",
+      "bytes": 102
+    },
+    {
+      "path": "frontend-report-reading-first.vitest.json",
+      "sha256": "abd6e085f0632c15df30e3b6a0c695ed6e2ea433f29fdd8f6c9ed11df8463cdc",
+      "bytes": 1546
+    }
+  ],
+  "reusedEvidence": "Earlier scorer/sequence/input/lifecycle results retain their original hashes; these modules were not modified. Original evidence/index.json is an immutable historical source manifest, not a current whole-candidate manifest.",
+  "notRun": [
+    "old connected 32-trial journey (only outdated copy expectations updated)",
+    "old runner or scorer suites",
+    "new types/build/browser/integration/CI/merge/deploy"
+  ]
+}
