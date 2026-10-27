@@ -7,14 +7,25 @@
   "product": null,
   "components": null,
   "source": {},
-  "controlBefore": {},
+  "controlBefore": {
+    ".github/scripts/pr363-bindings.json": null,
+    ".github/scripts/pr363-scope.mjs": null,
+    ".github/scripts/pr363-checks.mjs": null,
+    ".github/scripts/pr363-controls.test.mjs": null,
+    ".github/scripts/pr363-control-evidence.json": null,
+    ".github/scripts/content-scope.mjs": null,
+    ".github/scripts/merge-gate.mjs": null,
+    ".github/workflows/ci.yml": null
+  },
   "protectedInputs": {},
   "execution": null,
   "historicalAdmissions": [],
   "unresolved": [
     "Root must freeze final standard marker and IMMEDIATE/SCHEDULED feedbackPolicy inputs and full diff after independent review",
-    "Runtime owner must supply actual connected PostgreSQL and compiled browser commands, source closures, case names and report validators",
+    "Root must freeze missing PostgreSQL consumers and actual browser source/closure; real browser CLI and three-case PASS contract are wired from runtime 3a2665d8; management-summary increment awaits review",
     "Root must map actual per-case original evidence and complete consumed inputs; no summary-only admission or automatic replay",
-    "Root must select final types/lint/audit, migrations/restricted-role/nonempty restore and shared consumers before enabling"
-  ]
+    "Root must select final types/lint/audit, migrations/restricted-role/nonempty restore and shared consumers before enabling",
+    "Root must pin reviewed control checkpoint (all code-owned controls except bindings), real command executors and fixed historical raw proofs/review records"
+  ],
+  "controlCheckpoint": null
 }

@@ -1890,6 +1890,11 @@ jobs:
         artifact-ids: ${{ needs.pr363-frontend-build.outputs.images_id }}
         path: pr363-evidence
         merge-multiple: true
+    - uses: actions/download-artifact@v4
+      with:
+        artifact-ids: ${{ needs.pr363-backend-build.outputs.images_id }}
+        path: pr363-evidence
+        merge-multiple: true
     - run: node .github/scripts/pr363-checks.mjs frontend
     - uses: actions/upload-artifact@v4
       if: always()
@@ -2017,7 +2022,7 @@ jobs:
     needs: [scope, pr363-backend-build, pr363-frontend-build]
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'pr363'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     permissions:
       contents: read
       actions: read
@@ -2030,6 +2035,8 @@ jobs:
       CI_PR_NUMBER: ${{ github.event.pull_request.number }}
       CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
       NODE_ENV: test
+      TZ: UTC
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org
       NPM_CONFIG_REPLACE_REGISTRY_HOST: always
     services:
@@ -2038,9 +2045,9 @@ jobs:
         env:
           POSTGRES_USER: ptool
           POSTGRES_PASSWORD: synthetic-pr363-only
-          POSTGRES_DB: pr363_ci_test
+          POSTGRES_DB: school_teacher_browser_ci_test
         ports: ['5432/tcp']
-        options: --health-cmd "pg_isready -U ptool -d pr363_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
+        options: --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test" --health-interval 5s --health-timeout 5s --health-retries 20
       redis:
         image: redis:7.4.11-bookworm
         ports: ['6379/tcp']
@@ -2081,13 +2088,67 @@ jobs:
       with:
         artifact-ids: ${{ needs.pr363-frontend-build.outputs.dist_id }}
         path: server-version/frontend/dist
-    - name: prepare locked browser consumer dependencies without application build
+    - name: prepare official locked browser tools and system libraries without rebuilding applications
       run: |
+        npm ci --ignore-scripts --prefix .github/release-tools
+        if [ -f /etc/apt/apt-mirrors.txt ]; then
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/apt-mirrors.txt
+        fi
         bash server-version/scripts/ci-install-canvas-deps.sh
-        npm ci --prefix server-version/backend
-        node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
-    - run: node server-version/e2e/school-teacher-chrome.cjs preflight
-    - run: node .github/scripts/pr363-checks.mjs browser
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends fonts-wqy-zenhei libnss3-tools nginx openssl
+        sudo systemctl stop nginx
+        printf '%s\n' '127.0.0.1 school.eduk12.top teacher.eduk12.top # pr363-ci-ingress' | sudo tee -a /etc/hosts > /dev/null
+    - name: tighten only the approved Chrome and CJK trusted paths on this ephemeral runner
+      run: |
+        # Specific user approvals: 2026-10-27 03:31 and 03:38 UTC.
+        sudo python3 - <<'PYOPT'
+        import os,stat,subprocess,pathlib,json
+        chrome=['/opt/google/chrome/chrome','/opt/google/chrome/chrome-sandbox']
+        fonts=sorted(set(subprocess.check_output(['/usr/bin/fc-list',':lang=zh','--format','%{file}\n'],text=True).splitlines()))
+        assert fonts, 'No installed Chinese font candidates'
+        assert all(f.startswith('/usr/share/fonts/') and pathlib.Path(f).suffix.lower() in ('.ttf','.ttc','.otf','.otc') for f in fonts)
+        targets={}
+        for file in chrome+fonts:
+          p=pathlib.Path(file);targets[str(p)]='file'
+          for parent in p.parents:
+            if str(parent) in ('/','/usr'):continue
+            assert str(parent) in ('/opt','/opt/google','/opt/google/chrome','/usr/share','/usr/share/fonts') or str(parent).startswith('/usr/share/fonts/')
+            targets[str(parent)]='directory'
+        # Validate the complete bounded set before changing any of it.
+        before={}
+        for p,kind in targets.items():
+          st=os.lstat(p)
+          assert st.st_uid==0 and st.st_gid==0 and not stat.S_ISLNK(st.st_mode) and os.path.realpath(p)==p
+          assert stat.S_ISREG(st.st_mode) if kind=='file' else stat.S_ISDIR(st.st_mode)
+          before[p]=stat.S_IMODE(st.st_mode)
+        for p,mode in before.items():
+          os.chmod(p,mode & ~0o022)
+          assert stat.S_IMODE(os.lstat(p).st_mode)==mode & ~0o022
+        print(json.dumps({'scope':'approved-ephemeral-chrome-cjk-only','changes':[{'path':p,'before':oct(mode),'after':oct(mode & ~0o022)} for p,mode in sorted(before.items())]}))
+        PYOPT
+        python3 - <<'PYFONT'
+        import subprocess,os,stat,json,pathlib
+        paths=subprocess.check_output(['/usr/bin/fc-list','--format','%{file}\n'],text=True).splitlines()
+        rows=[]
+        for file in sorted(set(paths)):
+          if not file.startswith('/usr/share/fonts/'):
+            continue
+          for p in [pathlib.Path(file),*pathlib.Path(file).parents]:
+            if str(p)=='/':continue
+            st=os.lstat(p)
+            if st.st_uid!=0 or stat.S_IMODE(st.st_mode)&0o022 or stat.S_ISLNK(st.st_mode):
+              row={'path':str(p),'uid':st.st_uid,'gid':st.st_gid,'mode':oct(stat.S_IMODE(st.st_mode)),'symlink':stat.S_ISLNK(st.st_mode)}
+              if row not in rows:rows.append(row)
+        out=pathlib.Path('pr363-evidence');out.mkdir(exist_ok=True)
+        (out/'font-path-diagnostics.json').write_text(json.dumps({'readOnly':True,'untrustedPaths':rows},indent=2))
+        print(json.dumps({'readOnly':True,'untrustedPaths':rows}))
+        PYFONT
+    - name: run actual same-build private fixture and sandboxed browser through trusted HTTPS443
+      run: node .github/scripts/pr363-checks.mjs browser
+    - name: remove only this job's product ingress host aliases
+      if: always()
+      run: sudo sed -i '/# pr363-ci-ingress$/d' /etc/hosts
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -3252,7 +3313,7 @@ jobs:
     - survey-home
     - teacher-survey
     - pr356-admission
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (always() && ((github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
+    if: ${{ !(github.event_name == 'push' && needs.scope.outputs.application_route == 'pr363') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'perf/four-entry-feedback-20261027') && (always() && ((github.event_name == 'pull_request' && github.event.pull_request.number == 356 && github.event.pull_request.draft == false) || (github.event_name == 'workflow_dispatch' && github.ref_name == 'fix/runtime-time-and-validation-20261025' && inputs.pr356_phase == 'admit')
       || (!((github.event_name == 'pull_request' && (github.event.pull_request.number == 356 || github.event.pull_request.head.ref == 'fix/runtime-time-and-validation-20261025'))
       || github.ref_name == 'fix/runtime-time-and-validation-20261025') && needs.scope.outputs.application_route != 'pr356' && (!(github.event_name == 'workflow_dispatch'
       && github.ref_name == 'fix/runtime-time-and-validation-20261025') && (!(github.event_name == 'workflow_dispatch' && contains(fromJSON('["backup/shared-sjt-native-20261024","backup/training-survey-main350-20261024","perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/training-assessment-performance-20261023","work/survey-training-branding-20261023"]'),
