@@ -1,0 +1,18 @@
+{
+  "recordedAt": "2026-10-27T09:16:45.496054+00:00",
+  "kind": "contemporaneous-disclosure-only-backend-typecheck-input-observation",
+  "sourceTree": "6fbe95e22ede62fdc7b5ef100f0094d2754dcb21",
+  "codeBase": "9e80c3149778d479da98398d2b4f269a1df06024",
+  "componentTrees": {
+    "server-version/backend": "394873d5a694b268c3a271f34ff51e11e7a9c937",
+    "server-version/frontend": "1fe7f42ff5c7900c058f8c950dd9f4b313991183"
+  },
+  "sha256": {
+    "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts": "8646ddf4af1ad04356ba122af21762b5eee9dd0177fa0c0ae288f5c8003b8640",
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "e82239c8b55ca034622f61f4edaf4f12572749a41955581de8c48398d933ff9b",
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.fixture.ts": "2c57761ba4f05c8997083b22b8b20fc0c9fb78039d50c68323caf4209613ca16",
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "3051688a8b2f241650d4cb46c8dc0a4ddd36deafc221044f8ccd9f95d7c50410",
+    "server-version/backend/src/modules/reporting/respondentSummary.ts": "4f480127496f536947f3bc2f91949d7cd604f5ba23d147f896b1abee9e4eb805"
+  },
+  "limits": "Unsigned local observation; previous raw failures remain original, no complete historical dependency byte manifest."
+}

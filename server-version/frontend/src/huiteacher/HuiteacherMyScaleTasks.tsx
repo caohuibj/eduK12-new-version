@@ -3,7 +3,8 @@ import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import {assessmentStatus,type AssessmentListPresentation} from './assessmentTaskPresentation'
 import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
-import { EducationScalePersonalReport, type EducationScalePersonalReportData, type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
+import { type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
+import { EducationTaskFeedback, type EducationFeedbackData } from '../components/education-tools/EducationTaskFeedback'
 import type { CompositeAttemptState } from '../modules/composite/types'
 
 type Api=EducationReportApi
@@ -11,16 +12,6 @@ type Task={
   executionId:string;eventId:string;eventTitle:string;runId:string;
   organizationId:string;status:string;runtimeBindingRef:string|null;
   resourceKey:string;title:string;runStatus:string
-}
-type Summary=EducationScalePersonalReportData&{
-  state:'WITHHELD'|'COMPLETED'|'READY';mode?:string;
-  title?:string;scientificMaturity?:'PILOT';
-  metrics?:Array<{
-    key:string;label:string;value:number|null;precision:number;
-    headline?:string;summary?:string;direction:string;
-    guidance?:Array<{category:string;text:string}>
-  }>
-  disclaimer?:string;limitations?:string[];explanation?:string
 }
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
   runtimeBindingKind?:string;runtimeBindingRef?:string}
@@ -63,10 +54,9 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
       },
     }
   },[api,attempt])
-  const [reports,setReports]=useState<Record<string,Summary>>({})
+  const [feedback,setFeedback]=useState<{api:Api;task:Task}|null>(null)
+  const visibleFeedback=feedback?.api===api?feedback:null
   const [loading,setLoading]=useState(false)
-  const [reportBusy,setReportBusy]=useState(false)
-  const reportEpoch=useRef(0)
   const [message,setMessage]=useState('')
   const listSource=useRef({api,endpoint:'/my-scale-tasks'})
   const listRequest=useRef(0)
@@ -98,13 +88,13 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     return()=>{listRequest.current+=1}
   },[refresh])
   useEffect(()=>{
-    reportEpoch.current+=1;sessionEpoch.current+=1;setReports({});setReportBusy(false);setSession(null);setLoading(false)
-    return()=>{reportEpoch.current+=1;sessionEpoch.current+=1}
+    sessionEpoch.current+=1;setFeedback(null);setSession(null);setLoading(false)
+    return()=>{sessionEpoch.current+=1}
   },[api])
   const work=(task:(valid:()=>boolean)=>Promise<void>)=>{
     const token=++sessionEpoch.current
     const valid=()=>currentApi.current===api&&sessionEpoch.current===token
-    setLoading(true);setMessage('')
+    setLoading(true);setMessage('');setFeedback(null)
     void task(valid).catch(e=>{if(valid())setMessage(e instanceof Error?e.message:'当前测评操作失败')})
       .finally(()=>{if(valid())setLoading(false)})
   }
@@ -137,38 +127,24 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     }
     const value=await load(attemptId)
     if(!valid())return
-    setSession(value.status==='COMPLETED'?null:{api,selected:item,attempt:value})
-    await refresh()
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(item)}
+    else setSession({api,selected:item,attempt:value})
+    void refresh()
     })
   }
-  const closeReport=(executionId:string)=>{
-    reportEpoch.current+=1;setReportBusy(false)
-    setReports(previous=>{
-      const next={...previous};delete next[executionId];return next
-    })
-  }
-  const showReport=async(item:Task)=>{
-    closeReport(item.executionId)
-    const token=++reportEpoch.current
-    setReportBusy(true);setMessage('')
-    try{
-      const data=await api<Summary>(
-        '/run-executions/'+item.executionId+'/personal-summary')
-      if(token===reportEpoch.current)setReports(previous=>({...previous,[item.executionId]:data}))
-    }catch(error){
-      if(token===reportEpoch.current)setMessage(error instanceof Error?error.message:'当前报告暂不可读取，请重试。')
-    }finally{
-      if(token===reportEpoch.current)setReportBusy(false)
-    }
-  }
+  const showReport=(item:Task)=>{if(currentApi.current===api){setFeedback({api,task:item});setMessage('')}}
+  const feedbackExecutionId=visibleFeedback?.task.executionId
+  const readFeedback=useCallback(()=>api<EducationFeedbackData>(
+    '/run-executions/'+feedbackExecutionId+'/personal-summary'),[api,feedbackExecutionId])
   const leave=()=>{sessionEpoch.current+=1;sessionRef.current=null;setSession(null);setLoading(false)}
   const reload=async()=>{
     const source=visible,token=sessionEpoch.current
     if(!source||source.api!==api||currentApi.current!==api||sessionRef.current!==source)return
     const value=await load(source.attempt.id)
     if(currentApi.current!==api||sessionEpoch.current!==token||sessionRef.current!==source)return
-    setSession(value.status==='COMPLETED'?null:{...source,attempt:value})
-    await refresh()
+    if(value.status==='COMPLETED'){sessionRef.current=null;setSession(null);showReport(source.selected)}
+    else setSession({...source,attempt:value})
+    void refresh()
   }
   const submitScale=async(attemptId:string,itemId:string,payload:unknown)=>{
     const source=visible,token=sessionEpoch.current
@@ -197,43 +173,21 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         <div className="ht-inline">
           {item.status!=='COMPLETED'&&(item.runStatus==='PUBLISHED'
             ||(item.runStatus==='CLOSED'&&item.status==='STARTED'&&Boolean(item.runtimeBindingRef)))&&
-            <button type="button" disabled={loading||reportBusy||Boolean(visible)}
+            <button type="button" disabled={loading||Boolean(visible)}
               onClick={()=>open(item)}>{unified?(item.status==='STARTED'?'继续测评':'开始测评'):(item.runStatus==='CLOSED'?'继续已有自评':'进入本人自评')}</button>}
           {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'
             &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)&&
             <p className="ht-muted">任务已结束或不再接受新的 START，不能重新开始。</p>}
-          {item.status==='COMPLETED'&&<button type="button" disabled={loading||reportBusy}
+          {item.status==='COMPLETED'&&<button type="button" disabled={loading}
             onClick={()=>void showReport(item)}>查看本人反馈</button>}
         </div>
-        {reports[item.executionId]&&<TeacherAssessmentPage kind="feedback" title={item.title} onBack={()=>closeReport(item.executionId)}><div className="ht-personal-report">
-          <h4>本人描述性反馈</h4>
-          {reports[item.executionId].kind==='EDUCATION_SCALE_PERSONAL_REPORT'?<EducationScalePersonalReport
-            data={reports[item.executionId]} api={api} executionId={item.executionId} entry="TEACHER"/>:
-          reports[item.executionId].kind!==undefined&&reports[item.executionId].kind!=='HUITEACHER_PERSONAL_DESCRIPTION'
-            ?<p>当前反馈格式暂不支持，请联系管理员核查。</p>
-            :reports[item.executionId].state!=='READY'
-            ?<p>当前报告尚未获准显示。</p>
-            :<>
-              <p className="ht-muted">{reports[item.executionId].explanation}</p>
-              <p>科学成熟度：描述性 Pilot，尚无适用常模或临床临界值。</p>
-              {(reports[item.executionId].metrics??[]).map(metric=>
-                <article key={metric.key} className="ht-personal-metric">
-                  <h5>{metric.label}</h5>
-                  <strong>{typeof metric.value==='number'
-                    ?metric.value.toFixed(Math.min(6,Math.max(0,metric.precision)))
-                    :'当前数据不足，不能计算'}</strong>
-                  {metric.headline&&<p>{metric.headline}</p>}
-                  {metric.summary&&<p>{metric.summary}</p>}
-                  {metric.guidance?.map((guide,i)=><p key={i}>{guide.text}</p>)}
-                </article>)}
-              {reports[item.executionId].limitations?.map((t,i)=>
-                <p key={i} className="ht-muted">说明：{t}</p>)}
-              {reports[item.executionId].disclaimer&&<p className="ht-muted">
-                {reports[item.executionId].disclaimer}</p>}
-            </>}
-          <button type="button" onClick={()=>closeReport(item.executionId)}>关闭本人反馈</button>
-        </div></TeacherAssessmentPage>}
+
       </article>)}</div>}
+    {visibleFeedback&&<TeacherAssessmentPage kind="feedback" title={visibleFeedback.task.title} onBack={()=>setFeedback(null)}>
+      <EducationTaskFeedback key={visibleFeedback.task.executionId} api={api} entry="TEACHER"
+        executionId={visibleFeedback.task.executionId} title={visibleFeedback.task.title}
+        loadFeedback={readFeedback} onClose={()=>setFeedback(null)} renderLegacy={renderTeacherLegacyFeedback}/>
+    </TeacherAssessmentPage>}
     {selected&&attempt&&attempt.status!=='COMPLETED'&&<TeacherAssessmentPage kind="answer" title={selected.title} showTitle={false}><div className="ht-task" ref={answering} tabIndex={-1} role="region" aria-label="当前测评作答">
       {!unified&&<h3>正在完成：{selected.title}</h3>}
       {message&&<p role="status" className="ht-notice">{message}</p>}
@@ -248,10 +202,29 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
         submitFormSection={async()=>{throw new Error('教师 Scale 任务不存在 Form Section')}}
         onReload={reload}
         onExit={()=>{if(sessionRef.current===visible)leave()}}
-        onCompleted={()=>{if(sessionRef.current===visible){leave();void refresh()}}}
+        onCompleted={()=>{if(visible&&visible.attempt.status==='COMPLETED'&&sessionRef.current===visible){const task=visible.selected;leave();showReport(task);void refresh()}}}
         onEnterCognitive={()=>setMessage('该教师个人测评不允许启动认知任务')}
         onEnterSituational={()=>setMessage('该教师个人测评不允许启动情境任务')}
       />
     </div></TeacherAssessmentPage>}
   </section>
+}
+
+/** The legacy Teacher descriptive adapter is already audience-filtered by its
+ * own service. Unknown kinds never fall through to a numeric renderer. */
+function renderTeacherLegacyFeedback(data:EducationFeedbackData){
+  if(data.schemaVersion!==undefined&&data.schemaVersion!==1||data.kind!==undefined&&data.kind!=='HUITEACHER_PERSONAL_DESCRIPTION')return <p>当前反馈格式暂不支持，请联系管理员核查。</p>
+  if(data.state!=='READY')return null
+  const report=data as EducationFeedbackData&{explanation?:string;metrics?:Array<{key:string;label:string;value:number|null;precision:number;headline?:string;summary?:string;guidance?:Array<{text:string}>}>;limitations?:string[];disclaimer?:string}
+  return <div className="ht-personal-report">
+    <p className="ht-muted">{report.explanation}</p>
+    <p>科学成熟度：描述性 Pilot，尚无适用常模或临床临界值。</p>
+    {(Array.isArray(report.metrics)?report.metrics:[]).map((metric,index)=><article key={metric.key??index} className="ht-personal-metric">
+      <h5>{metric.label}</h5><strong>{typeof metric.value==='number'&&Number.isFinite(metric.value)?metric.value.toFixed(Number.isInteger(metric.precision)?Math.min(6,Math.max(0,metric.precision)):0):'当前数据不足，不能计算'}</strong>
+      {metric.headline&&<p>{metric.headline}</p>}{metric.summary&&<p>{metric.summary}</p>}
+      {metric.guidance?.map((guide,i)=><p key={i}>{guide.text}</p>)}
+    </article>)}
+    {report.limitations?.map((line,i)=><p key={i} className="ht-muted">说明：{line}</p>)}
+    {report.disclaimer&&<p className="ht-muted">{report.disclaimer}</p>}
+  </div>
 }

@@ -1,16 +1,17 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
-const m=vi.hoisted(()=>({workflow:vi.fn(),manager:vi.fn(),member:vi.fn(),source:vi.fn()}))
+const m=vi.hoisted(()=>({workflow:vi.fn(),manager:vi.fn(),member:vi.fn(),source:vi.fn(),distribution:vi.fn()}))
 vi.mock('../../modules/assessment-run/educationLibraryContext',()=>({readEducationRunLibraryContext:m.workflow}))
 vi.mock('../../modules/assessment-run/resourceBoundary',()=>({assertCurrentRunManagerBoundary:m.manager}))
 vi.mock('../../modules/organization/educationProductAccess',()=>({resolveEducationProductMemberScope:m.member}))
 vi.mock('../../modules/education-tools/assessment-resource.repository',()=>({readEducationAssessmentDeliveryIdentity:m.source,
  EducationAssessmentSourceError:class extends Error{constructor(readonly code:string){super(code)}}}))
+vi.mock('../../modules/education-tools/assessment-resource.distribution',()=>({assertEducationAssessmentDistributionCurrent:m.distribution}))
 import {assertEducationAssessmentRunUse} from '../../modules/education-tools/assessment-resource.authority'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const proof=(n:number)=>({kind:'PRODUCT_ADMIN',actorId:id(n),membershipId:id(n+10),grantId:id(n+20)})
 const db={$queryRaw:vi.fn(async()=>[{id:'matched-original-grant'}])}
 const input={actorUserId:'current-admin',organizationId:'org',runId:'run',resource:{family:'COGNITIVE',key:'exact-resource',version:'1.0.0'}}
-beforeEach(()=>{vi.clearAllMocks();m.workflow.mockResolvedValue({product:'TEACHER',teacherEventId:'event',schoolCourseId:null});m.manager.mockResolvedValue(undefined)
+beforeEach(()=>{vi.clearAllMocks();m.distribution.mockReset().mockResolvedValue(undefined);m.workflow.mockResolvedValue({product:'TEACHER',teacherEventId:'event',schoolCourseId:null});m.manager.mockResolvedValue(undefined)
  m.source.mockResolvedValue({origin:{product:'TEACHER',organizationId:'org',family:'COGNITIVE'},authority:[proof(1),proof(2),proof(3)],identityOnly:true})
  db.$queryRaw.mockResolvedValue([{id:'matched-original-grant'}]);m.member.mockImplementation(async(scope)=>({productAdmin:true,membershipId:id(Number(scope.actorUserId.slice(-12))+10)}))})
 describe('exact education delivery use authority',()=>{
@@ -43,4 +44,10 @@ it('does not accept a later valid administrator role when the original grant row
  db.$queryRaw.mockReset().mockResolvedValue([])
  await expect(assertEducationAssessmentRunUse(db as never,input)).rejects.toThrow('ORIGINAL_ISSUER_REVOKED')
  expect(m.member).toHaveBeenCalled()
+})
+
+it('rejects withdrawn exact distribution authority before returning new-use permission',async()=>{
+ m.distribution.mockRejectedValue(new Error('CONTENT_AUTHORITY_DENIED'))
+ await expect(assertEducationAssessmentRunUse(db as never,input)).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+ expect(m.distribution).toHaveBeenCalledWith(db,(await m.source.mock.results[0].value).origin)
 })

@@ -1,8 +1,9 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({get:vi.fn(),disclosure:vi.fn()}))
+const mocks=vi.hoisted(()=>({educationReport:vi.fn(),get:vi.fn(),disclosure:vi.fn()}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
 vi.mock('../../modules/composite/training-metric-disclosure',async importOriginal=>({...await importOriginal<typeof import('../../modules/composite/training-metric-disclosure')>(),loadTrainingMetricDisclosure:mocks.disclosure}))
 import {DISCLOSURE_PRESETS} from '../../modules/scale/policy/disclosure'
+vi.mock('../../modules/composite/training-report-selection',()=>({validateTrainingReportPointer:mocks.educationReport}))
 import {prepareTrainingFinalReceipt} from '../../modules/composite/training-content-final'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {compositeItemSlotKey} from '../../modules/assessment-runtime/slot-set'
@@ -124,4 +125,12 @@ it('reads a frozen static SJT report through exact persisted provenance, not an 
  expect((await readTrainingContentReports(db as never,{parent,audience:'teacher'}))[0].status).toBe('READY')
  f.measurement.provenance.mappingId='foreign'
  await expect(readTrainingContentReports(db as never,{parent,audience:'teacher'})).rejects.toMatchObject({statusCode:409})
+})
+
+it.each(['SCHOOL','TEACHER','PLATFORM'])('validates %s frozen report scope before any rendering',async product=>{
+ const f=await reportFixture();f.report.scope=product==='PLATFORM'?{kind:'PLATFORM',product:'TRAINING',resourceId:'platform'}:{kind:'PRIVATE',product,ownerId:'owner',resourceId:'composite'}
+ await expect(readTrainingContentReports(f.db as never,{parent:f.parent,audience:'teacher'})).resolves.toMatchObject([{status:'READY'}])
+ expect(mocks.educationReport).toHaveBeenCalledWith(f.db,expect.objectContaining({compositeId:'composite',ownerId:'owner',reportReleaseId:rId,publication:false}))
+ mocks.educationReport.mockRejectedValue(new Error('CONTENT_EDUCATION_SCOPE_DENIED'))
+ await expect(readTrainingContentReports(f.db as never,{parent:f.parent,audience:'teacher'})).rejects.toThrow('CONTENT_EDUCATION_SCOPE_DENIED')
 })

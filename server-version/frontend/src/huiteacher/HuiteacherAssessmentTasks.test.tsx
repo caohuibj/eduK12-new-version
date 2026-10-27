@@ -1,4 +1,5 @@
-import {cleanup,fireEvent,render,screen,within,waitFor} from '@testing-library/react'
+import {createEducationAssessmentFeedback} from '../components/education-tools/educationAssessmentFeedbackAdapter'
+import {act,cleanup,fireEvent,render,screen,within,waitFor} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 vi.mock('../survey/SurveyPublicApp',()=>({TaskForm:()=> <input aria-label="测评答案"/>}))
@@ -10,6 +11,21 @@ const privateForm={executionId:'private-task',formTitle:'课堂观察测评',eve
 const scale={executionId:'scale-task',title:'教师发展测评',eventTitle:'专业发展活动',status:'COMPLETED',runStatus:'CLOSED'}
 const card=(title:string)=>screen.getByText(title,{selector:'strong'}).closest('article')!
 describe('unified Teacher assessment inbox',()=>{
+ it('adds the approved runtime source only when explicitly assembled and forwards authoritative completion',async()=>{
+  const onCompleted=vi.fn(),api=vi.fn(async(path:string)=>{
+   if(path==='/my-assessment-tasks')return {list:[{executionId:'runtime-task',title:'认知情境组合任务',eventTitle:'合成活动',family:'BUNDLE',status:'STARTED',runStatus:'PUBLISHED',runtimeBindingRef:'runtime-parent'}],nextCursor:null}
+   if(path==='/assessment-composite-attempts/runtime-parent?view=current-unit')return {id:'runtime-parent',status:'COMPLETED',deliveryMode:'FINAL_ONLY',currentItem:null}
+   return {list:[]}
+  })
+  render(<HuiteacherAssessmentTasks api={api as Api} actorKey="actor" assessmentRuntime={{onCompleted,renderFeedback:()=> <p>独立授权反馈组件</p>}}/>)
+  await act(async()=>{await vi.dynamicImportSettled()})
+  await screen.findByText('认知情境组合任务',{selector:'strong'})
+  fireEvent.click(screen.getByRole('button',{name:'继续测评'}))
+  await screen.findByText('本次测评已完成')
+  expect(onCompleted).toHaveBeenCalledExactlyOnceWith({executionId:'runtime-task',attemptId:'runtime-parent'})
+  expect(screen.getByText('独立授权反馈组件')).toBeInTheDocument()
+  expect(api.mock.calls.some(call=>call[0].includes('/start-assessment'))).toBe(false)
+ })
  it('combines formats and retains the authorized start route',async()=>{
   const api=vi.fn(async(path:string)=>{
    if(path==='/my-form-tasks')return {list:[form]}
@@ -79,4 +95,21 @@ describe('unified Teacher assessment inbox',()=>{
   expect(screen.queryByRole('button',{name:'加载更多测评任务'})).not.toBeInTheDocument()
   expect(api).toHaveBeenCalledWith('/my-private-form-tasks?cursor=page-2')
  })
+})
+
+it('assembles the real feedback adapter after durable Teacher parent completion',async()=>{
+ const api=vi.fn(async(path:string)=>{
+  if(path==='/my-assessment-tasks')return {list:[{executionId:'joined-execution',title:'接线合成任务',eventTitle:'合成活动',family:'BUNDLE',status:'STARTED',runStatus:'PUBLISHED',runtimeBindingRef:'joined-parent'}],nextCursor:null}
+  if(path==='/assessment-composite-attempts/joined-parent?view=current-unit')return {id:'joined-parent',status:'COMPLETED',deliveryMode:'FINAL_ONLY',currentItem:null}
+  if(path==='/assessment-reports/executions/joined-execution')return {schemaVersion:1,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'COMPLETED',mode:'COMPLETION_ONLY',message:'Synthetic completion only'}
+  return {list:[]}
+ })
+ const transport=api as Api
+ render(<HuiteacherAssessmentTasks api={transport} actorKey="joined-actor" assessmentRuntime={{renderFeedback:createEducationAssessmentFeedback({api:transport,entry:'TEACHER'})}}/>)
+ await act(async()=>{await vi.dynamicImportSettled()})
+ fireEvent.click(await screen.findByRole('button',{name:'继续测评'}))
+ await screen.findByRole('region',{name:'获准的个人测评反馈'})
+ await screen.findByText('当前测评仅允许展示完成状态，不提供分数或诊断。')
+ expect(api.mock.calls.filter(([path])=>path==='/assessment-reports/executions/joined-execution')).toHaveLength(1)
+ expect(api.mock.calls.some(([path])=>path.includes('/start-assessment'))).toBe(false)
 })

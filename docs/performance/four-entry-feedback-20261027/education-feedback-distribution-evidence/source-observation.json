@@ -1,0 +1,26 @@
+{
+  "kind": "after-execution source observation, not backdated invocation inputs",
+  "commit": "b5bc4737b42e1328f1062d3ae2e6abc89e8f9879",
+  "tree": "da8318a6f3c52492f4f23c17dd0732280b6b4436",
+  "sha256": {
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.fixture.ts": "375da5ad00bd737c51b15286b0db71c38d8ab3bea5b05fa65a5f3fd159b972fc",
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "5dd55172e9ea85903dc5d240ba2d04d17dcb27479aa9a788897d12b9658f847e",
+    "server-version/backend/src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts": "f507b90f1f37a3186062b345d4b8c8a7cb73b227610a2043072105b20c285ca0",
+    "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": "4af1de2fd8ba380957d9585ce7129a23477684abac04565575e83460668d4694",
+    "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "972a72c337836397706793764af6ed83f8a409f21d22f3f6879b4b205aebd85c",
+    "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": "28447e4371e888ffa9c69ac917155e7d17badb11e7381c07721ac2712a5b5e14",
+    "server-version/backend/src/modules/education-tools/assessment-resource.distribution.ts": "05d9904e8721107de63e5d4aa45bda33e84fd2f8cbb220d8693c9e0b2f7f7e5d",
+    "server-version/backend/src/modules/composite/training-content-final.ts": "ca606452aa60cf2ba8c0408fb10aa7bf328700c2a11847671e503c39fa91aff6",
+    "server-version/backend/src/modules/composite/training-content-report.ts": "9e7a1ecdfd1a469b6e90247802c79662a242565c2fa161762086f1ab00f16b51",
+    "server-version/backend/src/modules/reporting/education-assessment-report.service.ts": "b718719ae9ef2938085755a414a8dabf851aaeac885e6a78cc8e414c89df37fc",
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "18caff63ee76f822d3dee6a1c284d23b237a038c0e433546067bc9a6123f5c91",
+    "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": "9b961ac54dcbaecc4dbf30167a96441b570175205aba08eb12620f7c8cd65296",
+    "server-version/backend/src/modules/reporting/respondentSummary.ts": "1e72dd92f261757a33d183aa5d1c44b5527e2f47579add40949d6a5dfeb89e54",
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": "02db1e528b085200e29317f808e6533f13b1bfa433ef960daae6450738a77926",
+    "server-version/frontend/src/components/education-tools/educationAssessmentFeedbackAdapter.ts": "19973d490f16739f6f8e0f0332cdf2cfbaf4d093f739801ab484b7e18338d47b",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+  }
+}

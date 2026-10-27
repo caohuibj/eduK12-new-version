@@ -41,6 +41,7 @@ export async function readEducationAssessmentDeliveryIdentity(tx:Tx,input:{
  if(canonicalHash(entry)!==row.entry_hash)fail('EDUCATION_ASSESSMENT_POLICY_IDENTITY')
  const runtime=await tx.compositeAssessment.findUnique({where:{id:row.runtime_composite_id},include:{items:{include:{cognitiveAssignment:true,scale:true}},formSections:{include:{items:true}}}})
  if(!runtime||runtime.productKind!=='ORGANIZATION_RESOURCE'||runtime.status!=='PUBLISHED'||runtime.publicEnabled||runtime.copyable
+  ||runtime.createdBy!==row.created_by_user_id||origin.distribution.actorId!==row.created_by_user_id
   ||runtime.courseId!==null||runtime.trainingContentSnapshotHash!==origin.runtimeSnapshotHash
   ||canonicalHash(runtime.trainingContentSnapshot)!==origin.runtimeSnapshotHash)fail('EDUCATION_ASSESSMENT_RUNTIME_IDENTITY')
  const definition=buildTrainingFlowUnits(runtime)

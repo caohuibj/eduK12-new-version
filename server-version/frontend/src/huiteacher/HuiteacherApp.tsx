@@ -1,6 +1,7 @@
 import {SchoolTaskHelp as ManagementHelp} from '../school/SchoolTaskHelp'
 import {TeacherAssessmentProvider} from './TeacherAssessmentPage'
 import {EducationRosterManagement} from '../components/education-roster/EducationRosterManagement'
+import {createEducationAssessmentFeedback} from '../components/education-tools/educationAssessmentFeedbackAdapter'
 import {HuiteacherAssessmentTasks} from './HuiteacherAssessmentTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
@@ -69,6 +70,7 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{re
   if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status,retryAfterSeconds:Number(response.headers.get('Retry-After'))||undefined})
   return result.data
 }
+const assessmentRuntime={renderFeedback:createEducationAssessmentFeedback({api:teacherApi,entry:'TEACHER'})}
 const assessmentResources=createEducationAssessmentResourceAdapter(teacherApi,'TEACHER')
 const Field=({label,value,set,type='text',required=true}:{
   label:string;value:string;set:(value:string)=>void;type?:string;required?:boolean
@@ -503,7 +505,7 @@ export default function HuiteacherApp(){
         </nav>
         <div className="ht-workspace-sections">
         <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="个人测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-tasks" hidden={personalSection!=='ht-personal-tasks'} className="ht-workspace-section" tabIndex={-1} aria-label="参与测评"><HuiteacherAssessmentTasks key={me.id} actorKey={me.id} api={teacherApi} assessmentRuntime={assessmentRuntime}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'

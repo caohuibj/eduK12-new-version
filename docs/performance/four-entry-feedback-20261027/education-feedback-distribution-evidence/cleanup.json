@@ -1,0 +1,34 @@
+[
+  {
+    "container": "pr363-feedback-distribution-postgres-20261027",
+    "id": "5e51473e5f114e3095b2321d07707dac7b831fc5cd358f2e5be058d0b0cbb561",
+    "action": "stop",
+    "exitCode": 0,
+    "stdout": "pr363-feedback-distribution-postgres-20261027\n",
+    "stderr": ""
+  },
+  {
+    "container": "pr363-feedback-distribution-postgres-20261027",
+    "id": "5e51473e5f114e3095b2321d07707dac7b831fc5cd358f2e5be058d0b0cbb561",
+    "action": "rm",
+    "exitCode": 0,
+    "stdout": "pr363-feedback-distribution-postgres-20261027\n",
+    "stderr": ""
+  },
+  {
+    "container": "pr363-feedback-distribution-redis-20261027",
+    "id": "f558358c5c33a85d675a500893eb7e12be3347195d4fbf2a36af780481b4463d",
+    "action": "stop",
+    "exitCode": 0,
+    "stdout": "pr363-feedback-distribution-redis-20261027\n",
+    "stderr": ""
+  },
+  {
+    "container": "pr363-feedback-distribution-redis-20261027",
+    "id": "f558358c5c33a85d675a500893eb7e12be3347195d4fbf2a36af780481b4463d",
+    "action": "rm",
+    "exitCode": 0,
+    "stdout": "pr363-feedback-distribution-redis-20261027\n",
+    "stderr": ""
+  }
+]
