@@ -1,6 +1,7 @@
+import {assertEducationAssessmentExecutionSource} from './educationAssessmentExecution'
 import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
 import {readEducationScaleExecutionSource} from './educationScaleExecutionSource'
-import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
+import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily, type RunResourcePolicy } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -96,6 +97,11 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
       ||canonicalHash(policy)!==row.resourcePolicyHash)
       throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_POLICY_MISMATCH','Private Scale source differs from the published frozen policy')
     return policy
+  })() : row.resourceKey.startsWith('education-assessment:') ? await (async()=>{
+    const frozen=row.frozenResourcePolicy as RunResourcePolicy
+    if(frozen.runtimeLaunchTarget?.kind!=='COMPOSITE')throw new RunScientificProvenanceError('RUN_RESOURCE_RUNTIME_UNAVAILABLE','Missing frozen runtime')
+    const source=await assertEducationAssessmentExecutionSource(tx,{executionId,compositeId:frozen.runtimeLaunchTarget.ref,purpose:'NEW_START'})
+    return relationalEntryToRunPolicy(source.entry)
   })() : await registry.resolveExact({ family: row.resourceFamily as RunResourceFamily, key: row.resourceKey, version: row.resourceVersion })
   const maturity = current.scientificMaturity
   if (typeof maturity !== 'string' || !MATURITIES.has(maturity as RunScientificMaturity)) {

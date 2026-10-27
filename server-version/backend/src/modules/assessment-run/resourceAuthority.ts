@@ -277,4 +277,7 @@ export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRe
           :original.resolveExact(ref)}
   })(),
   createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
+  // One cognitive tool uses the same transactional Composite parent and canonical
+  // child FINAL. This advertises capability, not approval of any source/version.
+  createRelationalRunResourceAdapter({ family: 'COGNITIVE', capabilities: transactionalCompositeCapabilities }),
 ])

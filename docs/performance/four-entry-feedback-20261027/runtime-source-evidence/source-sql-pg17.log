@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/pr357-dot-local/server-version/backend
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  09:26:07
+   Duration  5.58s (transform 3.80s, setup 0ms, import 5.32s, tests 65ms, environment 0ms)
+
