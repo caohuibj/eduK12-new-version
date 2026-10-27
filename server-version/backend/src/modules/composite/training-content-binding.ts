@@ -1,3 +1,5 @@
+import {educationMarkerBindingSchema} from '../education-tools/assessment-resource.marker-contract'
+import {readEducationMarkerSource} from '../education-tools/assessment-resource.marker'
 import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
@@ -23,7 +25,7 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  educationBinding:educationMarkerBindingSchema.optional(),standardCombination:trainingStandardItemSourceSchema.optional(),libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
  if(source.standardCombination&&(source.kind!=='SCALE'||source.libraryEntryId||source.privateVersionId||source.id!==source.standardCombination.reference.scaleId))ctx.addIssue({code:'custom',message:'Standard combination must retain its installed Scale identity'})
  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
@@ -115,8 +117,12 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     const source:Unit['source']={kind:row.kind,id:row.id,...(row.library_entry_id?{libraryEntryId:row.library_entry_id}:{}),...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
       ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id}:{}),
       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
+    const original=trainingContentSnapshotSchema.safeParse((composite as any).trainingContentSnapshot)
+    const privateId=original.success?original.data.units.find(unit=>unit.itemId===item.id)?.source.privateVersionId:undefined
+    const privateSource=privateId?await readExactPrivateSource(db,release,{...source,privateVersionId:privateId}):null
+    if(privateSource)source.privateVersionId=privateId
     const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null
-    if(!library)assertScope(release,source)
+    if(!library&&!privateSource)assertScope(release,source)
     if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
     const expected=projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
     const projected=prepareRelease(expected)
@@ -190,7 +196,15 @@ export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma
   const exact=await readTrainingStandardContentIdentity(db,{itemId:context.itemId,family:'SCALE',source,measurement:{releaseId:release.releaseId,contentHash:release.contentHash,measurementHash:release.content.measurementHash}},context)
   return exact.measurement.releaseId===release.releaseId&&exact.measurement.contentHash===release.contentHash
  }
- if(source.privateVersionId){await readExactPrivateSource(db,release,source);return true}
+ if(source.privateVersionId){
+  const exact=await readExactPrivateSource(db,release,source)
+  if(source.educationBinding){
+   if(!context)fail('SCOPE_DENIED')
+   const proof=await readEducationMarkerSource(db,source.educationBinding,context)
+   if(proof.binding.product!==exact.version.entry||proof.binding.organizationId!==exact.version.organizationId||proof.binding.ownerId!==exact.version.ownerUserId)fail('SCOPE_DENIED')
+  }
+  return true
+ }
  if(!source.libraryEntryId)return trainingMeasurementSourceScopeMatches(release,source)
  await readExactLibrarySource(db,release,source,'FROZEN_IDENTITY')
  return true
@@ -249,7 +263,12 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
     const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
     const privateSource=unit.source.privateVersionId?await readExactPrivateSource(db,release,unit.source):null
-    if(privateSource)await assertPrivateRuntimeCompositeIdentity(db,input.compositeId,unit.source.id,unit.source.privateVersionId!)
+    if(privateSource){
+      if(unit.source.educationBinding){
+       const exact=await readEducationMarkerSource(db,unit.source.educationBinding,{compositeId:input.compositeId,itemId:unit.itemId,ownerId:input.composite.createdBy!},'NEW_USE')
+       if(exact.binding.product!==privateSource.version.entry||exact.binding.organizationId!==privateSource.version.organizationId||exact.binding.ownerId!==privateSource.version.ownerUserId)fail('SCOPE_DENIED')
+      }else await assertPrivateRuntimeCompositeIdentity(db,input.compositeId,unit.source.id,unit.source.privateVersionId!)
+    }
     if(!library&&!privateSource)assertScope(release,unit.source)
     if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
     const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))

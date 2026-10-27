@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/education-tools/assessment-resource.standard-marker.postgres.integration.test.ts > Education exact standard marker real approved source > performs actual approval/trials and preserves original Training rights in a separately authorized School runtime 755ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:12:21
+   Duration  5.60s (transform 3.48s, setup 0ms, import 4.72s, tests 779ms, environment 0ms)
+

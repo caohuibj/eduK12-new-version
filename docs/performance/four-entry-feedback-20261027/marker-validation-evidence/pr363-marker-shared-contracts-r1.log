@@ -1,0 +1,125 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > pins C/P/R and the original 21B root without requiring a legacy Scale grant 30ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > uses the same exact user use across two owned courses without another grant 16ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: missing-use 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-recipient 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-combo 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > cannot start from a use row that is not the exact current combination use: wrong-hash 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > entry distribution never borrows system authority: system-issuer 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: replaced-root 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: missing-root 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-product 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: course-root 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-content 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-subject 11ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: no-distribute 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: revoked-root 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: expired-root 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: future-root 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: wrong-entry 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > without a current entry role the exact 21B delegation root is still enforced: revoked-entry 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > a current formal entry admin distributes without per-content re-approval 8ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: foreign-owner 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: foreign-course-owner 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: library-course 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: wrong-course-type 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: frozen-owner 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: survey-realm 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: wrong-item 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: changed-scale-version 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps the actual container/source boundary: changed-scale-key 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in WITHDRAWN 5ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in TRIAL_FAILED 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in APPROVED 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > refuses new use in TRIAL_RUNNING 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps missing-license non-gating after license retirement 9ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps revoked-license non-gating after license retirement 8ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps expired-license non-gating after license retirement 12ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > preserves deployment policy integrity: wrong-mode 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > preserves deployment policy integrity: changed-policy-hash 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: missing-measurement 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: revoked-measurement 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: axis-tamper 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: report-tamper 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: template-tamper 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: parameters-tamper 5ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects a broken/stopped source: emergency-stop 8ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects owner and original root expiry after source-lock waits 8ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > keeps deployment-policy expiry checks while the license gate is retired 8ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > Training consumes one exact shared combination through one user MaterialGrant > rejects client axes, self-authored and PUBLIC fields before any SQL 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > freezes formal entry authority without inventing a delegated content root 9ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: missing-role 10ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: wrong-entry 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: system-issuer 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: replaced-role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: reissued-role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: mixed-bases 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not substitute a changed or malformed formal entry basis: partial-basis 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed compositeId context before SQL 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed itemId context before SQL 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed scaleId context before SQL 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > refuses a changed ownerId context before SQL 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not silently adopt a newly issued use id 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > does not revive an old frozen reference when the same use UUID is explicitly reissued 12ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > preserves frozen C/P/R through installed-version changes, but not current grant or emergency revocation 9ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > the persisted Training source is exact, while live use remains current > keeps start-only hold semantics and current combination withdrawal separate 18ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects PENDING during source binding instead of waiting for student START 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects RETURNED during source binding instead of waiting for student START 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > rejects PAUSED during source binding instead of waiting for student START 6ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > exact Training entry approval precedes grant and publication > does not issue a Training use for a combination without Training entry approval 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original missing root even while issuer has a current entry role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original revoked root even while issuer has a current entry role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original expired root even while issuer has a current entry role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original wrong-content root even while issuer has a current entry role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > frozen delegation is not replaced by a later entry appointment > rejects the original wrong-product root even while issuer has a current entry role 3ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > projects each approved C/P/R version label for the authorized Training picker without exposing its snapshot 4ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > projects only validated frozen version labels into teacher summaries without current authority reads 7ms
+ ✓ src/__tests__/measurement-content/training-standard-source.test.ts > continues past 100 stale grants using the last scanned cursor, retaining current use checks 6ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a combination id as the existing V1 Scale/config/SJT source contract 9ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM theoretical_range parameter snapshot is not a formal normative publication just because its Survey combo is approved 4ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM descriptive_sample parameter snapshot is not a formal normative publication just because its Survey combo is approved 1ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > a PLATFORM criterion_threshold parameter snapshot is not a formal normative publication just because its Survey combo is approved 1ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not admit a Survey private parameter copy to the Training owner/composite 2ms
+ ✓ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a SURVEY report pointer as an existing Training private report binding 3ms
+ × src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a PLATFORM report pointer as an existing Training private report binding 7ms
+   → expected [Function] to throw error including 'CONTENT_TRAINING_REPORT_SELECTION_INV…' but got 'unexpected database read'
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > pins exact source-owner private content with one source query and one release read for repeated use 14ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > fails closed for missing pointers, wrong scope and publication lifecycle 6ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > permits historical report authoring for retired content without allowing new administration 3ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > rebuilds actual measurement and rejects a pointer to a different scoring definition 1ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > START keeps frozen pointers across retirement and rejects revocation or changed actual runtime 4ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > preserves legacy null/null and rejects partial, forged or source-substituted bindings 3ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > rejects a nonpositive epoch before reading releases with a controlled conflict 2ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > uses the actual Cognitive profile config and never binds a default-config release to a different profile 10ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > never substitutes an author row for a static SJT registry package 1ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > Training compact measurement publication and START binding > requires an exact SJT author pointer and compares the resolved package instead of guessing a static ID 26ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > keeps two effective profile assignment pointers distinct for the same config 11ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > START preserves the frozen private report even when revoked, with one read per release 8ms
+ ✓ src/__tests__/measurement-content/training-content-binding.test.ts > binds a real static mapping without a fabricated owner, and START preserves its exact current licensed pointer 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/measurement-content/training-standard-combination-boundary.test.ts > current Training consumers do not borrow Survey approval or PRIVATE scope > does not treat a PLATFORM report pointer as an existing Training private report binding
+AssertionError: expected [Function] to throw error including 'CONTENT_TRAINING_REPORT_SELECTION_INV…' but got 'unexpected database read'
+
+Expected: "CONTENT_TRAINING_REPORT_SELECTION_INVALID"
+Received: "unexpected database read"
+
+ ❯ src/__tests__/measurement-content/training-standard-combination-boundary.test.ts:53:97
+     51|         template:{title:'Synthetic',blocks:[{type:'METRIC',metricKey:'…
+     52|     await expect(validateTrainingReportPointer(c.db as never,{unit:c.u…
+     53|       publication:true,releases:new Map([[id,report],[c.measurement.re…
+       |                                                                                                 ^
+     54|     expect(c.db.$queryRaw).not.toHaveBeenCalled();expect(c.db.$execute…
+     55|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 95 passed (96)
+   Start at  10:15:39
+   Duration  2.98s (transform 5.02s, setup 0ms, import 7.81s, tests 559ms, environment 0ms)
+

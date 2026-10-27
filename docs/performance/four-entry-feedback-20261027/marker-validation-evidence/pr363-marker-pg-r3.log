@@ -1,0 +1,10 @@
+
+ RUN  v4.1.11 /workspace/eduK12-new-version/server-version/backend
+
+ ✓ src/__tests__/education-tools/assessment-resource.marker.postgres.integration.test.ts > Education privateVersion real persisted source and shared START binding > retains an owned exact version in an independent education runtime and rejects a forged source-item mapping 452ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:08:14
+   Duration  4.42s (transform 2.74s, setup 0ms, import 3.83s, tests 484ms, environment 0ms)
+

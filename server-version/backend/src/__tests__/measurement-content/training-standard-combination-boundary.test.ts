@@ -11,7 +11,7 @@ const id='30000000-0000-4000-8000-000000000001'
 function context(){
   const {row,measurement}=combinationFixture(),unit={itemId:'40000000-0000-4000-8000-000000000001',family:'SCALE' as const,
     source:{kind:'SCALE' as const,id:'scale',ownerId:'teacher'},measurement:{releaseId:measurement.releaseId,contentHash:measurement.contentHash,measurementHash:measurement.layer==='MEASUREMENT'?measurement.content.measurementHash:''}}
-  const db={$queryRaw:vi.fn(async()=>{throw new Error('unexpected database read')}),$executeRaw:vi.fn(async()=>{throw new Error('unexpected write')})}
+  const db={$queryRaw:vi.fn(async():Promise<unknown[]>=>{throw new Error('unexpected database read')}),$executeRaw:vi.fn(async()=>{throw new Error('unexpected write')})}
   return {row,measurement,unit,db}
 }
 const stored=(raw:unknown):StoredRelease=>({...prepareRelease(raw),releaseId:id,status:'PUBLISHED',publishedBy:'system',publishedAt:new Date('2026-10-25T00:00:00Z')})
@@ -45,12 +45,17 @@ describe('current Training consumers do not borrow Survey approval or PRIVATE sc
   })
   it.each(['SURVEY','PLATFORM'] as const)('does not treat a %s report pointer as an existing Training private report binding',async product=>{
     const c=context(),scope=product==='PLATFORM'?{kind:'PLATFORM',ownerId:'system'}:{kind:'PRIVATE',product,ownerId:'teacher',resourceId:'composite'}
+    if(product==='PLATFORM')c.db.$queryRaw.mockImplementationOnce(async()=>[])
     const report=stored({layer:'REPORT',family:'SCALE',key:'synthetic-report',version:'R1',scope,provenance:{surveyApprovedTriplet:c.row.combination_hash},assetRefs:[],sourceReleaseId:null,
       content:{projectionVersion:1,measurements:[{releaseId:c.measurement.releaseId,contentHash:c.measurement.contentHash}],metricKeys:['effort'],
         audience:'researcher',language:'zh-CN',generatorVersion:DECLARATIVE_REPORT_GENERATOR,
         template:{title:'Synthetic',blocks:[{type:'METRIC',metricKey:'effort',label:'Synthetic',display:'RAW'}],limitations:[],disclaimer:'Synthetic only'}}})
     await expect(validateTrainingReportPointer(c.db as never,{unit:c.unit,compositeId:'composite',ownerId:'teacher',reportReleaseId:id,
-      publication:true,releases:new Map([[id,report],[c.measurement.releaseId,c.measurement]])})).rejects.toThrow('CONTENT_TRAINING_REPORT_SELECTION_INVALID')
-    expect(c.db.$queryRaw).not.toHaveBeenCalled();expect(c.db.$executeRaw).not.toHaveBeenCalled()
+      publication:true,releases:new Map([[id,report],[c.measurement.releaseId,c.measurement]])})).rejects.toThrow(product==='PLATFORM'?'CONTENT_EDUCATION_SCOPE_DENIED':'CONTENT_TRAINING_REPORT_SELECTION_INVALID')
+    if(product==='PLATFORM'){
+      expect(c.db.$queryRaw).toHaveBeenCalledTimes(1)
+      expect((c.db.$queryRaw.mock.calls[0] as unknown as [{sql:string}])[0].sql).toContain('FROM education_assessment_deliveries WHERE runtime_composite_id=')
+    }else expect(c.db.$queryRaw).not.toHaveBeenCalled()
+    expect(c.db.$executeRaw).not.toHaveBeenCalled()
   })
 })
