@@ -259,6 +259,30 @@
     "label": "社会意识",
     "axis": "construct"
   },
+  "construct:sel_eaq30_analysing_own": {
+    "label": "思考自己的情绪",
+    "axis": "construct"
+  },
+  "construct:sel_eaq30_attending_to_others": {
+    "label": "关注他人的情绪",
+    "axis": "construct"
+  },
+  "construct:sel_eaq30_bodily_unawareness": {
+    "label": "较少觉察身体信号",
+    "axis": "construct"
+  },
+  "construct:sel_eaq30_differentiating": {
+    "label": "分辨自己的情绪",
+    "axis": "construct"
+  },
+  "construct:sel_eaq30_not_hiding": {
+    "label": "不隐藏情绪",
+    "axis": "construct"
+  },
+  "construct:sel_eaq30_verbal_sharing": {
+    "label": "用语言分享感受",
+    "axis": "construct"
+  },
   "construct:sel_secq25_relationship_management": {
     "label": "关系管理",
     "axis": "construct"
