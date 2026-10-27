@@ -252,3 +252,28 @@ files472cases from original exact reports; formally run11 affected consumers
 frontend build/runtime scan, and real browser. Backend remains complete reuse.
 Fresh SAST includes the actual shared component/test and changed e2e consumer.
 This does not replay all570 earlier tests or drop the selected formal contracts.
+
+## Form-specific browser adaptation after scale journey succeeds (04:31 UTC)
+
+Run40449223254 at3af54d38 formally passed11affected frontend files108cases,
+54unchanged472case reuse, type/lint/newbuild/scan and all other nonbrowser jobs.
+Teacher actual scale keyboard focus, save/reopen, FINAL and personal report now
+PASS. School actual scale authoring/freeze PASS. Raw browser12709189620
+ZIPf9ffa60bc27e592e9c0472b06f2a2e524a699f512ae53dd4bfce99f236bf004d
+retains remaining School form-editor timeout and Teacher FORM keyboard assertion.
+
+School compact form directory is named 表单分组与题目, not 区段, and can close
+on resize or selection. Open its real disclosure before each directory selection.
+Teacher FORM auto-advance intentionally moves focus from the old radio to the
+next question. Keep the Space action, verify next-question visible focus, go back
+and assert the original radio is checked; do not require focus on an unmounted
+radio or disable auto-advance. No production or backend bytes change in this fix.
+The two e2e changes ed9dc515 are skip-ci;11direct UI contractsPASS, not browserproof.
+
+Reuse the successful focus-fixed frontend fromrun40449223254/job122007883724,
+checks12710005978 ZIPbeb1ba8bcac5cdbadd67a6441b24eaea1061910f6211865e97fb999fa8b80cce,
+build12709388165 ZIPe81ba2ec55edbaaeeb63e96ac3fc47581a40bb28ebb27eb56f69c7f680cfcc68,
+image86d6ab63e8d173bd591a6102271356397f2dc6c9439449ad3fe2b6d2783d0ff4.
+Actual raw108PASS and original472 selection plus exactmanifest/component/scan
+are required; no old pre-focus image fallback, retest or rebuild. Only changed
+browser consumer and controls/SAST/final gate remain; original failures retained.

@@ -99,3 +99,10 @@ test('focus fix retains only unchanged passing files and requires all affected c
  const file=selected.accepted[0].file;const bad=structuredClone(rows);bad.find(r=>r.name.endsWith('/'+file)).assertionResults[0].status='failed';assert.throws(()=>selectUnchangedFrontend({reports:[{testResults:bad}]}));
  assert(selected.accepted.every(r=>!focusConsumers.includes(r.file)));
 });
+import {focusedFrontend,focusArtifacts} from './pr357-continuation.mjs';
+test('focus frontend reuse pins the successful updated component, never the pre-fix image',()=>{
+ const now=Date.now(),a=focusArtifacts.checks,m={id:a.id,name:a.prefix+focusedFrontend.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:focusedFrontend.run,head_sha:focusedFrontend.head,head_branch:binding.branch},size_in_bytes:116262,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'checks',now,'focus').id,a.id);
+ assert.throws(()=>verifyOriginalArtifact({...m,id:styleArtifacts.checks.id},'checks',now,'focus'));
+ assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:styledFrontend.run}},'checks',now,'focus'));
+});
