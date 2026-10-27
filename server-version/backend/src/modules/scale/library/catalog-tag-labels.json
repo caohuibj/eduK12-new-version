@@ -239,6 +239,38 @@
     "label": "学校归属",
     "axis": "construct"
   },
+  "construct:sel_wcsd_seca_emotion_knowledge": {
+    "label": "自我觉察：情绪知识",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_emotion_regulation": {
+    "label": "自我管理：情绪调节",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_goal_management": {
+    "label": "自我管理：目标管理",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_relationship_skills": {
+    "label": "人际关系技能",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_responsible_decision": {
+    "label": "负责任的决策",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_school_work": {
+    "label": "自我管理：学校功课",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_self_concept": {
+    "label": "自我觉察：自我概念",
+    "axis": "construct"
+  },
+  "construct:sel_wcsd_seca_social_awareness": {
+    "label": "社会觉察",
+    "axis": "construct"
+  },
   "construct:self_as_context": {
     "label": "以己为景",
     "axis": "construct"
@@ -355,6 +387,10 @@
     "label": "心理灵活性相关过程",
     "axis": "domain"
   },
+  "domain:sel": {
+    "label": "SEL",
+    "axis": "domain"
+  },
   "domain:self_regulation": {
     "label": "行为自我调节",
     "axis": "domain"
@@ -369,6 +405,10 @@
   },
   "domain:social_emotional": {
     "label": "人际、社会支持与社会情感",
+    "axis": "domain"
+  },
+  "domain:social_emotional_competence": {
+    "label": "社会情感相关能力",
     "axis": "domain"
   },
   "domain:stress_work": {
@@ -393,6 +433,10 @@
   },
   "language_validation:chinese_source": {
     "label": "中文原始/项目适配文本",
+    "axis": "language_validation"
+  },
+  "language_validation:chinese_working_translation": {
+    "label": "中文工作译文（未验证）",
     "axis": "language_validation"
   },
   "language_validation:content_en": {
@@ -450,6 +494,10 @@
   "language_validation:working_translation": {
     "label": "中文工作译稿",
     "axis": "language_validation"
+  },
+  "license:author_contact_required": {
+    "label": "需要联系作者",
+    "axis": "license"
   },
   "license:author_free_use": {
     "label": "作者允许免费使用（详见具体许可）",
@@ -515,12 +563,20 @@
     "label": "再分发受限/须遵守条件",
     "axis": "license"
   },
+  "license:redistribution_review_pending": {
+    "label": "再分发范围待核",
+    "axis": "license"
+  },
   "license:self_authored": {
     "label": "项目自编",
     "axis": "license"
   },
   "license:share_alike": {
     "label": "相同方式共享",
+    "axis": "license"
+  },
+  "license:translation_review_pending": {
+    "label": "翻译范围待核",
     "axis": "license"
   },
   "orientation:ACT": {
@@ -533,6 +589,10 @@
   },
   "orientation:DBT": {
     "label": "辩证行为疗法相关",
+    "axis": "orientation"
+  },
+  "orientation:casel": {
+    "label": "CASEL",
     "axis": "orientation"
   },
   "population:adolescent_source_evidence_only": {
@@ -611,6 +671,10 @@
     "label": "7—12年级（目录范围）",
     "axis": "population"
   },
+  "population:k12": {
+    "label": "K12",
+    "axis": "population"
+  },
   "population:teacher": {
     "label": "教师本人（目录范围）",
     "axis": "population"
@@ -633,6 +697,10 @@
   },
   "response:self": {
     "label": "本人自评",
+    "axis": "response"
+  },
+  "response:student_self": {
+    "label": "学生自评",
     "axis": "response"
   },
   "response:teacher_report": {

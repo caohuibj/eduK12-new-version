@@ -1,0 +1,64 @@
+{
+  "version": "17",
+  "complete_answers": {
+    "wc01": 1,
+    "wc05": 2,
+    "wc06": 3,
+    "wc10": 4,
+    "wc11": 1,
+    "wc12": 2,
+    "wc13": 3,
+    "wc16": 4,
+    "wc17": 1,
+    "wc20": 2,
+    "wc21": 3,
+    "wc24": 4,
+    "wc25": 1,
+    "wc30": 2,
+    "wc31": 3,
+    "wc36": 4,
+    "wc37": 1
+  },
+  "scores": {
+    "self_concept": {
+      "answered": 1,
+      "expected": 1,
+      "mean": 1.0
+    },
+    "emotion_knowledge": {
+      "answered": 3,
+      "expected": 3,
+      "mean": 3.0
+    },
+    "social_awareness": {
+      "answered": 3,
+      "expected": 3,
+      "mean": 2.0
+    },
+    "emotion_regulation": {
+      "answered": 2,
+      "expected": 2,
+      "mean": 2.5
+    },
+    "goal_management": {
+      "answered": 2,
+      "expected": 2,
+      "mean": 2.5
+    },
+    "school_work": {
+      "answered": 2,
+      "expected": 2,
+      "mean": 2.5
+    },
+    "relationship_skills": {
+      "answered": 2,
+      "expected": 2,
+      "mean": 2.5
+    },
+    "responsible_decision": {
+      "answered": 2,
+      "expected": 2,
+      "mean": 2.5
+    }
+  }
+}

@@ -1,0 +1,600 @@
+{
+  "id": "wcsd-seca",
+  "versions": {
+    "40": {
+      "reporter": "student_self_report",
+      "items": [
+        "wc01",
+        "wc02",
+        "wc03",
+        "wc04",
+        "wc05",
+        "wc06",
+        "wc07",
+        "wc08",
+        "wc09",
+        "wc10",
+        "wc11",
+        "wc12",
+        "wc13",
+        "wc14",
+        "wc15",
+        "wc16",
+        "wc17",
+        "wc18",
+        "wc19",
+        "wc20",
+        "wc21",
+        "wc22",
+        "wc23",
+        "wc24",
+        "wc25",
+        "wc26",
+        "wc27",
+        "wc28",
+        "wc29",
+        "wc30",
+        "wc31",
+        "wc32",
+        "wc33",
+        "wc34",
+        "wc35",
+        "wc36",
+        "wc37",
+        "wc38",
+        "wc39",
+        "wc40"
+      ]
+    },
+    "17": {
+      "reporter": "student_self_report",
+      "items": [
+        "wc01",
+        "wc05",
+        "wc06",
+        "wc10",
+        "wc11",
+        "wc12",
+        "wc13",
+        "wc16",
+        "wc17",
+        "wc20",
+        "wc21",
+        "wc24",
+        "wc25",
+        "wc30",
+        "wc31",
+        "wc36",
+        "wc37"
+      ]
+    }
+  },
+  "prompt_zh_working": "对你来说，做到下面每件事有多难或多容易？",
+  "options": [
+    {
+      "value": 1,
+      "en": "Very difficult",
+      "zh": "非常困难"
+    },
+    {
+      "value": 2,
+      "en": "Difficult",
+      "zh": "困难"
+    },
+    {
+      "value": 3,
+      "en": "Easy",
+      "zh": "容易"
+    },
+    {
+      "value": 4,
+      "en": "Very easy",
+      "zh": "非常容易"
+    }
+  ],
+  "dimensions": [
+    {
+      "id": "self_concept",
+      "name": "自我觉察：自我概念",
+      "item_ids": [
+        "wc01",
+        "wc02",
+        "wc03",
+        "wc04"
+      ],
+      "short_item_ids": [
+        "wc01"
+      ]
+    },
+    {
+      "id": "emotion_knowledge",
+      "name": "自我觉察：情绪知识",
+      "item_ids": [
+        "wc05",
+        "wc06",
+        "wc07",
+        "wc08",
+        "wc09",
+        "wc10"
+      ],
+      "short_item_ids": [
+        "wc05",
+        "wc06",
+        "wc10"
+      ]
+    },
+    {
+      "id": "social_awareness",
+      "name": "社会觉察",
+      "item_ids": [
+        "wc11",
+        "wc12",
+        "wc13",
+        "wc14",
+        "wc15"
+      ],
+      "short_item_ids": [
+        "wc11",
+        "wc12",
+        "wc13"
+      ]
+    },
+    {
+      "id": "emotion_regulation",
+      "name": "自我管理：情绪调节",
+      "item_ids": [
+        "wc16",
+        "wc17",
+        "wc18",
+        "wc19"
+      ],
+      "short_item_ids": [
+        "wc16",
+        "wc17"
+      ]
+    },
+    {
+      "id": "goal_management",
+      "name": "自我管理：目标管理",
+      "item_ids": [
+        "wc20",
+        "wc21",
+        "wc22",
+        "wc23"
+      ],
+      "short_item_ids": [
+        "wc20",
+        "wc21"
+      ]
+    },
+    {
+      "id": "school_work",
+      "name": "自我管理：学校功课",
+      "item_ids": [
+        "wc24",
+        "wc25",
+        "wc26",
+        "wc27",
+        "wc28",
+        "wc29"
+      ],
+      "short_item_ids": [
+        "wc24",
+        "wc25"
+      ]
+    },
+    {
+      "id": "relationship_skills",
+      "name": "人际关系技能",
+      "item_ids": [
+        "wc30",
+        "wc31",
+        "wc32",
+        "wc33",
+        "wc34",
+        "wc35"
+      ],
+      "short_item_ids": [
+        "wc30",
+        "wc31"
+      ]
+    },
+    {
+      "id": "responsible_decision",
+      "name": "负责任的决策",
+      "item_ids": [
+        "wc36",
+        "wc37",
+        "wc38",
+        "wc39",
+        "wc40"
+      ],
+      "short_item_ids": [
+        "wc36",
+        "wc37"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "wc01",
+      "table2_position": 1,
+      "dimension": "self_concept",
+      "english": "Knowing what my strengths are",
+      "zh_working_translation": "知道自己的长处是什么",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc02",
+      "table2_position": 2,
+      "dimension": "self_concept",
+      "english": "Knowing how to get better at things that are hard for me to do at school",
+      "zh_working_translation": "知道怎样把在学校里觉得困难的事情做得更好",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc03",
+      "table2_position": 3,
+      "dimension": "self_concept",
+      "english": "Knowing when I am wrong about something",
+      "zh_working_translation": "知道自己什么时候弄错了",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc04",
+      "table2_position": 4,
+      "dimension": "self_concept",
+      "english": "Knowing when I can’t control something",
+      "zh_working_translation": "知道什么时候有些事情我无法控制",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc05",
+      "table2_position": 5,
+      "dimension": "emotion_knowledge",
+      "english": "Knowing when my feelings are making it hard for me to focus",
+      "zh_working_translation": "知道什么时候自己的感受让我难以集中注意力",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc06",
+      "table2_position": 6,
+      "dimension": "emotion_knowledge",
+      "english": "Knowing the emotions I feel",
+      "zh_working_translation": "知道自己感受到的情绪",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc07",
+      "table2_position": 7,
+      "dimension": "emotion_knowledge",
+      "english": "Knowing ways to make myself feel better when I’m sad",
+      "zh_working_translation": "知道难过时怎样让自己感觉好一些",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc08",
+      "table2_position": 8,
+      "dimension": "emotion_knowledge",
+      "english": "Noticing what my body does when I am nervous",
+      "zh_working_translation": "注意到自己紧张时身体的反应",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc09",
+      "table2_position": 9,
+      "dimension": "emotion_knowledge",
+      "english": "Knowing when my mood affects how I treat others",
+      "zh_working_translation": "知道什么时候自己的心情会影响我对待他人的方式",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc10",
+      "table2_position": 10,
+      "dimension": "emotion_knowledge",
+      "english": "Knowing ways I calm myself down",
+      "zh_working_translation": "知道让自己平静下来的方法",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc11",
+      "table2_position": 11,
+      "dimension": "social_awareness",
+      "english": "Learning from people with different opinions than me",
+      "zh_working_translation": "向与我意见不同的人学习",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc12",
+      "table2_position": 12,
+      "dimension": "social_awareness",
+      "english": "Knowing what people may be feeling by the look on their face",
+      "zh_working_translation": "从他人的表情知道他们可能有什么感受",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc13",
+      "table2_position": 13,
+      "dimension": "social_awareness",
+      "english": "Knowing when someone needs help",
+      "zh_working_translation": "知道什么时候有人需要帮助",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc14",
+      "table2_position": 14,
+      "dimension": "social_awareness",
+      "english": "Knowing how to get help when I’m having trouble with a classmate",
+      "zh_working_translation": "与同学相处遇到困难时，知道怎样寻求帮助",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc15",
+      "table2_position": 15,
+      "dimension": "social_awareness",
+      "english": "Knowing how my actions impact my classmates",
+      "zh_working_translation": "知道自己的行为会怎样影响同学",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc16",
+      "table2_position": 16,
+      "dimension": "emotion_regulation",
+      "english": "Getting through something even when I feel frustrated",
+      "zh_working_translation": "即使感到沮丧，也能挺过困难",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc17",
+      "table2_position": 17,
+      "dimension": "emotion_regulation",
+      "english": "Being patient even when I am really excited",
+      "zh_working_translation": "即使非常兴奋，也能耐心等待",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc18",
+      "table2_position": 18,
+      "dimension": "emotion_regulation",
+      "english": "Staying calm when I feel stressed",
+      "zh_working_translation": "感到有压力时保持平静",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc19",
+      "table2_position": 19,
+      "dimension": "emotion_regulation",
+      "english": "Working on things even when I don’t like them",
+      "zh_working_translation": "即使不喜欢，也能继续做事情",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc20",
+      "table2_position": 20,
+      "dimension": "goal_management",
+      "english": "Finishing tasks even if they are hard for me",
+      "zh_working_translation": "即使任务对我来说很难，也能完成",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc21",
+      "table2_position": 21,
+      "dimension": "goal_management",
+      "english": "Setting goals for myself",
+      "zh_working_translation": "为自己设定目标",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc22",
+      "table2_position": 22,
+      "dimension": "goal_management",
+      "english": "Reaching goals that I set for myself",
+      "zh_working_translation": "实现自己设定的目标",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc23",
+      "table2_position": 23,
+      "dimension": "goal_management",
+      "english": "Thinking through the steps it will take to reach my goal",
+      "zh_working_translation": "仔细想清楚实现目标需要哪些步骤",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc24",
+      "table2_position": 24,
+      "dimension": "school_work",
+      "english": "Doing my schoolwork even when I do not feel like it",
+      "zh_working_translation": "即使不想做，也能做学校功课",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc25",
+      "table2_position": 25,
+      "dimension": "school_work",
+      "english": "Being prepared for tests",
+      "zh_working_translation": "为考试做好准备",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc26",
+      "table2_position": 26,
+      "dimension": "school_work",
+      "english": "Working on assignments even when they are hard",
+      "zh_working_translation": "即使作业很难，也能继续完成",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc27",
+      "table2_position": 27,
+      "dimension": "school_work",
+      "english": "Planning ahead so I can turn a project in on time",
+      "zh_working_translation": "提前计划，以便按时交项目作业",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc28",
+      "table2_position": 28,
+      "dimension": "school_work",
+      "english": "Finishing my schoolwork without reminders",
+      "zh_working_translation": "不需要提醒就完成学校功课",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc29",
+      "table2_position": 29,
+      "dimension": "school_work",
+      "english": "Staying focused in class even when there are distractions",
+      "zh_working_translation": "即使有干扰，上课时也能保持专注",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc30",
+      "table2_position": 30,
+      "dimension": "relationship_skills",
+      "english": "Respecting a classmate’s opinions during a disagreement",
+      "zh_working_translation": "与同学意见不一致时尊重对方的观点",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc31",
+      "table2_position": 31,
+      "dimension": "relationship_skills",
+      "english": "Getting along with my classmates",
+      "zh_working_translation": "与同学友好相处",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc32",
+      "table2_position": 32,
+      "dimension": "relationship_skills",
+      "english": "Sharing what I am feeling with others",
+      "zh_working_translation": "与他人分享自己的感受",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc33",
+      "table2_position": 33,
+      "dimension": "relationship_skills",
+      "english": "Talking to an adult when I have problems at school",
+      "zh_working_translation": "在学校遇到问题时，和一位成年人谈谈",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc34",
+      "table2_position": 34,
+      "dimension": "relationship_skills",
+      "english": "Being welcoming to someone I don’t usually eat lunch with",
+      "zh_working_translation": "友好接纳平时不和我一起吃午饭的人",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc35",
+      "table2_position": 35,
+      "dimension": "relationship_skills",
+      "english": "Getting along with my teachers",
+      "zh_working_translation": "与老师友好相处",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc36",
+      "table2_position": 36,
+      "dimension": "responsible_decision",
+      "english": "Thinking about what might happen before making a decision",
+      "zh_working_translation": "做决定前想想可能会发生什么",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc37",
+      "table2_position": 37,
+      "dimension": "responsible_decision",
+      "english": "Knowing what is right or wrong",
+      "zh_working_translation": "知道什么是对的、什么是错的",
+      "in_17": true,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc38",
+      "table2_position": 38,
+      "dimension": "responsible_decision",
+      "english": "Thinking of different ways to solve a problem",
+      "zh_working_translation": "想出解决问题的不同方法",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc39",
+      "table2_position": 39,
+      "dimension": "responsible_decision",
+      "english": "Saying “no” to a friend who wants to break the rules",
+      "zh_working_translation": "对想要违反规则的朋友说“不”",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    },
+    {
+      "id": "wc40",
+      "table2_position": 40,
+      "dimension": "responsible_decision",
+      "english": "Helping to make my school a better place",
+      "zh_working_translation": "帮助让学校变得更好",
+      "in_17": false,
+      "source": "Cheung & Ng 2024, Table 2"
+    }
+  ],
+  "tags": [
+    "SEL",
+    "学生自评",
+    "5至12年级",
+    "社会情绪能力"
+  ],
+  "source": {
+    "paper": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11117818/",
+    "attribution": "Cheung RYM, Ng OOS. Behavioral Sciences. 2024;14(5):399. doi:10.3390/bs14050399",
+    "paper_license": "CC BY 4.0 https://creativecommons.org/licenses/by/4.0/",
+    "response_options_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12882773/",
+    "original_site": "https://www.washoeschools.net/directory/accountability/school-climate/social-emotional-assessment",
+    "translation": "中文为基于论文英文题文的工作译文，并非香港研究所用已验证中文题文。"
+  },
+  "scoring_policy": {
+    "direction": "1至4，越高表示学生自评越容易；无反向题",
+    "dimension": "每维全部题目完成时计算该维题目均值；缺任何题该维不计算。此为透明展示策略，非论文确认的缺答规则。",
+    "total": "不以分维平均值机械生成总分。",
+    "short_version": "官网定位为总体能力简表；八维仅作探索性题目反馈，尤其自我概念仅一题。"
+  }
+}

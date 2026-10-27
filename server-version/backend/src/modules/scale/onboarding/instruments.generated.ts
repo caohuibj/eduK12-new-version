@@ -56,7 +56,9 @@ import { SCALE_INSTRUMENT_SOURCE as source52 } from '../instruments/value_cost_c
 import { SCALE_INSTRUMENT_SOURCE as source53 } from '../instruments/value_cost_english_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source54 } from '../instruments/value_cost_mathematics_zh_cn/1.0.0/instrument'
 import { SCALE_INSTRUMENT_SOURCE as source55 } from '../instruments/value_cost_physics_zh_cn/1.0.0/instrument'
-import { SCALE_INSTRUMENT_SOURCE as source56 } from '../instruments/who5/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source56 } from '../instruments/wcsd_seca_17_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source57 } from '../instruments/wcsd_seca_40_zh_cn/1.0.0/instrument'
+import { SCALE_INSTRUMENT_SOURCE as source58 } from '../instruments/who5/1.0.0/instrument'
 import type { ScaleInstrumentSourceV1, ScalePackageV2, VersionedScorerRegistration } from './types'
 
 /** Legacy descriptor arrays are intentionally empty after PR-4 source migration. */
@@ -121,4 +123,6 @@ export const GENERATED_SCALE_INSTRUMENT_SOURCES: readonly ScaleInstrumentSourceV
   source54,
   source55,
   source56,
+  source57,
+  source58,
 ]
