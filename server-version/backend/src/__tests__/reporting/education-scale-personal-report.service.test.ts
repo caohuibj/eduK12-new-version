@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const m = vi.hoisted(() => ({ query: vi.fn(), scope: vi.fn(), source: vi.fn(), parent: vi.fn(), children: vi.fn(), final: vi.fn(),
-  runtime: vi.fn(), admission: vi.fn(), slots: vi.fn(), canonical: vi.fn(), result: vi.fn(), report: vi.fn(), project: vi.fn() }))
+  runtime: vi.fn(), admission: vi.fn(), slots: vi.fn(), canonical: vi.fn(), reader: vi.fn(), result: vi.fn(), report: vi.fn(), project: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { $transaction: (work: (tx: unknown) => unknown) => work({
   $queryRaw: m.query, compositeAssessmentAttempt: { findUnique: m.parent }, assessment: { findMany: m.children },
   assessmentUnitSnapshot: { findMany: m.final },
@@ -10,7 +10,7 @@ vi.mock('../../modules/assessment-run/educationScaleExecutionSource', () => ({ r
 vi.mock('../../modules/assessment-runtime/runtime-snapshot', () => ({ loadFrozenScaleRuntimeSnapshot: m.runtime }))
 vi.mock('../../modules/assessment-runtime/unit-admission', () => ({ loadStoredVersionedUnitAdmission: m.admission }))
 vi.mock('../../modules/assessment-runtime/slot-set', () => ({ loadFrozenActiveSlotSet: m.slots, compositeItemSlotKey: (id: string) => 'scale:' + id }))
-vi.mock('../../modules/assessment-runtime/compact-assessment-storage', () => ({ resolveStoredScaleResult: m.result, loadStoredCanonicalUnitResult: m.canonical }))
+vi.mock('../../modules/assessment-runtime/compact-assessment-storage', () => ({ resolveStoredScaleResult: m.result, createStoredScaleFactsReader: m.reader, loadStoredCanonicalUnitResults: async (...args:unknown[]) => [await m.canonical(...args)] }))
 vi.mock('../../modules/reporting/scale-unit-report', () => ({ buildScaleUnitReport: m.report }))
 vi.mock('../../modules/reporting/education-scale-report.projector', () => ({ projectEducationScaleIndividualReport: m.project }))
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
@@ -21,6 +21,7 @@ const actorUserId = 'user-1', executionId = 'execution-1'
 let own: { organizationId: string; resourceKey: string; resourceVersion: string; attemptId: string; assignmentId: string; policy: object; policyHash: string }
 beforeEach(() => {
   vi.resetAllMocks()
+  m.reader.mockResolvedValue({read:vi.fn(),find:vi.fn()})
   const contract: ResultDisclosureContractV1 = { schemaVersion: 1, policyKey: 'test', minimumRespondents: null,
     audiences: Object.fromEntries(resultAudiences.map(key => [key, { mode: key === 'RESPONDENT' ? 'INDIVIDUAL_SUMMARY' : 'NONE',
       metricKeys: key === 'RESPONDENT' ? ['score'] : [], longitudinalMetricKeys: [] }])) as ResultDisclosureContractV1['audiences'] }
@@ -51,6 +52,11 @@ beforeEach(() => {
 describe('education personal report reader orchestration (mock storage)', () => {
   it('uses immutable HISTORY identity and independent persisted anchors, not publisher grants', async () => {
     expect(await readEducationRespondentScaleReport({ actorUserId, executionId, product: 'TEACHER' })).toMatchObject({ state: 'READY', unitReports: [{ type: 'SCALE' }] })
+    expect(m.reader).toHaveBeenCalledTimes(1)
+    const reader = await m.reader.mock.results[0].value
+    expect(m.canonical.mock.calls[0][3]).toBe(reader)
+    expect(m.result.mock.calls[0][1].reader).toBe(reader)
+    expect(m.canonical.mock.calls[0][1]).toBe(m.result.mock.calls[0][1].db)
     expect(m.source).toHaveBeenCalledWith(expect.anything(), { product: 'TEACHER', organizationId: own.organizationId, resourceKey: own.resourceKey, resourceVersion: '1.0.0', purpose: 'HISTORY' })
     expect(m.project).toHaveBeenCalledWith(expect.objectContaining({ resultAudience: 'RESPONDENT',
       persistedFacts: expect.objectContaining({ actorUserId, parent: expect.objectContaining({ frozenActiveSlotSetHash: 'slot-hash' }) }),
