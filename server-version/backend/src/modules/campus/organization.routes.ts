@@ -1,6 +1,7 @@
 import {educationRosterJobRouter} from '../education-roster/jobs.routes'
 import {educationRosterFileRouter} from '../education-roster/files.routes'
 import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
+import {educationAssessmentResourceRouter} from '../education-tools/assessment-resource.routes'
 import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
@@ -23,6 +24,7 @@ const router=Router()
 router.use(educationRosterJobRouter('SCHOOL'))
 router.use(educationRosterFileRouter('SCHOOL'))
 router.use('/organizations/:organizationId/private-tools',authenticateSchool,educationPrivateToolRouter('SCHOOL'))
+router.use('/organizations/:organizationId/assessment-resource-registrations',authenticateSchool,educationAssessmentResourceRouter('SCHOOL',requireRecentSchoolMfa))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 router.get('/organizations/:organizationId/tool-authoring-capabilities', authenticateSchool,
   educationToolAuthoringCapabilitiesHandler('SCHOOL'))

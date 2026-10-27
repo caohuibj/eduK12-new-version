@@ -24,7 +24,10 @@ export const typedCompositeFormQuestion = (item: CompositeSectionItem): FormQues
   // The unchanged shared validator checks the complete ordered graph at publication/FINAL.
   const checked = validateFormDefinition({ schemaVersion: 2, pages: [{ pageKey: 'training', title: 'Training', questions: [{ ...parsed.data!, displayIf: undefined }] }] }, { forPreview: true })
   if (!checked.definition || checked.issues.some(issue => issue.severity === 'error')) invalid('表单定义无效：' + checked.issues.map(issue => issue.message).join('; '))
-  const {displayIf:_temporaryCondition,...validatedQuestion}=checked.definition!.pages[0].questions[0]
+  // The structural preview above deliberately supplies displayIf: undefined.
+  // Do not retain that enumerable sentinel in the executable definition: the
+  // shared canonical JSON/hash contract correctly rejects undefined values.
+  const {displayIf:_previewDisplayIf,...validatedQuestion}=checked.definition!.pages[0].questions[0]
   const question = { ...validatedQuestion, ...(parsed.data!.displayIf ? { displayIf: parsed.data!.displayIf } : {}) }
   if (question.type !== (legacyTypes[item.formType] ?? item.formType) || question.required !== item.required || question.prompt !== item.formLabel) invalid('表单定义与字段类型、标题或必答策略不匹配')
   // C06 owns these policies; do not silently inherit Survey V2 semantics.

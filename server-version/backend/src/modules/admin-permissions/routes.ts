@@ -1,5 +1,6 @@
 import {prepareAdminStaticSjtMapping,publishAdminStaticSjtMeasurement} from '../situational/static-measurement-admin.service'
 import {ContentReleaseError} from '../measurement-content/release'
+import {educationAssessmentResourceRouter} from '../education-tools/assessment-resource.routes'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant} from '../measurement-content/admin-authority.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
@@ -90,6 +91,10 @@ adminSecurityRouter.post('/totp/step-up/verify', authenticate, adminTotpAttemptL
 
 export const adminPermissionsRouter = Router()
 adminPermissionsRouter.use(authenticate, originGuard, requireSystemAdmin, limiter)
+// System administrators act in their existing management entry. This never
+// permits a Training cookie to authenticate School or Teacher product routes.
+adminPermissionsRouter.use('/education/school/organizations/:organizationId/assessment-resource-registrations',requireRecentAdminKey,educationAssessmentResourceRouter('SCHOOL',requireRecentAdminKey))
+adminPermissionsRouter.use('/education/teacher/organizations/:organizationId/assessment-resource-registrations',requireRecentAdminKey,educationAssessmentResourceRouter('TEACHER',requireRecentAdminKey))
 adminPermissionsRouter.get('/accounts', handle(async req => {
   const query = z.object({ page: z.coerce.number().int().min(1).max(10000).default(1), keyword: z.string().trim().max(100).default('') }).strict().parse(req.query)
   const users = await prisma.user.findMany({ where: { accountDomain: { in: ['LEGACY','TRAINING'] },

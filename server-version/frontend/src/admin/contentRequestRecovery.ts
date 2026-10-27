@@ -9,8 +9,8 @@ const strings = (value: unknown): value is string[] => Array.isArray(value) && v
 export function isContentGrant(value: unknown): value is AdminContentGrant {
   if (!record(value) || !record(value.scope)) return false
   const scope = value.scope
-  if (!uuid(value.subjectId) || !['SURVEY', 'TRAINING'].includes(String(scope.product))
-    || !['PROJECT', 'COURSE', 'PLATFORM'].includes(String(scope.scopeKind)) || !text(scope.scopeId)
+  if (!uuid(value.subjectId) || !['SURVEY', 'TRAINING', 'SCHOOL', 'TEACHER'].includes(String(scope.product))
+    || !['PROJECT', 'COURSE', 'PLATFORM', 'ORGANIZATION'].includes(String(scope.scopeKind)) || !text(scope.scopeId)
     || !strings(scope.resourceKeys) || !scope.resourceKeys.length || scope.resourceKeys.length > 128 || !scope.resourceKeys.every(uuid)
     || new Set(scope.resourceKeys).size !== scope.resourceKeys.length || !strings(value.capabilities) || !value.capabilities.length
     || new Set(value.capabilities).size !== value.capabilities.length || !strings(value.delegableCapabilities)
@@ -21,6 +21,8 @@ export function isContentGrant(value: unknown): value is AdminContentGrant {
     || typeof value.validFrom !== 'string' || !Number.isFinite(Date.parse(value.validFrom))
     || typeof value.expiresAt !== 'string' || !Number.isFinite(Date.parse(value.expiresAt)) || Date.parse(value.expiresAt) <= Date.parse(value.validFrom)) return false
   let allowed: string[] = []
+  if (['SCHOOL','TEACHER'].includes(String(scope.product)) && scope.scopeKind === 'ORGANIZATION' && uuid(scope.scopeId)
+    && scope.resourceKind === 'material' && value.remainingDelegationDepth === 0 && value.delegableCapabilities.length === 0) allowed=['material.distribute']
   if (scope.product === 'SURVEY' && scope.scopeKind === 'PROJECT' && uuid(scope.scopeId)) {
     if (scope.resourceKind === 'reference') allowed = ['reference.analyze', 'reference.review', 'reference.publish']
     if (scope.resourceKind === 'data') allowed = ['data.reinterpret']
@@ -34,7 +36,7 @@ export function isContentGrant(value: unknown): value is AdminContentGrant {
     if (scope.scopeId === 'situational-registry' && scope.resourceKind === 'measurement') allowed = ['measurement.publish']
     if (scope.scopeId === 'reference-governance' && scope.resourceKind === 'reference') allowed = ['reference.review', 'reference.publish']
   }
-  if (scope.scopeKind === 'PLATFORM' && scope.scopeId === 'scale-library-governance') {
+  if (['TRAINING','SURVEY'].includes(String(scope.product)) && scope.scopeKind === 'PLATFORM' && scope.scopeId === 'scale-library-governance') {
     if (scope.product === 'TRAINING' && scope.resourceKind === 'catalog') allowed = ['catalog.manage']
     if (scope.resourceKind === 'material') allowed = ['material.distribute']
   }

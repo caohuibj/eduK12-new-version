@@ -1,5 +1,6 @@
 import {educationDeliveryAuthoritySchema,type EducationDeliveryAuthority} from './assessment-resource.contract'
 import {Prisma} from '@prisma/client'
+import {assertEducationAssessmentDistributionCurrent} from './assessment-resource.distribution'
 import {readEducationRunLibraryContext} from '../assessment-run/educationLibraryContext'
 import {assertCurrentRunManagerBoundary} from '../assessment-run/resourceBoundary'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
@@ -61,5 +62,6 @@ export async function assertEducationAssessmentRunUse(tx:Prisma.TransactionClien
   throw new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_WORKFLOW_MISMATCH')
  for(const proof of [...source.authority].sort((a,b)=>a.actorId.localeCompare(b.actorId)))
   await assertEducationDeliveryIssuerCurrent(tx,{proof,organizationId:input.organizationId,product:workflow.product})
+ await assertEducationAssessmentDistributionCurrent(tx,source.origin)
  return source
 }
