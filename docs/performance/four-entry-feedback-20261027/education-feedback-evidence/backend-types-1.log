@@ -1,0 +1,98 @@
+src/modules/reporting/education-assessment-personal-report.service.ts(80,56): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(82,54): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(83,9): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(83,51): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(84,9): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(86,48): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(87,85): error TS2322: Type 'EducationAssessmentReportIdentity | null' is not assignable to type 'EducationAssessmentReportIdentity'.
+  Type 'null' is not assignable to type 'EducationAssessmentReportIdentity'.
+src/modules/reporting/education-assessment-personal-report.service.ts(95,117): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(98,33): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(98,62): error TS18047: 'latest' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(99,87): error TS2322: Type 'EducationAssessmentReportIdentity | null' is not assignable to type 'EducationAssessmentReportIdentity'.
+  Type 'null' is not assignable to type 'EducationAssessmentReportIdentity'.
+src/modules/reporting/education-assessment-personal-report.service.ts(103,15): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(103,41): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(103,142): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(103,165): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(105,8): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(107,81): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(107,120): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(108,29): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(108,58): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(113,53): error TS2345: Argument of type '({ compositeAssessment: { id: string; name: string; code: string; status: CompositeAssessmentStatus; createdAt: Date; updatedAt: Date; description: string | null; ... 38 more ...; publishedAt: Date | null; }; } & { ...; }) | null' is not assignable to parameter of type 'TrainingFeedbackAttempt'.
+  Type 'null' is not assignable to type 'TrainingFeedbackAttempt'.
+src/modules/reporting/education-assessment-personal-report.service.ts(122,40): error TS2345: Argument of type '({ compositeAssessment: { id: string; name: string; code: string; status: CompositeAssessmentStatus; createdAt: Date; updatedAt: Date; description: string | null; ... 38 more ...; publishedAt: Date | null; }; } & { ...; }) | null' is not assignable to parameter of type 'TrainingReferenceParent'.
+  Type 'null' is not assignable to type 'TrainingReferenceParent'.
+src/modules/reporting/education-assessment-personal-report.service.ts(122,83): error TS2345: Argument of type '({ compositeAssessment: { id: string; name: string; code: string; status: CompositeAssessmentStatus; createdAt: Date; updatedAt: Date; description: string | null; ... 38 more ...; publishedAt: Date | null; }; } & { ...; }) | null' is not assignable to parameter of type 'TrainingReferenceParent & { aggregateInputHash: string | null; trainingContentInterpretationEncrypted: string | null; trainingContentInterpretationHash: string | null; }'.
+  Type 'null' is not assignable to type 'TrainingReferenceParent & { aggregateInputHash: string | null; trainingContentInterpretationEncrypted: string | null; trainingContentInterpretationHash: string | null; }'.
+    Type 'null' is not assignable to type 'TrainingReferenceParent'.
+src/modules/reporting/education-assessment-personal-report.service.ts(122,133): error TS2345: Argument of type '({ compositeAssessment: { id: string; name: string; code: string; status: CompositeAssessmentStatus; createdAt: Date; updatedAt: Date; description: string | null; ... 38 more ...; publishedAt: Date | null; }; } & { ...; }) | null' is not assignable to parameter of type 'TrainingReferenceParent'.
+  Type 'null' is not assignable to type 'TrainingReferenceParent'.
+src/modules/reporting/education-assessment-personal-report.service.ts(123,29): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(123,67): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(124,47): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(125,29): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(125,82): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(127,84): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(127,107): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(132,36): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(132,66): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(141,101): error TS18047: 'parent' is possibly 'null'.
+src/modules/reporting/education-assessment-personal-report.service.ts(147,119): error TS18047: 'source' is possibly 'null'.
+src/modules/reporting/education-assessment-report.projector.ts(44,8): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(44,43): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(44,77): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(44,97): error TS2339: Property 'measurementHash' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'measurementHash' does not exist on type '{ projectionVersion: 1; measurements: { releaseId: string; contentHash: string; }[]; metricKeys: string[]; audience: string; language: string; generatorVersion: string; template: { blocks: ({ type: "TEXT"; text: string; } | { ...; } | { ...; } | { ...; } | { ...; })[]; limitations: string[]; title?: string | undefin...'.
+src/modules/reporting/education-assessment-report.projector.ts(45,9): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(45,34): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(45,63): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(45,78): error TS2339: Property 'measurements' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'measurements' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(46,23): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(46,38): error TS2339: Property 'measurements' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'measurements' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(48,8): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(48,23): error TS2339: Property 'audience' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'audience' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(49,9): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(49,40): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(50,9): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(50,24): error TS2339: Property 'generatorVersion' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'generatorVersion' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(51,8): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(51,40): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(55,8): error TS18048: 'interpretation' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(55,48): error TS18048: 'interpretation' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(56,16): error TS18048: 'envelope' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(58,8): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(58,23): error TS2339: Property 'metricKeys' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'metricKeys' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(58,39): error TS7006: Parameter 'key' implicitly has an 'any' type.
+src/modules/reporting/education-assessment-report.projector.ts(59,27): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(59,42): error TS2339: Property 'metricKeys' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'metricKeys' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(62,12): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(62,32): error TS2339: Property 'metrics' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'metrics' does not exist on type '{ projectionVersion: 1; measurements: { releaseId: string; contentHash: string; }[]; metricKeys: string[]; audience: string; language: string; generatorVersion: string; template: { blocks: ({ type: "TEXT"; text: string; } | { ...; } | { ...; } | { ...; } | { ...; })[]; limitations: string[]; title?: string | undefin...'.
+src/modules/reporting/education-assessment-report.projector.ts(62,45): error TS7006: Parameter 'def' implicitly has an 'any' type.
+src/modules/reporting/education-assessment-report.projector.ts(65,22): error TS18048: 'interpretation' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(68,53): error TS18048: 'slot' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(69,10): error TS18048: 'slot' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(70,28): error TS2345: Argument of type '{ status: "SELECTED"; releaseId: string; contentHash: string; entryKey: string; metricKey: string; referenceKind: "normative_distribution" | "criterion_threshold" | "descriptive_sample" | "theoretical_range"; } | { ...; } | undefined' is not assignable to parameter of type '{ releaseId: string; contentHash: string; }'.
+  Type 'undefined' is not assignable to type '{ releaseId: string; contentHash: string; }'.
+src/modules/reporting/education-assessment-report.projector.ts(71,12): error TS18048: 'release' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(71,41): error TS18048: 'release' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(71,71): error TS18048: 'release' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(71,87): error TS2339: Property 'measurement' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'measurement' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(71,111): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(72,13): error TS18048: 'release' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(72,29): error TS2339: Property 'measurement' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'measurement' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.
+src/modules/reporting/education-assessment-report.projector.ts(72,55): error TS18048: 'measurement' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(73,30): error TS18048: 'release' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(78,66): error TS18048: 'report' is possibly 'undefined'.
+src/modules/reporting/education-assessment-report.projector.ts(78,81): error TS2339: Property 'template' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; } | { ...; } | { ...; }'.
+  Property 'template' does not exist on type '{ projectionVersion: 1; instrumentVersion: string; measurementHash: string; measurementHashScheme: string; scoringVersion: string; runnerKey: string; runnerVersion: string; locale: string; localizationVersion: string; metrics: { ...; }[]; executable: Record<...>; }'.

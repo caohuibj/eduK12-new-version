@@ -113,6 +113,10 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
       WHERE id=${scope.scopeId} AND owner_user_id=${grant.subjectId} FOR SHARE`)
     if(projects.length!==1)deny()
+    if(isEducationDistribution){
+      const {lockEducationAssessmentUsers}=await import('../education-tools/assessment-resource.locks')
+      await lockEducationAssessmentUsers(tx,[actorId,grant.subjectId])
+    }
     const {users}=await lockActor(tx,actorId,proof,grant.subjectId)
     const target=users.find(user=>user.id===grant.subjectId)
     if(!target||!target.is_active||target.is_frozen||target.must_change_password)deny()

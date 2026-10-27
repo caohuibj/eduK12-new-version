@@ -1,0 +1,7 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/school/SchoolCompositeRunner.tsx
+  112:5  warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  136:5  warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+

@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-10-27T09:05:56.382917+00:00",
+  "kind": "contemporaneous-final-frontend-typecheck-input-observation",
+  "sourceTree": "f387b432434499fa71c6b4ab2836b089abe048e0",
+  "base": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "node": "v24.19.0",
+  "componentTrees": {
+    "server-version/backend": "248661096b387c780e91c44a5f5d5cee4caf4a17",
+    "server-version/frontend": "74320bfceb88e432b19bb89747b3041efa6de979"
+  },
+  "sha256": {
+    "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "69b5bb5d807a622b7acec5b30aa4facd19adac883868716729886a6d99bff1bf",
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.fixture.ts": "c0abe1f4ddaa28a3b4260d7bd432551415c4ee1c9541513882bc163392e94e8a",
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.projector.test.ts": "ab99df2abdf815d1a38f3982780ad5c7e671d1dae01bbe141ae751bc265f5e43",
+    "server-version/backend/src/__tests__/reporting/education-assessment-report.routes.test.ts": "d9b2d95951dbb01f06f97f153af242967c0497b41dc3c8414db52aab1d470f2f",
+    "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "d7b66edb71fc59289d93b2e6c1eb0f953214aa3d0080ac005c5ac65c61347dd7",
+    "server-version/backend/src/modules/reporting/education-assessment-report.projector.ts": "9b961ac54dcbaecc4dbf30167a96441b570175205aba08eb12620f7c8cd65296",
+    "server-version/backend/src/modules/reporting/education-assessment-report.routes.ts": "c6268d35c55935e4a78d2c830b3fce24380167185f337d122b8f4241e55e0e45",
+    "server-version/frontend/src/components/education-tools/EducationAssessmentReport.tsx": "20d0e5c697c9f0f70688f4aa53c52ebbec0a1cbbaebc95649e7ea766ce4aed07",
+    "server-version/frontend/src/components/education-tools/EducationTaskFeedback.test.tsx": "ca8e1aa50271d6b6bd0a0f33506b111a8ce44f1c168454b8202b378fa593abe4",
+    "server-version/frontend/src/components/education-tools/EducationTaskFeedback.tsx": "11097716517c84b47ae0d4972ab7a7d1a4d66acafa305c5430fea5ff5bf2686d",
+    "server-version/frontend/src/components/education-tools/education-personal-report.css": "cf600cb4c55a257e4e76535881c80e03ebcccdeabcc0ff467380c22688eb5b04",
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx": "f40e6baf1ecffe892dbff61ee1585bdd1aa1518975e3d92690f8d6b1d78d8f97",
+    "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx": "fd1274f2984ac3a2bf1f096e2ce09db0afa6d09002c1e664bf176b4a8c51a9de",
+    "server-version/frontend/src/modules/composite/TrainingContentReports.tsx": "a3907246b4360ba26b8f4d14b06fad86b289d5bf4186c98d968565c192d3bf17",
+    "server-version/frontend/src/school/SchoolCompositeRunner.test.tsx": "bbe6424613a64e052e4a4ce190e2c32a09810db40eb91e5bc48dff6effc81b4b",
+    "server-version/frontend/src/school/SchoolCompositeRunner.tsx": "6e5147ba549da55e5a7f9947f4dc0d3a833542ae096acbbd78e47cb80db16fc4",
+    "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx": "ae9ebd25f219e6dbb0131fb7b51b17dd9c657d38546b88eee8170cd43613b959",
+    "server-version/frontend/src/school/SchoolStudentTasks.tsx": "26aee39277ba50068ce23d6b59785358665d486028cb5b8cd41046f94dfe30ab"
+  },
+  "limits": "Unsigned local observation, not backdated to earlier invocations. Earlier raw failures and reports remain retained."
+}

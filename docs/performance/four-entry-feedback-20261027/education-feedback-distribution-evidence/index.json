@@ -1,0 +1,297 @@
+{
+  "recordedAt": "2026-10-27T10:05:29.506693+00:00",
+  "branch": "feat/pr363-education-feedback",
+  "codeCommit": "b5bc4737b42e1328f1062d3ae2e6abc89e8f9879",
+  "tree": "da8318a6f3c52492f4f23c17dd0732280b6b4436",
+  "backendTree": "ba181d3ed259331b92aeb824574ad62934bf4820",
+  "frontendTree": "9e4137e0398d343542226d4401994ebaf637abff",
+  "sourceFoundation": "0e3d210d63ae1b6c74835265e12943cf6e84ec4e",
+  "teacherRuntimeContractReadOnly": "2b4955954",
+  "node": "24.19.0",
+  "caseResults": [
+    {
+      "id": "report-unit-1",
+      "exitCode": 0,
+      "passed": 39,
+      "failed": 0,
+      "filtered": 0,
+      "success": true,
+      "cases": [
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) reads exact saved mixed reports and independently rechecks current source and respondent rights",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses not-own before facts and never treats identity as authorization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses membership before facts and never treats identity as authorization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses source-authority before facts and never treats identity as authorization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong product binding",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong organization binding",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong version binding",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong subject binding",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects wrong assignment binding",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) honors current respondent disclosure without materializing raw canonical facts",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) shows only completion when the frozen tool permits that mode",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) returns PENDING only for a real matching accepted asynchronous job",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for absent report job",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-epoch report job",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for wrong-slots report job",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) never invents PENDING for failed report job",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects respondent withdrawal during asynchronous materialization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects authority withdrawal during asynchronous materialization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) rejects release withdrawal during asynchronous materialization",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) refuses a changed canonical FINAL source rather than displaying a stored template",
+          "status": "passed"
+        },
+        {
+          "name": "education respondent multi-tool report service (mock DB boundary, real saved-fact codecs) repeated reads do not write FINAL, reinterpretation or queue state",
+          "status": "passed"
+        },
+        {
+          "name": "honors an exact configured education report opening and becomes readable after that time",
+          "status": "passed"
+        },
+        {
+          "name": "refuses a different frozen publication even if unit IDs are the same",
+          "status": "passed"
+        },
+        {
+          "name": "does not replace original source authority proofs with another later administrator during a read",
+          "status": "passed"
+        },
+        {
+          "name": "refuses replacement of the frozen distribution proof while materializing a saved report",
+          "status": "passed"
+        },
+        {
+          "name": "keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle",
+          "status": "passed"
+        },
+        {
+          "name": "production composition consumes HISTORY and original proofs without new-use or current-issuer admission",
+          "status": "passed"
+        },
+        {
+          "name": "pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection renders approved SCHOOL mixed-family saved facts through the shared interpreter and renderer",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection renders approved TEACHER mixed-family saved facts through the shared interpreter and renderer",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection withholds audience without falling back to numeric facts",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection withholds training-private without falling back to numeric facts",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection withholds metric-withdrawn without falling back to numeric facts",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection honors current MEASUREMENT revocation while retaining original completion facts",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection honors current REPORT revocation while retaining original completion facts",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection allows exact retired history but never an unselected or missing report version",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection rejects substituted result identity",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection rejects substituted source identity",
+          "status": "passed"
+        },
+        {
+          "name": "education exact-version declared projection rejects substituted family identity",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "report-pg-1",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "filtered": 0,
+      "success": false,
+      "cases": [
+        {
+          "name": "education production report composition with real migrated PostgreSQL and real account middleware SCHOOL reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+          "status": "failed"
+        },
+        {
+          "name": "education production report composition with real migrated PostgreSQL and real account middleware TEACHER reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "id": "report-pg-2",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 1,
+      "success": true,
+      "cases": [
+        {
+          "name": "education production report composition with real migrated PostgreSQL and real account middleware SCHOOL reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+          "status": "passed"
+        },
+        {
+          "name": "education production report composition with real migrated PostgreSQL and real account middleware TEACHER reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+          "status": "skipped"
+        }
+      ]
+    }
+  ],
+  "otherChecks": {
+    "backend-types-1": 0,
+    "app-lint-1": 0,
+    "migrate-setup-1": 0
+  },
+  "protectedRootPaths": [
+    "server-version/backend/src/modules/education-tools",
+    "server-version/backend/prisma/migrations",
+    "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts",
+    "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+    "server-version/backend/src/modules/assessment-run/resourceAuthority.ts",
+    "server-version/backend/src/modules/assessment-run/run.service.ts",
+    "server-version/backend/src/modules/huiteacher/run.service.ts",
+    "server-version/backend/src/modules/composite/training-content-final.ts",
+    "server-version/backend/src/modules/composite/training-content-report.ts"
+  ],
+  "protectedRootDiffExitCode": 0,
+  "containers": {
+    "postgres": {
+      "name": "pr363-feedback-distribution-postgres-20261027",
+      "id": "5e51473e5f114e3095b2321d07707dac7b831fc5cd358f2e5be058d0b0cbb561",
+      "image": "postgres:16.15-bookworm",
+      "imageId": "sha256:345c8087a592c68bc6b1c347bb865b43e14cdefec77d741f85195588028f57a4"
+    },
+    "redis": {
+      "name": "pr363-feedback-distribution-redis-20261027",
+      "id": "f558358c5c33a85d675a500893eb7e12be3347195d4fbf2a36af780481b4463d",
+      "image": "redis:7.4.11-bookworm",
+      "imageId": "sha256:64035c2c9726d90bea2a217d43da49d7a3f13dde8647c1f409059e02e0e61287"
+    }
+  },
+  "containersRemoved": true,
+  "environment": {
+    "freshLoopbackDatabase": "pr363_feedback_distribution_test",
+    "DATABASE_URL": "explicitly the same new database as PR363_FEEDBACK_DATABASE_URL; URL not published",
+    "REDIS_URL": "new disposable Redis only",
+    "CI": null,
+    "GITHUB_ACTIONS": null,
+    "RELEASE_VERIFY_LOCAL": null,
+    "syntheticEncryptionAndJwtKeys": true,
+    "CAMPUS_ELIGIBILITY_HMAC_KEY": "not set in report-pg-1; synthetic 64 hex chars added for School-only report-pg-2"
+  },
+  "commands": {
+    "report-unit-1": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/reporting/education-assessment-report.projector.test.ts --maxWorkers=2 --reporter=json --outputFile=/tmp/pr363-feedback-distribution/report-unit-1.json",
+    "backend-types-1": "./node_modules/.bin/tsc --noEmit",
+    "app-lint-1": "./node_modules/.bin/eslint src/huiteacher/HuiteacherApp.tsx",
+    "postgresChecks": "Exact argument arrays and cwd are in *.execution.json. Migration is only setup of this independent new database."
+  },
+  "limits": [
+    "Unsigned local development evidence on Node 24.19.0, below engines; no CI/build/browser/deployment qualification.",
+    "report-pg-1 remains exit 1: Teacher passed, School fixture failed before report setup for missing synthetic campus HMAC key. Only School reran in report-pg-2.",
+    "Stored synthetic accepted FINAL facts, source metadata and original approval proofs remain fixture preparation. This is report-reader/current-authority evidence, not new-tool START/scorer/FINAL or restricted runtime DB role evidence.",
+    "Existing source 18-case, root 40-case exact report-consumer evidence and Teacher runtime tests were not repeated.",
+    "Teacher runtime host and assembly were read from its own branch, not copied or modified. Root must retain its actual lazy rendering and prop forwarding when integrating our existing minimal App injection.",
+    "Raw evidence is copied unchanged; source-observation.json is after-execution observation, not a backdated invocation-start manifest.",
+    "App lint exit 0 retains one preexisting org dependency warning."
+  ],
+  "files": {
+    "app-lint-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "app-lint-1.log": "aa54ad9a48a517be8310ad1dc2543a6f934011930a0c9507e2a4ead813974f54",
+    "backend-types-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "backend-types-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cleanup.json": "96f95bde0bc73903f376016051de3c4a1cd57190f007e23f569c88c49c479f79",
+    "database-observation.log": "694bd223bc3e9b1bf521040fc364be3c9cd8699b4ae52a908ab7f385474f44ac",
+    "migrate-setup-1.execution.json": "95379a60eae12694f28a301ebb33625554f98e762063edb6b427e8d953aa541e",
+    "migrate-setup-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "migrate-setup-1.log": "dc338a9c9fddf781aaf1676860144343c61cabd153f0b01119ae04b62d7740d0",
+    "postgres-create.log": "113e5fe61b3e91cb6a56cdb28452833b74467a2709fd38faaefd31199386f075",
+    "redis-create.log": "2c38d1fce79194b47dd1c8a416a6daaff519368f4f79c7b5fd7e4ec304f36605",
+    "report-pg-1.execution.json": "79b52c66b9e57f2850c3459bef3843a3e7ba7ab0cd0fc046b904bd89b647af76",
+    "report-pg-1.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "report-pg-1.json": "0b25fe974420f69a556d661b76bfe837b0cc2c2e1ffd40453f1053f967333aed",
+    "report-pg-1.log": "f3d72f5cae8759c87ce5ce18e62a7ffce8f7f315216a8ceced3446d0e97eb3a0",
+    "report-pg-2.execution.json": "dbe284a27b5331c8fcd98d4f3bd95121454f7eed36fc0b8e1941518d3709c450",
+    "report-pg-2.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "report-pg-2.json": "d3b27767885c3ea7d6109f7d3e6a5143ec58998c6b6a74ab8422c0e09801a520",
+    "report-pg-2.log": "090ca4ca5997f6c19d89df80d0a9263689c92f7ed7bb361ac83a9f98fd3c0091",
+    "report-unit-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "report-unit-1.json": "844e94e9bf546b52740876cd98b8dc07eaae48acc049558a95e268998ebc8ddc",
+    "report-unit-1.log": "269d3905414c686515756ee735d2990b47812c79fb3918d0f4a1ca77487864f6",
+    "source-observation.json": "6309b4de294cbc9ed572ffa84328a6718ef09e167b299755f2b12ae65d6c5437"
+  }
+}

@@ -1,3 +1,4 @@
+import {lockEducationDistributionSubjects} from './assessment-resource.locks'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
@@ -19,6 +20,7 @@ export async function assertEducationAssessmentDistribution(tx:Prisma.Transactio
  if(new Set(selection.map(s=>s.resourceId)).size!==selection.length||selection.length!==expected.length
   ||selection.some(s=>!expected.includes(s.resourceId)))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_SELECTION',403)
  if(input.pinned&&(input.pinned.actorId!==input.actorId||input.pinned.grants.length!==expected.length))fail('EDUCATION_ASSESSMENT_DISTRIBUTION_CHANGED',403)
+ await lockEducationDistributionSubjects(tx,selection.map(value=>value.grantId))
  const grants=[]
  for(const selected of [...selection].sort((a,b)=>a.grantId.localeCompare(b.grantId)||a.resourceId.localeCompare(b.resourceId))){
   const authority=await assertContentAuthority(tx,{actorId:input.actorId,grantId:selected.grantId,capability:'material.distribute',

@@ -1,0 +1,226 @@
+{
+  "recordedAt": "2026-10-27T09:53:27.247883+00:00",
+  "branch": "feat/pr363-education-feedback",
+  "codeCommit": "e44a2ce96c1e25f03685a979c36ee630e33c23fb",
+  "tree": "8517b2f07439ff2fa4cbd654a7d0115f1b0c78fb",
+  "sourceFoundation": "282e9fb353d3216d33a58306db2dbf9ae3d3d04a",
+  "backendTree": "f6e3ddb5d8a2d366449da6e874766c0a18c0f813",
+  "frontendTree": "57e9352141a2017f4b420ca61a63edd4c3eda8ff",
+  "node": "24.19.0",
+  "caseResults": [
+    {
+      "id": "backend-wiring-unit-1",
+      "exitCode": 0,
+      "passed": 36,
+      "failed": 0,
+      "filtered": 0,
+      "originalSuccess": true
+    },
+    {
+      "id": "backend-wiring-unit-2",
+      "exitCode": 0,
+      "passed": 31,
+      "failed": 0,
+      "filtered": 0,
+      "originalSuccess": true
+    },
+    {
+      "id": "frontend-wiring-1",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "filtered": 4,
+      "originalSuccess": true
+    },
+    {
+      "id": "frontend-wiring-2",
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0,
+      "filtered": 4,
+      "originalSuccess": true
+    },
+    {
+      "id": "report-pg-1",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 2,
+      "filtered": 0,
+      "originalSuccess": false
+    },
+    {
+      "id": "report-pg-2",
+      "exitCode": 1,
+      "passed": 0,
+      "failed": 2,
+      "filtered": 0,
+      "originalSuccess": false
+    },
+    {
+      "id": "report-pg-3",
+      "exitCode": 1,
+      "passed": 1,
+      "failed": 1,
+      "filtered": 0,
+      "originalSuccess": false
+    },
+    {
+      "id": "report-pg-4",
+      "exitCode": 0,
+      "passed": 1,
+      "failed": 0,
+      "filtered": 1,
+      "originalSuccess": true
+    }
+  ],
+  "typeChecks": [
+    {
+      "command": "backend ./node_modules/.bin/tsc --noEmit",
+      "log": "backend-types-2.log",
+      "exitCode": 0
+    },
+    {
+      "command": "frontend ./node_modules/.bin/tsc -p tsconfig.app.json --noEmit",
+      "log": "frontend-types-2.log",
+      "exitCode": 0
+    }
+  ],
+  "pg": {
+    "postgres": "16.15-bookworm",
+    "redis": "7.4.11-bookworm",
+    "schema": "complete prisma migrate deploy, 240 applied migrations and 267 public tables",
+    "migrateExitCode": 0,
+    "caseUnion": [
+      {
+        "report": "report-pg-3.json",
+        "selectedCase": "SCHOOL reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+        "status": "PASS"
+      },
+      {
+        "report": "report-pg-4.json",
+        "selectedCase": "TEACHER reads exact stored report, survives retirement/issuer loss, and enforces current report/realm revocation",
+        "status": "PASS"
+      }
+    ],
+    "ciOnlyEnvironment": false,
+    "realAccountMiddleware": true,
+    "syntheticPreparedFinalFacts": true,
+    "newStartOrFinalQualification": false,
+    "restrictedDatabaseRuntimeRoleQualification": false,
+    "containersRemoved": true,
+    "containerIds": [
+      "62ccaac5e772970e4223dec9fe978e1ee6e5c8fad783e8e5f29ef5fe9a49d4d1",
+      "c92081ee881e2071f53156c951ef4a40b1408bde2f79fb4ec6c1dce52b7238a7"
+    ]
+  },
+  "commands": {
+    "migrate": "./node_modules/.bin/prisma migrate deploy with an explicitly selected fresh loopback test DB; no original DB connection",
+    "backend-wiring-unit-1": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/assessment-policy/respondent-summary.test.ts src/__tests__/reporting/education-assessment-report.routes.test.ts --maxWorkers=2",
+    "backend-wiring-unit-2": "./node_modules/.bin/vitest run src/__tests__/reporting/education-assessment-personal-report.service.test.ts src/__tests__/assessment-policy/respondent-summary.test.ts --maxWorkers=2",
+    "frontend-wiring-2": "./node_modules/.bin/vitest run src/components/education-tools/EducationAssessmentFeedback.test.tsx src/school/SchoolStudentTasks.completion.test.tsx -t 'existing.*transport|late pending|server-declared' --maxWorkers=2",
+    "report-pg-1,2,3": "./node_modules/.bin/vitest run src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts --maxWorkers=1",
+    "report-pg-4": "./node_modules/.bin/vitest run src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts -t 'TEACHER reads exact stored' --maxWorkers=1",
+    "reporter": "Every test command adds --reporter=json --outputFile=/tmp/pr363-feedback-wiring/ID.json; stdout/stderr retained in ID.log. DATABASE_URL and the opted-in integration URL explicitly select the same new loopback test DB; REDIS_URL selects only the new disposable Redis. CI/GITHUB_ACTIONS/RELEASE_VERIFY_LOCAL were unset."
+  },
+  "currentSourceObservation": {
+    "kind": "after-execution frozen source observation, not backdated to invocation start",
+    "sha256": {
+      "docs/performance/four-entry-feedback-20261027/contract-progress.md": "57f128c0a06eb91dae3003f4a2a4dc538e68a7c92048557f6549af410fd7162e",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/cognitive-adapter-r1.log": "8c61c43f7673d87ef5228e23320db57520324db9b45c0ca1304a122e47a88d85",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/content-reference-r3.log": "bbe4199cda881c884aff53ee644cbe8114c3d5a1bd87ba4700ab86868ba5c95a",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/content-scope-r1.log": "875ce670e917264bac58eb6629f06e5b4afb9a5200891692c0752be00cb2f7d4",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/content-scope-r2.log": "4749de73d8021add647917271bd0ac39a9f07d57870a131573977e2e4fe53e31",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/execution-source-r1.log": "5678dd3db225dfeffadb470852fe4e9823656bf36f5915e324275c92c5c1c9a0",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/form-bundle-r1.log": "bb443e62aa35769bec957ee6dbacbfc906c2d23ff1f058f45d6873866368044c",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-evidence/source-sql-pg17.log": "898e0fcc986f8c8cefbb8c77d172b4ca5cd08ba727dee6109ac214898273414f",
+      "docs/performance/four-entry-feedback-20261027/runtime-source-progress.md": "83a0169f382631000d219d4d3cf419bc676b633b49195050d1ad488ebd1a546a",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/delivery-assertions-r2.sql": "f82f22f72023126b31bf8077deee2adef57a049e83395880a88de79192a1bdfa",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/delivery-assertions.sql": "5752cc6eaae49951324969490e28842fbc9b0498dafd710a1421a546358c4615",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/delivery-guards-pg17-r2.log": "1565ef43d5b076a935984d376ccd1667d56d086b08df553e2e7a136db9a6b618",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/delivery-guards-pg17.log": "85afe41bb25863a3b0930795631debbf7899733ba0fe73179d0af279afad2e90",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/delivery-guards.sql": "f84e9ed66138c7e454e61ca2128dd3fe066b7aca5859d0210f8edcbc09579cf0",
+      "docs/performance/four-entry-feedback-20261027/schema-guard-evidence/migration-r1.sql": "56acd33d6f845df86585db54b5e9a29b5b58447c029cbab8897c827c155ff4a7",
+      "server-version/backend/prisma/migrations/20261027100000_education_assessment_delivery/migration.sql": "ade4213f07ce7a9ce6fc94beca2b685bd6034bf133b53f24105f76d2e287dd19",
+      "server-version/backend/scripts/runtime-table-policy.json": "c1470d376dd84d2ac57371889211167693bd16b4c6f4a435db1de96655fa99d1",
+      "server-version/backend/src/__tests__/assessment-policy/respondent-summary.test.ts": "75204019d4dfa560ba56fb7b28ce8041cb57dcd098f03ddc73aaf9a8120acbbf",
+      "server-version/backend/src/__tests__/assessment-run/education-execution-source.test.ts": "234fc35d9a324a6544f0964fe94f19f4a71780fca969f8e7c54dd865ee60e8dc",
+      "server-version/backend/src/__tests__/assessment-run/resource-authority.test.ts": "5c70ea6931650d0f463d9eea472f231aa262ea58d0dcbf0d157264f1bbef74e0",
+      "server-version/backend/src/__tests__/education-tools/assessment-resource.authority.test.ts": "dc089b10aae311b0d4af4ae0a0107c496468fb4fcbc533610add8a62d30c2e47",
+      "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts": "d034eb59e43001b108ebf027a476e224778211a059a40b2a4938cf5620df8d4a",
+      "server-version/backend/src/__tests__/education-tools/assessment-resource.repository.test.ts": "40818461da58a64c949a09a5bf3b87ef69efad83ca8edd0f92aadeeba2eca122",
+      "server-version/backend/src/__tests__/integration/educationAssessmentReport.postgres.integration.test.ts": "4336f8323ae9ee77855088be651ce41e83c6a1f7ee8c9385835035635cec9642",
+      "server-version/backend/src/__tests__/integration/pr363-source-sql.postgres.integration.test.ts": "94db11811b6a9bd4c46fa5e9ea2158dca1a7f3a94e4cae9417d87b8c17262312",
+      "server-version/backend/src/__tests__/measurement-content/education-content-scope.test.ts": "bc62aebc3075d2e5110284a2aa184aa958e446b7f939c6568400320059fd7c13",
+      "server-version/backend/src/__tests__/reporting/education-assessment-personal-report.service.test.ts": "674636d08f90331a94231280b5cdb8a991de5a3fc3a5c39cbf58513de64b0551",
+      "server-version/backend/src/__tests__/reporting/education-assessment-report.fixture.ts": "015ec10ddd5d9e5dbb5c018dc4790cc9430f591dc37ad17364afa8ceee0a5ca8",
+      "server-version/backend/src/index.ts": "745ddc1f30d3e25090b6e9a1de6b4e2b7b809abcf5b8b48fa87e6a48f37b5d25",
+      "server-version/backend/src/modules/assessment-run/educationAssessmentExecution.ts": "34b3ce12322605dc6a1ac7b621d8ea234422fe43862e90ccbd4bda45759794ae",
+      "server-version/backend/src/modules/assessment-run/registeredResources.ts": "80ab18e0c357e16795c12003e53be76b5272c00e0c0e98d90ca5901d2fc5b740",
+      "server-version/backend/src/modules/assessment-run/resourceAuthority.ts": "62afb0a594b2f6a73fac29e734c79e14402319b659cd378860dcfb066c0da365",
+      "server-version/backend/src/modules/assessment-run/scientificProvenance.ts": "d958c72ba9b1e539c628948e0d9528eeefe3728b71abb9bc0dd4833ae093a7fe",
+      "server-version/backend/src/modules/assessment-run/startAuthority.ts": "6e65eac5d82ebb0239c00ba3cfb9b62385ada46cb465855c5cb69698e9372f93",
+      "server-version/backend/src/modules/assessment-run/startExecution.ts": "9b69574ba50ac255250a11a2ebd84bafa24dbde0caa61928be0e1391af5ddec5",
+      "server-version/backend/src/modules/campus/activity.tasks.ts": "120f6e2f537047c242d3f4927ac9ffab7f042a698709ee7779f4a7b88ba44119",
+      "server-version/backend/src/modules/composite/education-content-scope.ts": "b5df693e2d59eb1c928960fbe09167575b3e7f33fabaedc41a4667b6fd59084a",
+      "server-version/backend/src/modules/composite/training-reference-selection.ts": "e8ff15897ebab8bb3115b05ede7cf56a63f1bf5322888c0ed793a21220b9a388",
+      "server-version/backend/src/modules/composite/training-report-selection.ts": "85bc18a1380fa23f66ad8a11f2388f242df10ed7d3c270136c69cd082cbe25e1",
+      "server-version/backend/src/modules/education-tools/assessment-resource.authority.ts": "916770f1584571df19bf94051e715b74f6b5211755e15175be83535202496e55",
+      "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts": "886e5e32e7b8b9942a09271eb016a3f58e4be488a43d2b34e2e7bbbebed1aa79",
+      "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts": "196c8a2a8ff565d5f965e692f7e6ac48a511c08178a4ca72cb2eae0a2602cf31",
+      "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts": "18caff63ee76f822d3dee6a1c284d23b237a038c0e433546067bc9a6123f5c91",
+      "server-version/backend/src/modules/reporting/education-assessment-report.routes.ts": "0baa36d6b26e66e4a766cb7daa31e16dc86708318df6a38ea44dcf463de881c6",
+      "server-version/backend/src/modules/reporting/education-assessment-report.service.ts": "b718719ae9ef2938085755a414a8dabf851aaeac885e6a78cc8e414c89df37fc",
+      "server-version/backend/src/modules/reporting/respondentSummary.ts": "1e72dd92f261757a33d183aa5d1c44b5527e2f47579add40949d6a5dfeb89e54",
+      "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.test.tsx": "b92d9995805f42261d2286821258c14d9d42f945cba59d13f913e255d9c57819",
+      "server-version/frontend/src/components/education-tools/EducationAssessmentFeedback.tsx": "cf1de224d11fea7f73ef88caeb11480fa3c7d5900dab572b6c5e454c7fefd05e",
+      "server-version/frontend/src/components/education-tools/educationAssessmentFeedbackAdapter.ts": "19973d490f16739f6f8e0f0332cdf2cfbaf4d093f739801ab484b7e18338d47b",
+      "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": "05e86cb392ce99b6799bf24ffacde96907b9867e83c54638821ce37cf18d9faf",
+      "server-version/frontend/src/huiteacher/HuiteacherAssessmentTasks.tsx": "f54ff76e113dbe2df079e432ba43909dc7f4e592a45a6b39f9852c66163319d7",
+      "server-version/frontend/src/school/SchoolStudentTasks.completion.test.tsx": "ebb9a64cbe041b8e9195f5df96e014f8492f91015b16a571b373fe37d492a2f0",
+      "server-version/frontend/src/school/SchoolStudentTasks.tsx": "f4691a8c537d679e76b37e9f8c71c9b2f6a5d04c66b4fba17ad4463954d7c598",
+      "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+      "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+      "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+      "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+      "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+      "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+    }
+  },
+  "files": {
+    "backend-types-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-types-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-wiring-unit-1.json": "0ffc1c1408fc228a86260bf7de36a7c10fce6296d6d993be7901bbe236e20a81",
+    "backend-wiring-unit-1.log": "d21bc0d1a0db91e2dad837e12075cc421e5357e3442abd17905805c36fedf42d",
+    "backend-wiring-unit-2.json": "3d5d32894e8493fd3dcdbcd3c476db9bccfb8a338c8f977082009535c38372d1",
+    "backend-wiring-unit-2.log": "e3669bfb8b3872b78d9b147d1ca0700965cb955e6d6ed24fb804cf4b066da3ea",
+    "database-observation.log": "e864f842cd2b05545b8ff36c9d2880743664e0cfe27500bff123729497c461bc",
+    "frontend-lint-1.log": "20ae765c299a1ea122908f3815960fc02ad96018ab9dd7fa40f6379d4c2e2a18",
+    "frontend-lint-2.log": "b59045c7accbf578142b9e7cb524651d03c9d6f4d7528fd28fcedbf8ddaeb154",
+    "frontend-types-1.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-types-2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-wiring-1.json": "79a19bb184526b27dc1294d8eb6c72319be4405cff2f37bb3efc82fbf74c7a15",
+    "frontend-wiring-1.log": "8ea8ce1dd006ba53f1795200698d82c3d4a4f07b1403f174f64c0686aa290d54",
+    "frontend-wiring-2.json": "d0a5498e3bfe7f45e2c01f1c45f53d91c409c41b16d632fb690cb741d56ec179",
+    "frontend-wiring-2.log": "0da143cdf125dc702b8b8e03062217e44a4190432c931fcb15f2b397935780bd",
+    "migrate-full-schema-1.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "migrate-full-schema-1.log": "0160455ee84f6488de64329cceb38972c2305005eeabe608bf71b521e6c2390b",
+    "report-pg-1.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "report-pg-1.json": "33c687352860e87161f200e256cf22438763a1dac238f402b0b3ed38c39f786d",
+    "report-pg-1.log": "8417752ada0f4d564689a6c06596b22f0bb8d43592b2bb5288cd86547059f0bf",
+    "report-pg-2.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "report-pg-2.json": "575bc24c724e13d0faf6b118509303bfd87fed158afc7bc68228290de0e1e8c0",
+    "report-pg-2.log": "3146939c95fb2dfa2fb24e72c3ebe92c75dad91030f80470a5f0086f7f551720",
+    "report-pg-3.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "report-pg-3.json": "e7d4f7fa0ae1e475a9e68f524a52945d16b5569ef5493d0a48b3edbdabb0ea54",
+    "report-pg-3.log": "fe41dd2afe2966c3a2169827b29bc3a0bedef995bfb7360051d76da2ea9da0af",
+    "report-pg-4.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "report-pg-4.json": "c878040aca465f497e9b2a32c84a98c9916ae81d2948493192c13fa0b9cef111",
+    "report-pg-4.log": "146c7aa329903c6380f1cc6adcc7c66ebde3069ccd4f9a7a8b1716a9f4e43362"
+  },
+  "limits": [
+    "Unsigned local development evidence, Node below engines. No formal CI, real browser, build or deployment.",
+    "Prior failures remain original; School success from PG3 is not relabelled as a successful whole invocation, and only Teacher reran in PG4.",
+    "Synthetic source metadata and stored canonical results were prepared in the isolated DB. This does not prove new-tool publication/START/scoring/FINAL.",
+    "The final frontend has one preexisting HuiteacherApp useEffect org dependency warning. New adapter fast-refresh warning was removed by separating the pure factory module."
+  ]
+}

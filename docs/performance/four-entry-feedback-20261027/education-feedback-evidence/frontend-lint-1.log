@@ -1,0 +1,11 @@
+
+/workspace/eduK12-new-version/server-version/frontend/src/school/SchoolCompositeRunner.tsx
+   27:72  warning  React Hook useMemo has unnecessary dependencies: 'execution.courseId', 'execution.organizationId', and 'execution.runId'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+  112:5   warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array                                                                        react-hooks/exhaustive-deps
+  136:5   warning  React Hook useMemo has a missing dependency: 'state'. Either include it or remove the dependency array                                                                        react-hooks/exhaustive-deps
+
+/workspace/eduK12-new-version/server-version/frontend/src/school/SchoolStudentTasks.tsx
+  50:62  warning  React Hook useMemo has unnecessary dependencies: 'activityId' and 'api'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 4 problems (0 errors, 4 warnings)
+
