@@ -1,0 +1,1656 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "curiosity_5dcr24_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面是一些人们常用来描述自己的陈述。请使用下列选项，指出这些陈述在多大程度上准确地描述了您。答案没有对错。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "GESIS ZIS 2022英文施测说明的独立中文工作译稿，取自PR328材料包r2；未经作者认可或人工译审。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "五维好奇心量表修订版（5DCR，24题）— 独立中文工作译稿",
+      "abbreviation": "5DCR-24-ZH-WORKING",
+      "instrumentFamily": "Five-Dimensional Curiosity Scale Revised (5DCR)"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [
+        "MOTIVATION"
+      ],
+      "constructDefinition": "24题自评好奇心六个具体侧面：愉悦探索、匮乏敏感性、面对不确定性的压力耐受、一般社会好奇心、隐蔽社会好奇心与寻求刺激。六维不应混成统一能力、智力或学习动机总分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:personality",
+        "domain:motivation_learning",
+        "construct:curiosity",
+        "construct:joyous_exploration",
+        "construct:deprivation_sensitivity",
+        "construct:stress_tolerance",
+        "construct:social_curiosity_general",
+        "construct:social_curiosity_covert",
+        "construct:thrill_seeking",
+        "construct:six_dimensions_no_overall_total",
+        "orientation:multidimensional_curiosity",
+        "orientation:personality_psychology",
+        "orientation:not_therapy_specific",
+        "population:adult_18_plus",
+        "population:original_us_uk_adults",
+        "population:not_k12_validated",
+        "population:not_chinese_validated",
+        "response:self",
+        "response:digital_self",
+        "response:24_items",
+        "response:seven_point_1_to_7",
+        "response:gesis_2022_fixed_order",
+        "response:four_reverse_items_9_to_12",
+        "response:facet_complete_required_platform_policy",
+        "response:no_fixed_recall_window",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:no_chinese_norms",
+        "use:not_selection",
+        "license:cc_by_4_0",
+        "license:attribution_required",
+        "license:changes_indicated",
+        "license:redistribution_allowed",
+        "license:adaptation_allowed",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:expert_review_pending",
+        "language_validation:local_validation_pending",
+        "五维好奇心修订版",
+        "六维好奇心",
+        "好奇心",
+        "愉悦探索",
+        "匮乏敏感性",
+        "压力耐受",
+        "社会好奇心",
+        "隐蔽社会好奇心",
+        "寻求刺激",
+        "工作译稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "GESIS英语成年样本：美国Kashdan等2020两个样本N=483与460，英国Grüning/Lechner2022 N=483。当前中文是未经验证的独立工作译稿，不用于推断中学生或中国成人常模。"
+    },
+    "administration": {
+      "itemCount": 24,
+      "estimatedMinutes": 6,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "一般自我描述，没有原作者规定的固定回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定GESIS 2022版24项顺序，不与2020原文附录不同的维度编排混用。",
+        "七点选项1–7全部有描述标签；仅第9–12题按8−原值反向，其他20题不反向。",
+        "六个四题分量表分别均分1–7；无总分，不添加第七分数。",
+        "GESIS原文对缺失值的分母不够明确，本项目草稿规定只有某维四题齐全才计算该维；其他完整维度可以显示但附资料不完整说明，此规则不冒充作者原规范。",
+        "成年人18+为保守使用限定，不把其他中文版验证结论归于本工作译稿。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语版有结构和信度证据，中文工作译稿仍待审校、访谈与验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅描述自陈六类好奇倾向，不做诊断、选拔或高风险判断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "five-dcr-kashdan2020-us-structure",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "美国英语成人样本",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 483,
+        "studyDesign": "5DCR修订，包含六维，各四题；另有第二个美国样本N460；不等于中文译稿验证。",
+        "rating": "SUFFICIENT",
+        "citation": "Kashdan, T. B., Disabato, D. J., Goodman, F. R., & McKnight, P. E. (2020). Personality and Individual Differences, 157, 109836.",
+        "doi": "10.1016/j.paid.2020.109836",
+        "url": "https://doi.org/10.1016/j.paid.2020.109836"
+      },
+      {
+        "evidenceId": "five-dcr-gruning2022-uk-validation",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "英国英语成年人，18–69岁",
+        "ageRange": "18–69岁",
+        "locale": "en",
+        "territory": "GB",
+        "sampleSize": 483,
+        "studyDesign": "六因子验证及重复测量样本；仅源英语适用证据，不能外推本中文工作稿。",
+        "rating": "MIXED",
+        "citation": "Grüning, D. J., & Lechner, C. M. (2022 online / 2023 print). Journal of Personality Assessment, 105(2), 283–295.",
+        "doi": "10.1080/00223891.2022.2057318",
+        "url": "https://doi.org/10.1080/00223891.2022.2057318"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "GESIS ZIS Grüning/Lechner 2022官方英文24题r2材料，原版2020 Kashdan等；旧材料PR328 fa355ff2。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "沿用已存PR328 r2独立中文AI工作译稿，不复制Tian等中文验证版，不继承该版效度。材料原意向键5dcr_zh_cn_research以数字开头不符合系统key正则，正式key改为curiosity_5dcr24_zh_cn_research；源文内容未改。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "curiosity_5dcr24_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "curiosity_5dcr24_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "curiosity_5dcr24_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL",
+      "COMMERCIAL"
+    ],
+    "notes": [
+      "GESIS ZIS 英文24题与技术文档（Grüning、Lechner 2022）明确采用 CC BY 4.0；来源：https://access.gesis.org/zis/1218 和 https://access.gesis.org/zis/1217；许可证：https://creativecommons.org/licenses/by/4.0/。原5DCR作者为 Kashdan、Disabato、Goodman、McKnight（2020）。平台从GESIS原始24题固定顺序独立制作中文研究工作译稿与报告；必须署名及注明改动。不是原作者认可译本，尚未完成专家译审、认知访谈、中国效度/常模；不复制其他研究者已发表中文版措辞。",
+      "版权标签只做发现与管理员审查提示，不新增开发授权门禁；实际治理不在本次修改。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "GESIS ZIS 5DCR 24-item English 2022, independently translated Chinese research draft",
+        "citation": "Kashdan, T. B., Disabato, D. J., Goodman, F. R., & McKnight, P. E. (2020). The Five-Dimensional Curiosity Scale Revised (5DCR). Personality and Individual Differences, 157, 109836; Grüning, D. J., & Lechner, C. M. (2022). Five-dimensional curiosity-scale (5DCR). GESIS ZIS. https://doi.org/10.6102/zis319_exz.",
+        "url": "https://zis.gesis.org/skala/Gr%C3%BCning-Lechner-Five-dimensional-curiosity-scale-%285DCR%29",
+        "publicationYear": 2022
+      },
+      "license": {
+        "status": "verified",
+        "redistribution": "allowed",
+        "note": "GESIS ZIS 英文24题与技术文档（Grüning、Lechner 2022）明确采用 CC BY 4.0；来源：https://access.gesis.org/zis/1218 和 https://access.gesis.org/zis/1217；许可证：https://creativecommons.org/licenses/by/4.0/。原5DCR作者为 Kashdan、Disabato、Goodman、McKnight（2020）。平台从GESIS原始24题固定顺序独立制作中文研究工作译稿与报告；必须署名及注明改动。不是原作者认可译本，尚未完成专家译审、认知访谈、中国效度/常模；不复制其他研究者已发表中文版措辞。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "dcr5_describes_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不符合我",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "几乎不符合我",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有些符合我",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "中立",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "总体上符合我",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "大部分符合我",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "完全符合我",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "DCR5_01",
+          "content": "我把有挑战的情境看作成长和学习的机会。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_02",
+          "content": "我会主动寻找可能需要深入思考某件事的情境。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_03",
+          "content": "我喜欢学习自己不熟悉的主题。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_04",
+          "content": "我觉得学习新信息很有吸引力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_05",
+          "content": "思考困难的概念性问题的解法，可能会让我夜里睡不着。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_06",
+          "content": "我可能在一个问题上花上好几个小时，因为不知道答案就无法安心。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_07",
+          "content": "如果想不出问题的解法，我会感到受挫，所以会更加努力地解决它。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_08",
+          "content": "对于我觉得必须解决的问题，我会坚持不懈地钻研。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_09",
+          "content": "哪怕一点点疑虑，也能让我不再寻求新的体验。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_10",
+          "content": "我无法应对进入不确定情境所带来的压力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_11",
+          "content": "当我对自己的能力缺乏信心时，我觉得很难探索新的地方。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_12",
+          "content": "当有可能发生令我措手不及的事情时，我很难集中注意力。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_13",
+          "content": "我喜欢弄清楚人们为什么会那样行事。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 12,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_14",
+          "content": "我会问很多问题，以了解其他人对什么感兴趣。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 13,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_15",
+          "content": "和一个兴奋的人交谈时，我会好奇是什么让对方兴奋。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 14,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_16",
+          "content": "与人交谈时，我会尝试发现对方身上一些有趣的细节。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 15,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_17",
+          "content": "其他人在交谈时，我喜欢弄清楚他们在谈什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 16,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_18",
+          "content": "和其他人在一起时，我喜欢听他们的交谈。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 17,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_19",
+          "content": "人们争吵时，我喜欢知道发生了什么。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 18,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_20",
+          "content": "我会寻求有关我生活中那些人的私生活的信息。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 19,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_21",
+          "content": "冒险让我感到兴奋。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 20,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_22",
+          "content": "有空闲时间时，我想做一些有点吓人的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 21,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_23",
+          "content": "比起事先安排好的冒险，我觉得在过程中即兴展开的冒险要吸引人得多。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 22,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "DCR5_24",
+          "content": "我更喜欢那些让人感到兴奋、难以预测的朋友。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 23,
+          "responseSetKey": "dcr5_describes_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "DCR5_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_09",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DCR5_10",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DCR5_11",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DCR5_12",
+            "transform": {
+              "type": "reverse"
+            }
+          },
+          {
+            "itemCode": "DCR5_13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_14",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_15",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_16",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_17",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_18",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_19",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_20",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_21",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_22",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_23",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "DCR5_24",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "joyous_exploration",
+            "type": "dimension",
+            "label": "愉悦探索",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "deprivation_sensitivity",
+            "type": "dimension",
+            "label": "匮乏敏感性",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "stress_tolerance",
+            "type": "dimension",
+            "label": "面对不确定性的耐受",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "social_curiosity_general",
+            "type": "dimension",
+            "label": "一般社会好奇心",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_13",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_14",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_15",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_16",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "social_curiosity_covert",
+            "type": "dimension",
+            "label": "间接了解他人的好奇心",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_17",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_18",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_19",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_20",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "thrill_seeking",
+            "type": "dimension",
+            "label": "寻求新鲜与刺激",
+            "description": "本维四题作答完整时计算1–7分均值，只描述自报好奇倾向，不作为学习能力、人格优劣、临床状态或群体排名。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "DCR5_21",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_22",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_23",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "DCR5_24",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "joyous_exploration",
+          "deprivation_sensitivity",
+          "stress_tolerance",
+          "social_curiosity_general",
+          "social_curiosity_covert",
+          "thrill_seeking"
+        ],
+        "scoreOrder": [
+          "joyous_exploration",
+          "deprivation_sensitivity",
+          "stress_tolerance",
+          "social_curiosity_general",
+          "social_curiosity_covert",
+          "thrill_seeking"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "joyous_exploration",
+            "headline": "愉悦探索",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "你对新问题、新知识和挑战的兴趣，可能在学习、工作或日常生活的不同阶段有所变化。这个分数只反映你在本次回答中多大程度认可“愿意探索”这类描述，不是智力、学习成绩或潜力的评定。可以回想最近一件曾吸引你主动了解的事情：是什么让你想继续了解？不必要求自己对每件事都保持强烈好奇。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近什么问题让你想主动多了解一点？"
+              },
+              {
+                "category": "strategy",
+                "text": "为一件自己真正感兴趣的事留出十分钟，随意探索一个新线索。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "deprivation_sensitivity",
+            "headline": "匮乏敏感性",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "遇到一个暂时没有答案的问题时，有些人会一直惦记着，直到找到解释才感到踏实。这一维度描述的是你在这类时刻的倾向；较高的分数不等于更擅长解决难题，也不意味着越坚持越好。有时多想一会儿能带来发现，有时暂停和休息同样重要。可以想想哪些疑问值得继续投入，哪些可以允许自己先放下。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么问题会让你一直想弄清答案？"
+              },
+              {
+                "category": "strategy",
+                "text": "给一个难题设定适合自己的探索时段，结束时也允许自己休息。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "stress_tolerance",
+            "headline": "面对不确定性的耐受",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "新的环境、未知的结果或突然发生的变化，可能让人既好奇又有点紧张。这里的分数已经把四道反向题转换，高一些仅表示你在本次作答中更认同自己能够带着不确定感继续探索。它不是抗压能力的客观测试，也不能判断有没有焦虑问题。如果你想到某次犹豫的经历，可以试着分清实际风险和对未知的担心，再选择对自己安全的小尝试。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "遇到未知的情境时，哪种不确定感最容易影响你？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一个风险可控的小变化，先了解情况，再决定是否尝试。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "social_curiosity_general",
+            "headline": "一般社会好奇心",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "与人交往时，你可能喜欢问问题、了解对方的经历，也可能更愿意安静地观察。这部分关注你是否有主动理解他人的兴趣，并不评判社交能力或人际关系质量。真正的了解往往需要对方愿意分享，也需要倾听和尊重边界。下一次与人谈话，可以关注一个让你真心想理解的观点，而不是必须得到更多私人细节。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "你最喜欢了解别人经历中的哪一部分？"
+              },
+              {
+                "category": "strategy",
+                "text": "在一次轻松的交谈中，提一个尊重对方意愿的开放问题，并认真倾听。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "social_curiosity_covert",
+            "headline": "间接了解他人的好奇心",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这一维度描述你对他人谈话、事情来龙去脉或私人信息的好奇程度。分数较高并不自动意味着你不尊重别人，较低也不代表缺乏关心；情境、关系和习惯都会影响这些回答。好奇心与隐私边界可以同时存在：即使想知道发生了什么，也可以尊重别人不愿公开的内容。可以想想，哪些问题适合直接询问，哪些应该交给对方自主决定是否分享。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么时候你会特别想弄清别人正在谈论的事情？"
+              },
+              {
+                "category": "strategy",
+                "text": "留意一次好奇心出现的时刻，先考虑对方是否愿意分享，再决定是否询问。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "thrill_seeking",
+            "headline": "寻求新鲜与刺激",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "有的人喜欢可预期的安排，有的人对一点惊喜和刺激更感兴趣。这部分只描述你对冒险、新鲜体验和不按计划发生的事情有多大兴趣，不代表你应该从事危险活动，也不能据此判断是不是勇敢的人。想寻求新鲜感时，安全和个人边界仍然重要。你可以找到一种风险可控的新体验，例如换一种散步路线或尝试从未做过的小型创作。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "什么样的新鲜体验会让你觉得有趣，却不会带来不必要的风险？"
+              },
+              {
+                "category": "strategy",
+                "text": "挑一种安全、可退出的小尝试，为日常生活增添一点变化。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "本版中文为AI协助的研究工作译稿，未经作者批准、人工专家译审、认知访谈或中国样本验证；现有中文研究不能直接移用于本精确题本。",
+          "无总分、无中国常模、无诊断或选拔阈值；各维分数仅为本人自报倾向，不是客观能力。",
+          "GESIS缺答分母未明确，本平台草稿规定仅完整四题计该维；不等同作者验证的缺失算法。",
+          "寻求刺激不构成风险行为建议，隐蔽社会好奇心不意味着有权侵犯他人隐私。"
+        ],
+        "disclaimer": "5DCR原作者Kashdan等（2020），GESIS 2022 英文原题CC BY 4.0；该中文版本和报告为独立工作稿，未完成人工审校和中国效度验证。本报告用于非诊断研究准备，不提供总分、百分位或群体优劣评价。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "curiosity_5dcr24",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "all_min",
+        "answers": [
+          {
+            "itemCode": "DCR5_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_12",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_13",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_14",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_15",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_16",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_17",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_18",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_19",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_20",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_21",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_22",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_23",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "DCR5_24",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "joyous_exploration": 1,
+            "deprivation_sensitivity": 1,
+            "stress_tolerance": 7,
+            "social_curiosity_general": 1,
+            "social_curiosity_covert": 1,
+            "thrill_seeking": 1
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      },
+      {
+        "name": "all_max",
+        "answers": [
+          {
+            "itemCode": "DCR5_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_08",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_09",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_10",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_11",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_12",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_13",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_14",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_15",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_16",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_17",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_18",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_19",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_20",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_21",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_22",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_23",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "DCR5_24",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "joyous_exploration": 7,
+            "deprivation_sensitivity": 7,
+            "stress_tolerance": 1,
+            "social_curiosity_general": 7,
+            "social_curiosity_covert": 7,
+            "thrill_seeking": 7
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      },
+      {
+        "name": "midpoint",
+        "answers": [
+          {
+            "itemCode": "DCR5_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "joyous_exploration": 4,
+            "deprivation_sensitivity": 4,
+            "stress_tolerance": 4,
+            "social_curiosity_general": 4,
+            "social_curiosity_covert": 4,
+            "thrill_seeking": 4
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      },
+      {
+        "name": "first_missing",
+        "answers": [
+          {
+            "itemCode": "DCR5_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "joyous_exploration": null,
+            "deprivation_sensitivity": 4,
+            "stress_tolerance": 4,
+            "social_curiosity_general": 4,
+            "social_curiosity_covert": 4,
+            "thrill_seeking": 4
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      },
+      {
+        "name": "reverse_missing",
+        "answers": [
+          {
+            "itemCode": "DCR5_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_12",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_13",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_14",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_15",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_16",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_17",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_18",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_19",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_20",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_21",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_22",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_23",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "DCR5_24",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "joyous_exploration": 4,
+            "deprivation_sensitivity": 4,
+            "stress_tolerance": null,
+            "social_curiosity_general": 4,
+            "social_curiosity_covert": 4,
+            "thrill_seeking": 4
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "joyous_exploration": null,
+            "deprivation_sensitivity": null,
+            "stress_tolerance": null,
+            "social_curiosity_general": null,
+            "social_curiosity_covert": null,
+            "thrill_seeking": null
+          },
+          "totalScoreKeys": [
+            "joyous_exploration",
+            "deprivation_sensitivity",
+            "stress_tolerance",
+            "social_curiosity_general",
+            "social_curiosity_covert",
+            "thrill_seeking"
+          ]
+        }
+      }
+    ]
+  }
+}
