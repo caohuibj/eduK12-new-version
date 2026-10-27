@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Tokyo",
+  "status": "CONTENT_CANDIDATE_NOT_INTEGRATED",
+  "approvedChange": "user approved 320 research / 40 experience and more detailed instructions with examples; 80-game design remains historical only",
+  "execution": {
+    "os": "Debian 13.6",
+    "cwd": "/workspace/eduK12-new-version",
+    "availableLogicalCPUs": 5,
+    "cpuQuotaCores": 4,
+    "memoryLimitBytes": 17179869184,
+    "node": "24.21.0",
+    "location": "cloud only",
+    "physicalDeviceEvidence": false
+  },
+  "inputs": {
+    "server-version/backend/src/__tests__/cognitive/horizon-content.test.ts": "f3722748bedd401378ed47e0f9a8fc938a999e92b511ba64dfafc9870d91d806",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/analysis.ts": "b591ca218ed6cd64030101ea3893a369df4c47dd46d0e3ca0c342fc90f47827f",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/metadata.ts": "a99b5f0f9cc1555ba331fd9b9f68bedcd229e04f17e8f12f653aee2cc4ab93a2",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/package.ts": "a481ef4c63d338681f4e742c82178d85e9b59d7adf350c657c17f7a0fa3a9f87",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/participant-presentation.ts": "2fd78ea12e23c89dfd4bc9a5acd14a013f0d99f047781b41a0b3469e2423bd8b",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/protocol.ts": "a303f7ba29c0b9b859cf325ac3dd6bda939079ae6e70f386df0c950dcca31feb",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/report.ts": "728ebc3fac70046bfb5d8cfda485c058d1da4221a68e6ce62db7fbd7c61968d6",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/schema.ts": "8a7bef4eaa1fccd705af0eca44d0f01ca968627ac063e4a2e5511ed403486127",
+    "server-version/backend/src/modules/cognitive/content-candidates/horizon-exploration/scorer.ts": "160609b5962e26f7e8c321cd8b3369af814065e8cae58faea948c09f153bc7cb",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonInstructions.tsx": "bb59ec6498d34b8cfca17c2cf2be25c5aef048ce180e0f2ba394333a0222acaa",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonReport.tsx": "d38e614da06748be1ba8a7724f2171517d93e98d296f28c0c522b4a2153638d3",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/HorizonTask.tsx": "543f527c0d3f900a5a6116c34ab39ae38802ba2fc4562f1beaa0383160a277c3",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/capture.ts": "cc501438b14840bae222744a6b6acfdbf76eb661623ecc4b01b8e759c32f8c29",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/content.test.tsx": "a7864b41d0b6cf8fb657a6f32047cd41df40b2270df2d2243e6df6df7e6cb69f",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/contracts.ts": "8a6dc56e617ec5ad669f92a2001e8354e5bbd2b2303e29dd8e3e2379f38ef422",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/analysis.ts": "9147b0aecd9efac024346f2da040d14bfc5066484c14c30d106e7ed93a8a44c3",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/protocol.ts": "5a79a323a57527bab81c8ff2bf97414b2aac006f763c95fec09aedd270d8ae15",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/generated/report.ts": "badf45f31a2c183780d5ab36c8d64fd0371875ca326bdbdc9fd4caae3a32e509",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/horizon.css": "bbfa1063cbf5896c69f077c88f517c2674eeb82b7c1de99605fbf6e9d5d3f695",
+    "server-version/frontend/src/modules/cognitive/tasks/horizon-exploration/session.ts": "8940499a7b2d708af688f7492672b286307f5dca3dec3ca8379e5f7d39e98703",
+    "server-version/scripts/cognitive/horizon-content.cjs": "a772dffe1821f924ef26dff2e9b6776b5ef8fc7fec14d03504576e04c81802f1"
+  },
+  "configurationInputs": {
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143",
+    "server-version/backend/vitest.config.ts": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b",
+    "server-version/backend/package.json": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a",
+    "server-version/backend/package-lock.json": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+    "server-version/frontend/tsconfig.app.json": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e",
+    "server-version/frontend/vitest.config.ts": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db",
+    "server-version/frontend/package.json": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f",
+    "server-version/frontend/package-lock.json": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+  },
+  "checks": {
+    "distinctRuntimeTargets": 6,
+    "initial": {
+      "backend": {
+        "passed": 1,
+        "failed": 2
+      },
+      "frontend": {
+        "passed": 0,
+        "failed": 3
+      },
+      "typeDiagnostics": {
+        "backend": 5,
+        "frontend": 4
+      },
+      "cause": "new candidate ProtocolDefinition omitted existing required snapshot fields and supplied unsupported fields; also config index signature / typed empty group map / test helper parameter typing"
+    },
+    "fix": "candidate-only exact existing ProtocolDefinition fields, config type index signature, explicit typed group map, helper steps:number; no shared contract changes",
+    "followup": {
+      "backend": {
+        "passed": 3,
+        "failed": 0
+      },
+      "frontend": {
+        "passed": 3,
+        "failed": 0
+      },
+      "backendTypes": {
+        "roots": 3,
+        "sources": 49,
+        "diagnostics": 0
+      },
+      "frontendTypes": {
+        "roots": 4,
+        "sources": 57,
+        "diagnostics": 0
+      }
+    },
+    "reuse": "only the new candidate was rerun after its protocol identity changed; old tasks not executed; the six distinct targets are counted once, not initial+followup"
+  },
+  "commands": {
+    "backendRuntime": "node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/horizon-content.test.ts --maxWorkers=1 --reporter=json --outputFile=<original-or-followup.json>",
+    "frontendRuntime": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/horizon-exploration/content.test.tsx --maxWorkers=1 --reporter=json --outputFile=<original-or-followup.json>",
+    "typeMethod": "actual package tsconfig options; affected root closure with noEmit/incremental:false/composite:false; roots and all non-node_modules source hashes retained in type reports"
+  },
+  "evidenceScope": [
+    "software clocks",
+    "jsdom real React component",
+    "synthetic in-memory ports only",
+    "both profiles through authoritative backend scorer; 40 formal games through candidate session",
+    "static preview is design illustration, not a real App journey"
+  ],
+  "notRun": [
+    "old task regression",
+    "full App/auth/CSRF",
+    "actual IndexedDB/HTTP/COS",
+    "physical mobile/tablet/Safari or stimulus exposure",
+    "research320 real browser journey",
+    "tag persistence/filter/search",
+    "current-main merged candidate",
+    "CI",
+    "deployment or activation"
+  ],
+  "currentMainReadback": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "mainComparison": {
+    "from": "dff80f0604163a04e2f5a8119d7d4295116eeb41",
+    "commits": 9,
+    "returnedChangedPaths": 36,
+    "cognitivePaths": [],
+    "mergedIntoContentBranch": false
+  },
+  "rawFiles": {
+    "backend-followup.json": "388e247a47f8734c05c1c370405109e922c8f5c664fd1f7822060bb4a8b3e220",
+    "backend-original.json": "b984b96ca7898ffd9ccd7551f38be8c7836b25adee97a710b24e4463a4e83764",
+    "backend-types-followup.json": "d99978a1cfa5cbc41ade2ae8a73a28f5fae9a94ed3b7720114e55e984564c298",
+    "backend-types-original.json": "b8a4f1f8a1c18e51635750ca61201559c24ade5cc9e8c94b1e83f63547267030",
+    "frontend-followup.json": "c88c7cc3d96670f162d5d13cc4f3d9477ff72addddc2c8d072239e5dc28f4f32",
+    "frontend-original.json": "e8381a03ba52d2e2446932fbf59e604cf1d02073f1f2ade53c3030caed1912be",
+    "frontend-types-followup.json": "6848ac4dfbae4ea2c252a3f004309a783489a00c463316d72b4e4bcbab8d3a08",
+    "frontend-types-original.json": "7050ada53f88d9388d049949b22711acaa9673b353b9755ac95e65f9b3cb5ec3"
+  }
+}
