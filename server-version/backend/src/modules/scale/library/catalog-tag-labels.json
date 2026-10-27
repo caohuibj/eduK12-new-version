@@ -331,6 +331,18 @@
     "label": "情绪变化与负面反应",
     "axis": "construct"
   },
+  "construct:sel_erica16_dimension_1": {
+    "label": "情绪控制",
+    "axis": "construct"
+  },
+  "construct:sel_erica16_dimension_2": {
+    "label": "情绪自我觉察",
+    "axis": "construct"
+  },
+  "construct:sel_erica16_dimension_3": {
+    "label": "情境回应",
+    "axis": "construct"
+  },
   "construct:sel_erq_ca_dimension_1": {
     "label": "认知重评",
     "axis": "construct"
