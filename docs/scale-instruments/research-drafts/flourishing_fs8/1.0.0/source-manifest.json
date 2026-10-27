@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "flourishing_fs8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "sourceCarrier": {
+    "englishPdf": "https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf",
+    "officialTraditionalChinese": "https://eddiener.com/wp-content/uploads/2025/02/FS_Chinese.pdf",
+    "originalCopyright": "© Ed Diener and Robert Biswas-Diener January 2009",
+    "researchDoi": "10.1007/s11205-009-9493-y",
+    "chineseTranslator": "Counselling and Development Centre, Office of Student Affairs, Hong Kong Baptist University",
+    "platformTranslation": "INDEPENDENT_WORKING_ZH_CN"
+  },
+  "mapping": [
+    {
+      "itemCode": "FS8_01",
+      "sourceOrder": 1,
+      "englishContentConcept": "purpose and meaning in life"
+    },
+    {
+      "itemCode": "FS8_02",
+      "sourceOrder": 2,
+      "englishContentConcept": "support and benefit from social relationships"
+    },
+    {
+      "itemCode": "FS8_03",
+      "sourceOrder": 3,
+      "englishContentConcept": "engagement and interest in everyday activities"
+    },
+    {
+      "itemCode": "FS8_04",
+      "sourceOrder": 4,
+      "englishContentConcept": "contribution to others' happiness and well-being"
+    },
+    {
+      "itemCode": "FS8_05",
+      "sourceOrder": 5,
+      "englishContentConcept": "ability for personally important activities"
+    },
+    {
+      "itemCode": "FS8_06",
+      "sourceOrder": 6,
+      "englishContentConcept": "evaluation of goodness of self and life"
+    },
+    {
+      "itemCode": "FS8_07",
+      "sourceOrder": 7,
+      "englishContentConcept": "optimistic outlook on future"
+    },
+    {
+      "itemCode": "FS8_08",
+      "sourceOrder": 8,
+      "englishContentConcept": "respect received from others"
+    }
+  ],
+  "scoring": {
+    "scoringVersion": "1.0.0",
+    "items": 8,
+    "responseScale": [
+      1,
+      7
+    ],
+    "reverseItems": [],
+    "aggregation": "sum",
+    "theoreticalRange": [
+      8,
+      56
+    ],
+    "missing": "complete_required_project_only",
+    "noFacetScores": true
+  },
+  "referencePolicy": "none",
+  "reportVersion": "1.0.0",
+  "license": {
+    "officialResearch": "NON_COMMERCIAL_WITH_CREDIT",
+    "independentTranslation": "AUTHOR_CONTACT_PENDING",
+    "publicRedistribution": "ADMIN_REVIEW_PENDING",
+    "commercial": "NOT_LICENSED"
+  },
+  "validation": {
+    "staticPrepared": true,
+    "vitest": "NOTRUN",
+    "typescript": "NOTRUN",
+    "pg": "NOTRUN",
+    "ci": "NOTRUN",
+    "activated": false
+  }
+}

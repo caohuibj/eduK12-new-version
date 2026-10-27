@@ -1,0 +1,780 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "flourishing_fs8_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "text": "以下八句话涉及生活中不同方面的体验。请根据自己现在的真实想法判断，你在多大程度上同意每句话。请选择1到7中的一个数字，1表示完全不同意，7表示非常同意；请按自己的实际感受作答，不需要追求任何所谓的正确答案。",
+    "source": "根据Ed Diener等2009年官方英文Flourishing Scale施测说明独立撰写的中文研究工作指导语，不复制官网HKBU繁体译本。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "心理繁荣量表（FS，8题）— 独立中文研究工作译稿",
+      "abbreviation": "FS8-ZH-WORKING",
+      "instrumentFamily": "Flourishing Scale (Diener & Biswas-Diener)"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "由八个陈述共同形成的自评心理繁荣单一总分，涉及意义感、支持性关系、日常投入、对他人的贡献、重要活动中的胜任感、对自己和生活的总体积极评价、对未来的乐观以及被他人尊重。八项不是八个独立有效分量表，不是诊断或能力选拔测验。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:wellbeing",
+        "domain:positive_psychological_functioning",
+        "construct:flourishing",
+        "construct:psychological_resources",
+        "construct:life_purpose",
+        "construct:supportive_relationships",
+        "construct:daily_engagement",
+        "construct:contribution_to_others",
+        "construct:self_perceived_competence",
+        "construct:good_life_evaluation",
+        "construct:future_optimism",
+        "construct:experienced_respect",
+        "construct:single_total_not_eight_subscales",
+        "orientation:positive_psychology",
+        "orientation:subjective_wellbeing",
+        "orientation:not_therapy_specific",
+        "population:adult_research",
+        "population:project_18_plus",
+        "population:self_report",
+        "population:not_k12_validated",
+        "population:independent_translation_not_chinese_validated",
+        "response:self",
+        "response:digital_self",
+        "response:eight_items",
+        "response:seven_point_agreement_1_to_7",
+        "response:fixed_order",
+        "response:no_reverse_items",
+        "response:sum_8_to_56",
+        "response:no_fixed_recall_period",
+        "response:complete_required_project_policy",
+        "use:research",
+        "use:individual_reflection",
+        "use:score_only",
+        "use:no_bands",
+        "use:no_chinese_norms",
+        "use:not_diagnostic",
+        "use:not_selection",
+        "license:noncommercial_only",
+        "license:author_contact_required",
+        "license:redistribution_review_pending",
+        "license:translation_review_pending",
+        "license:attribution_required",
+        "license:original_full_text_acquired",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:working_translation",
+        "language_validation:separate_from_official_traditional_chinese",
+        "language_validation:expert_review_pending",
+        "language_validation:cognitive_debrief_not_established",
+        "language_validation:local_validation_pending",
+        "心理繁荣",
+        "积极心理",
+        "人生意义",
+        "人际支持",
+        "日常投入",
+        "能力感",
+        "尊重",
+        "未来乐观",
+        "幸福感",
+        "非商业研究",
+        "独立中文研究工作稿",
+        "非诊断"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "原英语版有跨样本大学生研究；平台中文独立工作译稿未验证，保守只作为18岁及以上成人自评草稿。不得继承官网香港繁体中文版的效度或对中国/K12人群进行外推。"
+    },
+    "administration": {
+      "itemCount": 8,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "整体当前生活自我描述，无固定过去一周或过去四周时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "固定作者网站2009年1月原英文FS八题顺序与七级同意度反应；不与SPANE-12或其他多维幸福量表混算。",
+        "全部八题1–7原值等权求和8–56，无反向，不生成八项独立能力画像。",
+        "中点4=既不赞同也不反对；作答指导语独立冻结，不塞入第1题。",
+        "本平台工作稿规定八题全部有效才计算单一总分，缺失不插补。它不是原作者完整性规范的伪称。",
+        "原作者对生活资源和优势的描述不是中国成人诊断、选拔或常模切点；不建立低中高分档。",
+        "原版 © 2009 Ed Diener和Robert Biswas-Diener；官网已有香港浸会大学繁体中文译本，本平台新简体中文工作译稿不混用文字或背书。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语原版有心理繁荣测量文献；平台独立中文工作译稿的翻译有效性和文化适配尚未确认。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "帮助一般作答者回顾重要活动、关系、目的与可获得的支持，不输出诊断或人格价值等级。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "fs-diener2010-original",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原英语心理繁荣研究样本，精确取样分布未由本轮源码处理确认",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "Diener等发表FS八题单总分的原始开发/效度研究，版权表单 ©2009、论文卷期2010；不得将原英语证据视为本中文工作译稿的信效度。",
+        "rating": "UNKNOWN",
+        "citation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y.",
+        "doi": "10.1007/s11205-009-9493-y",
+        "url": "https://doi.org/10.1007/s11205-009-9493-y"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Ed Diener及Robert Biswas-Diener官网2009英文原表：https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf；依八题英文独立制简体中文研究草稿。官网香港浸会大学繁体译本独立授权与署名仅作参照链接。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "本工作稿不是HKBU繁体中文版转码/转简，也不继承任何中文常模、翻译验证或作者认可。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "flourishing_fs8_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "requiredContextKeys": [],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    }
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "flourishing_fs8_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "flourishing_fs8_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "allowedCommercialNatures": [
+      "NON_COMMERCIAL"
+    ],
+    "notes": [
+      "© Ed Diener and Robert Biswas-Diener 2009 Flourishing Scale。官方非商业研究使用许可：https://eddiener.com/flourishing-scale-fs/；原始英文八题和计分说明：https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf。官网繁体中文译本由香港浸会大学学生事务处辅导及发展中心翻译，独立著作权和署名应保留：https://eddiener.com/wp-content/uploads/2025/02/FS_Chinese.pdf。平台新编简体中文仅为独立研究工作译稿，不复制官网繁体译文或冒充其受认可版本；作者网站允许署名非商业研究使用不等于全面授权独立译本、商业化和公开GitHub再分发。是否采用官网译本、翻译/数字呈现/公开分发与商业使用均由管理员后续确认。当前尚无明确覆盖平台独立简体中文稿的全面许可，按unknown/restricted保留权利风险说明。",
+      "完整原题已获得，内容草稿按用户规则先整理。版权及作者协商待办由管理员决定，不把待联系当开发门禁；不声称可公开商业使用。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Flourishing Scale eight-item English original (Diener & Biswas-Diener 2009), independent Chinese research draft",
+        "citation": "Diener, E., Wirtz, D., Tov, W., Kim-Prieto, C., Choi, D. W., Oishi, S., & Biswas-Diener, R. (2010). New Well-being Measures: Short Scales to Assess Flourishing and Positive and Negative Feelings. Social Indicators Research, 97, 143–156. https://doi.org/10.1007/s11205-009-9493-y.",
+        "url": "https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf",
+        "publicationYear": 2010
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "© Ed Diener and Robert Biswas-Diener 2009 Flourishing Scale。官方非商业研究使用许可：https://eddiener.com/flourishing-scale-fs/；原始英文八题和计分说明：https://eddiener.com/wp-content/uploads/2024/09/Flourishing-Scale.pdf。官网繁体中文译本由香港浸会大学学生事务处辅导及发展中心翻译，独立著作权和署名应保留：https://eddiener.com/wp-content/uploads/2025/02/FS_Chinese.pdf。平台新编简体中文仅为独立研究工作译稿，不复制官网繁体译文或冒充其受认可版本；作者网站允许署名非商业研究使用不等于全面授权独立译本、商业化和公开GitHub再分发。是否采用官网译本、翻译/数字呈现/公开分发与商业使用均由管理员后续确认。当前尚无明确覆盖平台独立简体中文稿的全面许可，按unknown/restricted保留权利风险说明。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "fs_agreement_1_7",
+          "options": [
+            {
+              "value": "1",
+              "label": "完全不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "有点不同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "既不赞同也不反对",
+              "score": 4
+            },
+            {
+              "value": "5",
+              "label": "有点赞同",
+              "score": 5
+            },
+            {
+              "value": "6",
+              "label": "同意",
+              "score": 6
+            },
+            {
+              "value": "7",
+              "label": "非常同意",
+              "score": 7
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "FS8_01",
+          "content": "我能感到自己的生活有目标，也有值得追求的意义。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_02",
+          "content": "我拥有能给我支持、也让我有所收获的人际关系。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_03",
+          "content": "我会投入日常所做的活动，并且对这些活动保持兴趣。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_04",
+          "content": "我会主动做一些事，为他人的快乐和生活福祉贡献自己的力量。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_05",
+          "content": "面对自己看重的事情，我相信自己有能力把它们做好。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_06",
+          "content": "我认为自己是个好人，并且过着一种好的生活。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_07",
+          "content": "我对未来抱有乐观的期待。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "FS8_08",
+          "content": "我感受到周围的人对我的尊重。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "fs_agreement_1_7",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "FS8_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "FS8_08",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "total",
+            "type": "total",
+            "label": "心理繁荣总分",
+            "description": "八个陈述的1–7原值相加得到8–56，分数较高仅表示自评的心理资源和积极功能体验较多；没有八维分数、临床分档或中国常模。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "FS8_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "FS8_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "total"
+        ],
+        "scoreOrder": [
+          "total"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "total",
+            "headline": "生活中让你感到充实的部分",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "这份问卷关注你如何看待生活中的意义、支持、投入感以及自己能做些什么。它并不是用八道题给人分出八种能力，也不能据一个总分评价谁的人生更成功。不同阶段的生活会有不同的困难与资源：即使你在一些地方感到满意，也可能同时有需要帮助的部分。你可以试着想一想，近期哪件小事让你感到有意义，哪些关系带来支持，哪些重要的活动还希望有人陪你一起尝试。分数只是对这些感受的简短记录，而不是对人格或价值的判定。愿意的话，可以从一件很小、可选择、也适合当前情况的事情开始，让日常生活多一点自己看重的内容。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近什么时候，你觉得自己做的事情有意义，或者和他人产生了真实的连接？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一件自己重视但不需要太多资源的小事，为它留出一小段时间。"
+              },
+              {
+                "category": "support",
+                "text": "如果生活中缺少被理解或被支持的机会，可以考虑与可信任的人交流自己的需要。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "这是一份独立简体中文研究工作译稿，尚未获作者或香港繁体译者认可、人工译审、认知访谈或中国目标样本验证；不能继承任何其他中文版证据。",
+          "八题合成单一心理繁荣总分8–56，不能输出八个独立人格/能力维度、学习能力判断或诊断结论。",
+          "高分意味着更认同问卷描述的积极心理资源体验，但不是生活毫无问题或人格价值更高；低分也不代表失败、疾病或能力不足。",
+          "本平台缺答策略为完整八题才计分，不补零、不插补；这不是作者已证实的个人缺失评分规则。",
+          "作者网站限署名的非商业研究用途，独立翻译、公开GitHub题文再分发与商用扩大范围需管理员另行确认。"
+        ],
+        "disclaimer": "Flourishing Scale 原作者Ed Diener、Robert Biswas-Diener（2009）；2010论文 DOI 10.1007/s11205-009-9493-y。本中文研究工作稿未经译审、人群验证及正式授权审批，不用于诊断、排名或高风险决策。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "flourishing_fs8",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "FS8_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_08",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 8
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "FS8_01",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_02",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_03",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_04",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_05",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_06",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_08",
+            "responseValue": "7"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 56
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "neutral",
+        "answers": [
+          {
+            "itemCode": "FS8_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_08",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 32
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "mixed",
+        "answers": [
+          {
+            "itemCode": "FS8_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "FS8_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "FS8_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "FS8_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_05",
+            "responseValue": "5"
+          },
+          {
+            "itemCode": "FS8_06",
+            "responseValue": "6"
+          },
+          {
+            "itemCode": "FS8_07",
+            "responseValue": "7"
+          },
+          {
+            "itemCode": "FS8_08",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "total": 29
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "one_missing",
+        "answers": [
+          {
+            "itemCode": "FS8_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "FS8_08",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "total": null
+          },
+          "totalScoreKeys": [
+            "total"
+          ]
+        }
+      }
+    ]
+  }
+}
