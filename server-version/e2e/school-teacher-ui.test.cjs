@@ -182,3 +182,12 @@ test('workspace and task consumers match the current compact product controls',(
  const fn=ui.slice(ui.indexOf('async function schoolManagementAnchor'),ui.indexOf('async function schoolManagementAnchor')+700);
  assert.doesNotMatch(fn,/if \(done.has\('teacher-school-anchor'\)\) return/);
 });
+
+test('compact form authoring and auto-advance checks use current labels and focus destination',()=>{
+ const fs=require('node:fs'),path=require('node:path'),source=fs.readFileSync(path.join(__dirname,'school-teacher-browser.cjs'),'utf8');
+ assert.match(source,/s.product === 'SCHOOL' \? '表单分组与题目' : '表单区段与题目'/);
+ assert.match(source,/details.education-private-directory-disclosure > summary/);
+ assert.match(source,/Auto-advanced question receives visible keyboard focus/);
+ assert.match(source,/focusTarget: 'next-question'/);
+ assert.doesNotMatch(source,/keyboardCheck\(s, player\(\).getByRole\('radio'/);
+});

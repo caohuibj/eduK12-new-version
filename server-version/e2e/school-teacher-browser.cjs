@@ -545,10 +545,14 @@ async function run() {
       await s.api(uri, 'PUT', { expectedRevision: draft.revision, title, definition: f.definitions[kind.toLowerCase()] })
       await s.click(studio.getByRole('button', { name: '重新读取草稿' }), uri, 'GET')
       if (kind === 'FORM') {
-        const outline = studio.getByRole('navigation', { name: '表单区段与题目', exact: true })
-        await outline.getByRole('button', { name: '编辑题目：合成矩阵题', exact: true }).click()
+        const outline = studio.getByRole('navigation', { name: s.product === 'SCHOOL' ? '表单分组与题目' : '表单区段与题目', exact: true })
+        const choose = async prompt => {
+          if (s.product === 'SCHOOL' && !await outline.isVisible()) await studio.locator('details.education-private-directory-disclosure > summary').click()
+          await outline.getByRole('button', { name: '编辑题目：' + prompt, exact: true }).click()
+        }
+        await choose('合成矩阵题')
         await shot(s, 'form-author-editor')
-        await outline.getByRole('button', { name: '编辑题目：合成单选条件题', exact: true }).click()
+        await choose('合成单选条件题')
       }
       const input = studio.getByLabel('工具名称', { exact: true }), savedTitle = title + ' 已保存'
       await input.fill(savedTitle)
@@ -696,10 +700,16 @@ async function run() {
           assert.deepEqual(fields.map(field => field.type), ['SINGLE', 'SHORT_TEXT', 'MULTIPLE', 'MATRIX'])
           assert.ok(fields.every(field => field.type === field.formDefinition.type))
           const player = () => p.locator('.form-player')
-          await keyboardCheck(s, player().getByRole('radio', { name: '合成选项乙', exact: true }))
-          // Single-choice selection auto-advances; do not click the next question's Next.
+          const firstChoice = player().getByRole('radio', { name: '合成选项乙', exact: true })
+          await firstChoice.focus(); await firstChoice.press('Space')
+          // Auto-advance deliberately focuses the next question, not the now
+          // unmounted radio. Verify that real keyboard destination, then read
+          // the original saved selection after navigating back.
           await player().getByRole('group', { name: /合成多选题/ }).waitFor()
+          assert.equal(await player().evaluate(el => document.activeElement === el && el.matches(':focus-visible')), true, 'Auto-advanced question receives visible keyboard focus')
           await player().getByRole('button', { name: '上一题', exact: true }).click()
+          assert.equal(await player().getByRole('radio', { name: '合成选项乙', exact: true }).isChecked(), true)
+          report.keyboard.push({ product: s.product, action: 'Space', control: 'radio', selected: true, focusVisible: true, focusTarget: 'next-question' })
           const selected = player().getByRole('radio', { name: '合成选项乙', exact: true })
           await selected.focus(); await selected.press('ArrowLeft')
           assert.equal(await player().getByRole('radio', { name: '合成选项甲', exact: true }).isChecked(), true)
