@@ -1,5 +1,6 @@
 # 延迟选择图审附录：来源、条件与解释边界
 
+当前状态补注：用户已在本原线程“同意设计”，DOT已明确继续实现；下文保留设计期资料与拟议口径。当前已实现候选、检查原件和限制见[实施交付](delay-choice-implementation/README.md)，未DOT复核、未接入。
 状态：DOT确认唯一归属；用户单项图审待定，未批准实现。现有信息采样候选保持原提交。serial-reaction-learning、pvt、emotion-situation-understanding属于其他领域；本项不复制它们。既有本领域四项WIP保留，不随此包提交。旧去重快照和逐项边界见[提报](delay-choice-proposal-20261027.md)。
 
 ## 固定来源与分项许可

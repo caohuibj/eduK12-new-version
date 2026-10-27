@@ -1,0 +1,1103 @@
+{
+  "kind": "ACTUAL_REACT_JSDOM_SYNTHETIC_PORTS_NOT_PARTICIPANT_OR_API",
+  "context": {
+    "language": "en",
+    "contextKey": "delay-synthetic-attempt",
+    "randomSeed": "delay-frontend-synthetic",
+    "snapshot": {
+      "schemaVersion": 1,
+      "testType": "delay-choice",
+      "engineVersion": "0.1.0",
+      "scoringVersion": "0.1.0",
+      "configVersion": "0.1.0",
+      "protocol": {
+        "schemaVersion": 1,
+        "key": "delay-choice/0.1.0/0.1.0",
+        "version": "0.1.0",
+        "clock": "performance",
+        "randomizationAlgorithmVersion": "delay-fnv1a-utf16-xorshift32-block36-side-v1",
+        "trialEnvelopeVersion": 1,
+        "phases": [
+          {
+            "key": "test",
+            "persists": true,
+            "required": true
+          }
+        ],
+        "measurementCriticalConfigPaths": [
+          "*"
+        ]
+      },
+      "config": {
+        "profile": "experience",
+        "totalTrials": 36,
+        "repetitions": 1,
+        "blockTrials": 36,
+        "amountUnit": "hypothetical-point-hundredths",
+        "soonerAmount": 2000,
+        "ratios": [
+          101,
+          105,
+          110,
+          115,
+          120,
+          125,
+          130,
+          150,
+          175
+        ],
+        "delays": [
+          [
+            0,
+            14
+          ],
+          [
+            0,
+            28
+          ],
+          [
+            14,
+            28
+          ],
+          [
+            14,
+            42
+          ]
+        ],
+        "transitionMs": 500,
+        "responseDeadlineMs": null,
+        "incentive": "hypothetical-no-payment-no-real-wait",
+        "inputPolicy": "first-valid-full-activation-or-explicit-skip-v1",
+        "stimulus": {
+          "surface": "#FFFFFF",
+          "text": "#1F2937",
+          "border": "#526981",
+          "equalCardStyle": true
+        },
+        "practice": {
+          "trials": 2,
+          "quizQuestions": 2,
+          "maximumGroups": 3,
+          "criterion": "operation-complete-and-two-rule-answers-not-preference"
+        },
+        "profileDefinitionVersion": "0.1.0",
+        "metricDefinitionVersion": "0.1.0",
+        "qualityDefinitionVersion": "0.1.0",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "parameterExplanationVersion": "0.1.0"
+      },
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "frozenAt": "2026-10-27T00:00:00.000Z"
+    },
+    "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b"
+  },
+  "manifest": {
+    "formal": [
+      {
+        "index": 0,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:14:28",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "left"
+      },
+      {
+        "index": 1,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:0:14",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "right"
+      },
+      {
+        "index": 2,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:0:14",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "left"
+      },
+      {
+        "index": 3,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:14:28",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "left"
+      },
+      {
+        "index": 4,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:0:14",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "left"
+      },
+      {
+        "index": 5,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:14:42",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "right"
+      },
+      {
+        "index": 6,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:0:14",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "left"
+      },
+      {
+        "index": 7,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:0:28",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "left"
+      },
+      {
+        "index": 8,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:0:28",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "right"
+      },
+      {
+        "index": 9,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:0:28",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "right"
+      },
+      {
+        "index": 10,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:14:42",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "right"
+      },
+      {
+        "index": 11,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:0:14",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "left"
+      },
+      {
+        "index": 12,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:14:42",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "left"
+      },
+      {
+        "index": 13,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:14:42",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "right"
+      },
+      {
+        "index": 14,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:14:28",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "right"
+      },
+      {
+        "index": 15,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:14:28",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "right"
+      },
+      {
+        "index": 16,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:0:28",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "right"
+      },
+      {
+        "index": 17,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:0:28",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "left"
+      },
+      {
+        "index": 18,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:14:42",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "left"
+      },
+      {
+        "index": 19,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:14:28",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "left"
+      },
+      {
+        "index": 20,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:14:28",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "left"
+      },
+      {
+        "index": 21,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:14:42",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "left"
+      },
+      {
+        "index": 22,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:14:42",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "right"
+      },
+      {
+        "index": 23,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:14:28",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "right"
+      },
+      {
+        "index": 24,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:14:42",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "left"
+      },
+      {
+        "index": 25,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:0:28",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "right"
+      },
+      {
+        "index": 26,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:0:28",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "left"
+      },
+      {
+        "index": 27,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:0:28",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "right"
+      },
+      {
+        "index": 28,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:0:14",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "right"
+      },
+      {
+        "index": 29,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:14:28",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "right"
+      },
+      {
+        "index": 30,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:14:28",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "left"
+      },
+      {
+        "index": 31,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:0:14",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "right"
+      },
+      {
+        "index": 32,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:0:28",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "left"
+      },
+      {
+        "index": 33,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:0:14",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "right"
+      },
+      {
+        "index": 34,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:14:42",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "right"
+      },
+      {
+        "index": 35,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:0:14",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "left"
+      }
+    ],
+    "practice": [
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "conditionId": "practice-today-week",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 7,
+          "soonerAmount": 1000,
+          "laterAmount": 1200,
+          "soonerSide": "left"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "conditionId": "practice-week-two",
+          "ratioPercent": 125,
+          "soonerDays": 7,
+          "laterDays": 14,
+          "soonerAmount": 800,
+          "laterAmount": 1000,
+          "soonerSide": "right"
+        }
+      ],
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "conditionId": "practice-today-week",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 7,
+          "soonerAmount": 1000,
+          "laterAmount": 1200,
+          "soonerSide": "left"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "conditionId": "practice-week-two",
+          "ratioPercent": 125,
+          "soonerDays": 7,
+          "laterDays": 14,
+          "soonerAmount": 800,
+          "laterAmount": 1000,
+          "soonerSide": "right"
+        }
+      ],
+      [
+        {
+          "index": 0,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "conditionId": "practice-today-week",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 7,
+          "soonerAmount": 1000,
+          "laterAmount": 1200,
+          "soonerSide": "left"
+        },
+        {
+          "index": 1,
+          "phase": "practice",
+          "round": 2,
+          "block": 0,
+          "conditionId": "practice-week-two",
+          "ratioPercent": 125,
+          "soonerDays": 7,
+          "laterDays": 14,
+          "soonerAmount": 800,
+          "laterAmount": 1000,
+          "soonerSide": "right"
+        }
+      ]
+    ]
+  },
+  "records": [
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "conditionId": "practice-today-week",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 7,
+          "soonerAmount": 1000,
+          "laterAmount": 1200,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 113,
+        "endedAtPerfMs": 117,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "atMs": 117,
+            "target": "left",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 117,
+          "rtMs": 4,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "practice:0:0",
+      "recordDigest": "c7c800e6de8f77a13e397e035777a8a990075a402a181b8a970356b32cdae044"
+    },
+    {
+      "phase": "practice",
+      "round": 0,
+      "index": 1,
+      "raw": {
+        "plan": {
+          "index": 1,
+          "phase": "practice",
+          "round": 0,
+          "block": 0,
+          "conditionId": "practice-week-two",
+          "ratioPercent": 125,
+          "soonerDays": 7,
+          "laterDays": 14,
+          "soonerAmount": 800,
+          "laterAmount": 1000,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 124,
+        "endedAtPerfMs": 128,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "atMs": 128,
+            "target": "right",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 128,
+          "rtMs": 4,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "practice:0:1",
+      "recordDigest": "f3c9424306337641c6ea1e76a5036ff1e3e590d21f4d821f4d1f031710aae071"
+    },
+    {
+      "phase": "quiz",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "round": 0,
+        "startedAtPerfMs": 135,
+        "endedAtPerfMs": 145,
+        "answers": [
+          1,
+          1
+        ],
+        "submitted": true
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "quiz:0:0",
+      "recordDigest": "c2a9e5e95315cfab6e4cbea1dd48fd44131762c6a2986d7e314c55face89c520"
+    },
+    {
+      "phase": "practice",
+      "round": 1,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "conditionId": "practice-today-week",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 7,
+          "soonerAmount": 1000,
+          "laterAmount": 1200,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 156,
+        "endedAtPerfMs": 160,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "atMs": 160,
+            "target": "left",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 160,
+          "rtMs": 4,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "practice:1:0",
+      "recordDigest": "ac444b47395f20cac46c118e8ffb0d9d72b3a3ecbe29fe8ea4f41f5d628b459c"
+    },
+    {
+      "phase": "practice",
+      "round": 1,
+      "index": 1,
+      "raw": {
+        "plan": {
+          "index": 1,
+          "phase": "practice",
+          "round": 1,
+          "block": 0,
+          "conditionId": "practice-week-two",
+          "ratioPercent": 125,
+          "soonerDays": 7,
+          "laterDays": 14,
+          "soonerAmount": 800,
+          "laterAmount": 1000,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 167,
+        "endedAtPerfMs": 171,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "atMs": 171,
+            "target": "right",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 171,
+          "rtMs": 4,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "practice:1:1",
+      "recordDigest": "ec26ad5fce8ce94fddd37f9e2f6a6b60c91dbfe01a925fbae07e4830f2386b9d"
+    },
+    {
+      "phase": "quiz",
+      "round": 1,
+      "index": 0,
+      "raw": {
+        "round": 1,
+        "startedAtPerfMs": 178,
+        "endedAtPerfMs": 188,
+        "answers": [
+          0,
+          1
+        ],
+        "submitted": true
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "quiz:1:0",
+      "recordDigest": "47fab92ee88fde0cc00e16389c9141ea6f5f2f9719f158c2375e6ef97176955d"
+    },
+    {
+      "phase": "test",
+      "round": 0,
+      "index": 0,
+      "raw": {
+        "plan": {
+          "index": 0,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "175:14:28",
+          "ratioPercent": 175,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 3500,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 199,
+        "endedAtPerfMs": 211,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "down",
+            "atMs": 203,
+            "target": "left",
+            "input": "keyboard",
+            "token": "key:Enter",
+            "key": "Enter",
+            "repeat": false
+          },
+          {
+            "kind": "up",
+            "atMs": 211,
+            "target": "left",
+            "input": "keyboard",
+            "token": "key:Enter",
+            "key": "Enter",
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 211,
+          "rtMs": 12,
+          "input": "keyboard",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 1,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "test:0:0",
+      "recordDigest": "7c213a1769f3cc88f509f4033b1ecb698654f2abae0cddc3069fc5b0918ab171"
+    },
+    {
+      "phase": "test",
+      "round": 0,
+      "index": 1,
+      "raw": {
+        "plan": {
+          "index": 1,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "125:0:14",
+          "ratioPercent": 125,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2500,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 218,
+        "endedAtPerfMs": 222,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "atMs": 222,
+            "target": "skip",
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": null,
+          "side": null,
+          "terminal": "skipped",
+          "responseAtMs": 222,
+          "rtMs": 4,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      },
+      "language": "en",
+      "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+      "contextKey": "delay-synthetic-attempt",
+      "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+      "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+      "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+      "realm": {
+        "timeOriginMs": 1793107398914.198,
+        "pageInstanceId": "8c2436d5-e166-4205-8297-864cd8a6d492"
+      },
+      "recordKey": "test:0:1",
+      "recordDigest": "f26c5b48dc21dbfc7f53cd6a5ff69f68a62a2d5686c138b6cc1d318f178871d9"
+    }
+  ],
+  "final": {
+    "language": "en",
+    "contextDigest": "9606866fe7055a013cb30fe9157ea47e6d30ccfb04972046f567c76c315f19ba",
+    "contextKey": "delay-synthetic-attempt",
+    "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+    "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+    "manifestHash": "68159075cd216e64bdba264525daf4bf074453dba68658c128740990ca23dc3b",
+    "formalCount": 2,
+    "practiceCount": 4,
+    "quizCount": 2,
+    "termination": "aborted",
+    "terminationReason": "participant-ended",
+    "recordDigests": [
+      "c7c800e6de8f77a13e397e035777a8a990075a402a181b8a970356b32cdae044",
+      "f3c9424306337641c6ea1e76a5036ff1e3e590d21f4d821f4d1f031710aae071",
+      "c2a9e5e95315cfab6e4cbea1dd48fd44131762c6a2986d7e314c55face89c520",
+      "ac444b47395f20cac46c118e8ffb0d9d72b3a3ecbe29fe8ea4f41f5d628b459c",
+      "ec26ad5fce8ce94fddd37f9e2f6a6b60c91dbfe01a925fbae07e4830f2386b9d",
+      "47fab92ee88fde0cc00e16389c9141ea6f5f2f9719f158c2375e6ef97176955d",
+      "7c213a1769f3cc88f509f4033b1ecb698654f2abae0cddc3069fc5b0918ab171",
+      "f26c5b48dc21dbfc7f53cd6a5ff69f68a62a2d5686c138b6cc1d318f178871d9"
+    ],
+    "finalPayloadDigest": "c165c7d42ead4744603de560062bad8c648512f9d9a833fd1af2d990eeb6448e"
+  }
+}

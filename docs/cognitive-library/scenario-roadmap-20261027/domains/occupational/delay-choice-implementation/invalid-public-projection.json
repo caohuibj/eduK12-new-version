@@ -1,0 +1,24 @@
+{
+  "kind": "EMPTY_SYNTHETIC_RECORDS_NOT_PARTICIPANT_DATA",
+  "report": {
+    "testType": "delay-choice",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "parameterExplanationVersion": "0.1.0",
+    "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+    "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+    "profile": "experience",
+    "state": "invalid",
+    "planned": 36,
+    "presented": 0,
+    "summary": null,
+    "conditions": null,
+    "contrasts": null
+  },
+  "chinese": null,
+  "image": null,
+  "publicDownload": null
+}

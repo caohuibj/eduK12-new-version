@@ -1,0 +1,5107 @@
+{
+  "kind": "SYNTHETIC_SOFTWARE_CAPTURE_NOT_PARTICIPANT_DATA",
+  "snapshot": {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-27T00:00:00.000Z",
+    "testType": "delay-choice",
+    "configVersion": "0.1.0",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "config": {
+      "profile": "experience",
+      "totalTrials": 36,
+      "repetitions": 1,
+      "blockTrials": 36,
+      "amountUnit": "hypothetical-point-hundredths",
+      "soonerAmount": 2000,
+      "ratios": [
+        101,
+        105,
+        110,
+        115,
+        120,
+        125,
+        130,
+        150,
+        175
+      ],
+      "delays": [
+        [
+          0,
+          14
+        ],
+        [
+          0,
+          28
+        ],
+        [
+          14,
+          28
+        ],
+        [
+          14,
+          42
+        ]
+      ],
+      "transitionMs": 500,
+      "responseDeadlineMs": null,
+      "incentive": "hypothetical-no-payment-no-real-wait",
+      "inputPolicy": "first-valid-full-activation-or-explicit-skip-v1",
+      "stimulus": {
+        "surface": "#FFFFFF",
+        "text": "#1F2937",
+        "border": "#526981",
+        "equalCardStyle": true
+      },
+      "practice": {
+        "trials": 2,
+        "quizQuestions": 2,
+        "maximumGroups": 3,
+        "criterion": "operation-complete-and-two-rule-answers-not-preference"
+      },
+      "profileDefinitionVersion": "0.1.0",
+      "metricDefinitionVersion": "0.1.0",
+      "qualityDefinitionVersion": "0.1.0",
+      "reportDefinitionVersion": "0.1.0",
+      "presentationVersion": "0.1.0",
+      "parameterExplanationVersion": "0.1.0"
+    },
+    "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "delay-choice/0.1.0/0.1.0",
+      "version": "0.1.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "delay-fnv1a-utf16-xorshift32-block36-side-v1",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e"
+  },
+  "randomSeed": "delay-synthetic-research-records",
+  "raw": [
+    {
+      "plan": {
+        "index": 0,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:14:28",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 100,
+      "endedAtPerfMs": 300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 1,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:0:14",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 10100,
+      "endedAtPerfMs": 10300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 10300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 10300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 2,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:0:28",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 20100,
+      "endedAtPerfMs": 20300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 20300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 20300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 3,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:14:28",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 30100,
+      "endedAtPerfMs": 30300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 30300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 30300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 4,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:0:28",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 40100,
+      "endedAtPerfMs": 40300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 40300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 40300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 5,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:14:28",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 50100,
+      "endedAtPerfMs": 50300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 50300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 50300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 6,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:14:42",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 60100,
+      "endedAtPerfMs": 60300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 60300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 60300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 7,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:0:28",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 70100,
+      "endedAtPerfMs": 70300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 70300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 70300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 8,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:0:28",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 80100,
+      "endedAtPerfMs": 80300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 80300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 80300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 9,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:14:42",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 90100,
+      "endedAtPerfMs": 90300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 90300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 90300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 10,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:14:42",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 100100,
+      "endedAtPerfMs": 100300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 100300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 100300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 11,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:14:42",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 110100,
+      "endedAtPerfMs": 110300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 110300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 110300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 12,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:14:42",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 120100,
+      "endedAtPerfMs": 120300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 120300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 120300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 13,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:0:28",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 130100,
+      "endedAtPerfMs": 130300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 130300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 130300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 14,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:0:28",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 140100,
+      "endedAtPerfMs": 140300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 140300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 140300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 15,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:14:28",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 150100,
+      "endedAtPerfMs": 150300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 150300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 150300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 16,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:14:28",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 160100,
+      "endedAtPerfMs": 160300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 160300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 160300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 17,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:14:28",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 170100,
+      "endedAtPerfMs": 170300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 170300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 170300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 18,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:14:28",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 180100,
+      "endedAtPerfMs": 180300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 180300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 180300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 19,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:0:28",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 190100,
+      "endedAtPerfMs": 190300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 190300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 190300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 20,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:0:14",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 200100,
+      "endedAtPerfMs": 200300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 200300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 200300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 21,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:0:28",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 210100,
+      "endedAtPerfMs": 210300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 210300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 210300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 22,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:14:42",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 220100,
+      "endedAtPerfMs": 220300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 220300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 220300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 23,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:14:42",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 230100,
+      "endedAtPerfMs": 230300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 230300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 230300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 24,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:14:42",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 240100,
+      "endedAtPerfMs": 240300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 240300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 240300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 25,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "120:0:14",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2400,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 250100,
+      "endedAtPerfMs": 250300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 250300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 250300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 26,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:0:28",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 260100,
+      "endedAtPerfMs": 260300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 260300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 260300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 27,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:0:14",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 270100,
+      "endedAtPerfMs": 270300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 270300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 270300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 28,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "175:0:14",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 3500,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 280100,
+      "endedAtPerfMs": 280300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 280300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 280300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 29,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "110:0:14",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2200,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 290100,
+      "endedAtPerfMs": 290300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 290300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 290300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 30,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "101:14:28",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2020,
+        "soonerSide": "left"
+      },
+      "startedAtPerfMs": 300100,
+      "endedAtPerfMs": 300300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 300300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 300300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 31,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "130:14:42",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 42,
+        "soonerAmount": 2000,
+        "laterAmount": 2600,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 310100,
+      "endedAtPerfMs": 310300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 310300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 310300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 32,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "105:14:28",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 28,
+        "soonerAmount": 2000,
+        "laterAmount": 2100,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 320100,
+      "endedAtPerfMs": 320300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 320300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 320300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 33,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "150:0:14",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 3000,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 330100,
+      "endedAtPerfMs": 330300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 330300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 330300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 34,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "115:0:14",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2300,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 340100,
+      "endedAtPerfMs": 340300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "left",
+          "atMs": 340300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "later",
+        "side": "left",
+        "terminal": "chosen",
+        "responseAtMs": 340300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    },
+    {
+      "plan": {
+        "index": 35,
+        "phase": "test",
+        "round": 0,
+        "block": 0,
+        "conditionId": "125:0:14",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 14,
+        "soonerAmount": 2000,
+        "laterAmount": 2500,
+        "soonerSide": "right"
+      },
+      "startedAtPerfMs": 350100,
+      "endedAtPerfMs": 350300,
+      "status": "complete",
+      "stopReason": null,
+      "events": [
+        {
+          "kind": "activate",
+          "target": "right",
+          "atMs": 350300,
+          "input": "assistive",
+          "token": "assistive",
+          "key": null,
+          "repeat": false
+        }
+      ],
+      "state": {
+        "stage": "complete",
+        "choice": "sooner",
+        "side": "right",
+        "terminal": "chosen",
+        "responseAtMs": 350300,
+        "rtMs": 200,
+        "input": "assistive",
+        "held": [],
+        "ignored": 0
+      },
+      "ignoredRepeatCount": 0,
+      "overflow": false
+    }
+  ],
+  "envelopes": [
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 0,
+      "condition": "120:14:28",
+      "startedAtPerfMs": 100,
+      "endedAtPerfMs": 300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 0,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "120:14:28",
+          "ratioPercent": 120,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2400,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 100,
+        "endedAtPerfMs": 300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 1,
+      "condition": "101:0:14",
+      "startedAtPerfMs": 10100,
+      "endedAtPerfMs": 10300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 1,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "101:0:14",
+          "ratioPercent": 101,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2020,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 10100,
+        "endedAtPerfMs": 10300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 10300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 10300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 2,
+      "condition": "101:0:28",
+      "startedAtPerfMs": 20100,
+      "endedAtPerfMs": 20300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 2,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "101:0:28",
+          "ratioPercent": 101,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2020,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 20100,
+        "endedAtPerfMs": 20300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 20300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 20300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 3,
+      "condition": "150:14:28",
+      "startedAtPerfMs": 30100,
+      "endedAtPerfMs": 30300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 3,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "150:14:28",
+          "ratioPercent": 150,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 3000,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 30100,
+        "endedAtPerfMs": 30300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 30300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 30300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 4,
+      "condition": "110:0:28",
+      "startedAtPerfMs": 40100,
+      "endedAtPerfMs": 40300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 4,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "110:0:28",
+          "ratioPercent": 110,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2200,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 40100,
+        "endedAtPerfMs": 40300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 40300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 40300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 5,
+      "condition": "130:14:28",
+      "startedAtPerfMs": 50100,
+      "endedAtPerfMs": 50300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 5,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "130:14:28",
+          "ratioPercent": 130,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2600,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 50100,
+        "endedAtPerfMs": 50300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 50300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 50300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 6,
+      "condition": "101:14:42",
+      "startedAtPerfMs": 60100,
+      "endedAtPerfMs": 60300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 6,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "101:14:42",
+          "ratioPercent": 101,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2020,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 60100,
+        "endedAtPerfMs": 60300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 60300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 60300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 7,
+      "condition": "105:0:28",
+      "startedAtPerfMs": 70100,
+      "endedAtPerfMs": 70300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 7,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "105:0:28",
+          "ratioPercent": 105,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2100,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 70100,
+        "endedAtPerfMs": 70300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 70300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 70300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 8,
+      "condition": "120:0:28",
+      "startedAtPerfMs": 80100,
+      "endedAtPerfMs": 80300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 8,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "120:0:28",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2400,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 80100,
+        "endedAtPerfMs": 80300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 80300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 80300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 9,
+      "condition": "120:14:42",
+      "startedAtPerfMs": 90100,
+      "endedAtPerfMs": 90300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 9,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "120:14:42",
+          "ratioPercent": 120,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2400,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 90100,
+        "endedAtPerfMs": 90300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 90300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 90300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 10,
+      "condition": "150:14:42",
+      "startedAtPerfMs": 100100,
+      "endedAtPerfMs": 100300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 10,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "150:14:42",
+          "ratioPercent": 150,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 3000,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 100100,
+        "endedAtPerfMs": 100300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 100300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 100300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 11,
+      "condition": "110:14:42",
+      "startedAtPerfMs": 110100,
+      "endedAtPerfMs": 110300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 11,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "110:14:42",
+          "ratioPercent": 110,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2200,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 110100,
+        "endedAtPerfMs": 110300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 110300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 110300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 12,
+      "condition": "115:14:42",
+      "startedAtPerfMs": 120100,
+      "endedAtPerfMs": 120300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 12,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "115:14:42",
+          "ratioPercent": 115,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2300,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 120100,
+        "endedAtPerfMs": 120300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 120300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 120300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 13,
+      "condition": "150:0:28",
+      "startedAtPerfMs": 130100,
+      "endedAtPerfMs": 130300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 13,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "150:0:28",
+          "ratioPercent": 150,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 3000,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 130100,
+        "endedAtPerfMs": 130300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 130300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 130300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 14,
+      "condition": "130:0:28",
+      "startedAtPerfMs": 140100,
+      "endedAtPerfMs": 140300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 14,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "130:0:28",
+          "ratioPercent": 130,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2600,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 140100,
+        "endedAtPerfMs": 140300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 140300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 140300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 15,
+      "condition": "110:14:28",
+      "startedAtPerfMs": 150100,
+      "endedAtPerfMs": 150300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 15,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "110:14:28",
+          "ratioPercent": 110,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2200,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 150100,
+        "endedAtPerfMs": 150300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 150300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 150300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 16,
+      "condition": "175:14:28",
+      "startedAtPerfMs": 160100,
+      "endedAtPerfMs": 160300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 16,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "175:14:28",
+          "ratioPercent": 175,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 3500,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 160100,
+        "endedAtPerfMs": 160300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 160300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 160300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 17,
+      "condition": "125:14:28",
+      "startedAtPerfMs": 170100,
+      "endedAtPerfMs": 170300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 17,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "125:14:28",
+          "ratioPercent": 125,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2500,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 170100,
+        "endedAtPerfMs": 170300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 170300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 170300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 18,
+      "condition": "115:14:28",
+      "startedAtPerfMs": 180100,
+      "endedAtPerfMs": 180300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 18,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "115:14:28",
+          "ratioPercent": 115,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2300,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 180100,
+        "endedAtPerfMs": 180300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 180300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 180300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 19,
+      "condition": "125:0:28",
+      "startedAtPerfMs": 190100,
+      "endedAtPerfMs": 190300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 19,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "125:0:28",
+          "ratioPercent": 125,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2500,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 190100,
+        "endedAtPerfMs": 190300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 190300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 190300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 20,
+      "condition": "105:0:14",
+      "startedAtPerfMs": 200100,
+      "endedAtPerfMs": 200300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 20,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "105:0:14",
+          "ratioPercent": 105,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2100,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 200100,
+        "endedAtPerfMs": 200300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 200300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 200300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 21,
+      "condition": "175:0:28",
+      "startedAtPerfMs": 210100,
+      "endedAtPerfMs": 210300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 21,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "175:0:28",
+          "ratioPercent": 175,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 3500,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 210100,
+        "endedAtPerfMs": 210300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 210300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 210300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 22,
+      "condition": "175:14:42",
+      "startedAtPerfMs": 220100,
+      "endedAtPerfMs": 220300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 22,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "175:14:42",
+          "ratioPercent": 175,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 3500,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 220100,
+        "endedAtPerfMs": 220300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 220300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 220300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 23,
+      "condition": "105:14:42",
+      "startedAtPerfMs": 230100,
+      "endedAtPerfMs": 230300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 23,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "105:14:42",
+          "ratioPercent": 105,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2100,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 230100,
+        "endedAtPerfMs": 230300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 230300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 230300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 24,
+      "condition": "125:14:42",
+      "startedAtPerfMs": 240100,
+      "endedAtPerfMs": 240300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 24,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "125:14:42",
+          "ratioPercent": 125,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2500,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 240100,
+        "endedAtPerfMs": 240300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 240300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 240300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 25,
+      "condition": "120:0:14",
+      "startedAtPerfMs": 250100,
+      "endedAtPerfMs": 250300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 25,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "120:0:14",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2400,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 250100,
+        "endedAtPerfMs": 250300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 250300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 250300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 26,
+      "condition": "115:0:28",
+      "startedAtPerfMs": 260100,
+      "endedAtPerfMs": 260300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 26,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "115:0:28",
+          "ratioPercent": 115,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2300,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 260100,
+        "endedAtPerfMs": 260300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 260300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 260300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 27,
+      "condition": "130:0:14",
+      "startedAtPerfMs": 270100,
+      "endedAtPerfMs": 270300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 27,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "130:0:14",
+          "ratioPercent": 130,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2600,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 270100,
+        "endedAtPerfMs": 270300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 270300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 270300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 28,
+      "condition": "175:0:14",
+      "startedAtPerfMs": 280100,
+      "endedAtPerfMs": 280300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 28,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "175:0:14",
+          "ratioPercent": 175,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 3500,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 280100,
+        "endedAtPerfMs": 280300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 280300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 280300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 29,
+      "condition": "110:0:14",
+      "startedAtPerfMs": 290100,
+      "endedAtPerfMs": 290300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 29,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "110:0:14",
+          "ratioPercent": 110,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2200,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 290100,
+        "endedAtPerfMs": 290300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 290300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 290300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 30,
+      "condition": "101:14:28",
+      "startedAtPerfMs": 300100,
+      "endedAtPerfMs": 300300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 30,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "101:14:28",
+          "ratioPercent": 101,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2020,
+          "soonerSide": "left"
+        },
+        "startedAtPerfMs": 300100,
+        "endedAtPerfMs": 300300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 300300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 300300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 31,
+      "condition": "130:14:42",
+      "startedAtPerfMs": 310100,
+      "endedAtPerfMs": 310300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 31,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "130:14:42",
+          "ratioPercent": 130,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "soonerAmount": 2000,
+          "laterAmount": 2600,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 310100,
+        "endedAtPerfMs": 310300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 310300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 310300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 32,
+      "condition": "105:14:28",
+      "startedAtPerfMs": 320100,
+      "endedAtPerfMs": 320300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 32,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "105:14:28",
+          "ratioPercent": 105,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "soonerAmount": 2000,
+          "laterAmount": 2100,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 320100,
+        "endedAtPerfMs": 320300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 320300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 320300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 33,
+      "condition": "150:0:14",
+      "startedAtPerfMs": 330100,
+      "endedAtPerfMs": 330300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 33,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "150:0:14",
+          "ratioPercent": 150,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 3000,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 330100,
+        "endedAtPerfMs": 330300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 330300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 330300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 34,
+      "condition": "115:0:14",
+      "startedAtPerfMs": 340100,
+      "endedAtPerfMs": 340300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 34,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "115:0:14",
+          "ratioPercent": 115,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2300,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 340100,
+        "endedAtPerfMs": 340300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "left",
+            "atMs": 340300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "later",
+          "side": "left",
+          "terminal": "chosen",
+          "responseAtMs": 340300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "phase": "test",
+      "trialIndex": 35,
+      "condition": "125:0:14",
+      "startedAtPerfMs": 350100,
+      "endedAtPerfMs": 350300,
+      "durationMs": 200,
+      "flags": {
+        "timeout": false,
+        "premature": false
+      },
+      "qualityEvents": [],
+      "payload": {
+        "plan": {
+          "index": 35,
+          "phase": "test",
+          "round": 0,
+          "block": 0,
+          "conditionId": "125:0:14",
+          "ratioPercent": 125,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "soonerAmount": 2000,
+          "laterAmount": 2500,
+          "soonerSide": "right"
+        },
+        "startedAtPerfMs": 350100,
+        "endedAtPerfMs": 350300,
+        "status": "complete",
+        "stopReason": null,
+        "events": [
+          {
+            "kind": "activate",
+            "target": "right",
+            "atMs": 350300,
+            "input": "assistive",
+            "token": "assistive",
+            "key": null,
+            "repeat": false
+          }
+        ],
+        "state": {
+          "stage": "complete",
+          "choice": "sooner",
+          "side": "right",
+          "terminal": "chosen",
+          "responseAtMs": 350300,
+          "rtMs": 200,
+          "input": "assistive",
+          "held": [],
+          "ignored": 0
+        },
+        "ignoredRepeatCount": 0,
+        "overflow": false
+      }
+    }
+  ],
+  "score": {
+    "metrics": {
+      "planned": 36,
+      "presented": 36,
+      "summary": {
+        "planned": 36,
+        "presented": 36,
+        "answered": 36,
+        "sooner": 18,
+        "later": 18,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0.5
+      },
+      "conditions": [
+        {
+          "conditionId": "101:0:14",
+          "ratioPercent": 101,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "105:0:14",
+          "ratioPercent": 105,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "110:0:14",
+          "ratioPercent": 110,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "115:0:14",
+          "ratioPercent": 115,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "120:0:14",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "125:0:14",
+          "ratioPercent": 125,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "130:0:14",
+          "ratioPercent": 130,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "150:0:14",
+          "ratioPercent": 150,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "175:0:14",
+          "ratioPercent": 175,
+          "soonerDays": 0,
+          "laterDays": 14,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "101:0:28",
+          "ratioPercent": 101,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "105:0:28",
+          "ratioPercent": 105,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "110:0:28",
+          "ratioPercent": 110,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "115:0:28",
+          "ratioPercent": 115,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "120:0:28",
+          "ratioPercent": 120,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "125:0:28",
+          "ratioPercent": 125,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "130:0:28",
+          "ratioPercent": 130,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "150:0:28",
+          "ratioPercent": 150,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "175:0:28",
+          "ratioPercent": 175,
+          "soonerDays": 0,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "101:14:28",
+          "ratioPercent": 101,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "105:14:28",
+          "ratioPercent": 105,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "110:14:28",
+          "ratioPercent": 110,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "115:14:28",
+          "ratioPercent": 115,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "120:14:28",
+          "ratioPercent": 120,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "125:14:28",
+          "ratioPercent": 125,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "130:14:28",
+          "ratioPercent": 130,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "150:14:28",
+          "ratioPercent": 150,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "175:14:28",
+          "ratioPercent": 175,
+          "soonerDays": 14,
+          "laterDays": 28,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "101:14:42",
+          "ratioPercent": 101,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "105:14:42",
+          "ratioPercent": 105,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "110:14:42",
+          "ratioPercent": 110,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "115:14:42",
+          "ratioPercent": 115,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 1,
+          "sooner": 0,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 1
+        },
+        {
+          "conditionId": "120:14:42",
+          "ratioPercent": 120,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "125:14:42",
+          "ratioPercent": 125,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "130:14:42",
+          "ratioPercent": 130,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "150:14:42",
+          "ratioPercent": 150,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        },
+        {
+          "conditionId": "175:14:42",
+          "ratioPercent": 175,
+          "soonerDays": 14,
+          "laterDays": 42,
+          "planned": 1,
+          "presented": 1,
+          "answered": 1,
+          "later": 0,
+          "sooner": 1,
+          "skipped": 0,
+          "interrupted": 0,
+          "laterRate": 0
+        }
+      ],
+      "contrasts": {
+        "atToday28Minus14": -0.22222222222222227,
+        "atDay14_42Minus28": -0.2222222222222222
+      },
+      "observations": [
+        {
+          "index": 0,
+          "conditionId": "120:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 1,
+          "conditionId": "101:0:14",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 2,
+          "conditionId": "101:0:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 3,
+          "conditionId": "150:14:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 4,
+          "conditionId": "110:0:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 5,
+          "conditionId": "130:14:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 6,
+          "conditionId": "101:14:42",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 7,
+          "conditionId": "105:0:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 8,
+          "conditionId": "120:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 9,
+          "conditionId": "120:14:42",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 10,
+          "conditionId": "150:14:42",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 11,
+          "conditionId": "110:14:42",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 12,
+          "conditionId": "115:14:42",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 13,
+          "conditionId": "150:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 14,
+          "conditionId": "130:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 15,
+          "conditionId": "110:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 16,
+          "conditionId": "175:14:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 17,
+          "conditionId": "125:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 18,
+          "conditionId": "115:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 19,
+          "conditionId": "125:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 20,
+          "conditionId": "105:0:14",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 21,
+          "conditionId": "175:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 22,
+          "conditionId": "175:14:42",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 23,
+          "conditionId": "105:14:42",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 24,
+          "conditionId": "125:14:42",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 25,
+          "conditionId": "120:0:14",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 26,
+          "conditionId": "115:0:28",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 27,
+          "conditionId": "130:0:14",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 28,
+          "conditionId": "175:0:14",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 29,
+          "conditionId": "110:0:14",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 30,
+          "conditionId": "101:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 31,
+          "conditionId": "130:14:42",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 32,
+          "conditionId": "105:14:28",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 33,
+          "conditionId": "150:0:14",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 34,
+          "conditionId": "115:0:14",
+          "choice": "later",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        },
+        {
+          "index": 35,
+          "conditionId": "125:0:14",
+          "choice": "sooner",
+          "skipped": false,
+          "interrupted": false,
+          "rtMs": 200,
+          "input": "assistive"
+        }
+      ],
+      "reportBinding": {
+        "testType": "delay-choice",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "profile": "experience",
+        "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+        "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "parameterExplanationVersion": "0.1.0"
+      }
+    },
+    "quality": {
+      "state": "interpretable",
+      "flags": {
+        "noChoices": false,
+        "incompleteConditions": false,
+        "interrupted": false
+      },
+      "reasons": []
+    },
+    "audit": {
+      "scorerVersion": "0.1.0",
+      "trialCount": 36
+    }
+  },
+  "report": {
+    "testType": "delay-choice",
+    "engineVersion": "0.1.0",
+    "scoringVersion": "0.1.0",
+    "configVersion": "0.1.0",
+    "reportDefinitionVersion": "0.1.0",
+    "presentationVersion": "0.1.0",
+    "parameterExplanationVersion": "0.1.0",
+    "configHash": "ee3a1132ecf05fdf4f3821f99e08b3edaedfd481ff4f8414679d411275cbf379",
+    "protocolSignature": "9efae9d5301fbb5a4e757847034638ebe19708bd1699279549c24c81456cfa0e",
+    "profile": "experience",
+    "state": "interpretable",
+    "planned": 36,
+    "presented": 36,
+    "summary": {
+      "planned": 36,
+      "presented": 36,
+      "answered": 36,
+      "sooner": 18,
+      "later": 18,
+      "skipped": 0,
+      "interrupted": 0,
+      "laterRate": 0.5
+    },
+    "conditions": [
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "101:0:14",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "105:0:14",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "110:0:14",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "115:0:14",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "120:0:14",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "125:0:14",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "130:0:14",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "150:0:14",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "175:0:14",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 14
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "101:0:28",
+        "ratioPercent": 101,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "105:0:28",
+        "ratioPercent": 105,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "110:0:28",
+        "ratioPercent": 110,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "115:0:28",
+        "ratioPercent": 115,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "120:0:28",
+        "ratioPercent": 120,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "125:0:28",
+        "ratioPercent": 125,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "130:0:28",
+        "ratioPercent": 130,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "150:0:28",
+        "ratioPercent": 150,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "175:0:28",
+        "ratioPercent": 175,
+        "soonerDays": 0,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "101:14:28",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "105:14:28",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "110:14:28",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "115:14:28",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "120:14:28",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "125:14:28",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "130:14:28",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "150:14:28",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "175:14:28",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 28
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "101:14:42",
+        "ratioPercent": 101,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "105:14:42",
+        "ratioPercent": 105,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "110:14:42",
+        "ratioPercent": 110,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 0,
+        "later": 1,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 1,
+        "conditionId": "115:14:42",
+        "ratioPercent": 115,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "120:14:42",
+        "ratioPercent": 120,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "125:14:42",
+        "ratioPercent": 125,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "130:14:42",
+        "ratioPercent": 130,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "150:14:42",
+        "ratioPercent": 150,
+        "soonerDays": 14,
+        "laterDays": 42
+      },
+      {
+        "planned": 1,
+        "presented": 1,
+        "answered": 1,
+        "sooner": 1,
+        "later": 0,
+        "skipped": 0,
+        "interrupted": 0,
+        "laterRate": 0,
+        "conditionId": "175:14:42",
+        "ratioPercent": 175,
+        "soonerDays": 14,
+        "laterDays": 42
+      }
+    ],
+    "contrasts": {
+      "atToday28Minus14": -0.22222222222222227,
+      "atDay14_42Minus28": -0.2222222222222222
+    }
+  }
+}

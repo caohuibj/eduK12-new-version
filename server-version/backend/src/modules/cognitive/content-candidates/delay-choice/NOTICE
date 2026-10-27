@@ -1,0 +1,27 @@
+Delay choice: independently authored TypeScript and original amount/date cards.
+Protocol reference only; no upstream runtime, helper, images, bank or translation imported.
+Source: expfactory/expfactory-experiments @49b8123f18b26d94dfc010bb8a6ec7458b265e2e
+discount_titrate/experiment.js blob84bbe4c3553a6cca64d596bd1aa5a33fdaad254e
+The source notice is retained as acknowledgement and applies to any actual source-derived substantial portions; it does not clear unrelated assets.
+
+The MIT License (MIT)
+
+Copyright (c) 2016 Vanessa Sochat, Stanford University
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,6 +1,6 @@
 # 延迟选择：单项图审简要介绍
 
-[直接看界面图片](delay-choice-review.png)；[静态HTML](delay-choice-review.html)。这是原创设计图，不是施测截图；报告数字为合成例子，无参与者数据。DOT已确认`delay-choice`仅归职业科研领域；**等待用户图审，未批准实现、未接入**。
+[直接看界面图片](delay-choice-review.png)；[静态HTML](delay-choice-review.html)。这是原创设计图，不是施测截图；报告数字为合成例子，无参与者数据。DOT已确认`delay-choice`仅归职业科研领域；**用户已同意设计，当前独立内容候选已实现、未DOT复核、未接入**。原图保留审批时原字节与设计标记；当前代码、原件与报告见[实施交付](delay-choice-implementation/README.md)。
 
 每题比较两张金额／等待卡，选择更愿意的一张。例如“今天20点／2周后25点”，任一均可。两边都是假想点数，不实际付款，也不用真的等数周；没有正确偏好或高收益标准。金额、日期持续可见，首次有效选择结束本题，无倒计时；可明确跳过或结束。手机、平板用同一两卡界面，触屏／鼠标／键盘兼容，两卡样式相同、左右位置平衡。
 
@@ -19,4 +19,4 @@ English: “Both rewards are hypothetical. No payment will be made, and you will
 
 主要改造：参考公开36条件结构，固定基准而非随机金额、改用假想点数并去掉真实奖金承诺、原创卡片和中英教学、增加研究版重复。来源不是自适应滴定；本项目不估折扣参数。用真实选择数／条件分母描述本次结果，遗漏为空、早选真实0类选择不等于0能力，不按偏好评判。正文、小图、下载共同受三态控制；不输出自控力、耐心、常模、IQ、诊断或岗位结论。
 
-固定来源为[Experiment Factory同提交源码](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/discount_titrate/experiment.js)及[MIT许可](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/LICENSE)，没有导入源图片、题库、译文或旧运行时。假想／真实激励等效、中文、设备、人群及短版效度均未验证。来源／许可／公式／版本与位置平衡细节见[附录](delay-choice-appendix.md)。本包只提交设计资料，用户图审批准后才实现。
+固定来源为[Experiment Factory同提交源码](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/discount_titrate/experiment.js)及[MIT许可](https://github.com/expfactory/expfactory-experiments/blob/49b8123f18b26d94dfc010bb8a6ec7458b265e2e/LICENSE)，没有导入源图片、题库、译文或旧运行时。假想／真实激励等效、中文、设备、人群及短版效度均未验证。来源／许可／公式／版本与位置平衡细节见[附录](delay-choice-appendix.md)。本次沿用户已批准图稿实现独立候选；共享注册、产品接入、最终集中测试及发布仍待统一安排。

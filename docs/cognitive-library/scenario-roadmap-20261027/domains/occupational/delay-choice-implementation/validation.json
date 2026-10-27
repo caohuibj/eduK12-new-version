@@ -1,0 +1,415 @@
+{
+  "kind": "DELAY_CHOICE_CONTENT_CANDIDATE_EVIDENCE",
+  "status": "NOT_DOT_REVIEWED_NOT_INTEGRATED",
+  "base": "8ff8b2022871d8af3efa2e63313f60bb47e6159e",
+  "nodeVersion": "24.21.0",
+  "newIndependentTargets": 10,
+  "runs": [
+    {
+      "file": "backend-first.json",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "name": "freezes all 36 amount/date cells in both profiles with exact money, complete blocks and honest side balance",
+          "status": "passed"
+        },
+        {
+          "name": "scores actual capture originals into signed reports and retains inspectable 72/36 synthetic evidence",
+          "status": "passed"
+        },
+        {
+          "name": "preserves actual zeros, nulls, explicit skips and unexecuted items without judging preferences",
+          "status": "passed"
+        },
+        {
+          "name": "replays first complete activations, cancellations, multi-contact and bounded repeat input",
+          "status": "passed"
+        },
+        {
+          "name": "rejects forged sequence/state/envelope/version and scrubs internal fields from all public channels",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "frontend-first.json",
+      "passed": 4,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "name": "survives StrictMode prepare/start and preserves a real unmount or replacement through the original language/context ports",
+          "status": "passed"
+        },
+        {
+          "name": "uses actual cards, repeats full teaching after misunderstood rules, accepts either preference, then retains chosen/skipped records and a limited report",
+          "status": "passed"
+        },
+        {
+          "name": "keeps pending saves and FINAL retries immutable and refuses mismatched receipts without false success",
+          "status": "passed"
+        },
+        {
+          "name": "uses the same three public gates for report body, image and download and isolates late preparation after replacement",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "backend-continuation.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "name": "freezes all 36 amount/date cells in both profiles with exact money, complete blocks and honest side balance",
+          "status": "passed"
+        },
+        {
+          "name": "scores actual capture originals into signed reports and retains inspectable 72/36 synthetic evidence",
+          "status": "skipped"
+        },
+        {
+          "name": "preserves actual zeros, nulls, explicit skips and unexecuted items without judging preferences",
+          "status": "skipped"
+        },
+        {
+          "name": "replays first complete activations, cancellations, multi-contact and bounded repeat input",
+          "status": "skipped"
+        },
+        {
+          "name": "rejects forged sequence/state/envelope/version and scrubs internal fields from all public channels",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "file": "frontend-continuation.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 2,
+      "cases": [
+        {
+          "name": "survives StrictMode prepare/start and preserves a real unmount or replacement through the original language/context ports",
+          "status": "skipped"
+        },
+        {
+          "name": "uses actual cards, repeats full teaching after misunderstood rules, accepts either preference, then retains chosen/skipped records and a limited report",
+          "status": "passed"
+        },
+        {
+          "name": "keeps pending saves and FINAL retries immutable and refuses mismatched receipts without false success",
+          "status": "skipped"
+        },
+        {
+          "name": "uses the same three public gates for report body, image and download and isolates late preparation after replacement",
+          "status": "passed"
+        },
+        {
+          "name": "caps incomplete practice at three groups and preserves an unfinished quiz without fabricating formal work",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "label": "backend",
+      "entries": [
+        "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/package.ts",
+        "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/participant-presentation.ts",
+        "server-version/backend/src/__tests__/cognitive/delay-choice-content.test.ts"
+      ],
+      "sourceFileCount": 49,
+      "diagnostics": [],
+      "hashesStillCurrent": true
+    },
+    {
+      "label": "frontend",
+      "entries": [
+        "server-version/frontend/src/modules/cognitive/tasks/delay-choice/DelayTask.tsx",
+        "server-version/frontend/src/modules/cognitive/tasks/delay-choice/content.test.tsx"
+      ],
+      "sourceFileCount": 54,
+      "diagnostics": [],
+      "hashesStillCurrent": true
+    }
+  ],
+  "lint": [
+    {
+      "file": "lint-first.json",
+      "files": 10,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "file": "lint-continuation.json",
+      "files": 3,
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "pureGeneratedCopiesIdentical": true,
+  "oldInformationSamplingFilesPreserved": 62,
+  "approvedDesignPngPreserved": true,
+  "versions": {
+    "engine": "0.1.0",
+    "scoring": "0.1.0",
+    "config": "0.1.0",
+    "protocol": "0.1.0",
+    "profile": "0.1.0",
+    "metric": "0.1.0",
+    "quality": "0.1.0",
+    "reportDefinition": "0.1.0",
+    "presentation": "0.1.0",
+    "parameterExplanation": "0.1.0"
+  },
+  "initialTypeFailureRetained": "types-first.json; rootDir import, shadowed manifest parameter, matcher type and Promise generic; fixed without shared tsconfig/schema changes",
+  "commandFailureRetained": "One supplemental authoring Python command ran from frontend rather than repo root, FileNotFoundError before any edit. Following lint ran independently; it did not prove the authoring command succeeded. Corrected root invocation afterwards.",
+  "replayedExample": {
+    "input": "react-synthetic-originals.json",
+    "output": "react-replayed-report.json",
+    "formalCount": 2,
+    "command": "node server-version/backend/node_modules/tsx/dist/cli.mjs docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/replay-react-example.ts",
+    "exitCode": 0
+  },
+  "limits": [
+    "synthetic records and jsdom ports only, not participant/device data",
+    "no old cognitive suite rerun",
+    "no app build, CI, schema migration, registry, DB/API/COS, product integration, merge, deployment or activation"
+  ],
+  "filesBeforeManifest": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-appendix.md",
+      "bytes": 6933,
+      "sha256": "5db9af5af39eac4ddc8360b236e6c65f74ca604adf612553a0ad6fb1f9bd6ed6"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-brief.md",
+      "bytes": 4513,
+      "sha256": "a55a65a845988210ea38814d845862dc997d08cb8f302058a94e744f1a85aeef"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/README.md",
+      "bytes": 8672,
+      "sha256": "d346a628494f7f81ed79fbdbedaa2f45f3762d277d3ef309a678b8d8a58578b6"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/affected-types.cjs",
+      "bytes": 2135,
+      "sha256": "b84f121553b2c16d9f09956120a23f7bba71c35cc27b64d4b7ce7be0f8430cce"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/backend-continuation.json",
+      "bytes": 2559,
+      "sha256": "7c1c0a68f4de52d13a9100a6274e294f8a6fafbf6a9aaf03ed2b764f566e3acc"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/backend-first.json",
+      "bytes": 2672,
+      "sha256": "9fb79a9005e54e5706835730ff4ff448e8cf9f2f3083f0beea89f5cefc73ad6f"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/experience-public-report.json",
+      "bytes": 11069,
+      "sha256": "67ceb24a19eedb76c03bd71a2b30233f5b1b52cb4ae6f2c62125b530355afe39"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/experience-public-summary.svg",
+      "bytes": 753,
+      "sha256": "252c5adabbf808e9b40766d5c889dffd01ab0ef75c44dc7c5e8ba66a43b893ed"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/experience-synthetic-originals.json",
+      "bytes": 123136,
+      "sha256": "256f8e6c49046d8ecb28744c030d4780eaefcfa471e05d4e07eaf136fafff4c6"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/frontend-continuation.json",
+      "bytes": 2973,
+      "sha256": "2763ae6d18abb2906edfd3a84b08a626909b9d6202820317fcec1ea61d91b0d9"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/frontend-first.json",
+      "bytes": 2596,
+      "sha256": "fcd6b1d0d72c244c6fbd009f20655be06333ab735c289bb60244f31e838f0de1"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/invalid-public-projection.json",
+      "bytes": 723,
+      "sha256": "e25b17ed09f6aca3b724f852f2306433562d3a2bedce6d89fdd6a8c6fe825f97"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/limited-public-summary.svg",
+      "bytes": 742,
+      "sha256": "ef8a0ec33e5647893916aee328f719bfc868cab3244e7224832b475272cfdfa7"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/lint-continuation.json",
+      "bytes": 873,
+      "sha256": "9fd16b10fab56464d3016135217c302f8ae667a6284219aabbc4846c228a2984"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/lint-first.json",
+      "bytes": 2878,
+      "sha256": "7bd1ae756298825cb3c1b6ac9fd18c4ae3800c8045a04f53bf09666e494fbc68"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/react-replayed-report.json",
+      "bytes": 39310,
+      "sha256": "da177281cfe44a885b213b24e2dff3f4ca38e218bdf8b4b577aff75e30d4c708"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/react-synthetic-originals.json",
+      "bytes": 30446,
+      "sha256": "b3f19a1dbe8d58bb6bd5774b8a61c3ed1110f4c99aa347a058f77da53a7fc451"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/replay-react-example.ts",
+      "bytes": 2124,
+      "sha256": "5be96b7bf770be2e2d01b942c2e824769e080b90fc1d8886e3755878a5e2cd4b"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/research-public-report.json",
+      "bytes": 11067,
+      "sha256": "394e4dac6ebf3afed544912623834a256c05afbb22e38d1aa46c8f087ee19177"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/research-public-summary.svg",
+      "bytes": 751,
+      "sha256": "8a9bf46d0c62ae8abd18eb0f662443491254718d7d156079b5da066b236cbdcd"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/research-synthetic-originals.json",
+      "bytes": 218368,
+      "sha256": "e0bed89d2470c3b96a88c3e9594df9a695fd194e02d1503dcaa75b318024d3be"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/types-current.json",
+      "bytes": 20730,
+      "sha256": "7d6ae05a6a1f13c77666d3c295077d74c22018e9ad81847304d67dd9d0738c4c"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/types-final.json",
+      "bytes": 20730,
+      "sha256": "1240a60b77fca8de0e383cf89a38ae0226b4ebc9605a4bc228e6f4fc00fb5190"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-implementation/types-first.json",
+      "bytes": 22782,
+      "sha256": "29e7d0e41adac25b5247e081df659a4adac648493b89460228c13f56cf81d3c5"
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/occupational/delay-choice-proposal-20261027.md",
+      "bytes": 9202,
+      "sha256": "8ef92a00e28f15d70f38628855c7eb239fa3c62c7902a9a0f75d0119dc093c48"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/delay-choice-content.test.ts",
+      "bytes": 9851,
+      "sha256": "5f570e22e70ca38be9cbdb3a866682d08f2552560160f87e5455bec648fbd243"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/NOTICE",
+      "bytes": 1583,
+      "sha256": "efecf83bcde0a04bd61ca6e410235bf5ae33d0e4dda0852d115518556f20b278"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/capture.ts",
+      "bytes": 1582,
+      "sha256": "3f8a916f164ddd9a4850af1f78fb57dd6f776d47b9d9892cdc4f1b51b9b82b75"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/metadata.ts",
+      "bytes": 1948,
+      "sha256": "64f4e15542f93621d51d63a8ef42373b046b873e63fccc2f7d517919198edd80"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/package.ts",
+      "bytes": 3035,
+      "sha256": "34e1f4987d8b3bd6a4425da32daee7f67c132ba458728af4f0e73d80c7e868d4"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/participant-presentation.ts",
+      "bytes": 1217,
+      "sha256": "734d94251335214573a6f6238a879de3a63b406ade5948837f2f9daf4afe9d20"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/protocol.ts",
+      "bytes": 8676,
+      "sha256": "35c989c7f28cc9a72bc4e5794eb579ff0a7711644d72d1b327969213441f731c"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/report.ts",
+      "bytes": 9786,
+      "sha256": "72eae8ab23d93211ffbbc74a6b23a2fb3247f5e605bb0b7620547ef47deb9118"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/schema.ts",
+      "bytes": 1614,
+      "sha256": "e9a82345837dbb8e86d4bd332610192a9f464dfb10414eb99489aa9c2e803dbd"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/delay-choice/scorer.ts",
+      "bytes": 4368,
+      "sha256": "93296914d429f6d2df8971a01ee31bded91eb0db480027b8af9f39f4b41d1cc9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/DelayInstructions.tsx",
+      "bytes": 5135,
+      "sha256": "567bf654b4ab3225648a4daad4dfb68d59fa86200ab8f37ae45168d7b6c39c82"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/DelayReport.tsx",
+      "bytes": 4838,
+      "sha256": "2aac8bf0f7a68faf7fcbc3465d17aa2bffe4eac301d901d3426f1676e1a795f9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/DelayTask.tsx",
+      "bytes": 13178,
+      "sha256": "88bc946db4cd6bfa7ee56084a498ce6c30e9fbd2e7b60cf2d5fecb23a1ad7be9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/capture.ts",
+      "bytes": 51,
+      "sha256": "c3d0879b55cdcf97c1e2884ecf788179a1763709bce52417103dd6a9f645caea"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/content.test.tsx",
+      "bytes": 14226,
+      "sha256": "6181af4574d47d406cf2db32f99869b7745f984a1fca6b4e2e90589e084dc07f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/contracts.ts",
+      "bytes": 3565,
+      "sha256": "9490c31ac9d7f1abdbd05285003cdcd0d430e2d971c367171921bfd7d395eb92"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/delay.css",
+      "bytes": 1805,
+      "sha256": "1be43b0ba1f5be56698dce662e75493dcfdd820f502dcc6ffdf1c831d0035605"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/generated/capture.ts",
+      "bytes": 1582,
+      "sha256": "3f8a916f164ddd9a4850af1f78fb57dd6f776d47b9d9892cdc4f1b51b9b82b75"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/generated/protocol.ts",
+      "bytes": 8676,
+      "sha256": "35c989c7f28cc9a72bc4e5794eb579ff0a7711644d72d1b327969213441f731c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/generated/report.ts",
+      "bytes": 9786,
+      "sha256": "72eae8ab23d93211ffbbc74a6b23a2fb3247f5e605bb0b7620547ef47deb9118"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/delay-choice/session.ts",
+      "bytes": 11032,
+      "sha256": "7370a6459b388a5ec0b79c8afef1a039155f6b3fb06c9e174f513ff510d6f47f"
+    }
+  ]
+}
