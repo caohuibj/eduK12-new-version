@@ -1,0 +1,707 @@
+{
+  "schemaVersion": 1,
+  "kind": "pr363-read-only-official-evidence-observation",
+  "observedAtUTC": "2026-10-27 08:48:25 UTC",
+  "candidate": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+  "claim": "Inventory and original-candidate evidence only; no PR363 application qualification or cross-commit admission.",
+  "apiLimits": "Jobs/artifacts tools return first page, jobs latest attempt. Only returned successful jobs are listed; this is not exhaustive selected-job authentication.",
+  "prs": [
+    {
+      "number": 356,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/356",
+      "head": "3d433a58e313007bfb1e108e800b9da708589f9b",
+      "mergeCommit": "83955b898b84722a6518a908d6d1038e44e08a7d",
+      "merged": true,
+      "mergedAt": "2026-10-26T22:17:30Z",
+      "runId": 40382959231,
+      "successfulJobsObserved": [
+        {
+          "id": 121783747041,
+          "name": "classify changed content",
+          "conclusion": "success",
+          "runId": 40382959231,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "fetch the exact diff base without full history",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "detect the fixed PR356 entry before any legacy classification",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run if [ \"$PR356_ENTRY\" = \"true\" ]; then",
+              "number": 22,
+              "conclusion": "success"
+            },
+            {
+              "name": "retain PR356 source identity and complete selected input table",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 85,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 86,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 87,
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 121783996831,
+          "name": "pr356-admission",
+          "conclusion": "success",
+          "runId": 40382959231,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "Bind controlled runner paths after runner allocation",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "Recompute full official head/base/tree and complete selected plan",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "Bind stable source identity and aggregate role",
+              "number": 6,
+              "conclusion": "success"
+            },
+            {
+              "name": "Materialize exact aggregate recipe outside empty result directory",
+              "number": 7,
+              "conclusion": "success"
+            },
+            {
+              "name": "Parse explicit official Q coordinates and finding reviews as data",
+              "number": 8,
+              "conclusion": "success"
+            },
+            {
+              "name": "Verify every selected original outcome and source without application replay",
+              "number": 9,
+              "conclusion": "success"
+            },
+            {
+              "name": "Stage successful exact artifact payload",
+              "number": 10,
+              "conclusion": "success"
+            },
+            {
+              "name": "Upload exact original passing evidence",
+              "number": 11,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 24,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 25,
+              "conclusion": "success"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 12678828855,
+          "name": "pr356-source-40382959231-1",
+          "sha256": "e1ef7aee1c1ef9692b96acb23b8ce779309ace7c0d7bf6d8c0c1742d86b42f63",
+          "bytes": 2682321,
+          "expired": false,
+          "expiresAt": "2026-11-02T19:01:47Z",
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b"
+        },
+        {
+          "id": 12678509212,
+          "name": "pr356-merge-admission-precheck-40382959231-1",
+          "sha256": "23f0333b952fbf93cbbef96ad50e633faa849e55f909f24e36ea81a50e171c59",
+          "bytes": 1575075,
+          "expired": false,
+          "expiresAt": "2026-11-02T19:02:28Z",
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b"
+        },
+        {
+          "id": 12678239249,
+          "name": "pr356-merge-admission-40382959231-1",
+          "sha256": "d64174165708a4677e951835b81a67edf759f3ffbe82a21b8f7663532b7e1f1b",
+          "bytes": 1574959,
+          "expired": false,
+          "expiresAt": "2026-11-02T19:03:03Z",
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b"
+        }
+      ]
+    },
+    {
+      "number": 357,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/357",
+      "head": "8ca7668234982340bae0349a15e55b1660d813ca",
+      "mergeCommit": "dff80f0604163a04e2f5a8119d7d4295116eeb41",
+      "merged": true,
+      "mergedAt": "2026-10-27T05:31:02Z",
+      "runId": 40455202809,
+      "successfulJobsObserved": [
+        {
+          "id": 122026802348,
+          "name": "classify changed content",
+          "conclusion": "success",
+          "runId": 40455202809,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "fetch the exact diff base without full history",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "detect the fixed PR356 entry before any legacy classification",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "fetch exact two-candidate PR source for checkout-tree comparison",
+              "number": 6,
+              "conclusion": "success"
+            },
+            {
+              "name": "select dependency-free documentation or tooling classification",
+              "number": 20,
+              "conclusion": "success"
+            },
+            {
+              "name": "install pinned release classification tools",
+              "number": 21,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run if [ \"$PR356_ENTRY\" = \"true\" ]; then",
+              "number": 22,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 85,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 86,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 87,
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 122026888048,
+          "name": "codeql (javascript/typescript SAST)",
+          "conclusion": "success",
+          "runId": 40455202809,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "verify runner capacity and clean application ports",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "verify original PR357 application SAST before scanning changed controls and fixtures",
+              "number": 22,
+              "conclusion": "success"
+            },
+            {
+              "name": "initialize CodeQL",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "analyze with CodeQL",
+              "number": 24,
+              "conclusion": "success"
+            },
+            {
+              "name": "retain original PR357 SAST provenance without rewriting findings",
+              "number": 25,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post analyze with CodeQL",
+              "number": 59,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post initialize CodeQL",
+              "number": 60,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 61,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 62,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 63,
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 122026888737,
+          "name": "pr357-admission",
+          "conclusion": "success",
+          "runId": 40455202809,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run node .github/scripts/pr357-checks.mjs source",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run node --test .github/scripts/pr357-scope.test.mjs .github/scripts/pr357-checks.test.mjs",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 9,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 10,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 11,
+              "conclusion": "success"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 12712485342,
+          "name": "pr357-connected-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "73a778565031f60d84f48ac28fda2a54a9be4a99cc7365428544fae2faae019d",
+          "bytes": 9921971,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:29:23Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12712053871,
+          "name": "pr357-audit-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "64c38b08db3177522db11dd941def6a3605b89d5442b3c30fe6998be2a491d42",
+          "bytes": 510,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:25:55Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12712033895,
+          "name": "pr357-sast-continuation-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "f240649e062bf42d7629ff9e1b08d45fe2c0477ff561c4bc3c1cb0e3f8b4154e",
+          "bytes": 627,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:27:11Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12711938886,
+          "name": "pr357-frontend-checks-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "48bf3e77432d49c0648271d71f4d2e1eb71ef6ffe8a1c89494cd7d08969cadbc",
+          "bytes": 44137,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:26:06Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12711859459,
+          "name": "pr357-frontend-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "59558c172f06898a0c41a033e2059fef79a288764ef6f377c0171bfa45f60423",
+          "bytes": 22044713,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:26:04Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12711693324,
+          "name": "pr357-backend-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "63dfbcae516a6fc876f425caa239fb8c97a34ea98371484d54682098d7ce6483",
+          "bytes": 8057791,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:26:08Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        },
+        {
+          "id": 12711074463,
+          "name": "pr357-backend-checks-9ece34cbfccbc60aac6c64ab03f07614d77906af",
+          "sha256": "3e097680bd48bccffe65dc407aaeae9522e08bd2b5c50d7139cf473f94f4c70f",
+          "bytes": 108506,
+          "expired": false,
+          "expiresAt": "2026-10-30T05:26:13Z",
+          "sourceHead": "8ca7668234982340bae0349a15e55b1660d813ca"
+        }
+      ]
+    },
+    {
+      "number": 361,
+      "url": "https://github.com/caohuibj/eduK12-new-version/pull/361",
+      "head": "74062c61e1bf60b9f491f362dded7bca26e8089d",
+      "mergeCommit": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+      "merged": true,
+      "mergedAt": "2026-10-27T07:36:36Z",
+      "runId": 40465064872,
+      "successfulJobsObserved": [
+        {
+          "id": 122058371305,
+          "name": "classify changed content",
+          "conclusion": "success",
+          "runId": 40465064872,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "fetch the exact diff base without full history",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "fetch exact report-planning source for shallow tree comparison",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "detect the fixed PR356 entry before any legacy classification",
+              "number": 6,
+              "conclusion": "success"
+            },
+            {
+              "name": "select dependency-free documentation or tooling classification",
+              "number": 21,
+              "conclusion": "success"
+            },
+            {
+              "name": "install pinned release classification tools",
+              "number": 22,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run if [ \"$PR356_ENTRY\" = \"true\" ]; then",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 87,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 88,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 89,
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 122058449605,
+          "name": "codeql (javascript/typescript SAST)",
+          "conclusion": "success",
+          "runId": 40465064872,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "verify runner capacity and clean application ports",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "initialize CodeQL",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "analyze with CodeQL",
+              "number": 24,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post analyze with CodeQL",
+              "number": 59,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post initialize CodeQL",
+              "number": 60,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 61,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 62,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 63,
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 122058450231,
+          "name": "report-planning",
+          "conclusion": "success",
+          "runId": 40465064872,
+          "successfulStepsObserved": [
+            {
+              "name": "Set up job",
+              "number": 1,
+              "conclusion": "success"
+            },
+            {
+              "name": "Initialize containers",
+              "number": 2,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "number": 3,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/setup-node@v4",
+              "number": 4,
+              "conclusion": "success"
+            },
+            {
+              "name": "verify exact current source",
+              "number": 5,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run docker/setup-buildx-action@v3",
+              "number": 6,
+              "conclusion": "success"
+            },
+            {
+              "name": "build backend once using locked official dependencies",
+              "number": 7,
+              "conclusion": "success"
+            },
+            {
+              "name": "create isolated PG16 fixture schema and restricted runtime",
+              "number": 8,
+              "conclusion": "success"
+            },
+            {
+              "name": "missing PG16 report consumers in default and compact formats",
+              "number": 9,
+              "conclusion": "success"
+            },
+            {
+              "name": "package runtime from the same cached build, without recompiling",
+              "number": 10,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514",
+              "number": 11,
+              "conclusion": "success"
+            },
+            {
+              "name": "scan the exact saved runtime at unchanged severity thresholds",
+              "number": 12,
+              "conclusion": "success"
+            },
+            {
+              "name": "Run actions/upload-artifact@v4",
+              "number": 13,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514",
+              "number": 22,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run docker/setup-buildx-action@v3",
+              "number": 23,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/setup-node@v4",
+              "number": 24,
+              "conclusion": "success"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "number": 25,
+              "conclusion": "success"
+            },
+            {
+              "name": "Stop containers",
+              "number": 26,
+              "conclusion": "success"
+            },
+            {
+              "name": "Complete job",
+              "number": 27,
+              "conclusion": "success"
+            }
+          ]
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 12716670372,
+          "name": "report-planning-1ae220c924eed3106b8fa110de58a864c86224ec",
+          "sha256": "53079a4b306c53fc2d811354072def109e055165c9a13337dd9a1437cf4be11c",
+          "bytes": 383813010,
+          "expired": false,
+          "expiresAt": "2026-10-30T07:10:14Z",
+          "sourceHead": "74062c61e1bf60b9f491f362dded7bca26e8089d"
+        }
+      ]
+    }
+  ]
+}

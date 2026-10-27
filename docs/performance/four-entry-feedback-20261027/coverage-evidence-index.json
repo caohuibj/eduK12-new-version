@@ -1,0 +1,1366 @@
+{
+  "schemaVersion": 1,
+  "kind": "inspected-original-candidate-evidence-index",
+  "scope": "No PR363 application execution or cross-commit admission; original failures remain in upstream evidence.",
+  "downloads": [
+    {
+      "file": "pr356-admission.zip",
+      "sha256": "d64174165708a4677e951835b81a67edf759f3ffbe82a21b8f7663532b7e1f1b",
+      "bytes": 1574959,
+      "verification": "downloaded bytes matched official artifact digest"
+    },
+    {
+      "file": "pr357-backend-checks.zip",
+      "sha256": "3e097680bd48bccffe65dc407aaeae9522e08bd2b5c50d7139cf473f94f4c70f",
+      "bytes": 108506,
+      "verification": "downloaded bytes matched official artifact digest"
+    },
+    {
+      "file": "pr357-frontend-checks.zip",
+      "sha256": "48bf3e77432d49c0648271d71f4d2e1eb71ef6ffe8a1c89494cd7d08969cadbc",
+      "bytes": 44137,
+      "verification": "downloaded bytes matched official artifact digest"
+    },
+    {
+      "file": "pr357-connected.zip",
+      "sha256": "73a778565031f60d84f48ac28fda2a54a9be4a99cc7365428544fae2faae019d",
+      "bytes": 9921971,
+      "verification": "downloaded bytes matched official artifact digest"
+    }
+  ],
+  "pr356": {
+    "member": "merge-admission.json",
+    "memberSHA256": "75836e2b52a99857e9a1308b226b62782f395643c3e4bc7b9030874511657c77",
+    "head": "3d433a58e313007bfb1e108e800b9da708589f9b",
+    "tree": "5022a4f9ed6d0a053e1734a976736913f11505c1",
+    "base": "ff8471e529e7b3c56e1e20f17d1e2581040fc896",
+    "qualification": {
+      "runId": "40378392007",
+      "attempt": "1",
+      "jobId": "121781136112",
+      "artifactId": "12679576281",
+      "artifactName": "pr356-qualification-result-40378392007-1",
+      "zipSHA256": "a219478bcf5aff1e93b001ffbf6391bc56ae6e01a202e856e2c92d996c7dc2f0",
+      "zipBytes": 1568395,
+      "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+      "jobName": "pr356-result",
+      "originalJobConclusion": "success",
+      "completedAt": "2026-10-26T18:57:50Z"
+    },
+    "selectedPhases": [
+      {
+        "pointer": "/phases/6",
+        "phaseId": "vertical4",
+        "status": "success",
+        "inputsSHA256": "7fc1c96fd1c0702512a8c98f18b250ba75e3002ae561517713c34e81a755b3e3",
+        "caseIds": [
+          "dot356 registered source to real ONLINE and Training FINAL real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R",
+          "dot356 registered source to real ONLINE and Training FINAL stores exactly one role/delegation basis and protects active use identity in PostgreSQL",
+          "dot356 registered source to real ONLINE and Training FINAL keeps entry-role revocation separate from explicit reissue through the original exact 21B root",
+          "dot356 registered source to real ONLINE and Training FINAL keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop"
+        ],
+        "checks": [
+          {
+            "id": "dot356 registered source to real ONLINE and Training FINAL real installation, three trials, exact 21B, teacher publish, child FINAL, authorized reload and P/R",
+            "status": "passed"
+          },
+          {
+            "id": "dot356 registered source to real ONLINE and Training FINAL stores exactly one role/delegation basis and protects active use identity in PostgreSQL",
+            "status": "passed"
+          },
+          {
+            "id": "dot356 registered source to real ONLINE and Training FINAL keeps entry-role revocation separate from explicit reissue through the original exact 21B root",
+            "status": "passed"
+          },
+          {
+            "id": "dot356 registered source to real ONLINE and Training FINAL keeps admitted FINAL and durable whole receipts finishable after withdrawal and emergency stop",
+            "status": "passed"
+          }
+        ],
+        "command": {
+          "argv": [
+            "/usr/bin/python3",
+            "/home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr356-database.py",
+            "vertical4"
+          ],
+          "cwd": "/home/runner/work/eduK12-new-version/eduK12-new-version",
+          "exitCode": 0,
+          "logSHA256": "5f30968625a9afe5899a34eaf67953d850a64876fe16d5b47688a0212215fe28",
+          "startedAt": "2026-10-26T18:35:22.857345+00:00",
+          "completedAt": "2026-10-26T18:35:43.409860+00:00"
+        },
+        "upstream": [
+          {
+            "phaseId": "schema-restore",
+            "role": "schema-restore",
+            "artifactId": "12678800421",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "cf73cf473468da850dc6b40646e097b896ea7339689eed94948a5c832dcd031e",
+            "artifactDigest": "sha256:05b58e4a5ba6e3888c72f82aab53f4099965cd04177550db0a82a33c0dcf9820",
+            "inputsSHA256": "d31c203d6a0c6839ea71854903116ee6c23741f2ceb355f90fc239164b99e44d"
+          }
+        ],
+        "executionInputs": null,
+        "proofSHA256": "207794f1abf0b41994cd51776ba52c9c36f52010fbab9c83f6d39581736beab8",
+        "official": {
+          "runId": "40378392007",
+          "attempt": "1",
+          "jobId": "121769406027",
+          "artifactId": "12677975686",
+          "artifactName": "pr356-vertical4-40378392007-1",
+          "zipSHA256": "10908583568211ae43c6bb90a14dc4ede48e615bdeeea5c6c7e01505cce29ced",
+          "zipBytes": 875483,
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+          "jobName": "pr356-vertical4",
+          "originalJobConclusion": "success",
+          "completedAt": "2026-10-26T18:35:46Z"
+        }
+      },
+      {
+        "pointer": "/phases/7",
+        "phaseId": "exact-worker1",
+        "status": "success",
+        "inputsSHA256": "7fc1c96fd1c0702512a8c98f18b250ba75e3002ae561517713c34e81a755b3e3",
+        "caseIds": [
+          "accepted STANDARD whole receipt actual report-worker recovery recovers an expired real lease and completes parent/report after withdrawal without losing the accepted envelope"
+        ],
+        "checks": [
+          {
+            "id": "accepted STANDARD whole receipt actual report-worker recovery recovers an expired real lease and completes parent/report after withdrawal without losing the accepted envelope",
+            "status": "passed"
+          }
+        ],
+        "command": {
+          "argv": [
+            "/usr/bin/python3",
+            "/home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr356-database.py",
+            "exact-worker1"
+          ],
+          "cwd": "/home/runner/work/eduK12-new-version/eduK12-new-version",
+          "exitCode": 0,
+          "logSHA256": "2dbfda46dd20d5f35e7fcb75990bf53561af1a16547a5b6953fcec284e239d79",
+          "startedAt": "2026-10-26T18:35:23.642284+00:00",
+          "completedAt": "2026-10-26T18:35:38.893273+00:00"
+        },
+        "upstream": [
+          {
+            "phaseId": "schema-restore",
+            "role": "schema-restore",
+            "artifactId": "12678800421",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "cf73cf473468da850dc6b40646e097b896ea7339689eed94948a5c832dcd031e",
+            "artifactDigest": "sha256:05b58e4a5ba6e3888c72f82aab53f4099965cd04177550db0a82a33c0dcf9820",
+            "inputsSHA256": "d31c203d6a0c6839ea71854903116ee6c23741f2ceb355f90fc239164b99e44d"
+          }
+        ],
+        "executionInputs": null,
+        "proofSHA256": "413d993c66efe1e5cd8c3a318bff7c205cdcfa0f174b78fe8942168da212c658",
+        "official": {
+          "runId": "40378392007",
+          "attempt": "1",
+          "jobId": "121769405891",
+          "artifactId": "12678520535",
+          "artifactName": "pr356-exact-worker1-40378392007-1",
+          "zipSHA256": "f6b993323c9ef2a02ebba271ee805d96e573cc2d6726ca7c846e960af165250e",
+          "zipBytes": 872215,
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+          "jobName": "pr356-exact-worker1",
+          "originalJobConclusion": "success",
+          "completedAt": "2026-10-26T18:35:44Z"
+        }
+      },
+      {
+        "pointer": "/phases/8",
+        "phaseId": "ordinary-harness4",
+        "status": "success",
+        "inputsSHA256": "7fc1c96fd1c0702512a8c98f18b250ba75e3002ae561517713c34e81a755b3e3",
+        "caseIds": [
+          "ordinary durable whole receipt collection boundary processes accepted single units after emergency stop while retaining receipt and lease identity",
+          "ordinary durable whole receipt collection boundary processes accepted batch units after emergency stop while retaining receipt and lease identity",
+          "ordinary durable whole receipt collection boundary rechecks wall-clock lease after a real job-lock wait rather than transaction start",
+          "ordinary durable whole receipt collection boundary rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction"
+        ],
+        "checks": [
+          {
+            "id": "ordinary durable whole receipt collection boundary processes accepted single units after emergency stop while retaining receipt and lease identity",
+            "status": "passed"
+          },
+          {
+            "id": "ordinary durable whole receipt collection boundary processes accepted batch units after emergency stop while retaining receipt and lease identity",
+            "status": "passed"
+          },
+          {
+            "id": "ordinary durable whole receipt collection boundary rechecks wall-clock lease after a real job-lock wait rather than transaction start",
+            "status": "passed"
+          },
+          {
+            "id": "ordinary durable whole receipt collection boundary rejects a new ordinary whole submission stopped before durable ACK in the receipt transaction",
+            "status": "passed"
+          }
+        ],
+        "command": {
+          "argv": [
+            "/usr/bin/python3",
+            "/home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr356-database.py",
+            "ordinary-harness4"
+          ],
+          "cwd": "/home/runner/work/eduK12-new-version/eduK12-new-version",
+          "exitCode": 0,
+          "logSHA256": "79c88fa804ddf5b44e3d3b0d12a641beb8f7f99a1482a7f5ee5d67f0f0742c24",
+          "startedAt": "2026-10-26T18:35:30.662990+00:00",
+          "completedAt": "2026-10-26T18:35:52.739445+00:00"
+        },
+        "upstream": [
+          {
+            "phaseId": "schema-restore",
+            "role": "schema-restore",
+            "artifactId": "12678800421",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "cf73cf473468da850dc6b40646e097b896ea7339689eed94948a5c832dcd031e",
+            "artifactDigest": "sha256:05b58e4a5ba6e3888c72f82aab53f4099965cd04177550db0a82a33c0dcf9820",
+            "inputsSHA256": "d31c203d6a0c6839ea71854903116ee6c23741f2ceb355f90fc239164b99e44d"
+          }
+        ],
+        "executionInputs": null,
+        "proofSHA256": "05e1cd33d975c2077ea205e9a50720ba559b4fba0599353540c8e9a782a32a62",
+        "official": {
+          "runId": "40378392007",
+          "attempt": "1",
+          "jobId": "121769406337",
+          "artifactId": "12678255921",
+          "artifactName": "pr356-ordinary-harness4-40378392007-1",
+          "zipSHA256": "04f3e6cb1eb36eef2806cfc05277c87f1d74664362aa8ed201c14952da6097ab",
+          "zipBytes": 945413,
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+          "jobName": "pr356-ordinary-harness4",
+          "originalJobConclusion": "success",
+          "completedAt": "2026-10-26T18:35:58Z"
+        }
+      },
+      {
+        "pointer": "/phases/9",
+        "phaseId": "exact-lazy-current-child",
+        "status": "success",
+        "inputsSHA256": "878b0dba43a42c17be98d0e14661d7d734663a3d0773fbf2cff1be10fac69364",
+        "caseIds": [
+          "actual-current-exact-child-materialization"
+        ],
+        "checks": [
+          {
+            "id": "actual-current-exact-child-materialization",
+            "status": "passed"
+          }
+        ],
+        "command": {
+          "argv": [
+            "/usr/bin/python3",
+            "/home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr356-database.py",
+            "exact-lazy-current-child"
+          ],
+          "cwd": "/home/runner/work/eduK12-new-version/eduK12-new-version",
+          "exitCode": 0,
+          "logSHA256": "a7443fea2348b14fdc4a0f3dcec8ed939831df1af0d13cd468636ccc627cf9c2",
+          "startedAt": "2026-10-26T18:42:47.022744+00:00",
+          "completedAt": "2026-10-26T18:42:58.135001+00:00"
+        },
+        "upstream": [
+          {
+            "phaseId": "schema-restore",
+            "role": "schema-restore",
+            "artifactId": "12678800421",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "cf73cf473468da850dc6b40646e097b896ea7339689eed94948a5c832dcd031e",
+            "artifactDigest": "sha256:05b58e4a5ba6e3888c72f82aab53f4099965cd04177550db0a82a33c0dcf9820",
+            "inputsSHA256": "d31c203d6a0c6839ea71854903116ee6c23741f2ceb355f90fc239164b99e44d"
+          }
+        ],
+        "executionInputs": null,
+        "proofSHA256": "de22be8e63282fac7e3637502bd76382f1c600d54c6b8b8be561e738ba2fcbe0",
+        "official": {
+          "runId": "40378392007",
+          "attempt": "1",
+          "jobId": "121769405962",
+          "artifactId": "12676813934",
+          "artifactName": "pr356-exact-lazy-current-child-40378392007-1",
+          "zipSHA256": "4d486102705a12d2fb02566ec3d99a069d4ccb4c6d670cff32485bf24dfe4428",
+          "zipBytes": 872262,
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+          "jobName": "pr356-exact-lazy-current-child",
+          "originalJobConclusion": "success",
+          "completedAt": "2026-10-26T18:43:04Z"
+        }
+      },
+      {
+        "pointer": "/phases/11",
+        "phaseId": "product-browser",
+        "status": "success",
+        "inputsSHA256": "ffefe576eb958884cb7c7b56c2e042e88a0bad172b13528872a0ec76447f8765",
+        "caseIds": [
+          "teacher-course-exact-save-reload",
+          "teacher-general-native-and-exact-rejection",
+          "survey-ordinary-nonempty-frozen-instruction",
+          "survey-exact-empty-no-live-instruction"
+        ],
+        "checks": [
+          {
+            "id": "teacher-course-exact-save-reload",
+            "status": "passed"
+          },
+          {
+            "id": "teacher-general-native-and-exact-rejection",
+            "status": "passed"
+          },
+          {
+            "id": "survey-ordinary-nonempty-frozen-instruction",
+            "status": "passed"
+          },
+          {
+            "id": "survey-exact-empty-no-live-instruction",
+            "status": "passed"
+          }
+        ],
+        "command": {
+          "argv": [
+            "/opt/hostedtoolcache/node/24.21.0/x64/bin/node",
+            "/home/runner/work/eduK12-new-version/eduK12-new-version/.github/scripts/pr356-product-browser.mjs"
+          ],
+          "cwd": "/home/runner/work/eduK12-new-version/eduK12-new-version",
+          "startedAt": "2026-10-26T18:37:31.404Z",
+          "completedAt": "2026-10-26T18:37:39.712Z",
+          "exitCode": 0,
+          "logSHA256": "9c7070dff5b20e7c76d610f061a4c4a86864f399952d718556fd87c143955936"
+        },
+        "upstream": [
+          {
+            "phaseId": "schema-restore",
+            "role": "schema-restore",
+            "artifactId": "12678800421",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "cf73cf473468da850dc6b40646e097b896ea7339689eed94948a5c832dcd031e",
+            "artifactDigest": "sha256:05b58e4a5ba6e3888c72f82aab53f4099965cd04177550db0a82a33c0dcf9820",
+            "inputsSHA256": "d31c203d6a0c6839ea71854903116ee6c23741f2ceb355f90fc239164b99e44d"
+          },
+          {
+            "phaseId": "backend-image",
+            "role": "backend-image",
+            "artifactId": "12676652237",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "6b13f58f6a61cee323cfc811314c8b3d6f613de708b7a0450cff5b262164cf21",
+            "artifactDigest": "sha256:4373cca7c60d0438f9c75c4307ee07bb562ef68e46c02ddb9818456130837c26",
+            "inputsSHA256": "12c935c8f42cfbf76fdd5572a25b1ba0edb0e8b08503192aba7dac37957f5cf8"
+          },
+          {
+            "phaseId": "frontend-image",
+            "role": "frontend-dist",
+            "artifactId": "12676776948",
+            "runId": "40378392007",
+            "producerAttempt": 1,
+            "proofSHA256": "e0b0e74858bbdbbc82891c317b21909492a1412cf533721962eda5eea0f87b53",
+            "artifactDigest": "sha256:6716ec2f13962413dbc92d5bdbd496e98a3f0cd6ac16daf27d24873459856520",
+            "inputsSHA256": "ea6a51b4165daf216b4813c788b35564ec4d5d37b3f7e47c2448e7fb7ab2a5ad"
+          }
+        ],
+        "executionInputs": null,
+        "proofSHA256": "03bcd7ba7206419d65c34ead7860b7405ac3b1e10b3d2e1755481bbc6b7e0676",
+        "official": {
+          "runId": "40378392007",
+          "attempt": "1",
+          "jobId": "121769405734",
+          "artifactId": "12679090641",
+          "artifactName": "pr356-product-browser-40378392007-1",
+          "zipSHA256": "eb9a942f143b538733be76a371213b43703c17b4cd250b59488425261ae76cf7",
+          "zipBytes": 557822,
+          "sourceHead": "3d433a58e313007bfb1e108e800b9da708589f9b",
+          "jobName": "pr356-product-browser",
+          "originalJobConclusion": "success",
+          "completedAt": "2026-10-26T18:37:45Z"
+        }
+      }
+    ],
+    "selectedHistoricalCases": [
+      {
+        "pointer": "/historicalEvidence/cases/152",
+        "id": "affected-review-contracts-b1594529f2c49f4f",
+        "groupId": "affected-review-contracts",
+        "scope": "passed-case",
+        "rawSHA256": "76995f779d7d98b0b0dfe4b4577ea7c07b59398d68e754bed8a3907b3c120404",
+        "inputsSHA256": "c2b02408ea9d25fa7245b272074e575b68a9b5e1f3a50b0a40ae7894b82eef77",
+        "reviewDigest": "2233ccb471b7b3cee61bc783a40e49aa1947fd3ece8ff73e74b9d05b636a6e69",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "PR356 actual product entry and admitted standalone epoch does not apply a stopped Training entry to valid School/Teacher starts, while new Training stays blocked",
+        "suiteSuffix": "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/16",
+        "declarationRawSHA256": "76995f779d7d98b0b0dfe4b4577ea7c07b59398d68e754bed8a3907b3c120404"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/153",
+        "id": "affected-review-contracts-42f293f9ba5fb627",
+        "groupId": "affected-review-contracts",
+        "scope": "passed-case",
+        "rawSHA256": "76995f779d7d98b0b0dfe4b4577ea7c07b59398d68e754bed8a3907b3c120404",
+        "inputsSHA256": "c2b02408ea9d25fa7245b272074e575b68a9b5e1f3a50b0a40ae7894b82eef77",
+        "reviewDigest": "2233ccb471b7b3cee61bc783a40e49aa1947fd3ece8ff73e74b9d05b636a6e69",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "PR356 actual product entry and admitted standalone epoch resumes and commits the admitted Training epoch after entry withdrawal without bypassing replay identity",
+        "suiteSuffix": "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/16",
+        "declarationRawSHA256": "76995f779d7d98b0b0dfe4b4577ea7c07b59398d68e754bed8a3907b3c120404"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/154",
+        "id": "affected-review-contracts-378ed5ff07b446e3",
+        "groupId": "affected-review-contracts",
+        "scope": "passed-case",
+        "rawSHA256": "0a5d4aa250741ab2d8cead8bdee437641bc8021654b81806e1fab2092a050d48",
+        "inputsSHA256": "0533e5a8f39f41f3125b5c23ea99b43cec04a5989b440325c2c268d5e1ab5ed3",
+        "reviewDigest": "2233ccb471b7b3cee61bc783a40e49aa1947fd3ece8ff73e74b9d05b636a6e69",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "retained PR356 entry fixture: missing restart and emergency boundaries keeps restart as new entry and retains shared emergency-stop collection policy",
+        "suiteSuffix": "server-version/backend/src/__tests__/scale/pr356-entry-lifecycle.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/15",
+        "declarationRawSHA256": "0a5d4aa250741ab2d8cead8bdee437641bc8021654b81806e1fab2092a050d48"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/433",
+        "id": "standard-triplet-d6b0ff933d7117a3",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL allows the highest platform role irrespective of business role and rejects both entry admins",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/434",
+        "id": "standard-triplet-c23dbcb53807a009",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL exposes uninstalled onboarding versions read-only only to the current system administrator",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/435",
+        "id": "standard-triplet-5d76cfe08bf93172",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL rechecks session revocation inside transactional authorization",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/436",
+        "id": "standard-triplet-6941f8cd66b6f78f",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL keeps preview read only and rejects stale sessions, stale MFA, CSRF and foreign origins",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/437",
+        "id": "standard-triplet-5bf14d8528a3a0f3",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL approves, computes scores and report, commits and reads back trial rows before ONLINE, with no grants",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/438",
+        "id": "standard-triplet-75335407136a205c",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL records database failure without online or grants, and retries the immutable approval",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/439",
+        "id": "standard-triplet-4d79d6ddac07a103",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL keeps approval identity, versions and persisted trial rows immutable",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/440",
+        "id": "standard-triplet-32b28cb588f5b7ce",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL keeps system out of researcher assignment; explicit Survey grant can freeze and FINAL-score/report the approved triplet",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/441",
+        "id": "standard-triplet-2db67f36d67811da",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL allows explicit no-parameter/no-report approval without inventing feedback",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      },
+      {
+        "pointer": "/historicalEvidence/cases/442",
+        "id": "standard-triplet-e8aee9234db826c5",
+        "groupId": "standard-triplet",
+        "scope": "passed-case",
+        "rawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1",
+        "inputsSHA256": "f50aee32581babd767e2043684e74af83fc76b6efbcc35761f28682acb13a976",
+        "reviewDigest": "a48743550d9e430d2795ed2f18f6d25c80a1ffa6205b4f83f377b1860383fcb9",
+        "ciExecuted": false,
+        "originalExecutionSigned": false,
+        "contemporaneousSourceManifest": false,
+        "invocation": {
+          "exitCode": "unknown",
+          "wholeInvocationAccepted": false,
+          "originalReporterSuccess": true,
+          "originalFailed": 0,
+          "originalFiltered": 0
+        },
+        "fullName": "Survey standard workflow on schema-only isolated PostgreSQL withdraws future source use while preserving actual committed FINAL and stored report",
+        "suiteSuffix": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+        "declarationPointer": "/followupReports/61",
+        "declarationRawSHA256": "7ed5b77be8e983fd2ad8b5eca76ac1af5b04a68c1ae3f9d6f1001de4e80905d1"
+      }
+    ],
+    "limitations": "Only admission ZIP and embedded phase metadata inspected; original phase ZIPs and SARIF not downloaded or reauthenticated. Persisted source acceptance declarations remain historical, not current approval state."
+  },
+  "pr357Backend": {
+    "member": "backend-complete-reuse.json",
+    "memberSHA256": "389f8f5a309a3aa82ce5b35262b6d5a7334859c89cd4a4585168668cab115547",
+    "status": "REUSED_COMPLETE_BACKEND_QUALIFICATION_NOT_RETESTED_OR_REBUILT",
+    "candidate": {
+      "head": "9ece34cbfccbc60aac6c64ab03f07614d77906af",
+      "tree": "1273c9b0f9580f257bd9e3fab6a25d24b176a394",
+      "run": "40455202809",
+      "attempt": "1"
+    },
+    "selectedReports": [
+      {
+        "pointer": "/reports/3/report/testResults/0",
+        "suite": "/app/src/__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/reports/3/report/testResults/0/assertionResults/0",
+            "fullName": "Private exact Scale collection and Teacher media boundaries SCHOOL exact private source stops fresh START while an already-started FINAL completes under frozen rules",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/3/report/testResults/0/assertionResults/1",
+            "fullName": "Private exact Scale collection and Teacher media boundaries TEACHER exact private source stops fresh START while an already-started FINAL completes under frozen rules",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/reports/4/report/testResults/0",
+        "suite": "/app/src/__tests__/integration/educationLibraryCollectionStop.postgres.integration.test.ts",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/reports/4/report/testResults/0/assertionResults/0",
+            "fullName": "Education library emergency collection stop at real runtime boundaries SCHOOL: committed release stop rejects a new START while an already-started FINAL completes under frozen rules",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/4/report/testResults/0/assertionResults/1",
+            "fullName": "Education library emergency collection stop at real runtime boundaries TEACHER: committed release stop rejects a new START while an already-started FINAL completes under frozen rules",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/reports/5/report/testResults/0",
+        "suite": "/app/src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/reports/5/report/testResults/0/assertionResults/0",
+            "fullName": "Private fixed-version education actual FINAL and report privacy SCHOOL preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/5/report/testResults/0/assertionResults/1",
+            "fullName": "Private fixed-version education actual FINAL and report privacy TEACHER preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/5/report/testResults/0/assertionResults/2",
+            "fullName": "Private fixed-version education actual FINAL and report privacy keeps private PARENT_REPORT actual completion NONE for observer, subject and publisher",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/5/report/testResults/0/assertionResults/3",
+            "fullName": "Private fixed-version education actual FINAL and report privacy keeps private TEACHER_REPORT actual completion NONE for observer, subject and publisher",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/reports/7/report/testResults/0",
+        "suite": "/app/src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/reports/7/report/testResults/0/assertionResults/0",
+            "fullName": "Private fixed-version education actual FINAL and report privacy SCHOOL preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/7/report/testResults/0/assertionResults/1",
+            "fullName": "Private fixed-version education actual FINAL and report privacy TEACHER preserves actual FINAL feedback and version-pinned image after author edits/revocation, never broadens report rights",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/7/report/testResults/0/assertionResults/2",
+            "fullName": "Private fixed-version education actual FINAL and report privacy keeps private PARENT_REPORT actual completion NONE for observer, subject and publisher",
+            "status": "passed"
+          },
+          {
+            "pointer": "/reports/7/report/testResults/0/assertionResults/3",
+            "fullName": "Private fixed-version education actual FINAL and report privacy keeps private TEACHER_REPORT actual completion NONE for observer, subject and publisher",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "provenance": {
+      "componentTree": "100ae07d90a1bf9fc53b1df0a610008571f565dd",
+      "originalManifest": {
+        "schemaVersion": 1,
+        "sha": "d1a1dda7f1b16558e59a28c830579a50ba5efedd",
+        "runId": "40441725961",
+        "kind": "backend",
+        "lockDigest": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "contentDigest": "0421f6ecd58f39214ba763d933ee2cb5c6421cd8883c673680748591625d7b4f"
+      },
+      "buildProof": {
+        "run": 40441725961,
+        "head": "c8fef09433e536f8049d3a74c959de55d35c3c8a",
+        "checkout": "d1a1dda7f1b16558e59a28c830579a50ba5efedd",
+        "artifactId": 12707045680,
+        "zipSHA256": "4d0d603fc5b05944d42072839f36f18d8beb932031ec4edae616c0ef4206c81a",
+        "jobId": 121983573857,
+        "originalJobConclusion": "success"
+      },
+      "checksProof": {
+        "run": 40441725961,
+        "head": "c8fef09433e536f8049d3a74c959de55d35c3c8a",
+        "checkout": "d1a1dda7f1b16558e59a28c830579a50ba5efedd",
+        "artifactId": 12707500412,
+        "zipSHA256": "407f558c8e76984faf3b51d2c96e2d62359e271291ba4dba62582903e9a3ffd1",
+        "jobId": 121983573857,
+        "originalJobConclusion": "success"
+      }
+    },
+    "limitation": "Nested reports retain original invocation identity, including partial successes; this is an index, not a new qualification."
+  },
+  "pr357Frontend": {
+    "member": "frontend-focused-complete-reuse.json",
+    "memberSHA256": "9eb69fdd27795ad6c3f8121a566fa864a1f9120913fcc222fd8012332975711b",
+    "status": "REUSED_COMPLETE_FOCUS_FRONTEND_NOT_REBUILT",
+    "candidate": {
+      "head": "9ece34cbfccbc60aac6c64ab03f07614d77906af",
+      "tree": "1273c9b0f9580f257bd9e3fab6a25d24b176a394",
+      "run": "40455202809",
+      "attempt": "1"
+    },
+    "selectedReports": [
+      {
+        "pointer": "/raw/testResults/1",
+        "suite": "/home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/raw/testResults/1/assertionResults/0",
+            "fullName": "Teacher bound Scale continuation opens only the existing bound attempt after Run closes without calling START",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/1",
+            "fullName": "Teacher bound Scale continuation does not start a CLOSED ASSIGNED task without a binding",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/2",
+            "fullName": "Teacher bound Scale continuation does not start a CLOSED STARTED task without a binding",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/3",
+            "fullName": "Teacher bound Scale continuation keeps the ordinary PUBLISHED new START flow",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/4",
+            "fullName": "Teacher bound Scale continuation retains completed personal feedback without reopening the runner",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/5",
+            "fullName": "Teacher bound Scale continuation renders authorized Teacher descriptive feedback instead of routing it to the education unit report",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/6",
+            "fullName": "Teacher bound Scale continuation does not render metric values from an unknown feedback format",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/1/assertionResults/7",
+            "fullName": "requests only a receipt from the existing Teacher scale submission endpoint",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/raw/testResults/4",
+        "suite": "/home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolCompositeRunner.test.tsx",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/raw/testResults/4/assertionResults/0",
+            "fullName": "Huischool Cognitive task uses only school-bound Composite FINAL endpoints loads existing frozen slot and returns to parent after FINAl without training credentials",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/1",
+            "fullName": "Huischool Cognitive task uses only school-bound Composite FINAL endpoints does not start a child when the frozen session binding is absent",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/2",
+            "fullName": "returns without promising to save or sending a submission",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/3",
+            "fullName": "opts student FORM_SECTION into compact instructions without altering transport",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/4",
+            "fullName": "opts student SCALE into compact instructions without altering transport",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/5",
+            "fullName": "keeps observer preparation concise without hiding required consent or starting automatically",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/6",
+            "fullName": "scopes observer FORM_SECTION answer presentation without changing transport",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/7",
+            "fullName": "scopes observer SCALE answer presentation without changing transport",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/8",
+            "fullName": "scopes observer COGNITIVE answer presentation without changing transport",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/9",
+            "fullName": "shows a single plain-language observer completion with one return action",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/10",
+            "fullName": "presents the existing observer consent scope PRIVATE_RESPONDENT readably without accepting it",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/11",
+            "fullName": "presents the existing observer consent scope ASSIGNING_TEACHER readably without accepting it",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/12",
+            "fullName": "presents the existing observer consent scope SHARED_COURSE_LEAD readably without accepting it",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/13",
+            "fullName": "preserves unfamiliar consent wording instead of guessing its permissions",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/14",
+            "fullName": "labels parent observer preparation correctly and preserves the unchecked consent gate",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/4/assertionResults/15",
+            "fullName": "uses the shared current-unit view and receipt-only scale transport within the School endpoint",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/raw/testResults/6",
+        "suite": "/home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/school/SchoolStudentTasks.test.tsx",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/raw/testResults/6/assertionResults/0",
+            "fullName": "Huischool student tasks remain inside the campus account realm reads only the published respondent contract for a completed campus FINAL",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/1",
+            "fullName": "Huischool student tasks remain inside the campus account realm shows the real completed FORM task contract as a receipt without requesting a report",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/2",
+            "fullName": "Huischool student tasks remain inside the campus account realm keeps task identity through a delayed reversed refresh (FORM first: true)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/3",
+            "fullName": "Huischool student tasks remain inside the campus account realm keeps task identity through a delayed reversed refresh (FORM first: false)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/4",
+            "fullName": "Huischool student tasks remain inside the campus account realm shows only server-authorized tasks and submits through campus path",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/5",
+            "fullName": "shows an existing completed activity response without offering editable unsavable text",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/6",
+            "fullName": "keeps typed answers on submission failure and returns focus to the inbox without posting again",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/7",
+            "fullName": "uses fresh detail to lock a stale pending READING task",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/8",
+            "fullName": "uses fresh detail to lock a stale pending ASSIGNMENT task",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/9",
+            "fullName": "uses fresh detail to lock a stale pending CHECKIN task",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/6/assertionResults/10",
+            "fullName": "sends only one campus task POST while a submission is pending",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "pointer": "/raw/testResults/8",
+        "suite": "/home/runner/work/eduK12-new-version/eduK12-new-version/server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+        "status": "passed",
+        "assertions": [
+          {
+            "pointer": "/raw/testResults/8/assertionResults/0",
+            "fullName": "historical empty sections submits an explicit empty FINAL for an ordinary frozen section",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/1",
+            "fullName": "historical empty sections explains recovery for an invalid frozen context instead of silently skipping it",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/2",
+            "fullName": "FinalCompositeAssessment durable selection and exit waits for the current item write before exiting and preserves both item answers",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/3",
+            "fullName": "FinalCompositeAssessment durable selection and exit restores saved item selections without advancing or bleeding into the next item",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/4",
+            "fullName": "FinalCompositeAssessment durable selection and exit keeps the page and current selection when durable storage fails",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/5",
+            "fullName": "FinalCompositeAssessment provenance sibling placement sends one top-level provenance object for a Scale child",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/6",
+            "fullName": "FinalCompositeAssessment provenance sibling placement keeps Scale provenance out of a Form child submit",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/7",
+            "fullName": "durable submission confirmation does not relabel an accepted submission as failed when loading the next screen fails",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/8",
+            "fullName": "C04 typed FINAL persistence restores numeric zero and retries the identical sealed typed payload (public=false)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/9",
+            "fullName": "C04 typed FINAL persistence restores numeric zero and retries the identical sealed typed payload (public=true)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/10",
+            "fullName": "C04 negative and large text draft restoration preserves 'NUMBER' across local save, unmount and FINAL",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/11",
+            "fullName": "C04 negative and large text draft restoration preserves 'LONG_TEXT' across local save, unmount and FINAL",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/12",
+            "fullName": "C05 structured FINAL persistence restores 'LIKERT' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/13",
+            "fullName": "C05 structured FINAL persistence restores 'MATRIX' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/14",
+            "fullName": "C05 structured FINAL persistence restores 'MATRIX_MULTIPLE' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/15",
+            "fullName": "C05 structured FINAL persistence restores 'RANK_ORDER' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/16",
+            "fullName": "C05 structured FINAL persistence restores 'SLIDER' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/17",
+            "fullName": "C05 structured FINAL persistence restores 'CONSTANT_SUM' and replays identical sealed typed payload across reload",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/18",
+            "fullName": "C06 visibility and durable answer cleanup saves each ordinary form edit without an empty cleanup transaction",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/19",
+            "fullName": "C06 visibility and durable answer cleanup clears a previously saved hidden answer and seals only visible fields",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/20",
+            "fullName": "C06 versioned sealed recovery preserves refusal through offline sealed replay (public=false)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/21",
+            "fullName": "C06 versioned sealed recovery preserves refusal through offline sealed replay (public=true)",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/22",
+            "fullName": "C06 versioned sealed recovery keeps same-frame selection and Other text through offline sealed replay",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/23",
+            "fullName": "clears hidden selected Other and late same-frame text when a source changes",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/24",
+            "fullName": "focuses the first missing anonymous whole-page scale answer without sending a FINAL",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/25",
+            "fullName": "focuses the missing anonymous form field without changing required validation or submitting",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/26",
+            "fullName": "uses a compact Training header and Chinese SJT labels without changing the child action",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/27",
+            "fullName": "keeps the campus privacy appendix in one folded instruction entry without submitting",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/28",
+            "fullName": "advances a campus form only after durable save and never submits the page automatically",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/29",
+            "fullName": "enables campus single-question scale advance while keeping its FINAL manual",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/30",
+            "fullName": "advances to a newly revealed campus form question after the source choice is saved",
+            "status": "passed"
+          },
+          {
+            "pointer": "/raw/testResults/8/assertionResults/31",
+            "fullName": "uses plain School page wording for submission, progress and required answers",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "provenance": {
+      "componentTree": "eff42512c7a727c347fabea865dbad281d698bb1",
+      "originalManifest": {
+        "schemaVersion": 1,
+        "sha": "45118036bf53ba6fa28699cece17fd132eb044d4",
+        "runId": "40449223254",
+        "kind": "frontend",
+        "lockDigest": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "contentDigest": "6e8bdc26e65807e11568581d19a098f062d546382c45458a26929b641cb3f5ab"
+      },
+      "buildProof": {
+        "run": 40449223254,
+        "head": "3af54d387fd2c51fc193b578b0dd056d918156b0",
+        "checkout": "45118036bf53ba6fa28699cece17fd132eb044d4",
+        "artifactId": 12709388165,
+        "zipSHA256": "e81ba2ec55edbaaeeb63e96ac3fc47581a40bb28ebb27eb56f69c7f680cfcc68",
+        "jobId": 122007883724,
+        "originalJobConclusion": "success"
+      },
+      "checksProof": {
+        "run": 40449223254,
+        "head": "3af54d387fd2c51fc193b578b0dd056d918156b0",
+        "checkout": "45118036bf53ba6fa28699cece17fd132eb044d4",
+        "artifactId": 12710005978,
+        "zipSHA256": "beb1ba8bcac5cdbadd67a6441b24eaea1061910f6211865e97fb999fa8b80cce",
+        "jobId": 122007883724,
+        "originalJobConclusion": "success"
+      }
+    },
+    "limitation": "Nested reports retain original invocation identity, including partial successes; this is an index, not a new qualification."
+  },
+  "pr357Browser": {
+    "member": "browser.json",
+    "memberSHA256": "858275e14bb3ce4785de6223d3d1e41c9249a714a4488d2c72b50304e26988b8",
+    "source": {
+      "head": "9ece34cbfccbc60aac6c64ab03f07614d77906af",
+      "tree": "1273c9b0f9580f257bd9e3fab6a25d24b176a394"
+    },
+    "runId": "40455202809",
+    "inputs": {
+      "frontend": {
+        "schemaVersion": 1,
+        "sha": "9ece34cbfccbc60aac6c64ab03f07614d77906af",
+        "runId": "40455202809",
+        "kind": "frontend",
+        "lockDigest": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe",
+        "contentDigest": "6e8bdc26e65807e11568581d19a098f062d546382c45458a26929b641cb3f5ab"
+      },
+      "backend": {
+        "schemaVersion": 1,
+        "sha": "9ece34cbfccbc60aac6c64ab03f07614d77906af",
+        "runId": "40455202809",
+        "kind": "backend",
+        "lockDigest": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450",
+        "contentDigest": "0421f6ecd58f39214ba763d933ee2cb5c6421cd8883c673680748591625d7b4f"
+      }
+    },
+    "storageModes": [
+      {
+        "product": "SCHOOL",
+        "compactFactsEnabled": false
+      },
+      {
+        "product": "TEACHER",
+        "compactFactsEnabled": false
+      }
+    ],
+    "transport": "Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.",
+    "runtime": "Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.",
+    "coverage": [
+      {
+        "product": "SCHOOL",
+        "check": "author-SCALE",
+        "creation": "UI",
+        "definitionTemplate": "real authenticated PUT",
+        "saveDiscardPreviewFreeze": "UI",
+        "immutableVersion": true
+      },
+      {
+        "product": "SCHOOL",
+        "check": "author-FORM",
+        "creation": "UI",
+        "definitionTemplate": "real authenticated PUT",
+        "saveDiscardPreviewFreeze": "UI",
+        "immutableVersion": true
+      },
+      {
+        "product": "SCHOOL",
+        "check": "fixed-version-preview-publish",
+        "executionCount": 2,
+        "schoolPublisherIsNonAdmin": true
+      },
+      {
+        "product": "SCHOOL",
+        "check": "separate-STUDENT-SELF-SCALE",
+        "final": "COMPLETED",
+        "localDraftResume": true
+      },
+      {
+        "product": "SCHOOL",
+        "check": "separate-STUDENT-SELF-FORM",
+        "final": "COMPLETED",
+        "localDraftResume": true,
+        "typedAdapter": [
+          "SINGLE",
+          "MULTIPLE",
+          "MATRIX",
+          "CONDITIONAL_REFUSAL",
+          "ROW_REFUSAL",
+          "TWO_SECTIONS"
+        ]
+      },
+      {
+        "product": "TEACHER",
+        "check": "author-SCALE",
+        "creation": "UI",
+        "definitionTemplate": "real authenticated PUT",
+        "saveDiscardPreviewFreeze": "UI",
+        "immutableVersion": true
+      },
+      {
+        "product": "TEACHER",
+        "check": "author-FORM",
+        "creation": "UI",
+        "definitionTemplate": "real authenticated PUT",
+        "saveDiscardPreviewFreeze": "UI",
+        "immutableVersion": true
+      },
+      {
+        "product": "TEACHER",
+        "check": "fixed-version-preview-publish",
+        "executionCount": 4,
+        "schoolPublisherIsNonAdmin": false
+      },
+      {
+        "product": "TEACHER",
+        "check": "separate-TEACHER-SELF-SCALE",
+        "final": "COMPLETED",
+        "localDraftResume": true
+      },
+      {
+        "product": "TEACHER",
+        "check": "separate-TEACHER-SELF-FORM",
+        "final": "COMPLETED",
+        "localDraftResume": true,
+        "typedAdapter": [
+          "SINGLE",
+          "MULTIPLE",
+          "MATRIX",
+          "CONDITIONAL_REFUSAL",
+          "ROW_REFUSAL",
+          "TWO_SECTIONS"
+        ]
+      },
+      {
+        "product": "TEACHER",
+        "check": "ordinary-psychology-author-real-API",
+        "compiled": true,
+        "publicationAuthorityNotElevated": true
+      }
+    ],
+    "errors": [],
+    "notCovered": [
+      "Real media upload/storage/delivery and report images",
+      "Parent/teacher-observer/revocation matrix",
+      "Public deployment TLS, DNS, reverse proxy",
+      "MFA enrollment UI visuals (real enrollment API is used)",
+      "Manual construction of every question (real saved definition template API is used)"
+    ],
+    "status": "PASSED"
+  }
+}

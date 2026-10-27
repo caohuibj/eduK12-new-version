@@ -1,0 +1,1866 @@
+{
+  "schemaVersion": 1,
+  "kind": "pr363-source-and-test-inventory-not-qualification",
+  "candidate": {
+    "head": "6cf241d65b4bc44878ef9d9fe21c81fdd02561cd",
+    "tree": "d74a1d96567f0d2c0850440b2efbc205dc6c5007",
+    "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc"
+  },
+  "comparisonHeads": {
+    "PR356": "3d433a58e313007bfb1e108e800b9da708589f9b",
+    "PR357": "8ca7668234982340bae0349a15e55b1660d813ca",
+    "PR361": "74062c61e1bf60b9f491f362dded7bca26e8089d"
+  },
+  "limitations": [
+    "Direct file mode/blob equality is only a necessary input observation, never an import/config/schema/lock/fixture/runtime closure proof or automatic evidence admission.",
+    "No application tests, PG migrations, browser runs, build, security scan, or CI were executed by this task.",
+    "Named future test files N1-N4 are proposals and deliberately excluded from existing-file inventory.",
+    "PR361 large artifact ZIP not downloaded; metadata digest only.",
+    "Source records do not claim whole node_modules, Prisma generation, environment or tools were identical to past execution."
+  ],
+  "files": [
+    {
+      "path": ".github/scripts/pr356-acceptance.json",
+      "mode": "100644",
+      "blob": "1125653e95b818d7e945de96e62e162f4619c08c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1125653e95b818d7e945de96e62e162f4619c08c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "1125653e95b818d7e945de96e62e162f4619c08c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "1125653e95b818d7e945de96e62e162f4619c08c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": ".github/scripts/pr356-local-evidence.json",
+      "mode": "100644",
+      "blob": "1b983f36409209e7624264111f23f46f98e9064c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1b983f36409209e7624264111f23f46f98e9064c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "1b983f36409209e7624264111f23f46f98e9064c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "1b983f36409209e7624264111f23f46f98e9064c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": ".github/scripts/pr357-bindings.json",
+      "mode": "100644",
+      "blob": "f017fcd0c78dade30a80c6de2855ab80b64d3263",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "f017fcd0c78dade30a80c6de2855ab80b64d3263",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "f017fcd0c78dade30a80c6de2855ab80b64d3263",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": ".github/scripts/pr357-continuation.mjs",
+      "mode": "100644",
+      "blob": "e3623b5c22e0d7b90002e6f2a2f357f03c82930c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "e3623b5c22e0d7b90002e6f2a2f357f03c82930c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "e3623b5c22e0d7b90002e6f2a2f357f03c82930c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": ".github/scripts/report-planning-checks.mjs",
+      "mode": "100644",
+      "blob": "d2b3ee423849fd9d00bbff95f028913c160c79c9",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": "d2b3ee423849fd9d00bbff95f028913c160c79c9",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "blob": "27d6849de6d3461941a2772b008a28347e933e03",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "27d6849de6d3461941a2772b008a28347e933e03",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "27d6849de6d3461941a2772b008a28347e933e03",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "27d6849de6d3461941a2772b008a28347e933e03",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "docs/release/README.md",
+      "mode": "100644",
+      "blob": "cd7858296514a91a892fdb44e03e1715a1625414",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "cd7858296514a91a892fdb44e03e1715a1625414",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "cd7858296514a91a892fdb44e03e1715a1625414",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "cd7858296514a91a892fdb44e03e1715a1625414",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/prisma/schema.prisma",
+      "mode": "100644",
+      "blob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "7358a9c42941ec3ccdfcccb4095b8a03a53be2fb",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "eefdf15e7ec9084c4c9e06bd3693063ee0dc6034",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-run/teacher-personal-policy.test.ts",
+      "mode": "100644",
+      "blob": "5d20ac62e6c9255027178a08b76574be65fab07b",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/campus/cognitive-child.routes.test.ts",
+      "mode": "100644",
+      "blob": "29f456ba311f4d297c881602ca95d04a96dd4ada",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "29f456ba311f4d297c881602ca95d04a96dd4ada",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "29f456ba311f4d297c881602ca95d04a96dd4ada",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "29f456ba311f4d297c881602ca95d04a96dd4ada",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/report-reading.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "2015191a18ab0d875137de5f8822707f9fb75b5c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "2015191a18ab0d875137de5f8822707f9fb75b5c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "2015191a18ab0d875137de5f8822707f9fb75b5c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "2015191a18ab0d875137de5f8822707f9fb75b5c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/unknown-task-lifecycle.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "8c5b64c91af1b420fa8571e62b223e5c0d874cac",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "8c5b64c91af1b420fa8571e62b223e5c0d874cac",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "8c5b64c91af1b420fa8571e62b223e5c0d874cac",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "8c5b64c91af1b420fa8571e62b223e5c0d874cac",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/pr356-ordinary-receipt.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "2641fd107147602ef1b2430e88dcf5abe9807c39",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "2641fd107147602ef1b2430e88dcf5abe9807c39",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "2641fd107147602ef1b2430e88dcf5abe9807c39",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "2641fd107147602ef1b2430e88dcf5abe9807c39",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/situational-bundle.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "0c87e1d44968dc4087ce57555288229a263bdfa6",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "0c87e1d44968dc4087ce57555288229a263bdfa6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "0c87e1d44968dc4087ce57555288229a263bdfa6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "0c87e1d44968dc4087ce57555288229a263bdfa6",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/assessment-resource.contract.test.ts",
+      "mode": "100644",
+      "blob": "fbe3d5fff03ec99e0814191c4dc8b8cb10fe2499",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/education-tools/private-tool.teacher-route.test.ts",
+      "mode": "100644",
+      "blob": "fe6615194e0f69922c458bc24e48610d79c55a79",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "f7ab064137c5b78f4ae3f6a8a23b3abe99358c2d",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "f7ab064137c5b78f4ae3f6a8a23b3abe99358c2d",
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": "f7ab064137c5b78f4ae3f6a8a23b3abe99358c2d",
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/campusActivity.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "2228f9971fe67e147bf59f71803c78e2f8632a89",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "9fb15f2b23695d33ad3266e8f207ac8f12447405",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "2228f9971fe67e147bf59f71803c78e2f8632a89",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "2228f9971fe67e147bf59f71803c78e2f8632a89",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryCollectionStop.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "07e3b2d85c2df0990026cc44385c867f1d8f2ad9",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "07e3b2d85c2df0990026cc44385c867f1d8f2ad9",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "07e3b2d85c2df0990026cc44385c867f1d8f2ad9",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "07e3b2d85c2df0990026cc44385c867f1d8f2ad9",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryObserver.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "5553a7231dd40d184d279381c18a2f98a34dd4f6",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "5553a7231dd40d184d279381c18a2f98a34dd4f6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "5553a7231dd40d184d279381c18a2f98a34dd4f6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "5553a7231dd40d184d279381c18a2f98a34dd4f6",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryPersonalReport.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "299768aa92b8af19bb36aab684c900ef26e6ebff",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "299768aa92b8af19bb36aab684c900ef26e6ebff",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "299768aa92b8af19bb36aab684c900ef26e6ebff",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "299768aa92b8af19bb36aab684c900ef26e6ebff",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationPrivateFormExecution.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "4179621f6d548eecb9f2a54b31ec5f9baef0b648",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "4179621f6d548eecb9f2a54b31ec5f9baef0b648",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "4179621f6d548eecb9f2a54b31ec5f9baef0b648",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "4179621f6d548eecb9f2a54b31ec5f9baef0b648",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationPrivateFormPublication.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "aec87fe25a619d2f495ae10f55463f04114c82ec",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "aec87fe25a619d2f495ae10f55463f04114c82ec",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "aec87fe25a619d2f495ae10f55463f04114c82ec",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "aec87fe25a619d2f495ae10f55463f04114c82ec",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationPrivateScaleCollectionStop.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "4c83c102d708c87a370179e1682fca0827d125b0",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "6a60f3f2ef67ac0a3a16fac8d47c1a16dc36549c",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "4c83c102d708c87a370179e1682fca0827d125b0",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "4c83c102d708c87a370179e1682fca0827d125b0",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "6b2c476fb96844f98467b3cf6c2c052148674cfe",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "6b2c476fb96844f98467b3cf6c2c052148674cfe",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "6b2c476fb96844f98467b3cf6c2c052148674cfe",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "6b2c476fb96844f98467b3cf6c2c052148674cfe",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/huiteacherFormRuntime.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "e248a318415d5e353d6490bd74f2b9cdfc08d465",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "e248a318415d5e353d6490bd74f2b9cdfc08d465",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "e248a318415d5e353d6490bd74f2b9cdfc08d465",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "e248a318415d5e353d6490bd74f2b9cdfc08d465",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/huiteacherStudentEvaluationRuntime.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "c9eeaedaf8cfa1a1051cc47ee0b08480e7604af8",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c9eeaedaf8cfa1a1051cc47ee0b08480e7604af8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "c9eeaedaf8cfa1a1051cc47ee0b08480e7604af8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "c9eeaedaf8cfa1a1051cc47ee0b08480e7604af8",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "5cdf990c39d35b42d4e6af20e5a4740fa3564529",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "5cdf990c39d35b42d4e6af20e5a4740fa3564529",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "5cdf990c39d35b42d4e6af20e5a4740fa3564529",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "5cdf990c39d35b42d4e6af20e5a4740fa3564529",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/integration-env.ts",
+      "mode": "100644",
+      "blob": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "cf82ccecf79cecc5f4e80c0c1847ae8c4696de60",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/report-outbox.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "d4a552adcc59305cb0ff545694a4f34e62571cac",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d4a552adcc59305cb0ff545694a4f34e62571cac",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d4a552adcc59305cb0ff545694a4f34e62571cac",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d4a552adcc59305cb0ff545694a4f34e62571cac",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/dot356-standard-vertical.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "7464f1578f5020ae06115fcad462a071e4f84728",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "7464f1578f5020ae06115fcad462a071e4f84728",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "7464f1578f5020ae06115fcad462a071e4f84728",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "7464f1578f5020ae06115fcad462a071e4f84728",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts",
+      "mode": "100644",
+      "blob": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "4c0c920f06cefaf16dd5ddda2010c009de8b9651",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/reporting/reporting-protected-feedback.test.ts",
+      "mode": "100644",
+      "blob": "0af6ac0bcde52c825b0cbb1bd87f31bf2b40ddde",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "0af6ac0bcde52c825b0cbb1bd87f31bf2b40ddde",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "0af6ac0bcde52c825b0cbb1bd87f31bf2b40ddde",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "0af6ac0bcde52c825b0cbb1bd87f31bf2b40ddde",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/pr356-entry-boundaries.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "501fdb510f4cb2c37f54c9de5118b8b0b8fa4b05",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/scale/pr356-entry-lifecycle.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "711a5eeefd2c979979988c78d224253b8b4189d0",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "711a5eeefd2c979979988c78d224253b8b4189d0",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "711a5eeefd2c979979988c78d224253b8b4189d0",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "711a5eeefd2c979979988c78d224253b8b4189d0",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/situational/situational-final-submit.contract.test.ts",
+      "mode": "100644",
+      "blob": "d161da9f8ddae8722174d6239b8a66799a47c3d8",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d161da9f8ddae8722174d6239b8a66799a47c3d8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d161da9f8ddae8722174d6239b8a66799a47c3d8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d161da9f8ddae8722174d6239b8a66799a47c3d8",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/situational/situational-standalone.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "96a8db526260be086cb50c09761f7dbec595e810",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "96a8db526260be086cb50c09761f7dbec595e810",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "96a8db526260be086cb50c09761f7dbec595e810",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "96a8db526260be086cb50c09761f7dbec595e810",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/checkpoint-query.contract.test.ts",
+      "mode": "100644",
+      "blob": "a9afe975acbb4c01c69211c66f36b4ab2e60b5c1",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "a9afe975acbb4c01c69211c66f36b4ab2e60b5c1",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "a9afe975acbb4c01c69211c66f36b4ab2e60b5c1",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "a9afe975acbb4c01c69211c66f36b4ab2e60b5c1",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/governed-native.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "eb80d8407e37bdece95d5c048836b18d419f6d8c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "eb80d8407e37bdece95d5c048836b18d419f6d8c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "eb80d8407e37bdece95d5c048836b18d419f6d8c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "eb80d8407e37bdece95d5c048836b18d419f6d8c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/research-cognitive.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "345214cac9dd56b7086fdb231fc3dcd54f886568",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "345214cac9dd56b7086fdb231fc3dcd54f886568",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "345214cac9dd56b7086fdb231fc3dcd54f886568",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "345214cac9dd56b7086fdb231fc3dcd54f886568",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/research-final.contract.test.ts",
+      "mode": "100644",
+      "blob": "312065a377c689eab5593a257ea431ed1397c69d",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "312065a377c689eab5593a257ea431ed1397c69d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "312065a377c689eab5593a257ea431ed1397c69d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "312065a377c689eab5593a257ea431ed1397c69d",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/research-measurement-result.contract.test.ts",
+      "mode": "100644",
+      "blob": "d7cc1c359d1dad1a1f32983a7a2d538daa826ce6",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d7cc1c359d1dad1a1f32983a7a2d538daa826ce6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d7cc1c359d1dad1a1f32983a7a2d538daa826ce6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d7cc1c359d1dad1a1f32983a7a2d538daa826ce6",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "cdc208cbf1b3f475bf205f410453af3724a02ce7",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "cdc208cbf1b3f475bf205f410453af3724a02ce7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "cdc208cbf1b3f475bf205f410453af3724a02ce7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "cdc208cbf1b3f475bf205f410453af3724a02ce7",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/situational-native-flow.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "57f9b6e616cc4f12d5cbecccb0b269a56151f498",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "57f9b6e616cc4f12d5cbecccb0b269a56151f498",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "57f9b6e616cc4f12d5cbecccb0b269a56151f498",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "57f9b6e616cc4f12d5cbecccb0b269a56151f498",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/survey/standard-triplet.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "c27c67050468adb4c5d82bd28eb75c0aa1ed2007",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c27c67050468adb4c5d82bd28eb75c0aa1ed2007",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "c27c67050468adb4c5d82bd28eb75c0aa1ed2007",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "c27c67050468adb4c5d82bd28eb75c0aa1ed2007",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/currentPopulationAuthority.ts",
+      "mode": "100644",
+      "blob": "d88d16de4f535da5af270b82f3b459e384956bd7",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d88d16de4f535da5af270b82f3b459e384956bd7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d88d16de4f535da5af270b82f3b459e384956bd7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d88d16de4f535da5af270b82f3b459e384956bd7",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/educationLibraryContext.ts",
+      "mode": "100644",
+      "blob": "c29fdcd474a7289c39714bb0d362a59d6c627482",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c29fdcd474a7289c39714bb0d362a59d6c627482",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "c29fdcd474a7289c39714bb0d362a59d6c627482",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "c29fdcd474a7289c39714bb0d362a59d6c627482",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/publish.ts",
+      "mode": "100644",
+      "blob": "26e8cc1b46e4d60089f0da1da1c04e2507c05b8b",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "26e8cc1b46e4d60089f0da1da1c04e2507c05b8b",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "26e8cc1b46e4d60089f0da1da1c04e2507c05b8b",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "26e8cc1b46e4d60089f0da1da1c04e2507c05b8b",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/reconcile.ts",
+      "mode": "100644",
+      "blob": "70965f8c895ba29339efa98bae6995c1cdc17565",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "70965f8c895ba29339efa98bae6995c1cdc17565",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "70965f8c895ba29339efa98bae6995c1cdc17565",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "70965f8c895ba29339efa98bae6995c1cdc17565",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/registeredResources.ts",
+      "mode": "100644",
+      "blob": "c1a081ff78aba05b4fb07bbebf120fd729623886",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c1a081ff78aba05b4fb07bbebf120fd729623886",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "c1a081ff78aba05b4fb07bbebf120fd729623886",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "c1a081ff78aba05b4fb07bbebf120fd729623886",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/resourceAuthority.ts",
+      "mode": "100644",
+      "blob": "d6d212d2d9338fba09e4c5bf8e1515ed7cfef0f6",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1c05e78f8cc87fc08f0f67231b898d54bb024024",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "1c05e78f8cc87fc08f0f67231b898d54bb024024",
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": "1c05e78f8cc87fc08f0f67231b898d54bb024024",
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/scientificProvenance.ts",
+      "mode": "100644",
+      "blob": "bc5f3e0106033361468f6bb11fc7e9a96736a084",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "bc5f3e0106033361468f6bb11fc7e9a96736a084",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "bc5f3e0106033361468f6bb11fc7e9a96736a084",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "bc5f3e0106033361468f6bb11fc7e9a96736a084",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/startAuthority.ts",
+      "mode": "100644",
+      "blob": "66328b603d3ccde2000aa34d1342c1aec7a2623e",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "66328b603d3ccde2000aa34d1342c1aec7a2623e",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "66328b603d3ccde2000aa34d1342c1aec7a2623e",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "66328b603d3ccde2000aa34d1342c1aec7a2623e",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-run/startExecution.ts",
+      "mode": "100644",
+      "blob": "79ebef581523d6d6ef15f0a19b06488fa88a9ffa",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "79ebef581523d6d6ef15f0a19b06488fa88a9ffa",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "79ebef581523d6d6ef15f0a19b06488fa88a9ffa",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "79ebef581523d6d6ef15f0a19b06488fa88a9ffa",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts",
+      "mode": "100644",
+      "blob": "c6fa0b8ce337af2e76dc994d182063ef97889bb4",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c6fa0b8ce337af2e76dc994d182063ef97889bb4",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "c6fa0b8ce337af2e76dc994d182063ef97889bb4",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "c6fa0b8ce337af2e76dc994d182063ef97889bb4",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/activity.run.routes.ts",
+      "mode": "100644",
+      "blob": "a0a0ad28be8574247ac78741340ac00a87b14d9d",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "a0a0ad28be8574247ac78741340ac00a87b14d9d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "a0a0ad28be8574247ac78741340ac00a87b14d9d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "a0a0ad28be8574247ac78741340ac00a87b14d9d",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/composite.routes.ts",
+      "mode": "100644",
+      "blob": "3b54fd20e9b016b3c96646a9e0e005a069bd3ac2",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "3b54fd20e9b016b3c96646a9e0e005a069bd3ac2",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "3b54fd20e9b016b3c96646a9e0e005a069bd3ac2",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "3b54fd20e9b016b3c96646a9e0e005a069bd3ac2",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/campus/student-feedback.ts",
+      "mode": "100644",
+      "blob": "d59c038acc45f1fc1b999ceb87e59ff3500fb5b8",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d59c038acc45f1fc1b999ceb87e59ff3500fb5b8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d59c038acc45f1fc1b999ceb87e59ff3500fb5b8",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d59c038acc45f1fc1b999ceb87e59ff3500fb5b8",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts",
+      "mode": "100644",
+      "blob": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "4b944e96a41b24cadf22eabb39ed1be4a00024f1",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.routes.ts",
+      "mode": "100644",
+      "blob": "244e054f08448948749271b09a47c95fa2e9738e",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "244e054f08448948749271b09a47c95fa2e9738e",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "244e054f08448948749271b09a47c95fa2e9738e",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "244e054f08448948749271b09a47c95fa2e9738e",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/final-submit.service.ts",
+      "mode": "100644",
+      "blob": "852f54f06677801a374a57e269a16e5a315933d4",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "852f54f06677801a374a57e269a16e5a315933d4",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "852f54f06677801a374a57e269a16e5a315933d4",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "852f54f06677801a374a57e269a16e5a315933d4",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "mode": "100644",
+      "blob": "1f657f2132f797b9455375c640b2f1e6400c3aa6",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1f657f2132f797b9455375c640b2f1e6400c3aa6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "1f657f2132f797b9455375c640b2f1e6400c3aa6",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "1f657f2132f797b9455375c640b2f1e6400c3aa6",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-flow-definition.ts",
+      "mode": "100644",
+      "blob": "89ac78e557216fb0b2174f72cc44cf214ebef505",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "89ac78e557216fb0b2174f72cc44cf214ebef505",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "89ac78e557216fb0b2174f72cc44cf214ebef505",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "89ac78e557216fb0b2174f72cc44cf214ebef505",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "mode": "100644",
+      "blob": "59c9834b601719a892174eaec9b3703b4a392f15",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "59c9834b601719a892174eaec9b3703b4a392f15",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "59c9834b601719a892174eaec9b3703b4a392f15",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "59c9834b601719a892174eaec9b3703b4a392f15",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+      "mode": "100644",
+      "blob": "841dff47c3ef93f5431ec3287a7397dc7f2607dc",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/assessmentRunPolicy.ts",
+      "mode": "100644",
+      "blob": "5cdbb55238a2d7216a0646792896ec67979b2267",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/formFinal.service.ts",
+      "mode": "100644",
+      "blob": "bcf7545fe10e971483770db131fb08155b2178e3",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "bcf7545fe10e971483770db131fb08155b2178e3",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "bcf7545fe10e971483770db131fb08155b2178e3",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "bcf7545fe10e971483770db131fb08155b2178e3",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/formRuntime.routes.ts",
+      "mode": "100644",
+      "blob": "e52b0467a4eeeb02c8728108ac59caef33bc864a",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "e52b0467a4eeeb02c8728108ac59caef33bc864a",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "e52b0467a4eeeb02c8728108ac59caef33bc864a",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "e52b0467a4eeeb02c8728108ac59caef33bc864a",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/privateFormRuntime.routes.ts",
+      "mode": "100644",
+      "blob": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/run.service.ts",
+      "mode": "100644",
+      "blob": "59e127cbdfff6b8955b052e60b8897721da6438e",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "399081f3ca3800fe2cfcafa20352672dca6fbec5",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "399081f3ca3800fe2cfcafa20352672dca6fbec5",
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": "399081f3ca3800fe2cfcafa20352672dca6fbec5",
+          "sameDirectModeAndBlob": false
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts",
+      "mode": "100644",
+      "blob": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/education-scale-personal-report.service.ts",
+      "mode": "100644",
+      "blob": "0147e53823af93d88d703a9d7857854770a2e524",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "8ba8be3e33f360fac9ed934f67a9a4ceab374547",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "334ba8759f488c1476de3854142e164bdf0bf164",
+          "sameDirectModeAndBlob": false
+        },
+        "PR361": {
+          "blob": "0147e53823af93d88d703a9d7857854770a2e524",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-final-submit.service.ts",
+      "mode": "100644",
+      "blob": "732bd226532337f1dc18224fee411d87ecc258d9",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "732bd226532337f1dc18224fee411d87ecc258d9",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "732bd226532337f1dc18224fee411d87ecc258d9",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "732bd226532337f1dc18224fee411d87ecc258d9",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.public.routes.ts",
+      "mode": "100644",
+      "blob": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.results.ts",
+      "mode": "100644",
+      "blob": "aa278211bd0b1427f9587e893eb01bb688390846",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "aa278211bd0b1427f9587e893eb01bb688390846",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "aa278211bd0b1427f9587e893eb01bb688390846",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "aa278211bd0b1427f9587e893eb01bb688390846",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.service.ts",
+      "mode": "100644",
+      "blob": "36538b9cb22a6c99925b21a93282d06e2e095961",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "36538b9cb22a6c99925b21a93282d06e2e095961",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "36538b9cb22a6c99925b21a93282d06e2e095961",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "36538b9cb22a6c99925b21a93282d06e2e095961",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/content-binding.service.ts",
+      "mode": "100644",
+      "blob": "7c68c6743d116e061c77f495910d334a4aa92bb7",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "7c68c6743d116e061c77f495910d334a4aa92bb7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "7c68c6743d116e061c77f495910d334a4aa92bb7",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "7c68c6743d116e061c77f495910d334a4aa92bb7",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/final.service.ts",
+      "mode": "100644",
+      "blob": "d7c83a0306b6b7c2a36cb1704ea3c41ee8958b45",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d7c83a0306b6b7c2a36cb1704ea3c41ee8958b45",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d7c83a0306b6b7c2a36cb1704ea3c41ee8958b45",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d7c83a0306b6b7c2a36cb1704ea3c41ee8958b45",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/governed-package.reports.ts",
+      "mode": "100644",
+      "blob": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "2bbdf2c1f1e1d9f3393ebe14ec5d8f9a54da4476",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/measurement.result.ts",
+      "mode": "100644",
+      "blob": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "3c9dbcbe418c6189f49559c9f9c0d3e5ac8dd064",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/participant-feedback.ts",
+      "mode": "100644",
+      "blob": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "88c286b5d6b30a22ee3ea12fcbac03729b3da276",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/public.routes.ts",
+      "mode": "100644",
+      "blob": "e7a561f111c3848656854d44d480f5d77c7bbb11",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "e7a561f111c3848656854d44d480f5d77c7bbb11",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "e7a561f111c3848656854d44d480f5d77c7bbb11",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "e7a561f111c3848656854d44d480f5d77c7bbb11",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/publication.service.ts",
+      "mode": "100644",
+      "blob": "993495aebd79defb10d75b99401dcdd4b568287d",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "993495aebd79defb10d75b99401dcdd4b568287d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "993495aebd79defb10d75b99401dcdd4b568287d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "993495aebd79defb10d75b99401dcdd4b568287d",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/situational-native.public.routes.ts",
+      "mode": "100644",
+      "blob": "8ff38590806ab736331e5f879c4c5e8d5f9d779c",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "8ff38590806ab736331e5f879c4c5e8d5f9d779c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "8ff38590806ab736331e5f879c4c5e8d5f9d779c",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "8ff38590806ab736331e5f879c4c5e8d5f9d779c",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/survey/situational-native.service.ts",
+      "mode": "100644",
+      "blob": "d30e4a0274a4a0fefdc0209d3742a9be590eef7d",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "d30e4a0274a4a0fefdc0209d3742a9be590eef7d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "d30e4a0274a4a0fefdc0209d3742a9be590eef7d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d30e4a0274a4a0fefdc0209d3742a9be590eef7d",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+      "mode": "100644",
+      "blob": "6e5176e59df515962291f15a25a0b9a8270dc7b5",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "268ba1fae95a2b94f102873f1613714c5a4d1a43",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "6e5176e59df515962291f15a25a0b9a8270dc7b5",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "6e5176e59df515962291f15a25a0b9a8270dc7b5",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "mode": "100644",
+      "blob": "d26248139817107f425e89c4288f5f24166f70e5",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "cebb92747a751091358f4a269fa221266822b793",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "d26248139817107f425e89c4288f5f24166f70e5",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d26248139817107f425e89c4288f5f24166f70e5",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherCompletedEntryGuards.test.tsx",
+      "mode": "100644",
+      "blob": "6c20d811f38dd435493ee65e1cdb197eefdd6626",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": null,
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "6c20d811f38dd435493ee65e1cdb197eefdd6626",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "6c20d811f38dd435493ee65e1cdb197eefdd6626",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.test.tsx",
+      "mode": "100644",
+      "blob": "982fc0f5a1ee49b2a14c123c7e3cbb891d04efa9",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "c3ad57a931ea48ecb847fbe6d1c5e127d78eb22d",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "982fc0f5a1ee49b2a14c123c7e3cbb891d04efa9",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "982fc0f5a1ee49b2a14c123c7e3cbb891d04efa9",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/HuiteacherMyScaleTasks.tsx",
+      "mode": "100644",
+      "blob": "23dbcbd780f31cb75ccb04b88d7dcc32b8519305",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "46dffb1c5ad237617e0673d29fba79547a1a42ce",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "23dbcbd780f31cb75ccb04b88d7dcc32b8519305",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "23dbcbd780f31cb75ccb04b88d7dcc32b8519305",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx",
+      "mode": "100644",
+      "blob": "1cdfdce0d4cdea72c40b5052f1cd51acb558db09",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "1cdfdce0d4cdea72c40b5052f1cd51acb558db09",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "1cdfdce0d4cdea72c40b5052f1cd51acb558db09",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "1cdfdce0d4cdea72c40b5052f1cd51acb558db09",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/school/SchoolCompositeRunner.test.tsx",
+      "mode": "100644",
+      "blob": "d59db92dc343845e5664a307bd7f87e33aef75f0",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "5724cd5d3a012c6590d06e162f8816bc50f6a60d",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "d59db92dc343845e5664a307bd7f87e33aef75f0",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "d59db92dc343845e5664a307bd7f87e33aef75f0",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/school/SchoolCompositeRunner.tsx",
+      "mode": "100644",
+      "blob": "72f811f9c5e94e4441dbdfb6795d2a8f34078184",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "8b7d2b91508015daed93fda0b2e17347b24fe2eb",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "72f811f9c5e94e4441dbdfb6795d2a8f34078184",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "72f811f9c5e94e4441dbdfb6795d2a8f34078184",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/school/SchoolStudentTasks.test.tsx",
+      "mode": "100644",
+      "blob": "5c5c2188406e28042a6fa8655775120adf032947",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "33923920748ae137ac6f58f3fdd0d261ad805e91",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "5c5c2188406e28042a6fa8655775120adf032947",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "5c5c2188406e28042a6fa8655775120adf032947",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+      "mode": "100644",
+      "blob": "f536e86ad257cd81a13f83e6485dc7753590cb02",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "f536e86ad257cd81a13f83e6485dc7753590cb02",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "f536e86ad257cd81a13f83e6485dc7753590cb02",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "f536e86ad257cd81a13f83e6485dc7753590cb02",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+      "mode": "100644",
+      "blob": "2265c87e0034b03a16ccc0139dd1a8e282ef39b3",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "6d04b2baa0c9bec2d1075728608655e81ef314d0",
+          "sameDirectModeAndBlob": false
+        },
+        "PR357": {
+          "blob": "2265c87e0034b03a16ccc0139dd1a8e282ef39b3",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "2265c87e0034b03a16ccc0139dd1a8e282ef39b3",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    },
+    {
+      "path": "server-version/frontend/src/survey/checkpoint-recovery.test.ts",
+      "mode": "100644",
+      "blob": "5ea1c1d444def872551d04179b5b7e13a48e401d",
+      "directComparisonOnly": {
+        "PR356": {
+          "blob": "5ea1c1d444def872551d04179b5b7e13a48e401d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR357": {
+          "blob": "5ea1c1d444def872551d04179b5b7e13a48e401d",
+          "sameDirectModeAndBlob": true
+        },
+        "PR361": {
+          "blob": "5ea1c1d444def872551d04179b5b7e13a48e401d",
+          "sameDirectModeAndBlob": true
+        }
+      }
+    }
+  ],
+  "rootInterfaceSupplement": {
+    "head": "f46336cc45abaa21d4b946029cda2a0dfadec654",
+    "tree": "0631d6f2677336206a77a5bb63eaf3c3413a36ea",
+    "readOnly": true,
+    "files": [
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.contract.ts",
+        "lsTree": "100644 blob 059ec4acc0aea84b9fa90772ec5ff1e7fc288414\tserver-version/backend/src/modules/education-tools/assessment-resource.contract.ts"
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.repository.ts",
+        "lsTree": "100644 blob 3a91ff9a4e94b003478e987ace443211a72e6ede\tserver-version/backend/src/modules/education-tools/assessment-resource.repository.ts"
+      },
+      {
+        "path": "server-version/backend/src/modules/education-tools/assessment-resource.authority.ts",
+        "lsTree": "100644 blob afda0569ad70df337fd8a62ee2d158554b567f5a\tserver-version/backend/src/modules/education-tools/assessment-resource.authority.ts"
+      }
+    ]
+  }
+}
