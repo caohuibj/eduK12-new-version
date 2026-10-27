@@ -326,6 +326,7 @@ jobs:
       training_appearance_plan: ${{ steps.scope.outputs.training_appearance_plan }}
       survey_workspace_plan: ${{ steps.scope.outputs.survey_workspace_plan }}
       survey_governance_plan: ${{ steps.scope.outputs.survey_governance_plan }}
+      post356_plan: ${{ steps.scope.outputs.post356_plan }}
       training_polish_plan: ${{ steps.scope.outputs.training_polish_plan }}
       sjt_native_plan: ${{ steps.scope.outputs.sjt_native_plan }}
       training_entry_plan: ${{ steps.scope.outputs.training_entry_plan }}
@@ -401,7 +402,7 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/pr356-entry.mjs --detect
       - name: fetch exact two-candidate PR source for checkout-tree comparison
-        if: github.event_name == 'pull_request' && contains(fromJSON('["backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
+        if: github.event_name == 'pull_request' && contains(fromJSON('["fix/post358-shallow-ci-20261027","fix/post356-reference-kind-picker-20261027","backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
         env:
           EXACT_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -1117,7 +1118,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-polish' || needs.scope.outputs.application_route == 'survey-governance'))) }}
+    if: ${{ needs.scope.result == 'success' && needs.scope.outputs.application_route != 'pr356' && (((!cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'assessment-capacity' || needs.scope.outputs.application_route == 'survey-experience' || needs.scope.outputs.application_route == 'survey-cloud' || needs.scope.outputs.application_route == 'training-appearance' || needs.scope.outputs.application_route == 'survey-workspace')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-survey') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'admin-authenticator') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-workspace') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'composite-csv-memory') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'scale-library-governance') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-asset-storage') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-mac-ui') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'reviewed-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'exact-candidate') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast')))) || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher-visual') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-manual-ui') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'shared-authoring') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'school-teacher') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'participant-access') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'training-assessment' || (needs.scope.outputs.application_route == 'survey-assessment' || needs.scope.outputs.application_route == 'participant-capacity')))  || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-admin-integration')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'training-teacher-management' && needs.scope.outputs.codeql == 'true') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && (needs.scope.outputs.application_route == 'sjt-native' || needs.scope.outputs.application_route == 'training-entry')) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-review') || (!cancelled() && github.event_name == 'pull_request' && github.event.pull_request.draft == false && ((needs.scope.outputs.application_route == 'training-polish' || needs.scope.outputs.application_route == 'post356') || needs.scope.outputs.application_route == 'survey-governance'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -1647,6 +1648,78 @@ jobs:
           retention-days: 3
           if-no-files-found: error
 
+  post356:
+    name: Post356 bounded backend repair
+    needs: scope
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'post356'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      TZ: UTC
+      CI: 'true'
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+      PLAN: ${{ needs.scope.outputs.post356_plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recheck complete source plan and refusal contracts
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {post356Plan} from './.github/scripts/post356-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);assert.deepEqual(post356Plan(changedEntries(p.base,head),p.base,head),p);
+          JS
+          node --test .github/scripts/post356-scope.test.mjs
+      - uses: docker/setup-buildx-action@v3
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+      - name: compile only changed backend once
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+        run: |
+          mkdir post356-evidence
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('server-version/backend/Dockerfile').read_text()
+          assert 'RUN npm run build' in p
+          Path('post356.Dockerfile').write_text(p.replace('RUN npm run build','RUN npx tsc'))
+          PY
+          docker buildx build --load --build-arg DEBIAN_MIRROR=deb.debian.org --target build -f post356.Dockerfile -t post356-build server-version/backend
+      - name: affected longitudinal projection and authorized picker regressions
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+        run: |
+          docker run --rm -e TZ=UTC -e NODE_ENV=test -v "$PWD/post356-evidence:/evidence" post356-build npx vitest run src/__tests__/assessment-reference/scale-wave1-longitudinal.test.ts src/__tests__/measurement-content/training-standard-source.test.ts --maxWorkers=1 --reporter=json --outputFile=/evidence/tests.json
+          node -e "const r=require('./post356-evidence/tests.json');if(!r.success||r.numPendingTests||r.numFailedTests||r.numPassedTests<100)throw Error('Missing or failed required cases')"
+      - name: produce runtime from the same backend build cache
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+        run: docker buildx build --load --build-arg DEBIAN_MIRROR=deb.debian.org --target runtime -f post356.Dockerfile -t post356-runtime server-version/backend
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan changed runtime at existing thresholds
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly }}
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output post356-evidence/scan.json post356-runtime
+      - uses: actions/upload-artifact@v4
+        if: ${{ !fromJSON(needs.scope.outputs.post356_plan).controlOnly && (success() || failure()) }}
+        with:
+          name: post356-${{ github.sha }}
+          path: post356-evidence/
+          if-no-files-found: error
+          retention-days: 3
+
   training-polish:
     name: Training non-permission bounded qualification
     needs: scope
@@ -2122,6 +2195,7 @@ jobs:
     needs:
     - scope
     - survey-governance
+    - post356
     - training-polish
     - sjt-native
     - survey-review
