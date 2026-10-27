@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -62,6 +63,20 @@ export function ScalePlayer({
     hasNext: position < total, onSave: onChange, onNext,
   })
   const answerControlsDisabled = disabled || answerDisabled || submitting || selection.busy
+  const keyboardSelection = useRef<{ button: HTMLButtonElement; question: string } | null>(null)
+  const questionIdentity = `${scopeKey}:${item.itemCode}`
+  useLayoutEffect(() => {
+    if (answerControlsDisabled) return
+    const pending = keyboardSelection.current
+    keyboardSelection.current = null
+    // Native disabled buttons can lose keyboard focus during an async save.
+    // Restore only this same question's control, never steal a newer focus or
+    // override the next question heading selected by automatic navigation.
+    if (pending?.question === questionIdentity && pending.button.isConnected &&
+        !pending.button.disabled && pending.button.ownerDocument.activeElement === pending.button.ownerDocument.body) {
+      pending.button.focus()
+    }
+  }, [answerControlsDisabled, questionIdentity])
   const navigationControlsDisabled = disabled || navigationDisabled || submitting || selection.busy
   const submitControlsDisabled = disabled || submitDisabled || submitting || selection.busy
 
@@ -80,7 +95,13 @@ export function ScalePlayer({
               type="button"
               key={`${typeof option.value}:${String(option.value)}`}
               aria-pressed={selected}
-              onClick={event => { if (!automatic || event.detail < 2) void selection.select(option.value) }}
+              onClick={event => {
+                if (!automatic || event.detail < 2) {
+                  keyboardSelection.current = event.detail === 0 && event.currentTarget.ownerDocument.activeElement === event.currentTarget
+                    ? { button: event.currentTarget, question: questionIdentity } : null
+                  void selection.select(option.value)
+                }
+              }}
               disabled={answerControlsDisabled}
               className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${selected ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
             >

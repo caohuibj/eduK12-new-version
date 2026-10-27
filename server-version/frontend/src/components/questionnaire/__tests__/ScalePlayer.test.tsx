@@ -159,3 +159,18 @@ describe('ScalePlayer', () => {
   })
 
 })
+
+it.each([false,true])('restores keyboard focus after asynchronous final-item save without stealing another target (%s)',async moved=>{
+ let finish!:()=>void
+ const save=vi.fn(()=>new Promise<void>(resolve=>{finish=resolve}))
+ render(<><button type="button">另一个控件</button><ScalePlayer autoAdvance item={item} value={undefined} position={1} total={1} onChange={save} onPrevious={vi.fn()}/></>)
+ const button=screen.getByRole('button',{name:'同意'});button.focus();fireEvent.click(button,{detail:0})
+ await waitFor(()=>expect(button).toBeDisabled())
+ // Chromium blurs a natively disabled focused button; jsdom needs that state explicitly.
+ const other=screen.getByRole('button',{name:'另一个控件'});other.focus();if(!moved)other.blur()
+ expect(document.activeElement).toBe(moved?other:document.body)
+ await act(async()=>finish())
+ expect(button).toBeEnabled()
+ expect(moved?screen.getByRole('button',{name:'另一个控件'}):button).toHaveFocus()
+ expect(save).toHaveBeenCalledTimes(1)
+})

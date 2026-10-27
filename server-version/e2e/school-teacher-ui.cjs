@@ -346,7 +346,7 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
         await s.page.getByRole('navigation', { name: '校园活动功能入口', exact: true }).waitFor()
         assert.equal(new URL(s.page.url()).pathname, '/workspace/activities')
         assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
-        const back = s.page.getByRole('link', { name: '返回概览', exact: true })
+        const back = s.page.locator('a.hs-workspace-brand')
         await back.focus(); await back.press('Enter')
         await s.page.getByRole('heading', { name: '心理教师工作台', exact: true }).waitFor()
         assert.equal(await s.page.locator('.hs-workspace-content').evaluate(el => document.activeElement === el), true)
