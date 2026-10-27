@@ -279,6 +279,30 @@
     "label": "创新",
     "axis": "construct"
   },
+  "construct:sel_ccnes_t_dimension_1": {
+    "label": "苦恼反应",
+    "axis": "construct"
+  },
+  "construct:sel_ccnes_t_dimension_2": {
+    "label": "惩罚反应",
+    "axis": "construct"
+  },
+  "construct:sel_ccnes_t_dimension_3": {
+    "label": "鼓励表达",
+    "axis": "construct"
+  },
+  "construct:sel_ccnes_t_dimension_4": {
+    "label": "关注情绪的回应",
+    "axis": "construct"
+  },
+  "construct:sel_ccnes_t_dimension_5": {
+    "label": "关注问题的回应",
+    "axis": "construct"
+  },
+  "construct:sel_ccnes_t_dimension_6": {
+    "label": "轻视反应",
+    "axis": "construct"
+  },
   "construct:sel_delaware_climate_bullying": {
     "label": "Schoolwide bullying",
     "axis": "construct"

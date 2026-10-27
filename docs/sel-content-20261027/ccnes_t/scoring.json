@@ -1,0 +1,113 @@
+{
+  "instrument": "CCNES Teacher Version",
+  "source": "https://ccnes.org/ccnes-teacher-responses",
+  "item_count": 72,
+  "scenario_count": 12,
+  "responses_per_scenario": 6,
+  "response_range": [
+    1,
+    7
+  ],
+  "scale_anchors": {
+    "1": "非常不可能",
+    "4": "中等",
+    "7": "非常可能"
+  },
+  "dimensions": {
+    "distress_reactions": [
+      "1B",
+      "2A",
+      "3A",
+      "4D",
+      "5E",
+      "6C",
+      "7C",
+      "8C",
+      "9B",
+      "10A",
+      "11B",
+      "12D"
+    ],
+    "punitive_reactions": [
+      "1A",
+      "2F",
+      "3F",
+      "4A",
+      "5D",
+      "6D",
+      "7E",
+      "8E",
+      "9E",
+      "10B",
+      "11C",
+      "12E"
+    ],
+    "expressive_encouragement": [
+      "1E",
+      "2E",
+      "3E",
+      "4B",
+      "5F",
+      "6E",
+      "7F",
+      "8A",
+      "9A",
+      "10C",
+      "11F",
+      "12B"
+    ],
+    "emotion_focused": [
+      "1F",
+      "2B",
+      "3D",
+      "4E",
+      "5A",
+      "6A",
+      "7B",
+      "8F",
+      "9F",
+      "10D",
+      "11E",
+      "12C"
+    ],
+    "problem_focused": [
+      "1C",
+      "2D",
+      "3C",
+      "4F",
+      "5B",
+      "6F",
+      "7A",
+      "8B",
+      "9D",
+      "10E",
+      "11D",
+      "12A"
+    ],
+    "minimization": [
+      "1D",
+      "2C",
+      "3B",
+      "4C",
+      "5C",
+      "6B",
+      "7D",
+      "8D",
+      "9C",
+      "10F",
+      "11A",
+      "12F"
+    ]
+  },
+  "reverse_items": [
+    "10A",
+    "2A",
+    "7C",
+    "8C"
+  ],
+  "reverse_formula": "8 - response",
+  "aggregation": "12-item mean per dimension; no total",
+  "missing_policy": "complete required per dimension; null otherwise; product rule",
+  "thresholds": null,
+  "rights_note": "Educational and/or research use only per author site."
+}
