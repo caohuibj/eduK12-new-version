@@ -1,0 +1,800 @@
+{
+  "baseline": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "actualDatabaseImport": false,
+  "results": [
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/air_educator_sec_2022/1.0.0/instrument.ts",
+      "key": "air_educator_sec_2022",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bes20/1.0.0/instrument.ts",
+      "key": "bes20",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-keyed-min",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 11,
+            "cognitive_empathy": 9,
+            "total": 20
+          }
+        },
+        {
+          "name": "all-keyed-max",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 55,
+            "cognitive_empathy": 45,
+            "total": 100
+          }
+        },
+        {
+          "name": "sample-44-27",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "affective_empathy": 44,
+            "cognitive_empathy": 27,
+            "total": 71
+          }
+        },
+        {
+          "name": "missing-affective",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "affective_empathy": null,
+            "cognitive_empathy": 27,
+            "total": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/bessi_45_self_zh_cn/1.0.0/instrument.ts",
+      "key": "bessi_45_self_zh_cn",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/casel_schoolwide_rubric_2020/1.0.0/instrument.ts",
+      "key": "casel_schoolwide_rubric_2020",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/ccnes_t/1.0.0/instrument.ts",
+      "key": "ccnes_t",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/delaware_school_climate_student_en/1.0.0/instrument.ts",
+      "key": "delaware_school_climate_student_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 1,
+            "student_student": 1,
+            "engagement": 1,
+            "clarity": 1,
+            "fairness": 1,
+            "safety": 1,
+            "bullying": 1,
+            "climate_total": 39
+          }
+        },
+        {
+          "name": "all-4",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 4,
+            "student_student": 4,
+            "engagement": 4,
+            "clarity": 4,
+            "fairness": 4,
+            "safety": 4,
+            "bullying": 4,
+            "climate_total": 111
+          }
+        },
+        {
+          "name": "negative-direction",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 3,
+            "student_student": 3,
+            "engagement": 3,
+            "clarity": 3,
+            "fairness": 3,
+            "safety": 3,
+            "bullying": 1,
+            "climate_total": 93
+          }
+        },
+        {
+          "name": "missing-teacher-25",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "teacher_student": null,
+            "student_student": 3,
+            "engagement": 3,
+            "clarity": 3,
+            "fairness": 3,
+            "safety": 3,
+            "bullying": 1,
+            "climate_total": null
+          }
+        },
+        {
+          "name": "total-max",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 4,
+            "student_student": 4,
+            "engagement": 4,
+            "clarity": 4,
+            "fairness": 4,
+            "safety": 4,
+            "bullying": 1,
+            "climate_total": 120
+          }
+        },
+        {
+          "name": "total-min",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 1,
+            "student_student": 1,
+            "engagement": 1,
+            "clarity": 1,
+            "fairness": 1,
+            "safety": 1,
+            "bullying": 4,
+            "climate_total": 30
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/delaware_techniques_student_en/1.0.0/instrument.ts",
+      "key": "delaware_techniques_student_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "positive": 1,
+            "punitive": 1,
+            "sel": 1
+          }
+        },
+        {
+          "name": "all-4",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "positive": 4,
+            "punitive": 4,
+            "sel": 4
+          }
+        },
+        {
+          "name": "report-sample",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "positive": 3,
+            "punitive": 2,
+            "sel": 4
+          }
+        },
+        {
+          "name": "missing-first",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "positive": 3,
+            "punitive": null,
+            "sel": 4
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/delaware_dsecs_r2_student_en/1.0.0/instrument.ts",
+      "key": "delaware_dsecs_r2_student_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "responsible_decision_making": 1,
+            "social_awareness": 1,
+            "self_management": 1,
+            "relationship_skills": 1,
+            "self_awareness": 1,
+            "overall": 1
+          }
+        },
+        {
+          "name": "all-4",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "responsible_decision_making": 4,
+            "social_awareness": 4,
+            "self_management": 4,
+            "relationship_skills": 4,
+            "self_awareness": 4,
+            "overall": 4
+          }
+        },
+        {
+          "name": "report-sample",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "responsible_decision_making": 3.25,
+            "social_awareness": 3.5,
+            "self_management": 2.5,
+            "relationship_skills": 3,
+            "self_awareness": 2.75,
+            "overall": 3
+          }
+        },
+        {
+          "name": "missing-one",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "responsible_decision_making": null,
+            "social_awareness": 3.5,
+            "self_management": 2.5,
+            "relationship_skills": 3,
+            "self_awareness": 2.75,
+            "overall": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/eaq30_rieffe_zh_cn/1.0.0/instrument.ts",
+      "key": "eaq30_rieffe_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-midpoint",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "differentiating": 2,
+            "verbal_sharing": 2,
+            "not_hiding": 2,
+            "bodily_unawareness": 2,
+            "attending_to_others": 2,
+            "analysing_own": 2
+          }
+        },
+        {
+          "name": "all-keyed-maximum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "differentiating": 3,
+            "verbal_sharing": 3,
+            "not_hiding": 3,
+            "bodily_unawareness": 3,
+            "attending_to_others": 3,
+            "analysing_own": 3
+          }
+        },
+        {
+          "name": "all-keyed-minimum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "differentiating": 1,
+            "verbal_sharing": 1,
+            "not_hiding": 1,
+            "bodily_unawareness": 1,
+            "attending_to_others": 1,
+            "analysing_own": 1
+          }
+        },
+        {
+          "name": "missing-differentiation-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "differentiating": null,
+            "verbal_sharing": 2,
+            "not_hiding": 2,
+            "bodily_unawareness": 2,
+            "attending_to_others": 2,
+            "analysing_own": 2
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/erc24_parent_zh_cn/1.0.0/instrument.ts",
+      "key": "erc24_parent_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 8,
+            "lability_negativity": 15
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 32,
+            "lability_negativity": 60
+          }
+        },
+        {
+          "name": "missing-unscored-item",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 18,
+            "lability_negativity": 34
+          }
+        },
+        {
+          "name": "missing-regulation-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "emotion_regulation": null,
+            "lability_negativity": 34
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/erc24_teacher_zh_cn/1.0.0/instrument.ts",
+      "key": "erc24_teacher_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "minimum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 8,
+            "lability_negativity": 15
+          }
+        },
+        {
+          "name": "maximum-keyed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 32,
+            "lability_negativity": 60
+          }
+        },
+        {
+          "name": "missing-unscored-item",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "emotion_regulation": 18,
+            "lability_negativity": 34
+          }
+        },
+        {
+          "name": "missing-regulation-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "emotion_regulation": null,
+            "lability_negativity": 34
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/erica16/1.0.0/instrument.ts",
+      "key": "erica16",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/erq_ca_5point/1.0.0/instrument.ts",
+      "key": "erq_ca_5point",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/fasttrack_scs_parent_zh_cn/1.0.0/instrument.ts",
+      "key": "fasttrack_scs_parent_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-zero",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 0,
+            "regulation": 0,
+            "total": 0
+          }
+        },
+        {
+          "name": "all-midpoint",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 2,
+            "regulation": 2,
+            "total": 2
+          }
+        },
+        {
+          "name": "all-maximum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 4,
+            "regulation": 4,
+            "total": 4
+          }
+        },
+        {
+          "name": "missing-prosocial-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "prosocial": null,
+            "regulation": 2,
+            "total": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/fasttrack_scs_teacher_zh_cn/1.0.0/instrument.ts",
+      "key": "fasttrack_scs_teacher_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-zero",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 0,
+            "regulation": 0,
+            "academic": 0,
+            "social_emotional_combined": 0,
+            "total": 0
+          }
+        },
+        {
+          "name": "all-midpoint",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 2,
+            "regulation": 2,
+            "academic": 2,
+            "social_emotional_combined": 2,
+            "total": 2
+          }
+        },
+        {
+          "name": "all-maximum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "prosocial": 4,
+            "regulation": 4,
+            "academic": 4,
+            "social_emotional_combined": 4,
+            "total": 4
+          }
+        },
+        {
+          "name": "missing-prosocial-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "prosocial": null,
+            "regulation": 2,
+            "academic": 2,
+            "social_emotional_combined": null,
+            "total": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/secds_28_self/1.0.0/instrument.ts",
+      "key": "secds_28_self",
+      "executable": false,
+      "valid": true,
+      "issues": [],
+      "goldens": []
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/secq25_zhou_ee/1.0.0/instrument.ts",
+      "key": "secq25_zhou_ee",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-minimum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_awareness": 1,
+            "social_awareness": 1,
+            "self_management": 1,
+            "relationship_management": 1,
+            "responsible_decision_making": 1
+          }
+        },
+        {
+          "name": "all-maximum",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_awareness": 6,
+            "social_awareness": 6,
+            "self_management": 6,
+            "relationship_management": 6,
+            "responsible_decision_making": 6
+          }
+        },
+        {
+          "name": "missing-sa5",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "self_awareness": null,
+            "social_awareness": 4,
+            "self_management": 4,
+            "relationship_management": 4,
+            "responsible_decision_making": 4
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/sectrs14_teacher_en/1.0.0/instrument.ts",
+      "key": "sectrs14_teacher_en",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 1,
+            "emotion_regulation": 1,
+            "social_awareness": 1,
+            "interpersonal": 1
+          }
+        },
+        {
+          "name": "all-6",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 6,
+            "emotion_regulation": 6,
+            "social_awareness": 6,
+            "interpersonal": 6
+          }
+        },
+        {
+          "name": "report-sample",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "teacher_student": 4.6,
+            "emotion_regulation": 3.6666666666666665,
+            "social_awareness": 4.666666666666667,
+            "interpersonal": 4.333333333333333
+          }
+        },
+        {
+          "name": "missing-first",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "teacher_student": null,
+            "emotion_regulation": 3.6666666666666665,
+            "social_awareness": 4.666666666666667,
+            "interpersonal": 4.333333333333333
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/wcsd_seca_17_zh_cn/1.0.0/instrument.ts",
+      "key": "wcsd_seca_17_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "overall": 1
+          }
+        },
+        {
+          "name": "all-4",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "overall": 4
+          }
+        },
+        {
+          "name": "mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "overall": 2
+          }
+        },
+        {
+          "name": "missing-first-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "overall": null
+          }
+        }
+      ]
+    },
+    {
+      "file": "server-version/backend/src/modules/scale/instruments/wcsd_seca_40_zh_cn/1.0.0/instrument.ts",
+      "key": "wcsd_seca_40_zh_cn",
+      "executable": true,
+      "valid": true,
+      "issues": [],
+      "goldens": [
+        {
+          "name": "all-1",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_concept": 1,
+            "emotion_knowledge": 1,
+            "social_awareness": 1,
+            "emotion_regulation": 1,
+            "goal_management": 1,
+            "school_work": 1,
+            "relationship_skills": 1,
+            "responsible_decision": 1
+          }
+        },
+        {
+          "name": "all-4",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_concept": 4,
+            "emotion_knowledge": 4,
+            "social_awareness": 4,
+            "emotion_regulation": 4,
+            "goal_management": 4,
+            "school_work": 4,
+            "relationship_skills": 4,
+            "responsible_decision": 4
+          }
+        },
+        {
+          "name": "mixed",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_concept": 1,
+            "emotion_knowledge": 2,
+            "social_awareness": 3,
+            "emotion_regulation": 4,
+            "goal_management": 1,
+            "school_work": 2,
+            "relationship_skills": 3,
+            "responsible_decision": 4
+          }
+        },
+        {
+          "name": "report-sample",
+          "passed": true,
+          "quality": "interpretable",
+          "scores": {
+            "self_concept": 1,
+            "emotion_knowledge": 3,
+            "social_awareness": 2,
+            "emotion_regulation": 2.5,
+            "goal_management": 2.5,
+            "school_work": 2.5,
+            "relationship_skills": 2.5,
+            "responsible_decision": 2.6
+          }
+        },
+        {
+          "name": "missing-first-item",
+          "passed": true,
+          "quality": "invalid",
+          "scores": {
+            "self_concept": null,
+            "emotion_knowledge": 4,
+            "social_awareness": 4,
+            "emotion_regulation": 4,
+            "goal_management": 4,
+            "school_work": 4,
+            "relationship_skills": 4,
+            "responsible_decision": 4
+          }
+        }
+      ]
+    }
+  ]
+}

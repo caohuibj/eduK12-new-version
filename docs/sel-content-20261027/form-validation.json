@@ -1,0 +1,12 @@
+{
+  "kind": "CASEL_RECORDING_COMPANION_NOT_OFFICIAL_FULL_RUBRIC",
+  "actualDatabaseImport": false,
+  "validation": {
+    "issues": [],
+    "digest": "220079e5d980a3859c7e3b0359954de4cbf4d8a4ab08d0d218f33446454d30c0"
+  },
+  "fields": 69,
+  "worstCaseAnswerBytes": 347853,
+  "pages": 7,
+  "definitionBytes": 23963
+}

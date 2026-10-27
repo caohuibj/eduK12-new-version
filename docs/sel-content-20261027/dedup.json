@@ -1,0 +1,23 @@
+{
+  "mainSha": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "contentSha": "b92c69aefa2472775fa7ee86b9c208366886c908",
+  "mainExact": [],
+  "contentExact": [],
+  "related": [
+    {
+      "newFamily": "erq_ca",
+      "existing": "erq10_zh_cn_research",
+      "relation": "ERQ成人七点版与ERQ-CA儿童青少年五点版；同构念家族，非新独立构念，不能混用题本/计分。"
+    },
+    {
+      "newFamily": "eaq30",
+      "existing": "ipip_attending_emotions10_zh_cn_research",
+      "relation": "情绪关注相邻构念；EAQ30儿童青少年六维结构不等于成人IPIP情绪关注条目组。"
+    },
+    {
+      "newFamily": "erq_ca",
+      "existing": "ierq20_zh_cn_research",
+      "relation": "IERQ测量人际情绪调节；与ERQ-CA个体认知重评和表达抑制不同。"
+    }
+  ]
+}

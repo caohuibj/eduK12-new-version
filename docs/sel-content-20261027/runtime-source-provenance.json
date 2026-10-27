@@ -1,0 +1,114 @@
+{
+  "baseline": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+  "transportTerminalNewlineIgnored": true,
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/assessment-core/form/definition.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-core/definition-primitives.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/material.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-scoring.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/raw-score-feedback.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/validate-instrument.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/types.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/types.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/context.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/localization-manifest.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/content-locale.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/library/catalog-manifest.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-governance/scientific-maturity.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/reference.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/index.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/security.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-context/form-answer.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-reference/governance.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/onboarding/schema.ts",
+      "status": "matched"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/policy/schema.ts",
+      "status": "matched"
+    }
+  ]
+}

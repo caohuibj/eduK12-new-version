@@ -1,0 +1,87 @@
+[
+  {
+    "family": "wcsd_seca",
+    "sha": "57b1260ae23aad12f062ec7762b2b30b6a62df07",
+    "tree": "55e7fb7630353a40e6048488704baa67b41035ed"
+  },
+  {
+    "family": "dsecs_r2",
+    "sha": "69e0e8652f0188a689fabf658e73d91ebdb6ebce",
+    "tree": "213a6298f499a298e225a8213c2aa2dfe3bfc10d"
+  },
+  {
+    "family": "secq25",
+    "sha": "918e7bab820672efacdaea51724534c67da834e1",
+    "tree": "540e9afd12685918eb2a370737f7e4fe4801af36"
+  },
+  {
+    "family": "eaq30",
+    "sha": "f83bd076ea87c547bd424b5cc3855bf74e74a0d1",
+    "tree": "a9b16d1a709e8104ebdc43f835a0b97d1f8a1db1"
+  },
+  {
+    "family": "fasttrack_scs",
+    "sha": "c9cbb8c78cc28a78b276993c1a7f5ffdf0d7fb01",
+    "tree": "4162951029a9e3ac51bf2497e3d8cd0808737ff4"
+  },
+  {
+    "family": "erc24",
+    "sha": "d96eaecf59a0be86ac12c32f219ba7acd8b1edb3",
+    "tree": "118adf6d5d302447d6874bf675736dcb6b02a0c3"
+  },
+  {
+    "family": "delaware_climate",
+    "sha": "4f310e1722013ec1fefcb7e96c720611d0b33dc2",
+    "tree": "c2c56f85af6ec43a23a45680d278486f5e490210"
+  },
+  {
+    "family": "delaware_techniques",
+    "sha": "521c99981d3252f5fce170b2406f557539b43316",
+    "tree": "e5009040a345e1c112da5fd03cfdabea962df5a5"
+  },
+  {
+    "family": "sectrs14",
+    "sha": "384ffd2adf78632b2dbc81fc2e0114ba65a15f43",
+    "tree": "c4648df5b27ca9cfa5d0754272ecc55a4aa4d66e"
+  },
+  {
+    "family": "erq_ca",
+    "sha": "bd32a0955e2fd082053a6d377a917d9a61aada0e",
+    "tree": "eb4b2d2d52196771bc48fc3ca0e6eb4a6d0528f3"
+  },
+  {
+    "family": "erica16",
+    "sha": "43b9f60d7c9fd4f376da5e2856b4c7dadfee7400",
+    "tree": "de543762629ed699c429fa9fd2284958c2a1e689"
+  },
+  {
+    "family": "bessi45",
+    "sha": "5761d7537edff9474945950318beb68f799db2ed",
+    "tree": "ce424656a57e53d348c0c4c1acbfa3e2b3305a2c"
+  },
+  {
+    "family": "secds28",
+    "sha": "90d4093b3e07ed2763c03a44a59c62d068490df9",
+    "tree": "516d7ed3b8506fb48a51bfe40fd00ded5b4f524d"
+  },
+  {
+    "family": "air_educator",
+    "sha": "a3c01fdc9843405924f2c171a99572c48374ef64",
+    "tree": "0a445a0d7d0fa483baa6e11b72f5e99771a6696c"
+  },
+  {
+    "family": "ccnes_t",
+    "sha": "db9ca75cfda8cbb2399f3d7bc278c3d5e6ac36bf",
+    "tree": "2a86abd414951852ce7b30269d8377b98a4e53d2"
+  },
+  {
+    "family": "casel_rubric",
+    "sha": "313307069e15462d3d46d692ea5ed6453f8fcce7",
+    "tree": "2cf022e701a141bdc55ee42d269fa5458a178c94"
+  },
+  {
+    "family": "bes20",
+    "sha": "565079c7ec43a2090552218f588853941b1fe08d",
+    "tree": "e0a911612bbbd3c722afb6218dbbf124bc95b424"
+  }
+]
