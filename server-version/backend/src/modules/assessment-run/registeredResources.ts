@@ -194,6 +194,12 @@ export async function readPublishedRegisteredResource(actor: Actor, id: string) 
 
 /** Static content stays authoritative; registered content uses an exact, persisted identity. */
 export async function resolveReleasedRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('education-assessment:')){
+    const {readEducationAssessmentDeliveryIdentity}=await import('../education-tools/assessment-resource.repository')
+    const source=await readEducationAssessmentDeliveryIdentity(db as Prisma.TransactionClient,{resourceKey:ref.resourceKey,version:ref.resourceVersion,purpose:'NEW_USE'})
+    if(source.origin.family!==ref.resourceKind)return null
+    return source.entry
+  }
   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
@@ -208,6 +214,12 @@ export async function resolveReleasedRelationalEntry(ref: { resourceKind: string
 
 /** Retirement stops new delivery; frozen reports still require all current subject/organization grants. */
 export async function resolveHistoricalRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('education-assessment:')){
+    const {readEducationAssessmentDeliveryIdentity}=await import('../education-tools/assessment-resource.repository')
+    const source=await readEducationAssessmentDeliveryIdentity(db as Prisma.TransactionClient,{resourceKey:ref.resourceKey,version:ref.resourceVersion,purpose:'HISTORY'})
+    if(source.origin.family!==ref.resourceKind)return null
+    return source.entry
+  }
   if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
@@ -240,6 +252,14 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
 }
 
 export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
+  if(ref.key.startsWith('education-assessment:')){
+    if(!teacherRunScope)reportingFail('EDUCATION_ASSESSMENT_WORKFLOW_REQUIRED','教育测评必须绑定实际组织任务',403)
+    const {assertEducationAssessmentRunUse}=await import('../education-tools/assessment-resource.authority')
+    const check=(tx:Prisma.TransactionClient)=>assertEducationAssessmentRunUse(tx,{...teacherRunScope!,actorUserId:userId,resource:ref})
+    if(db===prisma)await prisma.$transaction(check,{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+    else await check(db as Prisma.TransactionClient)
+    return
+  }
   if(ref.key.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   if(ref.family==='SCALE'&&ref.key.startsWith('library-scale:')){
     if(!teacherRunScope||lock) return reportingFail('EDUCATION_LIBRARY_BATCH_AUTHORITY_REQUIRED','公库量表必须在任务事务开始时统一校验授权',403)
