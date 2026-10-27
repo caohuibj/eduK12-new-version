@@ -30,7 +30,8 @@ vi.mock('../../modules/situational/situational-video.controller',()=>({situation
 
 import {createTeacherAssessmentRuntimeRouter,projectTeacherCognitiveRuntime,projectTeacherSituationalRuntime} from '../../modules/huiteacher/assessmentRuntime.routes'
 import {createTeacherAssessmentAccess} from '../../modules/huiteacher/assessmentRuntime.access'
-import {draftEducationAssessmentEntry,educationAssessmentOriginSchema} from '../../modules/education-tools/assessment-resource.contract'
+import {EducationAssessmentSourceError} from '../../modules/education-tools/assessment-resource.repository'
+import {draftEducationAssessmentEntry} from '../../modules/education-tools/assessment-resource.contract'
 import {relationalEntryToRunPolicy} from '../../modules/assessment-run/resourceAuthority'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {createFrozenActiveSlotSet,encryptFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
@@ -45,9 +46,7 @@ const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
 const actor=id(1),attempt=id(8),item=id(6),session=id(9),sjtItem=id(16),sjtChild=id(19)
 const origin={schemaVersion:1 as const,adapterVersion:'1.0.0' as const,resourceId:id(2),product:'TEACHER' as const,organizationId:id(3),family:'BUNDLE' as const,
  sourceCompositeId:id(4),runtimeCompositeId:id(5),sourceSnapshotHash:'b'.repeat(64),runtimeSnapshotHash:'c'.repeat(64),
- // Root f46336 adds this strict identity field. Keep the synthetic fixture
- // usable on both this worker's pinned base and the later integration schema.
- ...('runtimeDefinitionHash' in educationAssessmentOriginSchema.shape?{runtimeDefinitionHash:'1'.repeat(64)}:{}),
+ runtimeDefinitionHash:'1'.repeat(64),distribution:{actorId:actor,grants:[{resourceId:id(4),grantId:id(31),version:1}]},
  units:[{itemId:item,family:'COGNITIVE' as const,measurement:{releaseId:id(7),contentHash:'a'.repeat(64),measurementHash:'d'.repeat(64)},references:[],report:null},
  {itemId:sjtItem,family:'SJT' as const,measurement:{releaseId:id(17),contentHash:'e'.repeat(64),measurementHash:'f'.repeat(64)},references:[],report:null}]}
 const entry={...draftEducationAssessmentEntry({origin,title:'Synthetic Teacher mixed delivery',disclosure:testDisclosure()}),releaseStatus:'PUBLISHED' as const}
@@ -228,6 +227,20 @@ describe('Teacher assessment runtime synthetic HTTP boundary',()=>{
   await expect(access.page(id(99),{cursor:page.nextCursor})).rejects.toMatchObject({statusCode:400})
   await expect(access.page(actor,{pageSize:101})).rejects.toBeDefined()
   expect(db.$queryRaw).not.toHaveBeenCalled()
+ })
+ it('keeps a cursor for a bounded page containing known unavailable sources',async()=>{
+  const db={$queryRaw:vi.fn().mockResolvedValue([{...baseline},{...baseline,executionId:id(21)}])}
+  source.readIdentity.mockRejectedValueOnce(new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE'))
+  const page=await createTeacherAssessmentAccess(db as never,source).page(actor,{pageSize:1})
+  expect(page.list).toEqual([]);expect(page.nextCursor).toBeTruthy()
+  expect(db.$queryRaw).toHaveBeenCalledTimes(1)
+ })
+ it('propagates identity corruption and unknown errors instead of returning an empty task page',async()=>{
+  const db={$queryRaw:vi.fn().mockResolvedValue([{...baseline}])},access=createTeacherAssessmentAccess(db as never,source)
+  for(const failure of [new EducationAssessmentSourceError('EDUCATION_ASSESSMENT_POLICY_IDENTITY'),{code:'UNKNOWN',statusCode:409},new Error('database unavailable')]){
+   source.readIdentity.mockRejectedValueOnce(failure)
+   await expect(access.page(actor)).rejects.toBe(failure)
+  }
  })
  it('projects completed children to completion-only responses',()=>{
   expect(projectTeacherCognitiveRuntime({...cognitivePayload,status:'COMPLETED'})).toEqual(expect.objectContaining({status:'COMPLETED',feedbackDeferred:true}))

@@ -15,6 +15,7 @@ import {UserRole} from '../../types'
 import {prisma} from '../../config/database'
 import {createTrialEnvelope} from '../../modules/cognitive/v2/trial-envelope'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {revokeAdminContentGrant} from '../../modules/measurement-content/admin-authority.service'
 import {closeTeacherRun} from '../../modules/huiteacher/run.service'
 import {verifyRuntimePrivileges} from '../../../scripts/runtime-role-contract.mjs'
 
@@ -193,6 +194,27 @@ suite('Teacher assessment runtime real PostgreSQL and canonical FINAL',()=>{
     expect(await owner.cognitiveRawSubmission.count({where:{sessionId:cognitive!.sessionId}})).toBe(1)
    }
   }
+ },90_000)
+
+ it('revokes the exact distribution grant to block new START while a frozen mixed Teacher attempt can finish',async()=>{
+  const f=await teacherRuntimePgFixture(owner,'BUNDLE',false,true),running=await start(f)
+  expect(f.otherExecutionId).toBeTruthy()
+  await revokeAdminContentGrant(f.issuer.id,f.proof,f.distribution.grantId,{expectedVersion:1,reason:'Synthetic original distribution withdrawal'})
+  const denied=await request('/run-executions/'+f.otherExecutionId+'/start-assessment',teacherCookie(f.other),'POST',{})
+  expect(denied.status,JSON.stringify(denied.body)).toBe(403)
+  expect(requireSuccess<any>(await request('/my-assessment-tasks',teacherCookie(f.other))).list).toEqual([])
+  expect(await owner.compositeAssessmentAttempt.count({where:{compositeAssessmentId:f.runtimeId}})).toBe(1)
+  expect(requireSuccess<any>(await request('/run-executions/'+f.executionId+'/start-assessment',running.cookie,'POST',{}))).toMatchObject({runtimeBindingRef:running.parentId,replayed:true})
+  let state=requireSuccess<any>(await request(running.parentPath,running.cookie))
+  await submitCognitive(running.parentPath,state.currentItem,running.cookie)
+  state=requireSuccess<any>(await request(running.parentPath,running.cookie))
+  await submitSjt(running.parentPath,state.currentItem,running.cookie)
+  state=requireSuccess<any>(await request(running.parentPath,running.cookie))
+  requireSuccess(await request(running.parentPath+'/form-sections/'+state.currentItem.formSectionId+'/submit',running.cookie,'POST',{
+   submissionId:randomUUID(),attemptEpoch:state.attemptEpoch,definitionHash:state.currentItem.definitionHash,contextSnapshotHash:state.contextSnapshotHash??null,
+   answers:state.currentItem.answers.map((field:any)=>({formItemId:field.id,value:'synthetic after withdrawal'}))}))
+  expect(requireSuccess<any>(await request(running.parentPath,running.cookie)).status).toBe('COMPLETED')
+  expect(await owner.assessmentUnitSnapshot.count({where:{compositeAttemptId:running.parentId}})).toBe(3)
  },90_000)
 
 })

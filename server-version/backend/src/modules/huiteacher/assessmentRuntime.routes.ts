@@ -1,3 +1,4 @@
+import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {Router,type Request,type Response,type NextFunction,type RequestHandler} from 'express'
 import {z,ZodError} from 'zod'
 import {prisma} from '../../config/database'
@@ -50,6 +51,7 @@ export function projectTeacherCompositeRuntime(value:Awaited<ReturnType<typeof g
  return state
 }
 function runtimeError(error:unknown,res:Response,next:NextFunction){
+ if(error instanceof ContentAuthorityError&&error.code==='CONTENT_AUTHORITY_DENIED')return res.status(403).json({code:error.code,message:'当前教师测评分发授权已不可用',data:null})
  if(error instanceof ZodError)return res.status(400).json({code:'HUITEACHER_ASSESSMENT_INPUT_INVALID',message:'教师测评参数无效',data:null})
  if(isUnitSubmitAdmissionBusyError(error))return assessmentSubmitBusy(res,error.retryAfterSeconds)
  if(isQuestionnaireCompletionAdmissionBusyError(error))return completionBusy(res,error.retryAfterSeconds)

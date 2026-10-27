@@ -1,3 +1,5 @@
+import {EducationAssessmentSourceError} from '../education-tools/assessment-resource.repository'
+import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -132,8 +134,9 @@ export function createTeacherAssessmentAccess<Identity extends TeacherSourceIden
    const page=rows.slice(0,input.pageSize),list:TeacherAssessmentTask[]=[]
    for(const row of page){
     try{list.push((await authorize(row,actorUserId)).task)}catch(error){
-     const status=(error as {statusCode?:number}).statusCode
-     if(!status||status<400||status>=500)throw error
+     if(error instanceof EducationAssessmentSourceError&&['EDUCATION_ASSESSMENT_RESOURCE_NOT_AVAILABLE','EDUCATION_ASSESSMENT_ORIGINAL_ISSUER_REVOKED'].includes(error.code))continue
+     if(error instanceof ContentAuthorityError&&error.code==='CONTENT_AUTHORITY_DENIED')continue
+     throw error
     }
    }
    const last=page[page.length-1]
