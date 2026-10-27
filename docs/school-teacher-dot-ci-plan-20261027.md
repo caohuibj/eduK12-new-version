@@ -38,3 +38,11 @@
 四入口即时反馈统一、最新冷/热资源基线、完整存储压缩收益及高级认知/SJT所有运行路径，不因本次定向CI而自动完成。当前目标是本PR的真实直接影响及可靠性，不以“全部功能一致”为名放宽角色、受众、同意或报告权限。
 
 PR357仅准备正式CI与合并资格；未部署，也不将历史PR356合并授权自动扩大为新PR357合并授权。
+
+## 首轮配置解析失败及第二候选
+
+HEAD `41ad563d` 的主workflow run `40430737854` 与可复用workflow校验记录 `40430731672` 均失败且 jobs=0，应用、构建、数据库和CodeQL均未执行；另一个既有SJT publication工作流成功，不替代主门禁。API未返回可读的原始配置annotation，不能伪造其逐字错误。
+
+独立静态核查确认：新YAML把 `job.services.*` 和 `runner.temp` 用在job级env，超出该层可用context。按GitHub官方context合同及仓库原有写法，改为step级env取得真实服务端口/容器ID/临时目录，再写入本job的GITHUB_ENV。新增实际YAML层级反例先FAIL，修正后单项PASS；补查所有job级env，不仅修改首个变量。应用两组件tree均未变，没有应用检查可重复，也没有producer产物可复用。
+
+来源：https://docs.github.com/en/actions/reference/workflows-and-actions/contexts

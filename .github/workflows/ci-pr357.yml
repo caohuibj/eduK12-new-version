@@ -95,11 +95,16 @@ jobs:
         image: redis:7.4.11-bookworm
         ports: ['6379/tcp']
         options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
-    env:
-      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/pr357_upgrade_ci_test
-      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/14
     steps:
+      - name: bind service endpoints only after runner service initialization
+        env:
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/pr357_upgrade_ci_test
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/14
+        run: |
+          for key in DATABASE_URL CI_POSTGRES_SERVICE_ID REDIS_URL; do
+            printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+          done
       - uses: actions/checkout@v4
         with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-node@v4
@@ -179,12 +184,18 @@ jobs:
     env:
       NODE_ENV: test
       SCHOOL_TEACHER_ISOLATED_DB: '1'
-      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-      SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
-      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-      SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
     steps:
+      - name: bind service endpoints only after runner service initialization
+        env:
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+        run: |
+          for key in DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
+            printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+          done
       - uses: actions/checkout@v4
         with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-node@v4

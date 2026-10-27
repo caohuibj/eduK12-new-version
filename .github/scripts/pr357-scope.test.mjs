@@ -30,3 +30,10 @@ test('real YAML connects exact source, independent affected workflow, CodeQL and
  for(const name of ['admission','frontend','backend','audit','connected','qualified'])assert(w.includes('\n  '+name+':'));
  assert.match(w,/needs: \[admission, frontend, backend, audit, connected\]/);assert.match(w,/chrom[e].cjs preflight/);assert(!w.includes('--no-sandbox'));assert(!w.includes('continue-on-error'));assert(!w.includes('ignoreHTTPSErrors'));assert(!w.includes('permissions.cjs tighten'));
 });
+test('service and runner contexts are bound in steps, never in job env',()=>{
+ const yaml=readFileSync(new URL('../workflows/ci-pr357.yml',import.meta.url),'utf8');
+ const check=text=>{for(const match of text.matchAll(/^    env:\n([\s\S]*?)(?=^    \S|^  \S|$(?![\s\S]))/gm))assert(!/\$\{\{\s*(job|runner|steps)\./.test(match[1]),'Unavailable job env context');};
+ assert.throws(()=>check("  backend:\n    env:\n      DATABASE_URL: ${{ job.services.postgres.id }}\n    steps:\n"));
+ assert.throws(()=>check("  connected:\n    env:\n      PRIVATE_DIR: ${{ runner.temp }}\n    steps:\n"));
+ check(yaml);assert.equal((yaml.match(/name: bind service endpoints only after runner service initialization/g)||[]).length,2);assert.match(yaml,/        env:\n          DATABASE_URL: .*job.services/);
+});
