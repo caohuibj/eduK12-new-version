@@ -1,7 +1,7 @@
 import {afterAll,describe,expect,it,vi} from 'vitest'
 import {prisma} from '../../config/database'
 import {localizationManifestV1Schema, parseLocalizationManifest} from '../../modules/scale/library/localization-manifest'
-import {scaleLocalizationReasons} from '../../modules/scale/policy/localization'
+import {scaleLocalizationReasons, scaleLocalizationManualIssues} from '../../modules/scale/policy/localization'
 import {previewScaleInstrument} from '../../modules/scale/onboarding/preview'
 import {getScaleInstrumentSource} from '../../modules/scale/onboarding/instrument-registry'
 import type {ScaleInstrumentSourceV1} from '../../modules/scale/onboarding/types'
@@ -29,22 +29,23 @@ const sourceWith = (over: Record<string, unknown>): ScaleInstrumentSourceV1 => (
 afterAll(async () => { await prisma.$disconnect() })
 
 describe('pending-audit content: review states, evidence records and next actions', () => {
-  it('imports and previews a PENDING translation while blocking deployment with located reasons', () => {
+  it('previews pending manual reviews without manufacturing an approval or blocking technical activation', () => {
     const preview = previewScaleInstrument({ source: sourceWith({}), locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE'] })
-    // Import/preview works for pending content; only activation is blocked.
-    expect(preview.blockers).toContain('LOCALIZATION_REVIEW_PENDING')
-    expect(preview.blockers).toContain('LOCALIZATION_EXPERT_REVIEW_PENDING')
-    expect(preview.allowActivation).toBe(false)
+    expect(preview.manualReview.localization).toContain('LOCALIZATION_REVIEW_PENDING')
+    expect(preview.manualReview.localization).toContain('LOCALIZATION_EXPERT_REVIEW_PENDING')
+    expect(preview.blockers).not.toContain('LOCALIZATION_REVIEW_PENDING')
+    expect(preview.localization?.reviewStatus).toBe('PENDING')
     const reasons = scaleLocalizationReasons(sourceWith({}), policy)
-    expect(reasons).toEqual(expect.arrayContaining(['LOCALIZATION_REVIEW_PENDING', 'LOCALIZATION_EXPERT_REVIEW_PENDING']))
+    expect(reasons).not.toContain('LOCALIZATION_REVIEW_PENDING')
+    expect(reasons).not.toContain('LOCALIZATION_EXPERT_REVIEW_PENDING')
   })
 
   it('separates RETURNED from PENDING with revision guidance', () => {
     const returned = sourceWith({ localization: { ...sourceWith({}).localization, sourceLocale: 'en', adaptationMethod: 'DIRECT_TRANSLATION', reviewStatus: 'RETURNED', review: { reviewer: '审校人', reviewedAt: '2026-10-26T00:00:00Z', instrumentVersion: '1.0.0', localizationVersion: '1.0.0', evidenceIds: ['ev-1'], reason: '第3题译文与锚点不符' } } })
-    expect(scaleLocalizationReasons(returned, policy)).toContain('LOCALIZATION_REVIEW_RETURNED')
+    expect(scaleLocalizationManualIssues(returned)).toContain('LOCALIZATION_REVIEW_RETURNED')
+    expect(scaleLocalizationReasons(returned, policy)).not.toContain('LOCALIZATION_REVIEW_RETURNED')
     const preview = previewScaleInstrument({ source: returned, locale: 'zh-CN', territory: 'CN', deploymentModes: ['STANDALONE'] })
-    const action = preview.nextActions.find(a => a.code === 'LOCALIZATION_REVIEW_RETURNED')
-    expect(action?.next).toContain('再次送审')
+    expect(preview.manualReview.localization).toContain('LOCALIZATION_REVIEW_RETURNED')
     // RETURNED without a reason is invalid at parse time.
     const noReason = localizationManifestV1Schema.safeParse({ ...(returned.localization as Record<string, unknown>), review: { reviewer: '审校人', reviewedAt: '2026-10-26T00:00:00Z', instrumentVersion: '1.0.0', localizationVersion: '1.0.0', evidenceIds: ['ev-1'] } })
     expect(noReason.success).toBe(false)

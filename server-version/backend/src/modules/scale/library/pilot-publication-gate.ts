@@ -81,7 +81,7 @@ export const evaluatePilotFirstPublicationGate = (input: PilotFirstPublicationGa
         localizationErrors.push(`localization targetLocale=${parsed.manifest.targetLocale} 与部署 locale=${input.locale} 不一致`)
       }
       if (parsed.manifest.reviewStatus !== 'APPROVED') {
-        localizationErrors.push('localization manifest reviewStatus=PENDING：治理审核未完成')
+        gateWarnings.push(`localization reviewStatus=${parsed.manifest.reviewStatus}：人工治理审核未完成`)
       }
       if (parsed.manifest.expertReviewStatus !== 'COMPLETED') {
         gateWarnings.push(`localization expertReviewStatus=${parsed.manifest.expertReviewStatus}：scientific/deployment gap`)

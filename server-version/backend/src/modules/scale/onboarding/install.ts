@@ -1,6 +1,7 @@
+import { validateScaleInstrumentSource } from './validate-instrument'
 import { allowsScaleAxisRevision } from './axis-snapshots'
 import { withSerializableScaleTransaction } from '../deployment/transactions'
-import { scaleLocalizationReasons } from '../policy/localization'
+import { scaleLocalizationReasons, scaleLocalizationManualIssues } from '../policy/localization'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -41,6 +42,7 @@ export interface InstallScaleInstrumentPlan {
   referenceUnchanged: string[]
   allowActivation: boolean
   blockers: string[]
+  manualReview: { localization: string[]; scientificReview: unknown; rights: unknown; reportQc: unknown }
 }
 
 const definitionCounts = (definition: { items: unknown[]; scoring: { scores: Array<{ type: string }> } }) => ({
@@ -57,9 +59,11 @@ const resolvePlan = async (
   if (!source?.executable || !runtimePolicy) throw new Error('Scale instrument is not executable or has no compiled runtime policy')
 
   const deploymentPolicy = scaleDeploymentPolicySchema.parse(input.deploymentPolicy)
-  const blockers: string[] = scaleLocalizationReasons(source, deploymentPolicy)
-  // Retain scientific scope and caller authority independently of retired licenses.
-  if (source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== deploymentPolicy.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+  const blockers: string[] = [
+    ...scaleLocalizationReasons(source, deploymentPolicy),
+    ...validateScaleInstrumentSource(source, { requireInstruction: true }).issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}:${issue.message}`),
+  ]
+  // Caller authority and exact deployment identity remain mandatory.
   const actor = await db.user.findUnique({ where: { id: input.actorUserId } })
   if (!actor || actor.platformRole !== 'SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen
     || (actor.expiresAt && actor.expiresAt <= new Date())) blockers.push('SYSTEM_ADMIN_REQUIRED')
@@ -142,6 +146,7 @@ const resolvePlan = async (
     referenceUnchanged,
     allowActivation: [...new Set(blockers)].length === 0,
     blockers: [...new Set(blockers)].sort(),
+    manualReview: { localization: scaleLocalizationManualIssues(source), scientificReview: source.scientificReview ?? null, rights: source.executable.definition.license, reportQc: source.executable.definition.report.audienceContract?.qcReview ?? null },
   }
 }
 

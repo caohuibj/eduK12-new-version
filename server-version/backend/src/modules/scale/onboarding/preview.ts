@@ -1,12 +1,11 @@
 import { evaluateScaleSourceScientificQualification } from '../library/scientific-qualification'
-import { qualificationAllowsScientificMaturity } from '../../assessment-governance/scientific-qualification'
 import { compileScalePolicy } from '../policy/compile'
 import {
   evaluateScaleDeployment,
   scaleDeploymentModeSchema,
   type ScaleDeploymentModeV1,
 } from '../policy/deployment'
-import { localizationNextActions, scaleLocalizationReasons } from '../policy/localization'
+import { localizationNextActions, scaleLocalizationReasons, scaleLocalizationManualIssues } from '../policy/localization'
 import { getScaleInstrumentSource } from './instrument-registry'
 import { scaleInstrumentSourceV1Schema } from './schema'
 import { validateScaleInstrumentSource, materializeCatalogManifest, materializeLocalizationManifest } from './validate-instrument'
@@ -29,14 +28,12 @@ export const previewScaleInstrument = (input: {
     ? scaleInstrumentSourceV1Schema.parse(input.source) as unknown as ScaleInstrumentSourceV1
     : (input.instrumentKey && input.instrumentVersion ? getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion) : undefined)
   if (!source) throw new Error('Scale instrument source not found')
-  const validation = validateScaleInstrumentSource(source)
+  const validation = validateScaleInstrumentSource(source, { requireInstruction: true })
   const catalog = materializeCatalogManifest(source)
   const localization = materializeLocalizationManifest(source)
   const blockers = validation.issues.filter(issue => issue.severity === 'error').map(issue => `${issue.path}: ${issue.message}`)
   if (!source.executable) blockers.push(...(source.candidatePreview?.blockers ?? ['EXECUTABLE_NOT_REGISTERED']))
   const qualification = evaluateScaleSourceScientificQualification(source)
-  if (source.executable && !qualificationAllowsScientificMaturity(source.catalog.scientificMaturity, qualification)) blockers.push('SCIENTIFIC_CLAIM_NOT_QUALIFIED')
-  if (source.executable && source.catalog.scientificMaturity !== 'PILOT' && source.scientificReview?.territory !== input.territory) blockers.push('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
   const modes = input.deploymentModes.map(mode => scaleDeploymentModeSchema.parse(mode))
   if (modes.length === 0) blockers.push('DEPLOYMENT_MODES_MISSING')
   if (source.executable && source.executable.releaseStatus !== 'PUBLISHED') blockers.push('EXECUTABLE_NOT_PUBLISHED')
@@ -76,6 +73,12 @@ export const previewScaleInstrument = (input: {
     executable: source.executable ? { releaseStatus: source.executable.releaseStatus, runtimePolicyHash } : null,
     scientific: { catalogStatus: catalog.catalogStatus, scientificMaturity: catalog.scientificMaturity, evidenceCount: catalog.evidence.length, qualification, review: source.scientificReview ?? null },
     localization: localization ?? null,
+    manualReview: {
+      localization: scaleLocalizationManualIssues(source),
+      scientific: qualification,
+      rights: source.executable?.definition.license ?? null,
+      reportQc: source.executable?.definition.report.audienceContract?.qcReview ?? null,
+    },
     report: {
       disclosureAudiences: source.disclosure ? Object.keys(source.disclosure.audiences) : [],
       educationalFeedback: Boolean(source.educationalFeedback),

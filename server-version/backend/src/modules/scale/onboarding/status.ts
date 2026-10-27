@@ -2,7 +2,7 @@ import {z} from 'zod'
 import {AdminPermissionError} from '../../admin-permissions/service'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { readToolPolicies } from '../../assessment-governance/tool-entry-policy'
-import { getScaleInstrumentSource, listScaleInstrumentSources } from './instrument-registry'
+import { getScaleInstrumentSource, listScaleInstrumentSources, listScaleInstrumentSourceDiagnostics } from './instrument-registry'
 import { previewScaleInstrument } from './preview'
 import { scaleSourcePolicyIdentity } from './source-snapshot'
 import { localizationNextActions } from '../policy/localization'
@@ -56,6 +56,7 @@ export interface StandardOnboardingEntry {
   }
   stage: string
   allowActivation: boolean
+  manualReview: ReturnType<typeof previewScaleInstrument>['manualReview'] | null
   blockers: string[]
   nextActions: Array<{ code: string; stage: string; owner: string; next: string }>
 }
@@ -68,7 +69,7 @@ const statusQuerySchema=z.object({limit:z.coerce.number().int().min(1).max(50).d
  query:z.string().trim().max(160).default(''),cursor:z.string().max(1024).regex(/^[A-Za-z0-9_-]+$/).optional()}).strict()
 const cursorSchema=z.object({key:z.string().min(1).max(240),version:z.string().min(1).max(240)}).strict()
 const encodeCursor=(row:{code:string;instrument_version:string})=>Buffer.from(JSON.stringify({key:row.code,version:row.instrument_version})).toString('base64url')
-export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): Promise<{ list: StandardOnboardingEntry[];pageSize:number;hasMore:boolean;nextCursor:string|null }> => {
+export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): Promise<{ list: StandardOnboardingEntry[];pageSize:number;hasMore:boolean;nextCursor:string|null; sourceDiagnostics: ReturnType<typeof listScaleInstrumentSourceDiagnostics> }> => {
   const input=statusQuerySchema.parse(rawQuery)
   let cursor:z.infer<typeof cursorSchema>|undefined
   if(input.cursor){try{cursor=cursorSchema.parse(JSON.parse(Buffer.from(input.cursor,'base64url').toString('utf8')))}
@@ -141,6 +142,7 @@ export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): 
         : states.imported ? '已导入待部署'
         : '仅目录候选',
       allowActivation: Boolean(deployment && preview?.allowActivation),
+      manualReview: preview?.manualReview ?? null,
       blockers,
       nextActions: blockers.flatMap(code => {
         const action = blockerNextAction(code)
@@ -148,5 +150,5 @@ export const listStandardOnboardingStatus = async (db: Db,rawQuery:unknown={}): 
       }),
     }
   })
-  return { list,pageSize:input.limit,hasMore,nextCursor:hasMore?encodeCursor(rows[rows.length-1]):null }
+  return { list,sourceDiagnostics:listScaleInstrumentSourceDiagnostics(),pageSize:input.limit,hasMore,nextCursor:hasMore?encodeCursor(rows[rows.length-1]):null }
 }

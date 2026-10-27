@@ -1,3 +1,4 @@
+import { validateScaleInstrumentSource } from './validate-instrument'
 import { allowsScaleAxisRevision, freezeScaleAxisSnapshot } from './axis-snapshots'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -22,6 +23,8 @@ export const materializeScaleInstrumentContent = async (db: Db, input: {
 }) => {
   const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)
   if (!source?.executable) throw new Error('Scale instrument source is not executable')
+  const errors = validateScaleInstrumentSource(source, { requireInstruction: true }).issues.filter(issue => issue.severity === 'error')
+  if (errors.length) throw new Error(`Scale materialization blocked: ${errors.map(issue => `${issue.path}:${issue.message}`).join('; ')}`)
   const executable = source.executable
   const definitionHash = hashScaleDefinition(executable.definition)
   const definitionCounts = counts(executable.definition)

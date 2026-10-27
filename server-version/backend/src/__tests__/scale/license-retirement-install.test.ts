@@ -5,6 +5,17 @@ import { activateScaleDeploymentRevision } from '../../modules/scale/deployment/
 import { hashScaleDeploymentPolicy, type ScaleDeploymentPolicyV2 } from '../../modules/scale/policy/deployment'
 import { getScaleInstrumentRuntimePolicy } from '../../modules/scale/onboarding/instrument-registry'
 
+
+// Synthetic administration instruction for this authority/deployment fixture.
+// Real repository packages and historical runtime definitions remain unchanged.
+vi.mock('../../modules/scale/onboarding/instrument-registry', async importOriginal => {
+  const actual = await importOriginal<typeof import('../../modules/scale/onboarding/instrument-registry')>()
+  return { ...actual, getScaleInstrumentSource: (key: string, version: string) => {
+    const source = actual.getScaleInstrumentSource(key, version)
+    return source ? { ...source, instruction: { schemaVersion: 1, text: '请选择对应选项。', language: source.executable?.contentLocale ?? 'zh-CN', version: 'synthetic-1', source: 'Synthetic install fixture' } } : undefined
+  } }
+})
+
 const actor = { id: 'admin', platformRole: 'SYSTEM_ADMIN', isActive: true, isFrozen: false, expiresAt: null }
 function input(key = 'academic_self_concept_biology_zh_cn') {
   const deploymentPolicy: ScaleDeploymentPolicyV2 = {
@@ -34,12 +45,13 @@ describe('V2 install remains an authorized operation without a license ledger', 
     expect(plan.allowActivation).toBe(false)
     expect(plan.blockers).toContain('SYSTEM_ADMIN_REQUIRED')
   })
-  it('retains scientific territory independently of copyright terms', async () => {
+  it('records scientific territory for manual review without turning it into installation authority', async () => {
     const request = input('academic_self_concept_chemistry_zh_cn')
     request.deploymentPolicy.territory = 'US'
     const plan = await planScaleInstrumentInstall(mockDb() as never, request)
-    expect(plan.allowActivation).toBe(false)
-    expect(plan.blockers).toContain('SCIENTIFIC_DEPLOYMENT_SCOPE_MISMATCH')
+    expect(plan.allowActivation).toBe(true)
+    expect(plan.blockers).toEqual([])
+    expect(plan.manualReview.scientificReview).toMatchObject({ territory: 'CN' })
   })
   it('rejects legacy V1 new writes before touching a database; backfill also requires V2', async () => {
     const request = input(), legacy = { ...request, deploymentPolicy: { ...request.deploymentPolicy, schemaVersion: 1, commercialNature: 'NON_COMMERCIAL', requiredRightsActions: ['display'], authorizationRefs: ['old-license'] } }
