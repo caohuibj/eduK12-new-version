@@ -1,0 +1,276 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "shared-final-report-dispatch",
+  "outcomes": [
+    "trusted aggregate payloads produce compact Training FINAL receipts uses real SCALE canonical projector outputs and decodes without facts or owner",
+    "trusted aggregate payloads produce compact Training FINAL receipts uses real COGNITIVE canonical projector outputs and decodes without facts or owner",
+    "trusted aggregate payloads produce compact Training FINAL receipts uses real SJT canonical projector outputs and decodes without facts or owner",
+    "trusted aggregate payloads produce compact Training FINAL receipts records skipped execution and per-layer revocation without changing stored facts",
+    "trusted aggregate payloads produce compact Training FINAL receipts rejects cross-entry/private owner or report composite scopes",
+    "trusted aggregate payloads produce compact Training FINAL receipts rejects duplicate verified slots and wrong canonical family before interpreting",
+    "trusted aggregate payloads produce compact Training FINAL receipts returns explicit legacy null and rejects partial binding or epoch mismatch",
+    "trusted aggregate payloads produce compact Training FINAL receipts rejects changed receipt identity/hash, aggregate hash and foreign source item",
+    "accepts only persisted static registry provenance without inventing an owner, even for revoked historical facts",
+    "frozen release indexes retain validation and interpretation semantics preserves order and validates every matching unit on every read, once per release group rather than per duplicate slot",
+    "frozen release indexes retain validation and interpretation semantics rejects differing source on another unit sharing a release",
+    "frozen release indexes retain validation and interpretation semantics rejects differing family on another unit sharing a release",
+    "frozen release indexes retain validation and interpretation semantics rejects differing hash on another unit sharing a release",
+    "frozen release indexes retain validation and interpretation semantics checks a different expected reference hash even when the release is cached",
+    "frozen release indexes retain validation and interpretation semantics preserves revoked stop guards without reading unused reference releases",
+    "frozen release indexes retain validation and interpretation semantics preserves quality stop guards without reading unused reference releases",
+    "frozen release indexes retain validation and interpretation semantics preserves not-executed stop guards without reading unused reference releases",
+    "frozen release indexes retain validation and interpretation semantics preserves unavailable stop guards without reading unused reference releases",
+    "frozen release indexes retain validation and interpretation semantics retains validation for revoked references and rebuilds indexes each invocation",
+    "does not reuse a successful measurement authority result on the next read",
+    "handles shared measurements without reference bindings and legacy null without release reads",
+    "routes SCHOOL frozen reports through exact bound report validation",
+    "routes TEACHER frozen reports through exact bound report validation",
+    "routes PLATFORM frozen reports through exact bound report validation",
+    "Training authorized report reads use saved FINAL facts renders only declared metrics with one bounded source query and actual canonical codec",
+    "Training authorized report reads use saved FINAL facts keeps retired frozen templates and suppresses metrics outside the declared whitelist",
+    "Training authorized report reads use saved FINAL facts never reads facts or content for participants or legacy parents",
+    "Training authorized report reads use saved FINAL facts does not newly render revoked measurement; retains notice and receipt",
+    "Training authorized report reads use saved FINAL facts does not newly render revoked report; retains notice and receipt",
+    "Training authorized report reads use saved FINAL facts does not render a non-READY receipt or query its source",
+    "Training authorized report reads use saved FINAL facts rejects wrong epoch, slot, missing facts, hash or private scope",
+    "Training authorized report reads use saved FINAL facts cannot promote hidden numeric facts through a declared teacher template",
+    "Training authorized report reads use saved FINAL facts cannot promote hidden numeric facts through a declared researcher template",
+    "Training authorized report reads use saved FINAL facts honors numeric capability and does not treat an allowed metric key as sufficient access",
+    "Training authorized report reads use saved FINAL facts does not derive a band when individual reference disclosure is unavailable",
+    "Training authorized report reads use saved FINAL facts does not swallow a frozen source identity failure as an empty report",
+    "reads a frozen static SJT report through exact persisted provenance, not an invented author or current source license",
+    "validates SCHOOL frozen report scope before any rendering",
+    "validates TEACHER frozen report scope before any rendering",
+    "validates PLATFORM frozen report scope before any rendering"
+  ],
+  "originalSHA256": {
+    "report": "ff8d5ac666072531a14a854c5b9155f6f766393741bb5b01bd5a4d4b158d15fe",
+    "execution": "c0350d20cc5e5251b949b8bd8366b55db0ea6adf5e354183f188cd80ec5339e8",
+    "log": "5680cc80bdb9b27c4757d9543aaef0402a425fd7bd86d29e68b0f297e5ece049",
+    "inputs": "bf82dab6f9139f461c633070d7da8cf06d54856dbb6f6341c77e1c2c78aa2fca"
+  },
+  "currentInputsSHA256": "358cc43b4cd456f382da88b3f1b21c2cf0c9fcc68143c709f6a2df454c439c94",
+  "originalExecution": {
+    "argv": "Recorded targeted Vitest invocation; selected files server-version/backend/src/__tests__/measurement-content/training-content-final.test.ts, server-version/backend/src/__tests__/measurement-content/training-content-report.test.ts; exact filters retained by original reporter and linked progress/index",
+    "cwd": "server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 40,
+    "numPassedTests": 40,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts uses real SCALE canonical projector outputs and decodes without facts or owner",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts uses real COGNITIVE canonical projector outputs and decodes without facts or owner",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts uses real SJT canonical projector outputs and decodes without facts or owner",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts records skipped execution and per-layer revocation without changing stored facts",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts rejects cross-entry/private owner or report composite scopes",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts rejects duplicate verified slots and wrong canonical family before interpreting",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts returns explicit legacy null and rejects partial binding or epoch mismatch",
+      "status": "passed"
+    },
+    {
+      "fullName": "trusted aggregate payloads produce compact Training FINAL receipts rejects changed receipt identity/hash, aggregate hash and foreign source item",
+      "status": "passed"
+    },
+    {
+      "fullName": "accepts only persisted static registry provenance without inventing an owner, even for revoked historical facts",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics preserves order and validates every matching unit on every read, once per release group rather than per duplicate slot",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics rejects differing source on another unit sharing a release",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics rejects differing family on another unit sharing a release",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics rejects differing hash on another unit sharing a release",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics checks a different expected reference hash even when the release is cached",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics preserves revoked stop guards without reading unused reference releases",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics preserves quality stop guards without reading unused reference releases",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics preserves not-executed stop guards without reading unused reference releases",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics preserves unavailable stop guards without reading unused reference releases",
+      "status": "passed"
+    },
+    {
+      "fullName": "frozen release indexes retain validation and interpretation semantics retains validation for revoked references and rebuilds indexes each invocation",
+      "status": "passed"
+    },
+    {
+      "fullName": "does not reuse a successful measurement authority result on the next read",
+      "status": "passed"
+    },
+    {
+      "fullName": "handles shared measurements without reference bindings and legacy null without release reads",
+      "status": "passed"
+    },
+    {
+      "fullName": "routes SCHOOL frozen reports through exact bound report validation",
+      "status": "passed"
+    },
+    {
+      "fullName": "routes TEACHER frozen reports through exact bound report validation",
+      "status": "passed"
+    },
+    {
+      "fullName": "routes PLATFORM frozen reports through exact bound report validation",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts renders only declared metrics with one bounded source query and actual canonical codec",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts keeps retired frozen templates and suppresses metrics outside the declared whitelist",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts never reads facts or content for participants or legacy parents",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts does not newly render revoked measurement; retains notice and receipt",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts does not newly render revoked report; retains notice and receipt",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts does not render a non-READY receipt or query its source",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts rejects wrong epoch, slot, missing facts, hash or private scope",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts cannot promote hidden numeric facts through a declared teacher template",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts cannot promote hidden numeric facts through a declared researcher template",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts honors numeric capability and does not treat an allowed metric key as sufficient access",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts does not derive a band when individual reference disclosure is unavailable",
+      "status": "passed"
+    },
+    {
+      "fullName": "Training authorized report reads use saved FINAL facts does not swallow a frozen source identity failure as an empty report",
+      "status": "passed"
+    },
+    {
+      "fullName": "reads a frozen static SJT report through exact persisted provenance, not an invented author or current source license",
+      "status": "passed"
+    },
+    {
+      "fullName": "validates SCHOOL frozen report scope before any rendering",
+      "status": "passed"
+    },
+    {
+      "fullName": "validates TEACHER frozen report scope before any rendering",
+      "status": "passed"
+    },
+    {
+      "fullName": "validates PLATFORM frozen report scope before any rendering",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend",
+      "currentObject": "3f56dbc63c9be94321c5f3d81dc10fffee5a9240",
+      "rationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.22.1",
+        "kind": "original local development environment; not current Actions"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "binaryHash": "not retained"
+      },
+      "generated": {
+        "kind": "No independently captured generated dependency byte manifest; no such identity claimed"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Historical semantic assertions only. Original Node 24.22.1 is preserved, never called a fresh engines-qualified Actions run. Same locked dependencies and pure JS/DOM or mocked-boundary assertions reviewed; actual compiled browser, backend TypeScript build, dependency/image scans and current runtime PG remain separate requirements. Installed byte manifests and original signatures were not recorded and are not reconstructed as facts."
+  },
+  "deltas": [],
+  "limitations": [
+    "No whole current-tree all-suite pass claim.",
+    "Original failures, filtered cases and nonzero exits are unchanged.",
+    "Source checkpoint is a post-execution reconstruction; root records known boundaries rather than inventing run-time binary provenance."
+  ],
+  "rootReadRationale": "Root read the affected implementation and original raw reports. Authority/NOWAIT and FINAL/report dispatch implementations remain byte-identical at their exercised boundary; host tests retain their original assertions, and the new adapter assertion is selected separately. Added registration UI does not alter the separately mounted inbox/feedback test subject. Validators mocked in these reports remain explicitly mock contracts, not PostgreSQL or browser evidence."
+}

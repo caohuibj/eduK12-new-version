@@ -11,7 +11,7 @@ const run=(exe,args,options={})=>execFileSync(exe,args,{cwd:repo,encoding:'utf8'
 const git=(...args)=>run('git',args).trim()
 async function main(){
  for(const k of ['CI','GITHUB_ACTIONS'])assert.equal(process.env[k],'true')
- assert.equal(process.version,'v24.21.0');assert.equal(process.env.NODE_ENV,'test')
+ assert.equal(process.version,'v24.21.0');assert.equal(process.env.NODE_ENV,'test');assert.equal(fs.existsSync(path.join(backend,'.env')),false,'No developer or production environment file')
  assert.equal(git('rev-parse','HEAD'),process.env.GITHUB_SHA)
  assert.equal(git('diff','--name-only','HEAD','--','server-version','.github'),'')
  const service=process.env.CI_POSTGRES_SERVICE_ID;assert.match(service||'',/^[a-f0-9]{64}$/)

@@ -1,0 +1,204 @@
+diff --git a/server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts b/server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts
+index ad64c440c..547246fee 100644
+--- a/server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts
++++ b/server-version/backend/src/__tests__/huiteacher/assessment-runtime-report.postgres.integration.test.ts
+@@ -136,7 +136,11 @@ suite('Actual education producer to canonical FINAL to own frozen report',()=>{
+     const [fact]=await loadStoredCanonicalUnitResults([stored.canonicalResultEncrypted!])
+     const metrics=unit.rendered.blocks.filter((block:any)=>block.type==='METRIC')
+     expect(metrics.length).toBeGreaterThan(0)
+-    for(const metric of metrics)expect(fact.core.metrics.some(value=>value.value===metric.value&&typeof metric.value==='number')).toBe(true)
++    for(const metric of metrics){
++     const saved=fact.core.metrics.find(value=>value.key===metric.metricKey)
++     expect(saved,'exact saved metric key '+metric.metricKey).toBeDefined()
++     expect(typeof metric.value).toBe('number');expect(metric.value).toBe(saved!.value)
++    }
+    }
+   }
+   expect((await request(endpoint,teacherCookie(f.issuer,'TRAINING'))).status).toBe(401)
+diff --git a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+index 422bf5559..1a1d5a2fd 100644
+--- a/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
++++ b/server-version/backend/src/modules/education-tools/assessment-resource.service.ts
+@@ -1,3 +1,5 @@
++import {CompositeServiceError} from '../composite/composite.errors'
++import {InstrumentFinalSubmitError} from '../../services/instrumentFinalSubmit'
+ import {decodeTrainingStandardItemSource} from '../composite/training-standard-combination'
+ import {readCurrentStandardCombination} from '../measurement-content/standard-combination-source'
+ import {assertStandardCombinationDerivedRelease} from '../measurement-content/standard-combination-content'
+@@ -5,6 +7,8 @@ import {randomUUID} from 'node:crypto'
+ import {Prisma} from '@prisma/client'
+ import {z} from 'zod'
+ import {parseTrainingFeedbackPolicy,trainingFeedbackPolicySchema} from '../assessment-policy/training-feedback-policy'
++import {ContentAuthorityError} from '../measurement-content/content-authority'
++import {ContentReleaseError} from '../measurement-content/release'
+ import {prisma} from '../../config/database'
+ import {canonicalHash} from '../assessment-runtime/canonical'
+ import {buildTrainingFlowUnits} from '../composite/training-flow-definition'
+@@ -16,8 +20,8 @@ import {resolveFormalReferenceRelease} from '../measurement-content/formal-refer
+ import {DECLARATIVE_REPORT_GENERATOR} from '../measurement-content/report-renderer'
+ import {validateReferenceSetDefinition,type AssessmentReferenceEntry} from '../assessment-reference/reference'
+ import {draftEducationAssessmentEntry,educationAssessmentOriginSchema,educationDeliveryAuthoritySchema,educationDistributionSchema} from './assessment-resource.contract'
+-import {readEducationAssessmentDeliveryIdentity} from './assessment-resource.repository'
+-import {educationManagementFail as fail,captureEducationAssessmentIssuer,lockEducationAssessmentOrganization,retainEducationAssessmentIssuers,type EducationAssessmentContext} from './assessment-resource.issuer'
++import {readEducationAssessmentDeliveryIdentity,EducationAssessmentSourceError} from './assessment-resource.repository'
++import {EducationAssessmentManagementError,educationManagementFail as fail,captureEducationAssessmentIssuer,lockEducationAssessmentOrganization,retainEducationAssessmentIssuers,type EducationAssessmentContext} from './assessment-resource.issuer'
+ import {educationDistributionSelectionSchema,assertEducationAssessmentDistribution,assertEducationAssessmentDistributionCurrent,educationAssessmentAssets,assertEducationAssessmentAssets} from './assessment-resource.distribution'
+ import {educationCompositeInclude,lockEducationAssessmentSourceIdentities,readEducationAssessmentSource} from './assessment-resource.source'
+ 
+@@ -62,7 +66,51 @@ async function boundary(tx:Tx,c:EducationAssessmentContext,sourceId:string,proof
+  return {identities,actor}
+ }
+ function projection(p:Preparation){return {resourceId:p.resourceId,product:p.product,organizationId:p.organizationId,family:p.family,
+- sourceCompositeId:p.sourceCompositeId,runtimeCompositeId:p.runtimeCompositeId,preparationHash:canonicalHash(p),title:p.title}}
++ sourceCompositeId:p.sourceCompositeId,runtimeCompositeId:p.runtimeCompositeId,preparationHash:canonicalHash(p),title:p.title,
++ licenses:p.distribution.grants.map(({resourceId,grantId})=>({resourceId,grantId}))}}
++async function assertPreparationPrivateOwners(tx:Tx,c:EducationAssessmentContext,snapshot:TrainingContentSnapshot){
++ for(const unit of snapshot.units)if(unit.source.privateVersionId){
++  const version=await tx.educationPrivateToolVersion.findUnique({where:{id:unit.source.privateVersionId}})
++  if(!version||version.entry!==c.product||version.organizationId!==c.organizationId||version.ownerUserId!==c.principal.userId)fail('EDUCATION_ASSESSMENT_PRIVATE_OWNER_REQUIRED',403)
++ }
++}
++type License=z.infer<typeof educationDistributionSelectionSchema>[number]
++/** New picker discovery only. Recovery never enters this helper: its exact
++ * original selection is returned from the preparation and rechecked as pinned.
++ * A broad grant contributes only the resource currently required by this item. */
++async function discoverLicenses(tx:Tx,c:EducationAssessmentContext,resourceIds:string[],pinned:License[]=[]):Promise<License[]|null>{
++ const ids=[...new Set(resourceIds)].sort(),fixed=new Map(pinned.map(value=>[value.resourceId,value.grantId]))
++ if(ids.length>1000)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
++ const rows=await tx.$queryRaw<Array<{id:string;resource_keys:string[]}>>(Prisma.sql`SELECT id,resource_keys FROM content_capability_grants
++  WHERE subject_id=${c.principal.userId} AND product=${c.product} AND scope_kind='ORGANIZATION'
++   AND scope_id=${c.organizationId} AND resource_kind='material' AND 'material.distribute'=ANY(capabilities)
++   AND resource_keys && ${ids}::text[] AND revoked_at IS NULL
++   AND valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
++  ORDER BY id LIMIT 1001`)
++ if(rows.length>1000)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
++ const licenses:License[]=[]
++ for(const resourceId of ids){
++  const options=fixed.has(resourceId)?[fixed.get(resourceId)!]:rows.filter(row=>row.resource_keys.includes(resourceId)).map(row=>row.id)
++  let accepted:License|undefined
++  for(const grantId of options){
++   try{
++    await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,resourceIds:[resourceId],selection:[{resourceId,grantId}]})
++    accepted={resourceId,grantId};break
++   }catch(error){if(!(error instanceof ContentAuthorityError))throw error}
++  }
++  if(!accepted)return null
++  licenses.push(accepted)
++ }
++ return licenses
++}
++export function pickerSourceUnavailable(error:unknown){
++ // Account contention must roll back the transaction, never masquerade as an
++ // unavailable candidate; database/unknown errors likewise propagate.
++ if(error instanceof Error&&'code'in error&&error.code==='EDUCATION_ASSESSMENT_AUTHORITY_BUSY')return false
++ if(error instanceof InstrumentFinalSubmitError)return error.code==='FORM_ANSWER_INVALID'&&error.statusCode===400
++ return error instanceof z.ZodError||error instanceof ContentReleaseError||error instanceof CompositeServiceError
++  ||error instanceof EducationAssessmentManagementError||error instanceof EducationAssessmentSourceError
++}
+ /** Stage 1 has an editable runtime identity but no delivery metadata/publication.
+  * Only immutable tool definitions/references are copied, never participant data. */
+ export async function prepareEducationAssessment(c:EducationAssessmentContext,raw:unknown){
+@@ -80,10 +128,7 @@ export async function prepareEducationAssessment(c:EducationAssessmentContext,ra
+    return {...projection(p),created:false,units:p.snapshot.units.map(unit=>({itemId:unit.itemId,family:unit.family,measurement:unit.measurement})),canPublish:false}
+   }
+   const {source,content}=await readEducationAssessmentSource(tx,input.sourceCompositeId,identities,c.product)
+-  for(const unit of content.snapshot.units)if(unit.source.privateVersionId){
+-   const version=await tx.educationPrivateToolVersion.findUnique({where:{id:unit.source.privateVersionId}})
+-   if(!version||version.entry!==c.product||version.organizationId!==c.organizationId||version.ownerUserId!==c.principal.userId)fail('EDUCATION_ASSESSMENT_PRIVATE_OWNER_REQUIRED',403)
+-  }
++  await assertPreparationPrivateOwners(tx,c,content.snapshot)
+   const assets=educationAssessmentAssets(source,content.releases.values())
+   await assertEducationAssessmentAssets(tx,assets)
+   const distribution=await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,selection:input.licenses,
+@@ -296,20 +341,35 @@ export async function readEducationAssessmentRegistration(c:EducationAssessmentC
+  * from this navigation projection. No arbitrary Training library is enumerated. */
+ export async function listEducationAssessmentSourceCandidates(c:EducationAssessmentContext){
+  return transaction(async tx=>{
+-  await lockEducationAssessmentOrganization(tx,c);await captureEducationAssessmentIssuer(tx,c)
+-  const candidates=await tx.$queryRaw<Array<{id:string;name:string;grant_id:string;resource_keys:string[]}>>(Prisma.sql`
+-   SELECT composite.id,composite.name,grant_row.id AS grant_id,grant_row.resource_keys
++  // Discovery precedes the existing source-advisory -> Org lock boundary. It
++  // authorizes no response; every emitted source grant is checked again below.
++  const candidates=await tx.$queryRaw<Array<{id:string;name:string}>>(Prisma.sql`
++   SELECT DISTINCT composite.id,composite.name
+    FROM content_capability_grants grant_row JOIN composite_assessments composite ON composite.id=ANY(grant_row.resource_keys)
+    WHERE grant_row.subject_id=${c.principal.userId} AND grant_row.product=${c.product} AND grant_row.scope_kind='ORGANIZATION'
+     AND grant_row.scope_id=${c.organizationId} AND grant_row.resource_kind='material' AND 'material.distribute'=ANY(grant_row.capabilities)
+     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
+-    AND composite.status='PUBLISHED' ORDER BY composite.id,grant_row.id LIMIT 51`)
++    AND composite.status='PUBLISHED' ORDER BY composite.id LIMIT 51`)
+   if(candidates.length>50)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
++  const identities=new Map<string,Awaited<ReturnType<typeof lockEducationAssessmentSourceIdentities>>>()
++  for(const candidate of candidates)identities.set(candidate.id,await lockEducationAssessmentSourceIdentities(tx,candidate.id))
++  await lockEducationAssessmentOrganization(tx,c);await captureEducationAssessmentIssuer(tx,c)
+   const list=[]
+   for(const candidate of candidates){
+-   const distribution=await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,resourceIds:[candidate.id],selection:[{resourceId:candidate.id,grantId:candidate.grant_id}]})
+-   list.push({sourceCompositeId:candidate.id,title:candidate.name,grantId:distribution.grants[0].grantId,
+-    grantedResourceIds:candidate.resource_keys,canPublish:false})
++   const sourceLicenses=await discoverLicenses(tx,c,[candidate.id])
++   if(!sourceLicenses)continue
++   let licenses:License[]|null=null,unavailableReason:'SOURCE_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|null=null
++   try{
++    const {source,content}=await readEducationAssessmentSource(tx,candidate.id,identities.get(candidate.id)!,c.product)
++    await assertPreparationPrivateOwners(tx,c,content.snapshot)
++    const assets=educationAssessmentAssets(source,content.releases.values())
++    await assertEducationAssessmentAssets(tx,assets)
++    licenses=await discoverLicenses(tx,c,[source.id,...content.snapshot.units.map(unit=>unit.measurement.releaseId),...assets.map(asset=>asset.assetId)],sourceLicenses)
++    unavailableReason=licenses?null:'MISSING_DISTRIBUTION_AUTHORITY'
++    await content.recheckSourceLicenses()
++   }catch(error){if(!pickerSourceUnavailable(error))throw error;unavailableReason='SOURCE_NOT_AVAILABLE'}
++   list.push({sourceCompositeId:candidate.id,title:candidate.name,canPrepare:unavailableReason===null,
++    canPublish:false as const,unavailableReason,licenses:unavailableReason===null?licenses!:[]})
+   }
+   return {list}
+  })
+@@ -324,8 +384,8 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
+   await assertEducationAssessmentDistributionCurrent(tx,p)
+   if(!p.snapshot.units.length)return {units:[],emptySelectionAllowed:true}
+   const measurementIds=[...new Set(p.snapshot.units.map(unit=>unit.measurement.releaseId))]
+-  const rows=await tx.$queryRaw<Array<{id:string;grant_id:string}>>(Prisma.sql`
+-   SELECT release.id,grant_row.id AS grant_id FROM measurement_content_releases release
++  const rows=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`
++   SELECT DISTINCT release.id FROM measurement_content_releases release
+     JOIN content_capability_grants grant_row ON release.id=ANY(grant_row.resource_keys)
+    WHERE release.status='PUBLISHED' AND release.layer IN ('REFERENCE','REPORT')
+     AND (release.scope->>'kind'='PLATFORM' OR (release.scope->>'product'=${c.product}
+@@ -335,7 +395,7 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
+     AND grant_row.subject_id=${c.principal.userId} AND grant_row.product=${c.product} AND grant_row.scope_kind='ORGANIZATION'
+     AND grant_row.scope_id=${c.organizationId} AND grant_row.resource_kind='material' AND 'material.distribute'=ANY(grant_row.capabilities)
+     AND grant_row.revoked_at IS NULL AND grant_row.valid_from<=(clock_timestamp() AT TIME ZONE 'UTC') AND grant_row.expires_at>(clock_timestamp() AT TIME ZONE 'UTC')
+-   ORDER BY release.id,grant_row.id LIMIT 51`)
++   ORDER BY release.id LIMIT 51`)
+   if(rows.length>50)fail('EDUCATION_ASSESSMENT_CANDIDATE_BOUND')
+   const releases=await getContentReleaseBatch(tx,rows.map(row=>row.id),true),units=[]
+   for(const unit of p.snapshot.units){
+@@ -346,14 +406,20 @@ export async function listEducationAssessmentContentChoices(c:EducationAssessmen
+     const matches=release.layer==='REFERENCE'?release.content.measurement.releaseId===unit.measurement.releaseId:
+      release.layer==='REPORT'&&release.content.measurements.some(measurement=>measurement.releaseId===unit.measurement.releaseId)
+     if(!matches)continue
+-    await assertEducationAssessmentDistribution(tx,{...c,actorId:c.principal.userId,resourceIds:[row.id],selection:[{resourceId:row.id,grantId:row.grant_id}]})
+-    const selection={...{expectedPreparationHash:canonicalHash(p),disclosure:null,licenses:p.distribution.grants},
+-     references:{schemaVersion:1 as const,units:release.layer==='REFERENCE'?[{itemId:unit.itemId,choices:release.content.entries.map(entry=>({releaseId:release.releaseId,entryKey:referenceEntryKey(entry.definition as unknown as AssessmentReferenceEntry),priority:0}))}]:[]},
+-     reports:release.layer==='REPORT'?[{itemId:unit.itemId,releaseId:release.releaseId}]:[]}
+-    await selectedContent(tx,c,p,p.snapshot,selection)
+-    if(release.layer==='REFERENCE')references.push({releaseId:release.releaseId,contentHash:release.contentHash,grantId:row.grant_id,
+-     choices:release.content.entries.map(entry=>({entryKey:referenceEntryKey(entry.definition as unknown as AssessmentReferenceEntry),metricKey:entry.metricKey,referenceKind:entry.referenceKind}))})
+-    if(release.layer==='REPORT')reports.push({releaseId:release.releaseId,contentHash:release.contentHash,grantId:row.grant_id,audience:release.content.audience,title:release.content.template.title??null,metricKeys:release.content.metricKeys})
++    let licenses:License[]|null=null,unavailableReason:'CONTENT_NOT_AVAILABLE'|'MISSING_DISTRIBUTION_AUTHORITY'|null=null
++    try{
++     const selection={references:{schemaVersion:1 as const,units:release.layer==='REFERENCE'?[{itemId:unit.itemId,choices:release.content.entries.map(entry=>({releaseId:release.releaseId,entryKey:referenceEntryKey(entry.definition as unknown as AssessmentReferenceEntry),priority:0}))}]:[]},
++      reports:release.layer==='REPORT'?[{itemId:unit.itemId,releaseId:release.releaseId}]:[]}
++     await selectedContent(tx,c,p,p.snapshot,selection)
++     const assets=educationAssessmentAssets({items:[]},[release])
++     await assertEducationAssessmentAssets(tx,assets)
++     licenses=await discoverLicenses(tx,c,[release.releaseId,...assets.map(asset=>asset.assetId)],p.distribution.grants)
++     unavailableReason=licenses?null:'MISSING_DISTRIBUTION_AUTHORITY'
++    }catch(error){if(!pickerSourceUnavailable(error))throw error;unavailableReason='CONTENT_NOT_AVAILABLE'}
++    const availability={selectable:unavailableReason===null,unavailableReason,licenses:unavailableReason===null?licenses!:[]}
++    if(release.layer==='REFERENCE')references.push({releaseId:release.releaseId,contentHash:release.contentHash,...availability,
++     choices:availability.selectable?release.content.entries.map(entry=>({entryKey:referenceEntryKey(entry.definition as unknown as AssessmentReferenceEntry),metricKey:entry.metricKey,referenceKind:entry.referenceKind})):[]})
++    if(release.layer==='REPORT')reports.push({releaseId:release.releaseId,contentHash:release.contentHash,...availability,audience:release.content.audience,title:release.content.template.title??null,metricKeys:availability.selectable?release.content.metricKeys:[]})
+    }
+    units.push({itemId:unit.itemId,family:unit.family,measurement:unit.measurement,references,reports})
+   }

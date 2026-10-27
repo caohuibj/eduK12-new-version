@@ -1,0 +1,62 @@
+{
+  "files": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+      "mode": "100644",
+      "blob": "26fc920bc35479ba14a3b40a87e104a91a48caf9"
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "mode": "100644",
+      "blob": "7363182e7457dd47370ae3a373e2cf729f48b4ad"
+    },
+    {
+      "path": "server-version/backend/src/modules/reporting/education-assessment-personal-report.service.ts",
+      "mode": "100644",
+      "blob": "368a93a592944897a21f5936073395069473519c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/educationLibraryRuntimeFixture.ts",
+      "mode": "100644",
+      "blob": "c9efb4fa3d5e772880f3094e2cc6a0f340185778"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "mode": "100644",
+      "blob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "mode": "100644",
+      "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
+      "mode": "100644",
+      "blob": "b453092297c64977921d61ff780a79f6921f320f"
+    }
+  ],
+  "environment": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "database": "pr363_runtime_test",
+    "restrictedRuntime": true,
+    "source": "original phase4/6 manifests and real beforeAll verifier"
+  },
+  "dependencies": {
+    "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "installedByteManifest": "not retained"
+  },
+  "tools": {
+    "vitest": "4.1.11",
+    "prisma": "5.22.0",
+    "basis": "original verbose output and manifest; binary hashes not retained"
+  },
+  "generated": {
+    "prismaVersion": "5.22.0",
+    "exactGeneratedByteManifest": "not retained"
+  },
+  "capture": "Source reconstructed from immutable Git checkpoints and original file SHA observations; not a new invocation or complete contemporaneous runtime trace",
+  "originalSourceCheckpoint": "3a2665d8652580c6da7b6a9ed6aeb9edd76146fd",
+  "originalRuntimeSourceCheckpoint": "3a2665d8652580c6da7b6a9ed6aeb9edd76146fd"
+}

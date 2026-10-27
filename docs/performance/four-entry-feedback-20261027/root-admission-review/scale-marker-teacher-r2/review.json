@@ -1,0 +1,197 @@
+{
+  "kind": "pr363-root-case-review-v1",
+  "reviewer": "root dot",
+  "decision": "ADMIT",
+  "admissionId": "scale-marker-teacher-r2",
+  "outcomes": [
+    "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
+  ],
+  "originalSHA256": {
+    "report": "72aff73d3c011669eae398639d9c6e6d3ea9a878e2180e65ac7f0591265b6b0c",
+    "execution": "449c5c9ec41cf4c233363958799659c21b973e21782a2da64cdd8ff2fc29e7f3",
+    "log": "72aff73d3c011669eae398639d9c6e6d3ea9a878e2180e65ac7f0591265b6b0c",
+    "inputs": "c8e63dfbd27bc6fa5e1ebdd400782748f018352daeb8efb200d16e50cac65ff5"
+  },
+  "currentInputsSHA256": "4313b9691946024ed36178cdf1cacfb5408fbce71b4178cadf4ec2fe2c819b21",
+  "originalExecution": {
+    "argv": [
+      "node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+      "--reporter=verbose"
+    ],
+    "cwd": "/workspace/eduK12-new-version/server-version/backend",
+    "exitCode": 0,
+    "signal": null
+  },
+  "originalReporterSummary": {
+    "success": true,
+    "numTotalTests": 2,
+    "numPassedTests": 2,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "originalInvocationCases": [
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > SCHOOL exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
+      "status": "passed"
+    },
+    {
+      "fullName": "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal",
+      "status": "passed"
+    }
+  ],
+  "completeSourceBindings": [
+    {
+      "path": "server-version/backend/src/modules",
+      "currentObject": "ed03949a2505228d082d70f8b027686edac098b0",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/config",
+      "currentObject": "dff457d37da95188509bda32d0a8c50f29519ee5",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/middleware",
+      "currentObject": "078e550f9334347ded4e042576469c293d8aaae6",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/services",
+      "currentObject": "b220b8fef97669b19c6f0eea0f3bd39a613f089e",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/src/utils",
+      "currentObject": "6124610cffa9d450f8f5bce7b6f6a01128c46b10",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/prisma",
+      "currentObject": "2da0306e1568c090ea0bd4b462d07ffb9eca353b",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "currentObject": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "currentObject": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "currentObject": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-role-contract.mjs",
+      "currentObject": "3669f1dabc2b26c42ea0158d93a1977d3f38898d",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    },
+    {
+      "path": "server-version/backend/scripts/runtime-table-policy.json",
+      "currentObject": "bb703b167ab21ed990031021d6e8d0bca1124d58",
+      "rationale": "Root freezes entire current runtime source/schema/config/lock boundary, including computed registry dependencies; not an original environment byte manifest."
+    }
+  ],
+  "environmentComparison": {
+    "original": {
+      "environment": {
+        "node": "24.21.0",
+        "postgres": "16.15",
+        "database": "pr363_runtime_test",
+        "restrictedRuntime": true,
+        "source": "original phase4/6 manifests and real beforeAll verifier"
+      },
+      "dependencies": {
+        "lockBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+        "installedByteManifest": "not retained"
+      },
+      "tools": {
+        "vitest": "4.1.11",
+        "prisma": "5.22.0",
+        "basis": "original verbose output and manifest; binary hashes not retained"
+      },
+      "generated": {
+        "prismaVersion": "5.22.0",
+        "exactGeneratedByteManifest": "not retained"
+      }
+    },
+    "current": {
+      "host": {
+        "node": "v24.21.0",
+        "platform": "linux",
+        "arch": "x64"
+      },
+      "configuration": {
+        "TZ": "UTC",
+        "NODE_ENV": "test"
+      }
+    },
+    "decision": "COMPATIBLE",
+    "rationale": "Original Node24.21/PG16.15/Prisma5.22 match target versions. Original installed/generated byte hashes were not captured and are not backfilled. This admits independently read historical semantic assertions only; fresh official production build, image/dependency audits and actual browser remain required. No historical execution signature or whole-environment cryptographic identity is claimed."
+  },
+  "deltas": [
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "26fc920bc35479ba14a3b40a87e104a91a48caf9"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "354cbb1115e11d59978bc8065141dde421fb879c"
+      },
+      "outcomes": [
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
+      ],
+      "rationale": "Only unused helpers/imports removed after original execution; grade7 School setup comes from r3, Teacher unchanged. Actual START/withdrawal/FINAL/report assertions remain identical."
+    },
+    {
+      "path": "server-version/backend/src/__tests__/huiteacher/assessment-scale-marker.postgres.fixture.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "b453092297c64977921d61ff780a79f6921f320f"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "b69a6eb1941f0e8aa4cc77a01a0110c9ea0d1e96"
+      },
+      "outcomes": [
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
+      ],
+      "rationale": "Only unused helpers/imports removed after original execution; grade7 School setup comes from r3, Teacher unchanged. Actual START/withdrawal/FINAL/report assertions remain identical."
+    },
+    {
+      "path": "server-version/backend/src/modules/education-tools/assessment-resource.service.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "7363182e7457dd47370ae3a373e2cf729f48b4ad"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "1a1d5a2fdf21019eea2a84f9a91e08c69ed6b48c"
+      },
+      "outcomes": [
+        "src/__tests__/huiteacher/assessment-scale-marker-final.postgres.integration.test.ts > Actual education Scale marker START and FINAL > TEACHER exact Scale marker completes real FINAL after ordinary target distribution withdrawal"
+      ],
+      "rationale": "Root read full producer delta: prepare projection adds pinned licenses; private-owner loop extracted without semantic change; discovery-only multi-grant helpers and typed error filter do not run in these explicit-license producer/FINAL/report journeys. No source registration/transition or frozen report logic weakened."
+    }
+  ],
+  "limitations": [
+    "Verbose source remains verbatim and hash-verified; parsed view is not a new reporter JSON.",
+    "Accepted case set is not a new all-file run; failed and filtered history remains original.",
+    "No current browser, deployment, COS, or formal CI claim."
+  ],
+  "rootRead": [
+    "actual fixture/producer/start/final/report source",
+    "raw verbose and original exits",
+    "recorded and immutable Git source observations",
+    "post-execution changes and relevant caller paths"
+  ]
+}

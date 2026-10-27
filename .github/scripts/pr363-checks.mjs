@@ -34,7 +34,9 @@ export function readVerboseCases(raw){
  return {success:counts.failed===0,numTotalTests:rows.length,numPassedTests:counts.passed,numFailedTests:counts.failed,numPendingTests:counts.skipped,testResults:[{assertionResults:rows}]};
 }
 export function verifyHistoricalAdmission(entry,context){
- const {head,currentInputs,currentEnvironment,readBytes,readGit,readGitBytes}=context;
+ const {head,currentInputs:phaseInputs,currentEnvironment,readBytes,readGit,readGitBytes}=context;
+ const currentInputs=entry.currentInputs??phaseInputs;
+ if(entry.currentInputs){assert(Array.isArray(currentInputs)&&currentInputs.length);for(const f of currentInputs)assert(phaseInputs.some(p=>p.path===f.path&&p.mode===f.mode&&p.blob===f.blob),'Admission input outside frozen phase closure');}
  assert(entry&&entry.schemaVersion===1);assert(/^[a-z0-9-]+$/.test(entry.id));assert(['backend','frontend','pg'].includes(entry.phase));assert(['vitest','vitest-verbose','command'].includes(entry.kind));
  assert(Array.isArray(entry.outcomes)&&entry.outcomes.length);assert(/^[a-f0-9]{40}$/.test(entry.reviewCheckpoint));
  const objects={},hashes={},transportSHA256={};
@@ -48,8 +50,15 @@ export function verifyHistoricalAdmission(entry,context){
  const review=objects.review;assert.equal(review.kind,'pr363-root-case-review-v1');assert.equal(review.reviewer,'root dot');assert.equal(review.decision,'ADMIT');assert.equal(review.admissionId,entry.id);assert.deepEqual(review.outcomes,entry.outcomes);
  assert.deepEqual(review.originalSHA256,Object.fromEntries(['report','execution','log','inputs'].map(k=>[k,hashes[k]])));
  assert.equal(review.currentInputsSHA256,digest(currentInputs));
+ if(entry.currentInputs){
+  assert(Array.isArray(review.completeSourceBindings)&&review.completeSourceBindings.length,'Per-invocation inputs require complete source closure bindings');
+  for(const b of review.completeSourceBindings){safePath(b.path);assert(/^[a-f0-9]{40}$/.test(b.currentObject));assert.equal(readGit('rev-parse',head+':'+b.path),b.currentObject,'Reviewed transitive source closure drift');assert(typeof b.rationale==='string'&&b.rationale.length);}
+ }
+
  const selectors=entry.selectors;
- const execution={argv:jsonPointer(objects.execution,selectors.argv),exitCode:jsonPointer(objects.execution,selectors.exitCode),signal:jsonPointer(objects.execution,selectors.signal),cwd:jsonPointer(objects.execution,selectors.cwd)};
+ const originalExit=jsonPointer(objects.execution,selectors.exitCode);
+ if(selectors.signalFromNormalExit){assert.equal(originalExit,0);assert.equal(review.signalBasis,'inferred only from recorded normal exit 0; no original signal field was retained');}
+ const execution={argv:jsonPointer(objects.execution,selectors.argv),exitCode:originalExit,signal:selectors.signalFromNormalExit?null:jsonPointer(objects.execution,selectors.signal),cwd:jsonPointer(objects.execution,selectors.cwd)};
  assert((Array.isArray(execution.argv)&&execution.argv.length)||typeof execution.argv==='string'&&execution.argv.length);assert(Number.isInteger(execution.exitCode));assert.equal(execution.signal,null);assert(typeof execution.cwd==='string'&&execution.cwd.length);assert.deepEqual(review.originalExecution,execution,'Original exit/command identity changed');
  const rawInputs=jsonPointer(objects.inputs,selectors.files);assert(Array.isArray(rawInputs)&&rawInputs.length);
  const fields=selectors.fileFields??{path:'path',mode:'mode',blob:'blob',sha256:'sha256'};
@@ -71,7 +80,7 @@ export function verifyHistoricalAdmission(entry,context){
   const names=[];for(const selected of entry.cases){const c=jsonPointer(objects.report,selected.pointer);assert.equal(c.fullName,selected.fullName);assert.equal(c.status,'passed','Cannot admit skipped/failed/unknown case');assert.equal(invocation.filter(v=>v.fullName===c.fullName).length,1,'Ambiguous original fullName');names.push(c.fullName);}
   assert.equal(new Set(names).size,names.length);assert.deepEqual([...names].sort(),[...entry.outcomes].sort());
  }else{
-  assert(!JSON.stringify(execution.argv).includes('--if-present'),'Optional/no-op scripts cannot establish a command qualification');assert.equal(execution.exitCode,0,'Whole command admission requires original exit0');assert.equal(jsonPointer(objects.report,selectors.reportExitCode??selectors.exitCode),0);assert.deepEqual(jsonPointer(objects.report,selectors.reportArgv??selectors.argv),execution.argv);assert.equal(jsonPointer(objects.report,selectors.reportSignal??selectors.signal),null);assert.equal(entry.outcomes.length,1);assert.deepEqual(review.commandOutcome,{id:entry.outcomes[0],argv:execution.argv,exitCode:0,logSHA256:hashes.log});assert(typeof review.commandLogAssociationRationale==='string'&&review.commandLogAssociationRationale.trim().length>0);assert.deepEqual(review.originalInvocationCases,[],'Whole commands cannot claim Vitest cases');
+  assert(!JSON.stringify(execution.argv).includes('--if-present'),'Optional/no-op scripts cannot establish a command qualification');assert.equal(execution.exitCode,0,'Whole command admission requires original exit0');assert.equal(jsonPointer(objects.report,selectors.reportExitCode??selectors.exitCode),0);assert.deepEqual(jsonPointer(objects.report,selectors.reportArgv??selectors.argv),execution.argv);if(!selectors.signalFromNormalExit)assert.equal(jsonPointer(objects.report,selectors.reportSignal??selectors.signal),null);assert.equal(entry.outcomes.length,1);assert.deepEqual(review.commandOutcome,{id:entry.outcomes[0],argv:execution.argv,exitCode:0,logSHA256:hashes.log});assert(typeof review.commandLogAssociationRationale==='string'&&review.commandLogAssociationRationale.trim().length>0);assert.deepEqual(review.originalInvocationCases,[],'Whole commands cannot claim Vitest cases');
  }
  return {kind:'reviewed-local-evidence',admissionId:entry.id,outcomes:entry.outcomes,originalExecution:execution,originalSHA256:hashes,proofTransportSHA256:transportSHA256,reviewCheckpoint:entry.reviewCheckpoint,ciExecuted:false,originalExecutionSigned:false,originalFailuresRetained:true,originalReportFormat:entry.kind==='vitest-verbose'?'verbose-log-not-json':entry.kind,reviewAuthentication:'root-reviewed Git record; no cryptographic human-identity authentication',currentInputsSHA256:digest(currentInputs)};
 }
@@ -88,7 +97,7 @@ function run(id,exe,args,cwd=process.cwd(),metadata={},extraEnvironment={}){
 }
 export function verifyConsumerReport(report,step,identity){
  if(step.kind==='command'){assert.equal(report.kind,'command-receipt');assert.equal(report.exitCode,0);assert.equal(report.signal,null);return {outcomeId:step.id,exitCode:0,kind:'actual-command-exit',testsClaimed:false};}
- if(step.kind==='receipt'){for(const assertion of step.assertions)assert.deepEqual(jsonPointer(report,assertion.pointer),assertion.equals,'Native receipt assertion failed');return {outcomeId:step.id,kind:'native-receipt',testsClaimed:false};}
+ if(step.kind==='receipt'){assert.equal(report.schemaVersion,1);assert.equal(report.head,identity.head);assert.equal(String(report.runId),String(identity.runId));assert.match(identity.head,/^[a-f0-9]{40}$/);for(const assertion of step.assertions)assert.deepEqual(jsonPointer(report,assertion.pointer),assertion.equals,'Native receipt assertion failed');return {outcomeId:step.id,kind:'native-receipt',testsClaimed:false};}
  assert(step.expectedCases.length);let names;
  if(step.kind==='vitest'){
   assert.equal(report.success,true);assert.equal(report.numFailedTests,0);

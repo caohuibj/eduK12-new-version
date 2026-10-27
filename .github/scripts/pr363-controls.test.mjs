@@ -17,9 +17,10 @@ function fixture(){
  const read=(cmd,arg,...rest)=>cmd==='ls-tree'?`100644 blob ${blob}\t${rest.at(-1)}`:arg.endsWith('^{tree}')||arg.includes('server-version/')?tree:blob;
  return {b,env,entries,read};
 }
-test('committed bindings remain disabled and all actual consumers unresolved',()=>{
- assert.equal(binding.enabled,false);assert.equal(binding.readiness,'NOTREADY');assert.equal(binding.execution,null);assert.deepEqual(binding.historicalAdmissions,[]);assert(binding.unresolved.length);
- const f=fixture();assert.throws(()=>pr363Plan(f.entries,base,head,f.read,f.env),/NOTREADY/);
+test('committed readiness is explicit and an unready candidate always fails closed',()=>{
+ if(binding.enabled){assert.equal(binding.readiness,'READY');assert.deepEqual(binding.unresolved,[]);validateExecution(binding.execution,binding.historicalAdmissions);assert.match(binding.controlCheckpoint,/^[a-f0-9]{40}$/);}
+ else{assert.equal(binding.readiness,'NOTREADY');assert(binding.unresolved.length);}
+ const f=fixture();assert.throws(()=>pr363Plan(f.entries,base,head,f.read,f.env,{...f.b,enabled:false}),/NOTREADY/);
 });
 test('synthetic exact candidate routes exclusively and refuses all source/identity/closure drift',()=>{
  const f=fixture(),plan=pr363Plan(f.entries,base,head,f.read,f.env,f.b),o=pr363Outputs(plan);
@@ -101,7 +102,7 @@ test('real commands and native receipts are distinct from Vitest and use verifie
  const c=stepCommand(command,{imageId:'sha256:'+'1'.repeat(64),repository:'/checkout',evidence:'/results'});assert.equal(c.exe,'docker');assert(c.args.includes('node_modules/typescript/bin/tsc'));assert(c.args.includes('sha256:'+'1'.repeat(64)));
  assert.equal(verifyConsumerReport({kind:'command-receipt',exitCode:0,signal:null},command,{}).testsClaimed,false);
  assert.throws(()=>verifyConsumerReport({kind:'command-receipt',exitCode:2,signal:null},command,{}));
- const receipt={...command,kind:'receipt',assertions:[{pointer:'/restored/nonempty',equals:true}]};assert.equal(verifyConsumerReport({restored:{nonempty:true}},receipt,{}).testsClaimed,false);assert.throws(()=>verifyConsumerReport({restored:{nonempty:false}},receipt,{}));
+ const receipt={...command,kind:'receipt',assertions:[{pointer:'/restored/nonempty',equals:true}]};assert.equal(verifyConsumerReport({schemaVersion:1,head,runId:'1',restored:{nonempty:true}},receipt,{head,runId:'1'}).testsClaimed,false);assert.throws(()=>verifyConsumerReport({schemaVersion:1,head,runId:'1',restored:{nonempty:false}},receipt,{head,runId:'1'}));
  assert.throws(()=>validateExecution({...e,frontend:{...e.frontend,inputs:f.b.execution.frontend.inputs}}),/dependency lock/);
 });
 function historyFixture(){
@@ -176,4 +177,16 @@ test('fixed verbose originals retain passed failed and filtered rows without man
  const report=readVerboseCases(log);assert.equal(report.success,false);assert.deepEqual(report.testResults[0].assertionResults.map(x=>x.status),['passed','failed','skipped']);
  assert.equal(report.testResults[0].assertionResults[0].fullName,'a.test.ts > selected suite > success');
  for(const invalid of [log.replace('1 failed','2 failed'),log.replace(' ✓ a.test.ts > selected suite > success 12ms\n',''),log+log,log.replace('Tests','Unrecorded')])assert.throws(()=>readVerboseCases(invalid));
+});
+test('per-invocation history binds its full reviewed source boundary and refuses phase input omission',()=>{
+ const f=historyFixture();f.entry.currentInputs=f.context.currentInputs;f.review.completeSourceBindings=[{path:'source',currentObject:blob,rationale:'Synthetic complete source boundary for one invocation'}];
+ const prior=f.context.readGit;f.context.readGit=(cmd,...args)=>cmd==='rev-parse'?blob:prior(cmd,...args);f.proof('review',f.review);
+ verifyHistoricalAdmission(f.entry,f.context);
+ const read=f.context.readGit;f.context.readGit=(cmd,...args)=>cmd==='rev-parse'?h('9'):read(cmd,...args);assert.throws(()=>verifyHistoricalAdmission(f.entry,f.context),/transitive source closure drift/);
+ f.context.readGit=read;f.context.currentInputs=[];assert.throws(()=>verifyHistoricalAdmission(f.entry,f.context),/outside frozen phase closure/);
+});
+test('a missing historical signal can only be explicitly inferred from an actually recorded normal exit zero',()=>{
+ const f=historyFixture();f.entry.selectors.signalFromNormalExit=true;delete f.entry.selectors.signal;f.review.signalBasis='inferred only from recorded normal exit 0; no original signal field was retained';
+ f.execution.exitCode=0;delete f.execution.signal;f.proof('execution',f.execution);f.review.originalSHA256.execution=f.entry.proofs.execution.sha256;f.review.originalExecution={...f.execution,signal:null};f.proof('review',f.review);verifyHistoricalAdmission(f.entry,f.context);
+ f.execution.exitCode=1;f.proof('execution',f.execution);f.review.originalSHA256.execution=f.entry.proofs.execution.sha256;f.proof('review',f.review);assert.throws(()=>verifyHistoricalAdmission(f.entry,f.context));
 });
