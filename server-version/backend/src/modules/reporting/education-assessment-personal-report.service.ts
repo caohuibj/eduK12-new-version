@@ -7,7 +7,7 @@ import { educationAssessmentResourceKey, type EducationAssessmentOrigin } from '
 import type { RelationalProductEntryV1 } from '../assessment-relational/product-registry'
 import type { StoredRelease } from '../measurement-content/repository'
 import { validateResultDisclosureContract } from '../assessment-policy/result-disclosure'
-import { evaluateTrainingFeedbackForAttempt } from '../composite/training-feedback-binding'
+import { trainingFeedbackAvailability, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { trainingBoundContent, decodeTrainingReferenceBinding } from '../composite/training-reference-binding'
 import { decodeTrainingFinalReceipt } from '../composite/training-content-final'
@@ -126,6 +126,16 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       }
       await recheck();return response('WITHHELD','当前还没有可读取的正式完成报告。')
     }
+    // The exact immutable education origin owns timing. A missing legacy field
+    // means immediate; do not add defaults to the source or alter its hash.
+    const frozenPolicy=(origin as EducationAssessmentOrigin&{feedbackPolicy?:unknown}).feedbackPolicy
+    let timing:ReturnType<typeof trainingFeedbackAvailability>
+    try{
+      timing=trainingFeedbackAvailability({policy:trainingFeedbackPolicySchema.parse(frozenPolicy===undefined?{schemaVersion:1,mode:'IMMEDIATE'}:frozenPolicy),
+        completed:parent.status==='COMPLETED',reportReady:true,now:new Date()})
+    }catch{hidden()}
+    if(timing.state!=='AVAILABLE'){await recheck();return response('WITHHELD','反馈尚未达到开放时间或披露条件。',timing.releaseAt)}
+    // Optional workflow restrictions can only further withhold a frozen policy.
     const opening=await deps.readReportOpening?.(tx,{...input,organizationId:own.organizationId,source,attemptId:parent.id,attemptEpoch:parent.attemptEpoch})
     openingIdentity=opening
     if(opening?.releaseAt){
@@ -133,8 +143,6 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
       if(!Number.isFinite(timestamp))hidden()
       if(Date.now()<timestamp){await recheck();return response('WITHHELD','反馈尚未达到开放时间。',new Date(timestamp).toISOString())}
     }
-    const timing=evaluateTrainingFeedbackForAttempt(parent,{reportReady:true})
-    if(!timing.allowed){await recheck();return response('WITHHELD','反馈尚未达到开放时间或披露条件。',timing.releaseAt)}
     if(formOnly){await recheck();return response('COMPLETED','本次表单已正式完成，当前只提供完成确认。')}
     if(rule.mode==='COMPLETION_ONLY'){await recheck();return response('COMPLETED','本次作答已完成，当前仅提供完成确认。')}
     if(rule.mode!=='INDIVIDUAL_SUMMARY'||own.policy.analysisMode!=='INDIVIDUAL_ONLY')hidden()

@@ -1,3 +1,4 @@
+import {trainingFeedbackPolicySchema} from '../assessment-policy/training-feedback-policy'
 import {z} from 'zod'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
@@ -34,6 +35,8 @@ export const educationAssessmentOriginSchema=z.object({
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
   sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
   distribution:educationDistributionSchema,
+  // Absent historical policy remains absent: do not change frozen origin hashes.
+  feedbackPolicy:trainingFeedbackPolicySchema.optional(),
   units:z.array(unit).max(1000),
 }).strict().superRefine((origin,ctx)=>{
   const add=(message:string)=>ctx.addIssue({code:'custom',message})

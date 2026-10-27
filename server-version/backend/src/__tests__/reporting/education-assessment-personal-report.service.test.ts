@@ -157,7 +157,9 @@ async function formOnly(mode:'NONE'|'COMPLETION_ONLY'='COMPLETION_ONLY'){
 }
 it('pure Form BUNDLE confirms a completed parent without measurement, interpretation or score rows',async()=>{
  const f=await formOnly()
+ const frozenOrigin=canonicalHash(f.origin)
  expect(await f.read(input)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'})
+ expect(canonicalHash(f.origin)).toBe(frozenOrigin);expect(f.origin).not.toHaveProperty('feedbackPolicy')
  expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled();expect(m.job).not.toHaveBeenCalled()
 })
 it('pure Form NONE never exposes completion feedback from the measurement-free exception',async()=>{
@@ -174,9 +176,46 @@ it('pure Form completion obeys the same frozen opening and opens without creatin
  expect(await read(input)).toMatchObject({state:'COMPLETED',mode:'COMPLETION_ONLY'})
  expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled();expect(m.job).not.toHaveBeenCalled()
 })
-it('pure Form still fails closed for configured but missing shared feedback timing identity',async()=>{
+it('pure Form uses its frozen education schedule without borrowing a Training course snapshot',async()=>{
  const f=await formOnly()
- Object.assign(f.parent.compositeAssessment,{trainingFeedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2099-01-01T00:00:00.000Z'},trainingFeedbackPolicyHash:'a'.repeat(64)})
+ Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2099-01-01T00:00:00.000Z'}})
+ expect(await f.read(input)).toMatchObject({state:'WITHHELD',mode:'NONE',releaseAt:'2099-01-01T00:00:00.000Z'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
+})
+
+it('production composition enforces frozen education timing with no injected opening reader',async()=>{
+ const f=await setup()
+ Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2099-01-01T08:00:00+08:00'}})
+ m.identity.mockResolvedValue(f.source)
+ expect(await readEducationRespondentAssessmentReport(input)).toMatchObject({state:'WITHHELD',releaseAt:'2099-01-01T00:00:00.000Z'})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
+ Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2000-01-01T00:00:00.000Z'}})
+ expect(await readEducationRespondentAssessmentReport(input)).toMatchObject({state:'READY'})
+})
+
+it('an optional earlier workflow opening cannot widen the frozen schedule',async()=>{
+ const f=await formOnly(),readReportOpening=vi.fn().mockResolvedValue({releaseAt:'2000-01-01T00:00:00.000Z'})
+ Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2099-01-01T00:00:00.000Z'}})
+ const read=createEducationAssessmentReportReader({readSource:f.readSource,assertSourceAuthority:f.assertSourceAuthority,readReportOpening})
+ expect(await read(input)).toMatchObject({state:'WITHHELD',releaseAt:'2099-01-01T00:00:00.000Z'})
+ expect(m.units).not.toHaveBeenCalled()
+ Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'IMMEDIATE'}})
+ expect(await read(input)).toMatchObject({state:'COMPLETED'})
+})
+
+it.each([null,{schemaVersion:1,mode:'SCHEDULED',releaseAt:'bad-date'},{schemaVersion:1,mode:'OTHER'}])('rejects malformed present frozen policy instead of silently enabling legacy immediate: %j',async feedbackPolicy=>{
+ const f=await formOnly();Object.assign(f.origin,{feedbackPolicy})
+ await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
+ expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
+})
+
+it('an elapsed frozen schedule does not open NONE, incomplete or unauthorized Form reads',async()=>{
+ const f=await formOnly('NONE');Object.assign(f.origin,{feedbackPolicy:{schemaVersion:1,mode:'SCHEDULED',releaseAt:'2000-01-01T00:00:00.000Z'}})
  expect(await f.read(input)).toMatchObject({state:'WITHHELD',mode:'NONE'})
+ f.contract.audiences.RESPONDENT.mode='COMPLETION_ONLY';f.own.policyHash=canonicalHash(f.own.policy)
+ f.parent.status='STARTED'
+ expect(await f.read(input)).toMatchObject({state:'WITHHELD'})
+ m.query.mockResolvedValue([])
+ expect(await f.read(input)).toBeNull()
  expect(m.units).not.toHaveBeenCalled();expect(m.summary).not.toHaveBeenCalled()
 })

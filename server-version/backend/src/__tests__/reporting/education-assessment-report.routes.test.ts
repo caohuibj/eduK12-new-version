@@ -5,7 +5,7 @@ const m=vi.hoisted(()=>({reader:vi.fn(),status:vi.fn()}))
 vi.mock('../../middleware/auth',()=>{
  const auth=(realm:string,role:string)=>(req:any,res:any,next:any)=>{
   if(req.headers['x-fixture-realm']!==realm)return res.status(401).end()
-  req.user={userId:'self',role:req.headers['x-fixture-role']??role};next()
+  req.user={userId:'self',role:req.headers['x-fixture-role']??role,accountDomain:req.headers['x-fixture-domain']??'SCHOOL',teacherApproved:req.headers['x-fixture-approved']!=='false'};next()
  }
  return {authenticateSchool:auth('SCHOOL','STUDENT'),authenticateHuiteacher:auth('TEACHER','TEACHER')}
 })
@@ -45,5 +45,19 @@ describe('education multi-tool report route contract (mock authentication, real 
   expect((await fetch(url('teacher')+'?audience=researcher',{headers:{'x-fixture-realm':'TEACHER'}})).status).toBe(404)
   expect(m.reader).not.toHaveBeenCalled();m.reader.mockResolvedValue(null)
   expect((await fetch(url('teacher'),{headers:{'x-fixture-realm':'TEACHER'}})).status).toBe(404)
+ })
+ it('admits an approved School-domain ADMIN only through the own-report reader',async()=>{
+  const headers={'x-fixture-realm':'TEACHER','x-fixture-role':'ADMIN'}
+  expect((await fetch(url('teacher'),{headers})).status).toBe(200)
+  expect(m.reader).toHaveBeenCalledWith({actorUserId:'self',executionId:execution,product:'TEACHER'})
+  m.reader.mockResolvedValue(null)
+  expect((await fetch(url('teacher'),{headers})).status).toBe(404)
+ })
+ it.each([
+  {'x-fixture-domain':'TRAINING'}, {'x-fixture-domain':'LEGACY'},
+  {'x-fixture-approved':'false'}, {'x-fixture-role':'STUDENT'},
+ ])('never treats another domain, unapproved account or role as Teacher report authority: %j',async invalid=>{
+  expect((await fetch(url('teacher'),{headers:{'x-fixture-realm':'TEACHER','x-fixture-role':'ADMIN',...invalid}})).status).toBe(404)
+  expect(m.reader).not.toHaveBeenCalled()
  })
 })
