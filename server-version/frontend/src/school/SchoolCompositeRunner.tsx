@@ -42,7 +42,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
   const prefix=`/organizations/${execution.organizationId}/activities/${execution.courseId}/runs/${execution.runId}/executions/${execution.executionId}`
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   const load=useCallback(async(id:string)=>{
-    const result=await api<CompositeAttemptState>('/composite-attempts/'+encodeURIComponent(id))
+    const result=await api<CompositeAttemptState>('/composite-attempts/'+encodeURIComponent(id)+'?view=current-unit')
     if(result.deliveryMode!=='FINAL_ONLY')throw new Error('不支持通过校园入口重启历史旧版测评')
     setState(result);if(result.status==='COMPLETED')setDone(true)
   },[api])
@@ -197,7 +197,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished,title,obs
           'POST',input))
       }}
       submitScale={async(_id,itemId,input)=>{
-        return wrapped(await api(runApi('/items/'+encodeURIComponent(itemId)+'/scale/submit'),
+        return wrapped(await api(runApi('/items/'+encodeURIComponent(itemId)+'/scale/submit?response=receipt'),
           'POST',input))
       }}
       onReload={()=>load(state.id)}

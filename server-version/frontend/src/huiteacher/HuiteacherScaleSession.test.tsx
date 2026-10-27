@@ -8,14 +8,14 @@ type Api=Parameters<typeof HuiteacherMyScaleTasks>[0]['api']
 const tasks=['A','B'].map(id=>({executionId:id,eventId:'event',eventTitle:'活动',runId:'run',organizationId:'org',status:'STARTED',runtimeBindingRef:id,resourceKey:'teacher-scale:'+id+':INDIVIDUAL',title:'任务'+id,runStatus:'PUBLISHED'}))
 const state=(id:string):CompositeAttemptState=>({id,assessmentId:'assessment-'+id,name:id,instruction:null,status:'IN_PROGRESS',progress:0,completedItems:0,totalItems:1,currentIndex:0,startedAt:'2026-10-23T00:00:00Z',lastSavedAt:'2026-10-23T00:00:00Z',completedAt:null,anonymousCode:null,items:[],currentItem:null})
 function deferred(){let resolve!:(v:CompositeAttemptState)=>void;let reject!:(e:Error)=>void;const promise=new Promise<CompositeAttemptState>((a,b)=>{resolve=a;reject=b});return {promise,resolve,reject}}
-function client(read:(id:string)=>Promise<CompositeAttemptState>){return vi.fn((path:string)=>path==='/my-scale-tasks'?Promise.resolve({list:tasks}):read(path.split('/').pop()!)) as unknown as Api}
+function client(read:(id:string)=>Promise<CompositeAttemptState>){return vi.fn((path:string)=>path==='/my-scale-tasks'?Promise.resolve({list:tasks}):read(new URL(path,'https://fixture.invalid').pathname.split('/').pop()!)) as unknown as Api}
 const open=(i:number)=>fireEvent.click(screen.getAllByRole('button',{name:'进入本人自评'})[i])
 afterEach(()=>{cleanup();captured.latest=null})
 it('keeps A intact and refuses an unsaved direct switch, then atomically opens B after explicit saved exit',async()=>{
  const api=client(async id=>state(id));render(<HuiteacherMyScaleTasks api={api}/>);await screen.findByText('任务A');open(0)
  await screen.findByText('运行记录：A');expect(screen.getByRole('heading',{name:'正在完成：任务A'})).toBeInTheDocument()
  expect(screen.getAllByRole('button',{name:'进入本人自评'})[1]).toBeDisabled();open(1)
- expect(api).not.toHaveBeenCalledWith('/composite-attempts/B');expect(screen.getByText('运行记录：A')).toBeInTheDocument()
+ expect(api).not.toHaveBeenCalledWith('/composite-attempts/B?view=current-unit');expect(screen.getByText('运行记录：A')).toBeInTheDocument()
  fireEvent.click(screen.getByRole('button',{name:'模拟已完成保存退出'}));open(1)
  await screen.findByText('运行记录：B');expect(screen.getByRole('heading',{name:'正在完成：任务B'})).toBeInTheDocument()
 })

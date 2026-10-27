@@ -28,7 +28,7 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
   if(url===prefix+'/auth/csrf')return reply({csrfToken:'private-form-csrf'})
   if(url===prefix+'/my-private-form-tasks')return reply({list:[{executionId:'execution',runId:'run',organizationId:'school',eventId:'event',eventTitle:'教师活动',formTitle:'本人表单',status:saved?'COMPLETED':'ASSIGNED',runStatus:'PUBLISHED',eventStatus:'OPEN',runtimeBindingKind:null,runtimeBindingRef:null}]})
   if(url===prefix+'/run-executions/execution/start-private-form')return reply({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'private-form-attempt'})
-  if(url===prefix+'/private-form-composite-attempts/private-form-attempt'){
+  if(url===prefix+'/private-form-composite-attempts/private-form-attempt?view=current-unit'){
    if(!saved)return reply(state(false))
    return await new Promise<ReturnType<typeof reply>>(resolve=>finalReads.push(data=>resolve(reply(data))))
   }

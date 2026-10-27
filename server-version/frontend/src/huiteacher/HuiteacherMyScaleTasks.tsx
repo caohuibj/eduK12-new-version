@@ -109,7 +109,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
       .finally(()=>{if(valid())setLoading(false)})
   }
   const load=async(attemptId:string)=>{
-    const value=await api<CompositeAttemptState>('/composite-attempts/'+attemptId)
+    const value=await api<CompositeAttemptState>('/composite-attempts/'+attemptId+'?view=current-unit')
     if(value.id!==attemptId)throw new Error('测评记录与当前任务不一致，请重新读取。')
     return value
   }
@@ -175,7 +175,7 @@ export function HuiteacherMyScaleTasks({api,unified=false,onListStateChange}:{ap
     const valid=()=>currentApi.current===api&&sessionEpoch.current===token&&sessionRef.current===source
     if(!source||source.api!==api||source.attempt.id!==attemptId||source.attempt.currentItem?.id!==itemId||!valid())throw new Error('当前测评任务已切换，请重新读取。')
     const result=await api<unknown>('/composite-attempts/'+attemptId+
-      '/items/'+itemId+'/scale/submit','POST',payload)
+      '/items/'+itemId+'/scale/submit?response=receipt','POST',payload)
     if(!valid())throw new Error('测评任务已切换，请重新读取提交状态。')
     return {code:0,message:'本次正式提交已确认',data:result}
   }

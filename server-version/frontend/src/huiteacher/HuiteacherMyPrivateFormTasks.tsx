@@ -87,7 +87,7 @@ function PrivateFormSession({api,actorKey,unified=false,onListStateChange}:{api:
   finally{if(valid()){locked.current=false;setBusy(false)}}
  }
  const read=async(task:Task,id:string,valid:()=>boolean)=>{
-  const state=await api<CompositeAttemptState>(attemptPath(id))
+  const state=await api<CompositeAttemptState>(attemptPath(id)+'?view=current-unit')
   if(!valid())return
   assertAttempt(state,id)
   setActive({api,task,attempt:state})

@@ -27,6 +27,7 @@ import {SchoolCompositeRunner} from './SchoolCompositeRunner'
 const execution={organizationId:'school-a',courseId:'campus-act-1',runId:'run-1',
   executionId:'execution-1'}
 const parentPath='/composite-attempts/parent-attempt-1'
+const parentRead=parentPath+'?view=current-unit'
 const childPath=parentPath+'/items/slot-cognitive-1/cognitive/cognitive-session-1'
 
 describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoints',()=>{
@@ -37,7 +38,7 @@ describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoi
     const api=vi.fn(async(path:string,method='GET',payload?:unknown)=>{
       if(path==='/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start'&&method==='POST')
         return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}
-      if(path===parentPath&&method==='GET')
+      if(path===parentRead&&method==='GET')
         return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{
           id:'slot-cognitive-1',type:'COGNITIVE',cognitiveSession:{sessionId:'cognitive-session-1'},
         }}
@@ -71,7 +72,7 @@ describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoi
     m.entry.mockReturnValue({id:'slot-cognitive-1',type:'COGNITIVE'})
     const api=vi.fn(async(path:string)=>{
       if(path.endsWith('/start'))return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}
-      if(path===parentPath)return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'}
+      if(path===parentRead)return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS'}
       throw Error('unexpected')
     })
     render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution}
@@ -103,7 +104,7 @@ it('returns without promising to save or sending a submission',()=>{
   expect(container.querySelector('.hs-school-task-runner--answer')).not.toBeNull()
   expect(container.querySelector('.hs-school-runner-help')).not.toHaveAttribute('open')
   expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({campusMode:true,instructionsSummary:'作答说明'}))
-  expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
+  expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentRead])
  })
 
 
@@ -138,7 +139,7 @@ it.each(['FORM_SECTION','SCALE','COGNITIVE'])('scopes observer %s answer present
  expect(screen.getByLabelText('校园任务作答').classList.contains('hs-school-task-runner--answer')).toBe(ordinary)
  expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({campusMode:true,instructionsSummary:ordinary?'作答说明':undefined}))
  expect(Boolean(m.presentation.mock.lastCall?.[0].instructionsAppendix)).toBe(ordinary)
- expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentPath])
+ expect(api.mock.calls.map(call=>call[0])).toEqual(['/organizations/school-a/activities/campus-act-1/runs/run-1/executions/execution-1/start',parentRead])
 })
 
 
@@ -191,4 +192,19 @@ it('labels parent observer preparation correctly and preserves the unchecked con
  expect(screen.getByRole('checkbox')).not.toBeChecked()
  expect(screen.getByRole('button',{name:'开始或继续正式测评'})).toBeDisabled()
  expect(api).not.toHaveBeenCalled()
+})
+
+it('uses the shared current-unit view and receipt-only scale transport within the School endpoint',async()=>{
+ m.presentation.mockClear()
+ const payload={submissionId:'synthetic-id',attemptEpoch:1,definitionHash:'a'.repeat(64),answers:[]}
+ const api=vi.fn(async(path:string,method='GET')=>{
+  if(path.endsWith('/start'))return {state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'parent-attempt-1'}
+  if(path===parentRead)return {id:'parent-attempt-1',deliveryMode:'FINAL_ONLY',status:'IN_PROGRESS',currentItem:{id:'scale-item',type:'SCALE',scaleAssessmentId:'scale-child'}}
+  if(path===parentPath+'/items/scale-item/scale/submit?response=receipt'&&method==='POST')return {completed:true,replayed:false}
+  throw Error('Unexpected School transport '+path)
+ })
+ render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution} onExit={vi.fn()} onFinished={vi.fn()}/>);
+ fireEvent.click(screen.getByRole('button',{name:'开始或继续正式测评'}));await waitFor(()=>expect(m.presentation).toHaveBeenLastCalledWith(expect.objectContaining({state:expect.objectContaining({id:'parent-attempt-1'})})))
+ await m.presentation.mock.lastCall![0].submitScale('parent-attempt-1','scale-item',payload)
+ expect(api).toHaveBeenCalledWith(parentRead);expect(api).toHaveBeenCalledWith(parentPath+'/items/scale-item/scale/submit?response=receipt','POST',payload)
 })
