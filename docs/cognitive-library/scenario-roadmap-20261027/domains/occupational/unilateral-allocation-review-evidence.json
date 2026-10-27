@@ -1,0 +1,132 @@
+{
+  "kind": "ORIGINAL_STATIC_DESIGN_REVIEW_ONLY",
+  "status": "DESIGN_ONLY_AWAITING_USER_APPROVAL",
+  "stableKey": "unilateral-allocation",
+  "base": "855dda345831efee0e814bf39f6b8d6abad5e5d2",
+  "source": {
+    "repository": "oTree-org/otree",
+    "commit": "4731e6ac46a6dd35b4bd44813933e081ac205965",
+    "codeBlob": "8033d6886257259e072c4e11a520229ae8ae5832",
+    "codeSHA256": "43c4a96da0df297ed36b343107fab66af22fdbaa53475c2c97d6eabf62ca60cb",
+    "licenseBlob": "b2ed33ff82a86eb9c81e9a5fe67ab6707d54aa0c",
+    "licenseSHA256": "001aa4705e942a063008a1e1b8d22c059b99e583f809ec3ff667b96c40fd8acf",
+    "licenseSummary": "permissive code terms plus software-experiment-publication attribution/citation undertaking; not plain MIT",
+    "actualOriginalRounds": 1,
+    "actualOriginalPlayers": 2,
+    "actualOriginalEndowment": 100
+  },
+  "proposal": {
+    "researchTrials": 6,
+    "experienceTrials": 3,
+    "conditions": [
+      20,
+      40,
+      100
+    ],
+    "researchRepetitions": 2,
+    "experienceRepetitions": 1,
+    "practiceTrials": 1,
+    "comprehensionQuestions": 1,
+    "maximumPracticeGroups": 3,
+    "estimatedMinutes": {
+      "research": [
+        3,
+        5
+      ],
+      "experience": [
+        3,
+        4
+      ]
+    },
+    "timesMeasured": false,
+    "hypothetical": true,
+    "realPayment": false,
+    "livePartner": false,
+    "preferredAllocation": null,
+    "defaultAmount": null,
+    "answerPolicy": "first-explicit-confirmation; edits before confirmation allowed; null distinct from actual zero"
+  },
+  "staticRender": {
+    "browser": "cloud system Chromium, installed Python Playwright; inner sandbox unavailable in managed container",
+    "chromiumSandbox": false,
+    "network": "all page requests aborted; authored HTML set_content only",
+    "captures": [
+      {
+        "viewport": [
+          1290,
+          1400
+        ],
+        "label": "review",
+        "file": "unilateral-allocation-review.png",
+        "facts": {
+          "width": 1290,
+          "documentWidth": 1290,
+          "height": 1809,
+          "scripts": 0,
+          "forms": 0,
+          "inputs": 0,
+          "overflow": []
+        }
+      },
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "label": "phone",
+        "file": "unilateral-allocation-phone.png",
+        "facts": {
+          "width": 390,
+          "documentWidth": 390,
+          "height": 4315,
+          "scripts": 0,
+          "forms": 0,
+          "inputs": 0,
+          "overflow": []
+        }
+      },
+      {
+        "viewport": [
+          820,
+          1180
+        ],
+        "label": "tablet",
+        "file": "unilateral-allocation-tablet.png",
+        "facts": {
+          "width": 820,
+          "documentWidth": 820,
+          "height": 3477,
+          "scripts": 0,
+          "forms": 0,
+          "inputs": 0,
+          "overflow": []
+        }
+      }
+    ]
+  },
+  "runnerImplemented": false,
+  "sequenceOrScorerImplemented": false,
+  "participantData": false,
+  "files": [
+    {
+      "filename": "unilateral-allocation-review.html",
+      "bytes": 9209,
+      "sha256": "39f76b7e56f6a2d14d625d03c1ca410e358fd2fab1e40b02e7ee5b29d92f3394"
+    },
+    {
+      "filename": "unilateral-allocation-review.png",
+      "bytes": 416700,
+      "sha256": "d7360ec5c17ba8dfcaf83dc421b5060bac38cc418aef27c881f8d6aff35b98d0"
+    },
+    {
+      "filename": "unilateral-allocation-brief.md",
+      "bytes": 4605,
+      "sha256": "6c74f34f338b4b1b0b80440fd3349d18a7e0e2bf3b75ae6bb010923e603f7a0c"
+    },
+    {
+      "filename": "unilateral-allocation-appendix.md",
+      "bytes": 8394,
+      "sha256": "ba84f12a847146908408795f463b53f3ebc1bd0334633433207eb602d4f92ab6"
+    }
+  ]
+}
