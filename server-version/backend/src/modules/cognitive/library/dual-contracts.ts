@@ -215,6 +215,12 @@ const SCORING_DECLARATIONS: Record<string, CognitiveScoringContractDeclaration> 
     runtimeReconstructableFacts: ['延迟带与延后全额（frozen config）', '每步即时金额（二分轨迹可由选择权威复核）'],
     serverDerivedFacts: ['二分轨迹校验与无差异点', 'metrics（aucDelayDiscounting/laterChoiceRate）', 'quality flags'],
   },
+  gamblingdeck: {
+    testType: 'gamblingdeck',
+    clientObservedFacts: ['箱选择（A-D）', 'raw RT', 'interrupted'],
+    runtimeReconstructableFacts: ['每箱计划内位置（由选择序列权威推导）', '奖惩计划（scoringVersion 钉死）'],
+    serverDerivedFacts: ['逐试次净结果', 'metrics（advantageousChoiceRate/netScore/blockTrendSlope/deckChoiceRates）', 'quality flags'],
+  },
 }
 
 // 当前通用事实（所有任务一致）：完整加密 trial payload、v2 trial envelope qualityEvents、
@@ -365,6 +371,11 @@ const RESEARCH_CAPTURE_DECLARATIONS: Record<string, CognitiveResearchCaptureDecl
     testType: 'delaydiscount',
     currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次选择与轨迹金额'],
     futureCaptureFacts: ['真实激励（真实货币/积分兑换）', 'device provenance', 'viewport/dpr'],
+  },
+  gamblingdeck: {
+    testType: 'gamblingdeck',
+    currentlyAvailableFacts: [...COMMON_CURRENT_CAPTURE, '逐试次箱选择'],
+    futureCaptureFacts: ['选择前犹豫内的指针轨迹', '真实激励', 'device provenance', 'viewport/dpr'],
   },
 }
 

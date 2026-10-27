@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "testType": "gamblingdeck",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0"
+  },
+  "provenance": "Computed with scoreGamblingdeckV1 at task authoring time (2026-10-28); regenerate by rerunning the scorer on the committed inputs",
+  "cases": [
+    {
+      "name": "golden",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "blockSize": 2,
+          "fixationMs": 400,
+          "feedbackMs": 1200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "deck": "A",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 1,
+            "payload": {
+              "deck": "C",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 2,
+            "payload": {
+              "deck": "C",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          },
+          {
+            "trialIndex": 3,
+            "payload": {
+              "deck": "D",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expected": {
+        "score": 75,
+        "metrics": {
+          "advantageousChoiceRate": 0.75,
+          "netScore": 225,
+          "blockTrendSlope": 0.5,
+          "deckChoiceRates": {
+            "A": 0.25,
+            "B": 0,
+            "C": 0.5,
+            "D": 0.25
+          }
+        },
+        "qualityFlags": {
+          "interpretable": true,
+          "interrupted": false
+        }
+      }
+    },
+    {
+      "name": "empty",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "blockSize": 2,
+          "fixationMs": 400,
+          "feedbackMs": 1200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": []
+      },
+      "expectedError": "gamblingdeck v1 expects exactly 4 trials, got 0"
+    },
+    {
+      "name": "insufficient",
+      "input": {
+        "config": {
+          "totalTrials": 4,
+          "blockSize": 2,
+          "fixationMs": 400,
+          "feedbackMs": 1200,
+          "report": {
+            "reportVersion": "1.0.0",
+            "referenceMode": "none"
+          }
+        },
+        "trials": [
+          {
+            "trialIndex": 0,
+            "payload": {
+              "deck": "A",
+              "rtMs": 500,
+              "interrupted": false
+            }
+          }
+        ]
+      },
+      "expectedError": "gamblingdeck v1 expects exactly 4 trials, got 1"
+    }
+  ]
+}

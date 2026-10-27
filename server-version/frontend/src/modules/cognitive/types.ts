@@ -469,3 +469,26 @@ export type DelaydiscountTrialPayload = {
   rtMs: number | null
   interrupted: boolean
 }
+
+/** Gamblingdeck 冻结 config（与后端 gamblingdeck.config schema 一致）。 */
+export interface GamblingdeckConfig {
+  totalTrials: number
+  blockSize: number
+  fixationMs: number
+  feedbackMs: number
+  report: {
+    reportVersion: string
+    referenceMode: 'none' | 'simulated' | 'literature'
+    referenceVersion?: string
+    referenceBand?: string
+  }
+}
+
+/** Gamblingdeck 单 trial payload（与后端 gamblingdeck.trial schema 一致）。 */
+export type GamblingdeckTrialPayload = {
+  deck: 'A' | 'B' | 'C' | 'D'
+  rtMs: number | null
+  interrupted: boolean
+}
+
+export type GamblingdeckDeck = GamblingdeckTrialPayload['deck']
