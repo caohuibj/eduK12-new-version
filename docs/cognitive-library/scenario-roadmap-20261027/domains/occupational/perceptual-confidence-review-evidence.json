@@ -1,0 +1,174 @@
+{
+  "status": "DESIGN_ONLY_AWAITING_USER_APPROVAL",
+  "kind": "ORIGINAL_STATIC_REVIEW_NOT_TASK_RUNNER",
+  "branch": "cognitive/domain-occupational-20261027",
+  "base": "08dc6e85bc5ffd4d33661ea5a19cbdc6434890b2",
+  "source": {
+    "repository": "expfactory/expfactory-experiments",
+    "commit": "49b8123f18b26d94dfc010bb8a6ec7458b265e2e",
+    "blob": "bbcbe98932f58a1427a7a21e6b71007910ff4ec8",
+    "sha256": "3b016d0122a68c9708106c00b4a5d3b89ea32bc13c3fbfac1d36300cc4adb741",
+    "licenseBlob": "7ef17fe706ce88195e18473069d561dd4910a5ee",
+    "codeLicense": "MIT root notice; JGL helper chain not independently cleared and not imported",
+    "methodDOI": "10.3389/fnhum.2014.00443",
+    "articleLicense": "CC BY; no figure/text copied"
+  },
+  "proposal": {
+    "research": 300,
+    "experience": 60,
+    "conditionCount": 6,
+    "practice": 4,
+    "maximumGroups": 3,
+    "practiceMinimumSideCorrect": 3,
+    "practiceConfidencePreference": null,
+    "nominalSignalMixingWeights": [
+      0.04,
+      0.1,
+      0.2
+    ],
+    "timingMs": {
+      "fixation": 1000,
+      "stimulus": 200,
+      "interTrial": 1000,
+      "practiceStimulus": 500
+    },
+    "responseDeadline": null,
+    "timeEstimateMinutes": {
+      "research": [
+        24,
+        35
+      ],
+      "experience": [
+        7,
+        11
+      ]
+    },
+    "timeEstimatesMeasured": false
+  },
+  "staticRender": {
+    "browser": "system Chromium via installed Playwright; inner Chromium sandbox unavailable in this cloud container; using existing managed execution container",
+    "chromiumSandbox": false,
+    "network": "all page requests aborted; authored set_content only",
+    "captures": [
+      {
+        "viewport": [
+          1290,
+          1400
+        ],
+        "label": "review",
+        "file": "perceptual-confidence-review.png",
+        "facts": {
+          "width": 1290,
+          "documentWidth": 1290,
+          "height": 1877,
+          "scripts": 0,
+          "forms": 0,
+          "images": 0,
+          "overflow": [],
+          "patches": [
+            {
+              "x": 503.71875,
+              "y": 530.125,
+              "width": 128,
+              "height": 128
+            },
+            {
+              "x": 658.265625,
+              "y": 530.125,
+              "width": 128,
+              "height": 128
+            }
+          ]
+        }
+      },
+      {
+        "viewport": [
+          390,
+          844
+        ],
+        "label": "phone",
+        "file": "perceptual-confidence-phone.png",
+        "facts": {
+          "width": 390,
+          "documentWidth": 390,
+          "height": 4349,
+          "scripts": 0,
+          "forms": 0,
+          "images": 0,
+          "overflow": [],
+          "patches": [
+            {
+              "x": 53.71875,
+              "y": 1621.140625,
+              "width": 128,
+              "height": 128
+            },
+            {
+              "x": 208.265625,
+              "y": 1621.140625,
+              "width": 128,
+              "height": 128
+            }
+          ]
+        }
+      },
+      {
+        "viewport": [
+          820,
+          1180
+        ],
+        "label": "tablet",
+        "file": "perceptual-confidence-tablet.png",
+        "facts": {
+          "width": 820,
+          "documentWidth": 820,
+          "height": 3553,
+          "scripts": 0,
+          "forms": 0,
+          "images": 0,
+          "overflow": [],
+          "patches": [
+            {
+              "x": 268.71875,
+              "y": 1251.796875,
+              "width": 128,
+              "height": 128
+            },
+            {
+              "x": 423.265625,
+              "y": 1251.796875,
+              "width": 128,
+              "height": 128
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "implementedRunner": false,
+  "implementedStimulusOrSequenceGenerator": false,
+  "implementedScorer": false,
+  "participantData": false,
+  "files": [
+    {
+      "filename": "perceptual-confidence-review.html",
+      "bytes": 9188,
+      "sha256": "6af9aeac4304d46a035775bb50804464b2f22d48892d855bee656767f4b3873a"
+    },
+    {
+      "filename": "perceptual-confidence-review.png",
+      "bytes": 429217,
+      "sha256": "3315fd935545765ad7f133ba3d50b93faa34ee6e1af7e2426272258534b5051a"
+    },
+    {
+      "filename": "perceptual-confidence-brief.md",
+      "bytes": 5050,
+      "sha256": "2ad290945bf185977ebdc1601d12d2468e9eb9f6598310a6b8b2a9dd12235fcb"
+    },
+    {
+      "filename": "perceptual-confidence-appendix.md",
+      "bytes": 9675,
+      "sha256": "47581a9d5648812523d64cd29cb22345b90b9f0f4366f5ee73840bf609b647cc"
+    }
+  ]
+}
