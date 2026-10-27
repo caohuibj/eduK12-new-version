@@ -6,6 +6,35 @@ type Sources=Awaited<ReturnType<Client['sources']>>['list']
 type Choices=Awaited<ReturnType<Client['choices']>>
 type Rows=Awaited<ReturnType<Client['list']>>['list']
 type Props={api:PrivateToolApi;organizationId:string;actorId:string;product:'SCHOOL'|'TEACHER'}
+const object=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}
+const text=(value:unknown,fallback='未返回')=>typeof value==='string'&&value?value:fallback
+const familyNames:Record<string,string>={BUNDLE:'组合测评',COGNITIVE:'认知测评',SITUATIONAL:'情境测评',SCALE:'量表',SJT:'情境测评'}
+const disclosureNames:Record<string,string>={NONE:'不展示反馈',COMPLETION_ONLY:'仅完成确认',INDIVIDUAL_SUMMARY:'已批准报告的本人摘要'}
+function FrozenRegistrationSummary({registration}:{registration:EducationAssessmentRegistration}){
+ const entry=object(registration.entry),origin=object(entry.educationOrigin),applicability=object(entry.applicability)
+ const policy=object(origin.feedbackPolicy),audience=object(object(object(entry.resultDisclosure).audiences).RESPONDENT)
+ const units=Array.isArray(origin.units)?origin.units:[]
+ const scheduled=typeof policy.releaseAt==='string'&&Number.isFinite(Date.parse(policy.releaseAt))?new Date(policy.releaseAt).toISOString():null
+ return <div aria-label="冻结版本摘要">
+  <h3>{text(entry.title,'等待完整冻结详情')}</h3>
+  <dl><dt>工具家族</dt><dd>{familyNames[text(origin.family,text(applicability.resourceKind))]??'未返回'}</dd>
+   <dt>精确版本</dt><dd>{text(applicability.resourceVersion,registration.version??'未返回')}</dd>
+   <dt>审核状态</dt><dd>{{DRAFT:'草稿，等待独立审核',REVIEWED:'已独立审核，尚未发布',PUBLISHED:'已发布',RETIRED:'已停用新使用'}[registration.status]}</dd>
+   <dt>创建者账号</dt><dd>{text(registration.createdBy)}</dd><dt>审核者账号</dt><dd>{text(registration.reviewedBy,'尚未独立审核')}</dd>
+   <dt>本人披露</dt><dd>{disclosureNames[text(audience.mode)]??'未返回'}</dd>
+   <dt>反馈开放方式</dt><dd>{policy.mode==='IMMEDIATE'?'完成后按权限开放':policy.mode==='SCHEDULED'?'按冻结时间开放':'未配置（保留原历史政策）'}</dd>
+   {policy.mode==='SCHEDULED'&&<><dt>开放时间（UTC）</dt><dd>{scheduled??'时间信息无效，请联系管理员核查'}</dd></>}
+  </dl>
+  {units.length===0?<p>未列测量 C/P/R 单元；纯表单组合仅使用已冻结表单流程。</p>:<ol>{units.map((raw,index)=>{
+   const unit=object(raw),measurement=object(unit.measurement),report=object(unit.report),references=Array.isArray(unit.references)?unit.references:[]
+   return <li key={text(unit.itemId,String(index))}>{familyNames[text(unit.family)]??'测量单元'} {index+1}<dl>
+    <dt>固定内容 C</dt><dd>{text(measurement.releaseId)} · {text(measurement.contentHash)}</dd>
+    <dt>选择的参考 P</dt><dd>{references.length?references.map(ref=>text(object(ref).releaseId)+' · '+text(object(ref).contentHash)).join('；'):'明确未选参考'}</dd>
+    <dt>选择的报告 R</dt><dd>{typeof report.releaseId==='string'?report.releaseId+' · '+text(report.contentHash):'明确未选报告'}</dd>
+   </dl></li>
+  })}</ol>}
+ </div>
+}
 export function EducationAssessmentRegistrationPanel(props:Props){return <Panel key={JSON.stringify([props.product,props.organizationId,props.actorId])} {...props}/>}
 function Panel({api,organizationId,actorId,product}:Props){
  const client=educationAssessmentResourceClient(api,organizationId)
@@ -15,7 +44,8 @@ function Panel({api,organizationId,actorId,product}:Props){
  const [licenseIds,setLicenseIds]=useState<string[]>([])
  const [resourceId,setResourceId]=useState(''),[preparation,setPreparation]=useState<EducationAssessmentPreparation|null>(null),[choices,setChoices]=useState<Choices|null>(null)
  const [selectedP,setP]=useState<Record<string,string[]>>({}),[selectedR,setR]=useState<Record<string,string>>({})
- const [policyKey,setPolicyKey]=useState(''),[disclosure,setDisclosure]=useState<'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'>('COMPLETION_ONLY')
+ const policyKey=resourceId?`education-assessment:${resourceId}:disclosure:v1`:''
+ const [disclosure,setDisclosure]=useState<'NONE'|'COMPLETION_ONLY'|'INDIVIDUAL_SUMMARY'>('COMPLETION_ONLY')
  const [feedback,setFeedback]=useState<''|'IMMEDIATE'|'SCHEDULED'>(''),[releaseAt,setReleaseAt]=useState('')
  const [registration,setRegistration]=useState<EducationAssessmentRegistration|null>(null),[reason,setReason]=useState(''),[uncertain,setUncertain]=useState(false)
  const epoch=useRef(0),alive=useRef(true),locked=useRef(false),writing=useRef(false),context=useRef(api);context.current=api
@@ -111,20 +141,20 @@ function Panel({api,organizationId,actorId,product}:Props){
      <fieldset><legend>精确参考 P（不选表示明确空）</legend>{unit.references.flatMap(ref=>ref.choices.map(choice=>{const key=JSON.stringify([ref.releaseId,choice.entryKey]);return <label key={key}><input type="checkbox" checked={(selectedP[unit.itemId]??[]).includes(key)} onChange={e=>setP(old=>({...old,[unit.itemId]:e.target.checked?[...(old[unit.itemId]??[]),key]:(old[unit.itemId]??[]).filter(value=>value!==key)}))}/>{ref.releaseId} · {ref.contentHash} · {choice.entryKey} · {choice.metricKey}</label>}))}</fieldset>
      <label>精确报告 R<select value={selectedR[unit.itemId]??''} onChange={e=>setR(old=>({...old,[unit.itemId]:e.target.value}))}><option value="">明确未选报告</option>{unit.reports.map(row=><option key={row.releaseId} value={row.releaseId}>{row.title??row.releaseId} · {row.releaseId} · {row.contentHash}</option>)}</select></label>
     </section>)}
-    <label>披露政策编号<input value={policyKey} onChange={e=>setPolicyKey(e.target.value)}/></label>
-    <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
+    <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
+    <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
     <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结 UTC 时间开放</option></select></label>
     {feedback==='SCHEDULED'&&<label>开放时间（UTC）<input type="datetime-local" value={releaseAt} onChange={e=>setReleaseAt(e.target.value)}/></label>}
     <button disabled={uncertain||!feedback||!policyKey.trim()} onClick={register}>冻结登记为草稿</button>
    </>}
-   {registration&&<section aria-label="冻结登记详情"><p>状态：{registration.status} · hash：{registration.entryHash}</p><pre>{JSON.stringify(registration.entry??registration,null,2)}</pre>
+   {registration&&<section aria-label="冻结登记详情"><FrozenRegistrationSummary registration={registration}/><details><summary>查看冻结技术详情</summary><pre style={{maxWidth:'100%',overflowX:'auto'}}>{JSON.stringify(registration.entry??registration,null,2)}</pre></details>
     <p>冻结后只能回读或登记新版本，不能原地修改开放时间、内容或政策。</p>
     <label>审核或状态变更理由<input value={reason} onChange={e=>setReason(e.target.value)}/></label>
     {registration.entry!==undefined&&registration.status==='DRAFT'&&typeof registration.createdBy==='string'&&registration.createdBy!==actorId&&<button disabled={uncertain||!reason.trim()} onClick={()=>transition('review')}>独立审核</button>}
     {registration.entry!==undefined&&registration.status==='REVIEWED'&&<button disabled={uncertain||!reason.trim()} onClick={()=>transition('publish')}>发布已审核版本</button>}
     {registration.entry!==undefined&&registration.status==='PUBLISHED'&&<button disabled={uncertain||!reason.trim()} onClick={()=>transition('retire')}>停用后续新使用</button>}
    </section>}
-   <button disabled={uncertain} onClick={()=>{setResourceId('');setPreparation(null);setChoices(null);setRegistration(null);setP({});setR({});setFeedback('');setReleaseAt('');setPolicyKey('');setDisclosure('COMPLETION_ONLY')}}>新建另一登记版本</button>
+   <button disabled={uncertain} onClick={()=>{setResourceId('');setPreparation(null);setChoices(null);setRegistration(null);setP({});setR({});setFeedback('');setReleaseAt('');setDisclosure('COMPLETION_ONLY')}}>新建另一登记版本</button>
    <h3>已登记资源</h3>{rows.length===0&&<p>当前范围尚无登记资源。</p>}{rows.map(row=><button key={row.resourceId} onClick={()=>void perform(async valid=>{const value=await client.read(row.resourceId);if(valid()){setResourceId(row.resourceId);setRegistration(value);setPreparation(null);setChoices(null)}})}>{row.title} · {row.status}</button>)}
    {cursor&&<button onClick={()=>void perform(async valid=>{const page=await client.list(cursor);if(valid()){setRows(old=>[...new Map([...old,...page.list].map(row=>[row.resourceId,row])).values()]);setCursor(page.nextCursor)}})}>继续加载登记</button>}
   </fieldset>}

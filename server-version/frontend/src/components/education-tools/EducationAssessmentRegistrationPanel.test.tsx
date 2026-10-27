@@ -1,4 +1,4 @@
-import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {act,cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,describe,it,expect,vi} from 'vitest'
 import {EducationAssessmentRegistrationPanel} from './EducationAssessmentRegistrationPanel'
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
@@ -30,10 +30,23 @@ async function prepare(){
  fireEvent.change(screen.getByLabelText('获授权来源'),{target:{value:id(2)}})
  fireEvent.change(screen.getByLabelText('登记标题'),{target:{value:'新登记'}})
  fireEvent.click(screen.getByRole('button',{name:'准备独立教育版本'}))
- await screen.findByLabelText('披露政策编号')
- fireEvent.change(screen.getByLabelText('披露政策编号'),{target:{value:'APPROVED_PERSONAL_V1'}})
+ await screen.findByLabelText('披露政策编号（系统标识）')
 }
 describe('shared education registration management real client contracts',()=>{
+ it('presents readable frozen metadata and preserves historical missing feedback policy without inventing defaults',async()=>{
+  const {api}=setup((path,method)=>{
+   if(path===base)return {list:[{resourceId:id(8),title:'已冻结版本',status:'PUBLISHED',entryHash:'frozen'}],nextCursor:null}
+   if(path===base+'/'+id(8)&&method==='GET')return {resourceId:id(8),status:'PUBLISHED',entryHash:'frozen',createdBy:'creator-account',reviewedBy:'independent-reviewer',entry:{title:'已冻结版本',applicability:{resourceKind:'BUNDLE',resourceVersion:'1.0.0'},educationOrigin:{family:'BUNDLE',units:[{...prep.units[0],references:[{releaseId:id(6),contentHash:'c'.repeat(64)}],report:{releaseId:id(7),contentHash:'d'.repeat(64)}}]},resultDisclosure:{audiences:{RESPONDENT:{mode:'NONE'}}}}}
+  })
+  fireEvent.click(screen.getByRole('button',{name:'读取登记权限与资源'}));fireEvent.click(await screen.findByRole('button',{name:/已冻结版本/}))
+  const summary=within(await screen.findByLabelText('冻结版本摘要'))
+  expect(summary.getByText('组合测评')).toBeInTheDocument();expect(summary.getByText('1.0.0')).toBeInTheDocument()
+  expect(summary.getByText('creator-account')).toBeInTheDocument();expect(summary.getByText('independent-reviewer')).toBeInTheDocument()
+  expect(summary.getByText('不展示反馈')).toBeInTheDocument();expect(summary.getByText('未配置（保留原历史政策）')).toBeInTheDocument()
+  expect(summary.getByText(new RegExp(id(6)))).toBeInTheDocument();expect(summary.getByText(new RegExp(id(7)))).toBeInTheDocument()
+  const details=screen.getByText('查看冻结技术详情').closest('details')!;expect(details).not.toHaveAttribute('open')
+  expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
+ })
  it('does not expose operations before actual issuer read succeeds and keeps denial closed',async()=>{
   setup(path=>{if(path===base)throw Object.assign(Error('无组织登记权限'),{status:403})})
   expect(screen.queryByRole('button',{name:'准备独立教育版本'})).not.toBeInTheDocument()
@@ -95,7 +108,7 @@ describe('shared education registration management real client contracts',()=>{
   fireEvent.click(screen.getByRole('button',{name:'读取登记权限与资源'}))
   fireEvent.change(await screen.findByLabelText('登记编号'),{target:{value:id(8)}})
   fireEvent.click(screen.getByRole('button',{name:'回读准备或冻结登记'}))
-  await screen.findByLabelText('披露政策编号')
+  await screen.findByLabelText('披露政策编号（系统标识）')
   expect(screen.getByLabelText('获授权来源')).toHaveValue(id(2))
   expect(screen.getByRole('checkbox',{name:id(4)})).toBeChecked()
   expect(api.mock.calls.some(([,method])=>method==='POST')).toBe(false)
