@@ -45,3 +45,12 @@ test('fixture failures retain only fixed safe diagnostics, never private raw mes
  assert.equal(rows.length,3);assert.equal(rows[0].code,'TEACHER_SELF_IN_TRAINING');assert.equal(rows[1].code,'42501');assert.equal(rows[2].code,'UNKNOWN')
  assert(!JSON.stringify(rows).includes('secret'));assert(!JSON.stringify(rows).includes('https://'));assert.equal(readSafeSetupDiagnostics('PR363_FIXTURE_FAILED {broken').length,0)
 })
+test('Teacher refresh consumes the real bound-parent GET instead of manufacturing a second START',async()=>{
+ const {openCase}=require('./pr363-browser.cjs'),handlers=new Set();let clicks=0,reads=0
+ const response={url:()=> 'https://teacher.eduk12.top/api/huiteacher/assessment-composite-attempts/parent?view=current-unit',request:()=>({method:()=> 'GET'}),status:()=>200,json:async()=>({data:{id:'parent',status:'IN_PROGRESS'}})}
+ const card={first(){return this},waitFor:async()=>{},count:async()=>1,getByRole(){return {click:async()=>{clicks++}}}}
+ const page={goto:async()=>{},locator:()=>({filter:()=>card}),on:(_name,fn)=>handlers.add(fn),off:(_name,fn)=>handlers.delete(fn),waitForResponse:async predicate=>{reads++;assert.equal(predicate(response),true);return response},getByRole(){throw Error('Existing Teacher parent must not open another START button')}}
+ assert.equal(await openCase(page,{product:'TEACHER',title:'Synthetic',executionId:'execution'},'parent'),'parent');assert.equal(clicks,1);assert.equal(reads,1);assert.equal(handlers.size,0)
+ response.json=async()=>({data:{id:'different-parent',status:'IN_PROGRESS'}})
+ await assert.rejects(()=>openCase(page,{product:'TEACHER',title:'Synthetic',executionId:'execution'},'parent'));assert.equal(handlers.size,0)
+})

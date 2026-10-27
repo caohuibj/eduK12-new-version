@@ -45,66 +45,78 @@ async function login(browser,product,user,privileged){
  assert.ok(session?.secure&&session?.httpOnly);assert.equal(cookies.some(c=>c.name==='ptool_session'),false)
  return {context,page,prefix,url,verifyAssets}
 }
-async function openCase(page,c){
+async function openCase(page,c,expectedParent){
  const url=fixtureTools.origin(c.product)
  await page.goto(url+(c.product==='SCHOOL'?'/workspace/tasks':'/workspace#ht-personal-tasks'))
  const card=page.locator('article').filter({hasText:c.title});await card.first().waitFor({state:'visible'});assert.equal(await card.count(),1,'Exact human-readable task title, never manual UUID selection')
- await card.getByRole('button',{name:c.product==='SCHOOL'?'开始／继续官方测评':/^(开始测评|继续测评)$/}).click()
+ const button=card.getByRole('button',{name:c.product==='SCHOOL'?'开始／继续官方测评':/^(开始测评|继续测评)$/})
+ if(c.product==='TEACHER'&&expectedParent){
+  // Teacher resumes its already-bound parent on opening the task. Do not invent a second START.
+  let restarted=false;const watch=request=>{if(request.method()==='POST'&&new URL(request.url()).pathname.endsWith('/'+c.executionId+'/start-assessment'))restarted=true};page.on('request',watch)
+  try{const pending=page.waitForResponse(r=>r.request().method()==='GET'&&new URL(r.url()).pathname==='/api/huiteacher/assessment-composite-attempts/'+expectedParent)
+   await button.click();const response=await pending;assert.equal(response.status(),200);const data=(await response.json()).data;assert.equal(data.id,expectedParent);assert.equal(data.status,'IN_PROGRESS');assert.equal(restarted,false);return data.id
+  }finally{page.off('request',watch)}
+ }
+ await button.click()
  const pending=page.waitForResponse(r=>r.request().method()==='POST'&&new URL(r.url()).pathname.includes(c.executionId)&&/\/(start|start-assessment)$/.test(new URL(r.url()).pathname))
  await page.getByRole('button',{name:c.product==='SCHOOL'?'开始或继续正式测评':'开始或继续测评',exact:true}).click()
- const response=await pending;assert.equal(response.status(),200);const data=(await response.json()).data;assert.equal(data.runtimeBindingKind,'COMPOSITE');assert.ok(data.runtimeBindingRef)
+ const response=await pending;assert.equal(response.status(),200);const data=(await response.json()).data;assert.equal(data.runtimeBindingKind,'COMPOSITE');assert.ok(data.runtimeBindingRef);if(expectedParent)assert.equal(data.runtimeBindingRef,expectedParent)
  return data.runtimeBindingRef
 }
-async function reaction(page){
- await page.getByRole('button',{name:'开始/继续认知任务',exact:true}).click()
- await page.getByRole('button',{name:'开始测评',exact:true}).click()
- await page.getByRole('button',{name:'开始练习',exact:true}).click()
- for(let i=0;i<3;i++){
+async function reaction(page,progress=()=>{}){
+ progress('open');await page.getByRole('button',{name:'开始/继续认知任务',exact:true}).click()
+ progress('session-start');await page.getByRole('button',{name:'开始测评',exact:true}).click()
+ progress('practice-start');await page.getByRole('button',{name:'开始练习',exact:true}).click()
+ for(let i=0;i<3;i++){progress('practice-'+i)
   await page.waitForFunction(i=>document.querySelector('button[aria-label="practice trial '+i+'"]')?.textContent.includes('点击！'),i)
   await page.waitForTimeout(180);await page.getByRole('button',{name:'practice trial '+i,exact:true}).click()
   await page.getByRole('button',{name:i===2?'开始正式测评':'下一个',exact:true}).click()
  }
- for(let i=0;i<8;i++){
+ for(let i=0;i<8;i++){progress('trial-'+i)
   await page.waitForFunction(i=>document.querySelector('button[aria-label="trial '+i+'"]')?.textContent.includes('点击！'),i)
   await page.waitForTimeout(180);await page.getByRole('button',{name:'trial '+i,exact:true}).click()
  }
  // Real input timed by the task; no injected envelopes or manually submitted FINAL.
- await page.getByRole('button',{name:'完成测评',exact:true}).click()
- await page.getByRole('button',{name:/^(继续本次测评|返回校园活动)$/}).click()
+ progress('final');await page.getByRole('button',{name:'完成测评',exact:true}).click()
+ progress('return');await page.getByRole('button',{name:/^(继续本次测评|返回校园活动)$/}).click()
 }
-async function native(page){
- await page.getByRole('button',{name:'开始/继续情境判断测评',exact:true}).click()
- for(let node=0;node<2;node++){
-  await page.locator('input[type=radio][value=A]:not(:disabled)').first().click()
+function nativeOptionLabel(questionKey,optionKey){const rows=require('./pr363-native-template.json').options.filter(option=>option.questionKey===questionKey&&option.optionKey===optionKey);assert.equal(rows.length,1);return rows[0].label}
+async function native(page,progress=()=>{}){
+ progress('open');await page.getByRole('button',{name:'开始/继续情境判断测评',exact:true}).click()
+ for(let node=0;node<2;node++){progress('choice-'+node)
+  await page.getByRole('radio',{name:nativeOptionLabel(node===0?'PLAN_CHOICE':'REVIEW_CHOICE','A'),exact:true}).check()
   await page.getByRole('button',{name:'确认行动选择',exact:true}).click()
-  await page.locator('input[type=radio][value=CHECK]:not(:disabled)').first().click()
+  progress('probe-'+node);await page.getByRole('radio',{name:nativeOptionLabel(node===0?'PLAN_PROBE':'REVIEW_PROBE','CHECK'),exact:true}).check()
   await page.getByRole('button',{name:'确认本阶段作答',exact:true}).click()
   if(node===0)await page.getByRole('button',{name:/^(下一题|确认本页并进入下一情境)$/}).click()
  }
- await page.getByRole('button',{name:'提交测评',exact:true}).click()
+ progress('final');await page.getByRole('button',{name:'提交测评',exact:true}).click()
 }
 function assertManagementReads(reads){
  assert.ok(Array.isArray(reads));assert.deepEqual(reads.map(row=>row.product).sort(),['SCHOOL','TEACHER'])
  assert.ok(reads.every(row=>row.summaryRead===true&&row.cprVerified===true&&row.technicalJsonCollapsed===true&&row.disclosure==='INDIVIDUAL_SUMMARY'&&row.openingMode==='IMMEDIATE'))
 }
-async function readManagementSummary(manager,c){
+function managementToolLink(page,product){return product==='SCHOOL'?page.getByRole('link').filter({has:page.getByRole('heading',{name:'我的工具',exact:true})}):page.getByRole('button',{name:'我的工具',exact:true})}
+async function readManagementSummary(manager,c,progress=()=>{}){
  const {page,url,prefix}=manager
- await page.goto(url+'/workspace')
- await page.getByRole(c.product==='SCHOOL'?'link':'button',{name:'我的工具',exact:true}).click()
+ let operation='workspace';const stage=name=>{operation=name;progress(name)}
+ try{
+ stage('workspace');await page.goto(url+'/workspace')
+ stage('tools-navigation');await managementToolLink(page,c.product).click()
  const panel=page.getByLabel('共享测评资源登记',{exact:true})
- await panel.getByRole('button',{name:'读取登记权限与资源',exact:true}).click()
+ stage('registration-list');await panel.getByRole('button',{name:'读取登记权限与资源',exact:true}).click()
  const resourceId=c.resourceKey.split(':').at(-1)
  const endpoint=prefix+'/organizations/'+c.organizationId+'/assessment-resource-registrations/'+resourceId
  const pending=page.waitForResponse(response=>new URL(response.url()).pathname===endpoint&&response.request().method()==='GET')
- await panel.getByRole('button',{name:c.title+' · PUBLISHED',exact:true}).click()
- const response=await pending;assert.equal(response.status(),200)
+ stage('registration-detail');await panel.getByRole('button',{name:c.title+' · PUBLISHED',exact:true}).click()
+ const response=await pending;progress(operation,{responseStatus:response.status()});assert.equal(response.status(),200)
  const body=await response.json();assert.equal(body.code,0);const dto=body.data,entry=dto.entry,origin=entry.educationOrigin
  assert.equal(dto.resourceId,resourceId);assert.equal(dto.status,'PUBLISHED');assert.equal(entry.title,c.title)
  assert.equal(origin.product,c.product);assert.equal(origin.organizationId,c.organizationId);assert.equal(origin.runtimeCompositeId,c.runtimeId)
  assert.deepEqual(origin.feedbackPolicy,c.feedbackPolicy);assert.equal(origin.feedbackPolicy.mode,'IMMEDIATE')
  assert.equal(entry.resultDisclosure.audiences.RESPONDENT.mode,'INDIVIDUAL_SUMMARY')
  assert.deepEqual(origin.units.map(unit=>unit.family).sort(),['COGNITIVE','SJT'])
- const summary=panel.getByLabel('冻结版本摘要',{exact:true});await summary.getByRole('heading',{name:c.title,exact:true}).waitFor()
+ stage('frozen-summary');const summary=panel.getByLabel('冻结版本摘要',{exact:true});await summary.getByRole('heading',{name:c.title,exact:true}).waitFor()
  const value=(root,label)=>root.locator('dt').filter({hasText:new RegExp('^'+label+'$')}).locator('xpath=following-sibling::dd[1]')
  assert.equal((await value(summary,'本人披露').innerText()).trim(),'已批准报告的本人摘要')
  assert.equal((await value(summary,'反馈开放方式').innerText()).trim(),'完成后按权限开放')
@@ -118,10 +130,15 @@ async function readManagementSummary(manager,c){
   assert.ok(unit.report?.releaseId&&unit.report?.contentHash)
   assert.ok(report.includes(unit.report.releaseId)&&report.includes(unit.report.contentHash))
  }
- const technical=panel.locator('details').filter({has:page.getByText('查看冻结技术详情',{exact:true})})
+ stage('technical-collapse');const technical=panel.locator('details').filter({has:page.getByText('查看冻结技术详情',{exact:true})})
  assert.equal(await technical.count(),1);assert.equal(await technical.evaluate(node=>node.open),false)
  assert.equal(await technical.locator('pre').isVisible(),false)
  return {product:c.product,summaryRead:true,cprVerified:true,disclosure:'INDIVIDUAL_SUMMARY',openingMode:origin.feedbackPolicy.mode,technicalJsonCollapsed:true}
+ }catch(error){
+  const count=async locator=>{try{return await locator.count()}catch{return null}}
+  progress(operation,{errorName:['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN',code:error?.code==='ERR_ASSERTION'?'ERR_ASSERTION':'UNKNOWN',exactToolsLinks:await count(page.getByRole('link',{name:'我的工具',exact:true})),toolsHeadings:await count(page.getByRole('heading',{name:'我的工具',exact:true})),registrationPanels:await count(page.getByLabel('共享测评资源登记',{exact:true}))})
+  throw error
+ }
 }
 async function run(){
  const {root,value:fixture}=base.readFixture(),data=JSON.parse(fs.readFileSync(path.join(root,'pr363.json')))
@@ -143,7 +160,7 @@ async function run(){
    try{
     report.stage=product+'-management-read'
     const c=data.cases.find(row=>row.product===product&&row.mode==='IMMEDIATE');assert.ok(c)
-    report.managementReads.push(await readManagementSummary(manager,c));await manager.verifyAssets()
+    report.managementReads.push(await readManagementSummary(manager,c,(step,diagnostic)=>{report.stage=product+'-management-'+step;if(diagnostic)report.safeDiagnostic={product,step,...diagnostic}}));report.stage=product+'-management-assets';await manager.verifyAssets();delete report.safeDiagnostic
    }finally{await manager.context.close()}
    for(const c of data.cases.filter(c=>c.product===product)){
     report.stage=product+'-'+c.mode+'-participant-login';const {page,context,prefix,verifyAssets}=await login(browser,product,fixture.products[product].participant,false),pageErrors=[]
@@ -152,8 +169,8 @@ async function run(){
     page.on('response',response=>{const request=response.request(),url=new URL(response.url());if(url.pathname.startsWith('/api/')&&!['GET','HEAD','OPTIONS'].includes(request.method()))mutations.push({path:url.pathname,status:response.status()})})
     try{
      report.stage=product+'-'+c.mode+'-start-resume';const parentId=await openCase(page,c)
-     await page.reload();const resumedParentId=await openCase(page,c);assert.equal(resumedParentId,parentId,'Refresh must keep the actual durable parent')
-     report.stage=product+'-'+c.mode+'-cognitive';await reaction(page);report.stage=product+'-'+c.mode+'-native';await native(page)
+     await page.reload();const resumedParentId=await openCase(page,c,parentId);assert.equal(resumedParentId,parentId,'Refresh must keep the actual durable parent')
+     report.stage=product+'-'+c.mode+'-cognitive';await reaction(page,step=>{report.stage=product+'-'+c.mode+'-cognitive-'+step});report.stage=product+'-'+c.mode+'-native';await native(page,step=>{report.stage=product+'-'+c.mode+'-native-'+step})
      report.stage=product+'-'+c.mode+'-form-report';await page.getByLabel('Synthetic note',{exact:false}).fill('Synthetic browser Form answer')
      const feedback=page.waitForResponse(r=>new URL(r.url()).pathname===prefix+'/assessment-reports/executions/'+c.executionId&&r.request().method()==='GET')
      await page.getByRole('button',{name:'提交本页',exact:true}).click()
@@ -176,8 +193,8 @@ async function run(){
   fixtureTools.privateFile(root,'pr363-observed.json',observed)
   const checked=spawnSync(process.execPath,[path.join(__dirname,'pr363-fixture.cjs'),'verify'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024});assert.equal(checked.status,0,'Persisted FINAL exact metric-key/value verification required')
   assertManagementReads(report.managementReads);report.status='PASS';report.stage='complete'
- }catch(error){report.status='FAILED';report.errorDigest=base.sha(String(error));throw error}
+ }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }
-module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,readManagementSummary,run}
+module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,managementToolLink,nativeOptionLabel,readManagementSummary,run}
 if(require.main===module)run().catch(error=>{console.error('PR363_BROWSER_FAILED '+base.sha(String(error)));process.exitCode=1})

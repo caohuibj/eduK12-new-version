@@ -106,5 +106,64 @@
       "server-version/backend/src/modules/situational/situational-runtime.service.ts": "296441cfcbe5ae5431200f6d81a782a7c9f0d5a4"
     },
     "basis": "Teacher-only transaction/parent context correction; current backend build and current PG START/FINAL/report consumers mandatory. Original schema/dependency/frontend qualifications remain exact."
+  },
+  "qualifiedBackend": {
+    "run": 40525412926,
+    "head": "893f61b94deaf191d552f3145c03a8d1a750a666",
+    "checkout": "e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+    "tree": "c9abc8fdad3b606e076c321c8178c5341ff86e05",
+    "jobs": {
+      "classify changed content": 122263543154,
+      "codeql (javascript/typescript SAST)": 122263792858,
+      "pr363-backend-build": 122263793504,
+      "pr363-backend-checks": 122265990762,
+      "pr363-backend-scan": 122265991024,
+      "pr363-pg (reports)": 122265990838,
+      "pr363-pg (scales)": 122265990848
+    },
+    "artifacts": {
+      "pg-reports-reports": {
+        "id": 12744805743,
+        "name": "pr363-pg-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c-reports",
+        "sha256": "ab5a448f031f30e254e5bcf6b20aa1400e6098cb620accacbd617bcada0bd3c1",
+        "size": 19100
+      },
+      "backend-build-reports": {
+        "id": 12744241749,
+        "name": "pr363-backend-build-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "f6b7365e38b24a8584d9859fa98516fbb139c5bb98731e1b8f22be74f6747b34",
+        "size": 53375
+      },
+      "backend-images": {
+        "id": 12744226705,
+        "name": "pr363-backend-images-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "ea5a595d7362be27d2079692ba9c003a1101060c6105c3ce5e26b7c7b8d95eb5",
+        "size": 831937656
+      },
+      "backend-dist": {
+        "id": 12743832366,
+        "name": "pr363-backend-dist-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "18823d3d79f3876e52320d261864a78eb1421409fa5c4bb3121a1e2bc8dac5d3",
+        "size": 8209372
+      },
+      "backend-checks-reports": {
+        "id": 12743219596,
+        "name": "pr363-backend-checks-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "69d8e7312bb9e9d1ea71eb4467c7d648e17c2956082212d4cc6ea322177506c2",
+        "size": 23542
+      },
+      "pg-reports-scales": {
+        "id": 12743189877,
+        "name": "pr363-pg-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c-scales",
+        "sha256": "8b56d7f66be4946451039922ee40733ec58495edf0d5b23042a86bbaae49233e",
+        "size": 18815
+      },
+      "backend-scan-reports": {
+        "id": 12742589592,
+        "name": "pr363-backend-scan-reports-e63bcb221670ceb7369fea772a37d95ee2ed6e3c",
+        "sha256": "49a5796ca5c02e3b7a1e87fbc6ecb63ace0ef2aa92ed61fd0d8efc13cffeda42",
+        "size": 105917
+      }
+    }
   }
 }
