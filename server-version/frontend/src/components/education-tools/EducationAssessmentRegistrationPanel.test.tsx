@@ -184,3 +184,29 @@ describe('shared education registration management real client contracts',()=>{
   expect(api).toHaveBeenCalledWith(base+'/'+id(8)+'/review','POST',{expectedEntryHash:'h1',reason:'已独立核对'})
  })
 })
+
+describe('bounded resource pagination',()=>{
+ it('continues an empty eligible source page and preserves the selected source grant',async()=>{
+  const {api}=setup(path=>path===base+'/source-candidates'?{list:[],nextCursor:id(50)}:path===base+'/source-candidates?cursor='+id(50)?{list:[source],nextCursor:null}:undefined)
+  fireEvent.click(screen.getByRole('button',{name:'读取登记权限与资源'}));fireEvent.click(await screen.findByRole('button',{name:'读取获授权来源'}))
+  fireEvent.click(await screen.findByRole('button',{name:'继续加载获授权来源'}));await screen.findByRole('option',{name:/获授权来源/})
+  fireEvent.change(screen.getByLabelText('获授权来源'),{target:{value:id(2)}});fireEvent.change(screen.getByLabelText('登记标题'),{target:{value:'分页来源'}})
+  fireEvent.click(screen.getByRole('button',{name:'准备独立教育版本'}));await screen.findByLabelText('反馈开放方式')
+  expect(api.mock.calls.find(([path,method])=>path===base+'/preparations'&&method==='POST')?.[2].licenses).toEqual(pinnedLicenses)
+  expect(screen.queryByRole('button',{name:'继续加载获授权来源'})).toBeNull()
+ })
+ it('appends P/R choices without clearing selections or replacing the original grant',async()=>{
+  const second={...options,nextCursor:null,units:[{...options.units[0],references:[],reports:[{...options.units[0].reports[0],releaseId:id(30),licenses:[{resourceId:id(30),grantId:id(31)}],title:'第二页报告'}]}]}
+  const {api}=setup(path=>path.endsWith('/content-choices')?{...options,nextCursor:id(50)}:path.endsWith('/content-choices?cursor='+id(50))?second:undefined);await prepare()
+  fireEvent.click(screen.getByRole('checkbox',{name:/approved-reference/}));fireEvent.change(screen.getByLabelText('精确报告 R'),{target:{value:id(7)}})
+  fireEvent.click(screen.getByRole('button',{name:'继续加载参考与报告版本'}));await screen.findByRole('option',{name:/第二页报告/})
+  expect(screen.getByRole('checkbox',{name:/approved-reference/})).toBeChecked();expect(screen.getByLabelText('精确报告 R')).toHaveValue(id(7))
+  fireEvent.change(screen.getByLabelText('反馈开放方式'),{target:{value:'IMMEDIATE'}});fireEvent.click(screen.getByRole('button',{name:'冻结登记为草稿'}));await screen.findByLabelText('冻结登记详情')
+  const payload=api.mock.calls.find(([path])=>path.endsWith('/register'))![2];expect(payload.reports).toEqual([{itemId:id(4),releaseId:id(7)}]);expect(payload.licenses).toContainEqual({resourceId:id(7),grantId:id(17)})
+ })
+ it('refuses a changed measurement on later pages and preserves the prior selection',async()=>{
+  setup(path=>path.endsWith('/content-choices')?{...options,nextCursor:id(50)}:path.endsWith('/content-choices?cursor='+id(50))?{...options,nextCursor:null,units:[{...options.units[0],measurement:{...options.units[0].measurement,contentHash:'changed'}}]}:undefined);await prepare()
+  fireEvent.change(screen.getByLabelText('精确报告 R'),{target:{value:id(7)}});fireEvent.click(screen.getByRole('button',{name:'继续加载参考与报告版本'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('固定内容版本发生变化');expect(screen.getByLabelText('精确报告 R')).toHaveValue(id(7))
+ })
+})

@@ -1,7 +1,7 @@
 import LocalDateTimeInput,{parseLocalDateTime} from '../LocalDateTimeInput'
 import {formatLocalTimestamp,localTimeZoneLabel} from '../../utils/dateTime'
 import {useEffect,useRef,useState} from 'react'
-import {educationAssessmentResourceClient,mergeEducationAssessmentLicenses,type EducationAssessmentDisclosure,type EducationAssessmentFamily,type EducationAssessmentPreparation,type EducationAssessmentRegistration} from './assessmentResourceClient'
+import {educationAssessmentResourceClient,mergeEducationAssessmentLicenses,appendEducationAssessmentChoices,type EducationAssessmentDisclosure,type EducationAssessmentFamily,type EducationAssessmentPreparation,type EducationAssessmentRegistration} from './assessmentResourceClient'
 import type {PrivateToolApi} from './privateToolClient'
 type Client=ReturnType<typeof educationAssessmentResourceClient>
 type Sources=Awaited<ReturnType<Client['sources']>>['list']
@@ -43,6 +43,7 @@ function Panel({api,organizationId,actorId,product}:Props){
  const client=educationAssessmentResourceClient(api,organizationId)
  const [open,setOpen]=useState(false),[authorized,setAuthorized]=useState(false),[busy,setBusy]=useState(false)
  const [error,setError]=useState(''),[notice,setNotice]=useState(''),[rows,setRows]=useState<Rows>([]),[cursor,setCursor]=useState<string|null>(null)
+ const [sourceCursor,setSourceCursor]=useState<string|null>(null)
  const [sources,setSources]=useState<Sources>([]),[sourceId,setSourceId]=useState(''),[title,setTitle]=useState(''),[family,setFamily]=useState<EducationAssessmentFamily>('BUNDLE')
  const [resourceId,setResourceId]=useState(''),[preparation,setPreparation]=useState<EducationAssessmentPreparation|null>(null),[choices,setChoices]=useState<Choices|null>(null)
  const [selectedP,setP]=useState<Record<string,string[]>>({}),[selectedR,setR]=useState<Record<string,string>>({})
@@ -52,7 +53,7 @@ function Panel({api,organizationId,actorId,product}:Props){
  const [registration,setRegistration]=useState<EducationAssessmentRegistration|null>(null),[reason,setReason]=useState(''),[uncertain,setUncertain]=useState(false)
  const epoch=useRef(0),alive=useRef(true),locked=useRef(false),writing=useRef(false),mutationSent=useRef(false),context=useRef(api);context.current=api
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;epoch.current++}},[])
- useEffect(()=>{epoch.current++;locked.current=false;setBusy(false);setAuthorized(false);setOpen(false);setPreparation(null);setRegistration(null);setSources([]);setRows([]);setChoices(null);setUncertain(writing.current);writing.current=false},[api])
+ useEffect(()=>{epoch.current++;locked.current=false;setBusy(false);setAuthorized(false);setOpen(false);setPreparation(null);setRegistration(null);setSources([]);setSourceCursor(null);setRows([]);setChoices(null);setUncertain(writing.current);writing.current=false},[api])
  const perform=async(work:(valid:()=>boolean)=>Promise<void>,write=false)=>{
   if(locked.current)return
   locked.current=true;mutationSent.current=false;writing.current=write;setBusy(true);setError('');setNotice('')
@@ -125,7 +126,7 @@ function Panel({api,organizationId,actorId,product}:Props){
   if(!valid())return
   const frozen=await client.read(registration.resourceId);if(valid()){setRegistration(frozen);setReason('')}
  },true)
- const close=()=>{if(writing.current)return;epoch.current++;locked.current=false;setBusy(false);setOpen(false);setAuthorized(false);setPreparation(null);setChoices(null);setRegistration(null);setRows([]);setSources([])}
+ const close=()=>{if(writing.current)return;epoch.current++;locked.current=false;setBusy(false);setOpen(false);setAuthorized(false);setPreparation(null);setChoices(null);setRegistration(null);setRows([]);setSources([]);setSourceCursor(null)}
  return <section className={product==='SCHOOL'?'hs-panel':'ht-panel'} aria-label="共享测评资源登记">
   <h2>测评资源登记与审核</h2><p>复用已获本校及当前入口分发授权的工具。准备、独立审核、发布与报告开放分别校验；不自动批准题本。</p>
   <button disabled={busy} onClick={load}>读取登记权限与资源</button>{open&&<button disabled={busy} onClick={close}>关闭登记管理</button>}
@@ -135,7 +136,8 @@ function Panel({api,organizationId,actorId,product}:Props){
    <label>登记编号<input value={resourceId} onChange={e=>{setResourceId(e.target.value);setPreparation(null);setChoices(null);setRegistration(null)}}/></label>
    <button disabled={!resourceId} onClick={recover}>回读准备或冻结登记</button>
    {uncertain&&<p>先按原编号回读核对；不会自动重复提交。</p>}
-   <button disabled={uncertain||!!preparation||!!registration} onClick={()=>void perform(async valid=>{const data=await client.sources();if(valid()){setSources(data.list);setSourceId('');setP({});setR({})}})}>读取获授权来源</button>
+   <button disabled={uncertain||!!preparation||!!registration} onClick={()=>void perform(async valid=>{const data=await client.sources();if(valid()){setSources(data.list);setSourceCursor(data.nextCursor??null);setSourceId('');setP({});setR({})}})}>读取获授权来源</button>
+   {sourceCursor&&<button disabled={uncertain||!!preparation||!!registration} onClick={()=>void perform(async valid=>{const data=await client.sources(sourceCursor);if(valid()){setSources(old=>{const seen=new Set(old.map(row=>row.sourceCompositeId));return [...old,...data.list.filter(row=>!seen.has(row.sourceCompositeId))]});setSourceCursor(data.nextCursor??null)}})}>继续加载获授权来源</button>}
    <label>获授权来源<select disabled={!!preparation||!!registration||uncertain} value={sourceId} onChange={e=>{setSourceId(e.target.value);setP({});setR({})}}><option value="">请选择</option>{sources.map(row=><option key={row.sourceCompositeId} value={row.sourceCompositeId} disabled={!row.canPrepare||!row.licenses?.length}>{row.title}{row.canPrepare?' · 可准备':' · '+unavailableText(row.unavailableReason)}</option>)}</select></label>
    {sourceId&&!preparation&&<p>{sources.find(row=>row.sourceCompositeId===sourceId)?.canPrepare?'来源与必要许可已核对，准备时仍由服务器重新校验。':'该来源当前不可准备。'}</p>}
    <details><summary>查看精确来源许可标识</summary><pre style={{maxWidth:'100%',overflowX:'auto'}}>{JSON.stringify(preparation?.licenses??sources.find(row=>row.sourceCompositeId===sourceId)?.licenses??[],null,2)}</pre></details>
@@ -148,6 +150,7 @@ function Panel({api,organizationId,actorId,product}:Props){
      <fieldset><legend>精确参考 P（不选表示明确空）</legend>{unit.references.flatMap(ref=>ref.choices.map(choice=>{const key=JSON.stringify([ref.releaseId,choice.entryKey]);return <label key={key}><input type="checkbox" disabled={!ref.selectable} checked={(selectedP[unit.itemId]??[]).includes(key)} onChange={e=>setP(old=>({...old,[unit.itemId]:e.target.checked?[...(old[unit.itemId]??[]),key]:(old[unit.itemId]??[]).filter(value=>value!==key)}))}/>{ref.releaseId} · {ref.contentHash} · {choice.entryKey} · {choice.metricKey}</label>}))}{unit.references.filter(ref=>!ref.selectable).map(ref=><p key={ref.releaseId}>参考 {ref.releaseId}：{unavailableText(ref.unavailableReason)}，不可选择。</p>)}</fieldset>
      <label>精确报告 R<select value={selectedR[unit.itemId]??''} onChange={e=>setR(old=>({...old,[unit.itemId]:e.target.value}))}><option value="">明确未选报告</option>{unit.reports.map(row=><option key={row.releaseId} value={row.releaseId} disabled={!row.selectable}>{row.title??row.releaseId} · {row.releaseId} · {row.contentHash}{row.selectable?'':' · '+unavailableText(row.unavailableReason)}</option>)}</select></label>
     </section>)}
+    {choices.nextCursor&&<button onClick={()=>void perform(async valid=>{const next=await client.choices(preparation.resourceId,choices.nextCursor!);if(valid())setChoices(appendEducationAssessmentChoices(choices,next))})}>继续加载参考与报告版本</button>}
     <label>披露政策编号（系统标识）<input readOnly value={policyKey}/></label>
     <label>本人披露<select value={disclosure} onChange={e=>setDisclosure(e.target.value as typeof disclosure)}><option value="NONE">不展示反馈</option><option value="COMPLETION_ONLY">仅完成确认</option>{choices.units.length>0&&<option value="INDIVIDUAL_SUMMARY">已批准报告的本人摘要</option>}</select></label>
     <label>反馈开放方式<select value={feedback} onChange={e=>setFeedback(e.target.value as typeof feedback)}><option value="">请明确选择</option><option value="IMMEDIATE">完成后按权限开放</option><option value="SCHEDULED">按冻结时间开放</option></select></label>
