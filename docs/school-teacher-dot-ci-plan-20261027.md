@@ -81,3 +81,31 @@ run40436352177 / sourceedb119f6 / checkout0019a9ae：scope、admission、audit�
 后续不重复前端：固定成功job121965972676、run40436352177与同一frontend tree1bb800f1，核 checks artifact12703623377 SHA256 `b954b12f1ad078817f3b52b045ac185e7dbdebf2c8bd940c35c80e61b78fcb61` 与 dist artifact12704057621 SHA256 `decfa1befeace0a009d26018eae93461743017725d317dc8a3335dc6f3f5a92e`。真实原ZIP均已核，747个dist文件无非法路径，manifest contentDigest `94257d9e7ea5572bbc675d466f76a5f2c44580829e3e07212e560a3ecd223b97` 重算一致。消费者同时验证原560＋新10的完整链、当前frontend tree未变、扫描原image ID `sha256:fcb1c6da11c7ffdebde7757625cb3b60f1ba19a8d690f50c787cf8cd1721105a` 无HIGH/CRITICAL，保留原manifest/检查身份，仅转交同字节dist，不再npm安装、类型/lint/测试、Vite构建或重扫前端镜像。浏览器是独立未执行消费者，仍必须真实通过。
 
 后端编译、原升级、audit与不变应用SAST继续沿原固定证据；实际新控制代码仍扫描。唯一未完成主链仍为后端8文件、13PG、compact、恢复、backend运行镜像扫描及connected浏览器。此阶段不增加新业务功能，不改检查阈值或分支保护。
+
+## Redis-slot correction and precise database continuation (02:50 UTC)
+
+Run40439156003 at61c3d874 retained the preceding failure history and advanced:
+8 unit files/121 cases and PG0–4/62 cases PASS; roster PG5 has16 PASS and one
+FAIL before Redis connect (expected `/14`, received `/5`). Artifact12704938910,
+ZIP441b7c3007dc9af8eb13a306f33e61bce3ac5e291070fdf3a3547f56e466a21f,
+is the sole new partial-progress source, not an arbitrary successful run.
+
+Keep the original DB14 and empty-store assertions. Route roster only to14;
+other PG file indexes stay0–12, compact13. Unit tests do not rerun. The whole
+backend component, locked tools/schema and synthetic environment are unchanged.
+The16 passing roster cases did not initialize Redis; the one failure occurred
+before cache initialization. Select only its exact fullName on a fresh database
+and empty DB14. The raw new report must preserve16 pending/filtered names from
+the original passing cases and exactly1 fresh PASS; never label it17 freshly
+passing cases or rewrite the original failed JSON. Original121 unit,62 PG and16
+roster cases retain their original source/job/artifact identity. Their accepted
+raw evidence is carried into the current proof. The preceding33 unit and upgrade
+chain is independently reauthenticated as before.
+
+PG6–12, compact13, nonempty roster restore, backend runtime scan and the actual
+School/Teacher browser consumer remain NOTRUN until executed. The newly isolated
+5000-row fixture supplies the nonempty restore snapshot, preserving all six
+mapped-table hashes and immutable receipt trigger verification. No production
+code, limits, security thresholds or database cleanup policy changed. Current
+CI controls still require actual SAST and stable required gate success. No merge
+or deployment is performed by this correction.

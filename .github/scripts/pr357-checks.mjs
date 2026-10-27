@@ -6,7 +6,7 @@ import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 import {binding,pr357Plan} from './pr357-scope.mjs';
 import {changedEntries} from './content-scope.mjs';
-import {original,testContinuation,copyOriginalBackend,originalAudit,originalSast,copyDeliveredFrontend} from './pr357-continuation.mjs';
+import {original,testContinuation,copyOriginalBackend,originalAudit,originalSast,copyDeliveredFrontend,databaseContinuation,verifyQuotaContinuation,rosterFile,quotaName} from './pr357-continuation.mjs';
 const root=process.cwd(),out=resolve('pr357-evidence');
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 const digest=value=>createHash('sha256').update(value).digest('hex');
@@ -19,9 +19,13 @@ export function verifyReport(report,expectedFiles){
 }
 function verify(){assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.CI,'true');assert.equal(process.version,'v24.21.0');const head=git('rev-parse','HEAD'),p=JSON.parse(process.env.PLAN);assert.equal(head,process.env.GITHUB_SHA);assert.equal(p.head,head);assert.deepEqual(pr357Plan(changedEntries(p.base,head),p.base,head),p);return p;}
 function save(name,value){mkdirSync(out,{recursive:true});writeFileSync(join(out,name+'.json'),JSON.stringify({...value,candidate:{head:git('rev-parse','HEAD'),tree:git('rev-parse','HEAD^{tree}'),run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT}},null,2)+'\n');}
-function dockerTest(files,name,url,flags={}){const file=name+'.json',env={CI:'true',GITHUB_ACTIONS:'true',TZ:'UTC',NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',DATA_ENCRYPTION_KEY:'ab'.repeat(32),DATA_PSEUDONYM_KEY:'bc'.repeat(32),JWT_SECRET:'pr357-disposable-test-only-32-characters-minimum',CAMPUS_ELIGIBILITY_HMAC_KEY:'cd'.repeat(32),REDIS_URL:process.env.REDIS_URL,ROSTER_INTEGRATION_REDIS_URL:process.env.REDIS_URL,...flags,...(url?{DATABASE_URL:url,RELEASE_INTEGRATION_DATABASE_URL:url,PR26_INTEGRATION_DATABASE_URL:url,COGNITIVE_INTEGRATION_DB_URL:url,TRAINING_ARCHIVE_TEST_DATABASE_URL:url}:{})};
- run('docker',['run','--rm','--network','host',...Object.entries(env).flatMap(([k,v])=>['-e',k+'='+v]),'-v',out+':/evidence','pr357-build','npx','vitest','run',...files,'--maxWorkers=1','--reporter=default','--reporter=json','--outputFile=/evidence/'+file]);
- save(name+'-verified',verifyReport(JSON.parse(readFileSync(join(out,file),'utf8')),files));
+function dockerTest(files,name,url,flags={},selection=null){const file=name+'.json',env={CI:'true',GITHUB_ACTIONS:'true',TZ:'UTC',NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',DATA_ENCRYPTION_KEY:'ab'.repeat(32),DATA_PSEUDONYM_KEY:'bc'.repeat(32),JWT_SECRET:'pr357-disposable-test-only-32-characters-minimum',CAMPUS_ELIGIBILITY_HMAC_KEY:'cd'.repeat(32),REDIS_URL:process.env.REDIS_URL,ROSTER_INTEGRATION_REDIS_URL:process.env.REDIS_URL,...flags,...(url?{DATABASE_URL:url,RELEASE_INTEGRATION_DATABASE_URL:url,PR26_INTEGRATION_DATABASE_URL:url,COGNITIVE_INTEGRATION_DB_URL:url,TRAINING_ARCHIVE_TEST_DATABASE_URL:url}:{})};
+ run('docker',['run','--rm','--network','host',...Object.entries(env).flatMap(([k,v])=>['-e',k+'='+v]),'-v',out+':/evidence','pr357-build','npx','vitest','run',...files,...(selection?['--testNamePattern','^'+quotaName+'$']:[]),'--maxWorkers=1','--reporter=default','--reporter=json','--outputFile=/evidence/'+file]);
+ const report=JSON.parse(readFileSync(join(out,file),'utf8'));save(name+'-verified',selection?verifyQuotaContinuation(report,selection):verifyReport(report,files));
+}
+export function postgresRedis(base,file,index){
+ assert.equal(binding.tests.backend.filter(p=>p.includes('.postgres.'))[index],file);assert(index>=0&&index<13);
+ const redis=new URL(base);assert(['127.0.0.1','localhost'].includes(redis.hostname));assert.equal(redis.protocol,'redis:');redis.pathname='/'+(file===rosterFile?14:index);return redis.href;
 }
 function sql(db,text){assert(/^pr357_[a-z0-9_]+_ci_test$/.test(db)||db==='postgres');return execFileSync('docker',['exec',process.env.CI_POSTGRES_SERVICE_ID,'psql','-XAt','-v','ON_ERROR_STOP=1','-U','ptool','-d',db,'-c',text],{encoding:'utf8'}).trim();}
 async function database(){const prior=await testContinuation('backend');const u=new URL(process.env.DATABASE_URL);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.pathname,'/pr357_upgrade_ci_test');assert.equal(u.username,'ptool');assert.match(process.env.CI_POSTGRES_SERVICE_ID,/^[a-f0-9]{64}$/);
@@ -33,10 +37,16 @@ async function database(){const prior=await testContinuation('backend');const u=
  // second before/after upgrade qualification of the already-passed input.
  run('docker',['run','--rm','--network','host','-e','DATABASE_URL='+u.href,'pr357-build','npx','prisma','migrate','deploy','--schema','prisma/schema.prisma']);
  assert.equal(Number(sql('pr357_upgrade_ci_test','SELECT count(*) FROM _prisma_migrations WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL')),239);
- const selected=binding.tests.backend;sql('postgres','CREATE DATABASE pr357_unit_ci_test TEMPLATE pr357_upgrade_ci_test');dockerTest(prior.fresh,'backend-unit',url('pr357_unit_ci_test'));
- save('backend-unit-continuation',{status:'PASS_WITH_PINNED_PRIOR',prior,fresh:JSON.parse(readFileSync(join(out,'backend-unit-verified.json'),'utf8'))});
+ const selected=binding.tests.backend,progress=await databaseContinuation(prior);
+ save('database-progress-reused',{status:'REUSED_EXACT_PASSED_CASES',...progress});
  let roster;
- for(const [i,file]of selected.filter(p=>p.includes('.postgres.')).entries()){const db='pr357_case_'+i+'_ci_test';sql('postgres',`CREATE DATABASE ${db} TEMPLATE pr357_upgrade_ci_test`);const redis=new URL(process.env.REDIS_URL);redis.pathname='/'+i;assert(i<14);dockerTest([file],'postgres-'+i,url(db),{REDIS_URL:redis.href,ROSTER_INTEGRATION_REDIS_URL:redis.href});if(file.includes('educationRosterJobs.'))roster=db;}
+ for(const [i,file]of selected.filter(p=>p.includes('.postgres.')).entries()){
+  if(i<5)continue;
+  const db='pr357_case_'+i+'_ci_test';sql('postgres',`CREATE DATABASE ${db} TEMPLATE pr357_upgrade_ci_test`);
+  const redis=postgresRedis(process.env.REDIS_URL,file,i);
+  dockerTest([file],'postgres-'+i,url(db),{REDIS_URL:redis,ROSTER_INTEGRATION_REDIS_URL:redis},file===rosterFile?progress.acceptedRosterNames:null);
+  if(file===rosterFile)roster=db;
+ }
  const compactDb='pr357_compact_report_ci_test';sql('postgres',`CREATE DATABASE ${compactDb} TEMPLATE pr357_upgrade_ci_test`);
  const compactRedis=new URL(process.env.REDIS_URL);compactRedis.pathname='/13';
  dockerTest(['src/__tests__/integration/educationPrivateScaleReport.postgres.integration.test.ts'],'compact-report',url(compactDb),{ASSESSMENT_COMPACT_FACTS_ENABLED:'true',REDIS_URL:compactRedis.href,ROSTER_INTEGRATION_REDIS_URL:compactRedis.href});

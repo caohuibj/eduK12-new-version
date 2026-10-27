@@ -42,3 +42,25 @@ test('complete frontend reuse is pinned to its actually successful producer, not
  assert.equal(verifyOriginalArtifact(m,'checks',now,true).id,a.id);
  assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:original.run}},'checks',now,true));assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+artifacts.frontend.sha},'checks',now,true));
 });
+import {postgresRedis} from './pr357-checks.mjs';
+import {verifyQuotaContinuation,rosterFile,quotaName,databaseProgress,progressArtifacts} from './pr357-continuation.mjs';
+test('actual selected PostgreSQL files use unique Redis slots and retain roster DB14 guard',()=>{
+ const files=binding.tests.backend.filter(p=>p.includes('.postgres.'));
+ const slots=files.map((f,i)=>new URL(postgresRedis('redis://127.0.0.1:6379/14',f,i)).pathname);
+ assert.equal(slots[files.indexOf(rosterFile)],'/14');assert.equal(new Set([...slots,'/13']).size,14);
+ assert.throws(()=>postgresRedis('redis://remote.example/14',rosterFile,5));assert.throws(()=>postgresRedis('redis://127.0.0.1/14',rosterFile,6));
+ const source=readFileSync('server-version/backend/'+rosterFile,'utf8');assert.match(source,/expect\(parsed.pathname\).toBe\('\/14'\)/);
+});
+test('quota continuation only accepts one passed original failure with exact 16 prior names filtered',()=>{
+ const accepted=Array.from({length:16},(_,i)=>'prior'+String(i).padStart(2,'0'));
+ const r={success:true,numPassedTests:1,numFailedTests:0,numPendingTests:16,testResults:[{name:'/app/'+rosterFile,status:'passed',assertionResults:[{fullName:quotaName,status:'passed'},...accepted.map(fullName=>({fullName,status:'pending'}))]}]};
+ assert.equal(verifyQuotaContinuation(r,accepted).freshPassed,1);
+ for(const delta of [{success:false},{numPendingTests:0},{numPassedTests:17},{testResults:[{...r.testResults[0],assertionResults:r.testResults[0].assertionResults.slice(0,-1)}]}])assert.throws(()=>verifyQuotaContinuation({...r,...delta},accepted));
+ assert.throws(()=>verifyQuotaContinuation(r,[...accepted.slice(1),'wrong']));assert.equal(r.numPendingTests,16);
+});
+test('partial database evidence admits only the fixed failed run and ZIP',()=>{
+ const now=Date.now(),a=progressArtifacts.checks,m={id:a.id,name:a.prefix+databaseProgress.checkout,expired:false,digest:'sha256:'+a.sha,workflow_run:{id:databaseProgress.run,head_sha:databaseProgress.head,head_branch:binding.branch},size_in_bytes:18403,created_at:new Date(now-1000).toISOString()};
+ assert.equal(verifyOriginalArtifact(m,'checks',now,'database').id,a.id);
+ assert.throws(()=>verifyOriginalArtifact({...m,workflow_run:{...m.workflow_run,id:deliveredFrontend.run}},'checks',now,'database'));
+ assert.throws(()=>verifyOriginalArtifact({...m,digest:'sha256:'+'0'.repeat(64)},'checks',now,'database'));
+});
