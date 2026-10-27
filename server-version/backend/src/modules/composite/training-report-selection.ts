@@ -1,3 +1,4 @@
+import {assertEducationRuntimeContentScope} from './education-content-scope'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
 import { compositeForbidden } from './composite.errors'
@@ -29,6 +30,18 @@ export async function validateTrainingReportPointer(db:Prisma.TransactionClient,
     return {releaseId:report.releaseId,contentHash:report.contentHash}
   }
   const scope=report.scope
+  if(scope.kind==='PLATFORM'||scope.kind==='PRIVATE'&&['SCHOOL','TEACHER'].includes(scope.product)){
+    if(report.layer!=='REPORT'||report.family!==input.unit.family||input.publication&&report.status!=='PUBLISHED'
+      ||input.contentHash!==undefined&&report.contentHash!==input.contentHash)fail()
+    const source=await assertEducationRuntimeContentScope(db,{...input,release:report})
+    const measurement=input.releases.get(input.unit.measurement.releaseId)??source.releases.get(input.unit.measurement.releaseId)
+    if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.contentHash!==input.unit.measurement.contentHash
+      ||report.content.measurements.length!==1||report.content.measurements[0].releaseId!==measurement.releaseId
+      ||report.content.measurements[0].contentHash!==measurement.contentHash
+      ||report.content.audience!==(source.origin.product==='TEACHER'?'teacher':'student')
+      ||report.content.metricKeys.some(key=>!measurement.content.metrics.some(metric=>metric.metricKey===key)))fail()
+    return {releaseId:report.releaseId,contentHash:report.contentHash}
+  }
   if(report.layer!=='REPORT'||report.family!==input.unit.family||scope.kind!=='PRIVATE'||scope.product!=='TRAINING'
     ||scope.ownerId!==input.ownerId||scope.resourceId!==input.compositeId||input.publication&&report.status!=='PUBLISHED'
     ||input.contentHash!==undefined&&report.contentHash!==input.contentHash||prepareRelease({layer:report.layer,family:report.family,key:report.key,version:report.version,scope:report.scope,assetRefs:report.assetRefs,sourceReleaseId:report.sourceReleaseId,provenance:report.provenance,content:report.content}).contentHash!==report.contentHash)fail()

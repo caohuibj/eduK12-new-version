@@ -27,7 +27,7 @@ export const educationAssessmentOriginSchema=z.object({
   product:z.enum(['SCHOOL','TEACHER']),organizationId:id,
   family:z.enum(['COGNITIVE','SITUATIONAL','BUNDLE']),
   sourceCompositeId:id,runtimeCompositeId:id,sourceSnapshotHash:digest,runtimeSnapshotHash:digest,runtimeDefinitionHash:digest,
-  units:z.array(unit).min(1).max(1000),
+  units:z.array(unit).max(1000),
 }).strict().superRefine((origin,ctx)=>{
   const add=(message:string)=>ctx.addIssue({code:'custom',message})
   if(origin.sourceCompositeId===origin.runtimeCompositeId)add('Education delivery requires its own runtime identity')
@@ -59,6 +59,7 @@ export function draftEducationAssessmentEntry(input:{origin:unknown;title:string
   const origin=educationAssessmentOriginSchema.parse(input.origin)
   const title=z.string().trim().min(1).max(200).parse(input.title)
   const disclosure=validateResultDisclosureContract(input.disclosure)
+  if(origin.units.length===0&&!['NONE','COMPLETION_ONLY'].includes(disclosure.audiences.RESPONDENT.mode))throw new Error('Form-only delivery cannot invent measurement feedback')
   if(disclosure.minimumRespondents!==null)throw new Error('Personal delivery cannot imply group report authority')
   const role=origin.product==='TEACHER'?'TEACHER':'STUDENT'
   // Other audiences require their own separately reviewed workflows, not
