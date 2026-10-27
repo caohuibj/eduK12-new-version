@@ -181,7 +181,8 @@ async function run(){
      report.stage=product+'-'+c.mode+'-form-report';await page.getByLabel('Synthetic note',{exact:false}).fill('Synthetic browser Form answer')
      const feedback=page.waitForResponse(r=>new URL(r.url()).pathname===prefix+'/assessment-reports/executions/'+c.executionId&&r.request().method()==='GET')
      await page.getByRole('button',{name:'提交本页',exact:true}).click()
-     const response=await feedback;assert.equal(response.status(),200);const result=(await response.json()).data
+     report.stage=product+'-'+c.mode+'-feedback-http';const response=await feedback;report.safeDiagnostic={responseStatus:response.status()};assert.equal(response.status(),200);const result=(await response.json()).data
+     report.stage=product+'-'+c.mode+'-feedback-state';report.safeDiagnostic={responseStatus:response.status(),state:['READY','WITHHELD','PENDING','COMPLETED'].includes(result?.state)?result.state:'UNKNOWN',reportCount:Array.isArray(result?.reports)?result.reports.length:null}
      if(c.mode==='SCHEDULED'){
       assert.equal(result.state,'WITHHELD');assert.equal(result.releaseAt,c.feedbackPolicy.releaseAt);assert.equal(result.reports,undefined)
       await page.getByText(/反馈尚未达到开放时间|尚未开放|反馈尚未开放/).first().waitFor()
@@ -190,9 +191,9 @@ async function run(){
       assert.equal(result.state,'READY');assert.equal(result.reports.length,2)
       await page.getByRole('heading',{name:'Synthetic frozen report',exact:true}).first().waitFor()
      }
-     assert.ok(mutations.every(row=>row.path.startsWith(prefix+'/')),'No Training/global credential or runtime transport fallback')
-     for(const pattern of [/\/cognitive\/[^/]+\/submit$/,/\/situational\/[^/]+\/submit$/,/\/form-sections\/[^/]+\/submit$/])assert.ok(mutations.some(row=>pattern.test(row.path)&&row.status===200),'Actual UI must accept each canonical unit FINAL')
-     await verifyAssets();assert.deepEqual(pageErrors,[]);observed.push({executionId:c.executionId,parentId,resumedParentId,report:result})
+     report.stage=product+'-'+c.mode+'-entry-transport';assert.ok(mutations.every(row=>row.path.startsWith(prefix+'/')),'No Training/global credential or runtime transport fallback')
+     report.stage=product+'-'+c.mode+'-unit-final-receipts';for(const pattern of [/\/cognitive\/[^/]+\/submit$/,/\/situational\/[^/]+\/submit$/,/\/form-sections\/[^/]+\/submit$/])assert.ok(mutations.some(row=>pattern.test(row.path)&&row.status===200),'Actual UI must accept each canonical unit FINAL')
+     report.stage=product+'-'+c.mode+'-artifact-network-bytes';await verifyAssets();report.stage=product+'-'+c.mode+'-page-errors';report.safeDiagnostic={pageErrorCount:pageErrors.length};assert.deepEqual(pageErrors,[]);delete report.safeDiagnostic;observed.push({executionId:c.executionId,parentId,resumedParentId,report:result})
      report.cases.push({product,mode:c.mode,complete:true,resumedSameParent:true,reportState:result.state})
     }finally{await context.close()}
    }
@@ -200,7 +201,7 @@ async function run(){
   fixtureTools.privateFile(root,'pr363-observed.json',observed)
   const checked=spawnSync(process.execPath,[path.join(__dirname,'pr363-fixture.cjs'),'verify'],{env:process.env,encoding:'utf8',maxBuffer:1024*1024});assert.equal(checked.status,0,'Persisted FINAL exact metric-key/value verification required')
   assertManagementReads(report.managementReads);report.status='PASS';report.stage='complete'
- }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));throw error}
+ }catch(error){report.status='FAILED';report.errorName=['TimeoutError','AssertionError','Error'].includes(error?.name)?error.name:'UNKNOWN';report.errorDigest=base.sha(String(error));if(error?.code==='ERR_ASSERTION')report.assertion={operator:['strictEqual','deepStrictEqual','=='].includes(error.operator)?error.operator:'OTHER',actualType:typeof error.actual,expectedType:typeof error.expected,actualCount:Array.isArray(error.actual)?error.actual.length:null,expectedCount:Array.isArray(error.expected)?error.expected.length:null};throw error}
  finally{if(browser)await browser.close();fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2)+'\n')}
 }
 module.exports={api,login,openCase,reaction,native,artifactResponseFile,assertManagementReads,managementToolLink,nativeOptionLabel,readManagementSummary,selectNativeOption,run}
