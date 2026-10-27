@@ -1,0 +1,1278 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tes12_general_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "instruction": {
+    "schemaVersion": 1,
+    "text": "下面的陈述描述你作为教师时通常体验到的感受。请根据平时的教学经历，逐句判断自己有多赞同。1=非常不同意，2=不同意，3=同意，4=非常同意。答案没有对错，不要求教师必须只有一种情绪。题目涉及日常教学的一般体验，不是对某个特定班级的评价。",
+    "language": "zh-CN",
+    "version": "1.0.0",
+    "source": "Frenzel等2016原论文Appendix A General Scales英文指导语的独立中文研究工作稿。原作者研究采用四级同意度，不是后续研究中出现的五级或六级。"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "教师情绪量表（TES，12题一般教学版）— 独立中文研究工作稿",
+      "abbreviation": "TES12-GENERAL-ZH-WORKING",
+      "instrumentFamily": "Teacher Emotions Scales (Frenzel et al. 2016), general teaching form"
+    },
+    "construct": {
+      "primaryDomain": "SOCIAL_EMOTIONAL",
+      "secondaryDomains": [
+        "WELL_BEING"
+      ],
+      "constructDefinition": "分别描述教师日常授课的教学愉悦、愤怒和焦虑三种不同情绪；各四题求均分1–4，无总分。不同于按某特定班级/一组学生作答的同篇论文student-group-specific变体。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "domain:teacher_emotions",
+        "domain:social_emotional",
+        "domain:education",
+        "construct:teacher_enjoyment",
+        "construct:teacher_anger",
+        "construct:teacher_anxiety",
+        "construct:three_discrete_emotions",
+        "construct:three_four_item_means",
+        "construct:no_global_positive_negative_total",
+        "construct:trait_general_teaching",
+        "orientation:teacher_emotional_wellbeing",
+        "orientation:teacher_development_research",
+        "orientation:appraisal_theory",
+        "orientation:not_therapy_specific",
+        "population:adult_teachers",
+        "population:teacher_self_report",
+        "population:project_18_plus",
+        "population:chinese_working_translation_unvalidated",
+        "population:not_student_self_report",
+        "response:self",
+        "response:teacher_as_respondent",
+        "response:digital_self",
+        "response:12_items",
+        "response:original_four_point_agreement_1_to_4",
+        "response:source_appendix_codes_stable",
+        "response:original_author_recommends_randomized_order",
+        "response:no_reverse_items",
+        "response:four_item_means_1_to_4",
+        "response:no_fixed_recall_window",
+        "response:complete_facet_project_policy",
+        "use:research",
+        "use:teacher_professional_reflection",
+        "use:score_only",
+        "use:not_diagnostic",
+        "use:no_chinese_norms",
+        "use:not_teachers_ranking",
+        "use:no_global_emotion_ability_total",
+        "license:author_contact_required",
+        "license:publisher_reuse_review_pending",
+        "license:redistribution_review_pending",
+        "license:original_2016_appendix_acquired",
+        "license:independent_translation_pending_review",
+        "language_validation:source_en",
+        "language_validation:content_zh-CN",
+        "language_validation:independent_working_translation",
+        "language_validation:do_not_inherit_2020_chinese_4point_validation",
+        "language_validation:expert_review_pending",
+        "language_validation:chinese_teacher_validation_pending",
+        "教师情绪",
+        "教师愉悦",
+        "教学愤怒",
+        "教学焦虑",
+        "一般教学版",
+        "4点同意度",
+        "随机呈现待正式产品支持",
+        "教师发展",
+        "非诊断",
+        "待联系作者"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN",
+      "populationNotes": "仅拟供18岁以上教师自评，非学生评价教师或家长报告。平台现有通用SELF respondentType不能单靠source限制职业资格，须在未来Huiteacher适配层检查教师身份；源德国/加拿大及其他既有中国研究证据不直接证明本站新中文译稿有效。"
+    },
+    "administration": {
+      "itemCount": 12,
+      "estimatedMinutes": 4,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "通常的一般教学体验，原版trait形式，不要求过去一周、过去四周或最近一个班的具体时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": false,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "使用Frenzel等2016 Appendix A第49页General Scales，不混同第49–50页Student-Group Specific版，不允许把特定班级题干混入一般教学版。",
+        "正式原研究Study1使用1–4四级同意度：strongly disagree/disagree/agree/strongly agree；为避免中立，不能换成1–5中文研究变体或1–6后续研究改编。",
+        "三个独立四题均值1–4：joy1–joy4、ang1–ang4、anx1–anx4。全部原值计分，均无反向；不能把愤怒焦虑倒分以后并到整体情绪能力总分。",
+        "作者Appendix A建议题目随机呈现，原研究的12项也曾随机化。当前源码DRAFT保留display.randomizeItems=true及稳定题号；但现有ScaleDefinitionV2 forPublish校验会阻止发布随机化，本批不扩引擎，正式发布前要另行处理，不得声称可直接激活。",
+        "使用稳定源编号TESG_01–12与Appendix joy1–4/ang1–4/anx1–4一一对应；呈现随机化不影响结果的原题号计分映射。",
+        "各维4题完整才计算该维，缺答不插补；本缺答策略是平台保守选择，非作者原论文规定的个人结果插补规则。",
+        "教师情绪与工作压力、课堂条件有关，不把高愤怒或高焦虑理解为教师品德差/不适合任教，不用于行政考核或学校排行榜。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "英语/德语一般教学版有原2016开发证据，本站独立中文工作译文未完成测量验证。"
+        },
+        {
+          "use": "INDIVIDUAL_REFLECTION",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "可用于教师专业成长讨论，对课堂情绪和工作条件反思，不用于绩效考核或临床风险诊断。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "tes-frenzel2016-author-english",
+        "evidenceType": "CONTENT_VALIDITY",
+        "population": "原2016英语/德语样本合计944名教师（来源为Germany、Canada）；非本站中国独立中文译本数据",
+        "locale": "en",
+        "territory": "ZZ",
+        "studyDesign": "原作者提出享受/愤怒/焦虑三个4题因子及general和specific两套题，原研究Study1四档。这里仅保留官方题本构成与相应文献，不当作本站语言等值/中国常模证据。",
+        "rating": "UNKNOWN",
+        "citation": "Frenzel, A. C., Pekrun, R., Goetz, T., Daniels, L. M., Durksen, T. L., Becker-Kurz, B., & Klassen, R. M. (2016). Measuring teachers’ enjoyment, anger, and anxiety: The Teacher Emotions Scales (TES). Contemporary Educational Psychology, 46, 148–163. https://doi.org/10.1016/j.cedpsych.2016.05.003.",
+        "doi": "10.1016/j.cedpsych.2016.05.003",
+        "url": "https://doi.org/10.1016/j.cedpsych.2016.05.003"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Frenzel等2016 accepted manuscript Appendix A p49 general English 12 items：https://eprints.whiterose.ac.uk/id/eprint/99438/1/Frenzel_et_al._Teacher_Emotions_Scales_preprint.pdf；平台独立简体中文研究工作稿，不等于其他2020中国小学教师样本验证译本。",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "源General Scales，不能偷换成Student-Group Specific版；源研究四档锚点，中文工作译文未完成专家译审和中国教师测量等值验证。"
+  },
+  "applicability": {
+    "schemaVersion": 1,
+    "policyVersion": "tes12_general_zh_cn_research-1.0.0",
+    "respondentTypes": [
+      "SELF"
+    ],
+    "subject": {
+      "ageMonths": {
+        "minInclusive": 216
+      }
+    },
+    "requiredContextKeys": []
+  },
+  "disclosure": {
+    "schemaVersion": 1,
+    "policyVersion": "tes12_general_zh_cn_research-1.0.0",
+    "audiences": {
+      "respondent": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "subject": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": false,
+        "methods": true,
+        "educationalContent": false
+      },
+      "researcher": {
+        "numericScores": true,
+        "references": false,
+        "individualInterpretations": true,
+        "scoreDerivedLabels": false,
+        "resultQualityDetails": true,
+        "rawAnswers": false,
+        "itemScores": true,
+        "methods": true,
+        "educationalContent": false
+      }
+    },
+    "unknownAudience": "DENY"
+  },
+  "usageRequirements": {
+    "schemaVersion": 1,
+    "policyVersion": "tes12_general_zh_cn_research-1.0.0",
+    "requiredRightsActions": [
+      "electronicAdministration",
+      "scoring",
+      "translation",
+      "display"
+    ],
+    "notes": [
+      "TES原作者为Frenzel、Pekrun、Goetz、Daniels、Durksen、Becker-Kurz、Klassen（2016），英文与德文原版12题及General/Student-Group Specific双版本收录于作者 accepted manuscript Appendix A（https://eprints.whiterose.ac.uk/id/eprint/99438/1/Frenzel_et_al._Teacher_Emotions_Scales_preprint.pdf，英文第49-50页）；White Rose机构库注明©2016出版社，作者自存稿，进一步复制可能需要出版社许可（https://eprints.whiterose.ac.uk/id/eprint/99438/）。本次中文题文及报告由EDUK12.TOP依据一般教学版英文独立撰写，不复制2020年中国小学教师研究中其他团队的已验证中文译本。原作者对中国学校样本的计量等值不保证。本内容分支公开提交是DRAFT开发记录，不意味着获得公开GitHub完整题文/独立译稿再分发、数字施测或商用许可。管理员联系作者/出版社核实准确版本、许可、译审与样本验证；不作为内容草稿加工的额外阻塞。",
+      "按当前仅为DRAFT，既有forPublish随机化不支持、教师身份适配与语言科学审查另行列后续事项。作者和版权问题由管理员处理，不成为本次内部内容加工新增门禁。"
+    ]
+  },
+  "executable": {
+    "releaseStatus": "DRAFT",
+    "contentLocale": "zh-CN",
+    "references": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "Frenzel et al. 2016 TES General English 12-item original, independent Chinese research working draft",
+        "citation": "Frenzel, A. C., Pekrun, R., Goetz, T., Daniels, L. M., Durksen, T. L., Becker-Kurz, B., & Klassen, R. M. (2016). Measuring teachers’ enjoyment, anger, and anxiety: The Teacher Emotions Scales (TES). Contemporary Educational Psychology, 46, 148–163. https://doi.org/10.1016/j.cedpsych.2016.05.003.",
+        "url": "https://eprints.whiterose.ac.uk/id/eprint/99438/1/Frenzel_et_al._Teacher_Emotions_Scales_preprint.pdf",
+        "publicationYear": 2016
+      },
+      "license": {
+        "status": "unknown",
+        "redistribution": "restricted",
+        "note": "TES原作者为Frenzel、Pekrun、Goetz、Daniels、Durksen、Becker-Kurz、Klassen（2016），英文与德文原版12题及General/Student-Group Specific双版本收录于作者 accepted manuscript Appendix A（https://eprints.whiterose.ac.uk/id/eprint/99438/1/Frenzel_et_al._Teacher_Emotions_Scales_preprint.pdf，英文第49-50页）；White Rose机构库注明©2016出版社，作者自存稿，进一步复制可能需要出版社许可（https://eprints.whiterose.ac.uk/id/eprint/99438/）。本次中文题文及报告由EDUK12.TOP依据一般教学版英文独立撰写，不复制2020年中国小学教师研究中其他团队的已验证中文译本。原作者对中国学校样本的计量等值不保证。本内容分支公开提交是DRAFT开发记录，不意味着获得公开GitHub完整题文/独立译稿再分发、数字施测或商用许可。管理员联系作者/出版社核实准确版本、许可、译审与样本验证；不作为内容草稿加工的额外阻塞。"
+      },
+      "display": {
+        "randomizeItems": true
+      },
+      "responseSets": [
+        {
+          "key": "tes_general_agree_1_4",
+          "options": [
+            {
+              "value": "1",
+              "label": "非常不同意",
+              "score": 1
+            },
+            {
+              "value": "2",
+              "label": "不同意",
+              "score": 2
+            },
+            {
+              "value": "3",
+              "label": "同意",
+              "score": 3
+            },
+            {
+              "value": "4",
+              "label": "非常同意",
+              "score": 4
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "TESG_01",
+          "content": "一般而言，我喜欢教学。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 0,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_02",
+          "content": "通常，教学让我感到非常愉快，因此我也乐于备课和上课。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 1,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_03",
+          "content": "在授课过程中，我常有值得高兴的事情。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 2,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_04",
+          "content": "一般来说，我带着热情进行教学。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 3,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_05",
+          "content": "授课时，我常常有生气的理由。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 4,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_06",
+          "content": "我在授课过程中经常感到烦躁。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 5,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_07",
+          "content": "有时我在授课时真的会非常生气。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 6,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_08",
+          "content": "一般来说，教学会让我感到受挫。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 7,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_09",
+          "content": "一般情况下，我在授课时会感到紧张和不安。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 8,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_10",
+          "content": "我常常担心自己的教学进行得不够顺利。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 9,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_11",
+          "content": "准备授课的过程经常让我担心。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 10,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "TESG_12",
+          "content": "想到要教学时，我会感到心神不安。",
+          "type": "single",
+          "required": false,
+          "sortOrder": 11,
+          "responseSetKey": "tes_general_agree_1_4",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "1.0.0",
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "itemRules": [
+          {
+            "itemCode": "TESG_01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "TESG_12",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "scores": [
+          {
+            "key": "enjoyment",
+            "type": "dimension",
+            "label": "教学愉悦",
+            "description": "教师通常是否乐于授课、备课并感受到教学的愉快与热情。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TESG_01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_04",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "anger",
+            "type": "dimension",
+            "label": "教学愤怒",
+            "description": "教师通常在授课过程中感到恼火、生气、烦躁或受挫的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TESG_05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_08",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          },
+          {
+            "key": "anxiety",
+            "type": "dimension",
+            "label": "教学焦虑",
+            "description": "教师通常在备课、授课或想到教学时感到紧张、不安和担心的倾向。 更多分表示较常认同相关体验，而不是能力或临床状况。",
+            "direction": "higher_is_more",
+            "canonical": true,
+            "displayPrecision": 2,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "TESG_09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "TESG_12",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "mean"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "1.0.0",
+        "primaryScoreKeys": [
+          "enjoyment",
+          "anger",
+          "anxiety"
+        ],
+        "scoreOrder": [
+          "enjoyment",
+          "anger",
+          "anxiety"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "enjoyment",
+            "headline": "教学愉悦",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "教学中感到开心、投入或者有热情，可能来自学生的一个进步、一次顺畅的讨论，也可能来自你自己对教学内容的喜爱。这组题记录你平时多大程度上体验到这些感受。分数较高表示你更认可这些关于愉悦和热情的描述，但并不意味着每天上课都应该开心。工作条件、课程任务和个人处境都可能影响情绪。你可以想想最近哪一个教学时刻让你觉得值得；即使这样的时刻不多，也不需要因此否定自己的职业价值。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "最近一次真正让你感到教学有趣或有意义的时刻是什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一项负担不大的教学活动，给有价值的课堂体验留一点空间。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "anger",
+            "headline": "教学愤怒",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "在课堂中感到生气、烦躁或受挫，可能与教学目标受阻、事情发展不顺利、工作压力或关系互动有关。这些感受不一定代表你不爱学生，也不能直接说明你的教学方式出了问题。这一分数只描述你通常多大程度上认同这些经历，而不是给教师的品德或专业能力评分。你可以回想最近一次感到烦躁的课堂：当时最困难的是什么？哪些支持、规则或现实条件可能让下一次的处境更容易处理？",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "授课时哪类情况最容易让你觉得恼火或受挫？"
+              },
+              {
+                "category": "strategy",
+                "text": "选择一个经常发生的困难，考虑是否能通过明确期望、交流或获取支持减少压力。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "anxiety",
+            "headline": "教学焦虑",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "备课或授课前感到担心、紧张，有时来自对学生学习负责的心情，也可能与任务负荷、时间限制或资源不足有关。这组回答反映的是你通常是否有这种感受，并不是对你是否适合当教师的判断。担心教学是否顺利并不等于教学一定失败；有些焦虑来自真实可改善的工作条件。你可以想想什么情况最容易引发担心，哪些准备有用，哪些反而使你更加疲惫。如果压力持续影响睡眠或工作，也可以考虑向同事、支持团队或专业人士求助。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "备课或上课前，你最常担心的事情是什么？"
+              },
+              {
+                "category": "strategy",
+                "text": "选一个能实际减轻负担的小准备步骤，并考虑哪些资源可以与同事共享。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "源2016量表分General和Student-Group Specific不同变体；本工作稿固定一般教学12题，不把班级特定版与一般版或不同版本原值混用。",
+          "原2016首项研究采用4档同意度，三种情绪每组4题均分1–4；后续中文研究也见4档，另有5/6档研究，但不能在同一scoringVersion中混用。",
+          "三个维度并存且没有总体“好教师/坏教师”情绪总分，也不依任一分数评价专业道德、胜任力、职业适合性。",
+          "作者建议随机呈现12题；本DRAFT设置randomizeItems=true，但当前正式发布校验仍拒绝随机题序，需要独立解决产品支持后才能激活，不把源码配置当已运行效果。",
+          "通用SELF作答者键仅代表教师自评，不是教师岗位认证；Huiteacher场景未来另核教师身份，不把DRAFT拿去开放给学生/家长。",
+          "本版中文属于独立研究工作译稿，尚未获原作者认可、双语译审、中国教师认知访谈或信效度研究。",
+          "四题维度齐全才计算该维，缺失不插补是项目保守策略，不是原作者完整缺失规则。",
+          "作者存档论文的进一步复制、公开译文GitHub再分发和商业电子施测具体权利仍需管理员核定。"
+        ],
+        "disclaimer": "TES © Frenzel等（2016）。当前为EDUK12.TOP独立中文DRAFT研究工作稿，未取得公开再分发或科学人审通过结论。三个分数不用于诊断、教师绩效考核或学校排名。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      },
+      "versionAxes": {
+        "schemaVersion": 1,
+        "subjectKey": "tes_general2016",
+        "locale": "zh-CN",
+        "localizationVersion": "1.0.0"
+      }
+    },
+    "goldenCases": [
+      {
+        "name": "minimum",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 1,
+            "anger": 1,
+            "anxiety": 1
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "maximum",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 4,
+            "anger": 4,
+            "anxiety": 4
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "middle_two",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 2,
+            "anger": 2,
+            "anxiety": 2
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "enjoyment4_others1",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 4,
+            "anger": 1,
+            "anxiety": 1
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "anger4_others1",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "1"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 1,
+            "anger": 4,
+            "anxiety": 1
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "anxiety4_others1",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 1,
+            "anger": 1,
+            "anxiety": 4
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "mixed_1_to_4",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "4"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "1"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "3"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "4"
+          }
+        ],
+        "expected": {
+          "quality": "interpretable",
+          "scores": {
+            "enjoyment": 2.5,
+            "anger": 2.5,
+            "anxiety": 2.5
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "one_enjoyment_missing",
+        "answers": [
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_09",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "enjoyment": null,
+            "anger": 2,
+            "anxiety": 2
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "one_anxiety_missing",
+        "answers": [
+          {
+            "itemCode": "TESG_01",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_02",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_03",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_04",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_05",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_06",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_07",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_08",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_10",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_11",
+            "responseValue": "2"
+          },
+          {
+            "itemCode": "TESG_12",
+            "responseValue": "2"
+          }
+        ],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "enjoyment": 2,
+            "anger": 2,
+            "anxiety": null
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      },
+      {
+        "name": "all_missing",
+        "answers": [],
+        "expected": {
+          "quality": "invalid",
+          "scores": {
+            "enjoyment": null,
+            "anger": null,
+            "anxiety": null
+          },
+          "totalScoreKeys": [
+            "enjoyment",
+            "anger",
+            "anxiety"
+          ]
+        }
+      }
+    ]
+  }
+}

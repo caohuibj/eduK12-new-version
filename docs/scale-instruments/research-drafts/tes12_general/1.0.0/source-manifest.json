@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "tes12_general_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "original": {
+    "paperDoi": "10.1016/j.cedpsych.2016.05.003",
+    "acceptedManuscriptPdf": "https://eprints.whiterose.ac.uk/id/eprint/99438/1/Frenzel_et_al._Teacher_Emotions_Scales_preprint.pdf",
+    "sourcePage": "Appendix A, printed page 49",
+    "authorForm": "General TES",
+    "otherDistinctForm": "Student-Group Specific TES",
+    "authors": [
+      "Frenzel",
+      "Pekrun",
+      "Goetz",
+      "Daniels",
+      "Durksen",
+      "Becker-Kurz",
+      "Klassen"
+    ],
+    "year": 2016
+  },
+  "response": {
+    "range": [
+      1,
+      4
+    ],
+    "labels": [
+      "strongly disagree",
+      "disagree",
+      "agree",
+      "strongly agree"
+    ],
+    "notVersions": [
+      5,
+      6
+    ],
+    "noFixedRecall": true
+  },
+  "items": [
+    {
+      "originalShortCode": "joy1",
+      "code": "TESG_01",
+      "canonicalSourcePosition": 1,
+      "englishOriginal": "I generally enjoy teaching.",
+      "dimension": "enjoyment"
+    },
+    {
+      "originalShortCode": "joy2",
+      "code": "TESG_02",
+      "canonicalSourcePosition": 2,
+      "englishOriginal": "I generally have so much fun teaching that I gladly prepare and teach my lessons.",
+      "dimension": "enjoyment"
+    },
+    {
+      "originalShortCode": "joy3",
+      "code": "TESG_03",
+      "canonicalSourcePosition": 3,
+      "englishOriginal": "I often have reasons to be happy while I teach.",
+      "dimension": "enjoyment"
+    },
+    {
+      "originalShortCode": "joy4",
+      "code": "TESG_04",
+      "canonicalSourcePosition": 4,
+      "englishOriginal": "I generally teach with enthusiasm.",
+      "dimension": "enjoyment"
+    },
+    {
+      "originalShortCode": "ang1",
+      "code": "TESG_05",
+      "canonicalSourcePosition": 5,
+      "englishOriginal": "I often have reasons to be angry while I teach.",
+      "dimension": "anger"
+    },
+    {
+      "originalShortCode": "ang2",
+      "code": "TESG_06",
+      "canonicalSourcePosition": 6,
+      "englishOriginal": "I often feel annoyed while teaching.",
+      "dimension": "anger"
+    },
+    {
+      "originalShortCode": "ang3",
+      "code": "TESG_07",
+      "canonicalSourcePosition": 7,
+      "englishOriginal": "Sometimes I get really mad while I teach.",
+      "dimension": "anger"
+    },
+    {
+      "originalShortCode": "ang4",
+      "code": "TESG_08",
+      "canonicalSourcePosition": 8,
+      "englishOriginal": "Teaching generally frustrates me.",
+      "dimension": "anger"
+    },
+    {
+      "originalShortCode": "anx1",
+      "code": "TESG_09",
+      "canonicalSourcePosition": 9,
+      "englishOriginal": "I generally feel tense and nervous while teaching.",
+      "dimension": "anxiety"
+    },
+    {
+      "originalShortCode": "anx2",
+      "code": "TESG_10",
+      "canonicalSourcePosition": 10,
+      "englishOriginal": "I am often worried that my teaching isn't going so well.",
+      "dimension": "anxiety"
+    },
+    {
+      "originalShortCode": "anx3",
+      "code": "TESG_11",
+      "canonicalSourcePosition": 11,
+      "englishOriginal": "Preparing to teach often causes me to worry.",
+      "dimension": "anxiety"
+    },
+    {
+      "originalShortCode": "anx4",
+      "code": "TESG_12",
+      "canonicalSourcePosition": 12,
+      "englishOriginal": "I feel uneasy when I think about teaching.",
+      "dimension": "anxiety"
+    }
+  ],
+  "scoring": {
+    "version": "1.0.0",
+    "threeDimensions": [
+      {
+        "key": "enjoyment",
+        "numbers": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "originalCodes": [
+          "joy1",
+          "joy2",
+          "joy3",
+          "joy4"
+        ],
+        "aggregation": "mean"
+      },
+      {
+        "key": "anger",
+        "numbers": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "originalCodes": [
+          "ang1",
+          "ang2",
+          "ang3",
+          "ang4"
+        ],
+        "aggregation": "mean"
+      },
+      {
+        "key": "anxiety",
+        "numbers": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "originalCodes": [
+          "anx1",
+          "anx2",
+          "anx3",
+          "anx4"
+        ],
+        "aggregation": "mean"
+      }
+    ],
+    "noReverse": true,
+    "noTotal": true,
+    "range": [
+      1,
+      4
+    ],
+    "missing": "complete_facet_project_policy"
+  },
+  "display": {
+    "originalAuthorRecommendsRandomizedItems": true,
+    "definitionDraftRandomizeItems": true,
+    "forPublishSupported": false,
+    "referenceCodeStable": true
+  },
+  "localization": {
+    "target": "zh-CN",
+    "status": "PENDING"
+  },
+  "versions": {
+    "measurement": "1.0.0",
+    "localization": "1.0.0",
+    "report": "1.0.0",
+    "reference": null
+  },
+  "rights": {
+    "originalManuscriptSelfArchived": true,
+    "publicRedistribution": "ADMIN_REVIEW_PENDING",
+    "translation": "ADMIN_REVIEW_PENDING"
+  },
+  "tests": {
+    "syntheticCases": 10,
+    "vitest": "NOTRUN",
+    "CI": "NOTRUN",
+    "server": "NOTRUN"
+  }
+}
