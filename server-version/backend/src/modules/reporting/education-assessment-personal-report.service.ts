@@ -130,7 +130,7 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
     if(rule.mode==='COMPLETION_ONLY'){await recheck();return response('COMPLETED','本次作答已完成，当前仅提供完成确认。')}
     if(rule.mode!=='INDIVIDUAL_SUMMARY'||own.policy.analysisMode!=='INDIVIDUAL_ONLY')hidden()
     // Existing current respondent disclosure remains an independent ceiling.
-    const summary=await readRespondentRunSummary(input.actorUserId,input.executionId)
+    const summary=await readRespondentRunSummary(input.actorUserId,input.executionId,{disclosureOnly:true})
     if(summary.state!=='READY'||summary.mode!=='INDIVIDUAL_SUMMARY'){
       await recheck();return response('WITHHELD','当前反馈尚未获准显示。')
     }
@@ -159,9 +159,9 @@ export function createEducationAssessmentReportReader<Source extends EducationAs
         ||(envelope.persistenceProvenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null))hidden()
       facts.set(unit.itemId,envelope)
     }
-    const available='metrics' in summary?summary.metrics:{}
+    const available=new Set(Array.isArray(summary.metricKeys)?summary.metricKeys:[])
     const reports=projectEducationAssessmentReports({product:input.product,origin,binding,receipt,references,releases:source.releases,facts,
-      metricKeys:new Set(rule.metricKeys.filter(key=>Object.prototype.hasOwnProperty.call(available,key)))})
+      metricKeys:new Set(rule.metricKeys.filter(key=>available.has(key)))})
     await recheck()
     return {schemaVersion:1 as const,kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT' as const,state:'READY' as const,mode:'INDIVIDUAL_SUMMARY' as const,
       message:'以下反馈依据本次作答冻结、且当前获准开放的工具与报告版本展示。',reports}

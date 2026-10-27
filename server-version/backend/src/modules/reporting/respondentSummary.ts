@@ -8,7 +8,13 @@ import { resolveAuthoritativeTrackObservations } from './resultSource'
 import { reportingFail } from './types'
 
 const hidden = (): never => reportingFail('REPORT_NOT_FOUND', 'reporting resource not found', 404)
-export async function readRespondentRunSummary(userId: string, executionId: string) {
+type RespondentDisclosure={schemaVersion:1;mode:string;state:'READY'|'COMPLETED'|'WITHHELD';metricKeys?:string[]}
+export function readRespondentRunSummary(userId:string,executionId:string):Promise<ReturnType<typeof projectAudienceResult>>
+export function readRespondentRunSummary(userId:string,executionId:string,options:{disclosureOnly:true}):Promise<RespondentDisclosure>
+/** The internal disclosure-only consumer independently verifies canonical facts
+ * per unit. It receives no metrics and cannot flatten or merge identically named
+ * metrics from different instruments. Existing two-argument callers are unchanged. */
+export async function readRespondentRunSummary(userId: string, executionId: string, options?:{disclosureOnly:true}) {
   const readOwn = () => prisma.$queryRaw<Array<{ organizationId: string; runId: string; trackId: string; subjectUserId: string; relationship: string; perspective: any; family: string; key: string; version: string; policy: any; hash: string }>>`
     SELECT e.organization_id AS "organizationId",e.run_id AS "runId",e.track_id AS "trackId",s.user_id AS "subjectUserId",
       a.relationship_kind AS relationship,a.perspective,t.resource_family AS family,t.resource_key AS key,t.resource_version AS version,
@@ -48,16 +54,23 @@ export async function readRespondentRunSummary(userId: string, executionId: stri
   const rule = contract.audiences.RESPONDENT
   if (rule.mode === 'NONE' || rule.mode === 'COMPLETION_ONLY') return projectAudienceResult({contract,audience:'RESPONDENT',metrics:{}})
   if (rule.mode !== 'INDIVIDUAL_SUMMARY' || row.policy.analysisMode !== 'INDIVIDUAL_ONLY') return hidden()
+  const assertCurrent=async()=>{
+    const current = (await readOwn())[0]
+    const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
+    if (!current || current.hash !== row.hash || canonicalHash(current.policy) !== current.hash
+        || !currentEntry || currentEntry.releaseStatus !== 'PUBLISHED' || !currentEntry.resultDisclosure
+        || canonicalHash(currentEntry.resultDisclosure) !== canonicalHash(contract)) return hidden()
+  }
+  if(options?.disclosureOnly){
+    await assertCurrent()
+    return {schemaVersion:1 as const,mode:'INDIVIDUAL_SUMMARY' as const,state:'READY' as const,metricKeys:[...rule.metricKeys]}
+  }
   const batch = await resolveAuthoritativeTrackObservations({organizationId:row.organizationId,runId:row.runId,trackId:row.trackId,
     selection:{subjectUserId:row.subjectUserId,relationshipKind:row.relationship,perspective:row.perspective}})
   const result = batch.resolved.find(r => r.executionId === executionId && r.respondent.userId === userId)
   if (!result) return hidden()
   const metrics = Object.fromEntries(result.metrics.filter(m=>m.resultQuality!=='invalid').map(m=>[m.key,m.value]))
   // Recheck revocation after awaiting canonical result reads.
-  const current = (await readOwn())[0]
-  const currentEntry = await resolveHistoricalRelationalEntry({resourceKind:row.family as any,resourceKey:row.key,resourceVersion:row.version})
-  if (!current || current.hash !== row.hash || canonicalHash(current.policy) !== current.hash
-      || !currentEntry || currentEntry.releaseStatus !== 'PUBLISHED' || !currentEntry.resultDisclosure
-      || canonicalHash(currentEntry.resultDisclosure) !== canonicalHash(contract)) return hidden()
+  await assertCurrent()
   return projectAudienceResult({contract,audience:'RESPONDENT',metrics})
 }

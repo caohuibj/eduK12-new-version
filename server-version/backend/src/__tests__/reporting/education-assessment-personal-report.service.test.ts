@@ -9,10 +9,10 @@ import { educationReportFixture } from './education-assessment-report.fixture'
 import { createEducationAssessmentReportReader } from '../../modules/reporting/education-assessment-personal-report.service'
 
 const input={actorUserId:'self',executionId:'execution',product:'SCHOOL' as const}
-async function setup(){
-  const f=await educationReportFixture('SCHOOL',['COGNITIVE','SJT'])
+async function setup(sharedMetricKey?:string){
+  const f=await educationReportFixture('SCHOOL',['COGNITIVE','SJT'],{sharedMetricKey})
   m.query.mockResolvedValue([f.own]);m.scope.mockResolvedValue({membershipId:'own-member'})
-  m.summary.mockResolvedValue({schemaVersion:1,state:'READY',mode:'INDIVIDUAL_SUMMARY',metrics:{score0:10,score1:11}})
+  m.summary.mockResolvedValue({schemaVersion:1,state:'READY',mode:'INDIVIDUAL_SUMMARY',metricKeys:f.contract.audiences.RESPONDENT.metricKeys})
   m.parent.mockResolvedValue(f.parent);m.units.mockResolvedValue(f.rows);m.job.mockResolvedValue(null)
   const readSource=vi.fn().mockResolvedValue(f.source),assertSourceAuthority=vi.fn().mockResolvedValue(undefined)
   return {...f,readSource,assertSourceAuthority,read:createEducationAssessmentReportReader({readSource,assertSourceAuthority})}
@@ -25,7 +25,7 @@ describe('education respondent multi-tool report service (mock DB boundary, real
     expect(data).toMatchObject({kind:'EDUCATION_ASSESSMENT_PERSONAL_REPORT',state:'READY',reports:[{status:'READY'},{status:'READY'}]})
     expect(f.assertSourceAuthority).toHaveBeenCalledTimes(2)
     expect(m.query).toHaveBeenCalledTimes(2)
-    expect(m.summary).toHaveBeenCalledWith('self','execution')
+    expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true})
     expect(m.units).toHaveBeenCalledTimes(1)
     const sql=m.query.mock.calls[0][0].strings.join(' ')
     expect(sql).toContain("a.relationship_kind='SELF'")
@@ -118,4 +118,13 @@ it('does not replace original source authority proofs with another later adminis
  const f=await setup(),latest={...f.source,authority:[{kind:'PRODUCT_ADMIN',actorId:'later-admin',membershipId:'later-member',grantId:'later-grant'}]}
  f.readSource.mockResolvedValueOnce(f.source).mockResolvedValueOnce(latest)
  await expect(f.read(input)).rejects.toMatchObject({statusCode:404})
+})
+
+it('keeps identically named metrics in distinct approved unit reports instead of flattening a mixed bundle',async()=>{
+ const f=await setup('score'),data=await f.read(input)
+ expect(data).toMatchObject({state:'READY',reports:[
+  {itemId:f.origin.units[0].itemId,rendered:{blocks:[{type:'TEXT'},{metricKey:'score',value:10}]}},
+  {itemId:f.origin.units[1].itemId,rendered:{blocks:[{type:'TEXT'},{metricKey:'score',value:11}]}},
+ ]})
+ expect(m.summary).toHaveBeenCalledWith('self','execution',{disclosureOnly:true})
 })

@@ -13,7 +13,7 @@ import { draftEducationAssessmentEntry } from '../../modules/education-tools/ass
 
 const hash='a'.repeat(64)
 const uid=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`
-export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL',families:Array<'SCALE'|'COGNITIVE'|'SJT'>=['COGNITIVE']){
+export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL',families:Array<'SCALE'|'COGNITIVE'|'SJT'>=['COGNITIVE'],options:{sharedMetricKey?:string}={}){
   const candidate={schemaVersion:1,adapterVersion:'1.0.0',resourceId:uid(1),organizationId:uid(2),product,
     family:families.length>1?'BUNDLE':families[0]==='SJT'?'SITUATIONAL':'COGNITIVE',sourceCompositeId:uid(3),runtimeCompositeId:uid(4),
     sourceSnapshotHash:hash,runtimeSnapshotHash:hash,runtimeDefinitionHash:hash,units:[] as EducationAssessmentOrigin['units']}
@@ -22,13 +22,13 @@ export async function educationReportFixture(product:'SCHOOL'|'TEACHER'='SCHOOL'
   const origin=candidate as EducationAssessmentOrigin
   const contract:ResultDisclosureContractV1={schemaVersion:1,policyKey:'synthetic-reviewed-self-report',minimumRespondents:null,
     audiences:Object.fromEntries(resultAudiences.map(key=>[key,{mode:key==='RESPONDENT'?'INDIVIDUAL_SUMMARY':'NONE',
-      metricKeys:key==='RESPONDENT'?families.map((_,i)=>'score'+i):[],longitudinalMetricKeys:[]}])) as ResultDisclosureContractV1['audiences']}
+      metricKeys:key==='RESPONDENT'?[...new Set(families.map((_,i)=>options.sharedMetricKey??'score'+i))]:[],longitudinalMetricKeys:[]}])) as ResultDisclosureContractV1['audiences']}
   const policy={analysisMode:'INDIVIDUAL_ONLY',resultDisclosure:contract}
   const binding:TrainingContentSnapshot&{attemptId:string;epoch:number;publicationHash:string}={schemaVersion:1,compositeId:origin.runtimeCompositeId,
     attemptId:'attempt',epoch:1,publicationHash:hash,units:[]}
   const releases=new Map<string,StoredRelease>(),facts=new Map<string,ReturnType<typeof createCanonicalUnitResultEnvelope>>()
   for(const [i,family] of families.entries()){
-    const itemId=uid(10+i),metricKey='score'+i,type=family==='SJT'?'SITUATIONAL':family
+    const itemId=uid(10+i),metricKey=options.sharedMetricKey??'score'+i,type=family==='SJT'?'SITUATIONAL':family
     const measurement:StoredRelease={...prepareRelease({layer:'MEASUREMENT',family,key:'synthetic-'+family,version:'1',scope:{kind:'PRIVATE',product,ownerId:'approved-author',resourceId:uid(3)},
       assetRefs:[],sourceReleaseId:null,content:{projectionVersion:1,instrumentVersion:'1',measurementHash:hash,measurementHashScheme:'SYNTHETIC',scoringVersion:'1',runnerKey:'synthetic',runnerVersion:'1',locale:'zh-CN',localizationVersion:'1',metrics:[{metricKey,unit:'points',direction:'descriptive'}],executable:{}}}),
       releaseId:uid(30+i),status:'PUBLISHED',publishedBy:'approved-author',publishedAt:new Date('2026-10-27T00:00:00Z')}
