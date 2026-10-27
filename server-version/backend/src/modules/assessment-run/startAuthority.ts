@@ -16,7 +16,20 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
     SELECT e.id,(t.resource_family='FORM' AND t.resource_key LIKE 'private-form:%') AS "privateForm" FROM assessment_run_executions e JOIN assessment_run_tracks t
       ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
     LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
-    WHERE e.id=${executionId} AND ((t.resource_family='SCALE' AND (
+    WHERE e.id=${executionId} AND (EXISTS(
+      SELECT 1 FROM education_assessment_deliveries delivery
+      WHERE delivery.organization_id=e.organization_id AND delivery.family=t.resource_family
+       AND t.resource_version='1.0.0'
+       AND t.resource_key=('education-assessment:'||delivery.product||':'||delivery.organization_id||':'||delivery.id)
+       AND delivery.runtime_composite_id=t.frozen_resource_policy#>>'{runtimeLaunchTarget,ref}'
+       AND delivery.status IN ('PUBLISHED','RETIRED')
+       AND ((delivery.product='TEACHER'
+         AND EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id)
+         AND NOT EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id))
+        OR (delivery.product='SCHOOL'
+         AND EXISTS(SELECT 1 FROM campus_activity_runs c WHERE c.organization_id=e.organization_id AND c.run_id=e.run_id)
+         AND NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h WHERE h.organization_id=e.organization_id AND h.run_id=e.run_id))))
+      OR (t.resource_family='SCALE' AND (
       (t.resource_key LIKE 'library-scale:%' AND r.entry->'libraryOrigin'->>'product' IN ('SCHOOL','TEACHER'))
       OR (${privateScaleRegistryIdentitySql({registered:Prisma.sql`r`,organizationId:Prisma.sql`e.organization_id`,product:'SCHOOL'})}
         AND EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
