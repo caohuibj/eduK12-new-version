@@ -1,0 +1,15 @@
+import { describe, expect, it } from 'vitest'
+import { SCALE_INSTRUMENT_SOURCE as source } from '../../../modules/scale/instruments/apq42_parent_global_zh_cn_research/1.0.0/instrument'
+import { defineScaleInstrumentSource, projectScalePackage } from '../../../modules/scale/onboarding/define-instrument'
+import { scoreScale } from '../../../modules/scale/scale-scoring'
+const pkg=projectScalePackage(source)!,d=pkg.definition
+const id=(n:number)=>'APQ42_'+String(n).padStart(2,'0')
+const all=(v:string)=>Array.from({length:42},(_,i)=>({itemCode:id(i+1),responseValue:v}))
+const facets={"involvement":[1,4,7,9,11,14,15,20,23,26],"positive_parenting":[2,5,13,16,18,27],"poor_monitoring":[6,10,17,19,21,24,28,29,30,32],"inconsistent_discipline":[3,8,12,22,25,31],"corporal_punishment":[33,35,38]}
+describe('APQ-42 parent Global Chinese working draft (NOTRUN)',()=>{
+ it('validates source, 42 items, five anchors and DRAFT',()=>{expect(()=>defineScaleInstrumentSource(source)).not.toThrow();expect(source.executable?.releaseStatus).toBe('DRAFT');expect(d.items.map(x=>x.itemCode)).toEqual(Array.from({length:42},(_,i)=>id(i+1)));expect(d.responseSets[0].options.map(x=>x.score)).toEqual([1,2,3,4,5]);expect(d.items[37].content).toContain('皮带');expect(d.items[38].content).toContain('大喊')})
+ it('has five original dimensions, no all42 total, no sixth Other Discipline',()=>{expect(d.scoring.scores.map(s=>s.key)).toEqual(Object.keys(facets));expect(d.scoring.itemRules.every(r=>r.transform.type==='identity')).toBe(true);for(const [i,s] of d.scoring.scores.entries()){if(s.source.type!=='items')throw new Error('items source required');expect(s.source.aggregation).toBe('sum');expect(s.source.items.map(x=>x.itemCode)).toEqual(Object.values(facets)[i].map(id))};expect(scoreScale(d,all('1')).scores.map(x=>x.value)).toEqual([10,6,10,6,3]);expect(scoreScale(d,all('5')).scores.map(x=>x.value)).toEqual([50,30,50,30,15]);expect(d.referencePolicy).toEqual({type:'none'})})
+ it('evaluates 15 synthetic expected golden cases incl missing and facet extremes',()=>{for(const fx of pkg.goldenCases){const out=scoreScale(d,fx.answers);expect(out.quality.status).toBe(fx.expected.quality);expect(Object.fromEntries(out.scores.map(x=>[x.key,x.value]))).toEqual(fx.expected.scores)}})
+ it('uses eight axes with rights and localization review pending, no invented thresholds',()=>{expect(source.localization?.reviewStatus).toBe('PENDING');expect(d.license).toMatchObject({status:'unknown',redistribution:'restricted'});expect(source.catalog.construct.constructOverlapTags).toContain('license:author_contact_required');expect(d.report.interpretations).toHaveLength(5);expect(d.report.interpretations.every(x=>x.source.type==='score_only'&&x.bands.length===0)).toBe(true)})
+ it('rejects illegal or duplicate answer',()=>{for(const bad of ['0','6','bad',3,3.5,Number.NaN])expect(()=>scoreScale(d,[{itemCode:id(1),responseValue:bad},...all('3').slice(1)])).toThrow('量表回答不合法');expect(()=>scoreScale(d,[...all('3'),{itemCode:id(1),responseValue:'3'}])).toThrow('量表回答不合法')})
+})
