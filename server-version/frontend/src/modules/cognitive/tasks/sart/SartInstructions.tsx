@@ -1,0 +1,16 @@
+import React from 'react'
+import type {SartConfig} from './generated/protocol'
+export function SartInstructions({config,language='zh'}:{config:SartConfig;language?:'zh'|'en'}){
+  const en=language==='en'
+  return <section aria-label={en?'Instructions and examples':'操作说明与例子'}>
+    <h1>{en?'Look first, then respond':'先看清，再回应'}</h1>
+    <p>{en?'Digits from 1 to 9 appear one at a time in the centre, then a ring with a cross covers them. Press the response area once for every digit except 3. For 3, do not press. On a computer, use Space.':'中央会依次出现1到9的数字，随后被带斜交叉的圆环遮住。除了3，每个数字都按一下下方回应区；看到3，不要按。电脑可用空格键。'}</p>
+    <p>{en?'Look at each digit, then respond promptly. Speed and accuracy matter equally: do not simply tap to the rhythm. Digit sizes change, but the rule stays the same.':'先看清数字，再尽快回应。速度和准确同样重要，不要跟着节奏一直按。数字大小会变化，规则不变。'}</p>
+    <div className="sart-example"><h2>{en?'Example 1: 4 → 3 → 8':'例子一：4 → 3 → 8'}</h2><p>{en?'For 4, press and release. For 3, keep withholding. For 8, press and release again. Holding does not answer later digits; only the first new press counts.':'4出现，按一下并松开；3出现，保持不按；8出现，再按一下并松开。按住不能代答后面的数字，每题只记第一次新按下。'}</p></div>
+    <div className="sart-example"><h2>{en?'Example 2: the digit has disappeared':'例子二：数字已经消失'}</h2><p>{en?'You can still respond during the covering symbol. After 3, keep withholding while the symbol is shown. When the next digit appears, do not make up a response to the previous digit.':'数字后的符号阶段仍可回应。3消失后，即使已变成圆环也继续不按。下一数字出现后，不补答上一题。'}</p></div>
+    <h2>{en?'Nine slower practice trials':'先做9次慢练习'}</h2><p>{en?'Eight trials require a press and one requires withholding. Each gives feedback. Complete all nine, respond on at least 7 of 8 Go trials and withhold on the one No-Go trial before assessment. Practice is separate from assessment.':'其中8次要按、1次不按，每次有反馈。完整做完9次，Go至少7/8、No-Go正确不按1/1，才进入正式。练习不计正式结果。'}</p>
+    <p>{en?'If practice is incomplete or does not meet the rule, the full explanation and both examples return before another round. Up to three rounds are available; you may end at any time. This checks understanding, not a clinical threshold.':'失败或未完成时，先完整重看本说明和两个例子，再开始新一组，最多3组，也可结束。这是理解规则的约定，不是临床阈值。'}</p>
+    <h2>{en?'One continuous assessment stream':'正式连续一段'}</h2><p>{en?`This ${config.profile} version has ${config.totalTrials} digits. The stream lasts about ${config.profile==='research'?'4 min 19 s':'1 min 44 s'}, without trial feedback or rest breaks. Including first instructions and practice, budget ${config.profile==='research'?'6–8':'3–5'} minutes; reading and retries can take longer.`:`本次${config.profile==='research'?'科研':'体验'}版共${config.totalTrials}个数字，正式约${config.profile==='research'?'4分19秒':'1分44秒'}，连续呈现，不逐题提示对错，也不中途插入休息。含首次说明和练习预计${config.profile==='research'?'6–8':'3–5'}分钟，阅读和重练可更长。`}</p>
+    <p>{en?'Start when ready. Use End this attempt whenever you need to stop. Incomplete windows are not guessed as misses or successful withholding. Results describe this session; they do not diagnose ADHD, memory disorders or another condition. Short-version precision, age range, language and device equivalence remain unverified.':'准备好再开始，需要时可点“结束本次”。未完成窗口不会猜成漏答或成功不按。结果只描述本次，不诊断ADHD、记忆障碍或其他疾病。短版精度、年龄、语言与设备等效仍未核。'}</p>
+  </section>
+}

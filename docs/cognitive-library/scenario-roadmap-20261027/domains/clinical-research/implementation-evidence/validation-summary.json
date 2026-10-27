@@ -1,0 +1,561 @@
+{
+  "kind": "LOCAL_CONTENT_DEVELOPMENT_EVIDENCE_NOT_CI_PRODUCT_OR_SCIENTIFIC_QUALIFICATION",
+  "recordedAt": "2026-10-27T11:19:15.685764+00:00",
+  "baseCommit": "fc0942b49c73c17f6396cac9efd059b2fbe1d97e",
+  "node": "v24.19.0",
+  "uniqueTargets": {
+    "backend": 5,
+    "frontend": 7
+  },
+  "finalCoverage": {
+    "backend:SART content authority freezes exact225/90 balanced cells, independent9-trial practice streams and all version/parameter identities": {
+      "result": "passed",
+      "report": "backend-presentation-followup.json"
+    },
+    "backend:SART content authority uses Go/No-Go actual denominators, retains true0ms and signed negative differences, never treats poor performance as invalid": {
+      "result": "passed",
+      "report": "backend-frozen-copy-followup.json"
+    },
+    "backend:SART content authority excludes interrupted/unexecuted windows, rejects resumed streams, plan/envelope changes and cross-profile versions": {
+      "result": "passed",
+      "report": "backend-frozen-copy-followup.json"
+    },
+    "backend:SART content authority locks first fresh input through held boundaries and half-open windows, preserving a real first0 response": {
+      "result": "passed",
+      "report": "backend-frozen-copy-followup.json"
+    },
+    "backend:SART content authority whitelists all three public surfaces, hides research metrics and suppresses invalid counts rather than inventing zero": {
+      "result": "passed",
+      "report": "backend-frozen-copy-followup.json"
+    },
+    "frontend:SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses": {
+      "result": "passed",
+      "report": "frontend-first.json"
+    },
+    "frontend:SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports": {
+      "result": "passed",
+      "report": "frontend-frozen-copy-followup.json"
+    },
+    "frontend:SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes": {
+      "result": "passed",
+      "report": "frontend-lifecycle-owner-followup.json"
+    },
+    "frontend:SART candidate flows refuses reused durable identities and provides complete English instruction/report copy": {
+      "result": "passed",
+      "report": "frontend-react-lifecycle-followup.json"
+    },
+    "frontend:SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure": {
+      "result": "passed",
+      "report": "frontend-frozen-copy-followup.json"
+    },
+    "frontend:SART candidate flows survives the existing application StrictMode effect replay while preparing exactly one fresh attempt": {
+      "result": "passed",
+      "report": "frontend-lifecycle-owner-followup.json"
+    },
+    "frontend:SART candidate flows keeps a completed stream completed when only the last local save requires retry": {
+      "result": "passed",
+      "report": "frontend-frozen-copy-followup.json"
+    }
+  },
+  "invocations": [
+    {
+      "cwd": "server-version/backend",
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/sart-content.test.ts --reporter=json --outputFile=<evidence>/backend-first.json",
+      "exitCode": 0,
+      "report": "backend-first.json",
+      "passed": 5,
+      "failed": 0,
+      "filtered": 0,
+      "cases": [
+        {
+          "fullName": "SART content authority freezes exact225/90 balanced cells, independent9-trial practice streams and all version/parameter identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority uses Go/No-Go actual denominators, retains true0ms and signed negative differences, never treats poor performance as invalid",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority excludes interrupted/unexecuted windows, rejects resumed streams, plan/envelope changes and cross-profile versions",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority locks first fresh input through held boundaries and half-open windows, preserving a real first0 response",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority whitelists all three public surfaces, hides research metrics and suppresses invalid counts rather than inventing zero",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx --reporter=json --outputFile=<evidence>/frontend-first.json",
+      "exitCode": 1,
+      "report": "frontend-first.json",
+      "passed": 4,
+      "failed": 1,
+      "filtered": 0,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "failed"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'preserves originals on delayed save failure' --reporter=json --outputFile=<evidence>/frontend-save-fixture-followup.json",
+      "exitCode": 0,
+      "report": "frontend-save-fixture-followup.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'refuses reused durable identities' --reporter=json --outputFile=<evidence>/frontend-english-assertion-followup.json",
+      "exitCode": 0,
+      "report": "frontend-english-assertion-followup.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'existing application StrictMode|renders both complete teaching examples|refuses reused durable identities' --reporter=json --outputFile=<evidence>/frontend-react-lifecycle-followup.json",
+      "exitCode": 0,
+      "report": "frontend-react-lifecycle-followup.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 3,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows survives the existing application StrictMode effect replay while preparing exactly one fresh attempt",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/backend",
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/sart-content.test.ts -t 'freezes exact225/90' --reporter=json --outputFile=<evidence>/backend-presentation-followup.json",
+      "exitCode": 0,
+      "report": "backend-presentation-followup.json",
+      "passed": 1,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "fullName": "SART content authority freezes exact225/90 balanced cells, independent9-trial practice streams and all version/parameter identities",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority uses Go/No-Go actual denominators, retains true0ms and signed negative differences, never treats poor performance as invalid",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART content authority excludes interrupted/unexecuted windows, rejects resumed streams, plan/envelope changes and cross-profile versions",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART content authority locks first fresh input through held boundaries and half-open windows, preserving a real first0 response",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART content authority whitelists all three public surfaces, hides research metrics and suppresses invalid counts rather than inventing zero",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'preserves originals on delayed save failure|keeps a completed stream completed' --reporter=json --outputFile=<evidence>/frontend-save-boundary-followup.json",
+      "exitCode": 0,
+      "report": "frontend-save-boundary-followup.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 5,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows survives the existing application StrictMode effect replay while preparing exactly one fresh attempt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows keeps a completed stream completed when only the last local save requires retry",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/backend",
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/cognitive/sart-content.test.ts -t 'uses Go/No-Go|excludes interrupted|locks first fresh|whitelists all three' --reporter=json --outputFile=<evidence>/backend-frozen-copy-followup.json",
+      "exitCode": 0,
+      "report": "backend-frozen-copy-followup.json",
+      "passed": 4,
+      "failed": 0,
+      "filtered": 1,
+      "cases": [
+        {
+          "fullName": "SART content authority freezes exact225/90 balanced cells, independent9-trial practice streams and all version/parameter identities",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART content authority uses Go/No-Go actual denominators, retains true0ms and signed negative differences, never treats poor performance as invalid",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority excludes interrupted/unexecuted windows, rejects resumed streams, plan/envelope changes and cross-profile versions",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority locks first fresh input through held boundaries and half-open windows, preserving a real first0 response",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART content authority whitelists all three public surfaces, hides research metrics and suppresses invalid counts rather than inventing zero",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'finishes failed|preserves originals|keeps a completed' --reporter=json --outputFile=<evidence>/frontend-frozen-copy-followup.json",
+      "exitCode": 0,
+      "report": "frontend-frozen-copy-followup.json",
+      "passed": 3,
+      "failed": 0,
+      "filtered": 4,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows survives the existing application StrictMode effect replay while preparing exactly one fresh attempt",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows keeps a completed stream completed when only the last local save requires retry",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "cwd": "server-version/frontend",
+      "command": "node node_modules/vitest/vitest.mjs run src/modules/cognitive/tasks/sart/content.test.tsx -t 'renders both complete teaching examples|existing application StrictMode' --reporter=json --outputFile=<evidence>/frontend-lifecycle-owner-followup.json",
+      "exitCode": 0,
+      "report": "frontend-lifecycle-owner-followup.json",
+      "passed": 2,
+      "failed": 0,
+      "filtered": 5,
+      "cases": [
+        {
+          "fullName": "SART candidate flows records mask responses, first0ms, ignored repeats and releases across trial boundaries without accepting late presses",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows finishes failed+retried9 practice and continuous90 formal, queues persistence without gaps, freezes final retry and gates reports",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows renders both complete teaching examples, actual touch/Space/mask controls, repeats instructions after incomplete practice and freezes context changes",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows refuses reused durable identities and provides complete English instruction/report copy",
+          "status": "skipped"
+        },
+        {
+          "fullName": "SART candidate flows survives the existing application StrictMode effect replay while preparing exactly one fresh attempt",
+          "status": "passed"
+        },
+        {
+          "fullName": "SART candidate flows keeps a completed stream completed when only the last local save requires retry",
+          "status": "skipped"
+        }
+      ]
+    }
+  ],
+  "originalFailures": [
+    {
+      "target": "frontend:SART candidate flows preserves originals on delayed save failure, interrupts only the current window and retries identical bytes without new exposure",
+      "report": "frontend-first.json",
+      "status": "failed-original-retained"
+    }
+  ],
+  "historicalBinding": "Original JSON reporters and errors retained. Initial complete source manifests were not captured contemporaneously. Final source hashes are not relabelled as original-run manifests. Changes and targeted continuations are described in implementation.md.",
+  "finalSourceFootprint": [
+    {
+      "path": "server-version/backend/src/__tests__/cognitive/sart-content.test.ts",
+      "sha256": "25167bff21ae960fe1ccf676e925c04e7e22494aee6161c2e1a5d3a269f9d4ed"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/analysis.ts",
+      "sha256": "48ecf2b1195d8bcfac9feaa66219db46ff91e8f5dff27caa460302ecc0818b39"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/metadata.ts",
+      "sha256": "9e7b43e7c095ffe52d12fc84da1949ad8fc1d814f1471c8c952c4891e6ae8962"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/package.ts",
+      "sha256": "e13effb1203d2d1e450704d8bacba78b22c8fc4e22ab74bd82fd459de9d4a671"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/participant-presentation.ts",
+      "sha256": "02f5127acd79759b7f8714fbbac706b92c15e2bded9d40f62d8c083738743382"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/protocol.ts",
+      "sha256": "62097f12f207a19b522ecb26d729081f89e04a72a3059e925ce54ab2139674de"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/report.ts",
+      "sha256": "3148f325c4f3877c67198fda5916dff601c446dbb776fc087e72009dabcc2e46"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/schema.ts",
+      "sha256": "c4f2016489ce29446f64e2ebc184a02f1bd0e65106bdc36662caadc0281427f9"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/sart/scorer.ts",
+      "sha256": "ed6d750b2fd5be9d54fbf1fe63edb440c3f6a5d53bc05e394d77886e1b0ab423"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartInstructions.tsx",
+      "sha256": "1f59ae9a04018ea2dd6a2eeabf995a9b0858c0ae862b213a02b958596b0dbe74"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartReport.tsx",
+      "sha256": "0f5b7cbc87309e1dd406f53f905a191386fb705c79749ff27dac0fb42892d22b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/SartTask.tsx",
+      "sha256": "3bff51bb4f9f9ecadc3893a4e6bc9cadc347d2422055a030970bf6249f6be546"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/capture.ts",
+      "sha256": "78494661396b204bbcdd20fb799cd9d4e550a8710e0c5d1866b40a7375217449"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx",
+      "sha256": "e53de3469dbb8a7375ce863fd9b35202635b229bc5cfd5387d145c2e99429a8a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/contracts.ts",
+      "sha256": "1bbec141fc2d72b3375ea422cde78495f0c496aeedca8ccf2f0ab7c00d616a50"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/generated/analysis.ts",
+      "sha256": "991d42d5313597ece49cdb81e4dc80db5e29117a88a7606fdf62464dc301bed1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/generated/protocol.ts",
+      "sha256": "d2a5597af6e55a4ddaa585db5a3c6fca87a2028654165d27a4e127ab2d51a69f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/generated/report.ts",
+      "sha256": "7fb6ca90957e1959868c27d06df098a7cc84f52f6a7fc665da9d04fbdc65fb3d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/sart.css",
+      "sha256": "8370d4468347babcd195b6bfe1fd072e781a100cf607845896b3ce5d8b58519c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/session.ts",
+      "sha256": "c33bcfd9cd331f9e1fdf19177f53234351e12ce9a522c2ecd84e6c94c4ab77fd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sart/sync-content.cjs",
+      "sha256": "08cf5dc3fdc332d202ec57e05f1df41427f70f12d1a1b8e02dda326e0af64eaa"
+    }
+  ],
+  "unchangedSharedInputs": [
+    {
+      "path": "server-version/backend/package.json",
+      "gitBlob": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+      "sha256": "d629185584fcd679ca367c2d536c6c7783f7a9fe23363a8cd870964a47b2990a"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "gitBlob": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+      "sha256": "01b51f001193cf54c5f09b9b78fa20a46efa65ad08175d1199e588e33f9a0450"
+    },
+    {
+      "path": "server-version/backend/tsconfig.json",
+      "gitBlob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+      "sha256": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "gitBlob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "gitBlob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+      "sha256": "ba3959e4e7935cb3b60b8391f590a2622990397b1b33b99a545c45867d51e49f"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "gitBlob": "38d624d2dd610673f9392a89af7290682862e2b0",
+      "sha256": "ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe"
+    },
+    {
+      "path": "server-version/frontend/tsconfig.app.json",
+      "gitBlob": "990a9f4222f2330106b8141fe5658283326e49df",
+      "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+    },
+    {
+      "path": "server-version/frontend/vitest.config.ts",
+      "gitBlob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+      "sha256": "3d757d2b1cee6c1c09a3ec7016b296aa159c938f83365e2370a1d423f29917db"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/content-candidates/native-registry/definitions.ts",
+      "gitBlob": "2e377345634f56f0597c704dfc00a346aae72c38",
+      "sha256": "1138875dd230f89b2e6e0bb1a52fe7b6bb353268653e6736c150c88beda19af7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/registry.ts",
+      "gitBlob": "a6947a36033fb2480f0f5c9fd49f3258086c4f41",
+      "sha256": "cbcd64d98168a4428fe11fd6609dba39f5f6257f9028854ddb8bbfc1d81e3617"
+    },
+    {
+      "path": "server-version/frontend/src/main.tsx",
+      "gitBlob": "b624739dc8baca26f74d3716250ff7d3c939860b",
+      "sha256": "4fe557df842ea036e4df441b8e3e91c070715060d8cf250c7ca13d1950b8ba2c"
+    }
+  ],
+  "excluded": [
+    "all other tasks",
+    "shared registry/interface/catalog writes",
+    "platform or DB/COS services",
+    "CI",
+    "merge",
+    "deploy",
+    "activation",
+    "final integration qualification"
+  ]
+}

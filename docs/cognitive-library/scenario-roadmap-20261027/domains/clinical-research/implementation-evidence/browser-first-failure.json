@@ -1,0 +1,8 @@
+{
+  "kind": "OBSERVED_TOOL_FAILURE_NOT_SUCCESS",
+  "action": "actual React preview at about:blank",
+  "error": "locator.waitFor: Timeout 30000ms exceeded; waiting for h1 to be visible",
+  "completedScenarios": 0,
+  "correction": "Use loopback-fulfilled HTTPS synthetic origin and verify native secure context/crypto.randomUUID. No production request or insecure browser feature flag.",
+  "diagnosisBoundary": "Origin deficiency inferred from native crypto requirement and successful secure-context correction; original page body was not retained."
+}

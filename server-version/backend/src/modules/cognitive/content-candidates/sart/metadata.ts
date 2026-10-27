@@ -1,0 +1,8 @@
+export const sartContent={candidateId:'sart',status:'CONTENT_CANDIDATE_NOT_DOT_REVIEWED_NOT_INTEGRATED',
+  source:{repository:'staiw/SART',commit:'735d300eab4a18784e7f12f85a1123b754a981a1',readmeBlob:'16b2968389f721a3710b87596a7b5ffe712cb0a6',licenseBlob:'76cffea6b187b3e5ff7addb8cc7363dd9ed64800',scriptBlob:'05367638b77d7cdb39f49962aaef36e96a2617b7',doi:'10.1016/S0028-3932(97)00015-8'},
+  rights:{code:'Independent implementation from described methods; no upstream code copied',upstreamCodeLicense:'MIT, Stella Wernicke 2023',images:'Original SVG ring/cross; no upstream images or paper figures',questionBank:'No restricted bank; generated digits and balanced font-size cells',translations:'Original Chinese and English instructions, not a licensed clinical translation',font:'System UI font stack; no redistributed font file'},
+  vocabularyCommit:'22721e5c63dd78819e8c58921adf20157cdaa08c',
+  tags:{cognitive_domain:['attention','executive_control'],target_process:['sustained_monitoring','response_withholding'],key_metric:['condition_accuracy','condition_rt','omission_commission','rt_variability'],intended_use:['research_protocol_selection'],implementation_strategy:['literature_reimplementation'],baseline_relation:['protocol_variant']},
+  proposalOnlyExtensions:{paradigm:'frequent digit response with rare withholding',stimulus:'digits and mask'},
+  applicability:{ageRange:null,populationValidation:null,chineseValidation:null,difficultyValidation:null,deviceEquivalence:null,shortProfileValidation:null},
+  backendTagsPersisted:false,backendSearchConnected:false,clinicalScreeningValidated:false}

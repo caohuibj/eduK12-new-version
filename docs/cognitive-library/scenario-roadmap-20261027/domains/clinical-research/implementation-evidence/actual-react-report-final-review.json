@@ -1,0 +1,77 @@
+{
+  "kind": "ACTUAL_REACT_CANDIDATE_WITH_SYNTHETIC_PORTS_NOT_PRODUCT_ACCEPTANCE",
+  "renderedAt": "2026-10-27T11:11:23.480Z",
+  "browser": "151.0.7922.173",
+  "chromiumSandbox": false,
+  "network": "HTTP(S) aborted",
+  "results": [
+    {
+      "name": "actual-report-interpretable-phone",
+      "options": {
+        "mode": "report",
+        "state": "interpretable",
+        "language": "zh",
+        "width": 390,
+        "height": 844,
+        "name": "actual-report-interpretable-phone"
+      },
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 901
+      },
+      "errors": []
+    },
+    {
+      "name": "actual-report-limited-phone",
+      "options": {
+        "mode": "report",
+        "state": "limited",
+        "language": "zh",
+        "width": 390,
+        "height": 844,
+        "name": "actual-report-limited-phone"
+      },
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 947
+      },
+      "errors": []
+    },
+    {
+      "name": "actual-report-invalid-phone",
+      "options": {
+        "mode": "report",
+        "state": "invalid",
+        "language": "zh",
+        "width": 390,
+        "height": 844,
+        "name": "actual-report-invalid-phone"
+      },
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 844
+      },
+      "errors": []
+    },
+    {
+      "name": "actual-report-en-tablet",
+      "options": {
+        "mode": "report",
+        "state": "interpretable",
+        "language": "en",
+        "width": 820,
+        "height": 1180,
+        "name": "actual-report-en-tablet"
+      },
+      "layout": {
+        "width": 820,
+        "scrollWidth": 820,
+        "height": 1180
+      },
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "name": "backend",
+    "config": "server-version/backend/tsconfig.json",
+    "entries": [
+      "server-version/backend/src/modules/cognitive/content-candidates/sart/package.ts",
+      "server-version/backend/src/modules/cognitive/content-candidates/sart/metadata.ts",
+      "server-version/backend/src/__tests__/cognitive/sart-content.test.ts"
+    ],
+    "sourceCount": 46,
+    "diagnostics": []
+  },
+  {
+    "name": "frontend",
+    "config": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/sart/SartTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx"
+    ],
+    "sourceCount": 54,
+    "diagnostics": [
+      {
+        "code": 2322,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx",
+        "line": 14,
+        "message": "Type 'SessionConfigSnapshot<{ profile: SartProfile; totalTrials: number; repetitionsPerDigitSize: number; digits: number[]; noGoDigit: number; fontSizesPx: number[]; fontFamily: string; digitMs: number; maskMs: number; ... 10 more ...; presentationVersion: string; }>' is not assignable to type 'SartSnapshot'.\n  The types of 'protocol.phases' are incompatible between these types.\n    Type 'ProtocolPhaseDefinition[]' is not assignable to type '{ key: \"test\"; persists: boolean; required: boolean; }[]'.\n      Type 'ProtocolPhaseDefinition' is not assignable to type '{ key: \"test\"; persists: boolean; required: boolean; }'.\n        Types of property 'key' are incompatible.\n          Type 'CognitivePhase' is not assignable to type '\"test\"'.\n            Type '\"learning\"' is not assignable to type '\"test\"'."
+      },
+      {
+        "code": 2339,
+        "file": "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx",
+        "line": 65,
+        "message": "Property 'toHaveTextContent' does not exist on type 'Assertion<HTMLElement>'."
+      }
+    ]
+  }
+]

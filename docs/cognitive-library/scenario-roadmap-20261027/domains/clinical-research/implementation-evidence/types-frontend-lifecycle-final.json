@@ -1,0 +1,12 @@
+[
+  {
+    "name": "frontend",
+    "config": "server-version/frontend/tsconfig.app.json",
+    "entries": [
+      "server-version/frontend/src/modules/cognitive/tasks/sart/SartTask.tsx",
+      "server-version/frontend/src/modules/cognitive/tasks/sart/content.test.tsx"
+    ],
+    "sourceCount": 54,
+    "diagnostics": []
+  }
+]

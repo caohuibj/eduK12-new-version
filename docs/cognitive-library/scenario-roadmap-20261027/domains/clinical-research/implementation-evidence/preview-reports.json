@@ -1,0 +1,478 @@
+{
+  "kind": "AUTHORITATIVE_SOFTWARE_SYNTHETIC_LAYOUT_FIXTURE_NOT_PARTICIPANT_DATA",
+  "reports": {
+    "interpretable": {
+      "report": {
+        "testType": "sart",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "c21844f7f6b41c16d28830986c97b15810966e230d1894f0ef175a3a0bb45cd0",
+        "protocolSignature": "587e23a5b5e173a07949c58d76ee06200f9505a91fce52697e498b7ec459b0e2",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "state": "interpretable",
+        "planned": 90,
+        "received": 90,
+        "complete": 90,
+        "stats": {
+          "go": 80,
+          "noGo": 10,
+          "hits": 80,
+          "omissions": 0,
+          "commissions": 0,
+          "correctWithholds": 10,
+          "rtCount": 80,
+          "medianMs": 320
+        },
+        "thirds": [
+          {
+            "go": 26,
+            "noGo": 4,
+            "hits": 26,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 4,
+            "rtCount": 26,
+            "medianMs": 320
+          },
+          {
+            "go": 27,
+            "noGo": 3,
+            "hits": 27,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 3,
+            "rtCount": 27,
+            "medianMs": 320
+          },
+          {
+            "go": 27,
+            "noGo": 3,
+            "hits": 27,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 3,
+            "rtCount": 27,
+            "medianMs": 320
+          }
+        ],
+        "differences": {
+          "commissionPercentagePoints": 0,
+          "medianMs": 0
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段回应",
+            "partial": "本次只描述已经完整记录的部分",
+            "invalid": "本次暂时无法形成表现结论",
+            "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+            "tip": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+            "limit": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+            "empty": "尚无完整正式回应窗口；这不代表表现为零或注意力差。可以先休息或重看说明，再由你决定是否重新开始。"
+          },
+          "en": {
+            "title": "Thank you for completing this response stream",
+            "partial": "Only the fully recorded part is described",
+            "invalid": "No performance conclusion is available",
+            "explanation": "This record separates missed Go responses from presses on No-Go trials. A single session cannot establish their causes, and speed alone does not determine attention.",
+            "tip": "Before another sustained observation task, confirm the rule, reduce nearby interruptions and take a break when needed. Consider accuracy with speed rather than trying only to respond faster.",
+            "limit": "There are no clinical or age norms for this version. Sleep, hand movements and devices can affect performance. This does not determine ADHD, memory disorders, IQ or fitness for work.",
+            "empty": "No complete formal response window is available. This does not mean zero performance or poor attention. Rest or review the instructions, then decide whether to start another attempt."
+          }
+        }
+      },
+      "download": {
+        "state": "interpretable",
+        "profile": "experience",
+        "title": "谢谢你完成这段回应",
+        "notice": null,
+        "summary": {
+          "noGo": {
+            "presses": 0,
+            "opportunities": 10
+          },
+          "go": {
+            "misses": 0,
+            "opportunities": 80
+          },
+          "latency": {
+            "medianMs": 320,
+            "responses": 80
+          }
+        },
+        "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+        "suggestion": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+        "limitation": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+        "details": {
+          "complete": 90,
+          "planned": 90,
+          "thirds": [
+            {
+              "go": 26,
+              "noGo": 4,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 27,
+              "noGo": 3,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 27,
+              "noGo": 3,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            }
+          ],
+          "differences": {
+            "commissionPercentagePoints": 0,
+            "medianMs": 0
+          }
+        }
+      },
+      "image": {
+        "state": "interpretable",
+        "profile": "experience",
+        "title": "谢谢你完成这段回应",
+        "notice": null,
+        "summary": {
+          "noGo": {
+            "presses": 0,
+            "opportunities": 10
+          },
+          "go": {
+            "misses": 0,
+            "opportunities": 80
+          },
+          "latency": {
+            "medianMs": 320,
+            "responses": 80
+          }
+        },
+        "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+        "suggestion": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+        "limitation": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+        "details": {
+          "complete": 90,
+          "planned": 90,
+          "thirds": [
+            {
+              "go": 26,
+              "noGo": 4,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 27,
+              "noGo": 3,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 27,
+              "noGo": 3,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            }
+          ],
+          "differences": {
+            "commissionPercentagePoints": 0,
+            "medianMs": 0
+          }
+        },
+        "brand": "EDUK12.TOP"
+      }
+    },
+    "limited": {
+      "report": {
+        "testType": "sart",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "c21844f7f6b41c16d28830986c97b15810966e230d1894f0ef175a3a0bb45cd0",
+        "protocolSignature": "587e23a5b5e173a07949c58d76ee06200f9505a91fce52697e498b7ec459b0e2",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "state": "limited",
+        "planned": 90,
+        "received": 6,
+        "complete": 6,
+        "stats": {
+          "go": 6,
+          "noGo": 0,
+          "hits": 6,
+          "omissions": 0,
+          "commissions": 0,
+          "correctWithholds": 0,
+          "rtCount": 6,
+          "medianMs": 320
+        },
+        "thirds": [
+          {
+            "go": 6,
+            "noGo": 0,
+            "hits": 6,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 6,
+            "medianMs": 320
+          },
+          {
+            "go": 0,
+            "noGo": 0,
+            "hits": 0,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 0,
+            "medianMs": null
+          },
+          {
+            "go": 0,
+            "noGo": 0,
+            "hits": 0,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 0,
+            "medianMs": null
+          }
+        ],
+        "differences": {
+          "commissionPercentagePoints": null,
+          "medianMs": null
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段回应",
+            "partial": "本次只描述已经完整记录的部分",
+            "invalid": "本次暂时无法形成表现结论",
+            "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+            "tip": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+            "limit": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+            "empty": "尚无完整正式回应窗口；这不代表表现为零或注意力差。可以先休息或重看说明，再由你决定是否重新开始。"
+          },
+          "en": {
+            "title": "Thank you for completing this response stream",
+            "partial": "Only the fully recorded part is described",
+            "invalid": "No performance conclusion is available",
+            "explanation": "This record separates missed Go responses from presses on No-Go trials. A single session cannot establish their causes, and speed alone does not determine attention.",
+            "tip": "Before another sustained observation task, confirm the rule, reduce nearby interruptions and take a break when needed. Consider accuracy with speed rather than trying only to respond faster.",
+            "limit": "There are no clinical or age norms for this version. Sleep, hand movements and devices can affect performance. This does not determine ADHD, memory disorders, IQ or fitness for work.",
+            "empty": "No complete formal response window is available. This does not mean zero performance or poor attention. Rest or review the instructions, then decide whether to start another attempt."
+          }
+        }
+      },
+      "download": {
+        "state": "limited",
+        "profile": "experience",
+        "title": "谢谢你完成这段回应",
+        "notice": "本次只描述已经完整记录的部分",
+        "summary": {
+          "noGo": null,
+          "go": {
+            "misses": 0,
+            "opportunities": 6
+          },
+          "latency": {
+            "medianMs": 320,
+            "responses": 6
+          }
+        },
+        "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+        "suggestion": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+        "limitation": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+        "details": {
+          "complete": 6,
+          "planned": 90,
+          "thirds": [
+            {
+              "go": 6,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 0,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": null
+            },
+            {
+              "go": 0,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": null
+            }
+          ],
+          "differences": {
+            "commissionPercentagePoints": null,
+            "medianMs": null
+          }
+        }
+      },
+      "image": {
+        "state": "limited",
+        "profile": "experience",
+        "title": "谢谢你完成这段回应",
+        "notice": "本次只描述已经完整记录的部分",
+        "summary": {
+          "noGo": null,
+          "go": {
+            "misses": 0,
+            "opportunities": 6
+          },
+          "latency": {
+            "medianMs": 320,
+            "responses": 6
+          }
+        },
+        "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+        "suggestion": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+        "limitation": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+        "details": {
+          "complete": 6,
+          "planned": 90,
+          "thirds": [
+            {
+              "go": 6,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": 320
+            },
+            {
+              "go": 0,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": null
+            },
+            {
+              "go": 0,
+              "noGo": 0,
+              "misses": 0,
+              "presses": 0,
+              "medianMs": null
+            }
+          ],
+          "differences": {
+            "commissionPercentagePoints": null,
+            "medianMs": null
+          }
+        },
+        "brand": "EDUK12.TOP"
+      }
+    },
+    "invalid": {
+      "report": {
+        "testType": "sart",
+        "engineVersion": "0.1.0",
+        "scoringVersion": "0.1.0",
+        "configVersion": "0.1.0",
+        "configHash": "c21844f7f6b41c16d28830986c97b15810966e230d1894f0ef175a3a0bb45cd0",
+        "protocolSignature": "587e23a5b5e173a07949c58d76ee06200f9505a91fce52697e498b7ec459b0e2",
+        "profile": "experience",
+        "reportDefinitionVersion": "0.1.0",
+        "presentationVersion": "0.1.0",
+        "state": "invalid",
+        "planned": 90,
+        "received": 0,
+        "complete": 0,
+        "stats": {
+          "go": 0,
+          "noGo": 0,
+          "hits": 0,
+          "omissions": 0,
+          "commissions": 0,
+          "correctWithholds": 0,
+          "rtCount": 0,
+          "medianMs": null
+        },
+        "thirds": [
+          {
+            "go": 0,
+            "noGo": 0,
+            "hits": 0,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 0,
+            "medianMs": null
+          },
+          {
+            "go": 0,
+            "noGo": 0,
+            "hits": 0,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 0,
+            "medianMs": null
+          },
+          {
+            "go": 0,
+            "noGo": 0,
+            "hits": 0,
+            "omissions": 0,
+            "commissions": 0,
+            "correctWithholds": 0,
+            "rtCount": 0,
+            "medianMs": null
+          }
+        ],
+        "differences": {
+          "commissionPercentagePoints": null,
+          "medianMs": null
+        },
+        "copy": {
+          "zh": {
+            "title": "谢谢你完成这段回应",
+            "partial": "本次只描述已经完整记录的部分",
+            "invalid": "本次暂时无法形成表现结论",
+            "explanation": "这份记录分别描述该按时未按，以及不该按时按下。单次表现不能说明这些情况的原因，也不能只用速度判断注意力。",
+            "tip": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+            "limit": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+            "empty": "尚无完整正式回应窗口；这不代表表现为零或注意力差。可以先休息或重看说明，再由你决定是否重新开始。"
+          },
+          "en": {
+            "title": "Thank you for completing this response stream",
+            "partial": "Only the fully recorded part is described",
+            "invalid": "No performance conclusion is available",
+            "explanation": "This record separates missed Go responses from presses on No-Go trials. A single session cannot establish their causes, and speed alone does not determine attention.",
+            "tip": "Before another sustained observation task, confirm the rule, reduce nearby interruptions and take a break when needed. Consider accuracy with speed rather than trying only to respond faster.",
+            "limit": "There are no clinical or age norms for this version. Sleep, hand movements and devices can affect performance. This does not determine ADHD, memory disorders, IQ or fitness for work.",
+            "empty": "No complete formal response window is available. This does not mean zero performance or poor attention. Rest or review the instructions, then decide whether to start another attempt."
+          }
+        }
+      },
+      "download": {
+        "state": "invalid",
+        "profile": "experience",
+        "title": "本次暂时无法形成表现结论",
+        "notice": null,
+        "summary": null,
+        "explanation": "尚无完整正式回应窗口；这不代表表现为零或注意力差。可以先休息或重看说明，再由你决定是否重新开始。",
+        "suggestion": "下次做持续观察任务，可以先确认规则、减少旁边打断，并在需要时安排休息。速度与准确一起看，无需只追求按得更快。",
+        "limitation": "本版本没有临床或同龄参照；睡眠、手部操作和设备都可能影响表现。不据此判断 ADHD、记忆障碍、IQ 或工作适任。",
+        "details": null
+      },
+      "image": null
+    }
+  }
+}

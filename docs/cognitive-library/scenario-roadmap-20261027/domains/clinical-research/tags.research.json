@@ -4,7 +4,7 @@
   "taxonomyPath": "docs/cognitive-library/candidate-tags-20261026/taxonomy.json",
   "taxonomyBlob": "f28a14159348d3cebbfa04a3675b126307dd9e43",
   "candidate": "sart",
-  "currentDesignStatus": "DESIGNED_AWAITING_EXPLICIT_SINGLE_TASK_APPROVAL_NOT_IMPLEMENTED",
+  "currentDesignStatus": "CONTENT_CANDIDATE_APPROVED_FOR_DEVELOPMENT_NOT_DOT_REVIEWED_NOT_INTEGRATED",
   "preservedVocabularyMappings": {
     "cognitive_domain": [
       "attention",
@@ -89,5 +89,6 @@
   },
   "backendTagsPersisted": false,
   "backendSearchConnected": false,
-  "rightsCaveat": "Asset pending concerns future font and external assets, not a claim that original geometric storyboard is prohibited. Code MIT does not clear upstream images, questionnaires or translations. No upstream media copied."
+  "rightsCaveat": "Asset pending concerns future font and external assets, not a claim that original geometric storyboard is prohibited. Code MIT does not clear upstream images, questionnaires or translations. No upstream media copied.",
+  "approvalNote": "DOT relayed explicit user approval to develop SART225/90 and9 slow practice; scientific validity remains unverified"
 }
