@@ -13,9 +13,9 @@ export type TeacherSourceIdentity={origin:EducationAssessmentOrigin;entry:Relati
 export type TeacherRuntimePurpose='START'|'BOUND_COLLECTION'|'HISTORY_READ'
 /** Required integration port. Reading a registered identity does not grant use.
  * Root must also enforce this contract within shared START/FINAL transactions. */
-export type TeacherAssessmentSourceAccess={
- readIdentity:(db:TeacherRuntimeDb,input:{resourceKey:string;version:string;purpose:'NEW_USE'|'HISTORY'})=>Promise<TeacherSourceIdentity>
- assertUse:(db:TeacherRuntimeDb,input:{identity:TeacherSourceIdentity;executionId:string;actorUserId:string;purpose:TeacherRuntimePurpose})=>Promise<void>
+export type TeacherAssessmentSourceAccess<Identity extends TeacherSourceIdentity=TeacherSourceIdentity>={
+ readIdentity:(db:TeacherRuntimeDb,input:{resourceKey:string;version:string;purpose:'NEW_USE'|'HISTORY'})=>Promise<Identity>
+ assertUse:(db:TeacherRuntimeDb,input:{identity:Identity;executionId:string;actorUserId:string;purpose:TeacherRuntimePurpose})=>Promise<void>
 }
 export class TeacherAssessmentRuntimeError extends Error{
  constructor(public readonly code='HUITEACHER_ASSESSMENT_UNAVAILABLE',public readonly statusCode=404){super('当前教师测评任务不可访问');this.name='TeacherAssessmentRuntimeError'}
@@ -101,7 +101,7 @@ function taskDto(row:Row,title:string):TeacherAssessmentTask{
  const {executionId,organizationId,runId,eventId,eventTitle,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}=row
  return {executionId,organizationId,runId,eventId,eventTitle,title,family,status,runStatus,runtimeBindingRef,consentRequired,consentPurpose,consentVisibility}
 }
-export function createTeacherAssessmentAccess(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess){
+export function createTeacherAssessmentAccess<Identity extends TeacherSourceIdentity>(db:TeacherRuntimeDb,source:TeacherAssessmentSourceAccess<Identity>){
  const authorize=async(row:Row,actorUserId:string)=>{
   const identity=await source.readIdentity(db,{resourceKey:row.resourceKey,version:row.resourceVersion,purpose:row.status==='ASSIGNED'?'NEW_USE':'HISTORY'})
   const origin=educationAssessmentOriginSchema.parse(identity.origin),entry=identity.entry
@@ -152,7 +152,7 @@ export function createTeacherAssessmentAccess(db:TeacherRuntimeDb,source:Teacher
     JOIN composite_assessment_items slot ON slot.composite_assessment_id=parent.composite_assessment_id
     WHERE parent.id=${input.attemptId} AND parent.user_id=${actorUserId}
      AND parent.composite_assessment_id=${proof.identity.origin.runtimeCompositeId}
-     AND ${input.type==='FORM_SECTION'?Prisma.sql`slot.form_section_id=${input.itemId} AND slot.type='FORM'`:Prisma.sql`slot.id=${input.itemId} AND slot.type=${input.type}`}
+     AND ${input.type==='FORM_SECTION'?Prisma.sql`slot.form_section_id=${input.itemId} AND slot.type='FORM'`:Prisma.sql`slot.id=${input.itemId} AND slot.type::text=${input.type}`}
      ${input.type==='COGNITIVE'?Prisma.sql`AND EXISTS(SELECT 1 FROM cognitive_sessions child
       WHERE child.id=${input.sessionId??''} AND child.composite_attempt_id=parent.id AND child.composite_item_id=slot.id
        AND child.assignment_id=slot.cognitive_assignment_id AND child.user_id=${actorUserId} AND child.attempt_no=parent.attempt_epoch

@@ -23,7 +23,7 @@ import {situationalFinalSubmitSchema} from '../situational/situational-final-sub
 import {submitSituationalAttemptFinal} from '../situational/situational-final-submit.service'
 import {situationalVideoController} from '../situational/situational-video.controller'
 import {compositeItemSlotKey} from '../assessment-runtime/slot-set'
-import {createTeacherAssessmentAccess,TeacherAssessmentRuntimeError,type TeacherAssessmentSourceAccess,type TeacherRuntimeDb} from './assessmentRuntime.access'
+import {createTeacherAssessmentAccess,TeacherAssessmentRuntimeError,type TeacherAssessmentSourceAccess,type TeacherSourceIdentity,type TeacherRuntimeDb} from './assessmentRuntime.access'
 
 const uuid=z.string().guid()
 const pick=(value:Record<string,unknown>,keys:readonly string[])=>Object.fromEntries(keys.filter(key=>key in value).map(key=>[key,value[key]]))
@@ -69,7 +69,7 @@ const embedded=(req:Request)=>({userId:req.user!.userId,compositeAttemptId:req.p
 
 /** Deliberately requires both the root identity reader and current-use checker.
  * Never mount with an identity-only checker or a fabricated grant. */
-export function createTeacherAssessmentRuntimeRouter(source:TeacherAssessmentSourceAccess,db:TeacherRuntimeDb=prisma){
+export function createTeacherAssessmentRuntimeRouter<Identity extends TeacherSourceIdentity>(source:TeacherAssessmentSourceAccess<Identity>,db:TeacherRuntimeDb=prisma){
  const router=Router(),access=createTeacherAssessmentAccess(db,source)
  router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
  // Authentication itself validates the HUITEACHER credential audience; this

@@ -24,7 +24,8 @@ export const typedCompositeFormQuestion = (item: CompositeSectionItem): FormQues
   // The unchanged shared validator checks the complete ordered graph at publication/FINAL.
   const checked = validateFormDefinition({ schemaVersion: 2, pages: [{ pageKey: 'training', title: 'Training', questions: [{ ...parsed.data!, displayIf: undefined }] }] }, { forPreview: true })
   if (!checked.definition || checked.issues.some(issue => issue.severity === 'error')) invalid('表单定义无效：' + checked.issues.map(issue => issue.message).join('; '))
-  const question = { ...checked.definition!.pages[0].questions[0], ...(parsed.data!.displayIf ? { displayIf: parsed.data!.displayIf } : {}) }
+  const {displayIf:_temporaryCondition,...validatedQuestion}=checked.definition!.pages[0].questions[0]
+  const question = { ...validatedQuestion, ...(parsed.data!.displayIf ? { displayIf: parsed.data!.displayIf } : {}) }
   if (question.type !== (legacyTypes[item.formType] ?? item.formType) || question.required !== item.required || question.prompt !== item.formLabel) invalid('表单定义与字段类型、标题或必答策略不匹配')
   // C06 owns these policies; do not silently inherit Survey V2 semantics.
   if (!policy && (question.displayIf || question.allowRefusal || question.otherOptionKey || question.exclusiveOptionKeys?.length)) invalid('此 Training 版本尚未开放显隐、拒答或其他/互斥策略')
