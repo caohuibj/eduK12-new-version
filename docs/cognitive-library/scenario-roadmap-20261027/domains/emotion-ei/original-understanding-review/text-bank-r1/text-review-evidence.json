@@ -1,0 +1,350 @@
+{
+  "kind": "TEXT_REVIEW_COMPLETENESS_ONLY_NOT_SCIENTIFIC_VALIDATION",
+  "observedAtUTC": "2026-10-27T13:39:23.852186+00:00",
+  "baseHead": "cd00029faea1b91c8e4085b05154d09012620fa6",
+  "status": "original visual direction approved; full wording pending review; no implementation authorization",
+  "formalScenarios": 36,
+  "experienceProposalScenarios": 12,
+  "cells": 12,
+  "researchScenariosPerCell": 3,
+  "experienceScenariosPerCell": 1,
+  "uniqueChineseTexts": 36,
+  "uniqueEnglishTexts": 36,
+  "completeFieldsPerScenario": [
+    "**中文场景**：",
+    "**English**:",
+    "**题问／Question**：",
+    "**选项**：",
+    "**人物视角与设计依据**："
+  ],
+  "practiceChecks": 3,
+  "formalOptions": 5,
+  "skipSeparate": true,
+  "answerKey": null,
+  "scoreWeights": null,
+  "numbersArePresentationSequence": false,
+  "manualEditorialReview": "36 bilingual scenes and their goal/confirmation rationale read; full names remove English pronoun ambiguity. Not expert key review or language equivalence validation.",
+  "originalAuditFailureRetained": "text-audit-initial-failure.json",
+  "notExecuted": [
+    "runner",
+    "sequence generation",
+    "scorer",
+    "participant data collection",
+    "product tests",
+    "CI",
+    "merge",
+    "deploy"
+  ],
+  "coverageAuditOnly": [
+    {
+      "reviewId": "ESU-001",
+      "context": "日常安排",
+      "condition": "G-C",
+      "experienceProposal": true,
+      "zhCharacters": 66,
+      "enWords": 45
+    },
+    {
+      "reviewId": "ESU-002",
+      "context": "学习活动",
+      "condition": "G-C",
+      "experienceProposal": true,
+      "zhCharacters": 70,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-003",
+      "context": "协作活动",
+      "condition": "G-C",
+      "experienceProposal": true,
+      "zhCharacters": 64,
+      "enWords": 44
+    },
+    {
+      "reviewId": "ESU-004",
+      "context": "日常安排",
+      "condition": "G-U",
+      "experienceProposal": true,
+      "zhCharacters": 62,
+      "enWords": 41
+    },
+    {
+      "reviewId": "ESU-005",
+      "context": "学习活动",
+      "condition": "G-U",
+      "experienceProposal": true,
+      "zhCharacters": 60,
+      "enWords": 40
+    },
+    {
+      "reviewId": "ESU-006",
+      "context": "协作活动",
+      "condition": "G-U",
+      "experienceProposal": true,
+      "zhCharacters": 63,
+      "enWords": 38
+    },
+    {
+      "reviewId": "ESU-007",
+      "context": "日常安排",
+      "condition": "A-C",
+      "experienceProposal": true,
+      "zhCharacters": 64,
+      "enWords": 44
+    },
+    {
+      "reviewId": "ESU-008",
+      "context": "学习活动",
+      "condition": "A-C",
+      "experienceProposal": true,
+      "zhCharacters": 69,
+      "enWords": 49
+    },
+    {
+      "reviewId": "ESU-009",
+      "context": "协作活动",
+      "condition": "A-C",
+      "experienceProposal": true,
+      "zhCharacters": 62,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-010",
+      "context": "日常安排",
+      "condition": "A-U",
+      "experienceProposal": true,
+      "zhCharacters": 63,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-011",
+      "context": "学习活动",
+      "condition": "A-U",
+      "experienceProposal": true,
+      "zhCharacters": 67,
+      "enWords": 44
+    },
+    {
+      "reviewId": "ESU-012",
+      "context": "协作活动",
+      "condition": "A-U",
+      "experienceProposal": true,
+      "zhCharacters": 67,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-013",
+      "context": "日常安排",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 66,
+      "enWords": 41
+    },
+    {
+      "reviewId": "ESU-014",
+      "context": "学习活动",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 71,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-015",
+      "context": "协作活动",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 70,
+      "enWords": 42
+    },
+    {
+      "reviewId": "ESU-016",
+      "context": "日常安排",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 61,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-017",
+      "context": "学习活动",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 69,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-018",
+      "context": "协作活动",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 67,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-019",
+      "context": "日常安排",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 61,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-020",
+      "context": "学习活动",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 66,
+      "enWords": 49
+    },
+    {
+      "reviewId": "ESU-021",
+      "context": "协作活动",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 57,
+      "enWords": 40
+    },
+    {
+      "reviewId": "ESU-022",
+      "context": "日常安排",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 64,
+      "enWords": 49
+    },
+    {
+      "reviewId": "ESU-023",
+      "context": "学习活动",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 71,
+      "enWords": 52
+    },
+    {
+      "reviewId": "ESU-024",
+      "context": "协作活动",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 62,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-025",
+      "context": "日常安排",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 69,
+      "enWords": 45
+    },
+    {
+      "reviewId": "ESU-026",
+      "context": "学习活动",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 61,
+      "enWords": 41
+    },
+    {
+      "reviewId": "ESU-027",
+      "context": "协作活动",
+      "condition": "G-C",
+      "experienceProposal": false,
+      "zhCharacters": 66,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-028",
+      "context": "日常安排",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 66,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-029",
+      "context": "学习活动",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 67,
+      "enWords": 45
+    },
+    {
+      "reviewId": "ESU-030",
+      "context": "协作活动",
+      "condition": "G-U",
+      "experienceProposal": false,
+      "zhCharacters": 64,
+      "enWords": 48
+    },
+    {
+      "reviewId": "ESU-031",
+      "context": "日常安排",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 56,
+      "enWords": 45
+    },
+    {
+      "reviewId": "ESU-032",
+      "context": "学习活动",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 67,
+      "enWords": 43
+    },
+    {
+      "reviewId": "ESU-033",
+      "context": "协作活动",
+      "condition": "A-C",
+      "experienceProposal": false,
+      "zhCharacters": 64,
+      "enWords": 46
+    },
+    {
+      "reviewId": "ESU-034",
+      "context": "日常安排",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 64,
+      "enWords": 48
+    },
+    {
+      "reviewId": "ESU-035",
+      "context": "学习活动",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 61,
+      "enWords": 45
+    },
+    {
+      "reviewId": "ESU-036",
+      "context": "协作活动",
+      "condition": "A-U",
+      "experienceProposal": false,
+      "zhCharacters": 63,
+      "enWords": 43
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/text-bank-r1/README.md",
+      "sha256": "ffea32b854d33a467fac2cb3845b2f8a870859451f412a3bb46c2f25e812d081",
+      "bytes": 3192
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/text-bank-r1/SCENARIOS.md",
+      "sha256": "32c3400f461fbfe925e3c54e42d60f94ffc78eebae4796a83714baa76660d547",
+      "bytes": 41794
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/text-bank-r1/TEACHING-AND-REPORT.md",
+      "sha256": "e4a89f8e0bc8b7f578b778e9eb785b4e3c66de30f3a0b6270f8a0c4f7e107306",
+      "bytes": 16735
+    },
+    {
+      "path": "docs/cognitive-library/scenario-roadmap-20261027/domains/emotion-ei/original-understanding-review/text-bank-r1/text-audit-initial-failure.json",
+      "sha256": "908c52cd826afabd15b6c4f11bc637780e78075d4bdf9083b6eb81d61d8b9417",
+      "bytes": 655
+    }
+  ]
+}

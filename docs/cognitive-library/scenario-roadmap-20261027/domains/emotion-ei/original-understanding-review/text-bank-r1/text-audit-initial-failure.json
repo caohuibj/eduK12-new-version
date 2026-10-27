@@ -1,0 +1,10 @@
+{
+  "kind": "TEXT_AUDIT_TOOL_MATCHER_ERROR",
+  "outcome": "failed",
+  "failedAssertion": "Expected literal 首次有效确认 in teaching draft",
+  "actualEquivalentWording": "首个有效确认",
+  "reason": "Audit used a different equivalent phrase; content already specified the first valid confirmation. No scene/instruction/criterion changed for this correction.",
+  "stageReached": "36 bilingual scene sections, options, cell counts and three practice headings inspected before literal matcher failure",
+  "resolution": "Check the actual documented wording 首个有效确认; retain original failed observation.",
+  "runtimeTestsExecuted": false
+}
