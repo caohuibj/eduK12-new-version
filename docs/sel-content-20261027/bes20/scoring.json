@@ -1,0 +1,69 @@
+{
+  "instrument": "Basic Empathy Scale original 20-item",
+  "item_count": 20,
+  "options": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "dimensions": {
+    "affective_empathy": [
+      1,
+      2,
+      4,
+      5,
+      7,
+      8,
+      11,
+      13,
+      15,
+      17,
+      18
+    ],
+    "cognitive_empathy": [
+      3,
+      6,
+      9,
+      10,
+      12,
+      14,
+      16,
+      19,
+      20
+    ]
+  },
+  "reverse_items": [
+    1,
+    6,
+    7,
+    8,
+    13,
+    18,
+    19,
+    20
+  ],
+  "reverse_formula": "6-response",
+  "sum_ranges": {
+    "affective_empathy": [
+      11,
+      55
+    ],
+    "cognitive_empathy": [
+      9,
+      45
+    ],
+    "total": [
+      20,
+      100
+    ]
+  },
+  "mean_range": [
+    1,
+    5
+  ],
+  "missing_policy": "complete required per score, otherwise null; product convention",
+  "thresholds": null,
+  "source_note": "IDB scoring appendix lists cognitive item 5 instead of 6; multiple published validations list item 6."
+}

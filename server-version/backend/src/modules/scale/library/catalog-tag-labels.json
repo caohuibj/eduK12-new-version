@@ -259,6 +259,14 @@
     "label": "负责任决策",
     "axis": "construct"
   },
+  "construct:sel_bes20_affective_empathy": {
+    "label": "情感共情",
+    "axis": "construct"
+  },
+  "construct:sel_bes20_cognitive_empathy": {
+    "label": "认知共情",
+    "axis": "construct"
+  },
   "construct:sel_bessi45_dimension_1": {
     "label": "自我管理",
     "axis": "construct"
