@@ -1,0 +1,116 @@
+{
+  "artifact_kind": "STATIC_DESIGN_REVIEW_ONLY",
+  "stable_key_proposal": "relational-match-to-sample",
+  "design_version": "R1",
+  "status": "DESIGNED_AWAITING_SINGLE_ITEM_USER_APPROVAL_NOT_IMPLEMENTED_NOT_INTEGRATED",
+  "base_head": "202f01bbeec17bf8ace7b90048e547e9d320c172",
+  "branch": "cognitive/domain-child-learning-20261027",
+  "captured_at_utc": "2026-10-27T14:16:22.979497+00:00",
+  "remote_snapshots": {
+    "main": "7e6d7da4a01e4a42b410cf2dbdcfa76f11759fdc",
+    "cognitive-next-three-core-20261026": "072b2900d4295c7d741d5e55c9ce6cfbbf6f58d2",
+    "clinical-research": "5f5ffdee8c4d8bea25952e1aad4e926cedbbb816",
+    "emotion-ei": "587a1b4e26db1f462bd43020eb9e24514a3d555c",
+    "occupational": "9b39a51fbc6601220c6412d6f247296c74e5ab91"
+  },
+  "dedup": {
+    "old24_frontend_directories_changed_since_prior_code_audit": 0,
+    "old_audited_base": "a0130ea6603d7e37fd4f900d8694b5b7d490c51e",
+    "existing11_preserved": true,
+    "directly_reread_neighbours": [
+      "matrix shared/prng.ts progression/alternation/combination",
+      "cardsort color/shape ruleCue",
+      "lexicaldecision word/nonword"
+    ],
+    "RMTS_alias_matches_in_tracked_five_snapshots": 0,
+    "other_reserved_work": [
+      "SART/PVT/AX-CPT:clinical",
+      "information-sampling/confidence/delay-choice:occupational",
+      "emotion-situation-understanding:EI",
+      "hearts-flowers:original owner"
+    ],
+    "unpublished_WIP_exhaustively_known": false
+  },
+  "primary_source": {
+    "authors": "Shivaram, Shao, Simms, Hespos and Gentner",
+    "year": 2023,
+    "title": "When do Children Pass the Relational-Match-To-Sample Task?",
+    "permanent_record": "https://escholarship.org/uc/item/27j6n7jm",
+    "doi": "Not listed in inspected official records; not invented",
+    "author_lab_pdf": "https://groups.psych.northwestern.edu/gentner/papers/ShivaramShaoSimmsHespos%26Gentner%282023%29WhenDoChildren.pdf",
+    "pdf_sha256": "860f44dbfebaaa15eb8939005736ee2551fcf63822a0609e56f51c70f6cce7b1",
+    "license": "CC BY 4.0, inspected university record and PDF page1 footer",
+    "read": "full8page author PDF with emphasis Experiment1/2 methods and General Discussion",
+    "historical_related_doi_not_fulltext_reread": "10.1111/cogs.12099",
+    "access_boundaries": [
+      "eScholarship page JS verification",
+      "direct eScholarship PDF HTTP429",
+      "author university lab independent public PDF read successfully",
+      "verbal-analogy inventory10.3758/s13428-019-01312-3 subscription preview only; no items used"
+    ]
+  },
+  "profiles_proposed": {
+    "research": {
+      "formal": 16,
+      "same": 8,
+      "different": 8,
+      "per_relation_correct_left": 4,
+      "per_relation_correct_right": 4,
+      "estimated_minutes": [
+        5,
+        8
+      ]
+    },
+    "experience": {
+      "formal": 8,
+      "same": 4,
+      "different": 4,
+      "per_relation_correct_left": 2,
+      "per_relation_correct_right": 2,
+      "estimated_minutes": [
+        3,
+        5
+      ]
+    }
+  },
+  "practice_proposed": {
+    "trials": 4,
+    "same": 2,
+    "different": 2,
+    "first_correct_required": 4,
+    "maximum_rounds": 3,
+    "failure_or_incompletion": "full instructions and both examples again"
+  },
+  "image": {
+    "filename": "relational-match-to-sample-review.png",
+    "sha256": "5ac8a271e263d34286131922cdcd10bf143e8d7647db19bd7c5922a0ff4f4b82",
+    "bytes": 1674689,
+    "width": 1536,
+    "height": 1024,
+    "method": "ImageGen original concept board, then replace two diamonds with five-point stars to avoid rotated-square ambiguity; final PNG copied without other editing",
+    "runtime_screenshot": false,
+    "participant_or_report_data": false
+  },
+  "adaptations": [
+    "explicit teaching and4practice instead of original spontaneous no-training protocol",
+    "touchscreen instead of adult physical-card pointing",
+    "original monochrome shape pairs instead of paper colored cards",
+    "no after-task catch or explanation questions",
+    "proposed software RT is additional descriptive measure, not inherited paper evidence"
+  ],
+  "limits": [
+    "not spontaneous analogy discovery",
+    "no age/language/touch/profile equivalence",
+    "few trials and possible ceiling effects",
+    "not Wechsler/Raven equivalence; noIQ/norms/diagnosis/rank/prediction"
+  ],
+  "checks": {
+    "source_and_license_read": true,
+    "image_reviewed": true,
+    "square_diamond_ambiguity_removed": true,
+    "application_tests": "NOT_RUN_NO_APPLICATION_CHANGE",
+    "runner_sequence_scorer": "NOT_IMPLEMENTED",
+    "shared_registry_product_server_permissions_COS_dependency_CI": "UNCHANGED"
+  },
+  "delivery": "design-only [skip ci] commit on own branch; exact remote HEAD/tree and byte check reported after push"
+}
