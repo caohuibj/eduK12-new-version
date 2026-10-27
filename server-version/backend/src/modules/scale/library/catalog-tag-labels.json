@@ -283,6 +283,22 @@
     "label": "用语言分享感受",
     "axis": "construct"
   },
+  "construct:sel_fasttrack_scs_academic": {
+    "label": "学习活动表现",
+    "axis": "construct"
+  },
+  "construct:sel_fasttrack_scs_prosocial": {
+    "label": "亲社会与沟通",
+    "axis": "construct"
+  },
+  "construct:sel_fasttrack_scs_regulation": {
+    "label": "情绪调节",
+    "axis": "construct"
+  },
+  "construct:sel_fasttrack_scs_social_emotional_combined": {
+    "label": "亲社会与情绪调节合并",
+    "axis": "construct"
+  },
   "construct:sel_secq25_relationship_management": {
     "label": "关系管理",
     "axis": "construct"
